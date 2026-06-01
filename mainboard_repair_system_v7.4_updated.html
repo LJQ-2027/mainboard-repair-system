@@ -1,0 +1,4791 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能主板维修系统 v8.0 AI版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 1200px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 14px;
+        }
+
+        /* Tab切换样式 */
+        .tab-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .tab-btn {
+            padding: 12px 30px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            font-size: 16px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .tab-btn:hover {
+            color: #667eea;
+        }
+
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* 诊断模式切换 */
+        .diagnosis-mode-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 15px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .mode-btn:hover {
+            border-color: #667eea;
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .mode-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .mode-desc {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .search-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"], textarea {
+            flex: 1;
+            min-width: 300px;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            outline: none;
+            font-family: inherit;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        button {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .hint {
+            color: #999;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        /* 快捷搜索按钮 */
+        .quick-search {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+            align-items: center;
+        }
+
+        .quick-btn {
+            padding: 8px 16px;
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        /* 诊断结果样式 */
+        .result-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .result-header h3 {
+            margin-bottom: 10px;
+        }
+
+        .result-stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .result-body {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-top: none;
+            border-radius: 0 0 15px 15px;
+            padding: 20px;
+        }
+
+        .point-card {
+            background: #f8f9fa;
+            border-left: 4px solid #4caf50;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .point-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateX(5px);
+        }
+
+        .point-card.rank-1 {
+            border-left-color: #f44336;
+            background: #fff3e0;
+        }
+
+        .point-card.rank-2 {
+            border-left-color: #ff9800;
+            background: #fff8e1;
+        }
+
+        .point-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .point-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .point-probability {
+            background: #4caf50;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .point-card.rank-1 .point-probability {
+            background: #f44336;
+        }
+
+        .point-card.rank-2 .point-probability {
+            background: #ff9800;
+        }
+
+        .point-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .meta-label {
+            font-size: 11px;
+            color: #999;
+            margin-bottom: 2px;
+        }
+
+        .meta-value {
+            font-size: 13px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .point-method {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+            border: 1px solid #e0e0e0;
+        }
+
+        /* 专业诊断结果样式 */
+        .result-section-title {
+            background: #f5f5f5;
+            padding: 15px 20px;
+            border-bottom: 2px solid #e0e0e0;
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .result-section-content {
+            padding: 20px;
+        }
+
+        .module-card {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .module-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .module-item {
+            margin-bottom: 10px;
+            padding-left: 15px;
+            position: relative;
+        }
+
+        .module-item::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .module-item strong {
+            color: #333;
+        }
+
+        .suggestion-list {
+            list-style: none;
+        }
+
+        .suggestion-list li {
+            padding: 15px 20px;
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .suggestion-list li strong {
+            color: #2e7d32;
+            font-size: 15px;
+        }
+
+        /* 资料查询样式 */
+        .project-info {
+            background: #e8f4ff;
+            border-left: 4px solid #2196F3;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .project-info h3 {
+            color: #1976D2;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+            display: none;
+        }
+
+        .resource-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .resource-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .resource-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+
+        .resource-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .resource-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .resource-desc {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .empty-result {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            display: none;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            color: #999;
+            font-size: 12px;
+        }
+
+        .diagnosis-toolbar, .resource-toolbar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 15px 0 25px;
+        }
+
+        .secondary-btn {
+            background: #fff;
+            color: #667eea;
+            border: 2px solid #667eea;
+            box-shadow: none;
+        }
+
+        .secondary-btn:hover {
+            background: #667eea;
+            color: #fff;
+        }
+
+        .analysis-tip, .history-panel, .copy-feedback, .resource-summary {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 15px 18px;
+            margin-bottom: 18px;
+        }
+
+        .analysis-tip strong, .resource-summary strong {
+            color: #333;
+        }
+
+        .copy-feedback {
+            display: none;
+            background: #e8f5e9;
+            border-color: #a5d6a7;
+            color: #2e7d32;
+        }
+
+        .history-list {
+            list-style: none;
+            margin-top: 12px;
+        }
+
+        .history-list li {
+            padding: 10px 0;
+            border-top: 1px dashed #ddd;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .history-list li:first-child {
+            border-top: none;
+            padding-top: 0;
+        }
+
+        .history-empty {
+            color: #999;
+            font-size: 14px;
+        }
+
+        .resource-card.available {
+            border-color: #4caf50;
+        }
+
+        .resource-card.missing {
+            border-color: #ffc107;
+            background: #fffdf5;
+        }
+
+        .resource-status {
+            margin-top: 10px;
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .resource-status.available {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .resource-status.missing {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+
+        .upload-panel {
+            border: 2px dashed #c7d2fe;
+            background: #f8faff;
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .upload-panel.dragover {
+            border-color: #667eea;
+            background: #eef2ff;
+        }
+
+        .upload-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        .file-meta {
+            margin-top: 14px;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .log-result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .log-stat-card {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            padding: 16px;
+        }
+
+        .log-stat-title {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        .log-stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .tag-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: #eef2ff;
+            color: #4f46e5;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .analysis-block {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 16px;
+        }
+
+        .analysis-block h4 {
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .analysis-block ul {
+            padding-left: 18px;
+            color: #555;
+            line-height: 1.7;
+        }
+
+        .analysis-block li {
+            margin-bottom: 8px;
+        }
+
+        .mono-box {
+            background: #0f172a;
+            color: #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            font-family: "SFMono-Regular", Consolas, monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            max-height: 280px;
+            overflow: auto;
+        }
+
+        .risk-high { color: #d32f2f; }
+        .risk-medium { color: #ef6c00; }
+        .risk-low { color: #2e7d32; }
+
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .module-mini-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 14px;
+            background: #fafafa;
+        }
+
+        .module-mini-card h5 {
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .tiny-text {
+            font-size: 12px;
+            color: #777;
+            line-height: 1.7;
+        }
+
+        .report-section {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 16px;
+        }
+
+        .report-section h4 {
+            margin-bottom: 14px;
+            color: #222;
+        }
+
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .report-table th,
+        .report-table td {
+            border: 1px solid #e5e7eb;
+            padding: 10px 12px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .report-table th {
+            background: #f8fafc;
+            color: #333;
+            width: 32%;
+        }
+
+        .timeline-list {
+            padding-left: 18px;
+            color: #555;
+            line-height: 1.8;
+        }
+
+        .timeline-list li {
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .tab-btn {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+
+            .diagnosis-mode-selector {
+                flex-direction: column;
+            }
+        }
+
+        /* ========== AI 集成样式 ========== */
+
+        /* 设置齿轮按钮 */
+        .settings-gear {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: #f5f5f5;
+            border: 2px solid #e0e0e0;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            z-index: 10;
+        }
+        .settings-gear:hover {
+            background: #667eea;
+            border-color: #667eea;
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        /* 设置弹窗 */
+        .settings-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .settings-overlay.active { display: flex; }
+
+        .settings-panel {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            width: 90%;
+            max-width: 480px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .settings-panel h3 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 20px;
+        }
+        .setting-row {
+            margin-bottom: 16px;
+        }
+        .setting-row label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 6px;
+        }
+        .setting-row input, .setting-row select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .setting-row input:focus, .setting-row select:focus {
+            border-color: #667eea;
+        }
+        .setting-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+        .setting-actions button {
+            padding: 10px 24px;
+            font-size: 14px;
+        }
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            margin-top: 6px;
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .status-dot.ok { background: #4caf50; }
+        .status-dot.err { background: #f44336; }
+        .status-dot.checking { background: #ff9800; animation: pulse 1s infinite; }
+
+        /* AI 模式按钮 */
+        .mode-btn.ai-mode {
+            border-color: #10b981;
+            position: relative;
+            overflow: hidden;
+        }
+        .mode-btn.ai-mode::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(5,150,105,0.04));
+            pointer-events: none;
+        }
+        .mode-btn.ai-mode:hover {
+            border-color: #059669;
+            box-shadow: 0 0 20px rgba(16,185,129,0.15);
+        }
+        .mode-btn.ai-mode.active {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-color: #10b981;
+            color: white;
+        }
+        .mode-btn .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+        .mode-btn.ai-mode .badge {
+            background: #d1fae5;
+            color: #059669;
+        }
+        .mode-btn.ai-mode.active .badge {
+            background: rgba(255,255,255,0.3);
+            color: white;
+        }
+
+        /* AI 结果区域 */
+        .ai-result-container {
+            margin-top: 20px;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 2px solid #10b981;
+            box-shadow: 0 0 30px rgba(16,185,129,0.08);
+        }
+        .ai-result-header {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .ai-result-header .ai-badge {
+            background: rgba(255,255,255,0.25);
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .ai-result-body {
+            background: #f8fdf9;
+            padding: 20px;
+            line-height: 1.8;
+            color: #333;
+            font-size: 15px;
+        }
+        .ai-result-body h4 {
+            color: #059669;
+            margin: 18px 0 10px;
+            font-size: 16px;
+        }
+        .ai-result-body h4:first-child { margin-top: 0; }
+        .ai-result-body ol, .ai-result-body ul {
+            padding-left: 20px;
+            margin: 8px 0;
+        }
+        .ai-result-body li { margin-bottom: 6px; }
+        .ai-result-body table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        .ai-result-body th, .ai-result-body td {
+            border: 1px solid #d1fae5;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        .ai-result-body th {
+            background: #ecfdf5;
+            color: #065f46;
+            font-weight: 600;
+        }
+        .ai-result-body strong { color: #065f46; }
+
+        /* AI 打字机效果 */
+        .ai-typing-cursor::after {
+            content: '▊';
+            animation: blink 1s step-end infinite;
+            color: #10b981;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
+        /* AI 加载动画 */
+        .ai-loading {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 30px;
+            justify-content: center;
+            color: #666;
+            font-size: 15px;
+        }
+        .ai-loading-dots {
+            display: flex;
+            gap: 5px;
+        }
+        .ai-loading-dots span {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #10b981;
+            animation: dotBounce 1.4s ease-in-out infinite both;
+        }
+        .ai-loading-dots span:nth-child(2) { animation-delay: 0.16s; }
+        .ai-loading-dots span:nth-child(3) { animation-delay: 0.32s; }
+        @keyframes dotBounce {
+            0%, 80%, 100% { transform: scale(0.3); opacity: 0.3; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* AI Log 分析按钮 */
+        .ai-log-btn {
+            margin-top: 12px;
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+        .ai-log-btn:disabled {
+            background: #ccc;
+        }
+
+        /* AI 错误提示 */
+        .ai-error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 12px;
+            padding: 16px 20px;
+            color: #991b1b;
+            font-size: 14px;
+            margin-top: 16px;
+        }
+        .ai-error strong { color: #7f1d1d; }
+
+        /* 原理图上传区域 */
+        .schematic-upload-area {
+            margin-bottom: 18px;
+        }
+        .schematic-upload-zone {
+            border: 2px dashed #10b981;
+            background: #f0fdf6;
+            border-radius: 14px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+        .schematic-upload-zone:hover {
+            border-color: #059669;
+            background: #ecfdf5;
+            box-shadow: 0 0 16px rgba(16,185,129,0.1);
+        }
+        .schematic-upload-zone.dragover {
+            border-color: #059669;
+            background: #d1fae5;
+            box-shadow: 0 0 24px rgba(16,185,129,0.2);
+        }
+        .schematic-preview {
+            margin-top: 12px;
+            text-align: center;
+            position: relative;
+            display: inline-block;
+        }
+        .schematic-preview img {
+            max-width: 100%;
+            max-height: 320px;
+            border-radius: 12px;
+            border: 2px solid #10b981;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        .schematic-clear-btn {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #f44336;
+            color: white;
+            border: 2px solid white;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .schematic-clear-btn:hover { background: #d32f2f; }
+
+        /* 项目选择器 */
+        .project-selector-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+            padding: 12px 16px;
+            background: #f0f7ff;
+            border: 1px solid #b3d4ff;
+            border-radius: 12px;
+            flex-wrap: wrap;
+        }
+        .project-selector-bar label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            white-space: nowrap;
+        }
+        .project-selector-bar select {
+            padding: 8px 14px;
+            border: 2px solid #c7d2fe;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            outline: none;
+            min-width: 160px;
+            cursor: pointer;
+        }
+        .project-selector-bar select:focus { border-color: #667eea; }
+        .project-coverage {
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        .project-coverage.good { background: #d1fae5; color: #065f46; }
+        .project-coverage.ok { background: #fef3c7; color: #92400e; }
+        .project-coverage.none { background: #fee2e2; color: #991b1b; }
+        .link-from-resource {
+            font-size: 12px;
+            color: #667eea;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        /* 位号管理面板 */
+        .settings-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .settings-tab-btn {
+            padding: 8px 20px;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            font-weight: 600;
+            color: #888;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+        .settings-tab-btn.active { color: #667eea; border-bottom-color: #667eea; }
+        .settings-tab-content { display: none; }
+        .settings-tab-content.active { display: block; }
+
+        .component-mgmt-project-select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #d0d5dd;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+        .component-mgmt-modules { margin-bottom: 16px; }
+        .component-mgmt-module {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+        }
+        .component-mgmt-module-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        .component-mgmt-item {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 4px;
+            font-size: 13px;
+            padding: 4px 8px;
+            background: white;
+            border-radius: 4px;
+        }
+        .component-mgmt-item input {
+            padding: 4px 8px;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        .component-mgmt-item input.bit-hao { width: 90px; }
+        .component-mgmt-item input.bit-name { flex: 1; min-width: 120px; }
+        .component-mgmt-item input.bit-model { width: 120px; }
+        .component-mgmt-item .btn-del {
+            color: #dc2626;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 2px 6px;
+        }
+        .component-mgmt-add-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .component-mgmt-add-row input {
+            padding: 6px 10px;
+            border: 1px dashed #b3d4ff;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        .bom-import-area {
+            margin-top: 16px;
+            padding: 12px;
+            background: #fffbeb;
+            border: 1px solid #fcd34d;
+            border-radius: 8px;
+        }
+        .bom-import-area h4 { margin: 0 0 8px; font-size: 14px; }
+        .bom-import-area textarea {
+            width: 100%;
+            height: 100px;
+            font-size: 12px;
+            font-family: monospace;
+            border: 1px solid #d0d5dd;
+            border-radius: 4px;
+            padding: 8px;
+        }
+        .bom-import-hint {
+            font-size: 11px;
+            color: #888;
+            margin-top: 4px;
+        }
+        .json-export-import {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="position: relative;">
+            <h1>🔧 智能主板维修系统</h1>
+            <button class="settings-gear" onclick="openSettings()" title="AI 设置">⚙</button>
+            <p class="subtitle">基于多维表格维修报表案例库 · Claude AI 智能诊断 · 实时检索真实维修数据 · 精准定位故障器件 &nbsp;|&nbsp; <span id="aiStatusInline" style="font-size:12px;color:#999;">AI: 检测中...</span></p>
+        </div>
+
+        <!-- Tab切换 -->
+        <div class="tab-container">
+            <button class="tab-btn active" data-tab="resources" onclick="switchTab('resources')">📚 资料查询</button>
+            <button class="tab-btn" data-tab="diagnosis" onclick="switchTab('diagnosis')">🧠 故障诊断</button>
+            <button class="tab-btn" data-tab="log-analysis" onclick="switchTab('log-analysis')">📑 校准log分析</button>
+        </div>
+
+        <!-- Tab 1: 资料查询 -->
+        <div class="tab-content active" id="resources-tab">
+            <div class="search-section">
+                <p class="hint">💡 输入主板SN号，从智能主板维修系统项目资料库中查询对应原理图和位号图</p>
+                
+                <div class="input-group">
+                    <input type="text" id="snInput" placeholder="输入主板SN号，例如：X6878-20260330-001">
+                    <button onclick="searchProjectResources()">🔍 查找资料</button>
+                </div>
+
+                <div class="quick-search">
+                    <span style="color: #666; font-size: 13px;">快捷输入：</span>
+                    <button class="quick-btn" onclick="quickInputSN('X6878')">X6878</button>
+                    <button class="quick-btn" onclick="quickInputSN('X6886')">X6886</button>
+                    <button class="quick-btn" onclick="quickInputSN('KL8')">KL8</button>
+                    <button class="quick-btn" onclick="quickInputSN('LJ8')">LJ8</button>
+                    <button class="quick-btn" onclick="quickInputSN('X6725')">X6725</button>
+                </div>
+            </div>
+
+            <div class="analysis-tip" id="resourceKeywordTip"><strong>关键词分析：</strong>支持直接输入项目型号或完整SN，回车可快速触发查询。</div>
+            <div class="resource-summary" id="resourceSummary"><strong>资料状态：</strong>等待查询项目资料。</div>
+
+            <!-- 项目信息 -->
+            <div class="project-info" id="projectInfo">
+                <h3>📂 项目信息</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div>
+                        <div style="font-size: 12px; color: #666; margin-bottom: 2px;">项目名称</div>
+                        <div style="font-size: 14px; font-weight: 500;" id="projectName">-</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 12px; color: #666; margin-bottom: 2px;">主板SN</div>
+                        <div style="font-size: 14px; font-weight: 500;" id="projectSN">-</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 12px; color: #666; margin-bottom: 2px;">版本</div>
+                        <div style="font-size: 14px; font-weight: 500;" id="projectVersion">-</div>
+                    </div>
+                </div>
+                <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+                    <button class="secondary-btn" onclick="gotoAIDiagnosis()" style="font-size:13px;">🔧 带入 AI 智能诊断</button>
+                    <span style="font-size:11px;color:#888;align-self:center;" id="resourceComponentStatus"></span>
+                </div>
+            </div>
+
+            <!-- 资料列表 -->
+            <div class="resources-grid" id="resourcesGrid">
+                <div class="resource-card" id="schematicCard" onclick="window.open('', '_blank')">
+                    <div class="resource-icon">📄</div>
+                    <div class="resource-title">原理图</div>
+                    <div class="resource-desc" id="schematicDesc">点击直接打开原理图文档</div>
+                    <div class="resource-status" id="schematicStatus"></div>
+                </div>
+                <div class="resource-card" id="layoutCard" onclick="window.open('', '_blank')">
+                    <div class="resource-icon">📍</div>
+                    <div class="resource-title">位号图</div>
+                    <div class="resource-desc" id="layoutDesc">点击直接打开位号图文档</div>
+                    <div class="resource-status" id="layoutStatus"></div>
+                </div>
+                <div class="resource-card" id="bomCard" onclick="window.open('', '_blank')">
+                    <div class="resource-icon">📦</div>
+                    <div class="resource-title">BOM</div>
+                    <div class="resource-desc" id="bomDesc">点击打开物料清单</div>
+                    <div class="resource-status" id="bomStatus"></div>
+                </div>
+                <div class="resource-card" id="sopCard" onclick="window.open('', '_blank')">
+                    <div class="resource-icon">📋</div>
+                    <div class="resource-title">维修指导书</div>
+                    <div class="resource-desc" id="sopDesc">点击打开维修操作指导书</div>
+                    <div class="resource-status" id="sopStatus"></div>
+                </div>
+            </div>
+
+            <!-- 无结果提示 -->
+            <div class="empty-result" id="emptyResult">
+                <p>未找到对应SN的项目资料，请检查SN是否正确</p>
+                <p style="margin-top: 10px;">或者访问 <a href="https://transsioner.feishu.cn/base/NDbibNRXEa2TmKsPlWFcFB7Mncd" target="_blank" style="color: #667eea;">智能主板维修系统资料库</a> 手动查询</p>
+            </div>
+        </div>        <!-- Tab 2: 故障诊断 -->
+        <div class="tab-content" id="diagnosis-tab">
+            
+            <!-- 诊断模式选择器 -->
+            <div class="diagnosis-mode-selector">
+                <button class="mode-btn active" data-mode="history" onclick="switchDiagnosisMode('history')">
+                    <div class="mode-title">📊 历史案例匹配</div>
+                    <div class="mode-desc">基于维修记录的快速诊断，适合常见故障</div>
+                </button>
+                <button class="mode-btn" data-mode="professional" onclick="switchDiagnosisMode('professional')">
+                    <div class="mode-title">🧪 专业硬件诊断</div>
+                    <div class="mode-desc">基于飞书电子工程知识库的深度分析，含工作原理和排查步骤</div>
+                </button>
+                <button class="mode-btn ai-mode" data-mode="ai" onclick="switchDiagnosisMode('ai')">
+                    <div class="mode-title">🤖 AI 智能诊断<span class="badge">推荐</span></div>
+                    <div class="mode-desc">基于 Claude 大模型的深度分析，综合知识库推理</div>
+                </button>
+            </div>
+            <div id="history-mode" class="diagnosis-mode-content active">
+                <div class="search-section">
+                    <p class="hint">💡 输入故障现象关键词，系统自动匹配历史案例，给出推荐检查点位</p>
+                    
+                    <div class="input-group">
+                        <input type="text" id="symptomInput" placeholder="输入故障现象关键词，例如：不开机、无服务、充电异常">
+                        <button onclick="startDiagnosis()">🔍 诊断分析</button>
+                    </div>
+
+                    <div class="quick-search">
+                        <span style="color: #666; font-size: 13px;">快捷输入：</span>
+                        <button class="quick-btn" onclick="quickInput('不开机')">不开机</button>
+                        <button class="quick-btn" onclick="quickInput('无服务')">无服务</button>
+                        <button class="quick-btn" onclick="quickInput('充电异常')">充电异常</button>
+                        <button class="quick-btn" onclick="quickInput('显示异常')">显示异常</button>
+                        <button class="quick-btn" onclick="quickInput('音频异常')">音频异常</button>
+                        <button class="quick-btn" onclick="quickInput('下载失败')">下载失败</button>
+                    </div>
+                </div>
+
+                <div class="analysis-tip" id="keywordTip"><strong>关键词分析：</strong>输入后系统会提示命中的故障关键词与建议方向。</div>
+                <div class="diagnosis-toolbar">
+                    <button class="secondary-btn" onclick="copyLatestDiagnosisResult()">📋 复制当前诊断结果</button>
+                    <button class="secondary-btn" onclick="exportDiagnosisHistory()">🗂️ 导出诊断历史</button>
+                </div>
+                <div class="copy-feedback" id="copyFeedback">诊断结果已复制到剪贴板</div>
+                <div id="diagnosisResult"></div>
+                <div class="history-panel">
+                    <strong>最近诊断历史（本机保存）</strong>
+                    <ul class="history-list" id="historyList"></ul>
+                    <div class="history-empty" id="historyEmpty">暂无诊断历史</div>
+                </div>
+            </div>
+
+            <!-- 专业硬件诊断模式 -->
+            <div id="professional-mode" class="diagnosis-mode-content" style="display: none;">
+                <div class="search-section">
+                    <p class="hint">💡 描述故障现象，系统基于飞书电子工程知识库进行结构化分析：工作原理 → 排查步骤 → 关键信号</p>
+                    
+                    <div class="input-group">
+                        <textarea id="professionalSymptomInput" placeholder="请详细描述故障现象...&#10;&#10;示例：手机不开机，插入电池后电流只有50mA，之前有过进水的情况"></textarea>
+                        <button onclick="startProfessionalDiagnosis()">🔬 开始诊断</button>
+                    </div>
+
+                    <div class="quick-search">
+                        <span style="color: #666; font-size: 13px;">快捷输入：</span>
+                        <button class="quick-btn" onclick="quickInputPro('手机不开机，电流只有50mA')">不开机50mA</button>
+                        <button class="quick-btn" onclick="quickInputPro('手机不开机，插入USB无反应')">不开机无反应</button>
+                        <button class="quick-btn" onclick="quickInputPro('手机无服务，无法拨打电话')">无服务</button>
+                        <button class="quick-btn" onclick="quickInputPro('手机充电很慢，发热严重')">充电异常</button>
+                    </div>
+                </div>
+
+                <div id="professionalResult"></div>
+            </div>
+
+            <!-- AI 智能诊断模式 -->
+            <div id="ai-mode" class="diagnosis-mode-content" style="display: none;">
+                <div class="search-section">
+                    <p class="hint">💡 详细描述故障现象，可上传原理图截图，AI 会直接从原理图中读取真实位号进行精确诊断</p>
+
+                    <!-- 项目选择器 -->
+                    <div class="project-selector-bar" id="aiProjectSelector">
+                        <label>🔧 选择项目型号：</label>
+                        <select id="aiProjectSelect" onchange="onAIProjectChange()">
+                            <option value="">-- 不选择项目（通用位号） --</option>
+                        </select>
+                        <span class="project-coverage none" id="aiProjectCoverage">未选择项目</span>
+                        <span class="link-from-resource" onclick="switchToResourceTab()" title="在资料查询中查找项目位号数据">📋 资料查询</span>
+                    </div>
+
+                    <div class="input-group">
+                        <textarea id="aiSymptomInput" placeholder="请详细描述故障现象...&#10;&#10;示例：X6878主板不开机，插入电池后电流只有50mA，按下开机键无任何反应，之前没有进水或摔机的情况"></textarea>
+                        <button onclick="startAIDiagnosis()" id="aiDiagnosisBtn">🤖 开始 AI 诊断</button>
+                    </div>
+
+                    <!-- 原理图上传区域 -->
+                    <div class="schematic-upload-area" id="schematicUploadArea">
+                        <div class="schematic-upload-zone" id="schematicDropZone" onclick="document.getElementById('schematicImageInput').click()">
+                            <span style="font-size:32px;">📐</span>
+                            <span style="font-weight:600;color:#333;">上传原理图截图</span>
+                            <span style="font-size:12px;color:#999;">点击选择、拖拽图片，或 Ctrl+V 粘贴截图</span>
+                            <span style="font-size:11px;color:#059669;">AI 会直接从原理图中读取真实位号进行诊断</span>
+                        </div>
+                        <input type="file" id="schematicImageInput" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="handleSchematicUpload(event)">
+                        <div class="schematic-preview" id="schematicPreview" style="display:none;">
+                            <img id="schematicPreviewImg" src="" alt="原理图预览">
+                            <button class="schematic-clear-btn" onclick="clearSchematicImage()" title="移除图片">✕</button>
+                        </div>
+                    </div>
+
+                    <div class="quick-search">
+                        <span style="color: #666; font-size: 13px;">快捷输入：</span>
+                        <button class="quick-btn" onclick="quickInputAI('手机不开机，电流只有50mA，按开机键无反应')">不开机50mA</button>
+                        <button class="quick-btn" onclick="quickInputAI('手机无服务，校准log显示LTE Band 3 TX fail')">射频校准失败</button>
+                        <button class="quick-btn" onclick="quickInputAI('手机充电慢，发热严重，快充不识别')">充电异常</button>
+                        <button class="quick-btn" onclick="quickInputAI('手机经常自动重启，卡在logo界面')">死机重启</button>
+                    </div>
+                </div>
+                <div id="aiDiagnosisResult"></div>
+            </div>
+        </div>
+
+
+
+        <div class="tab-content" id="log-analysis-tab">
+            <div class="search-section">
+                <p class="hint">💡 支持本地上传 MTK / 展锐 / Android 校准、综测、系统 log，自动识别错误特征并输出分析建议</p>
+
+                <div class="upload-panel" id="logUploadPanel">
+                    <div style="font-size: 42px; margin-bottom: 10px;">📂</div>
+                    <div style="font-size: 18px; font-weight: 600; color: #333;">上传校准 log 文件</div>
+                    <div style="margin-top: 8px; color: #666; font-size: 14px;">支持 .log / .txt / .csv / .xml，拖拽或点击选择本地文件</div>
+                    <div class="upload-actions">
+                        <button type="button" onclick="triggerLogUpload()">选择log文件</button>
+                        <button type="button" class="secondary-btn" onclick="analyzeUploadedLog()">开始分析</button>
+                    </div>
+                    <input type="file" id="logFileInput" accept=".log,.txt,.csv,.xml,.json" style="display:none;">
+                    <div class="file-meta" id="logFileMeta">当前未选择文件</div>
+                </div>
+
+                <div class="analysis-tip" id="logAnalysisTip"><strong>分析范围：</strong>优先按“明确报错 → 回溯最近校准流程 → 锁定频段/项目 → 提炼故障结论”分析，不再只按关键词抓 Band；输出定位方式、校准项目、问题频段、故障原因、结论和关键定位行。</div>
+            </div>
+
+            <div id="logAnalysisResult">
+                <div class="history-panel">
+                    <strong>分析说明</strong>
+                    <div style="margin-top: 10px; color: #555; line-height: 1.8; font-size: 14px;">
+                        上传日志后，系统会从关键字段、错误关键词、失败阶段、模块归属四个维度做首轮分析，输出：
+                        <br>1. 日志类型判断
+                        <br>2. 高风险异常摘要
+                        <br>3. 关键日志字段
+                        <br>4. 可操作的调试建议
+                        <br>5. 原始日志片段示例
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Log 深度分析区域 -->
+            <div id="aiLogSection" style="display:none; margin-top: 20px;">
+                <button class="ai-log-btn" onclick="startAILogAnalysis()" id="aiLogBtn">🤖 AI 深度解读 Log</button>
+                <div id="aiLogResult"></div>
+            </div>
+        </div>
+
+        <div class="footer">
+            智能主板维修系统 v8.0 AI版 | 数据来源：飞书电子工程知识库 · 产线维修记录 · 原理图分析 · Claude AI 深度分析
+        </div>
+    </div>
+
+    <!-- AI 设置弹窗 -->
+    <div class="settings-overlay" id="settingsOverlay">
+        <div class="settings-panel">
+            <div class="settings-tabs">
+                <button class="settings-tab-btn active" data-settingstab="ai" onclick="switchSettingsTab('ai')">AI 服务设置</button>
+                <button class="settings-tab-btn" data-settingstab="component" onclick="switchSettingsTab('component')">🔧 器件位号管理</button>
+            </div>
+
+            <!-- AI 设置子面板 -->
+            <div class="settings-tab-content active" id="settingsTab-ai">
+                <div class="setting-row">
+                    <label>后端代理地址</label>
+                    <input type="text" id="settingApiUrl" placeholder="http://localhost:8899">
+                </div>
+                <div class="setting-row">
+                    <label>AI 模型</label>
+                    <select id="settingModel">
+                        <option value="deepseek-chat">DeepSeek-V3 (推荐)</option>
+                        <option value="deepseek-reasoner">DeepSeek-R1 (深度推理)</option>
+                        <option value="claude-sonnet-4-6">Claude Sonnet 4.6</option>
+                        <option value="claude-opus-4-7">Claude Opus 4.7 (最强)</option>
+                        <option value="claude-haiku-4-5">Claude Haiku 4.5 (快速)</option>
+                    </select>
+                </div>
+                <div class="setting-row">
+                    <label>连接状态</label>
+                    <div class="status-indicator" id="connectionStatus">
+                        <span class="status-dot" id="statusDot"></span>
+                        <span id="statusText">未检测</span>
+                    </div>
+                </div>
+                <div class="setting-actions">
+                    <button class="secondary-btn" onclick="closeSettings()">取消</button>
+                    <button onclick="testAIConnection()">🔗 测试连接</button>
+                    <button onclick="saveAISettings()">💾 保存设置</button>
+                </div>
+            </div>
+
+            <!-- 器件位号管理子面板 -->
+            <div class="settings-tab-content" id="settingsTab-component">
+                <div style="margin-bottom:12px;">
+                    <label style="font-size:13px;font-weight:600;">选择项目</label>
+                    <select class="component-mgmt-project-select" id="mgmtProjectSelect" onchange="renderComponentMgmtModules()">
+                        <option value="">-- 选择或新建项目 --</option>
+                    </select>
+                    <div style="display:flex;gap:8px;">
+                        <input type="text" id="mgmtNewProjectInput" placeholder="输入新项目型号（如 X6878）" style="flex:1;padding:8px;border:1px dashed #b3d4ff;border-radius:6px;font-size:13px;">
+                        <button onclick="createNewProject()" style="padding:8px 16px;font-size:13px;white-space:nowrap;">+ 新建项目</button>
+                    </div>
+                </div>
+                <div class="component-mgmt-modules" id="mgmtModules"></div>
+                <div id="mgmtAddModule" style="margin-bottom:12px;"></div>
+
+                <!-- BOM 粘贴导入 -->
+                <div class="bom-import-area">
+                    <h4>📋 从 BOM 粘贴导入</h4>
+                    <textarea id="bomPasteArea" placeholder="粘贴 BOM 文本内容...&#10;格式示例：&#10;U2601,主PMIC电源管理,MT6360&#10;U3501,副PMIC,MT6315&#10;C3816,充电通路电容&#10;&#10;每行一条：位号,名称,型号（型号可选）"></textarea>
+                    <div class="bom-import-hint">每行格式：位号,器件名称,型号（用逗号分隔，型号可选）</div>
+                    <button onclick="importBOM()" style="margin-top:8px;padding:6px 16px;font-size:13px;">📥 解析并导入</button>
+                </div>
+
+                <!-- JSON 导入导出 -->
+                <div class="json-export-import">
+                    <button class="secondary-btn" onclick="exportComponentMapJSON()">📤 导出 JSON</button>
+                    <button class="secondary-btn" onclick="document.getElementById('jsonImportFile').click()">📥 导入 JSON</button>
+                    <input type="file" id="jsonImportFile" accept=".json" style="display:none;" onchange="importComponentMapJSON(event)">
+                    <button class="secondary-btn" onclick="resetComponentMap()" style="color:#dc2626;">🔄 恢复默认</button>
+                </div>
+                <div id="mgmtSaveStatus" style="margin-top:8px;font-size:12px;color:#059669;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 核心导航功能
+        function switchTab(tabId) {
+            // 隐藏所有Tab内容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            // 取消所有按钮激活状态
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // 显示当前Tab
+            const activeTab = document.getElementById(tabId + '-tab');
+            if (activeTab) {
+                activeTab.classList.add('active');
+            }
+            
+            // 激活当前按钮
+            const activeBtn = document.querySelector(`[data-tab="${tabId}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+        }
+
+        function switchDiagnosisMode(mode) {
+            document.querySelectorAll('.diagnosis-mode-content').forEach(content => {
+                content.style.display = 'none';
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            const activeContent = document.getElementById(mode + '-mode');
+            if (activeContent) {
+                activeContent.style.display = 'block';
+                activeContent.classList.add('active');
+            }
+
+            const activeBtn = document.querySelector(`[data-mode="${mode}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+        }
+
+        // 项目资料库（从飞书多维表格智能主板维修系统同步）
+        const projectDatabase = {
+    "X6878": {
+        "name": "X6878-Q352 智能手机主板",
+        "version": "V1.3",
+        "schematicUrl": "https://transsioner.feishu.cn/wiki/RIlBwOGLeiOS2rk9isqcLmT6nQg",
+        "schematicName": "Q352_MAIN_PCB_V1.3_维修原理图_20251110.pdf",
+        "layoutUrl": "https://transsioner.feishu.cn/wiki/Mz3zwHcR6iUBJykFv7NcEtlAn6e",
+        "layoutName": "Q352_MAIN_PCB_V1.3_位号图.pdf",
+        "bomUrl": "https://transsioner.feishu.cn/wiki/Tdqqwn3Usihs1CkdOPecNZcenKd",
+        "bomName": "BOM物料清单",
+        "sopUrl": "https://transsioner.feishu.cn/wiki/SbxYwRVxJijTOuk8ic8cVAArnCH",
+        "sopName": "IFINIX-X6878-Q352手机维修通用操作指导书V1.0_20251215.docx"
+    },
+    "X6840": {
+        "name": "X6840-H6941 智能手机主板",
+        "version": "V1.0",
+        "schematicUrl": "https://transsioner.feishu.cn/file/XO7QbETLuo2gITxnO1gcGh7Mnfb",
+        "schematicName": "H6941_MAIN_PCB_V1.0_A2维修原理图_20251209.pdf",
+        "layoutUrl": "https://transsioner.feishu.cn/file/XYrHb5royo2f4FxLuv8cR3LsnBb",
+        "layoutName": "H6941_MAIN_PCB_V1.0(A2)_位号图.pdf",
+        "bomUrl": "",
+        "bomName": "暂无资料",
+        "sopUrl": "https://transsioner.feishu.cn/file/HePGb4f1To2JWixZLgYcSn4Rn4i",
+        "sopName": "Infinix_M6735_X6840-H6941维修操作指导书_V1.0_20251223.pdf"
+    },
+    "X6887": {
+        "name": "X6887-H581 智能手机主板",
+        "version": "V1.2",
+        "schematicUrl": "https://transsioner.feishu.cn/file/TeimbfFbMoa5g2x9IXwcnoBOn0g",
+        "schematicName": "L6778-H581_MAIN_PCB_V1.2_维修原理图_20250930.pdf",
+        "layoutUrl": "https://transsioner.feishu.cn/file/PGLsbeHhOoCboCxDBlYcvlDMn6R",
+        "layoutName": "H581_MAIN_PCB_V1.2(A3)_位号图20251014.pdf",
+        "bomUrl": "",
+        "bomName": "暂无资料",
+        "sopUrl": "https://transsioner.feishu.cn/file/YYiwb2rJHopnNWx3eZocZ57fnpe",
+        "sopName": "InFinix_L6778_X6887-H581手机维修通用操作指导书V1.020251117.pdf"
+    },
+    "KO5": {
+        "name": "KO5-H8925 功能手机主板",
+        "version": "V1.1",
+        "schematicUrl": "https://transsioner.feishu.cn/file/Q6pwbkulMoq5A1xyibxcxEIjnFh",
+        "schematicName": "H8925_MAIN_PCB_V1.1_SCH_20251203.pdf",
+        "layoutUrl": "https://transsioner.feishu.cn/file/D4fnbcOBToXypqx2G6PciHX8nsb",
+        "layoutName": "H8925_MAIN_PCB_V1.1_A3_位号图.pdf",
+        "bomUrl": "",
+        "bomName": "暂无资料",
+        "sopUrl": "https://transsioner.feishu.cn/file/Io4rbbzYSolhVNxjL09cbjTpnlf",
+        "sopName": "Infinix_KO5_H8925维修操作指导书_V1.0_20260202.pdf"
+    },
+    "X6886": {
+        "name": "X6886 智能手机主板",
+        "version": "待补充",
+        "schematicUrl": "",
+        "schematicName": "暂无资料",
+        "layoutUrl": "",
+        "layoutName": "暂无资料",
+        "bomUrl": "",
+        "bomName": "暂无资料",
+        "sopUrl": "",
+        "sopName": "暂无资料"
+    },
+    "KL8": {
+        "name": "KL8 功能手机主板",
+        "version": "待补充",
+        "schematicUrl": "",
+        "schematicName": "暂无资料",
+        "layoutUrl": "",
+        "layoutName": "暂无资料",
+        "bomUrl": "",
+        "bomName": "暂无资料",
+        "sopUrl": "",
+        "sopName": "暂无资料"
+    },
+    "LJ8": {
+        "name": "LJ8 功能手机主板",
+        "version": "待补充",
+        "schematicUrl": "",
+        "schematicName": "暂无资料",
+        "layoutUrl": "",
+        "layoutName": "暂无资料",
+        "bomUrl": "",
+        "bomName": "暂无资料",
+        "sopUrl": "",
+        "sopName": "暂无资料"
+    },
+    "X6725": {
+        "name": "X6725 入门级智能手机主板",
+        "version": "待补充",
+        "schematicUrl": "",
+        "schematicName": "暂无资料",
+        "layoutUrl": "",
+        "layoutName": "暂无资料",
+        "bomUrl": "",
+        "bomName": "暂无资料",
+        "sopUrl": "",
+        "sopName": "暂无资料"
+    }
+};
+
+        // =========================
+        // 项目器件位号映射表（每个项目的真实位号，用于AI诊断时注入）
+        // 数据来源：项目原理图/BOM，格式：{ 项目型号: { 功能模块: [ {位号,名称,型号} ] } }
+        // 通过设置面板的"位号管理"进行录入和维护，保存在 localStorage
+        // =========================
+        const PROJECT_COMPONENT_MAP_KEY = 'projectComponentMapV1';
+
+        // 默认位号数据（预设 X6878 已知器件，后续可通过管理面板扩展）
+        const defaultComponentMap = {
+            "X6878": {
+                "电源管理": [
+                    { "位号": "U2601", "名称": "主PMIC电源管理", "型号": "MT6360" },
+                    { "位号": "U2602", "名称": "背光驱动", "型号": "" },
+                    { "位号": "U2603", "名称": "显示驱动", "型号": "" },
+                    { "位号": "U3501", "名称": "副PMIC", "型号": "MT6315" },
+                    { "位号": "U2401", "名称": "快充Charge Pump", "型号": "BQ25970" }
+                ],
+                "充电电路": [
+                    { "位号": "U3901", "名称": "充电管理IC", "型号": "" },
+                    { "位号": "C3816", "名称": "充电通路电容", "型号": "" }
+                ],
+                "主芯片与存储": [
+                    { "位号": "U0501", "名称": "主芯片SoC", "型号": "MT6833" },
+                    { "位号": "U1701", "名称": "eMMC/UFS存储", "型号": "" },
+                    { "位号": "U1601", "名称": "LPDDR4X内存", "型号": "" }
+                ],
+                "连接器": [
+                    { "位号": "J3801", "名称": "电池BTB连接器", "型号": "" },
+                    { "位号": "J5201", "名称": "LCD连接器", "型号": "" },
+                    { "位号": "J5202", "名称": "副板连接器", "型号": "" },
+                    { "位号": "J204", "名称": "指纹连接器", "型号": "" },
+                    { "位号": "J304", "名称": "SIM卡座", "型号": "" }
+                ],
+                "音频": [
+                    { "位号": "U6001", "名称": "音频功放PA", "型号": "AW87319" },
+                    { "位号": "U4101", "名称": "音频功放PA", "型号": "" },
+                    { "位号": "M4301", "名称": "副麦克风", "型号": "" },
+                    { "位号": "MIC101", "名称": "主麦克风", "型号": "" }
+                ],
+                "射频": [
+                    { "位号": "U8001", "名称": "无线收发器WCN", "型号": "MT6631" },
+                    { "位号": "U9002", "名称": "天线开关", "型号": "" },
+                    { "位号": "U9003", "名称": "天线开关", "型号": "" },
+                    { "位号": "J301", "名称": "射频座", "型号": "" },
+                    { "位号": "J303", "名称": "射频座", "型号": "" }
+                ],
+                "传感器": [
+                    { "位号": "U5501", "名称": "传感器IC", "型号": "" },
+                    { "位号": "U5502", "名称": "传感器IC", "型号": "" },
+                    { "位号": "U5504", "名称": "磁力传感器", "型号": "" }
+                ],
+                "摄像头": [
+                    { "位号": "U4501", "名称": "摄像头供电IC", "型号": "" },
+                    { "位号": "U4503", "名称": "摄像头供电IC", "型号": "" },
+                    { "位号": "U1001", "名称": "摄像头供电IC", "型号": "" },
+                    { "位号": "R4807", "名称": "摄像头通路电阻", "型号": "" }
+                ],
+                "显示": [
+                    { "位号": "U2603", "名称": "显示驱动IC", "型号": "" },
+                    { "位号": "C5209", "名称": "显示通路电容", "型号": "" }
+                ]
+            },
+            "X6886": { "待录入": [] },
+            "KL8": { "待录入": [] },
+            "LJ8": { "待录入": [] },
+            "X6725": { "待录入": [] },
+            "X6840": { "待录入": [] },
+            "X6887": { "待录入": [] },
+            "KO5": { "待录入": [] }
+        };
+
+        function getProjectComponentMap() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(PROJECT_COMPONENT_MAP_KEY) || '{}');
+                // 合并默认数据（用户数据优先）
+                const merged = JSON.parse(JSON.stringify(defaultComponentMap));
+                for (const [project, modules] of Object.entries(saved)) {
+                    if (!merged[project]) merged[project] = {};
+                    for (const [module, comps] of Object.entries(modules)) {
+                        merged[project][module] = comps;
+                    }
+                }
+                return merged;
+            } catch (e) { return JSON.parse(JSON.stringify(defaultComponentMap)); }
+        }
+
+        function getProjectCoverage(projectModel) {
+            const map = getProjectComponentMap();
+            const project = map[projectModel];
+            if (!project) return { count: 0, status: 'none', label: '未录入' };
+            let count = 0;
+            let modules = 0;
+            for (const [mod, comps] of Object.entries(project)) {
+                if (mod === '待录入') continue;
+                modules++;
+                count += comps.filter(c => c.位号).length;
+            }
+            let status = 'none', label = '';
+            if (count >= 15) { status = 'good'; label = `已录入 ${count} 个器件`; }
+            else if (count > 0) { status = 'ok'; label = `仅录入 ${count} 个器件`; }
+            else { label = '暂无位号数据'; }
+            return { count, modules, status, label };
+        }
+
+        // 当前选中的项目（AI 诊断用）
+        let selectedAIProject = '';
+        // 资料查询中当前查询到的项目
+        let currentResourceProject = '';
+
+        function populateAIProjectSelector() {
+            const select = document.getElementById('aiProjectSelect');
+            if (!select) return;
+            const map = getProjectComponentMap();
+            const projects = Object.keys(map).filter(p => p !== '__version__');
+            select.innerHTML = '<option value="">-- 不选择项目（通用位号） --</option>';
+            projects.forEach(p => {
+                const cov = getProjectCoverage(p);
+                const option = document.createElement('option');
+                option.value = p;
+                option.textContent = `${p} (${cov.label})`;
+                select.appendChild(option);
+            });
+            // 恢复上次选择
+            if (selectedAIProject && projects.includes(selectedAIProject)) {
+                select.value = selectedAIProject;
+                updateAIProjectCoverage(selectedAIProject);
+            }
+        }
+
+        function onAIProjectChange() {
+            const select = document.getElementById('aiProjectSelect');
+            selectedAIProject = select ? select.value : '';
+            updateAIProjectCoverage(selectedAIProject);
+            // 保存选择到 localStorage
+            try { localStorage.setItem('aiSelectedProject', selectedAIProject); } catch(e) {}
+        }
+
+        function updateAIProjectCoverage(projectModel) {
+            const label = document.getElementById('aiProjectCoverage');
+            if (!label) return;
+            if (!projectModel) {
+                label.textContent = '未选择项目';
+                label.className = 'project-coverage none';
+                return;
+            }
+            const cov = getProjectCoverage(projectModel);
+            label.textContent = cov.label;
+            label.className = 'project-coverage ' + cov.status;
+        }
+
+        function switchToResourceTab() {
+            switchTab('resources');
+            // 滚动到项目信息区域
+            setTimeout(() => {
+                const projectInfo = document.getElementById('projectInfo');
+                if (projectInfo && projectInfo.style.display !== 'none') {
+                    projectInfo.scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 200);
+        }
+
+        function gotoAIDiagnosis() {
+            if (!currentResourceProject) {
+                alert('请先在资料查询中输入SN号查询项目');
+                return;
+            }
+            // 预选项目
+            selectedAIProject = currentResourceProject;
+            try { localStorage.setItem('aiSelectedProject', selectedAIProject); } catch(e) {}
+            // 切换到诊断 Tab → AI 模式
+            switchTab('diagnosis');
+            switchDiagnosisMode('ai');
+            // 刷新项目选择器并设置选中值
+            setTimeout(() => {
+                populateAIProjectSelector();
+                updateAIProjectCoverage(currentResourceProject);
+                // 滚动到 AI 诊断区域
+                const aiMode = document.getElementById('ai-mode');
+                if (aiMode) aiMode.scrollIntoView({ behavior: 'smooth' });
+            }, 150);
+        }
+
+        function buildProjectComponentPrompt(projectModel) {
+            if (!projectModel) return '';
+            const map = getProjectComponentMap();
+            const project = map[projectModel];
+            if (!project) return '';
+            const moduleCount = Object.keys(project).filter(k => k !== '待录入').length;
+            let totalComps = 0;
+            for (const comps of Object.values(project)) {
+                if (Array.isArray(comps)) totalComps += comps.filter(c => c.位号).length;
+            }
+            let text = `\n## 当前项目信息\n`;
+            text += `- 项目型号：${projectModel}\n`;
+            text += `- 已录入 ${totalComps} 个真实器件位号（${moduleCount} 个功能模块）\n`;
+            text += `- 以下为该项目的真实器件位号映射（**请优先使用这些位号进行诊断**）：\n`;
+            for (const [mod, comps] of Object.entries(project)) {
+                if (mod === '待录入' || !Array.isArray(comps) || comps.length === 0) continue;
+                const validComps = comps.filter(c => c.位号);
+                if (validComps.length === 0) continue;
+                text += `\n【${mod}】\n`;
+                validComps.forEach(c => {
+                    const modelStr = c.型号 ? ` (${c.型号})` : '';
+                    text += `  ${c.位号} - ${c.名称}${modelStr}\n`;
+                });
+            }
+            text += `\n**请在诊断结果中使用上述真实位号。** 如果故障可能涉及上表中未列出的器件，请根据电路原理推断并明确标注"待确认"。\n`;
+            return text;
+        }
+
+        // =========================
+        // 器件位号管理面板
+        // =========================
+
+        function switchSettingsTab(tab) {
+            document.querySelectorAll('.settings-tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.settings-tab-content').forEach(c => c.classList.remove('active'));
+            const btn = document.querySelector(`[data-settingstab="${tab}"]`);
+            if (btn) btn.classList.add('active');
+            const content = document.getElementById(`settingsTab-${tab}`);
+            if (content) content.classList.add('active');
+            if (tab === 'component') {
+                populateMgmtProjectSelect();
+            }
+        }
+
+        function populateMgmtProjectSelect() {
+            const select = document.getElementById('mgmtProjectSelect');
+            if (!select) return;
+            const map = getProjectComponentMap();
+            const projects = Object.keys(map).filter(p => p !== '__version__' && p !== '待录入');
+            select.innerHTML = '<option value="">-- 选择或新建项目 --</option>';
+            projects.forEach(p => {
+                const cov = getProjectCoverage(p);
+                const option = document.createElement('option');
+                option.value = p;
+                option.textContent = `${p} (${cov.count} 个器件, ${cov.modules} 个模块)`;
+                select.appendChild(option);
+            });
+        }
+
+        function renderComponentMgmtModules() {
+            const project = document.getElementById('mgmtProjectSelect').value;
+            const container = document.getElementById('mgmtModules');
+            const addDiv = document.getElementById('mgmtAddModule');
+            if (!project || !container) { container.innerHTML = ''; addDiv.innerHTML = ''; return; }
+
+            const map = getProjectComponentMap();
+            const modules = map[project] || {};
+            const moduleNames = Object.keys(modules).filter(k => k !== '待录入');
+
+            let html = '';
+            moduleNames.forEach(mod => {
+                const comps = modules[mod] || [];
+                html += `<div class="component-mgmt-module">
+                    <div class="component-mgmt-module-header">
+                        <span>📦 ${mod}</span>
+                        <div>
+                            <button onclick="addComponentToModule('${mod.replace(/'/g, "\\'")}')" style="font-size:12px;padding:2px 8px;">+ 添加器件</button>
+                            <button onclick="deleteModule('${mod.replace(/'/g, "\\'")}')" style="font-size:12px;padding:2px 8px;color:#dc2626;margin-left:4px;">删除模块</button>
+                        </div>
+                    </div>`;
+                comps.forEach((c, i) => {
+                    html += `<div class="component-mgmt-item">
+                        <input class="bit-hao" value="${escHtml(c.位号 || '')}" placeholder="位号" onchange="updateComponentItem('${mod.replace(/'/g, "\\'")}',${i},'位号',this.value)">
+                        <input class="bit-name" value="${escHtml(c.名称 || '')}" placeholder="器件名称" onchange="updateComponentItem('${mod.replace(/'/g, "\\'")}',${i},'名称',this.value)">
+                        <input class="bit-model" value="${escHtml(c.型号 || '')}" placeholder="型号(选填)" onchange="updateComponentItem('${mod.replace(/'/g, "\\'")}',${i},'型号',this.value)">
+                        <span class="btn-del" onclick="deleteComponentItem('${mod.replace(/'/g, "\\'")}',${i})" title="删除">✕</span>
+                    </div>`;
+                });
+                if (comps.length === 0) {
+                    html += `<div style="font-size:12px;color:#999;padding:4px 8px;">暂无器件，点击"+ 添加器件"</div>`;
+                }
+                html += '</div>';
+            });
+
+            if (moduleNames.length === 0) {
+                html = '<div style="font-size:13px;color:#999;text-align:center;padding:20px;">该项目暂未录入任何功能模块<br>请先添加模块</div>';
+            }
+            container.innerHTML = html;
+
+            // 添加新模块按钮
+            addDiv.innerHTML = `
+                <div class="component-mgmt-add-row">
+                    <input type="text" id="mgmtNewModuleInput" placeholder="新功能模块名称（如：电源管理）" style="flex:1;">
+                    <button onclick="addModuleToProject()">+ 添加模块</button>
+                </div>`;
+        }
+
+        function escHtml(str) {
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        function addModuleToProject() {
+            const project = document.getElementById('mgmtProjectSelect').value;
+            const input = document.getElementById('mgmtNewModuleInput');
+            if (!project || !input || !input.value.trim()) return;
+            const moduleName = input.value.trim();
+            const map = getProjectComponentMap();
+            if (!map[project]) map[project] = {};
+            if (map[project][moduleName]) { alert('该模块已存在'); return; }
+            map[project][moduleName] = [];
+            saveComponentMapData(map);
+            input.value = '';
+            renderComponentMgmtModules();
+            populateAIProjectSelector();
+            populateMgmtProjectSelect();
+            showMgmtSaveStatus('模块已添加');
+        }
+
+        function deleteModule(moduleName) {
+            const project = document.getElementById('mgmtProjectSelect').value;
+            if (!project || !confirm(`确定要删除模块"${moduleName}"及其所有器件吗？`)) return;
+            const map = getProjectComponentMap();
+            if (map[project]) delete map[project][moduleName];
+            saveComponentMapData(map);
+            renderComponentMgmtModules();
+            populateAIProjectSelector();
+            populateMgmtProjectSelect();
+            showMgmtSaveStatus(`模块"${moduleName}"已删除`);
+        }
+
+        function addComponentToModule(moduleName) {
+            const project = document.getElementById('mgmtProjectSelect').value;
+            if (!project) return;
+            const map = getProjectComponentMap();
+            if (!map[project]) map[project] = {};
+            if (!map[project][moduleName]) map[project][moduleName] = [];
+            map[project][moduleName].push({ '位号': '', '名称': '', '型号': '' });
+            saveComponentMapData(map);
+            renderComponentMgmtModules();
+            showMgmtSaveStatus('新器件已添加，请填写信息');
+        }
+
+        function updateComponentItem(moduleName, index, field, value) {
+            const project = document.getElementById('mgmtProjectSelect').value;
+            if (!project) return;
+            const map = getProjectComponentMap();
+            if (map[project] && map[project][moduleName] && map[project][moduleName][index]) {
+                map[project][moduleName][index][field] = value;
+                saveComponentMapData(map);
+            }
+        }
+
+        function deleteComponentItem(moduleName, index) {
+            const project = document.getElementById('mgmtProjectSelect').value;
+            if (!project) return;
+            const map = getProjectComponentMap();
+            if (map[project] && map[project][moduleName]) {
+                map[project][moduleName].splice(index, 1);
+                saveComponentMapData(map);
+                renderComponentMgmtModules();
+                populateAIProjectSelector();
+                showMgmtSaveStatus('器件已删除');
+            }
+        }
+
+        function saveComponentMapData(map) {
+            // Remove default entries, only save user modifications
+            const toSave = {};
+            for (const [project, modules] of Object.entries(map)) {
+                // Skip projects that are only in defaults and haven't been modified
+                const defaultProject = defaultComponentMap[project];
+                if (!defaultProject || JSON.stringify(modules) !== JSON.stringify(defaultProject)) {
+                    toSave[project] = modules;
+                }
+            }
+            try {
+                localStorage.setItem(PROJECT_COMPONENT_MAP_KEY, JSON.stringify(toSave));
+            } catch(e) {
+                alert('保存失败：localStorage 空间不足，请清理旧数据');
+            }
+        }
+
+        function showMgmtSaveStatus(msg) {
+            const el = document.getElementById('mgmtSaveStatus');
+            if (el) {
+                el.textContent = '✅ ' + msg;
+                setTimeout(() => { el.textContent = ''; }, 2000);
+            }
+        }
+
+        function createNewProject() {
+            const input = document.getElementById('mgmtNewProjectInput');
+            if (!input || !input.value.trim()) return;
+            const projectModel = input.value.trim().toUpperCase();
+            const map = getProjectComponentMap();
+            if (map[projectModel]) { alert('该项目已存在'); return; }
+            map[projectModel] = {};
+            saveComponentMapData(map);
+            input.value = '';
+            populateMgmtProjectSelect();
+            document.getElementById('mgmtProjectSelect').value = projectModel;
+            renderComponentMgmtModules();
+            populateAIProjectSelector();
+            showMgmtSaveStatus(`项目 ${projectModel} 已创建`);
+        }
+
+        function importBOM() {
+            const project = document.getElementById('mgmtProjectSelect').value;
+            if (!project) { alert('请先选择项目'); return; }
+            const text = document.getElementById('bomPasteArea').value.trim();
+            if (!text) { alert('请粘贴 BOM 内容'); return; }
+            const lines = text.split(/[\r\n]+/).filter(l => l.trim());
+            const map = getProjectComponentMap();
+            if (!map[project]) map[project] = {};
+            const defaultModule = 'BOM导入';
+            if (!map[project][defaultModule]) map[project][defaultModule] = [];
+            let imported = 0;
+            lines.forEach(line => {
+                const parts = line.split(/[,\t;|]+/).map(s => s.trim());
+                if (parts.length >= 1 && parts[0]) {
+                    map[project][defaultModule].push({
+                        '位号': parts[0],
+                        '名称': parts[1] || '',
+                        '型号': parts[2] || ''
+                    });
+                    imported++;
+                }
+            });
+            saveComponentMapData(map);
+            document.getElementById('bomPasteArea').value = '';
+            renderComponentMgmtModules();
+            populateAIProjectSelector();
+            populateMgmtProjectSelect();
+            showMgmtSaveStatus(`已导入 ${imported} 个器件到"${defaultModule}"模块`);
+        }
+
+        function exportComponentMapJSON() {
+            const map = getProjectComponentMap();
+            const json = JSON.stringify(map, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `project_component_map_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showMgmtSaveStatus('JSON 已导出');
+        }
+
+        function importComponentMapJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (typeof imported !== 'object' || Array.isArray(imported)) {
+                        alert('无效的 JSON 格式：需要一个对象（项目→模块→器件）');
+                        return;
+                    }
+                    const existing = getProjectComponentMap();
+                    // Merge: imported data overrides existing
+                    for (const [project, modules] of Object.entries(imported)) {
+                        if (!existing[project]) existing[project] = {};
+                        for (const [mod, comps] of Object.entries(modules)) {
+                            existing[project][mod] = comps;
+                        }
+                    }
+                    saveComponentMapData(existing);
+                    populateMgmtProjectSelect();
+                    populateAIProjectSelector();
+                    const project = document.getElementById('mgmtProjectSelect');
+                    if (project && imported[Object.keys(imported)[0]]) {
+                        project.value = Object.keys(imported)[0];
+                    }
+                    renderComponentMgmtModules();
+                    showMgmtSaveStatus(`已导入 ${Object.keys(imported).length} 个项目`);
+                } catch(err) {
+                    alert('JSON 解析失败: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        function resetComponentMap() {
+            if (!confirm('确定要清除所有自定义位号数据，恢复到默认预设吗？此操作不可撤销。')) return;
+            try {
+                localStorage.removeItem(PROJECT_COMPONENT_MAP_KEY);
+            } catch(e) {}
+            populateMgmtProjectSelect();
+            populateAIProjectSelector();
+            renderComponentMgmtModules();
+            document.getElementById('mgmtProjectSelect').value = '';
+            showMgmtSaveStatus('已恢复默认数据');
+        }
+
+        // =========================
+        // 专业硬件诊断知识库
+        // 数据来源：飞书知识库「电子工程知识 - 手机各模块分析思路和案例」
+        // Wiki: https://transsioner.feishu.cn/wiki/wikcnRyIZbC5waXzvvFZt5NZnVb
+        // =========================
+        const hardwareKnowledgeBase = {
+            // ---- 通用分析方法 ----
+            analysisMethods: {
+                title: '手机异常问题分析思路',
+                source: 'https://transsioner.feishu.cn/wiki/wikcnk7PZxAfrscml92niQv0dHX',
+                steps: [
+                    '问：向用户或检测人员了解情况——不良现象、测试数值、不良率等',
+                    '看：结合机型和现象，对外观结构、电流等查看，初步定位故障区域',
+                    '听：从话音质量、音量、声音断续等初步判断故障',
+                    '摸：针对功耗不良，手摸器件表面温度判断是否过热或电流过大',
+                    '思：根据观察和资料，运用电路原理综合分析判断',
+                    '修：对失效元器件加热、植球重装、芯片调换等'
+                ],
+                methods: [
+                    { name: '重置法', desc: '恢复出厂设置及软件升级对设置或软件重置' },
+                    { name: '交叉验证法', desc: '正常品与不良品上的某个器件互换，达到分析定位' },
+                    { name: '电阻测量法', desc: '用蜂鸣档及欧姆档测量线路阻值定位' },
+                    { name: '电压量法', desc: '用万用表电压档或示波器检测供电线路或控制线' },
+                    { name: '电流检测法', desc: '假电池供压接通外部电源，按开机键看电流显示' },
+                    { name: '信号追踪法', desc: '驱使手机进入特定模式，用辅助设备定点检测信号强弱' },
+                    { name: '补焊法', desc: '对元件加热来定位，针对无法测量异常的主板' },
+                    { name: '电压倒灌法', desc: '开关机状态下对各供电线路外接电源，定位漏电故障' }
+                ]
+            },
+            // ---- 不开机 ----
+            '不开机': {
+                title: '不开机分析思路',
+                keywords: ['不开机', '无法开机', '无法启动', '无电流', '电流只有', '无法唤醒'],
+                source: 'https://transsioner.feishu.cn/wiki/wikcnakXTr9gy97ioCWMGlokIRg',
+                principle: '手机正常供电后按开机键低电平触发电源工作，输出数字核心电压、系统电压给CPU、存储、各模块电源电压，晶体26M起振给CPU提供基准时钟，同时给CPU复位信号唤醒CPU开始工作完成自检，自检正常后与电源通讯，CPU发出维持信号持续供电发送各路电压，调取存储程序运行开机。',
+                diagnosis: [
+                    '插入充电器排除电池低电量，观察手机是否亮屏排除电源键失效；长按开机键看是否振动排除开机黑屏',
+                    '检查电池BTB是否破损、电池FPC是否撕裂；检查电源键弹片是否变形、按键FPC是否破损；用铁镊子短路PWRKEY点验证是否可开机；检查导电布是否搭接到元器件导致短路',
+                    '交叉验证附件（LCD、副板、摄像头、主FPC）排除附件影响，不良随主板则退SMT',
+                    '主板无法出MediaTek preload下载口或无法连接下载工具→硬件下载系统NG，PMIC上电异常，需量测上电时序',
+                    '量测方法：短接开机键量测各时序电压，与正常单板对比；直接量测AP GOOD点，高电平说明上电时序OK，重点排查CPU/EMMC/DDR；量测异常则按PMU上电时序排查',
+                    '辅助定位：开机电流异常→大电流可能短路，无小电流可能PMIC/CPU虚焊；无反应可能时钟失效或VBAT未供电到VSYS；漏电流大→红外仪或手摸定位漏电电源芯片',
+                    '软件定位：抓取串口log或下载log，发给研发分析具体异常模块'
+                ],
+                keySignals: 'VBAT、VSYS、VIO、PMIC_PWRON、TCXO(26MHz)、AP GOOD点、PMU上电时序(Vcore/VS1/VS18/VPROC12/Vaud28)',
+                commonFaults: 'PMIC供电异常、CPU/EMMC/DDR虚焊或损坏、时钟晶体失效、复位电路异常、电源按键电路故障、电池接口接触不良'
+            },
+            // ---- 卡logo/重启 ----
+            '重启': {
+                title: '卡logo & 自动重启分析思路',
+                keywords: ['重启', '死机', '卡logo', '自动关机', '无限重启', '反复重启'],
+                source: 'https://transsioner.feishu.cn/wiki/wikcn3WMxKrwYaZC1UWpDZVwoCh',
+                principle: '手机在正常开机过程中，若某个硬件模块异常就会造成手机异常重启。软件侧：上层造成重启（system_server被杀、watchdog重启、重要线程阻塞）；kernel造成重启（空指针、非法地址）；kernel watchdog造成重启（原因不确定如内存问题）。',
+                diagnosis: [
+                    '确认现象是否稳定及复现路径，抓取串口log和android log给研发分析',
+                    '重新下载软件排除软件问题导致的卡logo和自动重启',
+                    '整机通过更换附件（屏幕、电池、主FPC、副板、侧键、摄像头）定位重启器件，排除附件确认为主板则退SMT',
+                    '结合串口log和android分析定位具体哪个硬件模块异常；或排查相关硬件模块',
+                    '常见不良器件：UFS、DDR、CPU、PMU、NFC芯片、音频驱动芯片等'
+                ],
+                keySignals: '串口log、android log、UFS供电、DDR供电、CPU各路电压',
+                commonFaults: 'UFS虚焊/损坏、DDR虚焊/损坏、CPU虚焊、PMU异常、NFC芯片异常'
+            },
+            // ---- 充电不良 ----
+            '充电异常': {
+                title: '充电不良分析思路',
+                keywords: ['充电', '快充', '充电慢', '充不进', '充电发热', '发热严重', '充电不良'],
+                source: 'https://transsioner.feishu.cn/wiki/V4V4wJLaMiPbbpkHgINckUD7nld',
+                principle: '5V2A标准充电和18W快充采用Buck降压方式在同一芯片完成，高压充电需DP/DM通讯协议支持（18W MAX传音自有协议）。超级快充为电荷泵电容充电，Vout=0.5Vin、Iout=2Iin（2:1芯片），后衍生4:1芯片，采用主副路泵芯片并联分流。高端机型充电集成在PMIC内。',
+                diagnosis: [
+                    '确认不良现象：连接电脑有端口？无端口按无端口维修。有端口则分别插标充、18W Max、45W/68W充电器复测，更换充电器或线缆排除',
+                    '检查电池BTB扣合、主FPC扣合、主副板撞件；交叉验证排除附件（电池/USB FPC/副板），不良随主板退SMT',
+                    '主板充电不良：确认是标充5V2A还是快充不良，量测USB的VBUS_OVP是否有5V，排除MOS管不导通',
+                    '标充和18W快充不良：对照原理图检查开关充电芯片是否正常、连锡、周围小元件正常，量测各管脚阻抗，无异常则更换开关充电芯片',
+                    '33W/45W/68W快充不良：检查快充芯片是否正常、连锡偏位、周围小元件和Fly电容正常，检查DPDM协议通路器件，量测各管脚阻抗，无异常则更换主/副Charge Pump芯片验证'
+                ],
+                keySignals: 'VBUS_OVP、VBUS、充电芯片各管脚电压、DP/DM协议通路、Charge Pump芯片供电、Fly电容',
+                commonFaults: '充电IC损坏、USB连接器虚焊、充电通路电感损坏、Charge Pump芯片异常、DPDM协议通路器件故障、MOS管不导通'
+            },
+            // ---- 无端口 ----
+            '无端口': {
+                title: '无端口分析思路',
+                keywords: ['无端口', '不识别', '无USB', 'OTG', 'OTG不识别', '连接电脑无反应'],
+                source: 'https://transsioner.feishu.cn/wiki/GDPgwSxkmitQSKku9g3cS2S4nef',
+                principle: '手机TypeC接口通过USB线连接电脑时执行TypeC协议和USB2.0 BC1.2端口识别协议，通过DP/DM与电脑数据传输。电路由TypeC和BC1.2协议的USB_TYPEC_CC1、USB_TYPEC_CC2、VBUS、USB_DP、USB_DM网络构成。',
+                diagnosis: [
+                    '检查主FPC BTB是否扣好、有无变形浮高，主FPC是否破损，主副板是否撞件；交叉验证排除主FPC、副板影响，不良随主板退SMT',
+                    '主板无端口：检查主FPC BTB是否变形虚焊连锡，排查通路上器件和芯片是否虚焊连锡（照Xray和目检）',
+                    '量测USB_TYPEC_CC1、USB_TYPEC_CC2、VBUS、USB_DP、USB_DM阻抗和电压是否异常，无异常则更换对应通路上USB开关芯片、标充芯片、CPU和通路阻容感小件验证',
+                    '注：OTG不识别分析思路同无端口'
+                ],
+                keySignals: 'USB_TYPEC_CC1、USB_TYPEC_CC2、VBUS、USB_DP、USB_DM',
+                commonFaults: '主FPC BTB虚焊/变形、USB开关芯片损坏、标充芯片异常、CPU通路异常、通路阻容感小件异常'
+            },
+            // ---- 射频 ----
+            '无服务': {
+                title: '射频天线不良分析思路',
+                keywords: ['无服务', '无信号', '信号弱', '无法通话', '信号', '通话', '射频'],
+                source: 'https://transsioner.feishu.cn/wiki/MaNqwIhpPigj2ikUw85cTsdGnyc',
+                principle: '射频电路分为主集和分集，主集包括发射TX通路和接收通路PRX，分集只有接收DRX通路。发射通路：TRS→PA→SPXT→DPDT→射频座；接收通路：射频座→DPDT→滤波器→LNA→TRS。',
+                diagnosis: [
+                    '从不良log中找到测试失败的频段、TX/RX或Carkit信息，定位具体射频通路',
+                    '检查通路上从射频座/同轴线座到射频收发器上器件芯片是否连锡虚焊、容阻感器件是否撞件连锡',
+                    '量测通路器件上阻抗和供电，无异常则更换通路器件验证'
+                ],
+                keySignals: '射频收发器(TRS)、射频放大器(PA)、射频开关(SPXT)、DPDT开关、滤波器、LNA',
+                commonFaults: 'PA损坏/虚焊、天线开关虚焊、滤波器失效、射频收发器异常、通路器件连锡虚焊'
+            },
+            // ---- 天线 ----
+            '耦合不良': {
+                title: '天线耦合不良分析思路',
+                keywords: ['耦合', '耦合不良', '天线', 'ANT', 'GSM850', 'LTE', '分集'],
+                source: 'https://transsioner.feishu.cn/wiki/XRINwGobDiaLQ9kQHePcPLPFnCf',
+                principle: '手机天线接收和发射信号通过弹片或同轴线和主板接触传递到主板，电路由射频传导和天线调谐电路组成，射频功率经射频座/同轴线座子后，经SP4T天线调谐开关和外围容阻感器件匹配使信号达到最佳效率。',
+                diagnosis: [
+                    '整机耦合测试根据失败频段和发射/接收信息，通过频段天线分布图找到对应ANT，再找到对应ANT位置',
+                    '检查主板或副板弹片是否变形、元件是否撞件、同轴线座子是否扣变形或同轴线断裂、中框接触是否良好',
+                    '交叉验证主副板、同轴线、中框定位问题',
+                    '整机耦合天线类不良主板：检查弹片是否撞件变形、通路上天线开关和元件是否撞件连锡、射频座是否虚焊',
+                    '主板复测校准综测，不良按射频校准综测不良维修；测试OK则重点检查射频座后面通路是否正常，更换通路器件验证'
+                ],
+                keySignals: '射频座/同轴线座、SP4T天线调谐开关、ANT弹片、通路容阻感器件',
+                commonFaults: '弹片变形、天线开关虚焊/连锡、同轴线断裂、射频座虚焊、通路器件撞件'
+            },
+            // ---- NFC ----
+            'NFC': {
+                title: '近场通讯NFC分析思路',
+                keywords: ['NFC', '近场通讯', 'nfc刷不了', 'nfc感应'],
+                source: 'https://transsioner.feishu.cn/wiki/M40YwUW2OiYRvjkkYrxcNLQPnTb',
+                principle: 'NFC通过天线线圈与NFC芯片配合实现近场通讯，电路包括NFC芯片、天线线圈、匹配电路。',
+                diagnosis: [
+                    '检查NFC天线FPC是否破损、连接是否良好',
+                    '交叉验证主板和NFC模组',
+                    '量测NFC芯片供电、时钟、I2C通信是否正常',
+                    '检查天线线圈阻抗是否正常'
+                ],
+                keySignals: 'NFC芯片供电、时钟、I2C通信、天线线圈阻抗',
+                commonFaults: 'NFC芯片虚焊/损坏、天线线圈开路/短路、匹配电路异常'
+            },
+            // ---- 开机黑屏 ----
+            '显示异常': {
+                title: '开机黑屏/显示异常分析思路',
+                keywords: ['黑屏', '显示', '屏幕', 'LCD', 'AMOLED', '无显示', '花屏', '闪屏', '显示异常'],
+                source: 'https://transsioner.feishu.cn/wiki/wikcnhHp1GD5SgYGGEEDxJd2mvh',
+                principle: 'LCD显示数据通过共模电感与CPU连接，CPU经图形处理将数据信号发差分信号显示。电路由背光驱动升压芯片U2602提供LEDA_LCM/LEDK_LCM，显示驱动U2603输出AVDD_LCM和AVEE_LCM液晶翻转电压，VIO18_EXT为LCM IO口供电1.8V。显示图像信号DSI0通过五组共模电感和CPU相连。控制信号：LCM_RST复位、DSI_TE_CON同步、AUX_LCM_IN2 ID检测由CPU控制。AMOLED屏幕自发光无背光电路。',
+                diagnosis: [
+                    '确认能开机振动无显示，拆机确认LCD-BTB扣合是否正常，检查主板撞件、屏幕FPC撕裂',
+                    '交叉验证确认排除LCD或主板不良',
+                    '主板不良：检查BTB是否虚焊连锡变形，更换BTB验证',
+                    '量测LCM背光电路阻抗和供电压（LCM_LEDK、LCM_LEDA），显示驱动阻抗和电压（AVDD_LCM、AVEE_LCM、VIO18）是否正常，异常则排查背光供电U2602、显示驱动U2603或VIO18供电芯片',
+                    '量测控制信号LCM_RST、DSI_TE_CON、AUX_LCM_IN2阻抗是否正常，排查外围器件或更换CPU验证',
+                    '注：AMOLED屏幕无背光LCM LED电路，排查方法同LCD'
+                ],
+                keySignals: 'LEDA_LCM、LEDK_LCM、AVDD_LCM、AVEE_LCM、VIO18、LCM_RST、DSI_TE_CON、AUX_LCM_IN2',
+                commonFaults: 'BTB连接器虚焊/变形、背光驱动U2602损坏、显示驱动U2603损坏、VIO18供电异常、CPU异常'
+            },
+            // ---- 触摸 ----
+            '触摸': {
+                title: '屏幕触摸失灵分析思路',
+                keywords: ['触摸', '触屏', '触控', '触摸失灵', '触摸不灵', '屏幕触摸'],
+                source: 'https://transsioner.feishu.cn/wiki/wikcnMpfQ2VOskIFlqhuz2TcdVg',
+                principle: '触摸屏通过I2C/SPI与CPU通信，由触摸IC控制触摸信号采集和处理。',
+                diagnosis: [
+                    '检查触摸屏BTB扣合、FPC是否破损',
+                    '交叉验证触摸屏和主板',
+                    '量测触摸IC供电、I2C/SPI通信是否正常',
+                    '更换触摸IC验证'
+                ],
+                keySignals: '触摸IC供电、I2C/SPI通信、触摸连接器',
+                commonFaults: '触摸连接器接触不良、触摸IC虚焊/损坏、I2C/SPI通路异常'
+            },
+            // ---- 摄像头 ----
+            '摄像头': {
+                title: '摄像头拍照类分析思路',
+                keywords: ['摄像头', '拍照', '相机', 'camera', '打不开摄像头', '摄像头模糊', '对焦', '标定', '防抖', 'OIS'],
+                source: 'https://transsioner.feishu.cn/wiki/wikcnPXt2JTcHNzdQm1VyMM6hSc',
+                principle: '摄像头将光信号转换为数字信号，由镜头、VCM马达、底座、IR滤光片、图像传感器、电路板等组成。主摄电路：CSI信号和供电VCAMD_EXT0/VCAM_VDDAF_EXT0/VCAMIO_EXT1/VCAMA_EXT0/VCAMA_1V8，防抖OIS供电VCAM_ACT_VDD，时钟CAM_CLK1，同步VSYNC，复位CAM_RST1，防抖使能GPIO142_OIS_EN，和SCP_SCL3/SDA3同CPU通讯。CSI通路共模电感降低高频噪声。',
+                diagnosis: [
+                    'MMI/QT工位失败：检查摄像头BTB扣合是否变形浮高、FPC无撕裂、主板无撞件；拨号*#9646633#进入RGT DEVinfo查看是否多个摄像头无法读取；交叉验证摄像头和主板',
+                    '主板不良：检查BTB是否变形虚焊连锡；量测各管脚阻抗是否正常',
+                    '排查摄像头工作电压：VCAMD_EXT0/VCAM_VDDAF_EXT0/VCAMIO_EXT1/VCAMA_EXT0/VCAMA_1V8，根据异常阻抗和电压排查对应通路，或更换通路电源芯片和外围器件',
+                    '防抖OIS工位失败：量测VCAM_OIS_VDD0阻抗和供电、OISEN使能脚阻抗；检查重力感芯片是否虚焊连锡',
+                    '标定工位失败：确认摄像头都能正常打开，根据测试项判定哪两颗摄像头标定失败，检查摄像头组装是否偏心/倾斜/脏污'
+                ],
+                keySignals: 'VCAMD_EXT0、VCAM_VDDAF_EXT0、VCAMIO_EXT1、VCAMA_EXT0、VCAMA_1V8、VCAM_OIS_VDD0、CAM_CLK1、VSYNC、CAM_RST1',
+                commonFaults: 'BTB连接器虚焊/变形、摄像头供电芯片异常、共模电感异常、CPU异常、VCM马达异常、重力感芯片异常'
+            },
+            // ---- 闪光灯 ----
+            '闪光灯': {
+                title: '闪光灯分析思路',
+                keywords: ['闪光灯', 'flash', '补光灯'],
+                source: 'https://transsioner.feishu.cn/wiki/wikcnR6cxOD3G4WDdSWsp99SEXe',
+                principle: '闪光灯LED由闪光灯驱动IC控制，通过I2C与CPU通信，供电由PMU提供。',
+                diagnosis: [
+                    '检查闪光灯LED单体是否正常',
+                    '交叉验证闪光灯和主板',
+                    '量测闪光灯驱动IC供电和I2C通信',
+                    '更换闪光灯驱动IC验证'
+                ],
+                keySignals: '闪光灯驱动IC供电、I2C通信、闪光灯LED',
+                commonFaults: '闪光灯LED损坏、驱动IC异常、I2C通路异常'
+            },
+            // ---- 喇叭 ----
+            '音频异常': {
+                title: '上喇叭（听筒）和下喇叭类不良分析思路',
+                keywords: ['喇叭', '听筒', '声音', '音频', '无声', '声音小', '杂音', '破音', 'speaker'],
+                source: 'https://transsioner.feishu.cn/wiki/wikcnCrskoej4JZDSR2b1vWLRyd',
+                principle: '上喇叭和下喇叭是电声器件，CPU提供的数字音频信号经PMU音频处理模块转换为声音信号。CPU通过I2S信号和音频放大PA芯片U6001通讯，VIO18_PMU和VBAT为PA芯片供电，PA输出差分信号SPKP_T/SPKN_T连接到听筒弹片。',
+                diagnosis: [
+                    '人工听声音大小，正常则优先排查听筒单体、密封泡棉偏位变形、出音孔溢胶/披风堵孔',
+                    '无声或声音小：检查听筒pad点和主板接触、主板弹片变形、听筒FPC破损、主板撞件；更换听筒看是否单体问题',
+                    '主板不良：通路排查SPKP/N_T→PA→PMU芯片的器件问题，外观检查撞件虚焊连锡，无异常则更换PA芯片、主PMU芯片、CPU和通路容阻感器件',
+                    '下喇叭：通过触点和副板弹片接触，到副板BTB通过主FPC连主板，分析思路同上喇叭'
+                ],
+                keySignals: 'SPKP_T/SPKN_T（上喇叭差分信号）、SPKP/N_B（下喇叭）、PA芯片供电VIO18_PMU/VBAT、I2S信号',
+                commonFaults: '听筒单体损坏、音频PA芯片U6001异常、PMU音频模块异常、弹片变形、I2S通路异常'
+            },
+            // ---- MIC ----
+            '麦克风': {
+                title: '麦克风MIC类不良分析思路',
+                keywords: ['麦克风', 'MIC', '通话对方听不到', '录音', 'mic无声'],
+                source: 'https://transsioner.feishu.cn/wiki/SjbPweUgni5hwikTGDCcSCT3nfM',
+                principle: 'MIC将声音信号转换为电信号，通过音频通路传递给CPU处理。',
+                diagnosis: [
+                    '检查MIC孔是否堵塞、MIC单体是否损坏',
+                    '交叉验证MIC和主板',
+                    '量测MIC供电、偏置电压、音频通路是否正常',
+                    '更换MIC单体或音频IC验证'
+                ],
+                keySignals: 'MIC供电、偏置电压、音频通路',
+                commonFaults: 'MIC单体损坏/堵塞、MIC供电异常、音频IC异常'
+            },
+            // ---- 耳机 ----
+            '耳机': {
+                title: '耳机类不良分析思路',
+                keywords: ['耳机', '耳机无声音', '耳机孔', '耳机不识别'],
+                source: 'https://transsioner.feishu.cn/wiki/ERV7w4bZziVPE3ksOtlcm4T6nRl',
+                principle: '耳机检测通过耳机座子识别耳机插入状态，音频信号通过耳机通路输出。',
+                diagnosis: [
+                    '检查耳机座子是否变形、氧化',
+                    '交叉验证耳机和手机',
+                    '量测耳机座子弹片阻抗和耳机检测信号',
+                    '更换耳机座子或音频IC验证'
+                ],
+                keySignals: '耳机座子弹片、耳机检测信号、音频通路',
+                commonFaults: '耳机座子变形/氧化、弹片接触不良、音频IC异常'
+            },
+            // ---- 传感器 ----
+            '传感器': {
+                title: '传感器Sensor类不良分析思路',
+                keywords: ['传感器', 'sensor', '陀螺仪', '重力', '加速度', '光距', '距离感应', '光线感应'],
+                source: 'https://transsioner.feishu.cn/wiki/K3xVwvtAIiMKytkH8OXcaUDunhd',
+                principle: '传感器通过I2C/SPI总线与CPU通信，由传感器Hub或PMU供电。常见传感器：加速度传感器(G-Sensor)、陀螺仪(Gyro)、光距离传感器(ALS/PS)、重力感应等。',
+                diagnosis: [
+                    '确认传感器工位失败类型（MMI/QT/标定等）',
+                    '检查传感器BTB扣合、FPC是否破损',
+                    '交叉验证传感器和主板',
+                    '量测传感器供电、I2C/SPI通信是否正常',
+                    '更换传感器芯片验证'
+                ],
+                keySignals: '传感器供电、I2C/SPI通信、传感器Hub',
+                commonFaults: '传感器芯片虚焊/损坏、供电异常、I2C/SPI通路异常、传感器Hub异常'
+            }
+        };
+
+        // 诊断规则库（12种故障类型）- 数据来源：多维表格维修报表案例库（真实维修记录）
+        const diagnosisRules = {
+  "不开机": [
+    {
+      "point": "U0501",
+      "point_name": "主芯片(SoC)",
+      "component_type": "IC芯片",
+      "probability": 38.9,
+      "case_count": 74,
+      "fault_type": "少件/物料不良",
+      "repair_method": "补件焊接/更换"
+    },
+    {
+      "point": "U1701",
+      "point_name": "eMMC/UFS存储",
+      "component_type": "IC芯片",
+      "probability": 18.9,
+      "case_count": 36,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    },
+    {
+      "point": "U1601",
+      "point_name": "DDR内存",
+      "component_type": "IC芯片",
+      "probability": 15.8,
+      "case_count": 30,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    },
+    {
+      "point": "J3801",
+      "point_name": "电池BTB连接器",
+      "component_type": "连接器",
+      "probability": 8.4,
+      "case_count": 16,
+      "fault_type": "破损/假焊",
+      "repair_method": "更换"
+    },
+    {
+      "point": "U2601",
+      "point_name": "电源管理IC",
+      "component_type": "IC芯片",
+      "probability": 6.3,
+      "case_count": 12,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    }
+  ],
+  "充电异常": [
+    {
+      "point": "U3901",
+      "point_name": "充电管理IC",
+      "component_type": "IC芯片",
+      "probability": 88.6,
+      "case_count": 39,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    },
+    {
+      "point": "U3501",
+      "point_name": "电源管理IC",
+      "component_type": "IC芯片",
+      "probability": 4.5,
+      "case_count": 2,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    },
+    {
+      "point": "C3816",
+      "point_name": "充电通路电容",
+      "component_type": "电容",
+      "probability": 3.4,
+      "case_count": 1,
+      "fault_type": "连锡",
+      "repair_method": "清理重焊"
+    }
+  ],
+  "死机重启": [
+    {
+      "point": "U8001",
+      "point_name": "无线收发器(WCN)",
+      "component_type": "IC芯片",
+      "probability": 33.3,
+      "case_count": 9,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    },
+    {
+      "point": "U0501",
+      "point_name": "主芯片(SoC)",
+      "component_type": "IC芯片",
+      "probability": 22.2,
+      "case_count": 6,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    },
+    {
+      "point": "U2601",
+      "point_name": "电源管理IC",
+      "component_type": "IC芯片",
+      "probability": 11.1,
+      "case_count": 3,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    },
+    {
+      "point": "U2201",
+      "point_name": "充电管理IC",
+      "component_type": "IC芯片",
+      "probability": 11.1,
+      "case_count": 3,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    },
+    {
+      "point": "U1601",
+      "point_name": "DDR内存",
+      "component_type": "IC芯片",
+      "probability": 11.1,
+      "case_count": 3,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    }
+  ],
+  "显示异常": [
+    {
+      "point": "U0501",
+      "point_name": "主芯片(SoC)",
+      "component_type": "IC芯片",
+      "probability": 32.7,
+      "case_count": 36,
+      "fault_type": "假焊",
+      "repair_method": "重焊"
+    },
+    {
+      "point": "U2601",
+      "point_name": "显示驱动IC",
+      "component_type": "IC芯片",
+      "probability": 28.2,
+      "case_count": 31,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    },
+    {
+      "point": "C5209",
+      "point_name": "显示通路电容",
+      "component_type": "电容",
+      "probability": 9.1,
+      "case_count": 10,
+      "fault_type": "破损",
+      "repair_method": "更换"
+    }
+  ],
+  "音频异常": [
+    {
+      "point": "U6001",
+      "point_name": "音频功放IC",
+      "component_type": "IC芯片",
+      "probability": 34.6,
+      "case_count": 83,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    },
+    {
+      "point": "U4101",
+      "point_name": "音频功放IC",
+      "component_type": "IC芯片",
+      "probability": 22.5,
+      "case_count": 54,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    },
+    {
+      "point": "M4301",
+      "point_name": "副麦克风",
+      "component_type": "麦克风",
+      "probability": 12.5,
+      "case_count": 30,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    },
+    {
+      "point": "MIC101",
+      "point_name": "麦克风",
+      "component_type": "麦克风",
+      "probability": 8.3,
+      "case_count": 20,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    },
+    {
+      "point": "U4301",
+      "point_name": "音频功放IC",
+      "component_type": "IC芯片",
+      "probability": 4.6,
+      "case_count": 11,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    }
+  ],
+  "下载失败": [
+    {
+      "point": "U0501",
+      "point_name": "主芯片(SoC)",
+      "component_type": "IC芯片",
+      "probability": 28.5,
+      "case_count": 228,
+      "fault_type": "少件/连锡/物料不良",
+      "repair_method": "补件焊接/清理重焊/更换"
+    },
+    {
+      "point": "U1601",
+      "point_name": "DDR内存",
+      "component_type": "IC芯片",
+      "probability": 25.3,
+      "case_count": 203,
+      "fault_type": "少件/物料不良",
+      "repair_method": "补件焊接/更换"
+    },
+    {
+      "point": "U1701",
+      "point_name": "eMMC/UFS存储",
+      "component_type": "IC芯片",
+      "probability": 12.5,
+      "case_count": 100,
+      "fault_type": "少件/物料不良",
+      "repair_method": "补件焊接/更换"
+    },
+    {
+      "point": "U1801",
+      "point_name": "eMMC/UFS存储",
+      "component_type": "IC芯片",
+      "probability": 4.5,
+      "case_count": 36,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    },
+    {
+      "point": "U2401",
+      "point_name": "快充芯片",
+      "component_type": "IC芯片",
+      "probability": 3.7,
+      "case_count": 30,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    }
+  ],
+  "耦合不良": [
+    {
+      "point": "J301",
+      "point_name": "射频座",
+      "component_type": "连接器",
+      "probability": 19.6,
+      "case_count": 40,
+      "fault_type": "破损",
+      "repair_method": "更换"
+    },
+    {
+      "point": "J303",
+      "point_name": "射频座",
+      "component_type": "连接器",
+      "probability": 19.1,
+      "case_count": 39,
+      "fault_type": "破损",
+      "repair_method": "更换"
+    },
+    {
+      "point": "U9003",
+      "point_name": "天线开关",
+      "component_type": "IC芯片",
+      "probability": 8.8,
+      "case_count": 18,
+      "fault_type": "物料不良/连锡",
+      "repair_method": "更换"
+    },
+    {
+      "point": "ANT301",
+      "point_name": "天线",
+      "component_type": "天线",
+      "probability": 7.4,
+      "case_count": 15,
+      "fault_type": "破损/撞件",
+      "repair_method": "更换"
+    },
+    {
+      "point": "U9002",
+      "point_name": "天线开关",
+      "component_type": "IC芯片",
+      "probability": 4.4,
+      "case_count": 9,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    }
+  ],
+  "功耗异常": [
+    {
+      "point": "U0501",
+      "point_name": "主芯片(SoC)",
+      "component_type": "IC芯片",
+      "probability": 24.6,
+      "case_count": 35,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    },
+    {
+      "point": "U2601",
+      "point_name": "电源管理IC",
+      "component_type": "IC芯片",
+      "probability": 14.1,
+      "case_count": 20,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    },
+    {
+      "point": "U2401",
+      "point_name": "快充芯片",
+      "component_type": "IC芯片",
+      "probability": 7,
+      "case_count": 10,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    },
+    {
+      "point": "U3501",
+      "point_name": "电源管理IC",
+      "component_type": "IC芯片",
+      "probability": 7,
+      "case_count": 10,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    },
+    {
+      "point": "U1801",
+      "point_name": "eMMC/UFS存储",
+      "component_type": "IC芯片",
+      "probability": 7,
+      "case_count": 10,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    }
+  ],
+  "摄像头故障": [
+    {
+      "point": "U0501",
+      "point_name": "主芯片(SoC)",
+      "component_type": "IC芯片",
+      "probability": 34.1,
+      "case_count": 41,
+      "fault_type": "物料不良/假焊",
+      "repair_method": "更换/重焊"
+    },
+    {
+      "point": "R4807",
+      "point_name": "摄像头通路电阻",
+      "component_type": "电阻",
+      "probability": 10.8,
+      "case_count": 13,
+      "fault_type": "物料不良/撞件",
+      "repair_method": "更换"
+    },
+    {
+      "point": "U4501",
+      "point_name": "摄像头供电IC",
+      "component_type": "IC芯片",
+      "probability": 6.7,
+      "case_count": 8,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    },
+    {
+      "point": "U4503",
+      "point_name": "摄像头供电IC",
+      "component_type": "IC芯片",
+      "probability": 6.7,
+      "case_count": 8,
+      "fault_type": "假焊",
+      "repair_method": "重焊"
+    },
+    {
+      "point": "U1001",
+      "point_name": "摄像头供电IC",
+      "component_type": "IC芯片",
+      "probability": 6.7,
+      "case_count": 8,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    }
+  ],
+  "触摸故障": [
+    {
+      "point": "U0501",
+      "point_name": "主芯片(SoC)",
+      "component_type": "IC芯片",
+      "probability": 55,
+      "case_count": 22,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    },
+    {
+      "point": "J5202",
+      "point_name": "连接器",
+      "component_type": "连接器",
+      "probability": 15,
+      "case_count": 6,
+      "fault_type": "破损",
+      "repair_method": "更换"
+    },
+    {
+      "point": "J5201",
+      "point_name": "连接器",
+      "component_type": "连接器",
+      "probability": 10,
+      "case_count": 4,
+      "fault_type": "破损",
+      "repair_method": "更换"
+    }
+  ],
+  "无线充电": [
+    {
+      "point": "U3901",
+      "point_name": "充电管理IC",
+      "component_type": "IC芯片",
+      "probability": 100,
+      "case_count": 21,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    }
+  ],
+  "SIM卡问题": [
+    {
+      "point": "J304",
+      "point_name": "SIM卡座",
+      "component_type": "连接器",
+      "probability": 43.2,
+      "case_count": 22,
+      "fault_type": "破损",
+      "repair_method": "更换"
+    },
+    {
+      "point": "U0501",
+      "point_name": "主芯片(SoC)",
+      "component_type": "IC芯片",
+      "probability": 19.6,
+      "case_count": 10,
+      "fault_type": "物料不良/连锡",
+      "repair_method": "更换"
+    },
+    {
+      "point": "C5206",
+      "point_name": "SIM通路电容",
+      "component_type": "电容",
+      "probability": 5.9,
+      "case_count": 3,
+      "fault_type": "立件",
+      "repair_method": "重新焊接"
+    }
+  ],
+  "传感器故障": [
+    {
+      "point": "U5501",
+      "point_name": "传感器IC",
+      "component_type": "IC芯片",
+      "probability": 67.6,
+      "case_count": 52,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    },
+    {
+      "point": "U0501",
+      "point_name": "主芯片(SoC)",
+      "component_type": "IC芯片",
+      "probability": 11.7,
+      "case_count": 9,
+      "fault_type": "假焊",
+      "repair_method": "重焊"
+    }
+  ],
+  "NFC故障": [
+    {
+      "point": "U0501",
+      "point_name": "主芯片(SoC)",
+      "component_type": "IC芯片",
+      "probability": 100,
+      "case_count": 24,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    }
+  ],
+  "指纹故障": [
+    {
+      "point": "U0501",
+      "point_name": "主芯片(SoC)",
+      "component_type": "IC芯片",
+      "probability": 41.7,
+      "case_count": 10,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    },
+    {
+      "point": "J204",
+      "point_name": "指纹连接器",
+      "component_type": "连接器",
+      "probability": 41.7,
+      "case_count": 10,
+      "fault_type": "破损",
+      "repair_method": "更换"
+    }
+  ],
+  "闪光灯故障": [
+    {
+      "point": "U2601",
+      "point_name": "闪光灯驱动IC",
+      "component_type": "IC芯片",
+      "probability": 78.3,
+      "case_count": 18,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    }
+  ],
+  "蓝牙故障": [
+    {
+      "point": "U8001",
+      "point_name": "无线收发器(WCN)",
+      "component_type": "IC芯片",
+      "probability": 84.2,
+      "case_count": 16,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    },
+    {
+      "point": "R8403",
+      "point_name": "蓝牙通路电阻",
+      "component_type": "电阻",
+      "probability": 10.5,
+      "case_count": 2,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    }
+  ],
+  "WIFI故障": [
+    {
+      "point": "U0501",
+      "point_name": "主芯片(SoC)",
+      "component_type": "IC芯片",
+      "probability": 66.7,
+      "case_count": 14,
+      "fault_type": "物料不良",
+      "repair_method": "更换"
+    },
+    {
+      "point": "C8203",
+      "point_name": "WIFI通路电容",
+      "component_type": "电容",
+      "probability": 9.5,
+      "case_count": 2,
+      "fault_type": "偏位",
+      "repair_method": "校正重焊"
+    }
+  ],
+  "磁力故障": [
+    {
+      "point": "U5504",
+      "point_name": "磁力传感器IC",
+      "component_type": "IC芯片",
+      "probability": 100,
+      "case_count": 11,
+      "fault_type": "物料不良/破损",
+      "repair_method": "更换"
+    }
+  ]
+};
+
+        // 故障现象搜索索引 - 从多维表格实时检索
+        const phenomenaSearchIndex = {
+            "开始校准终测": {
+                "phenomena": "开始校准终测 若是MTK校准终测DLL报错 直接显示MTK定义的错误代码 与ATE工具显示的错误代码一致。",
+                "top_components": [
+                    {"point": "U0501/U1701/U1601", "component_type": "IC芯片", "probability": 30.2, "case_count": 100, "fault_type": "少件", "repair_method": "重新焊接"},
+                    {"point": "U6607", "component_type": "IC芯片", "probability": 6.3, "case_count": 21, "fault_type": "物料不良", "repair_method": "更换"},
+                    {"point": "U6805", "component_type": "IC芯片", "probability": 6.0, "case_count": 20, "fault_type": "物料不良", "repair_method": "更换"}
+                ],
+                "total_count": 331
+            },
+            "下载无端口": {
+                "phenomena": "下载无端口",
+                "top_components": [
+                    {"point": "U0501", "component_type": "IC芯片", "probability": 48.9, "case_count": 174, "fault_type": "少件", "repair_method": "重新焊接"},
+                    {"point": "U0501U1601U1701", "component_type": "IC芯片", "probability": 35.7, "case_count": 127, "fault_type": "少件", "repair_method": "重新焊接"},
+                    {"point": "U1601", "component_type": "IC芯片", "probability": 1.7, "case_count": 6, "fault_type": "物料不良", "repair_method": "更换"}
+                ],
+                "total_count": 356
+            },
+            "MMI不开机": {
+                "phenomena": "MMI不开机",
+                "top_components": [
+                    {"point": "U0501", "component_type": "IC芯片", "probability": 38.9, "case_count": 37, "fault_type": "少件", "repair_method": "重新焊接"},
+                    {"point": "U8001", "component_type": "IC芯片", "probability": 24.2, "case_count": 23, "fault_type": "少件", "repair_method": "重新焊接"},
+                    {"point": "J3801", "component_type": "连接器", "probability": 8.4, "case_count": 8, "fault_type": "破损", "repair_method": "重新焊接"}
+                ],
+                "total_count": 95
+            },
+            "不开机": {
+                "phenomena": "不开机",
+                "top_components": [
+                    {"point": "U0501", "component_type": "IC芯片", "probability": 38.9, "case_count": 74, "fault_type": "少件", "repair_method": "重新焊接"},
+                    {"point": "U8001", "component_type": "IC芯片", "probability": 24.2, "case_count": 46, "fault_type": "少件", "repair_method": "重新焊接"},
+                    {"point": "J3801", "component_type": "连接器", "probability": 8.4, "case_count": 16, "fault_type": "破损", "repair_method": "重新焊接"}
+                ],
+                "total_count": 130
+            },
+            "WIFI不良": {
+                "phenomena": "WIFI不良",
+                "top_components": [
+                    {"point": "U8001", "component_type": "IC芯片", "probability": 76.0, "case_count": 19, "fault_type": "少件", "repair_method": "重新焊接"},
+                    {"point": "U0501", "component_type": "IC芯片", "probability": 8.0, "case_count": 2, "fault_type": "物料不良", "repair_method": "更换"}
+                ],
+                "total_count": 25
+            },
+            "撞件": {
+                "phenomena": "撞件/破损",
+                "top_components": [
+                    {"point": "ANT10801", "component_type": "连接器", "probability": 16.2, "case_count": 27, "fault_type": "破损", "repair_method": "重新焊接"},
+                    {"point": "U5502", "component_type": "IC芯片", "probability": 9.0, "case_count": 15, "fault_type": "撞件", "repair_method": "重新焊接"},
+                    {"point": "ANT9002", "component_type": "连接器", "probability": 6.6, "case_count": 11, "fault_type": "破损", "repair_method": "重新焊接"}
+                ],
+                "total_count": 167
+            },
+            "充电": {
+                "phenomena": "充电异常",
+                "top_components": [
+                    {"point": "U3901", "component_type": "IC芯片", "probability": 88.6, "case_count": 39, "fault_type": "物料不良", "repair_method": "更换"},
+                    {"point": "U3501", "component_type": "IC芯片", "probability": 4.5, "case_count": 2, "fault_type": "物料不良", "repair_method": "更换"}
+                ],
+                "total_count": 44
+            },
+            "快充": {
+                "phenomena": "快充测试",
+                "top_components": [
+                    {"point": "C3816", "component_type": "阻容件", "probability": 28.6, "case_count": 2, "fault_type": "连锡", "repair_method": "重新焊接"},
+                    {"point": "U3501", "component_type": "IC芯片", "probability": 28.6, "case_count": 2, "fault_type": "物料不良", "repair_method": "更换"}
+                ],
+                "total_count": 7
+            },
+            "重启": {
+                "phenomena": "开机死机重启等",
+                "top_components": [
+                    {"point": "U8001", "component_type": "IC芯片", "probability": 33.3, "case_count": 9, "fault_type": "物料不良", "repair_method": "更换"},
+                    {"point": "U0501", "component_type": "IC芯片", "probability": 22.2, "case_count": 6, "fault_type": "物料不良", "repair_method": "更换"}
+                ],
+                "total_count": 27
+            },
+            "功耗": {
+                "phenomena": "功耗不良",
+                "top_components": [
+                    {"point": "U3501", "component_type": "IC芯片", "probability": 37.1, "case_count": 13, "fault_type": "物料不良", "repair_method": "更换"}
+                ],
+                "total_count": 35
+            }
+        };
+
+        const DIAGNOSIS_HISTORY_KEY = 'mainboardDiagnosisHistoryV73';
+        let latestDiagnosisText = '';
+        let uploadedLogFile = null;
+        let uploadedLogContent = '';
+
+        const logKnowledgeBase = {
+            categories: {
+                calibration: { label: '校准/综测日志', keywords: ['cali', 'calibration', '校准', 'nv', 'write nv', 'final test', '综测', 'factorytest'] },
+                mtk: { label: 'MTK 平台日志', keywords: ['mtk', 'md1', 'ccci', 'rilj', 'meta mode', 'mdlog', 'modem warning'] },
+                unisoc: { label: '展锐平台日志', keywords: ['unisoc', 'sprd', 'engpc', 'modemd', 'wcn', 'marlin', 'phs'] },
+                android: { label: 'Android 系统日志', keywords: ['androidruntime', 'system_server', 'binder', 'anr', 'crash', 'fatal exception'] }
+            },
+            modules: {
+                rf: { label: '射频模块', keywords: ['rf', 'tx', 'rx', 'afc', 'pa', 'coupler', 'rssi', 'band', 'channel'], focus: '关注 band/channel、功率、AFC、天线治具链路' },
+                audio: { label: '音频模块', keywords: ['mic', 'speaker', 'audio', 'codec', 'headset', 'loopback'], focus: '关注 codec、mic/speaker 通路、回环值与阈值' },
+                sensor: { label: '传感器模块', keywords: ['sensor', 'gyro', 'g-sensor', 'accel', 'als', 'ps', 'proximity'], focus: '关注 sensor hub、I2C 通信、阈值配置与原始读值' },
+                nv: { label: 'NV/校准参数', keywords: ['nv', 'nvram', 'efs', 'write imei', 'write nv', 'calibration', 'save cali'], focus: '关注 NV item、写入结果码、分区权限和 META 模式' },
+                port: { label: '串口/工具通信', keywords: ['port', 'at', 'usb', 'device not found', 'open port', 'timeout'], focus: '关注 COM 口、USB 枚举、AT 回应和超时点' },
+                system: { label: 'Android系统/权限', keywords: ['selinux', 'denied', 'securityexception', 'system_server', 'binder', 'service not found'], focus: '关注服务权限、SELinux、系统服务注册状态' }
+            },
+            patterns: [
+                { name: '校准参数写入失败', module: 'nv', severity: '高', keywords: ['write nv fail', 'nv write fail', 'calibration fail', 'save cali fail', 'write imei fail'], fields: ['NV item', 'result code', 'phase', 'band/channel'], diagnosis: '校准流程已执行到参数写入阶段，但 NV/EFS/分区写入失败，优先检查权限、分区挂载状态、NVRAM/NV 分区健康度。', suggestions: ['确认设备是否处于 META/工程模式', '核对 NV 分区读写权限与剩余空间', '查看是否存在 write protect / secure boot 限制'] },
+                { name: '串口/AT 通信异常', module: 'port', severity: '高', keywords: ['open port fail', 'port not found', 'at timeout', 'no response', 'device not found'], fields: ['COM 端口号', 'AT 命令', 'timeout(ms)', 'USB 枚举状态'], diagnosis: '工具与设备通信链路异常，常见于驱动未加载、端口切换失败、设备未进入指定模式。', suggestions: ['检查 USB 驱动和端口识别', '确认 DUT 已进入校准/工厂模式', '复测时固定线材并减少 HUB 中转'] },
+                { name: '射频校准失败', module: 'rf', severity: '高', keywords: ['rf cal fail', 'tx fail', 'rx fail', 'afc fail', 'pa current', 'coupler'], fields: ['band', 'channel', 'power', 'AFC', 'PA current'], diagnosis: '日志显示 RF 校准链路异常，需联合射频通路、仪表连接和 NV 参数排查。', suggestions: ['核对天线座/同轴线/治具接触', '查看 band/channel 是否集中失败', '对比良机同站位数据确认是否仪表偏移'] },
+                { name: '音频/传感器综测失败', module: 'audio', severity: '中', keywords: ['mic fail', 'speaker fail', 'sensor fail', 'gyro fail', 'als fail', 'ps fail'], fields: ['test item', 'threshold', 'read value', 'device node'], diagnosis: '综测项返回值异常，通常与器件本体、驱动节点或上下限阈值配置有关。', suggestions: ['确认对应器件驱动节点是否正常创建设备文件', '检查上下限阈值是否被错误配置', '结合硬件替换与 I2C/SPI 通信日志交叉验证'] },
+                { name: '权限/系统服务异常', module: 'system', severity: '中', keywords: ['permission denied', 'selinux', 'avc: denied', 'service not found', 'securityexception'], fields: ['service name', 'uid/pid', 'selinux domain', 'permission'], diagnosis: '系统权限或服务调用被拦截，可能影响校准工具访问底层服务或节点。', suggestions: ['检查工程版权限策略是否完整', '确认服务已启动且 binder/service name 正确', '结合 dmesg / logcat 查看 SELinux 拒绝详情'] },
+                { name: '超时/流程中断', module: 'port', severity: '中', keywords: ['timeout', 'timed out', 'wait response timeout', 'step fail', 'abort'], fields: ['step name', 'timeout value', 'retry count', 'elapsed time'], diagnosis: '流程在特定阶段等待超时，需定位是设备侧未响应还是上位机流程控制问题。', suggestions: ['确认失败前最后一个成功步骤', '统计是否固定在同一阶段超时', '适当增加重试并对比异常前后的关键日志'] },
+                { name: 'Modem/RIL 异常', module: 'system', severity: '中', keywords: ['rilj', 'radio not available', 'modem warning', 'ccci', 'md1'], fields: ['RIL request', 'modem state', 'error cause', 'slot id'], diagnosis: '通信栈与 Modem 交互异常，可能影响射频、校准或网络相关测试流程。', suggestions: ['核对 modem 启动状态与版本匹配', '查看 SIM/射频相关流程是否同步异常', '抓取失败前后 RILJ/CCCI 连续日志'] },
+                { name: '传感器驱动/总线异常', module: 'sensor', severity: '中', keywords: ['i2c fail', 'probe failed', 'sensor init fail', 'read value fail', 'spi timeout'], fields: ['bus id', 'device addr', 'errno', 'probe stage'], diagnosis: '传感器初始化或总线通信异常，需排查器件本体、电源时序与驱动加载。', suggestions: ['查看 probe 阶段是否已报错', '核对 I2C/SPI 上拉、电压、时钟', '对比良机上电初始化顺序'] },
+                { name: '音频回环/编解码异常', module: 'audio', severity: '中', keywords: ['loopback fail', 'codec fail', 'audio path fail', 'headset detect fail'], fields: ['audio device', 'route', 'codec reg', 'loopback result'], diagnosis: '音频路径建立失败或 codec 初始化异常，需联动音频驱动、器件和治具回环路径排查。', suggestions: ['核对 audio route 与 mixer path', '检查 codec 寄存器写入和电源时序', '复测 MIC/SPK/耳机座相关治具接触'] }
+            ]
+        };
+
+        function analyzeKeywords(text, type = 'diagnosis') {
+            const source = type === 'resource' ? Object.keys(projectDatabase) : [...Object.keys(diagnosisRules), ...Object.keys(phenomenaSearchIndex)];
+            const hits = source.filter(keyword => text && (text.toLowerCase().includes(keyword.toLowerCase()) || keyword.toLowerCase().includes(text.toLowerCase()))).slice(0, 5);
+            if (type === 'resource') {
+                const el = document.getElementById('resourceKeywordTip');
+                el.innerHTML = `<strong>关键词分析：</strong>${hits.length ? '识别到项目关键词：' + hits.join('、') : '未识别到明确项目型号，将按输入原文尝试匹配。'}`;
+                return hits;
+            }
+            const el = document.getElementById('keywordTip');
+            el.innerHTML = `<strong>关键词分析：</strong>${hits.length ? '命中关键词：' + hits.join('、') : '暂未命中预置关键词，建议补充现象、电流、进水/摔机等信息。'}`;
+            return hits;
+        }
+
+        function getDiagnosisHistory() {
+            try {
+                return JSON.parse(localStorage.getItem(DIAGNOSIS_HISTORY_KEY) || '[]');
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function saveDiagnosisHistory(entry) {
+            const history = getDiagnosisHistory();
+            history.unshift(entry);
+            localStorage.setItem(DIAGNOSIS_HISTORY_KEY, JSON.stringify(history.slice(0, 20)));
+            renderDiagnosisHistory();
+        }
+
+        function renderDiagnosisHistory() {
+            const history = getDiagnosisHistory();
+            const list = document.getElementById('historyList');
+            const empty = document.getElementById('historyEmpty');
+            if (!list || !empty) return;
+            if (!history.length) {
+                list.innerHTML = '';
+                empty.style.display = 'block';
+                return;
+            }
+            empty.style.display = 'none';
+            list.innerHTML = history.map(item => `<li><strong>${item.mode}</strong>｜${item.keyword}<br><span style="color:#888;font-size:12px;">${item.time}</span><br>${item.summary}</li>`).join('');
+        }
+
+        async function copyLatestDiagnosisResult() {
+            if (!latestDiagnosisText) {
+                alert('暂无可复制的诊断结果');
+                return;
+            }
+            try {
+                await navigator.clipboard.writeText(latestDiagnosisText);
+                const feedback = document.getElementById('copyFeedback');
+                feedback.style.display = 'block';
+                setTimeout(() => feedback.style.display = 'none', 2000);
+            } catch (error) {
+                alert('复制失败，请手动复制页面内容');
+            }
+        }
+
+        function exportDiagnosisHistory() {
+            const history = getDiagnosisHistory();
+            if (!history.length) {
+                alert('暂无诊断历史可导出');
+                return;
+            }
+            const content = history.map((item, index) => `${index + 1}. [${item.mode}] ${item.keyword}\n时间：${item.time}\n摘要：${item.summary}`).join('\n\n');
+            latestDiagnosisText = content;
+            copyLatestDiagnosisResult();
+        }
+
+        function updateResourceCardState(cardId, statusId, available, text) {
+            const card = document.getElementById(cardId);
+            const status = document.getElementById(statusId);
+            card.classList.remove('available', 'missing');
+            status.classList.remove('available', 'missing');
+            if (available) {
+                card.classList.add('available');
+                status.classList.add('available');
+                status.textContent = '可用';
+            } else {
+                card.classList.add('missing');
+                status.classList.add('missing');
+                status.textContent = '缺失';
+            }
+            if (text) status.title = text;
+        }
+
+        // Tab切换
+        function switchTab(tabName) {
+            // 切换Tab按钮状态
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            
+            // 切换Tab内容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        }
+
+        // 诊断模式切换
+        function switchDiagnosisMode(mode) {
+            // 切换模式按钮状态
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            const activeBtn = document.querySelector(`[data-mode="${mode}"]`);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            // 切换模式内容
+            document.querySelectorAll('.diagnosis-mode-content').forEach(content => {
+                content.style.display = 'none';
+                content.classList.remove('active');
+            });
+            const activeContent = document.getElementById(`${mode}-mode`);
+            if (activeContent) {
+                activeContent.style.display = 'block';
+                activeContent.classList.add('active');
+            }
+
+            // 切换到 AI 模式时，刷新项目选择器
+            if (mode === 'ai') {
+                populateAIProjectSelector();
+            }
+        }
+
+        // 快捷输入
+        function quickInput(keyword) {
+            document.getElementById('symptomInput').value = keyword;
+        }
+
+        function quickInputPro(text) {
+            document.getElementById('professionalSymptomInput').value = text;
+        }
+
+        function quickInputSN(sn) {
+            document.getElementById('snInput').value = sn;
+        }
+
+        function triggerLogUpload() {
+            document.getElementById('logFileInput').click();
+        }
+
+        function formatFileSize(size) {
+            if (size < 1024) return `${size} B`;
+            if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+            return `${(size / 1024 / 1024).toFixed(2)} MB`;
+        }
+
+        function updateLogFileMeta(file, extra = '') {
+            const meta = document.getElementById('logFileMeta');
+            if (!file) {
+                meta.textContent = '当前未选择文件';
+                return;
+            }
+            meta.innerHTML = `<strong>已选择：</strong>${file.name}（${formatFileSize(file.size)}）${extra ? `<br>${extra}` : ''}`;
+        }
+
+        function detectLogTypes(text) {
+            const lowerText = text.toLowerCase();
+            return Object.values(logKnowledgeBase.categories)
+                .filter(category => category.keywords.some(keyword => lowerText.includes(keyword)))
+                .map(category => category.label);
+        }
+
+        function extractKeyLines(lines, keywords, limit = 6) {
+            const lowerKeywords = keywords.map(item => item.toLowerCase());
+            return lines.filter(line => {
+                const lower = line.toLowerCase();
+                return lowerKeywords.some(keyword => lower.includes(keyword));
+            }).slice(0, limit);
+        }
+
+        function analyzeLogContent(text, fileName = '') {
+            const lines = text.split(/\r?\n/).filter(Boolean);
+            const lowerLines = lines.map(line => line.toLowerCase());
+            const bandRegex = /(LTE\s*Band\s*\d+|GSM\s*Band\s*\d+|WCDMA\s*Band\s*\d+|NR\s*Band\s*\d+|\bB\d{1,2}\b)/ig;
+            const errorKeywords = ['result: fail', '[*error*]', ' failed', ' fail ', 'exception', 'abort', 'timeout', 'time out', 'non-recoverable', 'rf stop failed', 'meta_rf_getfdtdl_r', 'ncap', 'under -10dbm', 'no tx power', 'frequency error', 'calibration fail', 'incorrect'];
+            const projectMap = [
+                { key: 'gsm & edge dts fhc enhancement', name: 'GSM / EDGE FHC DTS', weight: 12 },
+                { key: 'fdt', name: 'GSM / EDGE FHC DTS', weight: 11 },
+                { key: 'dts', name: 'GSM / EDGE FHC DTS', weight: 10 },
+                { key: 'lte fhc', name: 'FHC', weight: 10 },
+                { key: 'fhc', name: 'FHC', weight: 8 },
+                { key: 'lte mm afc', name: 'AFC', weight: 6 },
+                { key: 'start afc calibration flow', name: 'AFC', weight: 6 },
+                { key: ' afc', name: 'AFC', weight: 5 },
+                { key: 'apc', name: 'APC', weight: 5 },
+                { key: 'agc', name: 'AGC', weight: 5 },
+                { key: 'temperature sensor', name: 'Temperature Sensor', weight: 3 },
+                { key: 'tadc', name: 'TADC', weight: 3 },
+                { key: 'nsft', name: 'NSFT', weight: 3 }
+            ];
+
+            const normalizeBand = (value) => {
+                const raw = value.replace(/\s+/g, ' ').trim().toUpperCase();
+                if (/^B\d+$/.test(raw)) return `LTE Band ${raw.slice(1)}`;
+                return raw
+                    .replace(/LTE\s*BAND\s*(\d+)/i, 'LTE Band $1')
+                    .replace(/GSM\s*BAND\s*(\d+)/i, 'GSM Band $1')
+                    .replace(/WCDMA\s*BAND\s*(\d+)/i, 'WCDMA Band $1')
+                    .replace(/NR\s*BAND\s*(\d+)/i, 'NR Band $1');
+            };
+
+            const extractBands = (value) => [...new Set((value.match(bandRegex) || []).map(normalizeBand))];
+
+            const classifyProject = (line) => {
+                const lower = line.toLowerCase();
+                for (const item of projectMap) {
+                    if (lower.includes(item.key.trim())) return item.name;
+                }
+                return null;
+            };
+
+            const findNearestProject = (index) => {
+                for (let i = index; i >= Math.max(0, index - 200); i--) {
+                    const lower = lines[i].toLowerCase();
+                    for (const item of projectMap) {
+                        if (lower.includes(item.key.trim())) return { project: item.name, index: i, line: lines[i], weight: item.weight || 0 };
+                    }
+                }
+                return { project: '未识别校准项目', index: Math.max(0, index - 80), line: '', weight: 0 };
+            };
+
+                        const findNearestBand = (index, preferredProject = '') => {
+                const candidates = [];
+                for (let i = index; i >= Math.max(0, index - 260); i--) {
+                    const line = lines[i];
+                    const lower = line.toLowerCase();
+
+                    let m = line.match(/StartCalibration\(\)\s*band\s*=\s*(\d{1,3})/i);
+                    if (m) {
+                        candidates.push({ band: `LTE Band ${m[1]}`, index: i, line, source: 'startCalibration', weight: 1000 });
+                        continue;
+                    }
+
+                    m = line.match(/Check\w*Result\(.*Band\s*:\s*(\d{1,3})/i);
+                    if (m) {
+                        candidates.push({ band: `LTE Band ${m[1]}`, index: i, line, source: 'checkResult', weight: 900 });
+                        continue;
+                    }
+
+                    m = line.match(/Band\s*:\s*(\d{1,3}).*Result\s*:\s*FAIL/i);
+                    if (m) {
+                        candidates.push({ band: `LTE Band ${m[1]}`, index: i, line, source: 'resultFail', weight: 880 });
+                        continue;
+                    }
+
+                    m = line.match(/arrange band\s*:\s*([a-z0-9]+)/i);
+                    if (m) {
+                        candidates.push({ band: m[1].toUpperCase(), index: i, line, source: 'arrangeBand', weight: 700 });
+                        continue;
+                    }
+
+                    const directBands = extractBands(line);
+                    if (directBands.length) {
+                        if (lower.includes('support') || lower.includes('mapping') || lower.includes('route') || lower.includes('carkit') || lower.includes('loss table') || lower.includes('average cable loss')) {
+                            continue;
+                        }
+                        candidates.push({ band: directBands[0], index: i, line, source: 'genericBandLine', weight: 500 });
+                        continue;
+                    }
+
+                    m = line.match(/band\s*[:=]\s*(\d{1,3})/i);
+                    if (m && !/route|carkit|mapping|support/i.test(line)) {
+                        candidates.push({ band: `LTE Band ${m[1]}`, index: i, line, source: 'numericBand', weight: 450 });
+                    }
+
+                    // SRS 批次执行格式: <<<<< Band XX Execute in plan N >>>>>
+                    m = line.match(/Band\s+([a-zA-Z0-9]+)\s+Execute\s+in\s+plan\s+(\d+)/i);
+                    if (m) {
+                        const planNum = parseInt(m[2]);
+                        candidates.push({ band: m[1], index: i, line, source: 'srsExecuteBand', weight: 800 + (planNum * 10) });
+                        continue;
+                    }
+
+                    // SRS 结果收集格式: <<<<< Band XX Collect Results in plan N >>>>>
+                    m = line.match(/Band\s+([a-zA-Z0-9]+)\s+Collect\s+Results\s+in\s+plan\s+(\d+)/i);
+                    if (m) {
+                        const planNum = parseInt(m[2]);
+                        candidates.push({ band: m[1], index: i, line, source: 'srsCollectResult', weight: 850 + (planNum * 10) });
+                        continue;
+                    }
+                }
+
+            if (!candidates.length) return { band: '未识别频段', index: -1, line: '', source: 'none' };
+
+            if (preferredProject === 'AFC') {
+                const afcBest = candidates.find(item => item.source === 'startCalibration')
+                    || candidates.find(item => item.source === 'resultFail')
+                    || candidates.find(item => item.source === 'checkResult');
+                if (afcBest) return afcBest;
+            }
+
+            candidates.sort((a, b) => (b.weight + b.index / 10000) - (a.weight + a.index / 10000));
+            return candidates[0];
+            };
+
+            /**
+             * 针对 NR SRS 校准特有的多批次执行模式：
+             * 前几批次 Collect Results 成功，最后一批次 Execute 后因超时 Collect Results 缺失，
+             * 由此推断缺失 Collect 结果的频段为实际失败频段。
+             */
+            const extractSrsBands = (errorIndex) => {
+                // 从错误行往前找到最近一次 StartIteration（批次起点）
+                let batchStart = -1;
+                for (let j = errorIndex; j >= Math.max(0, errorIndex - 50); j--) {
+                    if (lowerLines[j].includes('startiteration')) { batchStart = j; break; }
+                }
+                if (batchStart < 0) return { bands: [], reason: '' };
+
+                // 从错误行往前找到所有 Execute in plan 行
+                const execBands = new Map(); // band -> plan
+                for (let j = errorIndex; j >= batchStart; j--) {
+                    const m = lines[j].match(/Band\s+([a-zA-Z0-9]+)\s+Execute\s+in\s+plan\s+(\d+)/i);
+                    if (m) execBands.set(m[1].toUpperCase(), parseInt(m[2]));
+                }
+                if (!execBands.size) return { bands: [], reason: '' };
+
+                // 往前搜索所有 Collect Results，记录已通过的频段
+                const collectedBands = new Set();
+                for (let j = batchStart; j >= Math.max(0, batchStart - 500); j--) {
+                    const cm = lines[j].match(/Band\s+([a-zA-Z0-9]+)\s+Collect\s+Results\s+in\s+plan\s+(\d+)/i);
+                    if (cm) collectedBands.add(cm[1].toUpperCase());
+                }
+
+                // 已执行的频段中，没有 Collect 结果的 = 实际失败频段
+                const failedBands = [];
+                for (const [band, plan] of execBands) {
+                    if (!collectedBands.has(band)) failedBands.push(band);
+                }
+
+                if (!failedBands.length) return { bands: [], reason: '' };
+
+                const nrBands = failedBands.filter(b => /^n\d+$/.test(b));
+                const displayBands = nrBands.length ? nrBands : failedBands;
+                const reason = `SRS 校准共执行 ${execBands.size} 个频段，${displayBands.length} 个频段（${displayBands.join('、')}）在末批执行后未返回 Collect 结果，综测仪测量超时`;
+                return { bands: displayBands, reason };
+            };
+
+            const buildReason = (errorLine, contextLines = []) => {
+                const full = [errorLine, ...contextLines].join(' | ').toLowerCase();
+                if (full.includes('meta_rf_getfdtdl_r') && (full.includes('time out') || full.includes('timeout'))) {
+                    return 'FDT 下行结果读取超时，流程级交互异常';
+                }
+                if (full.includes('rf stop failed') || full.includes('non-recoverable')) {
+                    return 'RF 流程停止失败，流程进入不可恢复异常状态';
+                }
+                if (full.includes('rx path loss calibration failed') || full.includes('plresult.ok = false')) {
+                    return 'RX Path Loss 校准失败，接收路径损耗结果无效';
+                }
+                if (full.includes('passloss check')) {
+                    return 'RX通路损耗异常，PassLoss Check 超规格';
+                }
+                if (full.includes('rxd') && full.includes('result: fail')) {
+                    return 'RXD 分集接收支路校准失败';
+                }
+                if (full.includes('under -10dbm') || full.includes('no tx power')) {
+                    return '发射功率过低，导致频偏结果无效';
+                }
+                const powerMatch = errorLine.match(/power\s*=\s*(-?\d+(?:\.\d+)?)/i);
+                if (powerMatch && Number(powerMatch[1]) < -10) {
+                    return `发射功率异常偏低（${powerMatch[1]} dBm），导致频偏结果无效`;
+                }
+                if (full.includes('frequency error') && (full.includes('under -10dbm') || full.includes('power ='))) {
+                    return '先出现发射功率异常，继而频偏结果不可信';
+                }
+                if (full.includes('frequency error')) {
+                    return '频率误差异常';
+                }
+                if (full.includes('timeout') || full.includes('time out')) {
+                    return '流程等待超时/设备未按预期响应';
+                }
+                if (full.includes('ncap')) {
+                    return '仪表未捕获到有效能力点或有效测量结果';
+                }
+                if (full.includes('afc')) {
+                    return 'AFC校准失败';
+                }
+                return '校准流程异常';
+            };
+
+            const isFlowLevelTimeout = (line, reason, project) => {
+                const lower = line.toLowerCase();
+                return lower.includes('meta_rf_getfdtdl_r')
+                    || lower.includes('rf stop failed')
+                    || lower.includes('non-recoverable')
+                    || (reason.includes('流程级交互异常'))
+                    || (project === 'GSM / EDGE FHC DTS' && (lower.includes('timeout') || lower.includes('time out')));
+            };
+
+            const scoreErrorContext = (ctx) => {
+                const lower = ctx.line.toLowerCase();
+                let score = ctx.index;
+                if (lower.includes('result: fail')) score += 1000000;
+                if (lower.includes('[*error*]')) score += 900000;
+                if (lower.includes('meta_rf_getfdtdl_r')) score += 1400000;
+                if (lower.includes('rf stop failed')) score += 1300000;
+                if (lower.includes('non-recoverable')) score += 1200000;
+                if (lower.includes('rx path loss calibration failed')) score += 1500000;
+                if (lower.includes('plresult.ok = false')) score += 1400000;
+                if (lower.includes('checkrxscresult')) score += 300000;
+                if (lower.includes('checkrxpartialonresult')) score += 250000;
+                if (lower.includes('checkrxgbgresult')) score += 200000;
+                if (lower.includes('rxd')) score += 120000;
+                if (lower.includes('passloss check')) score += 120000;
+                if (ctx.project === 'GSM / EDGE FHC DTS') score += 180000;
+                if (ctx.project === 'FHC') score += 90000;
+                if (ctx.afcScanEvidence) score += 220000;
+                if (ctx.bandSource === 'startCalibration') score += 260000;
+                if (ctx.bandSource === 'checkResult' || ctx.bandSource === 'resultFail') score += 220000;
+                if (ctx.bandSource === 'genericBandLine') score += 20000;
+                if (ctx.reason.includes('PassLoss')) score += 80000;
+                if (ctx.band !== '未识别频段') score += 50000;
+                if ((lower.includes('ncap') || /freq_err\[\d+\]/i.test(ctx.line)) && !ctx.afcScanEvidence) score -= 120000;
+                if (lower.includes('warning')) score -= 500000;
+                if (lower.includes('duplicated definitions')) score -= 500000;
+                if (lower.includes('incorrect data due to the duplicated definitions')) score -= 500000;
+                return score;
+            };
+
+            const findAfcStartCalibrationBand = () => {
+                for (let i = 0; i < lines.length; i++) {
+                    const project = classifyProject(lines[i]) || '';
+                    if (project !== 'AFC') continue;
+                    for (let j = i; j < Math.min(lines.length, i + 120); j++) {
+                        const m = lines[j].match(/StartCalibration\(\)\s*band\s*=\s*(\d{1,3})/i);
+                        if (m) {
+                            return {
+                                band: `LTE Band ${m[1]}`,
+                                index: j,
+                                line: lines[j],
+                                project: 'AFC',
+                                projectLine: lines[i],
+                                source: 'afcStartCalibration'
+                            };
+                        }
+                    }
+                }
+                return null;
+            };
+
+            const afcStartBand = findAfcStartCalibrationBand();
+            const errorContexts = [];
+            for (let i = 0; i < lines.length; i++) {
+                const lower = lowerLines[i];
+                if (!errorKeywords.some(keyword => lower.includes(keyword))) continue;
+                const projectInfo = findNearestProject(i);
+                const bandInfo = findNearestBand(i, projectInfo.project);
+                const contextLines = lines.slice(Math.max(0, i - 6), Math.min(lines.length, i + 4));
+                const reason = buildReason(lines[i], contextLines);
+                const afcScanEvidence = projectInfo.project === 'AFC' && contextLines.some(ctx => /freq_err\[\d+\]\s*=\s*-?\d/i.test(ctx));
+                errorContexts.push({
+                    index: i,
+                    line: lines[i],
+                    project: projectInfo.project,
+                    band: bandInfo.band,
+                    projectLine: projectInfo.line,
+                    bandLine: bandInfo.line,
+                    reason,
+                    flowLevel: isFlowLevelTimeout(lines[i], reason, projectInfo.project),
+                    afcScanEvidence,
+                    bandSource: bandInfo.source || 'none',
+                    hasExplicitBand: /startcalibration\(\)\s*band\s*=|band\s*:\s*\d+.*result\s*:\s*fail/i.test((bandInfo.line || '').toLowerCase())
+                });
+            }
+
+            errorContexts.sort((a, b) => scoreErrorContext(b) - scoreErrorContext(a));
+            const preferredError = errorContexts[0] || null;
+
+            let fallbackContext = null;
+            for (let i = lines.length - 1; i >= 0; i--) {
+                const project = classifyProject(lines[i]);
+                if (project || /band\s*[:=]?\s*\d+/i.test(lines[i]) || /arrange band\s*:/i.test(lines[i])) {
+                    const projectInfo = project ? { project, line: lines[i] } : findNearestProject(i);
+                    const bandInfo = findNearestBand(i, projectInfo.project);
+                    fallbackContext = {
+                        index: i,
+                        line: lines[i],
+                        project: projectInfo.project,
+                        band: bandInfo.band,
+                        projectLine: projectInfo.line,
+                        bandLine: bandInfo.line
+                    };
+                    if (bandInfo.band !== '未识别频段') break;
+                }
+            }
+
+            let issueBand = '未识别频段';
+            let calibrationProject = '未识别校准项目';
+            let matchedLine = '';
+            let mode = '未定位';
+            let reason = '校准流程异常';
+            let conclusion = '未能从日志中提取出明确结论';
+            let keyLines = [];
+
+            if (preferredError) {
+                issueBand = preferredError.flowLevel ? '未明确落到单一Band（流程级异常）' : preferredError.band;
+                calibrationProject = preferredError.project;
+                matchedLine = preferredError.line;
+                mode = preferredError.flowLevel ? '最终报错优先 + 流程级超时定位' : '最终失败优先 + 结果行回溯定位';
+                reason = preferredError.reason;
+                keyLines = [preferredError.projectLine, preferredError.bandLine, preferredError.line].filter(Boolean);
+
+                // SRS 校准专用：末批执行后 Collect Results 缺失，推断失败频段
+                if (preferredError.line.toLowerCase().includes('fhcsrs') || preferredError.line.toLowerCase().includes('srs')) {
+                    const srs = extractSrsBands(preferredError.index);
+                    if (srs.bands.length) {
+                        issueBand = srs.bands.map(b => `NR ${b}`).join('、');
+                        reason = srs.reason;
+                        mode = 'SRS 末批缺失 Collect 结果 + 失败频段推断';
+                    }
+                }
+
+                if (!preferredError.flowLevel && calibrationProject === 'AFC' && afcStartBand
+                    && !preferredError.line.toLowerCase().includes('rx path loss calibration failed')
+                    && !preferredError.line.toLowerCase().includes('plresult.ok = false')) {
+                    issueBand = afcStartBand.band;
+                    if (!keyLines.includes(afcStartBand.line)) keyLines.unshift(afcStartBand.line);
+                    if (!keyLines.includes(afcStartBand.projectLine)) keyLines.unshift(afcStartBand.projectLine);
+                    mode = 'AFC专用定位 + StartCalibration band 锁定';
+                }
+
+                conclusion = preferredError.flowLevel
+                    ? `${calibrationProject} 发生流程级异常，直接原因是：${reason}`
+                    : issueBand !== '未识别频段'
+                        ? `${issueBand} 在 ${calibrationProject} 阶段出现异常，直接原因是：${reason}`
+                        : `${calibrationProject} 阶段出现异常，直接原因是：${reason}`;
+            } else if (fallbackContext) {
+                issueBand = fallbackContext.band;
+                calibrationProject = fallbackContext.project;
+                matchedLine = fallbackContext.line;
+                mode = '日志截断 + 最近流程回溯';
+                reason = '日志异常截断/流程中断';
+                keyLines = [fallbackContext.projectLine, fallbackContext.bandLine, fallbackContext.line].filter(Boolean);
+                conclusion = issueBand !== '未识别频段'
+                    ? `日志没有明确报错，但最近执行流程停在 ${issueBand} 的 ${calibrationProject} 阶段`
+                    : `日志没有明确报错，但最近执行流程停在 ${calibrationProject} 阶段`;
+            }
+
+            return {
+                issueBand,
+                reason,
+                calibrationProject,
+                matchedLine,
+                mode,
+                conclusion,
+                keyLines: [...new Set(keyLines)].slice(0, 6),
+                summary: conclusion
+            };
+        }
+
+                function renderLogAnalysisResult(result, file) {
+            const container = document.getElementById('logAnalysisResult');
+            const keyLinesHtml = (result.keyLines && result.keyLines.length
+                ? result.keyLines
+                : [result.matchedLine || '未匹配到明确报错行，已按最近校准流程回溯定位'])
+                .map(line => `<div class="mono-box" style="margin-bottom:8px;">${String(line).replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>`)
+                .join('');
+            container.innerHTML = `
+                <div class="result-header">
+                    <h3>MTK射频校准Log分析结果</h3>
+                </div>
+                <div class="result-body">
+                    <div class="report-section">
+                        <h4>分析结果</h4>
+                        <table class="report-table">
+                            <tr><th>定位方式</th><td>${result.mode}</td></tr>
+                            <tr><th>校准项目</th><td>${result.calibrationProject}</td></tr>
+                            <tr><th>问题频段</th><td>${result.issueBand}</td></tr>
+                            <tr><th>故障原因</th><td>${result.reason}</td></tr>
+                            <tr><th>结论</th><td>${result.conclusion || result.summary}</td></tr>
+                        </table>
+                    </div>
+                    <div class="analysis-block">
+                        <h4>关键定位行</h4>
+                        ${keyLinesHtml}
+                    </div>
+                </div>
+            `;
+            // 显示 AI 深度解读按钮
+            const aiLogSection = document.getElementById('aiLogSection');
+            if (aiLogSection) {
+                aiLogSection.style.display = 'block';
+                document.getElementById('aiLogResult').innerHTML = '';
+                document.getElementById('aiLogBtn').disabled = false;
+                document.getElementById('aiLogBtn').textContent = '🤖 AI 深度解读 Log';
+            }
+        }
+
+                function analyzeUploadedLog() {
+            if (!uploadedLogFile || !uploadedLogContent) {
+                alert('请先选择并读取log文件');
+                return;
+            }
+            const result = analyzeLogContent(uploadedLogContent, uploadedLogFile.name);
+            renderLogAnalysisResult(result, uploadedLogFile);
+        }
+
+        // 搜索项目资料
+        function searchProjectResources() {
+            const sn = document.getElementById('snInput').value.trim();
+            analyzeKeywords(sn, 'resource');
+            if (!sn) {
+                alert('请输入主板SN号');
+                return;
+            }
+
+            // 提取项目型号（如X6878-xxx提取X6878）
+            let projectModel = sn;
+            if (sn.includes('-')) {
+                projectModel = sn.split('-')[0];
+            }
+
+            // 转换为大写匹配
+            projectModel = projectModel.toUpperCase();
+
+            // 隐藏之前的内容
+            document.getElementById('projectInfo').style.display = 'none';
+            document.getElementById('resourcesGrid').style.display = 'none';
+            document.getElementById('emptyResult').style.display = 'none';
+
+            // 查询项目
+            if (projectDatabase[projectModel]) {
+                const project = projectDatabase[projectModel];
+                currentResourceProject = projectModel;
+
+                // 显示项目信息
+                document.getElementById('projectName').textContent = project.name;
+                document.getElementById('projectSN').textContent = sn;
+                document.getElementById('projectVersion').textContent = project.version;
+                document.getElementById('projectInfo').style.display = 'block';
+
+                // 更新资料链接 - 原理图
+                if (project.schematicUrl) {
+                    document.getElementById('schematicCard').onclick = () => window.open(project.schematicUrl, '_blank');
+                    document.getElementById('schematicCard').style.opacity = '1';
+                    document.getElementById('schematicCard').style.cursor = 'pointer';
+                    document.getElementById('schematicDesc').textContent = project.schematicName;
+                } else {
+                    document.getElementById('schematicCard').onclick = null;
+                    document.getElementById('schematicCard').style.opacity = '0.5';
+                    document.getElementById('schematicCard').style.cursor = 'not-allowed';
+                    document.getElementById('schematicDesc').textContent = project.schematicName + ' - 请到资料库补充';
+                }
+
+                // 更新资料链接 - 位号图
+                if (project.layoutUrl) {
+                    document.getElementById('layoutCard').onclick = () => window.open(project.layoutUrl, '_blank');
+                    document.getElementById('layoutCard').style.opacity = '1';
+                    document.getElementById('layoutCard').style.cursor = 'pointer';
+                    document.getElementById('layoutDesc').textContent = project.layoutName;
+                } else {
+                    document.getElementById('layoutCard').onclick = null;
+                    document.getElementById('layoutCard').style.opacity = '0.5';
+                    document.getElementById('layoutCard').style.cursor = 'not-allowed';
+                    document.getElementById('layoutDesc').textContent = project.layoutName + ' - 请到资料库补充';
+                }
+
+                // 更新资料链接 - BOM
+                if (project.bomUrl) {
+                    document.getElementById('bomCard').onclick = () => window.open(project.bomUrl, '_blank');
+                    document.getElementById('bomCard').style.opacity = '1';
+                    document.getElementById('bomCard').style.cursor = 'pointer';
+                    document.getElementById('bomDesc').textContent = project.bomName;
+                } else {
+                    document.getElementById('bomCard').onclick = null;
+                    document.getElementById('bomCard').style.opacity = '0.5';
+                    document.getElementById('bomCard').style.cursor = 'not-allowed';
+                    document.getElementById('bomDesc').textContent = project.bomName + ' - 请到资料库补充';
+                }
+
+                // 更新资料链接 - 维修指导书
+                if (project.sopUrl) {
+                    document.getElementById('sopCard').onclick = () => window.open(project.sopUrl, '_blank');
+                    document.getElementById('sopCard').style.opacity = '1';
+                    document.getElementById('sopCard').style.cursor = 'pointer';
+                    document.getElementById('sopDesc').textContent = project.sopName;
+                } else {
+                    document.getElementById('sopCard').onclick = null;
+                    document.getElementById('sopCard').style.opacity = '0.5';
+                    document.getElementById('sopCard').style.cursor = 'not-allowed';
+                    document.getElementById('sopDesc').textContent = project.sopName + ' - 请到资料库补充';
+                }
+
+                // 显示资料列表
+                document.getElementById('resourcesGrid').style.display = 'grid';
+
+                // 更新元件映射状态
+                const cov = getProjectCoverage(projectModel);
+                const statusEl = document.getElementById('resourceComponentStatus');
+                if (statusEl) {
+                    if (cov.count > 0) {
+                        statusEl.textContent = `✅ 已录入 ${cov.count} 个器件位号，可直接用于 AI 诊断`;
+                        statusEl.style.color = '#065f46';
+                    } else {
+                        statusEl.textContent = '⚠️ 该项目暂无器件位号数据，AI 诊断将使用通用位号';
+                        statusEl.style.color = '#92400e';
+                    }
+                }
+            } else {
+                currentResourceProject = '';
+                document.getElementById('resourceSummary').innerHTML = '<strong>资料状态：</strong>未找到匹配项目，请检查SN或型号。';
+                updateResourceCardState('schematicCard', 'schematicStatus', false, '未查询到');
+                updateResourceCardState('layoutCard', 'layoutStatus', false, '未查询到');
+                updateResourceCardState('bomCard', 'bomStatus', false, '未查询到');
+                updateResourceCardState('sopCard', 'sopStatus', false, '未查询到');
+                // 显示无结果
+                document.getElementById('emptyResult').style.display = 'block';
+            }
+        }
+
+        // 开始诊断
+        function startDiagnosis() {
+            const symptom = document.getElementById('symptomInput').value.trim();
+            analyzeKeywords(symptom, 'diagnosis');
+            if (!symptom) {
+                alert('请输入故障现象关键词');
+                return;
+            }
+
+            // 触发 AI 后台搜索信号（不阻塞前端展示）
+            console.log("EXEC_SEARCH_KNOWLEDGE_BASE: " + symptom);
+            
+            // 匹配故障类型
+            let matchedPoints = [];
+            let matchedRule = null;
+            let dataSource = '诊断规则库';
+
+            // 1. 先尝试精确匹配预定义故障类型
+            for (const [faultType, points] of Object.entries(diagnosisRules)) {
+                if (symptom.includes(faultType)) {
+                    matchedPoints = points;
+                    matchedRule = faultType;
+                    break;
+                }
+            }
+
+            // 2. 如果没匹配到，尝试从多维表格现象索引搜索
+            if (matchedPoints.length === 0) {
+                // 遍历所有索引的关键词，看用户输入是否包含
+                for (const [keyword, data] of Object.entries(phenomenaSearchIndex)) {
+                    if (symptom.includes(keyword) || keyword.includes(symptom)) {
+                        matchedPoints = data.top_components;
+                        matchedRule = data.phenomena;
+                        dataSource = '多维表格案例库';
+                        break;
+                    }
+                }
+
+                // 如果还没匹配到，尝试模糊匹配（关键词包含关系）
+                if (matchedPoints.length === 0) {
+                    const symptomLower = symptom.toLowerCase();
+                    for (const [keyword, data] of Object.entries(phenomenaSearchIndex)) {
+                        if (keyword.toLowerCase().includes(symptomLower) || symptomLower.includes(keyword.toLowerCase())) {
+                            matchedPoints = data.top_components;
+                            matchedRule = data.phenomena;
+                            dataSource = '多维表格案例库';
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // 显示结果
+            const resultContainer = document.getElementById('diagnosisResult');
+            if (matchedPoints.length === 0) {
+                latestDiagnosisText = `诊断模式：历史案例匹配\n输入现象：${symptom}\n结果：未匹配到相关故障案例，请检查输入关键词或使用专业诊断模式`;
+                saveDiagnosisHistory({ mode: '历史案例匹配', keyword: symptom, time: new Date().toLocaleString('zh-CN'), summary: '未匹配到相关故障案例' });
+                resultContainer.innerHTML = `
+                    <div class="result-header">
+                        <h3>诊断结果</h3>
+                        <p>未匹配到相关故障案例，请检查输入关键词或使用专业诊断模式</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // 按概率排序
+            matchedPoints.sort((a, b) => b.probability - a.probability);
+
+            // 生成结果HTML
+            let pointsHtml = '';
+            matchedPoints.forEach((point, index) => {
+                const rankClass = index === 0 ? 'rank-1' : index === 1 ? 'rank-2' : '';
+                pointsHtml += `
+                    <div class="point-card ${rankClass}">
+                        <div class="point-header">
+                            <div class="point-name">${point.point} (${point.point_name})</div>
+                            <div class="point-probability">${point.probability}%</div>
+                        </div>
+                        <div class="point-meta">
+                            <div class="meta-item">
+                                <div class="meta-label">器件类型</div>
+                                <div class="meta-value">${point.component_type}</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-label">历史案例</div>
+                                <div class="meta-value">${point.case_count}例</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-label">故障类型</div>
+                                <div class="meta-value">${point.fault_type}</div>
+                            </div>
+                        </div>
+                        <div class="point-method">
+                            <strong>维修方法：</strong>${point.repair_method}
+                        </div>
+                    </div>
+                `;
+            });
+
+            latestDiagnosisText = `诊断模式：历史案例匹配\n输入现象：${symptom}\n匹配规则：${matchedRule}\n数据来源：${dataSource}\n` + matchedPoints.map((point, index) => `${index + 1}. ${point.point} (${point.point_name || ''}) - ${point.probability}% - ${point.repair_method}`).join('\n');
+            saveDiagnosisHistory({ mode: '历史案例匹配', keyword: symptom, time: new Date().toLocaleString('zh-CN'), summary: `匹配 ${matchedPoints.length} 个检查点，首项 ${matchedPoints[0].point}` });
+
+            resultContainer.innerHTML = `
+                <div class="result-header">
+                    <h3>诊断结果</h3>
+                    <div class="result-stats">
+                        <div class="stat-item">
+                            <span class="stat-number">${matchedPoints.length}</span>
+                            <span>个建议检查点位</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">${matchedRule ? matchedRule.substring(0, 20) : matchedRule}${matchedRule && matchedRule.length > 20 ? '...' : ''}</span>
+                            <span>故障现象</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-source">${dataSource}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="result-body">
+                    ${pointsHtml}
+                </div>
+            `;
+        }
+
+        // 专业诊断 - 基于飞书电子工程知识库
+        function startProfessionalDiagnosis() {
+            const symptom = document.getElementById('professionalSymptomInput').value.trim();
+            analyzeKeywords(symptom, 'diagnosis');
+            if (!symptom) {
+                alert('请详细描述故障现象');
+                return;
+            }
+
+            // 1. 匹配故障模块（支持多模块匹配）
+            const matchedModules = [];
+            const symptomLower = symptom.toLowerCase();
+
+            for (const [key, module] of Object.entries(hardwareKnowledgeBase)) {
+                if (key === 'analysisMethods') continue;
+                if (module.keywords && module.keywords.some(kw => symptomLower.includes(kw.toLowerCase()) || kw.toLowerCase().includes(symptomLower))) {
+                    matchedModules.push({ key, ...module });
+                }
+            }
+
+            // 2. 生成结构化诊断结果
+            let sectionsHtml = '';
+            let plainTextParts = [];
+            plainTextParts.push(`诊断模式：专业硬件诊断（基于飞书电子工程知识库）`);
+            plainTextParts.push(`输入现象：${symptom}`);
+            plainTextParts.push('');
+
+            // 2.1 通用分析方法提示
+            const methods = hardwareKnowledgeBase.analysisMethods;
+            sectionsHtml += `
+                <div class="result-section-title">📖 分析思路框架</div>
+                <div class="result-section-content">
+                    <p><strong>六步分析法：</strong>${methods.steps.join(' → ')}</p>
+                    <div class="module-grid" style="margin-top: 12px;">
+                        ${methods.methods.map(m => `<div class="module-mini-card"><h5>${m.name}</h5><div class="tiny-text">${m.desc}</div></div>`).join('')}
+                    </div>
+                </div>
+            `;
+
+            // 2.2 匹配到的故障模块
+            if (matchedModules.length === 0) {
+                sectionsHtml += `
+                    <div class="result-section-title">⚠️ 未匹配到专业模块知识</div>
+                    <div class="result-section-content">
+                        <p>系统暂未匹配到与「${symptom}」直接对应的专业分析模块。</p>
+                        <p style="margin-top: 10px;">建议：</p>
+                        <ul class="suggestion-list">
+                            <li><strong>尝试补充描述：</strong>如电流值、进水/摔机历史、具体现象</li>
+                            <li><strong>切换到「历史案例匹配」模式：</strong>可能匹配到相关案例</li>
+                            <li><strong>参考通用分析方法：</strong>按「问→看→听→摸→思→修」六步分析</li>
+                        </ul>
+                    </div>
+                `;
+                plainTextParts.push('未匹配到专业模块，建议补充描述或切换到历史案例模式。');
+            } else {
+                // 主要模块优先展示
+                matchedModules.forEach((mod, idx) => {
+                    const isPrimary = idx === 0;
+                    sectionsHtml += `
+                        <div class="result-section-title">${isPrimary ? '🎯' : '🔹'} ${mod.title} ${isPrimary ? '（主要）' : ''}</div>
+                        <div class="result-section-content">
+                            <div class="module-card">
+                                <div class="module-title">⚡ 工作原理</div>
+                                <div class="module-item">${mod.principle}</div>
+                            </div>
+                            <div class="module-card">
+                                <div class="module-title">🔑 关键信号/电源</div>
+                                <div class="module-item">${mod.keySignals}</div>
+                            </div>
+                            <div class="module-card">
+                                <div class="module-title">⚠️ 常见故障</div>
+                                <div class="module-item">${mod.commonFaults}</div>
+                            </div>
+                            <div class="module-card">
+                                <div class="module-title">🔍 排查步骤</div>
+                                ${mod.diagnosis.map((step, i) => `<div class="module-item"><strong>步骤${i + 1}：</strong>${step}</div>`).join('')}
+                            </div>
+                            ${mod.source ? `<div class="tiny-text" style="margin-top: 10px;">📎 知识来源：<a href="${mod.source}" target="_blank" style="color: #667eea;">飞书知识库原文</a></div>` : ''}
+                        </div>
+                    `;
+                    plainTextParts.push(`【${mod.title}】`);
+                    plainTextParts.push(`工作原理：${mod.principle}`);
+                    plainTextParts.push(`关键信号：${mod.keySignals}`);
+                    plainTextParts.push(`常见故障：${mod.commonFaults}`);
+                    plainTextParts.push(`排查步骤：`);
+                    mod.diagnosis.forEach((step, i) => plainTextParts.push(`  ${i + 1}. ${step}`));
+                    plainTextParts.push('');
+                });
+            }
+
+            latestDiagnosisText = plainTextParts.join('\n');
+            saveDiagnosisHistory({
+                mode: '专业硬件诊断',
+                keyword: symptom.slice(0, 30),
+                time: new Date().toLocaleString('zh-CN'),
+                summary: `匹配 ${matchedModules.length} 个专业模块` + (matchedModules.length ? '：' + matchedModules.map(m => m.title).slice(0, 3).join('、') : '')
+            });
+
+            document.getElementById('professionalResult').innerHTML = sectionsHtml;
+        }
+
+        // =========================
+        // AI 集成 - 设置管理
+        // =========================
+        const AI_SETTINGS_KEY = 'aiSettingsV1';
+
+        function getAISettings() {
+            try {
+                const defaults = { apiUrl: 'http://localhost:8899', model: 'deepseek-chat' };
+                const saved = JSON.parse(localStorage.getItem(AI_SETTINGS_KEY) || '{}');
+                return { ...defaults, ...saved };
+            } catch (e) { return { apiUrl: 'http://localhost:8899', model: 'claude-sonnet-4-6' }; }
+        }
+
+        function saveAISettings() {
+            const apiUrl = document.getElementById('settingApiUrl').value.trim();
+            const model = document.getElementById('settingModel').value;
+            if (!apiUrl) { alert('请输入后端代理地址'); return; }
+            localStorage.setItem(AI_SETTINGS_KEY, JSON.stringify({ apiUrl, model }));
+            alert('AI 设置已保存');
+            closeSettings();
+        }
+
+        let aiSupportsVision = false;
+
+        async function checkAIStatus() {
+            const el = document.getElementById('aiStatusInline');
+            if (!el) return;
+            const settings = getAISettings();
+            try {
+                const resp = await fetch(`${settings.apiUrl}/health`, { method: 'GET', signal: AbortSignal.timeout(3000) });
+                const data = await resp.json();
+                aiSupportsVision = data.supports_vision || false;
+                if (data.status === 'ok' && data.api_configured) {
+                    el.innerHTML = `AI: <span style="color:#10b981;font-weight:600;">${data.provider || '已连接'}</span>`;
+                    el.title = `${data.provider} - ${data.default_model} | 图片分析: ${aiSupportsVision ? '支持' : '不支持'}`;
+                } else if (data.status === 'ok') {
+                    el.innerHTML = 'AI: <span style="color:#ef6c00;">Key 未配置</span>';
+                    el.title = '代理已运行但 API Key 未设置';
+                } else {
+                    el.innerHTML = 'AI: <span style="color:#ef6c00;">异常</span>';
+                }
+            } catch (e) {
+                el.innerHTML = 'AI: <span style="color:#f44336;">未连接</span>';
+                el.title = '代理服务未启动，请运行 启动AI服务.bat';
+            }
+        }
+
+        function openSettings() {
+            const settings = getAISettings();
+            document.getElementById('settingApiUrl').value = settings.apiUrl;
+            document.getElementById('settingModel').value = settings.model;
+            document.getElementById('statusDot').className = 'status-dot';
+            document.getElementById('statusText').textContent = '未检测';
+            document.getElementById('settingsOverlay').classList.add('active');
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsOverlay').classList.remove('active');
+        }
+
+        async function testAIConnection() {
+            const settings = getAISettings();
+            const dot = document.getElementById('statusDot');
+            const text = document.getElementById('statusText');
+            dot.className = 'status-dot checking';
+            text.textContent = '正在检测...';
+            try {
+                const resp = await fetch(`${settings.apiUrl}/health`, { method: 'GET' });
+                const data = await resp.json();
+                if (data.status === 'ok' && data.api_configured) {
+                    dot.className = 'status-dot ok';
+                    const visionNote = data.supports_vision ? ' ✅支持原理图分析' : '';
+                    text.innerHTML = `连接成功 - ${data.provider || ''} (${data.default_model || ''})<br><span style="font-size:11px;color:#666;">图片分析: ${data.supports_vision ? '✅ 支持' : '⚠️ 不支持（需 Anthropic Key）'}</span>`;
+                } else if (data.status === 'ok') {
+                    dot.className = 'status-dot err';
+                    text.textContent = '代理已启动但 API Key 未配置';
+                } else {
+                    dot.className = 'status-dot err';
+                    text.textContent = '代理返回异常';
+                }
+            } catch (e) {
+                dot.className = 'status-dot err';
+                text.textContent = '无法连接代理服务: ' + e.message;
+            }
+        }
+
+        // =========================
+        // AI 集成 - 流式 API 调用
+        // =========================
+
+        async function callAIStream(systemPrompt, userMessage, onChunk, onDone, onError) {
+            const settings = getAISettings();
+            // 构造用户消息内容（支持纯文本或文本+图片）
+            let userContent = userMessage;
+            if (schematicImageData) {
+                userContent = [
+                    { type: 'image', source: { type: 'base64', media_type: schematicImageData.media_type, data: schematicImageData.base64 } },
+                    { type: 'text', text: userMessage }
+                ];
+            }
+            const payload = {
+                model: settings.model,
+                system: systemPrompt,
+                messages: [{ role: 'user', content: userContent }],
+                max_tokens: 4096,
+                temperature: 0.7,
+                stream: true
+            };
+            try {
+                const resp = await fetch(`${settings.apiUrl}/api/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!resp.ok) {
+                    const errData = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` }));
+                    onError(errData.error || `请求失败 (${resp.status})`);
+                    return;
+                }
+                const reader = resp.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+                let fullText = '';
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop() || '';
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const dataStr = line.slice(6).trim();
+                            if (!dataStr) continue;
+                            try {
+                                const event = JSON.parse(dataStr);
+                                if (event.type === 'content_block_delta' && event.delta && event.delta.text) {
+                                    fullText += event.delta.text;
+                                    onChunk(fullText, event.delta.text);
+                                } else if (event.type === 'error') {
+                                    onError(event.error?.message || 'API 返回错误');
+                                    return;
+                                }
+                            } catch (e) { /* 跳过非 JSON 行 */ }
+                        }
+                    }
+                }
+                onDone(fullText);
+            } catch (e) {
+                onError('网络错误：无法连接到 AI 代理服务 (' + e.message + ')。请确认已启动 ai_proxy_server.py');
+            }
+        }
+
+        async function callAI(systemPrompt, userMessage) {
+            const settings = getAISettings();
+            const payload = {
+                model: settings.model,
+                system: systemPrompt,
+                messages: [{ role: 'user', content: userMessage }],
+                max_tokens: 4096,
+                temperature: 0.7,
+                stream: false
+            };
+            const resp = await fetch(`${settings.apiUrl}/api/chat`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!resp.ok) {
+                const errData = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` }));
+                throw new Error(errData.error || `请求失败 (${resp.status})`);
+            }
+            const data = await resp.json();
+            return data.content?.[0]?.text || 'AI 未返回内容';
+        }
+
+        // =========================
+        // 原理图图片处理
+        // =========================
+
+        let schematicImageData = null; // { base64, media_type }
+
+        function handleSchematicUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64 = e.target.result.split(',')[1];
+                const mediaType = file.type || 'image/png';
+                schematicImageData = { base64, media_type: mediaType };
+                document.getElementById('schematicPreviewImg').src = e.target.result;
+                document.getElementById('schematicPreview').style.display = 'inline-block';
+                document.getElementById('schematicDropZone').style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearSchematicImage() {
+            schematicImageData = null;
+            document.getElementById('schematicPreview').style.display = 'none';
+            document.getElementById('schematicDropZone').style.display = 'flex';
+            document.getElementById('schematicImageInput').value = '';
+        }
+
+        // =========================
+        // AI 智能诊断
+        // =========================
+
+        function quickInputAI(text) {
+            switchDiagnosisMode('ai');
+            document.getElementById('aiSymptomInput').value = text;
+            document.getElementById('aiSymptomInput').focus();
+        }
+
+        function buildDiagnosisContext(symptom, projectModel) {
+            // 收集项目位号映射
+            const projectComponentInfo = buildProjectComponentPrompt(projectModel || selectedAIProject);
+
+            // 收集本地规则库匹配结果
+            let localMatchInfo = '';
+            const symptomLower = symptom.toLowerCase();
+
+            // 先精确匹配 diagnosisRules
+            for (const [faultType, points] of Object.entries(diagnosisRules)) {
+                if (symptomLower.includes(faultType.toLowerCase())) {
+                    localMatchInfo += `\n【本地规则库匹配 - ${faultType}】\n`;
+                    points.slice(0, 5).forEach((p, i) => {
+                        localMatchInfo += `  ${i + 1}. ${p.point} (${p.point_name}) - 概率${p.probability}% - ${p.case_count}例 - ${p.repair_method}\n`;
+                    });
+                    break;
+                }
+            }
+
+            // 再从 phenomenaSearchIndex 匹配
+            if (!localMatchInfo) {
+                for (const [keyword, data] of Object.entries(phenomenaSearchIndex)) {
+                    if (symptomLower.includes(keyword.toLowerCase())) {
+                        localMatchInfo += `\n【多维表格案例库匹配 - ${data.phenomena}】共${data.total_count}例\n`;
+                        data.top_components.slice(0, 5).forEach((p, i) => {
+                            localMatchInfo += `  ${i + 1}. ${p.point} - 概率${p.probability}% - ${p.case_count}例 - ${p.repair_method}\n`;
+                        });
+                        break;
+                    }
+                }
+            }
+
+            // 收集专业知识库匹配
+            let knowledgeInfo = '';
+            for (const [key, module] of Object.entries(hardwareKnowledgeBase)) {
+                if (key === 'analysisMethods') continue;
+                if (module.keywords && module.keywords.some(kw => symptomLower.includes(kw.toLowerCase()))) {
+                    knowledgeInfo += `\n【${module.title}】\n`;
+                    knowledgeInfo += `工作原理：${module.principle}\n`;
+                    knowledgeInfo += `关键信号：${module.keySignals}\n`;
+                    knowledgeInfo += `常见故障：${module.commonFaults}\n`;
+                    knowledgeInfo += `排查步骤：\n${module.diagnosis.map((s, i) => `  ${i + 1}. ${s}`).join('\n')}\n`;
+                }
+            }
+
+            const methods = hardwareKnowledgeBase.analysisMethods;
+            const frameworkInfo = `六步分析法：${methods.steps.join(' → ')}\n分析方法：${methods.methods.map(m => m.name + ': ' + m.desc).join('; ')}`;
+
+            return {
+                localMatchInfo,
+                knowledgeInfo,
+                frameworkInfo,
+                projectComponentInfo,
+                hasLocalMatch: !!localMatchInfo,
+                hasProjectMap: !!projectComponentInfo
+            };
+        }
+
+        function renderAIStreamResult(container, fullText, isComplete) {
+            // 简单的 Markdown 转 HTML
+            let html = fullText
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/^### (.+)$/gm, '<h4>$1</h4>')
+                .replace(/^## (.+)$/gm, '<h4>$1</h4>')
+                .replace(/^- (.+)$/gm, '<li>$1</li>')
+                .replace(/^(\d+)\.\s+(.+)$/gm, '<li>$2</li>')
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/\n/g, '<br>');
+            html = '<p>' + html + '</p>';
+            html = html.replace(/<p>\s*<\/p>/g, '');
+            html = html.replace(/(<li>.*?<\/li>)/gs, function(match) {
+                if (!match.includes('</ul>') && !match.includes('<ul>')) {
+                    return '<ul>' + match + '</ul>';
+                }
+                return match;
+            });
+            // Clean duplicate ul wrappers
+            html = html.replace(/<\/ul>\s*<ul>/g, '');
+
+            const projectLabel = selectedAIProject ? ` · 项目: ${selectedAIProject}` : '';
+            const cursorClass = isComplete ? '' : ' ai-typing-cursor';
+            container.innerHTML = `
+                <div class="ai-result-container">
+                    <div class="ai-result-header">
+                        <span>🤖 AI 智能诊断分析${projectLabel}</span>
+                        <span class="ai-badge">${isComplete ? '分析完成' : '分析中...'}</span>
+                    </div>
+                    <div class="ai-result-body${cursorClass}">
+                        ${html}
+                    </div>
+                </div>
+            `;
+            if (!isComplete) {
+                container.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }
+        }
+
+        async function startAIDiagnosis() {
+            const symptom = document.getElementById('aiSymptomInput').value.trim();
+            if (!symptom) { alert('请详细描述故障现象'); return; }
+
+            const container = document.getElementById('aiDiagnosisResult');
+            const btn = document.getElementById('aiDiagnosisBtn');
+
+            // 前置检测：代理是否可用
+            const settings = getAISettings();
+            try {
+                const healthResp = await fetch(`${settings.apiUrl}/health`, { method: 'GET', signal: AbortSignal.timeout(3000) });
+                const healthData = await healthResp.json();
+                if (!healthData.api_configured) {
+                    container.innerHTML = `<div class="ai-error"><strong>AI 代理未配置：</strong>API Key 未设置。<br>请编辑桌面上的 .env 文件，填入正确的 API Key，然后重新启动 AI 服务。</div>`;
+                    return;
+                }
+            } catch (e) {
+                container.innerHTML = `<div class="ai-error"><strong>AI 代理未启动：</strong>无法连接到本地代理服务。<br><br>请双击桌面上的 <code>启动AI服务.bat</code> 启动代理，然后重试。<br><br>如果已启动，请检查：<br>1. 代理窗口是否显示 "监听地址: http://localhost:8899"<br>2. 右上角 AI 状态是否显示绿色</div>`;
+                return;
+            }
+
+            // 读取当前选中的项目
+            const projectSelect = document.getElementById('aiProjectSelect');
+            const currentProject = projectSelect ? projectSelect.value : (selectedAIProject || '');
+
+            // 收集本地上下文（含项目位号映射）
+            const ctx = buildDiagnosisContext(symptom, currentProject);
+
+            // 显示加载状态
+            const projectLabel = currentProject ? ` (项目: ${currentProject})` : ' (通用位号)';
+            container.innerHTML = `
+                <div class="ai-loading">
+                    <span>AI 正在分析故障现象${projectLabel}</span>
+                    <div class="ai-loading-dots">
+                        <span></span><span></span><span></span>
+                    </div>
+                </div>
+            `;
+            btn.disabled = true;
+            btn.textContent = '⏳ 分析中...';
+
+            const systemPrompt = `你是一位拥有15年经验的手机主板维修专家工程师，精通MTK/展锐平台主板原理图分析、故障定位和元器件级维修。
+
+## 核心任务
+用户会提供故障现象描述${schematicImageData ? '和一张原理图截图' : ''}。${schematicImageData ? '**请仔细观察原理图截图**，从图中读取真实的器件位号（如 U2601、C3816、R4807 等），基于原理图上的真实位号进行分析。**不要使用通用参考位号，必须使用原理图中实际标注的位号。**' : ''}
+
+## 维修分析框架
+${ctx.frameworkInfo}
+
+## 专业知识库匹配
+${ctx.knowledgeInfo || '未匹配到预置知识模块'}
+
+${ctx.hasProjectMap ? '## 项目真实器件位号映射（优先使用）\n' + ctx.projectComponentInfo : '**注意：用户未选择项目型号，请使用通用参考位号进行诊断，并在结果中提示用户选择具体项目以获取真实位号。**'}
+
+${ctx.localMatchInfo ? '## 本地案例库供参考（位号可能不准确，以原理图实际标注为准）\n' + ctx.localMatchInfo : ''}
+
+请给出结构化诊断报告，格式如下：
+
+### 故障根因分析
+${schematicImageData ? '结合原理图上的具体电路，' : ''}分析最可能的根因
+
+### 最可能故障器件排名
+${schematicImageData ? '**直接从原理图截图中读取真实位号**，' : ''}按概率排序，列出：位号、器件名称/功能、故障类型、维修方法
+
+### 推荐排查步骤
+从简到难，给出具体可操作的排查步骤${schematicImageData ? '，包含原理图上对应的量测点' : '（包含量测点）'}
+
+### 关键信号/电压参考
+列出需要测量的关键信号和参考电压值${schematicImageData ? '，标注在原理图上的位置' : ''}
+
+### 维修建议与注意事项
+给出维修方案建议和操作注意事项`;
+
+            // 构建用户消息（可能含图片）
+            const userMsgText = `故障现象：${symptom}\n\n${ctx.hasLocalMatch ? '请结合上述知识库和案例信息' : '请基于你的专业知识和分析框架'}，给出详细的诊断分析。`;
+
+            const userMessage = schematicImageData
+                ? `${userMsgText}\n\n请仔细观察上传的原理图截图，从图中读取真实的器件位号，并结合故障现象给出精确诊断。`
+                : ctx.hasLocalMatch
+                    ? userMsgText
+                    : `故障现象：${symptom}\n\n本地知识库未直接匹配到相关案例，请基于你的专业知识和上述分析框架给出诊断。`;
+
+            callAIStream(
+                systemPrompt,
+                userMessage,
+                (fullText, chunk) => renderAIStreamResult(container, fullText, false),
+                (fullText) => {
+                    renderAIStreamResult(container, fullText, true);
+                    btn.disabled = false;
+                    btn.textContent = '🤖 开始 AI 诊断';
+                    latestDiagnosisText = `AI 智能诊断\n输入：${symptom}\n\n${fullText}`;
+                    saveDiagnosisHistory({
+                        mode: 'AI 智能诊断',
+                        keyword: symptom.slice(0, 30),
+                        time: new Date().toLocaleString('zh-CN'),
+                        summary: 'AI 诊断完成，' + fullText.slice(0, 80) + '...'
+                    });
+                },
+                (error) => {
+                    container.innerHTML = `<div class="ai-error"><strong>AI 分析失败：</strong>${error}<br><br>请检查：<br>1. 是否已启动 ai_proxy_server.py<br>2. ANTHROPIC_API_KEY 是否配置正确<br>3. 网络是否正常</div>`;
+                    btn.disabled = false;
+                    btn.textContent = '🤖 重试 AI 诊断';
+                }
+            );
+        }
+
+        // =========================
+        // AI Log 深度分析
+        // =========================
+
+        function startAILogAnalysis() {
+            if (!uploadedLogContent || !uploadedLogFile) {
+                alert('请先上传并分析 log 文件');
+                return;
+            }
+
+            const container = document.getElementById('aiLogResult');
+            const btn = document.getElementById('aiLogBtn');
+            const localResult = analyzeLogContent(uploadedLogContent, uploadedLogFile.name);
+
+            // 提取关键日志行（限制长度）
+            const keyLogSnippet = (localResult.keyLines || [])
+                .slice(0, 15)
+                .map(l => String(l).slice(0, 300))
+                .join('\n');
+
+            // 日志类型判断
+            const logTypes = detectLogTypes(uploadedLogContent).join('、') || '未识别';
+
+            container.innerHTML = `
+                <div class="ai-loading">
+                    <span>AI 正在深度解读校准日志</span>
+                    <div class="ai-loading-dots">
+                        <span></span><span></span><span></span>
+                    </div>
+                </div>
+            `;
+            btn.disabled = true;
+            btn.textContent = '⏳ AI 解读中...';
+
+            const systemPrompt = `你是一位手机主板射频校准专家，精通 MTK/展锐平台校准流程和 log 分析。你的任务是对校准失败日志进行深度解读。
+
+请基于以下信息分析：
+
+## 本地初步分析结果
+- 定位方式：${localResult.mode}
+- 校准项目：${localResult.calibrationProject}
+- 问题频段：${localResult.issueBand}
+- 故障原因：${localResult.reason}
+- 结论：${localResult.conclusion || localResult.summary}
+- 日志类型：${logTypes}
+
+## 关键日志片段
+\`\`\`
+${keyLogSnippet || '无关键行'}
+\`\`\`
+
+请给出深度解读报告，格式如下：
+
+### 根因深度分析
+分析为什么会发生此校准失败，从电路原理角度解释
+
+### 影响范围
+评估此故障对产线测试、整机性能的影响范围
+
+### 修复方向
+给出具体的修复方向和建议（包含可能需排查的器件）
+
+### 需要什么资料
+建议查阅哪些原理图、位号图或文档来辅助排查
+
+### 维修策略
+推荐维修优先级和具体操作建议`;
+
+            const userMsg = `文件名：${uploadedLogFile.name}\n文件行数：${uploadedLogContent.split(/\\r?\\n/).length}\n\n请对上述校准 log 进行深度解读。`;
+
+            callAIStream(
+                systemPrompt,
+                userMsg,
+                (fullText, chunk) => renderAIStreamResult(container, fullText, false),
+                (fullText) => {
+                    renderAIStreamResult(container, fullText, true);
+                    btn.disabled = false;
+                    btn.textContent = '🤖 AI 深度解读 Log';
+                },
+                (error) => {
+                    container.innerHTML = `<div class="ai-error"><strong>AI 分析失败：</strong>${error}</div>`;
+                    btn.disabled = false;
+                    btn.textContent = '🤖 重试 AI 解读';
+                }
+            );
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('智能主板维修系统 v8.0 AI版 加载完成');
+
+            // 自动检测 AI 连接状态
+            checkAIStatus();
+            setInterval(checkAIStatus, 30000); // 每30秒检测一次
+            renderDiagnosisHistory();
+
+            // 恢复上次选择的 AI 诊断项目
+            try {
+                const saved = localStorage.getItem('aiSelectedProject');
+                if (saved) { selectedAIProject = saved; }
+            } catch(e) {}
+
+            // 初始化项目选择器（延迟加载，确保 DOM 就绪）
+            setTimeout(() => populateAIProjectSelector(), 100);
+
+            document.getElementById('symptomInput').addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    startDiagnosis();
+                }
+            });
+
+            document.getElementById('professionalSymptomInput').addEventListener('keydown', function(event) {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault();
+                    startProfessionalDiagnosis();
+                }
+            });
+
+            document.getElementById('aiSymptomInput').addEventListener('keydown', function(event) {
+                if (event.key === 'Enter' && event.ctrlKey) {
+                    event.preventDefault();
+                    startAIDiagnosis();
+                }
+            });
+
+            document.getElementById('snInput').addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    searchProjectResources();
+                }
+            });
+
+            // 设置弹窗背景点击关闭
+            document.getElementById('settingsOverlay').addEventListener('click', function(event) {
+                if (event.target === this) closeSettings();
+            });
+
+            // 原理图上传：拖拽事件
+            const dropZone = document.getElementById('schematicDropZone');
+            ['dragenter', 'dragover'].forEach(evt => {
+                dropZone.addEventListener(evt, function(e) {
+                    e.preventDefault();
+                    dropZone.classList.add('dragover');
+                });
+            });
+            ['dragleave', 'drop'].forEach(evt => {
+                dropZone.addEventListener(evt, function(e) {
+                    e.preventDefault();
+                    dropZone.classList.remove('dragover');
+                });
+            });
+            dropZone.addEventListener('drop', function(e) {
+                const file = e.dataTransfer.files[0];
+                if (!file || !file.type.startsWith('image/')) return;
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    const base64 = ev.target.result.split(',')[1];
+                    schematicImageData = { base64, media_type: file.type || 'image/png' };
+                    document.getElementById('schematicPreviewImg').src = ev.target.result;
+                    document.getElementById('schematicPreview').style.display = 'inline-block';
+                    document.getElementById('schematicDropZone').style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            });
+
+            // 原理图上传：Ctrl+V 粘贴截图
+            document.addEventListener('paste', function(e) {
+                // 只在 AI 诊断模式激活时处理
+                const aiMode = document.getElementById('ai-mode');
+                if (!aiMode || aiMode.style.display === 'none') return;
+                const items = e.clipboardData?.items;
+                if (!items) return;
+                for (const item of items) {
+                    if (item.type.startsWith('image/')) {
+                        e.preventDefault();
+                        const blob = item.getAsFile();
+                        const reader = new FileReader();
+                        reader.onload = function(ev) {
+                            const base64 = ev.target.result.split(',')[1];
+                            schematicImageData = { base64, media_type: item.type };
+                            document.getElementById('schematicPreviewImg').src = ev.target.result;
+                            document.getElementById('schematicPreview').style.display = 'inline-block';
+                            document.getElementById('schematicDropZone').style.display = 'none';
+                        };
+                        reader.readAsDataURL(blob);
+                        break;
+                    }
+                }
+            });
+
+            document.getElementById('symptomInput').addEventListener('input', function(event) {
+                analyzeKeywords(event.target.value, 'diagnosis');
+            });
+
+            document.getElementById('professionalSymptomInput').addEventListener('input', function(event) {
+                analyzeKeywords(event.target.value, 'diagnosis');
+            });
+
+            document.getElementById('snInput').addEventListener('input', function(event) {
+                analyzeKeywords(event.target.value, 'resource');
+            });
+
+            const logFileInput = document.getElementById('logFileInput');
+            const logUploadPanel = document.getElementById('logUploadPanel');
+
+            logFileInput.addEventListener('change', async function(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                uploadedLogFile = file;
+                uploadedLogContent = await file.text();
+                updateLogFileMeta(file, `已读取 ${uploadedLogContent.split(/\r?\n/).length} 行，可直接开始分析`);
+            });
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                logUploadPanel.addEventListener(eventName, function(event) {
+                    event.preventDefault();
+                    logUploadPanel.classList.add('dragover');
+                });
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                logUploadPanel.addEventListener(eventName, function(event) {
+                    event.preventDefault();
+                    logUploadPanel.classList.remove('dragover');
+                });
+            });
+
+            logUploadPanel.addEventListener('drop', async function(event) {
+                const file = event.dataTransfer.files[0];
+                if (!file) return;
+                uploadedLogFile = file;
+                uploadedLogContent = await file.text();
+                updateLogFileMeta(file, `已读取 ${uploadedLogContent.split(/\r?\n/).length} 行，可直接开始分析`);
+            });
+        });
+    </script>
+</body>
+</html>
