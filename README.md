@@ -13,7 +13,15 @@
 ## 项目结构
 
 ```
-├── mainboard_repair_system_v7.4_updated.html  # 前端主页面（单文件应用）
+├── mainboard_repair_system_v7.4_updated.html  # 前端主页面
+├── data/                                      # 项目资料、诊断规则、知识库和 log 规则
+│   ├── project-database.js                    # 项目资料入口
+│   ├── component-map.js                       # 项目器件位号映射
+│   ├── hardware-knowledge-base.js             # 专业硬件诊断知识库
+│   ├── diagnosis-rules.js                     # 历史案例诊断规则
+│   ├── phenomena-search-index.js              # 故障现象搜索索引
+│   └── log-knowledge-base.js                  # log 分析知识库
+├── docs/                                      # 产品愿景、资料边界和协作说明
 ├── ai_proxy_server.py                          # AI 代理服务器（Python）
 ├── 启动AI服务.bat                               # Windows 启动脚本
 ├── .env.example                                # 环境变量模板
@@ -55,7 +63,7 @@ python ai_proxy_server.py
 
 ## 技术架构
 
-- **前端**：纯 HTML/CSS/JS 单文件应用
+- **前端**：纯 HTML/CSS/JS 页面，核心数据拆分到 `data/` 目录
 - **后端**：Python HTTP Server 代理（端口 8899）
 - **AI 平台**：Anthropic Claude / DeepSeek
 - **通信协议**：SSE (Server-Sent Events) 流式传输
