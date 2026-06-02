@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智能主板维修系统 v8.0 AI版</title>
+    <title>海外主板维修知识工作台</title>
     <style>
         * {
             margin: 0;
@@ -12,70 +12,64 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: "Microsoft YaHei", "PingFang SC", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #f6f7f9;
+            color: #1f2937;
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 20px;
         }
 
         .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            padding: 40px;
-            max-width: 1200px;
+            min-height: 100vh;
             width: 100%;
-            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: 260px minmax(0, 1fr);
+            background: #f6f7f9;
         }
 
         h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 32px;
+            color: #111827;
+            margin-bottom: 6px;
+            font-size: 28px;
+            letter-spacing: 0;
         }
 
         .subtitle {
-            text-align: center;
-            color: #666;
-            margin-bottom: 40px;
-            font-size: 14px;
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.6;
         }
 
         /* Tab切换样式 */
         .tab-container {
             display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #e0e0e0;
-            padding-bottom: 10px;
-            flex-wrap: wrap;
-            justify-content: center;
+            flex-direction: column;
+            gap: 6px;
         }
 
         .tab-btn {
-            padding: 12px 30px;
+            padding: 11px 14px;
             background: transparent;
-            border: none;
-            border-bottom: 3px solid transparent;
-            font-size: 16px;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            font-size: 14px;
             font-weight: 600;
-            color: #666;
+            color: #334155;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
             position: relative;
+            text-align: left;
+            width: 100%;
         }
 
         .tab-btn:hover {
-            color: #667eea;
+            color: #0e3566;
+            background: #eef3f9;
         }
 
         .tab-btn.active {
-            color: #667eea;
-            border-bottom-color: #667eea;
+            color: #0e3566;
+            background: #e8eef7;
+            border-color: #c8d5e8;
         }
 
         .tab-content {
@@ -1263,31 +1257,321 @@
             gap: 8px;
             margin-top: 16px;
         }
+
+        /* ========== Knowledge workbench shell ========== */
+        .workbench-sidebar {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            background: #f1f3f6;
+            border-right: 1px solid #d9e0e8;
+            padding: 22px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+
+        .brand-block {
+            padding-bottom: 18px;
+            border-bottom: 1px solid #d9e0e8;
+        }
+
+        .brand-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: #0e3566;
+            line-height: 1.25;
+        }
+
+        .brand-kicker {
+            margin-top: 6px;
+            font-size: 11px;
+            color: #64748b;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .sidebar-group-title {
+            margin: 0 0 8px;
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .sidebar-secondary {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .sidebar-link-disabled {
+            padding: 10px 14px;
+            border: 1px dashed #c8d5e8;
+            border-radius: 6px;
+            color: #64748b;
+            font-size: 13px;
+            background: rgba(255, 255, 255, 0.55);
+        }
+
+        .workbench-main {
+            min-width: 0;
+            padding: 24px 30px 32px;
+        }
+
+        .workbench-topbar {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(280px, 420px) auto;
+            gap: 18px;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid #d9e0e8;
+        }
+
+        .global-search {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            border: 1px solid #d9e0e8;
+            border-radius: 6px;
+            padding: 8px 10px;
+        }
+
+        .global-search input {
+            border: 0;
+            min-width: 0;
+            padding: 0;
+            font-size: 13px;
+            box-shadow: none;
+        }
+
+        .global-search input:focus {
+            border: 0;
+            box-shadow: none;
+        }
+
+        .shortcut {
+            border: 1px solid #d9e0e8;
+            border-radius: 4px;
+            color: #64748b;
+            font-size: 11px;
+            padding: 2px 6px;
+            white-space: nowrap;
+            background: #f8fafc;
+        }
+
+        .settings-gear {
+            position: static !important;
+            width: auto;
+            height: auto;
+            padding: 8px 12px;
+            border-radius: 6px;
+            background: #0e3566;
+            color: white;
+            font-size: 13px;
+        }
+
+        .workbench-overview {
+            display: grid;
+            grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .overview-panel {
+            background: white;
+            border: 1px solid #d9e0e8;
+            border-radius: 8px;
+            padding: 18px;
+        }
+
+        .overview-panel h2,
+        .overview-panel h3 {
+            margin-bottom: 10px;
+            color: #111827;
+        }
+
+        .overview-panel h2 {
+            font-size: 20px;
+        }
+
+        .overview-panel h3 {
+            font-size: 16px;
+        }
+
+        .entry-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .entry-card {
+            border: 1px solid #d9e0e8;
+            border-radius: 6px;
+            background: #fbfcfd;
+            padding: 14px;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .entry-card:hover {
+            border-color: #9fb4d1;
+            background: #f4f7fb;
+        }
+
+        .entry-card strong {
+            display: block;
+            margin-bottom: 6px;
+            color: #0e3566;
+            font-size: 14px;
+        }
+
+        .entry-card span {
+            color: #64748b;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .roadmap-list {
+            display: grid;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .roadmap-item {
+            display: grid;
+            grid-template-columns: 74px minmax(0, 1fr);
+            gap: 10px;
+            align-items: start;
+            font-size: 13px;
+        }
+
+        .roadmap-state {
+            border-radius: 4px;
+            padding: 3px 7px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .roadmap-state.available {
+            color: #166534;
+            background: #dcfce7;
+        }
+
+        .roadmap-state.building {
+            color: #075985;
+            background: #e0f2fe;
+        }
+
+        .roadmap-state.planning {
+            color: #92400e;
+            background: #fef3c7;
+        }
+
+        @media (max-width: 980px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .workbench-sidebar {
+                position: static;
+                height: auto;
+            }
+
+            .workbench-topbar,
+            .workbench-overview {
+                grid-template-columns: 1fr;
+            }
+
+            .entry-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div style="position: relative;">
-            <h1>🔧 智能主板维修系统</h1>
-            <button class="settings-gear" onclick="openSettings()" title="AI 设置">⚙</button>
-            <p class="subtitle">基于多维表格维修报表案例库 · Claude AI 智能诊断 · 实时检索真实维修数据 · 精准定位故障器件 &nbsp;|&nbsp; <span id="aiStatusInline" style="font-size:12px;color:#999;">AI: 检测中...</span></p>
-        </div>
+        <aside class="workbench-sidebar">
+            <div class="brand-block">
+                <div class="brand-title">主板维修<br>知识工作台</div>
+                <div class="brand-kicker">Repair Knowledge Workbench</div>
+            </div>
 
-        <!-- Tab切换 -->
-        <div class="tab-container">
-            <button class="tab-btn active" data-tab="resources" onclick="switchTab('resources')">📚 资料查询</button>
-            <button class="tab-btn" data-tab="diagnosis" onclick="switchTab('diagnosis')">🧠 故障诊断</button>
-            <button class="tab-btn" data-tab="log-analysis" onclick="switchTab('log-analysis')">📑 校准log分析</button>
-        </div>
+            <nav>
+                <div class="sidebar-group-title">当前可用</div>
+                <div class="tab-container">
+                    <button class="tab-btn active" data-tab="resources" onclick="switchTab('resources')">资料查询</button>
+                    <button class="tab-btn" data-tab="diagnosis" onclick="switchTab('diagnosis')">故障诊断</button>
+                    <button class="tab-btn" data-tab="log-analysis" onclick="switchTab('log-analysis')">校准 Log 分析</button>
+                </div>
+            </nav>
+
+            <div class="sidebar-secondary">
+                <div class="sidebar-group-title">规划模块</div>
+                <div class="sidebar-link-disabled">机型资料库</div>
+                <div class="sidebar-link-disabled">故障知识库</div>
+                <div class="sidebar-link-disabled">器件与点位</div>
+                <div class="sidebar-link-disabled">维修培训</div>
+                <div class="sidebar-link-disabled">案例沉淀</div>
+                <div class="sidebar-link-disabled">能力路线图</div>
+            </div>
+        </aside>
+
+        <main class="workbench-main">
+            <div class="workbench-topbar">
+                <div>
+                    <h1>海外主板维修知识工作台</h1>
+                    <p class="subtitle">沉淀机型资料、故障案例、器件点位和培训标准；AI 作为辅助层，不替代工程判断。 <span id="aiStatusInline" style="font-size:12px;color:#64748b;">AI: 检测中...</span></p>
+                </div>
+                <label class="global-search" onclick="switchTab('resources'); setTimeout(() => document.getElementById('snInput')?.focus(), 0);">
+                    <span style="color:#64748b;">搜索</span>
+                    <input type="text" placeholder="机型 / SN / 故障 / 位号" readonly>
+                    <span class="shortcut">资料查询</span>
+                </label>
+                <button class="settings-gear" onclick="openSettings()" title="系统设置">系统设置</button>
+            </div>
+
+            <section class="workbench-overview">
+                <div class="overview-panel">
+                    <h2>工作入口</h2>
+                    <p class="subtitle">优先从资料检索开始，把海外现场、中方技术人员和制造中心协作需要的资料沉淀到同一个工作台。</p>
+                    <div class="entry-grid">
+                        <div class="entry-card" onclick="switchTab('resources'); setTimeout(() => document.getElementById('snInput')?.focus(), 0);">
+                            <strong>按机型 / SN 查询</strong>
+                            <span>查找原理图、位号图、BOM 和维修指导书。</span>
+                        </div>
+                        <div class="entry-card" onclick="switchTab('diagnosis'); setTimeout(() => document.getElementById('symptomInput')?.focus(), 0);">
+                            <strong>按故障现象进入</strong>
+                            <span>匹配历史案例，查看建议检查点位和维修方向。</span>
+                        </div>
+                        <div class="entry-card" onclick="switchTab('log-analysis');">
+                            <strong>校准 Log 分析</strong>
+                            <span>上传 MTK / 展锐 / Android 日志，辅助定位异常阶段。</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overview-panel">
+                    <h3>能力建设路线图</h3>
+                    <div class="roadmap-list">
+                        <div class="roadmap-item"><span class="roadmap-state available">可用</span><span>资料查询、案例匹配、基础 Log 分析</span></div>
+                        <div class="roadmap-item"><span class="roadmap-state building">建设中</span><span>机型 / 故障 / 器件知识库结构化</span></div>
+                        <div class="roadmap-item"><span class="roadmap-state planning">规划中</span><span>可视化点位图、交互式 SOP、AI + 软硬件自动化检测封装</span></div>
+                    </div>
+                </div>
+            </section>
 
         <!-- Tab 1: 资料查询 -->
         <div class="tab-content active" id="resources-tab">
             <div class="search-section">
-                <p class="hint">💡 输入主板SN号，从智能主板维修系统项目资料库中查询对应原理图和位号图</p>
+                <p class="hint">输入主板 SN 号，从项目资料库中查询对应原理图、位号图和维修资料。</p>
                 
                 <div class="input-group">
                     <input type="text" id="snInput" placeholder="输入主板SN号，例如：X6878-20260330-001">
-                    <button onclick="searchProjectResources()">🔍 查找资料</button>
+                    <button onclick="searchProjectResources()">查找资料</button>
                 </div>
 
                 <div class="quick-search">
@@ -1305,7 +1589,7 @@
 
             <!-- 项目信息 -->
             <div class="project-info" id="projectInfo">
-                <h3>📂 项目信息</h3>
+                <h3>项目信息</h3>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
                     <div>
                         <div style="font-size: 12px; color: #666; margin-bottom: 2px;">项目名称</div>
@@ -1321,7 +1605,7 @@
                     </div>
                 </div>
                 <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
-                    <button class="secondary-btn" onclick="gotoAIDiagnosis()" style="font-size:13px;">🔧 带入 AI 智能诊断</button>
+                    <button class="secondary-btn" onclick="gotoAIDiagnosis()" style="font-size:13px;">带入 AI 辅助诊断</button>
                     <span style="font-size:11px;color:#888;align-self:center;" id="resourceComponentStatus"></span>
                 </div>
             </div>
@@ -1329,25 +1613,25 @@
             <!-- 资料列表 -->
             <div class="resources-grid" id="resourcesGrid">
                 <div class="resource-card" id="schematicCard" onclick="window.open('', '_blank')">
-                    <div class="resource-icon">📄</div>
+                    <div class="resource-icon">DOC</div>
                     <div class="resource-title">原理图</div>
                     <div class="resource-desc" id="schematicDesc">点击直接打开原理图文档</div>
                     <div class="resource-status" id="schematicStatus"></div>
                 </div>
                 <div class="resource-card" id="layoutCard" onclick="window.open('', '_blank')">
-                    <div class="resource-icon">📍</div>
+                    <div class="resource-icon">PAD</div>
                     <div class="resource-title">位号图</div>
                     <div class="resource-desc" id="layoutDesc">点击直接打开位号图文档</div>
                     <div class="resource-status" id="layoutStatus"></div>
                 </div>
                 <div class="resource-card" id="bomCard" onclick="window.open('', '_blank')">
-                    <div class="resource-icon">📦</div>
+                    <div class="resource-icon">BOM</div>
                     <div class="resource-title">BOM</div>
                     <div class="resource-desc" id="bomDesc">点击打开物料清单</div>
                     <div class="resource-status" id="bomStatus"></div>
                 </div>
                 <div class="resource-card" id="sopCard" onclick="window.open('', '_blank')">
-                    <div class="resource-icon">📋</div>
+                    <div class="resource-icon">SOP</div>
                     <div class="resource-title">维修指导书</div>
                     <div class="resource-desc" id="sopDesc">点击打开维修操作指导书</div>
                     <div class="resource-status" id="sopStatus"></div>
@@ -1365,25 +1649,25 @@
             <!-- 诊断模式选择器 -->
             <div class="diagnosis-mode-selector">
                 <button class="mode-btn active" data-mode="history" onclick="switchDiagnosisMode('history')">
-                    <div class="mode-title">📊 历史案例匹配</div>
+                    <div class="mode-title">历史案例匹配</div>
                     <div class="mode-desc">基于维修记录的快速诊断，适合常见故障</div>
                 </button>
                 <button class="mode-btn" data-mode="professional" onclick="switchDiagnosisMode('professional')">
-                    <div class="mode-title">🧪 专业硬件诊断</div>
+                    <div class="mode-title">专业硬件诊断</div>
                     <div class="mode-desc">基于飞书电子工程知识库的深度分析，含工作原理和排查步骤</div>
                 </button>
                 <button class="mode-btn ai-mode" data-mode="ai" onclick="switchDiagnosisMode('ai')">
-                    <div class="mode-title">🤖 AI 智能诊断<span class="badge">推荐</span></div>
-                    <div class="mode-desc">基于 Claude 大模型的深度分析，综合知识库推理</div>
+                    <div class="mode-title">AI 辅助诊断<span class="badge">辅助</span></div>
+                    <div class="mode-desc">结合模型能力和知识库资料，输出需人工确认的排查建议</div>
                 </button>
             </div>
             <div id="history-mode" class="diagnosis-mode-content active">
                 <div class="search-section">
-                    <p class="hint">💡 输入故障现象关键词，系统自动匹配历史案例，给出推荐检查点位</p>
+                    <p class="hint">输入故障现象关键词，系统匹配历史案例，给出推荐检查点位。</p>
                     
                     <div class="input-group">
                         <input type="text" id="symptomInput" placeholder="输入故障现象关键词，例如：不开机、无服务、充电异常">
-                        <button onclick="startDiagnosis()">🔍 诊断分析</button>
+                        <button onclick="startDiagnosis()">诊断分析</button>
                     </div>
 
                     <div class="quick-search">
@@ -1399,8 +1683,8 @@
 
                 <div class="analysis-tip" id="keywordTip"><strong>关键词分析：</strong>输入后系统会提示命中的故障关键词与建议方向。</div>
                 <div class="diagnosis-toolbar">
-                    <button class="secondary-btn" onclick="copyLatestDiagnosisResult()">📋 复制当前诊断结果</button>
-                    <button class="secondary-btn" onclick="exportDiagnosisHistory()">🗂️ 导出诊断历史</button>
+                    <button class="secondary-btn" onclick="copyLatestDiagnosisResult()">复制当前诊断结果</button>
+                    <button class="secondary-btn" onclick="exportDiagnosisHistory()">导出诊断历史</button>
                 </div>
                 <div class="copy-feedback" id="copyFeedback">诊断结果已复制到剪贴板</div>
                 <div id="diagnosisResult"></div>
@@ -1414,11 +1698,11 @@
             <!-- 专业硬件诊断模式 -->
             <div id="professional-mode" class="diagnosis-mode-content" style="display: none;">
                 <div class="search-section">
-                    <p class="hint">💡 描述故障现象，系统基于飞书电子工程知识库进行结构化分析：工作原理 → 排查步骤 → 关键信号</p>
+                    <p class="hint">描述故障现象，系统基于电子工程知识库进行结构化分析：工作原理 → 排查步骤 → 关键信号。</p>
                     
                     <div class="input-group">
                         <textarea id="professionalSymptomInput" placeholder="请详细描述故障现象...&#10;&#10;示例：手机不开机，插入电池后电流只有50mA，之前有过进水的情况"></textarea>
-                        <button onclick="startProfessionalDiagnosis()">🔬 开始诊断</button>
+                        <button onclick="startProfessionalDiagnosis()">开始诊断</button>
                     </div>
 
                     <div class="quick-search">
@@ -1436,27 +1720,26 @@
             <!-- AI 智能诊断模式 -->
             <div id="ai-mode" class="diagnosis-mode-content" style="display: none;">
                 <div class="search-section">
-                    <p class="hint">💡 详细描述故障现象，可上传原理图截图，AI 会直接从原理图中读取真实位号进行精确诊断</p>
+                    <p class="hint">详细描述故障现象，可上传原理图截图；AI 输出仅作为辅助判断，需要人工确认。</p>
 
                     <!-- 项目选择器 -->
                     <div class="project-selector-bar" id="aiProjectSelector">
-                        <label>🔧 选择项目型号：</label>
+                        <label>选择项目型号：</label>
                         <select id="aiProjectSelect" onchange="onAIProjectChange()">
                             <option value="">-- 不选择项目（通用位号） --</option>
                         </select>
                         <span class="project-coverage none" id="aiProjectCoverage">未选择项目</span>
-                        <span class="link-from-resource" onclick="switchToResourceTab()" title="在资料查询中查找项目位号数据">📋 资料查询</span>
+                        <span class="link-from-resource" onclick="switchToResourceTab()" title="在资料查询中查找项目位号数据">资料查询</span>
                     </div>
 
                     <div class="input-group">
                         <textarea id="aiSymptomInput" placeholder="请详细描述故障现象...&#10;&#10;示例：X6878主板不开机，插入电池后电流只有50mA，按下开机键无任何反应，之前没有进水或摔机的情况"></textarea>
-                        <button onclick="startAIDiagnosis()" id="aiDiagnosisBtn">🤖 开始 AI 诊断</button>
+                        <button onclick="startAIDiagnosis()" id="aiDiagnosisBtn">开始 AI 辅助诊断</button>
                     </div>
 
                     <!-- 原理图上传区域 -->
                     <div class="schematic-upload-area" id="schematicUploadArea">
                         <div class="schematic-upload-zone" id="schematicDropZone" onclick="document.getElementById('schematicImageInput').click()">
-                            <span style="font-size:32px;">📐</span>
                             <span style="font-weight:600;color:#333;">上传原理图截图</span>
                             <span style="font-size:12px;color:#999;">点击选择、拖拽图片，或 Ctrl+V 粘贴截图</span>
                             <span style="font-size:11px;color:#059669;">AI 会直接从原理图中读取真实位号进行诊断</span>
@@ -1484,10 +1767,9 @@
 
         <div class="tab-content" id="log-analysis-tab">
             <div class="search-section">
-                <p class="hint">💡 支持本地上传 MTK / 展锐 / Android 校准、综测、系统 log，自动识别错误特征并输出分析建议</p>
+                <p class="hint">支持本地上传 MTK / 展锐 / Android 校准、综测、系统 log，自动识别错误特征并输出分析建议。</p>
 
                 <div class="upload-panel" id="logUploadPanel">
-                    <div style="font-size: 42px; margin-bottom: 10px;">📂</div>
                     <div style="font-size: 18px; font-weight: 600; color: #333;">上传校准 log 文件</div>
                     <div style="margin-top: 8px; color: #666; font-size: 14px;">支持 .log / .txt / .csv / .xml，拖拽或点击选择本地文件</div>
                     <div class="upload-actions">
@@ -1517,14 +1799,15 @@
 
             <!-- AI Log 深度分析区域 -->
             <div id="aiLogSection" style="display:none; margin-top: 20px;">
-                <button class="ai-log-btn" onclick="startAILogAnalysis()" id="aiLogBtn">🤖 AI 深度解读 Log</button>
+                <button class="ai-log-btn" onclick="startAILogAnalysis()" id="aiLogBtn">AI 深度解读 Log</button>
                 <div id="aiLogResult"></div>
             </div>
         </div>
 
         <div class="footer">
-            智能主板维修系统 v8.0 AI版 | 数据来源：飞书电子工程知识库 · 产线维修记录 · 原理图分析 · Claude AI 深度分析
+            主板维修知识工作台 | 数据来源：飞书电子工程知识库 · 产线维修记录 · 原理图分析 · AI 辅助分析
         </div>
+        </main>
     </div>
 
     <!-- AI 设置弹窗 -->
@@ -1532,7 +1815,7 @@
         <div class="settings-panel">
             <div class="settings-tabs">
                 <button class="settings-tab-btn active" data-settingstab="ai" onclick="switchSettingsTab('ai')">AI 服务设置</button>
-                <button class="settings-tab-btn" data-settingstab="component" onclick="switchSettingsTab('component')">🔧 器件位号管理</button>
+                <button class="settings-tab-btn" data-settingstab="component" onclick="switchSettingsTab('component')">器件位号管理</button>
             </div>
 
             <!-- AI 设置子面板 -->
@@ -1560,8 +1843,8 @@
                 </div>
                 <div class="setting-actions">
                     <button class="secondary-btn" onclick="closeSettings()">取消</button>
-                    <button onclick="testAIConnection()">🔗 测试连接</button>
-                    <button onclick="saveAISettings()">💾 保存设置</button>
+                    <button onclick="testAIConnection()">测试连接</button>
+                    <button onclick="saveAISettings()">保存设置</button>
                 </div>
             </div>
 
@@ -1582,18 +1865,18 @@
 
                 <!-- BOM 粘贴导入 -->
                 <div class="bom-import-area">
-                    <h4>📋 从 BOM 粘贴导入</h4>
+                    <h4>从 BOM 粘贴导入</h4>
                     <textarea id="bomPasteArea" placeholder="粘贴 BOM 文本内容...&#10;格式示例：&#10;U2601,主PMIC电源管理,MT6360&#10;U3501,副PMIC,MT6315&#10;C3816,充电通路电容&#10;&#10;每行一条：位号,名称,型号（型号可选）"></textarea>
                     <div class="bom-import-hint">每行格式：位号,器件名称,型号（用逗号分隔，型号可选）</div>
-                    <button onclick="importBOM()" style="margin-top:8px;padding:6px 16px;font-size:13px;">📥 解析并导入</button>
+                    <button onclick="importBOM()" style="margin-top:8px;padding:6px 16px;font-size:13px;">解析并导入</button>
                 </div>
 
                 <!-- JSON 导入导出 -->
                 <div class="json-export-import">
-                    <button class="secondary-btn" onclick="exportComponentMapJSON()">📤 导出 JSON</button>
-                    <button class="secondary-btn" onclick="document.getElementById('jsonImportFile').click()">📥 导入 JSON</button>
+                    <button class="secondary-btn" onclick="exportComponentMapJSON()">导出 JSON</button>
+                    <button class="secondary-btn" onclick="document.getElementById('jsonImportFile').click()">导入 JSON</button>
                     <input type="file" id="jsonImportFile" accept=".json" style="display:none;" onchange="importComponentMapJSON(event)">
-                    <button class="secondary-btn" onclick="resetComponentMap()" style="color:#dc2626;">🔄 恢复默认</button>
+                    <button class="secondary-btn" onclick="resetComponentMap()" style="color:#dc2626;">恢复默认</button>
                 </div>
                 <div id="mgmtSaveStatus" style="margin-top:8px;font-size:12px;color:#059669;"></div>
             </div>
@@ -2683,7 +2966,7 @@
                 aiLogSection.style.display = 'block';
                 document.getElementById('aiLogResult').innerHTML = '';
                 document.getElementById('aiLogBtn').disabled = false;
-                document.getElementById('aiLogBtn').textContent = '🤖 AI 深度解读 Log';
+                document.getElementById('aiLogBtn').textContent = 'AI 深度解读 Log';
             }
         }
 
@@ -3009,7 +3292,7 @@
                                 <div class="module-item">${mod.commonFaults}</div>
                             </div>
                             <div class="module-card">
-                                <div class="module-title">🔍 排查步骤</div>
+                                <div class="module-title">排查步骤</div>
                                 ${mod.diagnosis.map((step, i) => `<div class="module-item"><strong>步骤${i + 1}：</strong>${step}</div>`).join('')}
                             </div>
                             ${mod.source ? `<div class="tiny-text" style="margin-top: 10px;">📎 知识来源：<a href="${mod.source}" target="_blank" style="color: #667eea;">飞书知识库原文</a></div>` : ''}
@@ -3334,7 +3617,7 @@
             container.innerHTML = `
                 <div class="ai-result-container">
                     <div class="ai-result-header">
-                        <span>🤖 AI 智能诊断分析${projectLabel}</span>
+                        <span>AI 辅助诊断分析${projectLabel}</span>
                         <span class="ai-badge">${isComplete ? '分析完成' : '分析中...'}</span>
                     </div>
                     <div class="ai-result-body${cursorClass}">
@@ -3386,7 +3669,7 @@
                 </div>
             `;
             btn.disabled = true;
-            btn.textContent = '⏳ 分析中...';
+            btn.textContent = '分析中...';
 
             const systemPrompt = `你是一位拥有15年经验的手机主板维修专家工程师，精通MTK/展锐平台主板原理图分析、故障定位和元器件级维修。
 
@@ -3436,7 +3719,7 @@ ${schematicImageData ? '**直接从原理图截图中读取真实位号**，' : 
                 (fullText) => {
                     renderAIStreamResult(container, fullText, true);
                     btn.disabled = false;
-                    btn.textContent = '🤖 开始 AI 诊断';
+                    btn.textContent = '开始 AI 辅助诊断';
                     latestDiagnosisText = `AI 智能诊断\n输入：${symptom}\n\n${fullText}`;
                     saveDiagnosisHistory({
                         mode: 'AI 智能诊断',
@@ -3448,7 +3731,7 @@ ${schematicImageData ? '**直接从原理图截图中读取真实位号**，' : 
                 (error) => {
                     container.innerHTML = `<div class="ai-error"><strong>AI 分析失败：</strong>${error}<br><br>请检查：<br>1. 是否已启动 ai_proxy_server.py<br>2. ANTHROPIC_API_KEY 是否配置正确<br>3. 网络是否正常</div>`;
                     btn.disabled = false;
-                    btn.textContent = '🤖 重试 AI 诊断';
+                    btn.textContent = '重试 AI 辅助诊断';
                 }
             );
         }
@@ -3485,7 +3768,7 @@ ${schematicImageData ? '**直接从原理图截图中读取真实位号**，' : 
                 </div>
             `;
             btn.disabled = true;
-            btn.textContent = '⏳ AI 解读中...';
+            btn.textContent = 'AI 解读中...';
 
             const systemPrompt = `你是一位手机主板射频校准专家，精通 MTK/展锐平台校准流程和 log 分析。你的任务是对校准失败日志进行深度解读。
 
@@ -3530,12 +3813,12 @@ ${keyLogSnippet || '无关键行'}
                 (fullText) => {
                     renderAIStreamResult(container, fullText, true);
                     btn.disabled = false;
-                    btn.textContent = '🤖 AI 深度解读 Log';
+                    btn.textContent = 'AI 深度解读 Log';
                 },
                 (error) => {
                     container.innerHTML = `<div class="ai-error"><strong>AI 分析失败：</strong>${error}</div>`;
                     btn.disabled = false;
-                    btn.textContent = '🤖 重试 AI 解读';
+                    btn.textContent = '重试 AI 解读';
                 }
             );
         }
