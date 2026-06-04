@@ -1,0 +1,75 @@
+[
+  {
+    "request_id": "GAP-20260604-001",
+    "related_model": [],
+    "related_fault": [],
+    "gap_type": "技能认证明细",
+    "description": "器件维修培训提到完成 13 项认证后可开始试点主板维修，但当前文件未包含 13 项认证明细和每项通过标准。",
+    "provider": "技术支持 / 培训负责人",
+    "priority": "高",
+    "status": "待补充",
+    "next_action": "寻找或索要技能认证表、认证项目清单、评分规则和样例记录。",
+    "source_ids": [
+      "SRC-20260604-001"
+    ]
+  },
+  {
+    "request_id": "GAP-20260604-002",
+    "related_model": [],
+    "related_fault": [],
+    "gap_type": "工具与故障检测资料",
+    "description": "两份资料均引用 L4 故障检测和常用工具，但当前未提供该下钻资料原文。",
+    "provider": "技术支持 / 培训负责人",
+    "priority": "高",
+    "status": "待补充",
+    "next_action": "寻找 L4 故障检测和常用工具文档，用于拆分工具库、故障知识和 SOP 草案。",
+    "source_ids": [
+      "SRC-20260604-001",
+      "SRC-20260604-002"
+    ]
+  },
+  {
+    "request_id": "GAP-20260604-003",
+    "related_model": [],
+    "related_fault": [],
+    "gap_type": "点胶与 BGA 维修资料",
+    "description": "2025 主板培训标准引用点胶主板维修及除胶、BGA 重新焊接基础操作和除胶视频，但当前未提供完整资料。",
+    "provider": "技术支持 / 培训负责人 / 中方技术人员",
+    "priority": "中",
+    "status": "待补充",
+    "next_action": "寻找点胶、除胶、BGA 返修相关文档或视频，后续拆分为培训资料、工具要求和 SOP。",
+    "source_ids": [
+      "SRC-20260604-002"
+    ]
+  },
+  {
+    "request_id": "GAP-20260604-004",
+    "related_model": [],
+    "related_fault": [],
+    "gap_type": "5S 建设资料",
+    "description": "2025 主板培训标准引用 L4 主板维修 5S 建设，但当前未提供完整资料。",
+    "provider": "技术支持 / 培训负责人",
+    "priority": "中",
+    "status": "待补充",
+    "next_action": "寻找 L4 主板维修 5S 建设文档，用于拆分为维修现场要求和培训标准。",
+    "source_ids": [
+      "SRC-20260604-002"
+    ]
+  },
+  {
+    "request_id": "GAP-20260604-005",
+    "related_model": [],
+    "related_fault": [],
+    "gap_type": "维修案例",
+    "description": "当前两份资料提供培训和管理框架，但没有具体主板维修案例、测试数据、定位过程和修后验证记录。",
+    "provider": "中方技术人员 / L4 技术员 / 海外现场",
+    "priority": "高",
+    "status": "待补充",
+    "next_action": "优先收集 3-5 类高频故障的真实维修案例，用于建立案例库和 SOP 样板。",
+    "source_ids": [
+      "SRC-20260604-001",
+      "SRC-20260604-002"
+    ]
+  }
+]
+

@@ -1,0 +1,101 @@
+[
+  {
+    "source_id": "SRC-20260604-001",
+    "file_name": "器件维修培训.docx",
+    "original_path": "C:/Users/Mercurluto/Downloads/器件维修培训.docx",
+    "file_type": "Word",
+    "received_date": "2026-06-04",
+    "main_category": "培训资料库",
+    "secondary_categories": [
+      "维修边界库",
+      "缺口与需求库"
+    ],
+    "related_models": [],
+    "related_faults": [],
+    "related_components": [
+      "CPU",
+      "EMMC",
+      "PMU"
+    ],
+    "related_tools": [
+      "植锡钢网",
+      "直流电源",
+      "万用表",
+      "电烙铁",
+      "热风枪",
+      "放大镜"
+    ],
+    "summary": "器件维修培训资料，包含器件维修计划、所需设备、人员认证、试点网点计划，以及 CRM、Escalation、PO、多维表格记录等维修流程经验。",
+    "extractable_items": [
+      "器件维修试点计划",
+      "必备工具清单",
+      "人员认证门槛",
+      "CRM 录单规则",
+      "Escalation 提交流程",
+      "缺料 PO 流程",
+      "主板维修员 AssignedTo 要求",
+      "多维表格维修记录要求"
+    ],
+    "missing_fields": [
+      "13 项技能认证明细",
+      "各认证项目的通过标准",
+      "各网点实际培训完成状态",
+      "器件维修试点对应的具体故障范围"
+    ],
+    "target_knowledge_base": [
+      "training-materials",
+      "repair-boundaries",
+      "gap-requests"
+    ],
+    "processing_status": "已归类并完成第一版结构化入库",
+    "notes": "该文件更偏能力建设和流程管理，不是具体故障诊断 SOP。"
+  },
+  {
+    "source_id": "SRC-20260604-002",
+    "file_name": "2025 主板培训标准.docx",
+    "original_path": "C:/Users/Mercurluto/Downloads/2025 主板培训标准.docx",
+    "file_type": "Word",
+    "received_date": "2026-06-04",
+    "main_category": "培训资料库",
+    "secondary_categories": [
+      "维修边界库",
+      "缺口与需求库"
+    ],
+    "related_models": [],
+    "related_faults": [],
+    "related_components": [],
+    "related_tools": [],
+    "summary": "2025 主板培训标准，定义 L4 场所、培训资料、培训方式、培训目标、培训结果呈现、质量监控和不达标网点通报规则。",
+    "extractable_items": [
+      "L4 定义",
+      "全球 L4 清单说明",
+      "L4 故障检测和常用工具资料入口",
+      "点胶主板维修及除胶资料入口",
+      "BGA 重新焊接基础操作资料入口",
+      "5S 标准资料入口",
+      "培训方式",
+      "培训目标",
+      "培训后结果呈现要求",
+      "培训质量监控指标",
+      "不达标网点定义",
+      "通报规则"
+    ],
+    "missing_fields": [
+      "完整全球 L4 清单表",
+      "L4 故障检测和常用工具原文",
+      "点胶主板维修及除胶资料",
+      "BGA 重新焊接基础操作资料",
+      "除胶视频",
+      "L4 主板维修 5S 建设资料",
+      "培训完成后每个维修员的技能打分字段"
+    ],
+    "target_knowledge_base": [
+      "training-materials",
+      "repair-boundaries",
+      "gap-requests"
+    ],
+    "processing_status": "已归类并完成第一版结构化入库",
+    "notes": "该文件是 L4 能力建设总纲，可作为第一阶段售后场景知识库的培训与指标基线。"
+  }
+]
+

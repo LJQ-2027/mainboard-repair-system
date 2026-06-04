@@ -21,6 +21,7 @@
 │   ├── diagnosis-rules.js                     # 历史案例诊断规则
 │   ├── phenomena-search-index.js              # 故障现象搜索索引
 │   └── log-knowledge-base.js                  # log 分析知识库
+├── knowledge-base/                            # 第一阶段结构化售后知识条目
 ├── docs/                                      # 产品愿景、知识库结构、资料边界和协作说明
 │   ├── knowledge-base-structure.md            # 售后场景知识库结构
 │   ├── source-ingestion-template.md           # 资料入库登记模板
