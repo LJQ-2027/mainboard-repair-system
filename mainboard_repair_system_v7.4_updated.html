@@ -97,6 +97,7 @@
             background: white;
             border: 2px solid #e0e0e0;
             border-radius: 10px;
+            color: #1f2937;
             cursor: pointer;
             transition: all 0.3s;
             text-align: left;
@@ -113,14 +114,25 @@
         }
 
         .mode-title {
+            position: relative;
+            z-index: 1;
+            color: inherit;
             font-size: 16px;
             font-weight: 600;
             margin-bottom: 5px;
         }
 
         .mode-desc {
+            position: relative;
+            z-index: 1;
+            color: #64748b;
             font-size: 12px;
             opacity: 0.8;
+        }
+
+        .mode-btn.active .mode-desc,
+        .mode-btn.ai-mode.active .mode-desc {
+            color: rgba(255, 255, 255, 0.92);
         }
 
         .search-section {
