@@ -21,7 +21,7 @@
 │   ├── diagnosis-rules.js                     # 历史案例诊断规则
 │   ├── phenomena-search-index.js              # 故障现象搜索索引
 │   └── log-knowledge-base.js                  # log 分析知识库
-├── docs/                                      # 产品愿景、资料边界和协作说明
+├── docs/                                      # 产品愿景、知识库结构、资料边界和协作说明
 ├── ai_proxy_server.py                          # AI 代理服务器（Python）
 ├── 启动AI服务.bat                               # Windows 启动脚本
 ├── .env.example                                # 环境变量模板
