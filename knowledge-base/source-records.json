@@ -96,6 +96,188 @@
     ],
     "processing_status": "已归类并完成第一版结构化入库",
     "notes": "该文件是 L4 能力建设总纲，可作为第一阶段售后场景知识库的培训与指标基线。"
+  },
+  {
+    "source_id": "SRC-20260604-003",
+    "file_name": "手机EE原理介绍.pptx",
+    "original_path": "C:/Users/Mercurluto/Downloads/手机EE原理介绍.pptx",
+    "file_type": "PowerPoint",
+    "received_date": "2026-06-04",
+    "main_category": "培训资料库",
+    "secondary_categories": [
+      "模块原理库",
+      "故障知识库",
+      "器件与点位库"
+    ],
+    "related_models": [],
+    "related_faults": [
+      "不开机",
+      "不充电",
+      "快充异常",
+      "电池识别异常",
+      "无服务",
+      "显示异常",
+      "摄像头异常",
+      "音频异常"
+    ],
+    "related_components": [
+      "PMIC",
+      "Charge IC",
+      "Charge Pump",
+      "CPU",
+      "Battery BTB",
+      "RF IC",
+      "Camera",
+      "LCD",
+      "Sensor"
+    ],
+    "related_tools": [],
+    "summary": "手机 EE 工作原理培训资料，覆盖充电、供电、电池 BTB、USB、摄像头、显示、音频、Sensor、射频等模块原理。该资料适合作为第一阶段知识库中“模块原理说明”和后续诊断 SOP 的基础素材。",
+    "extractable_items": [
+      "标准充电链路原理",
+      "快充和电荷泵原理",
+      "电池 BTB 信号说明",
+      "USB 及 I2C 复用链路说明",
+      "供电模块基础说明",
+      "摄像头 / 显示 / 音频 / Sensor / 射频模块原理",
+      "关键 IC 和信号名称"
+    ],
+    "missing_fields": [
+      "每个模块的完整高清原理图或点位图",
+      "各机型对应的正常电压 / 阻值 / 波形范围",
+      "模块原理到故障诊断步骤的正式转译",
+      "PPT 中图片和示意图的结构化解析"
+    ],
+    "target_knowledge_base": [
+      "training-materials",
+      "module-principles",
+      "gap-requests"
+    ],
+    "processing_status": "已归类并完成第一版结构化入库",
+    "notes": "该资料偏原理培训，不应直接当作维修 SOP 使用；需要制造中心或技术支持把原理转化为测试点、判断条件和操作步骤。"
+  },
+  {
+    "source_id": "SRC-20260604-004",
+    "file_name": "漏电流和待机电流异常分析.docx",
+    "original_path": "C:/Users/Mercurluto/Downloads/漏电流和待机电流异常分析.docx",
+    "file_type": "Word",
+    "received_date": "2026-06-04",
+    "main_category": "故障知识库",
+    "secondary_categories": [
+      "诊断SOP库",
+      "培训资料库",
+      "案例素材库"
+    ],
+    "related_models": [],
+    "related_faults": [
+      "关机漏电流偏大",
+      "飞行模式待机电流偏大",
+      "待机功耗偏大",
+      "功耗不良"
+    ],
+    "related_components": [
+      "Charge IC",
+      "PMIC",
+      "VBAT",
+      "VBAT_SYS",
+      "BUCK",
+      "LDO"
+    ],
+    "related_tools": [
+      "程控电源",
+      "万用表",
+      "红外热像仪",
+      "串口工具",
+      "日志抓取工具"
+    ],
+    "summary": "电流异常学习总结，围绕关机漏电流偏大和飞行模式待机电流偏大，给出原因分析、检测方法、软件与硬件区分思路，以及触摸感知、红外热像、压差法、电流倒灌法等定位方法。",
+    "extractable_items": [
+      "关机漏电流异常原因",
+      "飞行模式待机电流异常原因",
+      "程控电源检测方法",
+      "Charge IC VBAT 与 VBAT_SYS 后级区分思路",
+      "软件 / 驱动未进入飞行模式的排查路径",
+      "红外热像定位方法",
+      "压差法",
+      "电流倒灌法",
+      "BUCK / LDO 支路对比数据"
+    ],
+    "missing_fields": [
+      "各机型关机漏电流标准阈值",
+      "各机型飞行模式待机电流标准阈值",
+      "各平台飞行模式串口命令和 Log 判定规则",
+      "各 BUCK / LDO 支路正常电流范围",
+      "完整维修案例照片和修后验证记录"
+    ],
+    "target_knowledge_base": [
+      "fault-knowledge",
+      "sop-drafts",
+      "training-materials",
+      "gap-requests"
+    ],
+    "processing_status": "已归类并完成第一版结构化入库",
+    "notes": "这是当前最接近可执行诊断 SOP 的资料，适合优先让技术支持或制造中心确认后转成正式流程。"
+  },
+  {
+    "source_id": "SRC-20260604-005",
+    "file_name": "手机维修分析培训_20190510.pptx",
+    "original_path": "C:/Users/Mercurluto/Downloads/手机维修分析培训_20190510.pptx",
+    "file_type": "PowerPoint",
+    "received_date": "2026-06-04",
+    "main_category": "培训资料库",
+    "secondary_categories": [
+      "模块原理库",
+      "Log分析知识库",
+      "流程规范库",
+      "故障知识库"
+    ],
+    "related_models": [],
+    "related_faults": [
+      "不开机",
+      "无服务",
+      "显示异常",
+      "触控异常",
+      "产线异常"
+    ],
+    "related_components": [
+      "PMIC",
+      "CPU",
+      "FLASH",
+      "26M 晶振",
+      "RF IC",
+      "LCD",
+      "CTP"
+    ],
+    "related_tools": [
+      "MES",
+      "META 工具",
+      "Log 抓取工具"
+    ],
+    "summary": "手机维修分析培训资料，内容包括 MES 维修录入规范、META 工具使用、手机原理讲解、Log 抓取、封胶不良品返工、常用维修分析手法和产线异常反馈。",
+    "extractable_items": [
+      "MES 维修录入规范",
+      "META 工具使用说明",
+      "基带开机原理",
+      "开机硬件逻辑顺序",
+      "射频收发原理",
+      "LCD / CTP 电路基础",
+      "Log 抓取操作",
+      "常用维修分析手法",
+      "产线异常问题反馈规则"
+    ],
+    "missing_fields": [
+      "META 工具完整操作步骤",
+      "Log 抓取工具版本和平台差异",
+      "MES 录入字段模板",
+      "封胶不良品返工的正式边界和风险控制",
+      "常用维修分析手法对应的案例样本"
+    ],
+    "target_knowledge_base": [
+      "training-materials",
+      "module-principles",
+      "gap-requests"
+    ],
+    "processing_status": "已归类并完成第一版结构化入库",
+    "notes": "该资料是维修分析培训总览，适合拆成培训路径、模块原理和工具操作入口；其中 MES / META / Log 内容需要继续下钻。"
   }
 ]
-
