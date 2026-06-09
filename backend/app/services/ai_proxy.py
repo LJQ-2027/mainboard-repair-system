@@ -298,7 +298,21 @@ async def chat_sync(payload: Dict[str, Any]) -> Dict[str, Any]:
                 config["url"], json=api_payload, headers=headers
             )
             response.raise_for_status()
-            return response.json()
+            result = response.json()
+
+            # OpenAI 格式 → Anthropic 格式转换（非流式）
+            if api_format == "openai" and "choices" in result:
+                text = result["choices"][0]["message"]["content"]
+                result = {
+                    "id": result.get("id", "msg_proxy"),
+                    "type": "message",
+                    "role": "assistant",
+                    "model": result.get("model", ""),
+                    "content": [{"type": "text", "text": text}],
+                    "stop_reason": "end_turn",
+                }
+
+            return result
         except httpx.TimeoutException:
             raise HTTPException(status_code=504, detail="API 请求超时")
         except httpx.ConnectError as e:
