@@ -25,6 +25,9 @@ env/
 Thumbs.db
 desktop.ini
 
+# Node.js
+node_modules/
+
 # 临时文件
 ~$*
 *.tmp
