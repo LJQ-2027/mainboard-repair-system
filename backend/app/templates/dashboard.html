@@ -1,0 +1,49 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<h2 style="margin-bottom:20px">数据统计看板</h2>
+
+<div class="stat-grid">
+    <div class="stat-card">
+        <div class="label">总诊断次数</div>
+        <div class="value">{{ total_diagnoses }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">今日诊断</div>
+        <div class="value">{{ today_count }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">注册用户</div>
+        <div class="value">{{ user_count }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">知识库条目</div>
+        <div class="value">{{ kb_count }}</div>
+    </div>
+</div>
+
+<div style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+    <div class="table" style="padding:20px">
+        <h3 style="margin-bottom:12px">故障诊断模式分布（近7天）</h3>
+        {% for mode, count in modes.items() %}
+        <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f0f0f0">
+            <span>{{ mode }}</span>
+            <span style="font-weight:600">{{ count }}</span>
+        </div>
+        {% else %}
+        <p style="color:#999">暂无数据</p>
+        {% endfor %}
+    </div>
+
+    <div class="table" style="padding:20px">
+        <h3 style="margin-bottom:12px">每日诊断趋势（近7天）</h3>
+        {% for date, count in daily_counts.items() %}
+        <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f0f0f0">
+            <span>{{ date }}</span>
+            <span style="font-weight:600">{{ count }}</span>
+        </div>
+        {% else %}
+        <p style="color:#999">暂无数据</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

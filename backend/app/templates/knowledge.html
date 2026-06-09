@@ -1,0 +1,77 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<h2 style="margin-bottom:20px">知识库管理</h2>
+
+<!-- 添加条目 -->
+<div class="table" style="padding:20px; margin-bottom:20px">
+    <h3 style="margin-bottom:12px">添加知识库条目</h3>
+    <form method="POST" action="/admin/knowledge/add">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:12px">
+            <div>
+                <label style="font-size:13px;color:#666">分类</label>
+                <input type="text" name="category" placeholder="如：不开机、充电异常" required>
+            </div>
+            <div>
+                <label style="font-size:13px;color:#666">标题</label>
+                <input type="text" name="title" placeholder="故障分析标题" required>
+            </div>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:12px">
+            <div>
+                <label style="font-size:13px;color:#666">关键词（逗号分隔）</label>
+                <input type="text" name="keywords" placeholder="如：不开机,无电流,无法启动">
+            </div>
+            <div>
+                <label style="font-size:13px;color:#666">来源链接</label>
+                <input type="text" name="source" placeholder="知识库链接（可选）">
+            </div>
+        </div>
+        <div style="margin-bottom:12px">
+            <label style="font-size:13px;color:#666">诊断内容（支持 Markdown）</label>
+            <textarea name="content" required placeholder="诊断步骤、关键信号、常见故障等"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">添加条目</button>
+    </form>
+</div>
+
+<!-- 现有条目列表 -->
+<div class="table">
+    <table>
+        <thead>
+            <tr>
+                <th>分类</th>
+                <th>标题</th>
+                <th>关键词</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in entries %}
+            <tr>
+                <td><span class="badge badge-active">{{ entry.category }}</span></td>
+                <td>{{ entry.title }}</td>
+                <td style="font-size:12px;color:#999">{{ entry.keywords or '-' }}</td>
+                <td>
+                    {% if entry.is_active %}
+                    <span class="badge badge-active">启用</span>
+                    {% else %}
+                    <span class="badge badge-inactive">禁用</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="/admin/knowledge/{{ entry.id }}/toggle" class="btn btn-sm btn-primary">
+                        {% if entry.is_active %}禁用{% else %}启用{% endif %}
+                    </a>
+                    <a href="/admin/knowledge/{{ entry.id }}/delete" class="btn btn-sm btn-danger" onclick="return confirm('确定删除？')">删除</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5" style="text-align:center;color:#999;padding:40px">暂无知识库条目，请在上方添加</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

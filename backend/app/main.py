@@ -1,4 +1,4 @@
-"""FastAPI 应用入口"""
+"""FastAPI 应用入口 v9.0 - 团队版"""
 
 import os
 
@@ -6,14 +6,15 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
+from app.database import init_db
 from app.middleware.logging import LoggingMiddleware
-from app.routers import chat, health
+from app.routers import admin, auth, chat, health
 
 # 创建应用实例
 app = FastAPI(
     title="智能主板维修系统 - AI 代理服务",
-    description="支持 Kimi / Anthropic Claude / DeepSeek 多平台的 AI 代理",
-    version="8.2.0",
+    description="支持多用户、知识库管理、AI 增强诊断的团队版维修系统",
+    version="9.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
 )
@@ -32,28 +33,33 @@ app.add_middleware(LoggingMiddleware)
 
 # 注册路由
 app.include_router(health.router)
+app.include_router(auth.router)
+app.include_router(admin.router)
 app.include_router(chat.router)
 
 # 静态文件服务 - data/ 目录
 _data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "data")
 if os.path.exists(_data_dir):
     from fastapi.staticfiles import StaticFiles
-
     app.mount("/data", StaticFiles(directory=_data_dir), name="data")
 
 
 @app.on_event("startup")
 async def startup():
-    """启动时打印配置信息"""
+    """启动时初始化数据库并打印配置"""
+    # 初始化数据库
+    init_db()
+
     settings = get_settings()
     from app.services.ai_proxy import detect_provider
 
     provider_id, config = detect_provider(settings.anthropic_api_key)
     print("=" * 60)
-    print("  AI 代理服务器 - 智能主板维修系统 v8.2 (FastAPI)")
+    print("  AI 代理服务器 - 智能主板维修系统 v9.0 (团队版)")
     print("=" * 60)
     print(f"  文档地址: http://localhost:{settings.port}/docs")
     print(f"  健康检查: http://localhost:{settings.port}/health")
+    print(f"  登录接口: POST http://localhost:{settings.port}/auth/login")
     print(f"  API 端点: POST http://localhost:{settings.port}/api/chat")
     print("-" * 60)
     if settings.anthropic_api_key:
