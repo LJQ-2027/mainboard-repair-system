@@ -1,0 +1,22 @@
+{
+  "name": "mainboard-repair-system",
+  "version": "8.1.0",
+  "description": "智能主板维修系统 - AI 辅助诊断",
+  "main": "mainboard_repair_system_v7.4_updated.html",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "keywords": [
+    "repair",
+    "mainboard",
+    "AI",
+    "diagnosis"
+  ],
+  "author": "junqiao.long",
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
+  }
+}
