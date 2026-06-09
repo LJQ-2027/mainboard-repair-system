@@ -1,0 +1,379 @@
+{
+  "analysisMethods": {
+    "title": "手机异常问题分析思路",
+    "source": "https://transsioner.feishu.cn/wiki/wikcnk7PZxAfrscml92niQv0dHX",
+    "steps": [
+      "问：向用户或检测人员了解情况——不良现象、测试数值、不良率等",
+      "看：结合机型和现象，对外观结构、电流等查看，初步定位故障区域",
+      "听：从话音质量、音量、声音断续等初步判断故障",
+      "摸：针对功耗不良，手摸器件表面温度判断是否过热或电流过大",
+      "思：根据观察和资料，运用电路原理综合分析判断",
+      "修：对失效元器件加热、植球重装、芯片调换等"
+    ],
+    "methods": [
+      {
+        "name": "重置法",
+        "desc": "恢复出厂设置及软件升级对设置或软件重置"
+      },
+      {
+        "name": "交叉验证法",
+        "desc": "正常品与不良品上的某个器件互换，达到分析定位"
+      },
+      {
+        "name": "电阻测量法",
+        "desc": "用蜂鸣档及欧姆档测量线路阻值定位"
+      },
+      {
+        "name": "电压量法",
+        "desc": "用万用表电压档或示波器检测供电线路或控制线"
+      },
+      {
+        "name": "电流检测法",
+        "desc": "假电池供压接通外部电源，按开机键看电流显示"
+      },
+      {
+        "name": "信号追踪法",
+        "desc": "驱使手机进入特定模式，用辅助设备定点检测信号强弱"
+      },
+      {
+        "name": "补焊法",
+        "desc": "对元件加热来定位，针对无法测量异常的主板"
+      },
+      {
+        "name": "电压倒灌法",
+        "desc": "开关机状态下对各供电线路外接电源，定位漏电故障"
+      }
+    ]
+  },
+  "不开机": {
+    "title": "不开机分析思路",
+    "keywords": [
+      "不开机",
+      "无法开机",
+      "无法启动",
+      "无电流",
+      "电流只有",
+      "无法唤醒"
+    ],
+    "source": "https://transsioner.feishu.cn/wiki/wikcnakXTr9gy97ioCWMGlokIRg",
+    "principle": "手机正常供电后按开机键低电平触发电源工作，输出数字核心电压、系统电压给CPU、存储、各模块电源电压，晶体26M起振给CPU提供基准时钟，同时给CPU复位信号唤醒CPU开始工作完成自检，自检正常后与电源通讯，CPU发出维持信号持续供电发送各路电压，调取存储程序运行开机。",
+    "diagnosis": [
+      "插入充电器排除电池低电量，观察手机是否亮屏排除电源键失效；长按开机键看是否振动排除开机黑屏",
+      "检查电池BTB是否破损、电池FPC是否撕裂；检查电源键弹片是否变形、按键FPC是否破损；用铁镊子短路PWRKEY点验证是否可开机；检查导电布是否搭接到元器件导致短路",
+      "交叉验证附件（LCD、副板、摄像头、主FPC）排除附件影响，不良随主板则退SMT",
+      "主板无法出MediaTek preload下载口或无法连接下载工具→硬件下载系统NG，PMIC上电异常，需量测上电时序",
+      "量测方法：短接开机键量测各时序电压，与正常单板对比；直接量测AP GOOD点，高电平说明上电时序OK，重点排查CPU/EMMC/DDR；量测异常则按PMU上电时序排查",
+      "辅助定位：开机电流异常→大电流可能短路，无小电流可能PMIC/CPU虚焊；无反应可能时钟失效或VBAT未供电到VSYS；漏电流大→红外仪或手摸定位漏电电源芯片",
+      "软件定位：抓取串口log或下载log，发给研发分析具体异常模块"
+    ],
+    "keySignals": "VBAT、VSYS、VIO、PMIC_PWRON、TCXO(26MHz)、AP GOOD点、PMU上电时序(Vcore/VS1/VS18/VPROC12/Vaud28)",
+    "commonFaults": "PMIC供电异常、CPU/EMMC/DDR虚焊或损坏、时钟晶体失效、复位电路异常、电源按键电路故障、电池接口接触不良"
+  },
+  "重启": {
+    "title": "卡logo & 自动重启分析思路",
+    "keywords": [
+      "重启",
+      "死机",
+      "卡logo",
+      "自动关机",
+      "无限重启",
+      "反复重启"
+    ],
+    "source": "https://transsioner.feishu.cn/wiki/wikcn3WMxKrwYaZC1UWpDZVwoCh",
+    "principle": "手机在正常开机过程中，若某个硬件模块异常就会造成手机异常重启。软件侧：上层造成重启（system_server被杀、watchdog重启、重要线程阻塞）；kernel造成重启（空指针、非法地址）；kernel watchdog造成重启（原因不确定如内存问题）。",
+    "diagnosis": [
+      "确认现象是否稳定及复现路径，抓取串口log和android log给研发分析",
+      "重新下载软件排除软件问题导致的卡logo和自动重启",
+      "整机通过更换附件（屏幕、电池、主FPC、副板、侧键、摄像头）定位重启器件，排除附件确认为主板则退SMT",
+      "结合串口log和android分析定位具体哪个硬件模块异常；或排查相关硬件模块",
+      "常见不良器件：UFS、DDR、CPU、PMU、NFC芯片、音频驱动芯片等"
+    ],
+    "keySignals": "串口log、android log、UFS供电、DDR供电、CPU各路电压",
+    "commonFaults": "UFS虚焊/损坏、DDR虚焊/损坏、CPU虚焊、PMU异常、NFC芯片异常"
+  },
+  "充电异常": {
+    "title": "充电不良分析思路",
+    "keywords": [
+      "充电",
+      "快充",
+      "充电慢",
+      "充不进",
+      "充电发热",
+      "发热严重",
+      "充电不良"
+    ],
+    "source": "https://transsioner.feishu.cn/wiki/V4V4wJLaMiPbbpkHgINckUD7nld",
+    "principle": "5V2A标准充电和18W快充采用Buck降压方式在同一芯片完成，高压充电需DP/DM通讯协议支持（18W MAX传音自有协议）。超级快充为电荷泵电容充电，Vout=0.5Vin、Iout=2Iin（2:1芯片），后衍生4:1芯片，采用主副路泵芯片并联分流。高端机型充电集成在PMIC内。",
+    "diagnosis": [
+      "确认不良现象：连接电脑有端口？无端口按无端口维修。有端口则分别插标充、18W Max、45W/68W充电器复测，更换充电器或线缆排除",
+      "检查电池BTB扣合、主FPC扣合、主副板撞件；交叉验证排除附件（电池/USB FPC/副板），不良随主板退SMT",
+      "主板充电不良：确认是标充5V2A还是快充不良，量测USB的VBUS_OVP是否有5V，排除MOS管不导通",
+      "标充和18W快充不良：对照原理图检查开关充电芯片是否正常、连锡、周围小元件正常，量测各管脚阻抗，无异常则更换开关充电芯片",
+      "33W/45W/68W快充不良：检查快充芯片是否正常、连锡偏位、周围小元件和Fly电容正常，检查DPDM协议通路器件，量测各管脚阻抗，无异常则更换主/副Charge Pump芯片验证"
+    ],
+    "keySignals": "VBUS_OVP、VBUS、充电芯片各管脚电压、DP/DM协议通路、Charge Pump芯片供电、Fly电容",
+    "commonFaults": "充电IC损坏、USB连接器虚焊、充电通路电感损坏、Charge Pump芯片异常、DPDM协议通路器件故障、MOS管不导通"
+  },
+  "无端口": {
+    "title": "无端口分析思路",
+    "keywords": [
+      "无端口",
+      "不识别",
+      "无USB",
+      "OTG",
+      "OTG不识别",
+      "连接电脑无反应"
+    ],
+    "source": "https://transsioner.feishu.cn/wiki/GDPgwSxkmitQSKku9g3cS2S4nef",
+    "principle": "手机TypeC接口通过USB线连接电脑时执行TypeC协议和USB2.0 BC1.2端口识别协议，通过DP/DM与电脑数据传输。电路由TypeC和BC1.2协议的USB_TYPEC_CC1、USB_TYPEC_CC2、VBUS、USB_DP、USB_DM网络构成。",
+    "diagnosis": [
+      "检查主FPC BTB是否扣好、有无变形浮高，主FPC是否破损，主副板是否撞件；交叉验证排除主FPC、副板影响，不良随主板退SMT",
+      "主板无端口：检查主FPC BTB是否变形虚焊连锡，排查通路上器件和芯片是否虚焊连锡（照Xray和目检）",
+      "量测USB_TYPEC_CC1、USB_TYPEC_CC2、VBUS、USB_DP、USB_DM阻抗和电压是否异常，无异常则更换对应通路上USB开关芯片、标充芯片、CPU和通路阻容感小件验证",
+      "注：OTG不识别分析思路同无端口"
+    ],
+    "keySignals": "USB_TYPEC_CC1、USB_TYPEC_CC2、VBUS、USB_DP、USB_DM",
+    "commonFaults": "主FPC BTB虚焊/变形、USB开关芯片损坏、标充芯片异常、CPU通路异常、通路阻容感小件异常"
+  },
+  "无服务": {
+    "title": "射频天线不良分析思路",
+    "keywords": [
+      "无服务",
+      "无信号",
+      "信号弱",
+      "无法通话",
+      "信号",
+      "通话",
+      "射频"
+    ],
+    "source": "https://transsioner.feishu.cn/wiki/MaNqwIhpPigj2ikUw85cTsdGnyc",
+    "principle": "射频电路分为主集和分集，主集包括发射TX通路和接收通路PRX，分集只有接收DRX通路。发射通路：TRS→PA→SPXT→DPDT→射频座；接收通路：射频座→DPDT→滤波器→LNA→TRS。",
+    "diagnosis": [
+      "从不良log中找到测试失败的频段、TX/RX或Carkit信息，定位具体射频通路",
+      "检查通路上从射频座/同轴线座到射频收发器上器件芯片是否连锡虚焊、容阻感器件是否撞件连锡",
+      "量测通路器件上阻抗和供电，无异常则更换通路器件验证"
+    ],
+    "keySignals": "射频收发器(TRS)、射频放大器(PA)、射频开关(SPXT)、DPDT开关、滤波器、LNA",
+    "commonFaults": "PA损坏/虚焊、天线开关虚焊、滤波器失效、射频收发器异常、通路器件连锡虚焊"
+  },
+  "耦合不良": {
+    "title": "天线耦合不良分析思路",
+    "keywords": [
+      "耦合",
+      "耦合不良",
+      "天线",
+      "ANT",
+      "GSM850",
+      "LTE",
+      "分集"
+    ],
+    "source": "https://transsioner.feishu.cn/wiki/XRINwGobDiaLQ9kQHePcPLPFnCf",
+    "principle": "手机天线接收和发射信号通过弹片或同轴线和主板接触传递到主板，电路由射频传导和天线调谐电路组成，射频功率经射频座/同轴线座子后，经SP4T天线调谐开关和外围容阻感器件匹配使信号达到最佳效率。",
+    "diagnosis": [
+      "整机耦合测试根据失败频段和发射/接收信息，通过频段天线分布图找到对应ANT，再找到对应ANT位置",
+      "检查主板或副板弹片是否变形、元件是否撞件、同轴线座子是否扣变形或同轴线断裂、中框接触是否良好",
+      "交叉验证主副板、同轴线、中框定位问题",
+      "整机耦合天线类不良主板：检查弹片是否撞件变形、通路上天线开关和元件是否撞件连锡、射频座是否虚焊",
+      "主板复测校准综测，不良按射频校准综测不良维修；测试OK则重点检查射频座后面通路是否正常，更换通路器件验证"
+    ],
+    "keySignals": "射频座/同轴线座、SP4T天线调谐开关、ANT弹片、通路容阻感器件",
+    "commonFaults": "弹片变形、天线开关虚焊/连锡、同轴线断裂、射频座虚焊、通路器件撞件"
+  },
+  "NFC": {
+    "title": "近场通讯NFC分析思路",
+    "keywords": [
+      "NFC",
+      "近场通讯",
+      "nfc刷不了",
+      "nfc感应"
+    ],
+    "source": "https://transsioner.feishu.cn/wiki/M40YwUW2OiYRvjkkYrxcNLQPnTb",
+    "principle": "NFC通过天线线圈与NFC芯片配合实现近场通讯，电路包括NFC芯片、天线线圈、匹配电路。",
+    "diagnosis": [
+      "检查NFC天线FPC是否破损、连接是否良好",
+      "交叉验证主板和NFC模组",
+      "量测NFC芯片供电、时钟、I2C通信是否正常",
+      "检查天线线圈阻抗是否正常"
+    ],
+    "keySignals": "NFC芯片供电、时钟、I2C通信、天线线圈阻抗",
+    "commonFaults": "NFC芯片虚焊/损坏、天线线圈开路/短路、匹配电路异常"
+  },
+  "显示异常": {
+    "title": "开机黑屏/显示异常分析思路",
+    "keywords": [
+      "黑屏",
+      "显示",
+      "屏幕",
+      "LCD",
+      "AMOLED",
+      "无显示",
+      "花屏",
+      "闪屏",
+      "显示异常"
+    ],
+    "source": "https://transsioner.feishu.cn/wiki/wikcnhHp1GD5SgYGGEEDxJd2mvh",
+    "principle": "LCD显示数据通过共模电感与CPU连接，CPU经图形处理将数据信号发差分信号显示。电路由背光驱动升压芯片U2602提供LEDA_LCM/LEDK_LCM，显示驱动U2603输出AVDD_LCM和AVEE_LCM液晶翻转电压，VIO18_EXT为LCM IO口供电1.8V。显示图像信号DSI0通过五组共模电感和CPU相连。控制信号：LCM_RST复位、DSI_TE_CON同步、AUX_LCM_IN2 ID检测由CPU控制。AMOLED屏幕自发光无背光电路。",
+    "diagnosis": [
+      "确认能开机振动无显示，拆机确认LCD-BTB扣合是否正常，检查主板撞件、屏幕FPC撕裂",
+      "交叉验证确认排除LCD或主板不良",
+      "主板不良：检查BTB是否虚焊连锡变形，更换BTB验证",
+      "量测LCM背光电路阻抗和供电压（LCM_LEDK、LCM_LEDA），显示驱动阻抗和电压（AVDD_LCM、AVEE_LCM、VIO18）是否正常，异常则排查背光供电U2602、显示驱动U2603或VIO18供电芯片",
+      "量测控制信号LCM_RST、DSI_TE_CON、AUX_LCM_IN2阻抗是否正常，排查外围器件或更换CPU验证",
+      "注：AMOLED屏幕无背光LCM LED电路，排查方法同LCD"
+    ],
+    "keySignals": "LEDA_LCM、LEDK_LCM、AVDD_LCM、AVEE_LCM、VIO18、LCM_RST、DSI_TE_CON、AUX_LCM_IN2",
+    "commonFaults": "BTB连接器虚焊/变形、背光驱动U2602损坏、显示驱动U2603损坏、VIO18供电异常、CPU异常"
+  },
+  "触摸": {
+    "title": "屏幕触摸失灵分析思路",
+    "keywords": [
+      "触摸",
+      "触屏",
+      "触控",
+      "触摸失灵",
+      "触摸不灵",
+      "屏幕触摸"
+    ],
+    "source": "https://transsioner.feishu.cn/wiki/wikcnMpfQ2VOskIFlqhuz2TcdVg",
+    "principle": "触摸屏通过I2C/SPI与CPU通信，由触摸IC控制触摸信号采集和处理。",
+    "diagnosis": [
+      "检查触摸屏BTB扣合、FPC是否破损",
+      "交叉验证触摸屏和主板",
+      "量测触摸IC供电、I2C/SPI通信是否正常",
+      "更换触摸IC验证"
+    ],
+    "keySignals": "触摸IC供电、I2C/SPI通信、触摸连接器",
+    "commonFaults": "触摸连接器接触不良、触摸IC虚焊/损坏、I2C/SPI通路异常"
+  },
+  "摄像头": {
+    "title": "摄像头拍照类分析思路",
+    "keywords": [
+      "摄像头",
+      "拍照",
+      "相机",
+      "camera",
+      "打不开摄像头",
+      "摄像头模糊",
+      "对焦",
+      "标定",
+      "防抖",
+      "OIS"
+    ],
+    "source": "https://transsioner.feishu.cn/wiki/wikcnPXt2JTcHNzdQm1VyMM6hSc",
+    "principle": "摄像头将光信号转换为数字信号，由镜头、VCM马达、底座、IR滤光片、图像传感器、电路板等组成。主摄电路：CSI信号和供电VCAMD_EXT0/VCAM_VDDAF_EXT0/VCAMIO_EXT1/VCAMA_EXT0/VCAMA_1V8，防抖OIS供电VCAM_ACT_VDD，时钟CAM_CLK1，同步VSYNC，复位CAM_RST1，防抖使能GPIO142_OIS_EN，和SCP_SCL3/SDA3同CPU通讯。CSI通路共模电感降低高频噪声。",
+    "diagnosis": [
+      "MMI/QT工位失败：检查摄像头BTB扣合是否变形浮高、FPC无撕裂、主板无撞件；拨号*#9646633#进入RGT DEVinfo查看是否多个摄像头无法读取；交叉验证摄像头和主板",
+      "主板不良：检查BTB是否变形虚焊连锡；量测各管脚阻抗是否正常",
+      "排查摄像头工作电压：VCAMD_EXT0/VCAM_VDDAF_EXT0/VCAMIO_EXT1/VCAMA_EXT0/VCAMA_1V8，根据异常阻抗和电压排查对应通路，或更换通路电源芯片和外围器件",
+      "防抖OIS工位失败：量测VCAM_OIS_VDD0阻抗和供电、OISEN使能脚阻抗；检查重力感芯片是否虚焊连锡",
+      "标定工位失败：确认摄像头都能正常打开，根据测试项判定哪两颗摄像头标定失败，检查摄像头组装是否偏心/倾斜/脏污"
+    ],
+    "keySignals": "VCAMD_EXT0、VCAM_VDDAF_EXT0、VCAMIO_EXT1、VCAMA_EXT0、VCAMA_1V8、VCAM_OIS_VDD0、CAM_CLK1、VSYNC、CAM_RST1",
+    "commonFaults": "BTB连接器虚焊/变形、摄像头供电芯片异常、共模电感异常、CPU异常、VCM马达异常、重力感芯片异常"
+  },
+  "闪光灯": {
+    "title": "闪光灯分析思路",
+    "keywords": [
+      "闪光灯",
+      "flash",
+      "补光灯"
+    ],
+    "source": "https://transsioner.feishu.cn/wiki/wikcnR6cxOD3G4WDdSWsp99SEXe",
+    "principle": "闪光灯LED由闪光灯驱动IC控制，通过I2C与CPU通信，供电由PMU提供。",
+    "diagnosis": [
+      "检查闪光灯LED单体是否正常",
+      "交叉验证闪光灯和主板",
+      "量测闪光灯驱动IC供电和I2C通信",
+      "更换闪光灯驱动IC验证"
+    ],
+    "keySignals": "闪光灯驱动IC供电、I2C通信、闪光灯LED",
+    "commonFaults": "闪光灯LED损坏、驱动IC异常、I2C通路异常"
+  },
+  "音频异常": {
+    "title": "上喇叭（听筒）和下喇叭类不良分析思路",
+    "keywords": [
+      "喇叭",
+      "听筒",
+      "声音",
+      "音频",
+      "无声",
+      "声音小",
+      "杂音",
+      "破音",
+      "speaker"
+    ],
+    "source": "https://transsioner.feishu.cn/wiki/wikcnCrskoej4JZDSR2b1vWLRyd",
+    "principle": "上喇叭和下喇叭是电声器件，CPU提供的数字音频信号经PMU音频处理模块转换为声音信号。CPU通过I2S信号和音频放大PA芯片U6001通讯，VIO18_PMU和VBAT为PA芯片供电，PA输出差分信号SPKP_T/SPKN_T连接到听筒弹片。",
+    "diagnosis": [
+      "人工听声音大小，正常则优先排查听筒单体、密封泡棉偏位变形、出音孔溢胶/披风堵孔",
+      "无声或声音小：检查听筒pad点和主板接触、主板弹片变形、听筒FPC破损、主板撞件；更换听筒看是否单体问题",
+      "主板不良：通路排查SPKP/N_T→PA→PMU芯片的器件问题，外观检查撞件虚焊连锡，无异常则更换PA芯片、主PMU芯片、CPU和通路容阻感器件",
+      "下喇叭：通过触点和副板弹片接触，到副板BTB通过主FPC连主板，分析思路同上喇叭"
+    ],
+    "keySignals": "SPKP_T/SPKN_T（上喇叭差分信号）、SPKP/N_B（下喇叭）、PA芯片供电VIO18_PMU/VBAT、I2S信号",
+    "commonFaults": "听筒单体损坏、音频PA芯片U6001异常、PMU音频模块异常、弹片变形、I2S通路异常"
+  },
+  "麦克风": {
+    "title": "麦克风MIC类不良分析思路",
+    "keywords": [
+      "麦克风",
+      "MIC",
+      "通话对方听不到",
+      "录音",
+      "mic无声"
+    ],
+    "source": "https://transsioner.feishu.cn/wiki/SjbPweUgni5hwikTGDCcSCT3nfM",
+    "principle": "MIC将声音信号转换为电信号，通过音频通路传递给CPU处理。",
+    "diagnosis": [
+      "检查MIC孔是否堵塞、MIC单体是否损坏",
+      "交叉验证MIC和主板",
+      "量测MIC供电、偏置电压、音频通路是否正常",
+      "更换MIC单体或音频IC验证"
+    ],
+    "keySignals": "MIC供电、偏置电压、音频通路",
+    "commonFaults": "MIC单体损坏/堵塞、MIC供电异常、音频IC异常"
+  },
+  "耳机": {
+    "title": "耳机类不良分析思路",
+    "keywords": [
+      "耳机",
+      "耳机无声音",
+      "耳机孔",
+      "耳机不识别"
+    ],
+    "source": "https://transsioner.feishu.cn/wiki/ERV7w4bZziVPE3ksOtlcm4T6nRl",
+    "principle": "耳机检测通过耳机座子识别耳机插入状态，音频信号通过耳机通路输出。",
+    "diagnosis": [
+      "检查耳机座子是否变形、氧化",
+      "交叉验证耳机和手机",
+      "量测耳机座子弹片阻抗和耳机检测信号",
+      "更换耳机座子或音频IC验证"
+    ],
+    "keySignals": "耳机座子弹片、耳机检测信号、音频通路",
+    "commonFaults": "耳机座子变形/氧化、弹片接触不良、音频IC异常"
+  },
+  "传感器": {
+    "title": "传感器Sensor类不良分析思路",
+    "keywords": [
+      "传感器",
+      "sensor",
+      "陀螺仪",
+      "重力",
+      "加速度",
+      "光距",
+      "距离感应",
+      "光线感应"
+    ],
+    "source": "https://transsioner.feishu.cn/wiki/K3xVwvtAIiMKytkH8OXcaUDunhd",
+    "principle": "传感器通过I2C/SPI总线与CPU通信，由传感器Hub或PMU供电。常见传感器：加速度传感器(G-Sensor)、陀螺仪(Gyro)、光距离传感器(ALS/PS)、重力感应等。",
+    "diagnosis": [
+      "确认传感器工位失败类型（MMI/QT/标定等）",
+      "检查传感器BTB扣合、FPC是否破损",
+      "交叉验证传感器和主板",
+      "量测传感器供电、I2C/SPI通信是否正常",
+      "更换传感器芯片验证"
+    ],
+    "keySignals": "传感器供电、I2C/SPI通信、传感器Hub",
+    "commonFaults": "传感器芯片虚焊/损坏、供电异常、I2C/SPI通路异常、传感器Hub异常"
+  }
+}
