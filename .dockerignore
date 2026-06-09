@@ -1,0 +1,29 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.egg-info
+.venv
+venv
+env
+
+# Node
+node_modules
+frontend/node_modules
+
+# 临时文件
+*.log
+*.tmp
+~$*
+
+# 敏感文件
+.env
+data/internal
+
+# IDE
+.vscode
+.idea

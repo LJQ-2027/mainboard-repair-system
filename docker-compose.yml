@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    container_name: mainboard-repair
+    ports:
+      - "8899:8899"
+    volumes:
+      - ./data:/app/data              # 持久化数据库
+      - ./backend/app:/app/backend/app # 开发热重载（可选）
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - AI_PROVIDER=${AI_PROVIDER:-kimi-code}
+      - AI_MODEL=${AI_MODEL:-kimi-k2-thinking}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8899/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
