@@ -54,6 +54,9 @@ PROVIDERS: Dict[str, Dict[str, Any]] = {
     },
 }
 
+# 注意：sk- 前缀同时匹配 kimi 和 deepseek
+# 如果无法自动区分，请用户在 .env 中设置 AI_PROVIDER
+
 
 def detect_provider(api_key: str) -> Tuple[str, Dict[str, Any]]:
     """检测 API 提供商"""
