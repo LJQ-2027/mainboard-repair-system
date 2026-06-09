@@ -9,21 +9,8 @@ from fastapi import HTTPException
 from app.config import get_settings
 
 # ========== 提供商配置 ==========
+# 注意：顺序很重要！特定前缀必须排在通用 sk- 前面
 PROVIDERS: Dict[str, Dict[str, Any]] = {
-    "kimi": {
-        "name": "Kimi (Moonshot)",
-        "url": "https://api.moonshot.cn/v1/chat/completions",
-        "key_prefix": "sk-",
-        "models": [
-            "moonshot-v1-vision-preview",
-            "moonshot-v1-128k",
-            "moonshot-v1-32k",
-            "moonshot-v1-8k",
-        ],
-        "default_model": "moonshot-v1-vision-preview",
-        "supports_vision": True,
-        "api_format": "openai",
-    },
     "kimi-code": {
         "name": "Kimi Code (订阅版)",
         "url": "https://api.kimi.com/coding/v1/messages",
@@ -41,6 +28,20 @@ PROVIDERS: Dict[str, Dict[str, Any]] = {
         "default_model": "claude-sonnet-4-6",
         "supports_vision": True,
         "api_format": "anthropic",
+    },
+    "kimi": {
+        "name": "Kimi (Moonshot)",
+        "url": "https://api.moonshot.cn/v1/chat/completions",
+        "key_prefix": "sk-",
+        "models": [
+            "moonshot-v1-vision-preview",
+            "moonshot-v1-128k",
+            "moonshot-v1-32k",
+            "moonshot-v1-8k",
+        ],
+        "default_model": "moonshot-v1-vision-preview",
+        "supports_vision": True,
+        "api_format": "openai",
     },
     "deepseek": {
         "name": "DeepSeek",

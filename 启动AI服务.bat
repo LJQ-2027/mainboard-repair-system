@@ -59,6 +59,11 @@ echo.
 echo   按 Ctrl+C 停止服务
 echo.
 
-python "%~dp0ai_proxy_server.py"
+echo [INFO] 使用 FastAPI 后端 (v9.0)
+echo   管理后台: http://localhost:8899/admin/
+echo   API 文档: http://localhost:8899/docs
+echo.
+
+python "%~dp0backend/run.py"
 
 pause
