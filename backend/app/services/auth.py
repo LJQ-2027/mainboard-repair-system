@@ -18,6 +18,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # OAuth2 scheme
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+optional_oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login", auto_error=False)
 
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_DAYS = 7
@@ -74,6 +75,19 @@ def get_current_user(
 
 def get_current_active_user(current_user: User = Depends(get_current_user)) -> User:
     return current_user
+
+
+def get_optional_user(
+    token: str | None = Depends(optional_oauth2_scheme),
+    db: Session = Depends(get_db)
+) -> User | None:
+    """获取当前用户（可选），未登录时返回 None"""
+    if token is None:
+        return None
+    try:
+        return get_current_user(token, db)
+    except HTTPException:
+        return None
 
 
 def require_admin(current_user: User = Depends(get_current_user)) -> User:
