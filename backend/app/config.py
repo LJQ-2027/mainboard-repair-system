@@ -1,0 +1,49 @@
+"""应用配置 - 使用 Pydantic Settings 自动加载 .env 文件"""
+
+import os
+from functools import lru_cache
+from typing import Literal
+
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+# 优先加载项目根目录的 .env
+_ENV_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), ".env")
+
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=_ENV_PATH,
+        env_file_encoding="utf-8",
+        extra="ignore",  # 忽略未定义的 env 变量
+    )
+
+    # API Key
+    anthropic_api_key: str = Field(default="", alias="ANTHROPIC_API_KEY")
+
+    # 提供商选择
+    ai_provider: Literal["kimi", "kimi-code", "anthropic", "deepseek"] = Field(
+        default="kimi-code", alias="AI_PROVIDER"
+    )
+
+    # 模型选择
+    ai_model: str = Field(default="kimi-k2-thinking", alias="AI_MODEL")
+
+    # 服务端点
+    port: int = Field(default=8899, alias="PORT")
+    host: str = "0.0.0.0"
+
+    # 日志
+    log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
+
+    @property
+    def api_key(self) -> str:
+        """兼容旧代码的 api_key 属性"""
+        return self.anthropic_api_key
+
+
+@lru_cache()
+def get_settings() -> Settings:
+    """获取配置单例（缓存避免重复读取 .env）"""
+    return Settings()
