@@ -170,19 +170,53 @@ export function clearDiagnosisHistory(): void {
 
 // ===== 导出历史 =====
 
-export function exportDiagnosisHistory(): string {
-  const history = getDiagnosisHistory();
-  if (history.length === 0) return '';
+export function exportDiagnosisText(entry?: DiagnosisResult): string {
+  const target = entry || getDiagnosisHistory()[0];
+  if (!target) return '';
 
-  let text = '智能主板维修系统 - 诊断历史导出\n';
+  let text = '智能主板维修系统 - 诊断报告\n';
   text += '='.repeat(60) + '\n\n';
-
-  history.forEach((entry, i) => {
-    text += `#${i + 1} [${entry.mode}] ${entry.time}\n`;
-    text += `  关键词: ${entry.keyword}\n`;
-    text += `  摘要: ${entry.summary}\n`;
-    text += '-'.repeat(60) + '\n';
-  });
+  text += `诊断模式: ${target.mode}\n`;
+  text += `诊断时间: ${target.time}\n`;
+  text += `故障关键词: ${target.keyword}\n`;
+  text += '-'.repeat(60) + '\n\n';
+  text += target.summary || '(无摘要)\n';
+  text += '\n' + '-'.repeat(60) + '\n';
+  text += '报告由 AI 辅助生成，仅供参考\n';
 
   return text;
+}
+
+export function exportDiagnosisHTML(entry?: DiagnosisResult): string {
+  const target = entry || getDiagnosisHistory()[0];
+  if (!target) return '';
+
+  const text = (target.fullText || target.summary || '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n/g, '<br>');
+
+  return `<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8">
+<title>诊断报告 - ${target.mode}</title>
+<style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:20px;color:#333}
+h1{color:#667eea}h3{color:#666}pre{background:#f5f5f5;padding:16px;border-radius:8px}
+</style></head><body>
+<h1>诊断报告</h1>
+<h3>模式: ${target.mode} | 时间: ${target.time}</h3>
+<hr>
+${target.fullText ? `<pre>${text}</pre>` : `<p>${text}</p>`}
+<p style="color:#999;margin-top:40px">报告由 AI 辅助生成，仅供参考</p>
+</body></html>`;
+}
+
+export function downloadAsFile(content: string, filename: string, type = 'text/plain') {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
 }
