@@ -3,7 +3,7 @@
 import json
 from typing import Any, Dict, Optional
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
@@ -13,6 +13,7 @@ from app.models.session import ChatSession
 from app.models.user import User
 from app.services.ai_proxy import chat_sync, stream_chat
 from app.services.auth import get_current_active_user
+from app.utils.validators import sanitize_input, validate_symptom, validate_system_prompt
 
 router = APIRouter(prefix="/api", tags=["chat"])
 
@@ -26,6 +27,25 @@ async def chat(
     """AI 对话接口 - 支持流式和非流式，自动保存诊断记录"""
     body: Dict[str, Any] = await request.json()
     stream = body.get("stream", True)
+
+    # ---- 输入校验 ----
+    system_prompt = body.get("system", "")
+    if system_prompt:
+        ok, err = validate_system_prompt(system_prompt)
+        if not ok:
+            raise HTTPException(status_code=400, detail=err)
+
+    user_msg = body.get("messages", [{}])[-1].get("content", "")
+    if isinstance(user_msg, str) and user_msg:
+        ok, err = validate_symptom(user_msg)
+        if not ok:
+            raise HTTPException(status_code=400, detail=err)
+        # 净化输入
+        user_msg = sanitize_input(user_msg)
+        if isinstance(body["messages"][-1]["content"], str):
+            body["messages"][-1]["content"] = user_msg
+
+    # ---- 保存诊断记录 ----
     session_id = body.pop("session_id", None)
 
     # 加载会话历史
