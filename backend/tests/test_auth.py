@@ -52,8 +52,8 @@ def test_login_wrong_password(client):
 
 def test_me_endpoint(client):
     username = _unique("me")
-    client.post("/auth/register", json={"username": username, "password": "pass"})
-    login = client.post("/auth/login", json={"username": username, "password": "pass"})
+    client.post("/auth/register", json={"username": username, "password": "pass123"})
+    login = client.post("/auth/login", json={"username": username, "password": "pass123"})
     token = login.json()["access_token"]
     resp = client.get("/auth/me", headers={"Authorization": f"Bearer {token}"})
     assert resp.status_code == 200
@@ -87,8 +87,8 @@ def test_admin_access(client):
 
 def test_normal_user_cannot_access_admin(client):
     username = _unique("normal")
-    client.post("/auth/register", json={"username": username, "password": "pass"})
-    login = client.post("/auth/login", json={"username": username, "password": "pass"})
+    client.post("/auth/register", json={"username": username, "password": "pass123"})
+    login = client.post("/auth/login", json={"username": username, "password": "pass123"})
     token = login.json()["access_token"]
     resp = client.get("/admin/", headers={"Authorization": f"Bearer {token}"})
     assert resp.status_code == 403

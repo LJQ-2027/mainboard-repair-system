@@ -34,6 +34,9 @@ async def chat(
         ok, err = validate_system_prompt(system_prompt)
         if not ok:
             raise HTTPException(status_code=400, detail=err)
+        # 注入引用来源要求
+        if "引用" not in system_prompt and "维修" in system_prompt:
+            body["system"] = system_prompt + "\n\n## 重要：请在你的回复中标注引用来源\n- 如果参考了知识库信息，用 [知识库: 标题] 标注\n- 如果参考了本地案例，用 [案例: 故障类型] 标注\n- 如果是基于专业经验，用 [经验] 标注"
 
     user_msg = body.get("messages", [{}])[-1].get("content", "")
     if isinstance(user_msg, str) and user_msg:
