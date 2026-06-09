@@ -5,7 +5,8 @@
   "main": "mainboard_repair_system_v7.4_updated.html",
   "scripts": {
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "setup-internal": "node scripts/setup-internal.js"
   },
   "keywords": [
     "repair",

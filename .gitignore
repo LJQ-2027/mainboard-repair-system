@@ -28,6 +28,9 @@ desktop.ini
 # Node.js
 node_modules/
 
+# 内部数据（含真实链接，不提交到公开仓库）
+data/internal/
+
 # 临时文件
 ~$*
 *.tmp

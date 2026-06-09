@@ -1,0 +1,88 @@
+// 故障现象搜索索引
+// 从主页面拆分，便于后续协作维护。
+const phenomenaSearchIndex = {
+    "开始校准终测": {
+        "phenomena": "开始校准终测 若是MTK校准终测DLL报错 直接显示MTK定义的错误代码 与ATE工具显示的错误代码一致。",
+        "top_components": [
+            {"point": "U0501/U1701/U1601", "component_type": "IC芯片", "probability": 30.2, "case_count": 100, "fault_type": "少件", "repair_method": "重新焊接"},
+            {"point": "U6607", "component_type": "IC芯片", "probability": 6.3, "case_count": 21, "fault_type": "物料不良", "repair_method": "更换"},
+            {"point": "U6805", "component_type": "IC芯片", "probability": 6.0, "case_count": 20, "fault_type": "物料不良", "repair_method": "更换"}
+        ],
+        "total_count": 331
+    },
+    "下载无端口": {
+        "phenomena": "下载无端口",
+        "top_components": [
+            {"point": "U0501", "component_type": "IC芯片", "probability": 48.9, "case_count": 174, "fault_type": "少件", "repair_method": "重新焊接"},
+            {"point": "U0501U1601U1701", "component_type": "IC芯片", "probability": 35.7, "case_count": 127, "fault_type": "少件", "repair_method": "重新焊接"},
+            {"point": "U1601", "component_type": "IC芯片", "probability": 1.7, "case_count": 6, "fault_type": "物料不良", "repair_method": "更换"}
+        ],
+        "total_count": 356
+    },
+    "MMI不开机": {
+        "phenomena": "MMI不开机",
+        "top_components": [
+            {"point": "U0501", "component_type": "IC芯片", "probability": 38.9, "case_count": 37, "fault_type": "少件", "repair_method": "重新焊接"},
+            {"point": "U8001", "component_type": "IC芯片", "probability": 24.2, "case_count": 23, "fault_type": "少件", "repair_method": "重新焊接"},
+            {"point": "J3801", "component_type": "连接器", "probability": 8.4, "case_count": 8, "fault_type": "破损", "repair_method": "重新焊接"}
+        ],
+        "total_count": 95
+    },
+    "不开机": {
+        "phenomena": "不开机",
+        "top_components": [
+            {"point": "U0501", "component_type": "IC芯片", "probability": 38.9, "case_count": 74, "fault_type": "少件", "repair_method": "重新焊接"},
+            {"point": "U8001", "component_type": "IC芯片", "probability": 24.2, "case_count": 46, "fault_type": "少件", "repair_method": "重新焊接"},
+            {"point": "J3801", "component_type": "连接器", "probability": 8.4, "case_count": 16, "fault_type": "破损", "repair_method": "重新焊接"}
+        ],
+        "total_count": 130
+    },
+    "WIFI不良": {
+        "phenomena": "WIFI不良",
+        "top_components": [
+            {"point": "U8001", "component_type": "IC芯片", "probability": 76.0, "case_count": 19, "fault_type": "少件", "repair_method": "重新焊接"},
+            {"point": "U0501", "component_type": "IC芯片", "probability": 8.0, "case_count": 2, "fault_type": "物料不良", "repair_method": "更换"}
+        ],
+        "total_count": 25
+    },
+    "撞件": {
+        "phenomena": "撞件/破损",
+        "top_components": [
+            {"point": "ANT10801", "component_type": "连接器", "probability": 16.2, "case_count": 27, "fault_type": "破损", "repair_method": "重新焊接"},
+            {"point": "U5502", "component_type": "IC芯片", "probability": 9.0, "case_count": 15, "fault_type": "撞件", "repair_method": "重新焊接"},
+            {"point": "ANT9002", "component_type": "连接器", "probability": 6.6, "case_count": 11, "fault_type": "破损", "repair_method": "重新焊接"}
+        ],
+        "total_count": 167
+    },
+    "充电": {
+        "phenomena": "充电异常",
+        "top_components": [
+            {"point": "U3901", "component_type": "IC芯片", "probability": 88.6, "case_count": 39, "fault_type": "物料不良", "repair_method": "更换"},
+            {"point": "U3501", "component_type": "IC芯片", "probability": 4.5, "case_count": 2, "fault_type": "物料不良", "repair_method": "更换"}
+        ],
+        "total_count": 44
+    },
+    "快充": {
+        "phenomena": "快充测试",
+        "top_components": [
+            {"point": "C3816", "component_type": "阻容件", "probability": 28.6, "case_count": 2, "fault_type": "连锡", "repair_method": "重新焊接"},
+            {"point": "U3501", "component_type": "IC芯片", "probability": 28.6, "case_count": 2, "fault_type": "物料不良", "repair_method": "更换"}
+        ],
+        "total_count": 7
+    },
+    "重启": {
+        "phenomena": "开机死机重启等",
+        "top_components": [
+            {"point": "U8001", "component_type": "IC芯片", "probability": 33.3, "case_count": 9, "fault_type": "物料不良", "repair_method": "更换"},
+            {"point": "U0501", "component_type": "IC芯片", "probability": 22.2, "case_count": 6, "fault_type": "物料不良", "repair_method": "更换"}
+        ],
+        "total_count": 27
+    },
+    "功耗": {
+        "phenomena": "功耗不良",
+        "top_components": [
+            {"point": "U3501", "component_type": "IC芯片", "probability": 37.1, "case_count": 13, "fault_type": "物料不良", "repair_method": "更换"}
+        ],
+        "total_count": 35
+    }
+};
