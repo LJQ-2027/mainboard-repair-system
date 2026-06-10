@@ -3054,7 +3054,7 @@
 
         function getAISettings() {
             try {
-                const defaults = { apiUrl: 'http://localhost:8899', model: 'kimi-k2-thinking' };
+                const defaults = { apiUrl: '', model: 'deepseek-chat' };
                 const saved = JSON.parse(localStorage.getItem(AI_SETTINGS_KEY) || '{}');
                 // 自动清理旧模型设置（deepseek-chat 在 Kimi Code 中不可用）
                 if (saved.model && saved.model.startsWith('deepseek')) {

@@ -43,6 +43,21 @@ if os.path.exists(_data_dir):
     from fastapi.staticfiles import StaticFiles
     app.mount("/data", StaticFiles(directory=_data_dir), name="data")
 
+# 静态文件服务 - 前端 HTML
+_root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+_html_path = os.path.join(_root_dir, "mainboard_repair_system_v7.4_updated.html")
+if os.path.exists(_html_path):
+    from fastapi.responses import FileResponse
+
+    @app.get("/")
+    async def serve_index():
+        return FileResponse(_html_path)
+
+    # 也需要提供 data/ 中的 .js 文件
+    js_dir = os.path.join(_root_dir, "js")
+    if os.path.exists(js_dir):
+        app.mount("/js", StaticFiles(directory=js_dir), name="js")
+
 
 @app.on_event("startup")
 async def startup():
