@@ -1894,6 +1894,8 @@
             for (const comps of Object.values(project)) {
                 if (Array.isArray(comps)) totalComps += comps.filter(c => c.位号).length;
             }
+            // 没有任何位号数据时返回空，不走位号注入流程
+            if (totalComps === 0) return '';
             let text = `\n## 当前项目信息\n`;
             text += `- 项目型号：${projectModel}\n`;
             text += `- 已录入 ${totalComps} 个真实器件位号（${moduleCount} 个功能模块）\n`;
@@ -3453,7 +3455,7 @@
             if (!localMatchInfo) {
                 for (const [faultType, points] of Object.entries(diagnosisRules)) {
                     if (symptomLower.includes(faultType.toLowerCase())) {
-                        localMatchInfo += `\n【全局案例库 - ${faultType}】（⚠️ 非项目专属，位号可能不准确）\n`;
+                        localMatchInfo += `\n【全局案例库 - ${faultType}】（⚠️ 数据来源未区分项目，以下位号可能属于其他项目，请勿直接作为 ${proj || '当前项目'} 的故障位号）\n`;
                         points.slice(0, 5).forEach((p, i) => {
                             localMatchInfo += `  ${i + 1}. ${p.point} (${p.point_name}) - 概率${p.probability}% - ${p.case_count}例 - ${p.repair_method}\n`;
                         });
