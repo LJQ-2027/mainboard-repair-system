@@ -1464,7 +1464,17 @@
             </div>
         </div>        <!-- Tab 2: 故障诊断 -->
         <div class="tab-content" id="diagnosis-tab">
-            
+
+            <!-- 全局项目选择器（所有诊断模式共用） -->
+            <div class="project-selector-bar global" style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:#f0f4ff;border-radius:8px;margin-bottom:14px;border:1px solid #c7d2fe">
+                <label style="font-weight:600;color:#1e1e2e;white-space:nowrap">🔧 当前项目：</label>
+                <select id="aiProjectSelect" onchange="onAIProjectChange()" style="flex:1;max-width:280px;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px">
+                    <option value="">-- 不选择项目（通用位号） --</option>
+                </select>
+                <span style="font-size:12px;padding:4px 10px;border-radius:10px" id="aiProjectCoverage">未选择项目</span>
+                <span style="font-size:11px;color:#6b7280">💡 选择项目后，诊断结果将使用该项目的真实位号</span>
+            </div>
+
             <!-- 诊断模式选择器 -->
             <div class="diagnosis-mode-selector">
                 <button class="mode-btn active" data-mode="history" onclick="switchDiagnosisMode('history')">
@@ -1540,16 +1550,6 @@
             <div id="ai-mode" class="diagnosis-mode-content" style="display: none;">
                 <div class="search-section">
                     <p class="hint">💡 详细描述故障现象，可上传原理图截图，AI 会直接从原理图中读取真实位号进行精确诊断</p>
-
-                    <!-- 项目选择器 -->
-                    <div class="project-selector-bar" id="aiProjectSelector">
-                        <label>🔧 选择项目型号：</label>
-                        <select id="aiProjectSelect" onchange="onAIProjectChange()">
-                            <option value="">-- 不选择项目（通用位号） --</option>
-                        </select>
-                        <span class="project-coverage none" id="aiProjectCoverage">未选择项目</span>
-                        <span class="link-from-resource" onclick="switchToResourceTab()" title="在资料查询中查找项目位号数据">📋 资料查询</span>
-                    </div>
 
                     <div class="input-group">
                         <textarea id="aiSymptomInput" placeholder="请详细描述故障现象...&#10;&#10;示例：X6878主板不开机，插入电池后电流只有50mA，按下开机键无任何反应，之前没有进水或摔机的情况"></textarea>
