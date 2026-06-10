@@ -48,53 +48,5 @@ const projectDatabase = {
 "bomName": "暂无资料",
 "sopUrl": "https://transsioner.feishu.cn/file/Io4rbbzYSolhVNxjL09cbjTpnlf",
 "sopName": "Infinix_KO5_H8925维修操作指导书_V1.0_20260202.pdf"
-    },
-    "X6886": {
-"name": "X6886 智能手机主板",
-"version": "待补充",
-"schematicUrl": "",
-"schematicName": "暂无资料",
-"layoutUrl": "",
-"layoutName": "暂无资料",
-"bomUrl": "",
-"bomName": "暂无资料",
-"sopUrl": "",
-"sopName": "暂无资料"
-    },
-    "KL8": {
-"name": "KL8 功能手机主板",
-"version": "待补充",
-"schematicUrl": "",
-"schematicName": "暂无资料",
-"layoutUrl": "",
-"layoutName": "暂无资料",
-"bomUrl": "",
-"bomName": "暂无资料",
-"sopUrl": "",
-"sopName": "暂无资料"
-    },
-    "LJ8": {
-"name": "LJ8 功能手机主板",
-"version": "待补充",
-"schematicUrl": "",
-"schematicName": "暂无资料",
-"layoutUrl": "",
-"layoutName": "暂无资料",
-"bomUrl": "",
-"bomName": "暂无资料",
-"sopUrl": "",
-"sopName": "暂无资料"
-    },
-    "X6725": {
-"name": "X6725 入门级智能手机主板",
-"version": "待补充",
-"schematicUrl": "",
-"schematicName": "暂无资料",
-"layoutUrl": "",
-"layoutName": "暂无资料",
-"bomUrl": "",
-"bomName": "暂无资料",
-"sopUrl": "",
-"sopName": "暂无资料"
     }
 };
