@@ -1,7 +1,11 @@
 """管理后台路由"""
 
 import datetime
+import json
+import os
+import re
 from collections import Counter
+from copy import deepcopy
 
 from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -103,6 +107,92 @@ def delete_knowledge(entry_id: int, user: User = Depends(require_admin), db: Ses
         db.delete(entry)
         db.commit()
     return RedirectResponse("/admin/knowledge", status_code=303)
+
+
+# ====== 项目资料管理 ======
+
+def _get_data_dir():
+    return os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), "data")
+
+def _read_project_db():
+    """读取 project-database.js 返回 Python dict"""
+    filepath = os.path.join(_get_data_dir(), "project-database.js")
+    with open(filepath, "r", encoding="utf-8") as f:
+        content = f.read()
+    idx = content.find("=")
+    obj_str = content[idx+1:].strip().rstrip(";")
+    import json5
+    return json5.loads(obj_str)
+
+def _write_project_db(data: dict):
+    """写回 project-database.js"""
+    filepath = os.path.join(_get_data_dir(), "project-database.js")
+    js = "const projectDatabase = " + json.dumps(data, ensure_ascii=False, indent=4) + ";"
+    with open(filepath, "w", encoding="utf-8") as f:
+        f.write("// 项目资料库\n// 从管理后台维护，刷新前端页面即可生效\n" + js)
+
+
+@router.get("/projects", response_class=HTMLResponse)
+def admin_projects(request: Request, user: User = Depends(require_admin)):
+    db = _read_project_db()
+    projects = []
+    for code, p in db.items():
+        projects.append({
+            "code": code, "name": p.get("name",""),
+            "version": p.get("version",""),
+            "has_schematic": bool(p.get("schematicUrl")),
+            "has_layout": bool(p.get("layoutUrl")),
+            "has_sop": bool(p.get("sopUrl")),
+        })
+    return templates.TemplateResponse("projects.html", {"request": request, "user": user, "projects": projects})
+
+
+@router.get("/projects/{code}/edit", response_class=HTMLResponse)
+def admin_project_edit(code: str, request: Request, user: User = Depends(require_admin)):
+    db = _read_project_db()
+    if code not in db:
+        return RedirectResponse("/admin/projects", 303)
+    return templates.TemplateResponse("project_edit.html", {
+        "request": request, "user": user, "project": {"code": code, **db[code]}
+    })
+
+
+@router.post("/projects/{code}/save")
+async def admin_project_save(code: str, request: Request, user: User = Depends(require_admin)):
+    """保存项目修改"""
+    form = await request.form()
+    db = _read_project_db()
+    if code not in db:
+        return RedirectResponse("/admin/projects", 303)
+    for field in ["name","version","schematicUrl","schematicName","layoutUrl","layoutName",
+                   "bomUrl","bomName","sopUrl","sopName"]:
+        if field in form:
+            db[code][field] = form[field]
+    _write_project_db(db)
+    return RedirectResponse("/admin/projects", 303)
+
+
+@router.post("/projects/add")
+async def admin_project_add(request: Request, user: User = Depends(require_admin)):
+    form = await request.form()
+    code = form.get("code", "").strip()
+    if not code:
+        return RedirectResponse("/admin/projects", 303)
+    db = _read_project_db()
+    db[code] = {
+        "name": form.get("name",""),
+        "version": form.get("version",""),
+        "schematicUrl": form.get("schematicUrl",""),
+        "schematicName": "",
+        "layoutUrl": form.get("layoutUrl",""),
+        "layoutName": "",
+        "bomUrl": "",
+        "bomName": "",
+        "sopUrl": form.get("sopUrl",""),
+        "sopName": "",
+    }
+    _write_project_db(db)
+    return RedirectResponse("/admin/projects", 303)
 
 
 @router.get("/knowledge/{entry_id}/toggle")

@@ -1,0 +1,41 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<h2 style="margin-bottom:20px">编辑项目：{{ project.code }}</h2>
+
+<form method="POST" action="/admin/projects/{{ project.code }}/save">
+    <div class="table" style="padding:20px;margin-bottom:16px">
+        <h3 style="margin-bottom:12px">基本信息</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+            <div><label style="font-size:13px;color:#666">项目名称</label>
+                <input type="text" name="name" value="{{ project.name }}" required></div>
+            <div><label style="font-size:13px;color:#666">版本</label>
+                <input type="text" name="version" value="{{ project.version }}"></div>
+        </div>
+    </div>
+
+    <div class="table" style="padding:20px;margin-bottom:16px">
+        <h3 style="margin-bottom:12px">资料链接</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+            <div><label style="font-size:13px;color:#666">原理图URL</label>
+                <input type="text" name="schematicUrl" value="{{ project.schematicUrl }}"></div>
+            <div><label style="font-size:13px;color:#666">原理图文件名</label>
+                <input type="text" name="schematicName" value="{{ project.schematicName }}"></div>
+            <div><label style="font-size:13px;color:#666">位号图URL</label>
+                <input type="text" name="layoutUrl" value="{{ project.layoutUrl }}"></div>
+            <div><label style="font-size:13px;color:#666">位号图文件名</label>
+                <input type="text" name="layoutName" value="{{ project.layoutName }}"></div>
+            <div><label style="font-size:13px;color:#666">SOP URL</label>
+                <input type="text" name="sopUrl" value="{{ project.sopUrl }}"></div>
+            <div><label style="font-size:13px;color:#666">SOP 文件名</label>
+                <input type="text" name="sopName" value="{{ project.sopName }}"></div>
+            <div><label style="font-size:13px;color:#666">BOM URL</label>
+                <input type="text" name="bomUrl" value="{{ project.bomUrl }}"></div>
+            <div><label style="font-size:13px;color:#666">BOM 文件名</label>
+                <input type="text" name="bomName" value="{{ project.bomName }}"></div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">保存修改</button>
+    <a href="/admin/projects" class="btn btn-sm" style="margin-left:8px;background:#999;color:#fff;text-decoration:none;padding:6px 12px;border-radius:4px">取消</a>
+</form>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<h2 style="margin-bottom:20px">项目资料管理</h2>
+<p style="color:#666;margin-bottom:16px;font-size:13px">编辑 data/project-database.js，修改后保存并刷新前端页面即可生效。</p>
+
+<div class="table">
+<table>
+<thead><tr>
+    <th>项目代号</th><th>项目名称</th><th>版本</th>
+    <th>原理图</th><th>位号图</th><th>SOP</th><th>操作</th>
+</tr></thead>
+<tbody>
+{% for proj in projects %}
+<tr>
+    <td><strong>{{ proj.code }}</strong></td>
+    <td>{{ proj.name }}</td>
+    <td>{{ proj.version }}</td>
+    <td>{% if proj.has_schematic %}<span class="badge badge-active">✅</span>{% else %}<span class="badge badge-inactive">❌</span>{% endif %}</td>
+    <td>{% if proj.has_layout %}<span class="badge badge-active">✅</span>{% else %}<span class="badge badge-inactive">❌</span>{% endif %}</td>
+    <td>{% if proj.has_sop %}<span class="badge badge-active">✅</span>{% else %}<span class="badge badge-inactive">❌</span>{% endif %}</td>
+    <td><a href="/admin/projects/{{ proj.code }}/edit" class="btn btn-primary btn-sm">编辑</a></td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+
+<div class="table" style="margin-top:20px;padding:20px">
+    <h3 style="margin-bottom:12px">添加新项目</h3>
+    <form method="POST" action="/admin/projects/add">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+            <div><label style="font-size:13px;color:#666">项目代号 *</label>
+                <input type="text" name="code" placeholder="如 X6888" required></div>
+            <div><label style="font-size:13px;color:#666">项目名称 *</label>
+                <input type="text" name="name" placeholder="如 X6888-Q352 智能手机主板" required></div>
+            <div><label style="font-size:13px;color:#666">版本</label>
+                <input type="text" name="version" placeholder="如 V1.0"></div>
+            <div><label style="font-size:13px;color:#666">原理图链接</label>
+                <input type="text" name="schematicUrl" placeholder="飞书链接"></div>
+            <div><label style="font-size:13px;color:#666">位号图链接</label>
+                <input type="text" name="layoutUrl" placeholder="飞书链接"></div>
+            <div><label style="font-size:13px;color:#666">SOP链接</label>
+                <input type="text" name="sopUrl" placeholder="飞书链接"></div>
+        </div>
+        <button type="submit" class="btn btn-primary">添加项目</button>
+    </form>
+</div>
+{% endblock %}

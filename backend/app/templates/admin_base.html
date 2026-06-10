@@ -45,6 +45,8 @@
     <div class="nav">
         <a href="/admin/" class="{% if request.url.path == '/admin/' %}active{% endif %}">仪表盘</a>
         <a href="/admin/knowledge" class="{% if 'knowledge' in request.url.path %}active{% endif %}">知识库</a>
+        <a href="/admin/projects" class="{% if 'projects' in request.url.path %}active{% endif %}">项目资料</a>
+        <a href="/admin/cases" class="{% if 'cases' in request.url.path %}active{% endif %}">案例库</a>
     </div>
     <div class="content">
         {% block content %}{% endblock %}
