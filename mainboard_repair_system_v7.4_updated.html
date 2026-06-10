@@ -2979,25 +2979,25 @@
                 }
             }
 
-            // 2. 全局规则回退（未选项目或无匹配时）
-            if (matchedPoints.length === 0) {
+            // 2. 全局规则回退（仅在未选项目时，选了项目不用其他项目数据）
+            if (matchedPoints.length === 0 && !currentProject) {
                 for (const [faultType, points] of Object.entries(diagnosisRules)) {
                     if (symptom.includes(faultType)) {
                         matchedPoints = points;
                         matchedRule = faultType;
-                        dataSource = '全局诊断规则库(⚠️未区分项目)';
+                        dataSource = '全局诊断规则库(⚠️未选项目)';
                         break;
                     }
                 }
             }
 
-            // 3. 全局现象索引回退
-            if (matchedPoints.length === 0) {
+            // 3. 全局现象索引回退（仅在未选项目时使用）
+            if (matchedPoints.length === 0 && !currentProject) {
                 for (const [keyword, data] of Object.entries(phenomenaSearchIndex)) {
                     if (symptom.includes(keyword) || keyword.includes(symptom)) {
                         matchedPoints = data.top_components;
                         matchedRule = data.phenomena;
-                        dataSource = '全局案例库(⚠️未区分项目)';
+                        dataSource = '全局案例库(⚠️未选项目)';
                         break;
                     }
                 }
@@ -3008,7 +3008,7 @@
                         if (keyword.toLowerCase().includes(symptomLower) || symptomLower.includes(keyword.toLowerCase())) {
                             matchedPoints = data.top_components;
                             matchedRule = data.phenomena;
-                            dataSource = '全局案例库(⚠️未区分项目)';
+                            dataSource = '全局案例库(⚠️未选项目)';
                             break;
                         }
                     }
@@ -3451,11 +3451,11 @@
                 }
             }
 
-            // 回退到全局规则
-            if (!localMatchInfo) {
+            // 回退到全局规则（仅在未选项目时使用，选了项目就不应该用其他项目的数据）
+            if (!localMatchInfo && !proj) {
                 for (const [faultType, points] of Object.entries(diagnosisRules)) {
                     if (symptomLower.includes(faultType.toLowerCase())) {
-                        localMatchInfo += `\n【全局案例库 - ${faultType}】（⚠️ 数据来源未区分项目，以下位号可能属于其他项目，请勿直接作为 ${proj || '当前项目'} 的故障位号）\n`;
+                        localMatchInfo += `\n【全局案例库 - ${faultType}】⚠️ 未选择项目，以下位号仅供参考，可能不准确\n`;
                         points.slice(0, 5).forEach((p, i) => {
                             localMatchInfo += `  ${i + 1}. ${p.point} (${p.point_name}) - 概率${p.probability}% - ${p.case_count}例 - ${p.repair_method}\n`;
                         });
@@ -3477,10 +3477,11 @@
                         break;
                     }
                 }
-                if (!localMatchInfo) {
+                // 全局回退仅在未选项目时（选了项目就不该用其他项目数据）
+                if (!localMatchInfo && !proj) {
                     for (const [keyword, data] of Object.entries(phenomenaSearchIndex)) {
                         if (symptomLower.includes(keyword.toLowerCase())) {
-                            localMatchInfo += `\n【全局案例索引 - ${data.phenomena}】（⚠️ 非项目专属）共${data.total_count}例\n`;
+                            localMatchInfo += `\n【全局案例索引 - ${data.phenomena}】⚠️ 未选项目，数据可能不准确。共${data.total_count}例\n`;
                             data.top_components.slice(0, 5).forEach((p, i) => {
                                 localMatchInfo += `  ${i + 1}. ${p.point} - 概率${p.probability}% - ${p.case_count}例 - ${p.repair_method}\n`;
                             });
