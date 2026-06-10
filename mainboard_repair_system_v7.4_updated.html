@@ -3520,6 +3520,17 @@
                 }
             } else {
                 projectComponentInfo = buildProjectComponentPrompt(proj);
+                // 如果既无 project-cases.js 数据，也无 localStorage 手动录入数据
+                if (!projectComponentInfo) {
+                    projectComponentInfo = `\n## ⚠️ 当前项目 "${proj}" 暂无位号数据\n
+请勿在诊断结果中输出具体器件位号（如 Uxxxx、Cxxxx、Rxxxx 等）。
+请基于通用电路原理、功能模块和故障排查经验进行分析，
+用功能性描述替代具体位号，例如：
+- "电源管理模块" 而非 "U0501"
+- "充电通路" 而非 "U2401"
+- "射频前端" 而非 "U5502"
+如有需要，建议用户先在"位号管理"中录入该项目的器件位号。`;
+                }
             }
 
             const methods = hardwareKnowledgeBase.analysisMethods;
