@@ -2928,43 +2928,85 @@
                 return;
             }
 
+            // ---- 项目检测 ----
+            const projSelect = document.getElementById('aiProjectSelect');
+            const currentProject = projSelect ? projSelect.value : '';
+            const projCase = (typeof projectCases !== 'undefined' && currentProject && projectCases[currentProject])
+                ? projectCases[currentProject] : null;
+
+            // 优先用项目专属数据，回退到全局
+            const activeRules = projCase ? (projCase.diagnosisRules || {}) : {};
+            const activePhenomena = projCase ? (projCase.phenomenaSearchIndex || {}) : {};
+
             // 触发 AI 后台搜索信号（不阻塞前端展示）
             console.log("EXEC_SEARCH_KNOWLEDGE_BASE: " + symptom);
-            
+
             // 匹配故障类型
             let matchedPoints = [];
             let matchedRule = null;
-            let dataSource = '诊断规则库';
+            let dataSource = projCase ? `${projCase.projectName} 专属案例库` : '诊断规则库';
 
-            // 1. 先尝试精确匹配预定义故障类型
-            for (const [faultType, points] of Object.entries(diagnosisRules)) {
-                if (symptom.includes(faultType)) {
-                    matchedPoints = points;
-                    matchedRule = faultType;
-                    break;
+            // 1. 项目专属规则优先
+            if (projCase) {
+                for (const [faultType, points] of Object.entries(activeRules)) {
+                    if (symptom.includes(faultType)) {
+                        matchedPoints = points;
+                        matchedRule = faultType;
+                        break;
+                    }
+                }
+                // 项目专属现象索引
+                if (matchedPoints.length === 0) {
+                    for (const [keyword, data] of Object.entries(activePhenomena)) {
+                        if (symptom.includes(keyword) || keyword.includes(symptom)) {
+                            matchedPoints = data.top_components;
+                            matchedRule = data.phenomena;
+                            break;
+                        }
+                    }
+                    if (matchedPoints.length === 0) {
+                        const sl = symptom.toLowerCase();
+                        for (const [keyword, data] of Object.entries(activePhenomena)) {
+                            if (keyword.toLowerCase().includes(sl) || sl.includes(keyword.toLowerCase())) {
+                                matchedPoints = data.top_components;
+                                matchedRule = data.phenomena;
+                                break;
+                            }
+                        }
+                    }
                 }
             }
 
-            // 2. 如果没匹配到，尝试从多维表格现象索引搜索
+            // 2. 全局规则回退（未选项目或无匹配时）
             if (matchedPoints.length === 0) {
-                // 遍历所有索引的关键词，看用户输入是否包含
+                for (const [faultType, points] of Object.entries(diagnosisRules)) {
+                    if (symptom.includes(faultType)) {
+                        matchedPoints = points;
+                        matchedRule = faultType;
+                        dataSource = '全局诊断规则库(⚠️未区分项目)';
+                        break;
+                    }
+                }
+            }
+
+            // 3. 全局现象索引回退
+            if (matchedPoints.length === 0) {
                 for (const [keyword, data] of Object.entries(phenomenaSearchIndex)) {
                     if (symptom.includes(keyword) || keyword.includes(symptom)) {
                         matchedPoints = data.top_components;
                         matchedRule = data.phenomena;
-                        dataSource = '多维表格案例库';
+                        dataSource = '全局案例库(⚠️未区分项目)';
                         break;
                     }
                 }
 
-                // 如果还没匹配到，尝试模糊匹配（关键词包含关系）
                 if (matchedPoints.length === 0) {
                     const symptomLower = symptom.toLowerCase();
                     for (const [keyword, data] of Object.entries(phenomenaSearchIndex)) {
                         if (keyword.toLowerCase().includes(symptomLower) || symptomLower.includes(keyword.toLowerCase())) {
                             matchedPoints = data.top_components;
                             matchedRule = data.phenomena;
-                            dataSource = '多维表格案例库';
+                            dataSource = '全局案例库(⚠️未区分项目)';
                             break;
                         }
                     }
@@ -2973,13 +3015,17 @@
 
             // 显示结果
             const resultContainer = document.getElementById('diagnosisResult');
+            const projectBadge = projCase
+                ? `<span style="display:inline-block;background:#4f46e5;color:#fff;padding:2px 10px;border-radius:10px;font-size:12px;margin-left:8px">${projCase.projectName}</span>`
+                : '<span style="display:inline-block;background:#f59e0b;color:#fff;padding:2px 10px;border-radius:10px;font-size:12px;margin-left:8px">⚠️ 未选项目</span>';
+
             if (matchedPoints.length === 0) {
                 latestDiagnosisText = `诊断模式：历史案例匹配\n输入现象：${symptom}\n结果：未匹配到相关故障案例，请检查输入关键词或使用专业诊断模式`;
                 saveDiagnosisHistory({ mode: '历史案例匹配', keyword: symptom, time: new Date().toLocaleString('zh-CN'), summary: '未匹配到相关故障案例' });
                 resultContainer.innerHTML = `
                     <div class="result-header">
-                        <h3>诊断结果</h3>
-                        <p>未匹配到相关故障案例，请检查输入关键词或使用专业诊断模式</p>
+                        <h3>诊断结果 ${projectBadge}</h3>
+                        <p>未匹配到相关案例。${currentProject ? '当前项目案例库中暂无该故障记录，请尝试 AI 智能诊断。' : '建议选择具体项目以获得更准确的案例匹配。'}</p>
                     </div>
                 `;
                 return;
@@ -3019,12 +3065,13 @@
                 `;
             });
 
-            latestDiagnosisText = `诊断模式：历史案例匹配\n输入现象：${symptom}\n匹配规则：${matchedRule}\n数据来源：${dataSource}\n` + matchedPoints.map((point, index) => `${index + 1}. ${point.point} (${point.point_name || ''}) - ${point.probability}% - ${point.repair_method}`).join('\n');
-            saveDiagnosisHistory({ mode: '历史案例匹配', keyword: symptom, time: new Date().toLocaleString('zh-CN'), summary: `匹配 ${matchedPoints.length} 个检查点，首项 ${matchedPoints[0].point}` });
+            latestDiagnosisText = `诊断模式：历史案例匹配\n项目：${projCase ? projCase.projectName : '未选择'}\n输入现象：${symptom}\n匹配规则：${matchedRule}\n数据来源：${dataSource}\n` + matchedPoints.map((point, index) => `${index + 1}. ${point.point} (${point.point_name || ''}) - ${point.probability}% - ${point.repair_method}`).join('\n');
+            saveDiagnosisHistory({ mode: '历史案例匹配', keyword: symptom, time: new Date().toLocaleString('zh-CN'), summary: `${projCase ? projCase.projectName + ' ' : ''}${matchedPoints.length} 个检查点，首项 ${matchedPoints[0].point}` });
 
             resultContainer.innerHTML = `
                 <div class="result-header">
-                    <h3>诊断结果</h3>
+                    <h3>诊断结果 ${projectBadge}</h3>
+                    <p style="font-size:12px;margin-top:4px;opacity:0.8">数据来源：${dataSource}${!currentProject ? ' — 建议选择项目以获得更准确的位号信息' : ''}</p>
                     <div class="result-stats">
                         <div class="stat-item">
                             <span class="stat-number">${matchedPoints.length}</span>
