@@ -1710,6 +1710,7 @@
     <script src="data/diagnosis-rules.js"></script>
     <script src="data/phenomena-search-index.js"></script>
     <script src="data/log-knowledge-base.js"></script>
+    <script src="data/project-cases.js"></script>
     <script>
         // 核心导航功能
         function switchTab(tabId) {
@@ -3375,38 +3376,73 @@
         }
 
         function buildDiagnosisContext(symptom, projectModel) {
-            // 收集项目位号映射
-            const projectComponentInfo = buildProjectComponentPrompt(projectModel || selectedAIProject);
-
-            // 收集本地规则库匹配结果
-            let localMatchInfo = '';
+            const proj = projectModel || selectedAIProject;
             const symptomLower = symptom.toLowerCase();
 
-            // 先精确匹配 diagnosisRules
-            for (const [faultType, points] of Object.entries(diagnosisRules)) {
+            // ---- Step 1: 获取项目专属案例（优先）----
+            const projCase = (typeof projectCases !== 'undefined' && proj && projectCases[proj])
+                ? projectCases[proj] : null;
+            const projRules = projCase ? (projCase.diagnosisRules || {}) : {};
+            const projPhenomena = projCase ? (projCase.phenomenaSearchIndex || {}) : {};
+            const projCompMap = projCase ? (projCase.componentMap || {}) : {};
+
+            // ---- Step 2: 匹配诊断规则（项目优先 → 全局回退）----
+            let localMatchInfo = '';
+            let matchSource = '';
+
+            // 先查项目专属规则
+            for (const [faultType, points] of Object.entries(projRules)) {
                 if (symptomLower.includes(faultType.toLowerCase())) {
-                    localMatchInfo += `\n【本地规则库匹配 - ${faultType}】\n`;
+                    localMatchInfo += `\n【${projCase.projectName} 专属案例 - ${faultType}】\n`;
                     points.slice(0, 5).forEach((p, i) => {
-                        localMatchInfo += `  ${i + 1}. ${p.point} (${p.point_name}) - 概率${p.probability}% - ${p.case_count}例 - ${p.repair_method}\n`;
+                        localMatchInfo += `  ${i + 1}. ${p.point} (${p.point_name || ''}) - 概率${p.probability}% - ${p.case_count}例 - ${p.repair_method}\n`;
                     });
+                    matchSource = 'project';
                     break;
                 }
             }
 
-            // 再从 phenomenaSearchIndex 匹配
+            // 回退到全局规则
             if (!localMatchInfo) {
-                for (const [keyword, data] of Object.entries(phenomenaSearchIndex)) {
-                    if (symptomLower.includes(keyword.toLowerCase())) {
-                        localMatchInfo += `\n【多维表格案例库匹配 - ${data.phenomena}】共${data.total_count}例\n`;
-                        data.top_components.slice(0, 5).forEach((p, i) => {
-                            localMatchInfo += `  ${i + 1}. ${p.point} - 概率${p.probability}% - ${p.case_count}例 - ${p.repair_method}\n`;
+                for (const [faultType, points] of Object.entries(diagnosisRules)) {
+                    if (symptomLower.includes(faultType.toLowerCase())) {
+                        localMatchInfo += `\n【全局案例库 - ${faultType}】（⚠️ 非项目专属，位号可能不准确）\n`;
+                        points.slice(0, 5).forEach((p, i) => {
+                            localMatchInfo += `  ${i + 1}. ${p.point} (${p.point_name}) - 概率${p.probability}% - ${p.case_count}例 - ${p.repair_method}\n`;
                         });
+                        matchSource = 'global';
                         break;
                     }
                 }
             }
 
-            // 收集专业知识库匹配
+            // ---- Step 3: 现象搜索索引（项目优先 → 全局回退）----
+            if (!localMatchInfo) {
+                for (const [keyword, data] of Object.entries(projPhenomena)) {
+                    if (symptomLower.includes(keyword.toLowerCase())) {
+                        localMatchInfo += `\n【${projCase.projectName} 案例索引 - ${data.phenomena}】共${data.total_count}例\n`;
+                        data.top_components.slice(0, 5).forEach((p, i) => {
+                            localMatchInfo += `  ${i + 1}. ${p.point} - 概率${p.probability}% - ${p.case_count}例 - ${p.repair_method}\n`;
+                        });
+                        matchSource = 'project';
+                        break;
+                    }
+                }
+                if (!localMatchInfo) {
+                    for (const [keyword, data] of Object.entries(phenomenaSearchIndex)) {
+                        if (symptomLower.includes(keyword.toLowerCase())) {
+                            localMatchInfo += `\n【全局案例索引 - ${data.phenomena}】（⚠️ 非项目专属）共${data.total_count}例\n`;
+                            data.top_components.slice(0, 5).forEach((p, i) => {
+                                localMatchInfo += `  ${i + 1}. ${p.point} - 概率${p.probability}% - ${p.case_count}例 - ${p.repair_method}\n`;
+                            });
+                            matchSource = 'global';
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // ---- Step 4: 专业硬件知识库（全局共享）----
             let knowledgeInfo = '';
             for (const [key, module] of Object.entries(hardwareKnowledgeBase)) {
                 if (key === 'analysisMethods') continue;
@@ -3419,6 +3455,26 @@
                 }
             }
 
+            // ---- Step 5: 项目位号映射（强制约束）----
+            let projectComponentInfo = '';
+            if (projCase && projCompMap) {
+                const modCount = Object.keys(projCompMap).length;
+                let totalComps = 0;
+                for (const comps of Object.values(projCompMap)) totalComps += comps.length;
+                projectComponentInfo = `\n## ⚠️ 当前项目位号约束（必须严格遵守）\n`;
+                projectComponentInfo += `项目: ${projCase.projectName}\n`;
+                projectComponentInfo += `共 ${modCount} 个模块，${totalComps} 个器件位号。\n`;
+                projectComponentInfo += `**你只能使用以下该项目实际存在的位号，不得编造！**\n\n`;
+                for (const [mod, comps] of Object.entries(projCompMap)) {
+                    projectComponentInfo += `### ${mod}\n`;
+                    comps.forEach(c => {
+                        projectComponentInfo += `- ${c.位号} (${c.型号 || ''}): ${c.功能}\n`;
+                    });
+                }
+            } else {
+                projectComponentInfo = buildProjectComponentPrompt(proj);
+            }
+
             const methods = hardwareKnowledgeBase.analysisMethods;
             const frameworkInfo = `六步分析法：${methods.steps.join(' → ')}\n分析方法：${methods.methods.map(m => m.name + ': ' + m.desc).join('; ')}`;
 
@@ -3428,7 +3484,9 @@
                 frameworkInfo,
                 projectComponentInfo,
                 hasLocalMatch: !!localMatchInfo,
-                hasProjectMap: !!projectComponentInfo
+                hasProjectMap: !!projectComponentInfo,
+                matchSource,
+                projectName: projCase ? projCase.projectName : ''
             };
         }
 
@@ -3520,14 +3578,16 @@ ${ctx.knowledgeInfo || '未匹配到预置知识模块'}
 
 ${ctx.hasProjectMap ? '## 项目真实器件位号映射（优先使用）\n' + ctx.projectComponentInfo : '**注意：用户未选择项目型号，请使用通用参考位号进行诊断，并在结果中提示用户选择具体项目以获取真实位号。**'}
 
-${ctx.localMatchInfo ? '## 本地案例库供参考（位号可能不准确，以原理图实际标注为准）\n' + ctx.localMatchInfo : ''}
+${ctx.localMatchInfo ? '## 本地案例库供参考\n' + ctx.localMatchInfo : ''}
+
+${ctx.hasProjectMap ? `\n## ⚠️ 位号强约束\n当前诊断项目：${ctx.projectName || selectedAIProject}\n**你必须且只能使用上述项目中列出的真实位号进行诊断！**\n如果故障现象对应的案例位号不在该项目位号列表中，请明确指出"根据该项目位号映射，未找到直接匹配的案例，建议参考以下通用排查思路"。\n**禁止编造或使用其他项目的位号！**` : ''}
 
 请给出结构化诊断报告，格式如下：
 
 ### 故障根因分析
 ${schematicImageData ? '结合原理图上的具体电路，' : ''}分析最可能的根因
 
-### 最可能故障器件排名
+### 最可能故障器件排名（${ctx.hasProjectMap ? '仅限当前项目真实位号' : '通用参考位号，请用户选择项目以获取准确位号'}）
 ${schematicImageData ? '**直接从原理图截图中读取真实位号**，' : ''}按概率排序，列出：位号、器件名称/功能、故障类型、维修方法
 
 ### 推荐排查步骤
