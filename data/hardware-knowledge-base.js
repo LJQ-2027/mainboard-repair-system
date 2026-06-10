@@ -4,7 +4,7 @@ const hardwareKnowledgeBase = {
     // ---- 通用分析方法 ----
     analysisMethods: {
         title: '手机异常问题分析思路',
-        source: '[内部知识库链接]',
+        source: 'https://transsioner.feishu.cn/wiki/wikcnk7PZxAfrscml92niQv0dHX',
         steps: [
             '问：向用户或检测人员了解情况——不良现象、测试数值、不良率等',
             '看：结合机型和现象，对外观结构、电流等查看，初步定位故障区域',
@@ -28,7 +28,7 @@ const hardwareKnowledgeBase = {
     '不开机': {
         title: '不开机分析思路',
         keywords: ['不开机', '无法开机', '无法启动', '无电流', '电流只有', '无法唤醒'],
-        source: '[内部知识库链接]',
+        source: 'https://transsioner.feishu.cn/wiki/wikcnakXTr9gy97ioCWMGlokIRg',
         principle: '手机正常供电后按开机键低电平触发电源工作，输出数字核心电压、系统电压给CPU、存储、各模块电源电压，晶体26M起振给CPU提供基准时钟，同时给CPU复位信号唤醒CPU开始工作完成自检，自检正常后与电源通讯，CPU发出维持信号持续供电发送各路电压，调取存储程序运行开机。',
         diagnosis: [
             '插入充电器排除电池低电量，观察手机是否亮屏排除电源键失效；长按开机键看是否振动排除开机黑屏',
@@ -46,7 +46,7 @@ const hardwareKnowledgeBase = {
     '重启': {
         title: '卡logo & 自动重启分析思路',
         keywords: ['重启', '死机', '卡logo', '自动关机', '无限重启', '反复重启'],
-        source: '[内部知识库链接]',
+        source: 'https://transsioner.feishu.cn/wiki/wikcn3WMxKrwYaZC1UWpDZVwoCh',
         principle: '手机在正常开机过程中，若某个硬件模块异常就会造成手机异常重启。软件侧：上层造成重启（system_server被杀、watchdog重启、重要线程阻塞）；kernel造成重启（空指针、非法地址）；kernel watchdog造成重启（原因不确定如内存问题）。',
         diagnosis: [
             '确认现象是否稳定及复现路径，抓取串口log和android log给研发分析',
@@ -62,7 +62,7 @@ const hardwareKnowledgeBase = {
     '充电异常': {
         title: '充电不良分析思路',
         keywords: ['充电', '快充', '充电慢', '充不进', '充电发热', '发热严重', '充电不良'],
-        source: '[内部知识库链接]',
+        source: 'https://transsioner.feishu.cn/wiki/V4V4wJLaMiPbbpkHgINckUD7nld',
         principle: '5V2A标准充电和18W快充采用Buck降压方式在同一芯片完成，高压充电需DP/DM通讯协议支持（18W MAX传音自有协议）。超级快充为电荷泵电容充电，Vout=0.5Vin、Iout=2Iin（2:1芯片），后衍生4:1芯片，采用主副路泵芯片并联分流。高端机型充电集成在PMIC内。',
         diagnosis: [
             '确认不良现象：连接电脑有端口？无端口按无端口维修。有端口则分别插标充、18W Max、45W/68W充电器复测，更换充电器或线缆排除',
@@ -78,7 +78,7 @@ const hardwareKnowledgeBase = {
     '无端口': {
         title: '无端口分析思路',
         keywords: ['无端口', '不识别', '无USB', 'OTG', 'OTG不识别', '连接电脑无反应'],
-        source: '[内部知识库链接]',
+        source: 'https://transsioner.feishu.cn/wiki/GDPgwSxkmitQSKku9g3cS2S4nef',
         principle: '手机TypeC接口通过USB线连接电脑时执行TypeC协议和USB2.0 BC1.2端口识别协议，通过DP/DM与电脑数据传输。电路由TypeC和BC1.2协议的USB_TYPEC_CC1、USB_TYPEC_CC2、VBUS、USB_DP、USB_DM网络构成。',
         diagnosis: [
             '检查主FPC BTB是否扣好、有无变形浮高，主FPC是否破损，主副板是否撞件；交叉验证排除主FPC、副板影响，不良随主板退SMT',
@@ -93,7 +93,7 @@ const hardwareKnowledgeBase = {
     '无服务': {
         title: '射频天线不良分析思路',
         keywords: ['无服务', '无信号', '信号弱', '无法通话', '信号', '通话', '射频'],
-        source: '[内部知识库链接]',
+        source: 'https://transsioner.feishu.cn/wiki/MaNqwIhpPigj2ikUw85cTsdGnyc',
         principle: '射频电路分为主集和分集，主集包括发射TX通路和接收通路PRX，分集只有接收DRX通路。发射通路：TRS→PA→SPXT→DPDT→射频座；接收通路：射频座→DPDT→滤波器→LNA→TRS。',
         diagnosis: [
             '从不良log中找到测试失败的频段、TX/RX或Carkit信息，定位具体射频通路',
@@ -107,7 +107,7 @@ const hardwareKnowledgeBase = {
     '耦合不良': {
         title: '天线耦合不良分析思路',
         keywords: ['耦合', '耦合不良', '天线', 'ANT', 'GSM850', 'LTE', '分集'],
-        source: '[内部知识库链接]',
+        source: 'https://transsioner.feishu.cn/wiki/XRINwGobDiaLQ9kQHePcPLPFnCf',
         principle: '手机天线接收和发射信号通过弹片或同轴线和主板接触传递到主板，电路由射频传导和天线调谐电路组成，射频功率经射频座/同轴线座子后，经SP4T天线调谐开关和外围容阻感器件匹配使信号达到最佳效率。',
         diagnosis: [
             '整机耦合测试根据失败频段和发射/接收信息，通过频段天线分布图找到对应ANT，再找到对应ANT位置',
@@ -123,7 +123,7 @@ const hardwareKnowledgeBase = {
     'NFC': {
         title: '近场通讯NFC分析思路',
         keywords: ['NFC', '近场通讯', 'nfc刷不了', 'nfc感应'],
-        source: '[内部知识库链接]',
+        source: 'https://transsioner.feishu.cn/wiki/M40YwUW2OiYRvjkkYrxcNLQPnTb',
         principle: 'NFC通过天线线圈与NFC芯片配合实现近场通讯，电路包括NFC芯片、天线线圈、匹配电路。',
         diagnosis: [
             '检查NFC天线FPC是否破损、连接是否良好',
@@ -138,7 +138,7 @@ const hardwareKnowledgeBase = {
     '显示异常': {
         title: '开机黑屏/显示异常分析思路',
         keywords: ['黑屏', '显示', '屏幕', 'LCD', 'AMOLED', '无显示', '花屏', '闪屏', '显示异常'],
-        source: '[内部知识库链接]',
+        source: 'https://transsioner.feishu.cn/wiki/wikcnhHp1GD5SgYGGEEDxJd2mvh',
         principle: 'LCD显示数据通过共模电感与CPU连接，CPU经图形处理将数据信号发差分信号显示。电路由背光驱动升压芯片U2602提供LEDA_LCM/LEDK_LCM，显示驱动U2603输出AVDD_LCM和AVEE_LCM液晶翻转电压，VIO18_EXT为LCM IO口供电1.8V。显示图像信号DSI0通过五组共模电感和CPU相连。控制信号：LCM_RST复位、DSI_TE_CON同步、AUX_LCM_IN2 ID检测由CPU控制。AMOLED屏幕自发光无背光电路。',
         diagnosis: [
             '确认能开机振动无显示，拆机确认LCD-BTB扣合是否正常，检查主板撞件、屏幕FPC撕裂',
@@ -155,7 +155,7 @@ const hardwareKnowledgeBase = {
     '触摸': {
         title: '屏幕触摸失灵分析思路',
         keywords: ['触摸', '触屏', '触控', '触摸失灵', '触摸不灵', '屏幕触摸'],
-        source: '[内部知识库链接]',
+        source: 'https://transsioner.feishu.cn/wiki/wikcnMpfQ2VOskIFlqhuz2TcdVg',
         principle: '触摸屏通过I2C/SPI与CPU通信，由触摸IC控制触摸信号采集和处理。',
         diagnosis: [
             '检查触摸屏BTB扣合、FPC是否破损',
@@ -170,7 +170,7 @@ const hardwareKnowledgeBase = {
     '摄像头': {
         title: '摄像头拍照类分析思路',
         keywords: ['摄像头', '拍照', '相机', 'camera', '打不开摄像头', '摄像头模糊', '对焦', '标定', '防抖', 'OIS'],
-        source: '[内部知识库链接]',
+        source: 'https://transsioner.feishu.cn/wiki/wikcnPXt2JTcHNzdQm1VyMM6hSc',
         principle: '摄像头将光信号转换为数字信号，由镜头、VCM马达、底座、IR滤光片、图像传感器、电路板等组成。主摄电路：CSI信号和供电VCAMD_EXT0/VCAM_VDDAF_EXT0/VCAMIO_EXT1/VCAMA_EXT0/VCAMA_1V8，防抖OIS供电VCAM_ACT_VDD，时钟CAM_CLK1，同步VSYNC，复位CAM_RST1，防抖使能GPIO142_OIS_EN，和SCP_SCL3/SDA3同CPU通讯。CSI通路共模电感降低高频噪声。',
         diagnosis: [
             'MMI/QT工位失败：检查摄像头BTB扣合是否变形浮高、FPC无撕裂、主板无撞件；拨号*#9646633#进入RGT DEVinfo查看是否多个摄像头无法读取；交叉验证摄像头和主板',
@@ -186,7 +186,7 @@ const hardwareKnowledgeBase = {
     '闪光灯': {
         title: '闪光灯分析思路',
         keywords: ['闪光灯', 'flash', '补光灯'],
-        source: '[内部知识库链接]',
+        source: 'https://transsioner.feishu.cn/wiki/wikcnR6cxOD3G4WDdSWsp99SEXe',
         principle: '闪光灯LED由闪光灯驱动IC控制，通过I2C与CPU通信，供电由PMU提供。',
         diagnosis: [
             '检查闪光灯LED单体是否正常',
@@ -201,7 +201,7 @@ const hardwareKnowledgeBase = {
     '音频异常': {
         title: '上喇叭（听筒）和下喇叭类不良分析思路',
         keywords: ['喇叭', '听筒', '声音', '音频', '无声', '声音小', '杂音', '破音', 'speaker'],
-        source: '[内部知识库链接]',
+        source: 'https://transsioner.feishu.cn/wiki/wikcnCrskoej4JZDSR2b1vWLRyd',
         principle: '上喇叭和下喇叭是电声器件，CPU提供的数字音频信号经PMU音频处理模块转换为声音信号。CPU通过I2S信号和音频放大PA芯片U6001通讯，VIO18_PMU和VBAT为PA芯片供电，PA输出差分信号SPKP_T/SPKN_T连接到听筒弹片。',
         diagnosis: [
             '人工听声音大小，正常则优先排查听筒单体、密封泡棉偏位变形、出音孔溢胶/披风堵孔',
@@ -216,7 +216,7 @@ const hardwareKnowledgeBase = {
     '麦克风': {
         title: '麦克风MIC类不良分析思路',
         keywords: ['麦克风', 'MIC', '通话对方听不到', '录音', 'mic无声'],
-        source: '[内部知识库链接]',
+        source: 'https://transsioner.feishu.cn/wiki/SjbPweUgni5hwikTGDCcSCT3nfM',
         principle: 'MIC将声音信号转换为电信号，通过音频通路传递给CPU处理。',
         diagnosis: [
             '检查MIC孔是否堵塞、MIC单体是否损坏',
@@ -231,7 +231,7 @@ const hardwareKnowledgeBase = {
     '耳机': {
         title: '耳机类不良分析思路',
         keywords: ['耳机', '耳机无声音', '耳机孔', '耳机不识别'],
-        source: '[内部知识库链接]',
+        source: 'https://transsioner.feishu.cn/wiki/ERV7w4bZziVPE3ksOtlcm4T6nRl',
         principle: '耳机检测通过耳机座子识别耳机插入状态，音频信号通过耳机通路输出。',
         diagnosis: [
             '检查耳机座子是否变形、氧化',
@@ -246,7 +246,7 @@ const hardwareKnowledgeBase = {
     '传感器': {
         title: '传感器Sensor类不良分析思路',
         keywords: ['传感器', 'sensor', '陀螺仪', '重力', '加速度', '光距', '距离感应', '光线感应'],
-        source: '[内部知识库链接]',
+        source: 'https://transsioner.feishu.cn/wiki/K3xVwvtAIiMKytkH8OXcaUDunhd',
         principle: '传感器通过I2C/SPI总线与CPU通信，由传感器Hub或PMU供电。常见传感器：加速度传感器(G-Sensor)、陀螺仪(Gyro)、光距离传感器(ALS/PS)、重力感应等。',
         diagnosis: [
             '确认传感器工位失败类型（MMI/QT/标定等）',
