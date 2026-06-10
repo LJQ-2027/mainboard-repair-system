@@ -1395,12 +1395,10 @@
                 </div>
 
                 <div class="quick-search">
-                    <span style="color: #666; font-size: 13px;">快捷输入：</span>
-                    <button class="quick-btn" onclick="quickInputSN('X6878')">X6878</button>
-                    <button class="quick-btn" onclick="quickInputSN('X6886')">X6886</button>
-                    <button class="quick-btn" onclick="quickInputSN('KL8')">KL8</button>
-                    <button class="quick-btn" onclick="quickInputSN('LJ8')">LJ8</button>
-                    <button class="quick-btn" onclick="quickInputSN('X6725')">X6725</button>
+                    <span style="color: #666; font-size: 13px;">快捷选择项目：</span>
+                    <select id="projectQuickSelect" onchange="onProjectQuickSelect()" style="padding:8px 12px;border:2px solid #3b82f6;border-radius:6px;font-size:13px;font-weight:600;color:#1e40af;background:#eff6ff;cursor:pointer">
+                        <option value="">-- 选择项目型号 --</option>
+                    </select>
                 </div>
             </div>
 
@@ -2347,6 +2345,29 @@
 
         function quickInputSN(sn) {
             document.getElementById('snInput').value = sn;
+        }
+
+        function populateProjectQuickSelect() {
+            const select = document.getElementById('projectQuickSelect');
+            if (!select || typeof projectDatabase === 'undefined') return;
+            // 保留第一个 option（占位符）
+            select.innerHTML = '<option value="">-- 选择项目型号 --</option>';
+            const projects = Object.keys(projectDatabase).sort();
+            projects.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p;
+                opt.textContent = p + (projectDatabase[p].name ? ' - ' + projectDatabase[p].name : '');
+                select.appendChild(opt);
+            });
+        }
+
+        function onProjectQuickSelect() {
+            const select = document.getElementById('projectQuickSelect');
+            const val = select.value;
+            if (!val) return;
+            document.getElementById('snInput').value = val;
+            // 同时自动触发查找
+            searchProjectResources();
         }
 
         function triggerLogUpload() {
@@ -3805,6 +3826,8 @@ ${keyLogSnippet || '无关键行'}
 
             // 初始化项目选择器（延迟加载，确保 DOM 就绪）
             setTimeout(() => populateAIProjectSelector(), 100);
+            // 初始化资料查询的项目下拉框
+            setTimeout(() => populateProjectQuickSelect(), 200);
 
             document.getElementById('symptomInput').addEventListener('keydown', function(event) {
                 if (event.key === 'Enter') {
