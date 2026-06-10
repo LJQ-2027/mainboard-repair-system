@@ -47,11 +47,16 @@ if os.path.exists(_data_dir):
 _root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 _html_path = os.path.join(_root_dir, "mainboard_repair_system_v7.4_updated.html")
 if os.path.exists(_html_path):
-    from fastapi.responses import FileResponse
+    from fastapi.responses import FileResponse, HTMLResponse
 
-    @app.get("/")
+    @app.get("/", response_class=HTMLResponse)
     async def serve_index():
-        return FileResponse(_html_path)
+        with open(_html_path, "r", encoding="utf-8") as f:
+            html = f.read()
+        from fastapi.responses import Response
+        return Response(content=html, media_type="text/html",
+                       headers={"Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+                                "Pragma": "no-cache", "Expires": "0"})
 
     # 也需要提供 data/ 中的 .js 文件
     js_dir = os.path.join(_root_dir, "js")
