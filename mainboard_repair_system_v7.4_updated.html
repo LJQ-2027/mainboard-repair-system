@@ -17,36 +17,114 @@
             background: #f0f2f5;
             min-height: 100vh;
             display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 24px;
+            margin: 0;
+            padding: 0;
         }
 
+        /* ====== 侧栏 ====== */
+        .sidebar {
+            width: 220px;
+            min-width: 220px;
+            background: #1e1e2e;
+            color: #a0a0b8;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            position: sticky;
+            top: 0;
+        }
+        .sidebar-brand {
+            padding: 24px 20px 20px;
+            border-bottom: 1px solid #2a2a3e;
+        }
+        .sidebar-brand h2 {
+            color: #fff;
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.3px;
+        }
+        .sidebar-brand span {
+            font-size: 11px;
+            color: #6b6b80;
+            display: block;
+            margin-top: 2px;
+        }
+        .sidebar-nav {
+            flex: 1;
+            padding: 12px 0;
+        }
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 20px;
+            color: #a0a0b8;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.15s;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+        }
+        .sidebar-nav a:hover {
+            background: #252540;
+            color: #d0d0e0;
+        }
+        .sidebar-nav a.active {
+            background: #252540;
+            color: #fff;
+            border-left-color: #4f46e5;
+        }
+        .sidebar-nav a .nav-icon {
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+        .sidebar-footer {
+            padding: 16px 20px;
+            border-top: 1px solid #2a2a3e;
+            font-size: 11px;
+            color: #555;
+        }
+        .sidebar-footer .ai-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 6px;
+            font-size: 12px;
+        }
+        .ai-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .ai-dot.online { background: #10b981; }
+        .ai-dot.offline { background: #f44336; }
+
+        /* ====== 主内容区 ====== */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            min-height: 100vh;
+        }
         .container {
             background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
-            padding: 36px 40px;
-            max-width: 1100px;
-            width: 100%;
-            margin-bottom: 24px;
+            margin: 20px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            padding: 32px 36px;
+            max-width: 960px;
+            width: auto;
         }
 
         h1 {
-            text-align: center;
             color: #1a1a2e;
-            margin-bottom: 6px;
-            font-size: 28px;
+            margin-bottom: 4px;
+            font-size: 24px;
             font-weight: 700;
-            letter-spacing: -0.5px;
         }
 
         .subtitle {
-            text-align: center;
             color: #6b7280;
-            margin-bottom: 32px;
+            margin-bottom: 28px;
             font-size: 13px;
-            line-height: 1.5;
         }
 
         /* Tab切换样式 */
@@ -1274,18 +1352,35 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div style="position: relative;">
-            <h1>🔧 智能主板维修系统</h1>
-            <button class="settings-gear" onclick="openSettings()" title="AI 设置">⚙</button>
-            <p class="subtitle">基于多维表格维修报表案例库 · Claude AI 智能诊断 · 实时检索真实维修数据 · 精准定位故障器件 &nbsp;|&nbsp; <span id="aiStatusInline" style="font-size:12px;color:#999;">AI: 检测中...</span></p>
+    <!-- ====== 侧栏 ====== -->
+    <nav class="sidebar">
+        <div class="sidebar-brand">
+            <h2>主板维修系统</h2>
+            <span>v9.0 Professional</span>
         </div>
+        <div class="sidebar-nav">
+            <a class="active" onclick="switchTab('resources')"><span class="nav-icon">📚</span> 资料查询</a>
+            <a onclick="switchTab('diagnosis')"><span class="nav-icon">🧠</span> 故障诊断</a>
+            <a onclick="switchTab('log-analysis')"><span class="nav-icon">📑</span> Log分析</a>
+            <a onclick="openSettings()"><span class="nav-icon">⚙️</span> AI 设置</a>
+        </div>
+        <div class="sidebar-footer">
+            <div class="ai-status"><span class="ai-dot offline" id="aiDot"></span><span id="aiStatusLabel">检测中...</span></div>
+            <div style="font-size:10px;margin-top:4px">DeepSeek · deepseek-chat</div>
+        </div>
+    </nav>
 
-        <!-- Tab切换 -->
-        <div class="tab-container">
-            <button class="tab-btn active" data-tab="resources" onclick="switchTab('resources')">📚 资料查询</button>
-            <button class="tab-btn" data-tab="diagnosis" onclick="switchTab('diagnosis')">🧠 故障诊断</button>
-            <button class="tab-btn" data-tab="log-analysis" onclick="switchTab('log-analysis')">📑 校准log分析</button>
+    <!-- ====== 主内容 ====== -->
+    <div class="main-content">
+    <div class="container">
+        <h1>智能主板维修系统</h1>
+        <p class="subtitle">基于多维表格维修报表案例库 · AI 智能诊断 · 精准定位故障器件</p>
+
+        <!-- 隐藏的旧 Tab 按钮（兼容 switchTab） -->
+        <div style="display:none">
+            <button class="tab-btn active" data-tab="resources" onclick="switchTab('resources')">📚</button>
+            <button class="tab-btn" data-tab="diagnosis" onclick="switchTab('diagnosis')">🧠</button>
+            <button class="tab-btn" data-tab="log-analysis" onclick="switchTab('log-analysis')">📑</button>
         </div>
 
         <!-- Tab 1: 资料查询 -->
@@ -1530,10 +1625,8 @@
             </div>
         </div>
 
-        <div class="footer">
-            智能主板维修系统 v8.0 AI版 | 数据来源：飞书电子工程知识库 · 产线维修记录 · 原理图分析 · Claude AI 深度分析
-        </div>
     </div>
+    </div><!-- .main-content -->
 
     <!-- AI 设置弹窗 -->
     <div class="settings-overlay" id="settingsOverlay">
@@ -1635,7 +1728,12 @@
                 activeTab.classList.add('active');
             }
             
-            // 激活当前按钮
+            // 激活侧栏导航
+            document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+            const sideLink = document.querySelector(`.sidebar-nav a[onclick*="${tabId}"]`);
+            if (sideLink) sideLink.classList.add('active');
+
+            // 激活当前按钮（兼容隐藏的旧tab）
             const activeBtn = document.querySelector(`[data-tab="${tabId}"]`);
             if (activeBtn) {
                 activeBtn.classList.add('active');
@@ -3077,25 +3175,26 @@
         let aiSupportsVision = false;
 
         async function checkAIStatus() {
-            const el = document.getElementById('aiStatusInline');
-            if (!el) return;
+            const dot = document.getElementById('aiDot');
+            const label = document.getElementById('aiStatusLabel');
             const settings = getAISettings();
             try {
                 const resp = await fetch(`${settings.apiUrl}/health`, { method: 'GET', signal: AbortSignal.timeout(3000) });
                 const data = await resp.json();
                 aiSupportsVision = data.supports_vision || false;
                 if (data.status === 'ok' && data.api_configured) {
-                    el.innerHTML = `AI: <span style="color:#10b981;font-weight:600;">${data.provider || '已连接'}</span>`;
-                    el.title = `${data.provider} - ${data.default_model} | 图片分析: ${aiSupportsVision ? '支持' : '不支持'}`;
+                    if (dot) dot.className = 'ai-dot online';
+                    if (label) label.textContent = `${data.provider} · ${data.default_model}`;
                 } else if (data.status === 'ok') {
-                    el.innerHTML = 'AI: <span style="color:#ef6c00;">Key 未配置</span>';
-                    el.title = '代理已运行但 API Key 未设置';
+                    if (dot) dot.className = 'ai-dot offline';
+                    if (label) label.textContent = 'Key 未配置';
                 } else {
-                    el.innerHTML = 'AI: <span style="color:#ef6c00;">异常</span>';
+                    if (dot) dot.className = 'ai-dot offline';
+                    if (label) label.textContent = '异常';
                 }
             } catch (e) {
-                el.innerHTML = 'AI: <span style="color:#f44336;">未连接</span>';
-                el.title = '代理服务未启动，请运行 启动AI服务.bat';
+                if (dot) dot.className = 'ai-dot offline';
+                if (label) label.textContent = '未连接';
             }
         }
 
