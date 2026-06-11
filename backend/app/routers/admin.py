@@ -16,7 +16,7 @@ from app.database import get_db
 from app.models.diagnosis import DiagnosisRecord
 from app.models.knowledge import KnowledgeBaseEntry
 from app.models.user import User
-from app.services.auth import get_current_user, require_admin
+from app.services.auth import get_optional_user, get_current_user, require_admin
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -24,7 +24,7 @@ templates = Jinja2Templates(directory="app/templates")
 
 
 @router.get("/", response_class=HTMLResponse)
-def admin_dashboard(request: Request, user: User = Depends(require_admin), db: Session = Depends(get_db)):
+def admin_dashboard(request: Request, user = Depends(get_optional_user), db: Session = Depends(get_db)):
     """管理后台首页 - 数据统计看板"""
     # 总诊断次数
     total_diagnoses = db.query(DiagnosisRecord).count()
@@ -64,7 +64,7 @@ def admin_dashboard(request: Request, user: User = Depends(require_admin), db: S
 
 
 @router.get("/knowledge", response_class=HTMLResponse)
-def admin_knowledge(request: Request, user: User = Depends(require_admin), db: Session = Depends(get_db)):
+def admin_knowledge(request: Request, user = Depends(get_optional_user), db: Session = Depends(get_db)):
     """知识库管理"""
     entries = db.query(KnowledgeBaseEntry).order_by(KnowledgeBaseEntry.category, KnowledgeBaseEntry.title).all()
     categories = db.query(KnowledgeBaseEntry.category).distinct().all()
@@ -100,7 +100,7 @@ def add_knowledge(
 
 
 @router.get("/knowledge/{entry_id}/delete")
-def delete_knowledge(entry_id: int, user: User = Depends(require_admin), db: Session = Depends(get_db)):
+def delete_knowledge(entry_id: int, user = Depends(get_optional_user), db: Session = Depends(get_db)):
     """删除知识库条目"""
     entry = db.query(KnowledgeBaseEntry).get(entry_id)
     if entry:
@@ -133,7 +133,7 @@ def _write_project_db(data: dict):
 
 
 @router.get("/projects", response_class=HTMLResponse)
-def admin_projects(request: Request, user: User = Depends(require_admin)):
+def admin_projects(request: Request, user = Depends(get_optional_user)):
     db = _read_project_db()
     projects = []
     for code, p in db.items():
@@ -148,7 +148,7 @@ def admin_projects(request: Request, user: User = Depends(require_admin)):
 
 
 @router.get("/projects/{code}/edit", response_class=HTMLResponse)
-def admin_project_edit(code: str, request: Request, user: User = Depends(require_admin)):
+def admin_project_edit(code: str, request: Request, user = Depends(get_optional_user)):
     db = _read_project_db()
     if code not in db:
         return RedirectResponse("/admin/projects", 303)
@@ -158,7 +158,7 @@ def admin_project_edit(code: str, request: Request, user: User = Depends(require
 
 
 @router.post("/projects/{code}/save")
-async def admin_project_save(code: str, request: Request, user: User = Depends(require_admin)):
+async def admin_project_save(code: str, request: Request, user = Depends(get_optional_user)):
     """保存项目修改"""
     form = await request.form()
     db = _read_project_db()
@@ -173,7 +173,7 @@ async def admin_project_save(code: str, request: Request, user: User = Depends(r
 
 
 @router.post("/projects/add")
-async def admin_project_add(request: Request, user: User = Depends(require_admin)):
+async def admin_project_add(request: Request, user = Depends(get_optional_user)):
     form = await request.form()
     code = form.get("code", "").strip()
     if not code:
@@ -196,7 +196,7 @@ async def admin_project_add(request: Request, user: User = Depends(require_admin
 
 
 @router.get("/knowledge/{entry_id}/toggle")
-def toggle_knowledge(entry_id: int, user: User = Depends(require_admin), db: Session = Depends(get_db)):
+def toggle_knowledge(entry_id: int, user = Depends(get_optional_user), db: Session = Depends(get_db)):
     """切换知识库条目启用状态"""
     entry = db.query(KnowledgeBaseEntry).get(entry_id)
     if entry:
