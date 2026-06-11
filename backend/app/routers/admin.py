@@ -4,10 +4,12 @@ import datetime
 import json
 import os
 import re
+import shutil
 from collections import Counter
 from copy import deepcopy
+from pathlib import Path
 
-from fastapi import APIRouter, Depends, Form, Request
+from fastapi import APIRouter, Depends, Form, Request, UploadFile, File
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
@@ -170,6 +172,53 @@ async def admin_project_save(code: str, request: Request, user = Depends(get_opt
             db[code][field] = form[field]
     _write_project_db(db)
     return RedirectResponse("/admin/projects", 303)
+
+
+def _get_uploads_dir(project_code: str = ""):
+    base = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "uploads")
+    if project_code:
+        base = os.path.join(base, project_code)
+    os.makedirs(base, exist_ok=True)
+    return base
+
+
+@router.post("/projects/{code}/upload")
+async def admin_project_upload(
+    code: str, request: Request, file: UploadFile = File(...),
+    file_type: str = Form("schematic"), user = Depends(get_optional_user)
+):
+    """上传项目文件（原理图/位号图/SOP）"""
+    if not file.filename:
+        return RedirectResponse(f"/admin/projects/{code}/edit", 303)
+
+    proj_dir = _get_uploads_dir(code)
+    ext = Path(file.filename).suffix
+    # 按类型命名：schematic.pdf, layout.pdf, sop.docx
+    filename = f"{file_type}{ext}"
+    dest = os.path.join(proj_dir, filename)
+
+    with open(dest, "wb") as f:
+        shutil.copyfileobj(file.file, f)
+
+    # 更新 project-database.js 中的链接
+    db = _read_project_db()
+    if code in db:
+        local_url = f"/uploads/{code}/{filename}"
+        if file_type == "schematic":
+            db[code]["schematicUrl"] = local_url
+            db[code]["schematicName"] = file.filename
+        elif file_type == "layout":
+            db[code]["layoutUrl"] = local_url
+            db[code]["layoutName"] = file.filename
+        elif file_type == "sop":
+            db[code]["sopUrl"] = local_url
+            db[code]["sopName"] = file.filename
+        elif file_type == "bom":
+            db[code]["bomUrl"] = local_url
+            db[code]["bomName"] = file.filename
+        _write_project_db(db)
+
+    return RedirectResponse(f"/admin/projects/{code}/edit", 303)
 
 
 @router.post("/projects/add")

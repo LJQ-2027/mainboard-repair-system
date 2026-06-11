@@ -35,6 +35,47 @@
         </div>
     </div>
 
+    <div class="table" style="padding:20px;margin-bottom:16px">
+        <h3 style="margin-bottom:12px">上传本地文件（可选，替代飞书链接）</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div>
+                <label style="font-size:13px;color:#666">上传原理图 (PDF)</label>
+                <form method="POST" action="/admin/projects/{{ project.code }}/upload" enctype="multipart/form-data" style="display:flex;gap:8px">
+                    <input type="hidden" name="file_type" value="schematic">
+                    <input type="file" name="file" accept=".pdf" style="flex:1;font-size:12px">
+                    <button type="submit" class="btn btn-primary btn-sm">上传</button>
+                </form>
+                {% if project.schematicUrl and project.schematicUrl.startswith('/uploads') %}
+                <span class="badge badge-active" style="margin-top:4px">✅ 已上传: {{ project.schematicName or project.schematicUrl }}</span>
+                {% endif %}
+            </div>
+            <div>
+                <label style="font-size:13px;color:#666">上传位号图 (PDF)</label>
+                <form method="POST" action="/admin/projects/{{ project.code }}/upload" enctype="multipart/form-data" style="display:flex;gap:8px">
+                    <input type="hidden" name="file_type" value="layout">
+                    <input type="file" name="file" accept=".pdf" style="flex:1;font-size:12px">
+                    <button type="submit" class="btn btn-primary btn-sm">上传</button>
+                </form>
+            </div>
+            <div>
+                <label style="font-size:13px;color:#666">上传SOP (PDF/DOCX)</label>
+                <form method="POST" action="/admin/projects/{{ project.code }}/upload" enctype="multipart/form-data" style="display:flex;gap:8px">
+                    <input type="hidden" name="file_type" value="sop">
+                    <input type="file" name="file" accept=".pdf,.docx" style="flex:1;font-size:12px">
+                    <button type="submit" class="btn btn-primary btn-sm">上传</button>
+                </form>
+            </div>
+            <div>
+                <label style="font-size:13px;color:#666">上传BOM (XLS/PDF)</label>
+                <form method="POST" action="/admin/projects/{{ project.code }}/upload" enctype="multipart/form-data" style="display:flex;gap:8px">
+                    <input type="hidden" name="file_type" value="bom">
+                    <input type="file" name="file" accept=".pdf,.xls,.xlsx" style="flex:1;font-size:12px">
+                    <button type="submit" class="btn btn-primary btn-sm">上传</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <button type="submit" class="btn btn-primary">保存修改</button>
     <a href="/admin/projects" class="btn btn-sm" style="margin-left:8px;background:#999;color:#fff;text-decoration:none;padding:6px 12px;border-radius:4px">取消</a>
 </form>
