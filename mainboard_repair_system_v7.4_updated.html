@@ -2865,31 +2865,24 @@
                 document.getElementById('projectVersion').textContent = project.version;
                 document.getElementById('projectInfo').style.display = 'block';
 
-                // 辅助函数：本地优先，云链接回退
-                async function getBestUrl(projectCode, url, type) {
-                    if (!url) return null;
-                    // 如果已经是本地链接，直接返回
-                    if (url.startsWith('/uploads/')) return url;
-                    // 检查本地是否有上传文件
-                    const ext = url.match(/\.(\w+)$/)?.[1] || 'pdf';
-                    const localUrl = `/uploads/${projectCode}/${type}.${ext}`;
-                    try {
-                        const r = await fetch(localUrl, { method: 'HEAD' });
-                        if (r.ok) return localUrl; // 本地优先
-                    } catch(e) {}
-                    return url; // 回退到云链接
+                function getDisplayUrl(url, name) {
+                    if (!url) return { url: '', label: name, icon: '' };
+                    const isLocal = url.startsWith('/uploads/');
+                    return {
+                        url: url,
+                        label: name,
+                        icon: isLocal ? '📁 ' : '☁️ ',
+                        suffix: isLocal ? ' (本地)' : ' (云端)',
+                    };
                 }
 
                 // 更新资料链接 - 原理图
                 if (project.schematicUrl) {
-                    getBestUrl(projectModel, project.schematicUrl, 'schematic').then(bestUrl => {
-                        document.getElementById('schematicCard').onclick = () => window.open(bestUrl, '_blank');
-                        document.getElementById('schematicCard').style.opacity = '1';
-                        document.getElementById('schematicCard').style.cursor = 'pointer';
-                        document.getElementById('schematicDesc').textContent = bestUrl.startsWith('/uploads/')
-                            ? '📁 ' + project.schematicName + ' (本地)'
-                            : '☁️ ' + project.schematicName + ' (云端)';
-                    });
+                    const best = getDisplayUrl(project.schematicUrl, project.schematicName);
+                    document.getElementById('schematicCard').onclick = () => window.open(best.url, '_blank');
+                    document.getElementById('schematicCard').style.opacity = '1';
+                    document.getElementById('schematicCard').style.cursor = 'pointer';
+                    document.getElementById('schematicDesc').textContent = best.icon + best.label + best.suffix;
                 } else {
                     document.getElementById('schematicCard').onclick = null;
                     document.getElementById('schematicCard').style.opacity = '0.5';
@@ -2899,14 +2892,11 @@
 
                 // 更新资料链接 - 位号图
                 if (project.layoutUrl) {
-                    getBestUrl(projectModel, project.layoutUrl, 'layout').then(bestUrl => {
-                        document.getElementById('layoutCard').onclick = () => window.open(bestUrl, '_blank');
-                        document.getElementById('layoutCard').style.opacity = '1';
-                        document.getElementById('layoutCard').style.cursor = 'pointer';
-                        document.getElementById('layoutDesc').textContent = bestUrl.startsWith('/uploads/')
-                            ? '📁 ' + project.layoutName + ' (本地)'
-                            : '☁️ ' + project.layoutName + ' (云端)';
-                    });
+                    const bestL = getDisplayUrl(project.layoutUrl, project.layoutName);
+                    document.getElementById('layoutCard').onclick = () => window.open(bestL.url, '_blank');
+                    document.getElementById('layoutCard').style.opacity = '1';
+                    document.getElementById('layoutCard').style.cursor = 'pointer';
+                    document.getElementById('layoutDesc').textContent = bestL.icon + bestL.label + bestL.suffix;
                 } else {
                     document.getElementById('layoutCard').onclick = null;
                     document.getElementById('layoutCard').style.opacity = '0.5';
@@ -2916,14 +2906,11 @@
 
                 // 更新资料链接 - BOM
                 if (project.bomUrl) {
-                    getBestUrl(projectModel, project.bomUrl, 'bom').then(bestUrl => {
-                        document.getElementById('bomCard').onclick = () => window.open(bestUrl, '_blank');
-                        document.getElementById('bomCard').style.opacity = '1';
-                        document.getElementById('bomCard').style.cursor = 'pointer';
-                        document.getElementById('bomDesc').textContent = bestUrl.startsWith('/uploads/')
-                            ? '📁 ' + project.bomName + ' (本地)'
-                            : '☁️ ' + project.bomName + ' (云端)';
-                    });
+                    const bestB = getDisplayUrl(project.bomUrl, project.bomName);
+                    document.getElementById('bomCard').onclick = () => window.open(bestB.url, '_blank');
+                    document.getElementById('bomCard').style.opacity = '1';
+                    document.getElementById('bomCard').style.cursor = 'pointer';
+                    document.getElementById('bomDesc').textContent = bestB.icon + bestB.label + bestB.suffix;
                 } else {
                     document.getElementById('bomCard').onclick = null;
                     document.getElementById('bomCard').style.opacity = '0.5';
@@ -2933,14 +2920,11 @@
 
                 // 更新资料链接 - 维修指导书
                 if (project.sopUrl) {
-                    getBestUrl(projectModel, project.sopUrl, 'sop').then(bestUrl => {
-                        document.getElementById('sopCard').onclick = () => window.open(bestUrl || '', '_blank');
-                        document.getElementById('sopCard').style.opacity = '1';
-                        document.getElementById('sopCard').style.cursor = 'pointer';
-                        document.getElementById('sopDesc').textContent = bestUrl?.startsWith('/uploads/')
-                            ? '📁 ' + (project.sopName || 'SOP') + ' (本地)'
-                            : '☁️ ' + (project.sopName || 'SOP') + ' (云端)';
-                    });
+                    const bestS = getDisplayUrl(project.sopUrl, project.sopName || 'SOP');
+                    document.getElementById('sopCard').onclick = () => window.open(bestS.url, '_blank');
+                    document.getElementById('sopCard').style.opacity = '1';
+                    document.getElementById('sopCard').style.cursor = 'pointer';
+                    document.getElementById('sopDesc').textContent = bestS.icon + bestS.label + bestS.suffix;
                 } else {
                     document.getElementById('sopCard').onclick = null;
                     document.getElementById('sopCard').style.opacity = '0.5';
