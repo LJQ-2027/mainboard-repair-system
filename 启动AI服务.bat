@@ -64,9 +64,15 @@ echo   管理后台: http://localhost:8899/admin/
 echo   API 文档: http://localhost:8899/docs
 echo.
 
-:: 自动打开浏览器
-start http://localhost:8899/
+:: 启动代理（后台运行）
+start "AI代理" /MIN python "%~dp0backend/run.py"
 
-python "%~dp0backend/run.py"
+:: 等待服务启动
+echo 正在启动服务...
+timeout /t 6 /nobreak >nul
+
+:: 打开浏览器
+start http://localhost:8899/
+echo [OK] 浏览器已打开，如果页面未加载请稍等刷新
 
 pause
