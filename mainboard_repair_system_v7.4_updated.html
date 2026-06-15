@@ -2865,24 +2865,12 @@
                 document.getElementById('projectVersion').textContent = project.version;
                 document.getElementById('projectInfo').style.display = 'block';
 
-                function getDisplayUrl(url, name) {
-                    if (!url) return { url: '', label: name, icon: '' };
-                    const isLocal = url.startsWith('/uploads/');
-                    return {
-                        url: url,
-                        label: name,
-                        icon: isLocal ? '📁 ' : '☁️ ',
-                        suffix: isLocal ? ' (本地)' : ' (云端)',
-                    };
-                }
-
                 // 更新资料链接 - 原理图
                 if (project.schematicUrl) {
-                    const best = getDisplayUrl(project.schematicUrl, project.schematicName);
-                    document.getElementById('schematicCard').onclick = () => window.open(best.url, '_blank');
+                    document.getElementById('schematicCard').onclick = () => window.open(project.schematicUrl, '_blank');
                     document.getElementById('schematicCard').style.opacity = '1';
                     document.getElementById('schematicCard').style.cursor = 'pointer';
-                    document.getElementById('schematicDesc').textContent = best.icon + best.label + best.suffix;
+                    document.getElementById('schematicDesc').textContent = project.schematicName;
                 } else {
                     document.getElementById('schematicCard').onclick = null;
                     document.getElementById('schematicCard').style.opacity = '0.5';
@@ -2892,11 +2880,10 @@
 
                 // 更新资料链接 - 位号图
                 if (project.layoutUrl) {
-                    const bestL = getDisplayUrl(project.layoutUrl, project.layoutName);
-                    document.getElementById('layoutCard').onclick = () => window.open(bestL.url, '_blank');
+                    document.getElementById('layoutCard').onclick = () => window.open(project.layoutUrl, '_blank');
                     document.getElementById('layoutCard').style.opacity = '1';
                     document.getElementById('layoutCard').style.cursor = 'pointer';
-                    document.getElementById('layoutDesc').textContent = bestL.icon + bestL.label + bestL.suffix;
+                    document.getElementById('layoutDesc').textContent = project.layoutName;
                 } else {
                     document.getElementById('layoutCard').onclick = null;
                     document.getElementById('layoutCard').style.opacity = '0.5';
@@ -2906,11 +2893,10 @@
 
                 // 更新资料链接 - BOM
                 if (project.bomUrl) {
-                    const bestB = getDisplayUrl(project.bomUrl, project.bomName);
-                    document.getElementById('bomCard').onclick = () => window.open(bestB.url, '_blank');
+                    document.getElementById('bomCard').onclick = () => window.open(project.bomUrl, '_blank');
                     document.getElementById('bomCard').style.opacity = '1';
                     document.getElementById('bomCard').style.cursor = 'pointer';
-                    document.getElementById('bomDesc').textContent = bestB.icon + bestB.label + bestB.suffix;
+                    document.getElementById('bomDesc').textContent = project.bomName;
                 } else {
                     document.getElementById('bomCard').onclick = null;
                     document.getElementById('bomCard').style.opacity = '0.5';
@@ -2920,16 +2906,7 @@
 
                 // 更新资料链接 - 维修指导书
                 if (project.sopUrl) {
-                    const bestS = getDisplayUrl(project.sopUrl, project.sopName || 'SOP');
-                    document.getElementById('sopCard').onclick = () => window.open(bestS.url, '_blank');
-                    document.getElementById('sopCard').style.opacity = '1';
-                    document.getElementById('sopCard').style.cursor = 'pointer';
-                    document.getElementById('sopDesc').textContent = bestS.icon + bestS.label + bestS.suffix;
-                } else {
-                    document.getElementById('sopCard').onclick = null;
-                    document.getElementById('sopCard').style.opacity = '0.5';
-                    document.getElementById('sopCard').style.cursor = 'not-allowed';
-                    document.getElementById('sopDesc').textContent = (project.sopName || 'SOP') + ' - 请到资料库补充';
+                    document.getElementById('sopCard').onclick = () => window.open(project.sopUrl, '_blank');
                     document.getElementById('sopCard').style.opacity = '1';
                     document.getElementById('sopCard').style.cursor = 'pointer';
                     document.getElementById('sopDesc').textContent = project.sopName;
