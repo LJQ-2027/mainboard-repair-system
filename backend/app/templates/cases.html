@@ -1,0 +1,34 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<h2 style="margin-bottom:20px">案例库管理</h2>
+<p style="color:#666;margin-bottom:16px;font-size:13px">查看各项目的专属案例数据（来源：data/project-cases.js）</p>
+
+<div class="table">
+<table>
+<thead><tr>
+    <th>项目代号</th><th>项目名称</th><th>故障类型</th><th>案例数</th><th>位号数</th>
+</tr></thead>
+<tbody>
+{% for proj in projects %}
+<tr>
+    <td><strong>{{ proj.code }}</strong></td>
+    <td>{{ proj.name }}</td>
+    <td>{% for ft in proj.fault_types %}<span class="badge badge-active" style="margin:2px">{{ ft }}</span>{% endfor %}</td>
+    <td>{{ proj.total_rules }}</td>
+    <td>{{ proj.total_components }}</td>
+</tr>
+{% else %}
+<tr><td colspan="5" style="text-align:center;color:#999;padding:40px">暂无案例数据。请编辑 data/project-cases.js 添加项目案例</td></tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+
+<div class="table" style="margin-top:20px;padding:20px;background:#f0f4ff">
+    <h3 style="margin-bottom:8px">如何添加案例？</h3>
+    <p style="font-size:13px;color:#666;line-height:1.8">
+        编辑文件 <code>data/project-cases.js</code>，在对应项目下添加 diagnosisRules 和 componentMap。<br>
+        格式参考已有的 X6878 项目。
+    </p>
+</div>
+{% endblock %}

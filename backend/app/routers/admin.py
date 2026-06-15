@@ -252,3 +252,40 @@ def toggle_knowledge(entry_id: int, user = Depends(get_optional_user), db: Sessi
         entry.is_active = not entry.is_active
         db.commit()
     return RedirectResponse("/admin/knowledge", status_code=303)
+
+
+# ====== 案例库管理 ======
+
+@router.get("/cases", response_class=HTMLResponse)
+def admin_cases(request: Request, user = Depends(get_optional_user)):
+    """查看各项目的案例数据"""
+    import json5
+    cases_file = os.path.join(_get_data_dir(), "project-cases.js")
+    if os.path.exists(cases_file):
+        with open(cases_file, "r", encoding="utf-8") as f:
+            content = f.read()
+        idx = content.find("=")
+        obj_str = content[idx+1:].strip()
+        # 去掉最后的 };（JS 变量声明语法）
+        if obj_str.endswith("};"):
+            obj_str = obj_str[:-2].rstrip() + "}"
+        cases = json5.loads(obj_str)
+    else:
+        cases = {}
+
+    projects = []
+    for code, proj in cases.items():
+        rules = proj.get("diagnosisRules", {})
+        comps = proj.get("componentMap", {})
+        total_components = sum(len(v) for v in comps.values())
+        projects.append({
+            "code": code,
+            "name": proj.get("projectName", code),
+            "fault_types": list(rules.keys()),
+            "total_rules": sum(len(v) for v in rules.values()),
+            "total_components": total_components,
+        })
+
+    return templates.TemplateResponse("cases.html", {
+        "request": request, "user": user, "projects": projects
+    })
