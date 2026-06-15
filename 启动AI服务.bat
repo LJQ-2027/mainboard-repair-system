@@ -6,17 +6,14 @@ echo ========================================
 echo   AI 代理服务器 - 智能主板维修系统 v9.0
 echo ========================================
 echo.
-echo   启动中，请稍候...
+echo   启动后请打开浏览器访问:
+echo   http://localhost:8899/
+echo.
+echo   按 Ctrl+C 停止服务
+echo ========================================
+echo.
 
-:: 启动代理（新窗口）
-start "" python "%~dp0backend/run.py"
+cd /d "%~dp0backend"
+python run.py
 
-:: 等5秒让服务启动
-ping -n 6 127.0.0.1 >nul
-
-:: 打开浏览器
-start "" http://localhost:8899/
-
-echo   浏览器已打开！
-echo   按任意键关闭此窗口...
-pause >nul
+pause
