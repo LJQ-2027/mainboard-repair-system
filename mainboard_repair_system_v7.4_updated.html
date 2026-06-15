@@ -2865,12 +2865,31 @@
                 document.getElementById('projectVersion').textContent = project.version;
                 document.getElementById('projectInfo').style.display = 'block';
 
+                // 辅助函数：本地优先，云链接回退
+                async function getBestUrl(projectCode, url, type) {
+                    if (!url) return null;
+                    // 如果已经是本地链接，直接返回
+                    if (url.startsWith('/uploads/')) return url;
+                    // 检查本地是否有上传文件
+                    const ext = url.match(/\.(\w+)$/)?.[1] || 'pdf';
+                    const localUrl = `/uploads/${projectCode}/${type}.${ext}`;
+                    try {
+                        const r = await fetch(localUrl, { method: 'HEAD' });
+                        if (r.ok) return localUrl; // 本地优先
+                    } catch(e) {}
+                    return url; // 回退到云链接
+                }
+
                 // 更新资料链接 - 原理图
                 if (project.schematicUrl) {
-                    document.getElementById('schematicCard').onclick = () => window.open(project.schematicUrl, '_blank');
-                    document.getElementById('schematicCard').style.opacity = '1';
-                    document.getElementById('schematicCard').style.cursor = 'pointer';
-                    document.getElementById('schematicDesc').textContent = project.schematicName;
+                    getBestUrl(projectModel, project.schematicUrl, 'schematic').then(bestUrl => {
+                        document.getElementById('schematicCard').onclick = () => window.open(bestUrl, '_blank');
+                        document.getElementById('schematicCard').style.opacity = '1';
+                        document.getElementById('schematicCard').style.cursor = 'pointer';
+                        document.getElementById('schematicDesc').textContent = bestUrl.startsWith('/uploads/')
+                            ? '📁 ' + project.schematicName + ' (本地)'
+                            : '☁️ ' + project.schematicName + ' (云端)';
+                    });
                 } else {
                     document.getElementById('schematicCard').onclick = null;
                     document.getElementById('schematicCard').style.opacity = '0.5';
@@ -2880,10 +2899,14 @@
 
                 // 更新资料链接 - 位号图
                 if (project.layoutUrl) {
-                    document.getElementById('layoutCard').onclick = () => window.open(project.layoutUrl, '_blank');
-                    document.getElementById('layoutCard').style.opacity = '1';
-                    document.getElementById('layoutCard').style.cursor = 'pointer';
-                    document.getElementById('layoutDesc').textContent = project.layoutName;
+                    getBestUrl(projectModel, project.layoutUrl, 'layout').then(bestUrl => {
+                        document.getElementById('layoutCard').onclick = () => window.open(bestUrl, '_blank');
+                        document.getElementById('layoutCard').style.opacity = '1';
+                        document.getElementById('layoutCard').style.cursor = 'pointer';
+                        document.getElementById('layoutDesc').textContent = bestUrl.startsWith('/uploads/')
+                            ? '📁 ' + project.layoutName + ' (本地)'
+                            : '☁️ ' + project.layoutName + ' (云端)';
+                    });
                 } else {
                     document.getElementById('layoutCard').onclick = null;
                     document.getElementById('layoutCard').style.opacity = '0.5';
@@ -2893,10 +2916,14 @@
 
                 // 更新资料链接 - BOM
                 if (project.bomUrl) {
-                    document.getElementById('bomCard').onclick = () => window.open(project.bomUrl, '_blank');
-                    document.getElementById('bomCard').style.opacity = '1';
-                    document.getElementById('bomCard').style.cursor = 'pointer';
-                    document.getElementById('bomDesc').textContent = project.bomName;
+                    getBestUrl(projectModel, project.bomUrl, 'bom').then(bestUrl => {
+                        document.getElementById('bomCard').onclick = () => window.open(bestUrl, '_blank');
+                        document.getElementById('bomCard').style.opacity = '1';
+                        document.getElementById('bomCard').style.cursor = 'pointer';
+                        document.getElementById('bomDesc').textContent = bestUrl.startsWith('/uploads/')
+                            ? '📁 ' + project.bomName + ' (本地)'
+                            : '☁️ ' + project.bomName + ' (云端)';
+                    });
                 } else {
                     document.getElementById('bomCard').onclick = null;
                     document.getElementById('bomCard').style.opacity = '0.5';
@@ -2906,7 +2933,19 @@
 
                 // 更新资料链接 - 维修指导书
                 if (project.sopUrl) {
-                    document.getElementById('sopCard').onclick = () => window.open(project.sopUrl, '_blank');
+                    getBestUrl(projectModel, project.sopUrl, 'sop').then(bestUrl => {
+                        document.getElementById('sopCard').onclick = () => window.open(bestUrl || '', '_blank');
+                        document.getElementById('sopCard').style.opacity = '1';
+                        document.getElementById('sopCard').style.cursor = 'pointer';
+                        document.getElementById('sopDesc').textContent = bestUrl?.startsWith('/uploads/')
+                            ? '📁 ' + (project.sopName || 'SOP') + ' (本地)'
+                            : '☁️ ' + (project.sopName || 'SOP') + ' (云端)';
+                    });
+                } else {
+                    document.getElementById('sopCard').onclick = null;
+                    document.getElementById('sopCard').style.opacity = '0.5';
+                    document.getElementById('sopCard').style.cursor = 'not-allowed';
+                    document.getElementById('sopDesc').textContent = (project.sopName || 'SOP') + ' - 请到资料库补充';
                     document.getElementById('sopCard').style.opacity = '1';
                     document.getElementById('sopCard').style.cursor = 'pointer';
                     document.getElementById('sopDesc').textContent = project.sopName;
