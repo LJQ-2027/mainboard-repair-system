@@ -64,6 +64,9 @@ echo   管理后台: http://localhost:8899/admin/
 echo   API 文档: http://localhost:8899/docs
 echo.
 
+:: 自动打开浏览器
+start http://localhost:8899/
+
 python "%~dp0backend/run.py"
 
 pause
