@@ -279,5 +279,76 @@
     ],
     "processing_status": "已归类并完成第一版结构化入库",
     "notes": "该资料是维修分析培训总览，适合拆成培训路径、模块原理和工具操作入口；其中 MES / META / Log 内容需要继续下钻。"
+  },
+  {
+    "source_id": "SRC-20260622-001",
+    "file_name": "WO_Serialized_Report_2068984729568735233.xlsx",
+    "original_path": "D:/Feishu/WO_Serialized_Report_2068984729568735233.xlsx",
+    "file_type": "Excel",
+    "received_date": "2026-06-22",
+    "main_category": "维修报告库",
+    "secondary_categories": [
+      "案例素材库",
+      "故障知识库",
+      "优先级规划库",
+      "缺口与需求库"
+    ],
+    "related_models": [
+      "BG6m",
+      "KM4",
+      "KL4",
+      "CM6",
+      "KL5",
+      "KM5",
+      "C671L",
+      "A6611L",
+      "KM7",
+      "CL6k"
+    ],
+    "related_faults": [
+      "PWR01-No power on",
+      "CLA01-No signal/No Service/No network",
+      "PWR07-Restart",
+      "PWR02-Power on stopped at Logo",
+      "CHG01-Can not charging",
+      "420-Memory Failure",
+      "400-CPU Failure",
+      "410-PMU Failure",
+      "430-RF IC Failure",
+      "461-Charger IC Failure"
+    ],
+    "related_components": [
+      "Memory",
+      "CPU",
+      "PMU",
+      "RF IC",
+      "Charger IC",
+      "Resistor/Capacitor/Inductor"
+    ],
+    "related_tools": [],
+    "summary": "CI L4 PCBA 维修工单报告，共识别 4705 条记录，包含国家、仓库、维修状态、机型、故障现象、故障归因、维修动作、消耗物料等字段。该文件含 IMEI、序列号、技师姓名和工单号等敏感字段，因此当前只沉淀脱敏统计摘要，不保存原始明细。",
+    "extractable_items": [
+      "L4 PCBA 维修量",
+      "维修状态分布",
+      "高频机型",
+      "高频故障现象",
+      "高频故障归因",
+      "维修动作分布",
+      "消耗物料分布",
+      "机型与故障交叉统计"
+    ],
+    "missing_fields": [
+      "Memory Failure / CPU Failure / PMU Failure 等故障分类的判定标准",
+      "高频机型对应的测试点正常值",
+      "高频故障的真实维修过程、照片、测量数据和修后验证记录",
+      "Non Repairable / Damage / Semi-manufactured 等状态的业务含义",
+      "IC Replaced 等维修动作对应的工艺参数和验收标准"
+    ],
+    "target_knowledge_base": [
+      "repair-report-summaries",
+      "gap-requests"
+    ],
+    "processing_status": "已完成脱敏汇总入库，未入库原始明细",
+    "notes": "该报告适合用于确定第一阶段优先机型和优先故障，不应直接当作诊断 SOP 使用。"
   }
 ]

@@ -136,5 +136,75 @@
       "SRC-20260604-003",
       "SRC-20260604-005"
     ]
+  },
+  {
+    "request_id": "GAP-20260622-001",
+    "related_model": [
+      "BG6m",
+      "KM4",
+      "KL4",
+      "CM6",
+      "KL5",
+      "KM5",
+      "C671L"
+    ],
+    "related_fault": [
+      "420-Memory Failure",
+      "400-CPU Failure",
+      "410-PMU Failure",
+      "430-RF IC Failure",
+      "461-Charger IC Failure"
+    ],
+    "gap_type": "L4 故障分类判定标准",
+    "description": "CI L4 维修报告显示 Memory Failure、CPU Failure、PMU Failure 是高频故障归因，但当前缺少这些分类在 L4 录单中的实际判定标准，例如依据哪些测试点、现象、电流曲线、Log 或更换结果来归类。",
+    "provider": "技术支持 / L4 负责人 / 制造中心维修工程师",
+    "priority": "高",
+    "status": "待补充",
+    "next_action": "索要 L4 故障代码字典、故障分类说明、录单规则和典型判定案例，优先解释 400/410/420/430/461 等高频代码。",
+    "source_ids": [
+      "SRC-20260622-001"
+    ]
+  },
+  {
+    "request_id": "GAP-20260622-002",
+    "related_model": [
+      "BG6m",
+      "KM4",
+      "KL4",
+      "CM6",
+      "KL5",
+      "KM5",
+      "C671L"
+    ],
+    "related_fault": [
+      "PWR01-No power on",
+      "CLA01-No signal/No Service/No network",
+      "PWR07-Restart",
+      "PWR02-Power on stopped at Logo",
+      "CHG01-Can not charging"
+    ],
+    "gap_type": "高频机型真实维修案例",
+    "description": "维修报告能看出哪些机型和故障高频，但不包含详细检测步骤、测试点、照片、测量数据、维修前后对比和修后验证。",
+    "provider": "中方技术人员 / CI L4 技术员 / 技术支持",
+    "priority": "高",
+    "status": "待补充",
+    "next_action": "按机型+故障组合抽取真实案例，例如 BG6m/KM4/KL4 的 Memory Failure、CPU Failure、PMU Failure，每类至少 3-5 个完整案例。",
+    "source_ids": [
+      "SRC-20260622-001"
+    ]
+  },
+  {
+    "request_id": "GAP-20260622-003",
+    "related_model": [],
+    "related_fault": [],
+    "gap_type": "维修状态与维修动作口径",
+    "description": "维修报告包含 Repair Completed、Non Repairable、Damage、Semi-manufactured、Assigned To Technician 等状态，以及 IC Replaced、Re-soldering、Return Without Repair 等服务动作，但当前缺少这些字段的业务含义和使用规则。",
+    "provider": "技术支持 / L4 负责人 / 备件或系统负责人",
+    "priority": "中",
+    "status": "待补充",
+    "next_action": "索要 WO Serialized Report 字段说明、状态流转说明、维修动作代码字典，以及哪些状态应纳入维修成功率/返修率分析。",
+    "source_ids": [
+      "SRC-20260622-001"
+    ]
   }
 ]
