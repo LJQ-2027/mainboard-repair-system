@@ -50,3 +50,15 @@ ANTHROPIC_API_KEY=...
 ```
 
 `PORT`, `STATIC_ROOT`, and `INDEX_FILE` are supplied by the deploy script / PM2 environment.
+
+## Current Deployment
+
+- Deployed on: 2026-06-22
+- Deployed commit: `fb73fcc`
+- Internal service: `http://127.0.0.1:3010`
+- External beta URL: `https://cccsat.top/mb-repair-beta/`
+- Health URL: `https://cccsat.top/mb-repair-beta/health`
+- PM2 process: `motherboard-repair-beta`
+- Nginx config touched: `/etc/nginx/sites-available/sikayetvar`
+- Nginx config backup: `/etc/nginx/sites-available/sikayetvar.before-mb-repair-20260622_095918`
+- Current AI status: service is reachable, but `.env` still has no valid `ANTHROPIC_API_KEY`, so AI features are not enabled yet.
