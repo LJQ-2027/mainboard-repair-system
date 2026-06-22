@@ -3383,7 +3383,10 @@
 
         function getDefaultApiUrl() {
             const isHttp = window.location.protocol === 'http:' || window.location.protocol === 'https:';
-            return isHttp ? window.location.origin : 'http://localhost:8899';
+            if (!isHttp) return 'http://localhost:8899';
+            const path = window.location.pathname;
+            const basePath = path.endsWith('/') ? path.slice(0, -1) : path.replace(/\/[^/]*$/, '');
+            return `${window.location.origin}${basePath}`;
         }
 
         function getAISettings() {
