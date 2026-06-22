@@ -92,7 +92,9 @@ sleep 2
 curl -fsS "http://127.0.0.1:`$PORT/health" >/tmp/motherboard-repair-health.json
 cat /tmp/motherboard-repair-health.json
 echo
-curl -fsSI "http://127.0.0.1:`$PORT/" | head -n 1
+curl -fsS "http://127.0.0.1:`$PORT/" >/tmp/motherboard-repair-index.html
+head -c 80 /tmp/motherboard-repair-index.html
+echo
 pm2 status "`$PROCESS_NAME"
 "@
 

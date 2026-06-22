@@ -19,6 +19,7 @@ INDEX_FILE = os.environ.get("INDEX_FILE", "mainboard_repair_system_v7.4_updated.
 PORT = int(os.environ.get("PORT", "8899"))
 DENIED_STATIC_DIRS = {".git", ".local", "__pycache__", "node_modules"}
 DENIED_STATIC_EXTENSIONS = {".bat", ".env", ".pem", ".ps1", ".py", ".pyc"}
+PLACEHOLDER_API_KEYS = {"sk-ant-api03-your-key-here", "sk-your-deepseek-key-here"}
 
 # 提供商配置
 PROVIDERS = {
@@ -46,6 +47,13 @@ def detect_provider(api_key):
             return provider_id, config
     # 默认当作 DeepSeek/OpenAI 兼容
     return "deepseek", PROVIDERS["deepseek"]
+
+
+def get_configured_api_key():
+    api_key = os.environ.get("ANTHROPIC_API_KEY", "").strip()
+    if not api_key or api_key in PLACEHOLDER_API_KEYS or api_key.endswith("your-key-here"):
+        return ""
+    return api_key
 
 
 def convert_to_anthropic_sse(openai_chunk):
@@ -149,7 +157,7 @@ class ProxyHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         request_path = urlparse(self.path).path
         if request_path == "/health":
-            api_key = os.environ.get("ANTHROPIC_API_KEY", "")
+            api_key = get_configured_api_key()
             provider_id, config = detect_provider(api_key) if api_key else (None, None)
             self.send_response(200)
             self._send_cors_headers()
@@ -208,7 +216,7 @@ class ProxyHandler(BaseHTTPRequestHandler):
             self.end_headers()
             return
 
-        api_key = os.environ.get("ANTHROPIC_API_KEY", "")
+        api_key = get_configured_api_key()
         if not api_key:
             self._send_error(500, "未配置 ANTHROPIC_API_KEY 环境变量")
             return
@@ -422,7 +430,7 @@ def load_env_file(env_path=".env"):
 
 def main():
     load_env_file()
-    api_key = os.environ.get("ANTHROPIC_API_KEY", "")
+    api_key = get_configured_api_key()
     provider_id, config = detect_provider(api_key) if api_key else ("unknown", None)
 
     print("=" * 55)
