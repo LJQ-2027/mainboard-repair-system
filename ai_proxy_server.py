@@ -6,12 +6,19 @@ AI 代理服务器 - 智能主板维修系统
 """
 
 import json
+import mimetypes
 import os
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
+from urllib.parse import unquote, urlparse
 from urllib.request import Request, urlopen
 from urllib.error import URLError, HTTPError
 
-PORT = 8899
+APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+STATIC_ROOT = os.environ.get("STATIC_ROOT", APP_ROOT)
+INDEX_FILE = os.environ.get("INDEX_FILE", "mainboard_repair_system_v7.4_updated.html")
+PORT = int(os.environ.get("PORT", "8899"))
+DENIED_STATIC_DIRS = {".git", ".local", "__pycache__", "node_modules"}
+DENIED_STATIC_EXTENSIONS = {".bat", ".env", ".pem", ".ps1", ".py", ".pyc"}
 
 # 提供商配置
 PROVIDERS = {
@@ -140,7 +147,8 @@ class ProxyHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
-        if self.path == "/health":
+        request_path = urlparse(self.path).path
+        if request_path == "/health":
             api_key = os.environ.get("ANTHROPIC_API_KEY", "")
             provider_id, config = detect_provider(api_key) if api_key else (None, None)
             self.send_response(200)
@@ -157,8 +165,42 @@ class ProxyHandler(BaseHTTPRequestHandler):
             }
             self.wfile.write(json.dumps(resp).encode("utf-8"))
         else:
+            self._serve_static(request_path)
+
+    def _serve_static(self, request_path):
+        if request_path in ("", "/"):
+            request_path = "/" + INDEX_FILE
+
+        rel_path = unquote(request_path).lstrip("/")
+        rel_parts = [part for part in rel_path.replace("\\", "/").split("/") if part]
+        if any(part in DENIED_STATIC_DIRS or part.startswith(".") for part in rel_parts):
             self.send_response(404)
             self.end_headers()
+            return
+
+        target = os.path.abspath(os.path.join(STATIC_ROOT, *rel_parts))
+        static_root = os.path.abspath(STATIC_ROOT)
+        if not target.startswith(static_root + os.sep) and target != static_root:
+            self.send_response(404)
+            self.end_headers()
+            return
+
+        ext = os.path.splitext(target)[1].lower()
+        if ext in DENIED_STATIC_EXTENSIONS or not os.path.isfile(target):
+            self.send_response(404)
+            self.end_headers()
+            return
+
+        content_type = mimetypes.guess_type(target)[0] or "application/octet-stream"
+        if ext in {".html", ".js", ".css", ".json", ".md", ".txt"}:
+            content_type = content_type + "; charset=utf-8"
+
+        self.send_response(200)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Cache-Control", "no-cache")
+        self.end_headers()
+        with open(target, "rb") as f:
+            self.wfile.write(f.read())
 
     def do_POST(self):
         if self.path != "/api/chat":
@@ -361,7 +403,25 @@ class ProxyHandler(BaseHTTPRequestHandler):
         self.wfile.write(err.encode("utf-8"))
 
 
+def load_env_file(env_path=".env"):
+    env_file = os.path.join(APP_ROOT, env_path)
+    if not os.path.isfile(env_file):
+        return
+
+    with open(env_file, "r", encoding="utf-8") as f:
+        for raw_line in f:
+            line = raw_line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            key = key.strip()
+            value = value.strip().strip('"').strip("'")
+            if key and key not in os.environ:
+                os.environ[key] = value
+
+
 def main():
+    load_env_file()
     api_key = os.environ.get("ANTHROPIC_API_KEY", "")
     provider_id, config = detect_provider(api_key) if api_key else ("unknown", None)
 
@@ -384,7 +444,7 @@ def main():
     print("  按 Ctrl+C 停止服务")
     print()
 
-    server = HTTPServer(("0.0.0.0", PORT), ProxyHandler)
+    server = ThreadingHTTPServer(("0.0.0.0", PORT), ProxyHandler)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

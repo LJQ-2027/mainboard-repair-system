@@ -877,6 +877,8 @@
         .setting-actions button {
             padding: 10px 24px;
             font-size: 14px;
+            min-width: 92px;
+            white-space: nowrap;
         }
         .status-indicator {
             display: inline-flex;
@@ -1514,6 +1516,21 @@
 
             .entry-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .settings-panel {
+                width: min(92vw, 480px);
+            }
+
+            .setting-actions {
+                justify-content: stretch;
+            }
+
+            .setting-actions button {
+                flex: 1 1 0;
+                min-width: 0;
+                padding: 10px 8px;
+                font-size: 13px;
             }
         }
     </style>
@@ -3364,12 +3381,17 @@
         // =========================
         const AI_SETTINGS_KEY = 'aiSettingsV1';
 
+        function getDefaultApiUrl() {
+            const isHttp = window.location.protocol === 'http:' || window.location.protocol === 'https:';
+            return isHttp ? window.location.origin : 'http://localhost:8899';
+        }
+
         function getAISettings() {
             try {
-                const defaults = { apiUrl: 'http://localhost:8899', model: 'deepseek-chat' };
+                const defaults = { apiUrl: getDefaultApiUrl(), model: 'deepseek-chat' };
                 const saved = JSON.parse(localStorage.getItem(AI_SETTINGS_KEY) || '{}');
                 return { ...defaults, ...saved };
-            } catch (e) { return { apiUrl: 'http://localhost:8899', model: 'claude-sonnet-4-6' }; }
+            } catch (e) { return { apiUrl: getDefaultApiUrl(), model: 'claude-sonnet-4-6' }; }
         }
 
         function saveAISettings() {
