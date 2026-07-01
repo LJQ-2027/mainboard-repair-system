@@ -53,8 +53,8 @@ ANTHROPIC_API_KEY=...
 
 ## Current Deployment
 
-- Deployed on: 2026-06-22
-- Deployed commit: `fb73fcc`
+- Deployed on: 2026-07-01
+- Deployed commit: `47b4bd3`
 - Internal service: `http://127.0.0.1:3010`
 - External beta URL: `https://cccsat.top/mb-repair-beta/`
 - Health URL: `https://cccsat.top/mb-repair-beta/health`
@@ -62,3 +62,4 @@ ANTHROPIC_API_KEY=...
 - Nginx config touched: `/etc/nginx/sites-available/sikayetvar`
 - Nginx config backup: `/etc/nginx/sites-available/sikayetvar.before-mb-repair-20260622_095918`
 - Current AI status: service is reachable, but `.env` still has no valid `ANTHROPIC_API_KEY`, so AI features are not enabled yet.
+- Latest smoke check: complete; readiness dashboard, interactive SOP, and repair case template render through the external beta URL.
