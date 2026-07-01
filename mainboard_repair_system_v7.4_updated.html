@@ -1973,6 +1973,7 @@
             <div class="sidebar-secondary">
                 <div class="sidebar-group-title">规划模块</div>
                 <div class="tab-container">
+                    <button class="tab-btn" data-tab="diagnostic-workbench" onclick="switchTab('diagnostic-workbench')">诊断工作台</button>
                     <button class="tab-btn" data-tab="readiness-dashboard" onclick="switchTab('readiness-dashboard')">完整度仪表盘</button>
                     <button class="tab-btn" data-tab="model-library" onclick="switchTab('model-library')">机型资料库</button>
                     <button class="tab-btn" data-tab="fault-packages" onclick="switchTab('fault-packages')">故障包</button>
@@ -1993,10 +1994,10 @@
                     <h1>海外主板维修知识工作台</h1>
                     <p class="subtitle">沉淀机型资料、故障案例、器件点位和培训标准；AI 作为辅助层，不替代工程判断。 <span id="aiStatusInline" style="font-size:12px;color:#64748b;">AI: 按需检测</span></p>
                 </div>
-                <label class="global-search" onclick="switchTab('resources'); setTimeout(() => document.getElementById('snInput')?.focus(), 0);">
+                <label class="global-search" onclick="switchTab('diagnostic-workbench'); setTimeout(() => document.getElementById('diagnosticQueryInput')?.focus(), 0);">
                     <span style="color:#64748b;">搜索</span>
                     <input type="text" placeholder="机型 / SN / 故障 / 位号" readonly>
-                    <span class="shortcut">资料查询</span>
+                    <span class="shortcut">诊断工作台</span>
                 </label>
                 <button class="settings-gear" onclick="openSettings()" title="系统设置">系统设置</button>
             </div>
@@ -2282,6 +2283,39 @@
             <div id="aiLogSection" style="display:none; margin-top: 20px;">
                 <button class="ai-log-btn" onclick="startAILogAnalysis()" id="aiLogBtn">AI 深度解读 Log</button>
                 <div id="aiLogResult"></div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="diagnostic-workbench-tab">
+            <div class="knowledge-shell">
+                <div class="knowledge-hero">
+                    <h2>诊断工作台</h2>
+                    <p class="subtitle">输入已知信息，系统自动匹配机型、故障包、信号、SOP、案例模板和资料缺口。适合技术员从一个页面开始排查。</p>
+                    <div class="knowledge-toolbar">
+                        <input type="text" id="diagnosticQueryInput" placeholder="输入机型 / SN / 故障现象 / 故障代码 / 信号，例如 BG6m 不开机 VBAT" oninput="renderDiagnosticWorkbench()">
+                        <select id="diagnosticModelSelect" onchange="renderDiagnosticWorkbench()">
+                            <option value="">选择机型（可选）</option>
+                        </select>
+                        <select id="diagnosticFaultSelect" onchange="renderDiagnosticWorkbench()">
+                            <option value="">选择故障包（可选）</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="knowledge-stat-grid" id="diagnosticContextStats"></div>
+                <div class="dashboard-section">
+                    <div class="knowledge-card">
+                        <h3>当前诊断上下文</h3>
+                        <div id="diagnosticContextPanel" class="knowledge-list"></div>
+                    </div>
+                    <div class="knowledge-card">
+                        <h3>推荐资料与入口</h3>
+                        <div id="diagnosticActionPanel" class="knowledge-list"></div>
+                    </div>
+                    <div class="knowledge-card">
+                        <h3>相关信号 / SOP / 案例</h3>
+                        <div id="diagnosticReferencePanel" class="knowledge-list"></div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -3294,10 +3328,27 @@
                 }).join('');
             }
 
+            const diagnosticModelSelect = document.getElementById('diagnosticModelSelect');
+            if (diagnosticModelSelect) {
+                const models = knowledgeBaseState.data.modelAssets?.models || [];
+                diagnosticModelSelect.innerHTML = '<option value="">选择机型（可选）</option>' + models.map(model => {
+                    return `<option value="${escapeHtml(model.model_name)}">${escapeHtml(model.model_name)}</option>`;
+                }).join('');
+            }
+
+            const diagnosticFaultSelect = document.getElementById('diagnosticFaultSelect');
+            if (diagnosticFaultSelect) {
+                const packages = knowledgeBaseState.data.faultPackages?.packages || [];
+                diagnosticFaultSelect.innerHTML = '<option value="">选择故障包（可选）</option>' + packages.map(pack => {
+                    return `<option value="${escapeHtml(pack.package_id)}">${escapeHtml(pack.title)}</option>`;
+                }).join('');
+            }
+
             renderSignalModuleFilter();
         }
 
         function renderAllKnowledgePages() {
+            renderDiagnosticWorkbench();
             renderReadinessDashboard();
             renderModelLibrary();
             renderFaultPackages();
@@ -3677,6 +3728,96 @@
             gapListEl.innerHTML = gapItems.slice(0, 12).map(item => `
                 <div class="knowledge-row"><strong>${escapeHtml(item.blocker)}</strong><span>${escapeHtml(item.type)}</span><span>${escapeHtml(item.owner)}</span></div>
             `).join('');
+        }
+
+        function findDiagnosticModel(query, selectedModel) {
+            const models = knowledgeBaseState.data.modelAssets?.models || [];
+            if (selectedModel) return models.find(model => model.model_name === selectedModel);
+            const normalized = query.toLowerCase();
+            return models.find(model => {
+                const names = [model.model_name].concat(asArray(model.aliases)).filter(Boolean);
+                return names.some(name => normalized.includes(String(name).toLowerCase()));
+            });
+        }
+
+        function findDiagnosticFaultPackage(query, selectedPackageId, model) {
+            const packages = knowledgeBaseState.data.faultPackages?.packages || [];
+            if (selectedPackageId) return packages.find(pack => pack.package_id === selectedPackageId);
+            const normalized = query.toLowerCase();
+            const keywordMap = [
+                { id: 'FP-NO-POWER', words: ['不开机', 'no power', 'pwr01', 'power on', '开不了机'] },
+                { id: 'FP-NO-SERVICE', words: ['无服务', '无网络', 'no service', 'no network', 'cla01', '信号'] },
+                { id: 'FP-RESTART-LOGO', words: ['重启', '卡logo', '卡 logo', 'restart', 'logo', 'pwr07', 'pwr02'] },
+                { id: 'FP-NO-CHARGE', words: ['不充电', '充电', 'charging', 'chg01', '快充'] },
+                { id: 'FP-CURRENT-LEAKAGE', words: ['漏电', '待机电流', '功耗', 'current', 'leakage'] }
+            ];
+            const mapped = keywordMap.find(item => item.words.some(word => normalized.includes(word)));
+            if (mapped) return packages.find(pack => pack.package_id === mapped.id);
+            if (model?.related_faults?.length) {
+                return packages.find(pack => asArray(pack.related_models).includes(model.model_name)) || null;
+            }
+            return null;
+        }
+
+        function findDiagnosticSignals(query, pack) {
+            const entries = knowledgeBaseState.data.mtkSignals?.entries || [];
+            const tokens = query.split(/\s+/).filter(Boolean).concat(asArray(pack?.related_signal_keywords));
+            const uniqueTokens = [...new Set(tokens.map(token => token.toLowerCase()).filter(token => token.length >= 2))];
+            return entries.filter(entry => {
+                const text = [entry.signal_name, entry.module, entry.function, entry.reference_value_or_waveform].join(' ').toLowerCase();
+                return uniqueTokens.some(token => text.includes(token));
+            }).slice(0, 8);
+        }
+
+        function renderDiagnosticWorkbench() {
+            const statsEl = document.getElementById('diagnosticContextStats');
+            const contextEl = document.getElementById('diagnosticContextPanel');
+            const actionEl = document.getElementById('diagnosticActionPanel');
+            const referenceEl = document.getElementById('diagnosticReferencePanel');
+            if (!statsEl || !contextEl || !actionEl || !referenceEl) return;
+            if (!knowledgeBaseState.loaded) return;
+
+            const query = document.getElementById('diagnosticQueryInput')?.value.trim() || '';
+            const selectedModel = document.getElementById('diagnosticModelSelect')?.value || '';
+            const selectedPackageId = document.getElementById('diagnosticFaultSelect')?.value || '';
+            const model = findDiagnosticModel(query, selectedModel);
+            const pack = findDiagnosticFaultPackage(query, selectedPackageId, model);
+            const modelReadiness = model ? calculateModelReadiness(model, knowledgeBaseState.data.modelAssets) : null;
+            const packageReadiness = pack ? calculatePackageReadiness(pack, knowledgeBaseState.data.faultPackages) : null;
+            const signals = findDiagnosticSignals(query, pack);
+            const sops = knowledgeBaseState.data.sopDrafts || [];
+            const interactive = knowledgeBaseState.data.interactiveSops?.prototypes || [];
+            const gaps = [];
+            if (modelReadiness) asArray(modelReadiness.blockers).slice(0, 4).forEach(item => gaps.push(`机型缺口：${item}`));
+            if (packageReadiness) asArray(packageReadiness.blockers).slice(0, 4).forEach(item => gaps.push(`故障包缺口：${item}`));
+
+            statsEl.innerHTML = `
+                <div class="knowledge-stat"><strong>${model ? model.model_name : '-'}</strong><span>匹配机型</span></div>
+                <div class="knowledge-stat"><strong>${pack ? pack.priority : '-'}</strong><span>故障优先级</span></div>
+                <div class="knowledge-stat"><strong>${modelReadiness ? `${modelReadiness.score}%` : '-'}</strong><span>机型完整度</span></div>
+                <div class="knowledge-stat"><strong>${packageReadiness ? `${packageReadiness.score}%` : '-'}</strong><span>故障包完整度</span></div>
+            `;
+
+            contextEl.innerHTML = `
+                <div class="knowledge-row"><strong>输入内容</strong><span>${escapeHtml(query || '未输入')}</span><span>${query ? '已分析' : '可输入机型、故障、信号'}</span></div>
+                <div class="knowledge-row"><strong>机型</strong><span>${escapeHtml(model?.model_name || '未匹配')}</span><span>${escapeHtml(model?.next_action || '可通过下拉选择机型')}</span></div>
+                <div class="knowledge-row"><strong>故障包</strong><span>${escapeHtml(pack?.title || '未匹配')}</span><span>${escapeHtml(pack?.next_action || '可输入故障现象或选择故障包')}</span></div>
+                <div class="knowledge-row"><strong>推荐模块</strong><span>${escapeHtml(asArray(pack?.related_modules).join(' / ') || asArray(model?.related_modules).join(' / ') || '待匹配')}</span><span>用于决定先查哪块电路</span></div>
+            `;
+
+            actionEl.innerHTML = `
+                <div class="knowledge-row"><strong>查看机型资料</strong><span>${escapeHtml(model ? `${model.model_name} 主板图、点位图、完整度` : '先选择或输入机型')}</span><span><button class="model-detail-btn" onclick="switchTab('model-library')">跳转</button></span></div>
+                <div class="knowledge-row"><strong>查看故障包</strong><span>${escapeHtml(pack ? pack.title : '先选择或输入故障现象')}</span><span><button class="model-detail-btn" onclick="switchTab('fault-packages')">跳转</button></span></div>
+                <div class="knowledge-row"><strong>进入交互式 SOP</strong><span>${escapeHtml(interactive[0]?.title || '暂无 SOP 原型')}</span><span><button class="model-detail-btn" onclick="switchTab('interactive-sop')">跳转</button></span></div>
+                <div class="knowledge-row"><strong>记录维修案例</strong><span>按模板沉淀测量值、维修动作和验证结果</span><span><button class="model-detail-btn" onclick="switchTab('case-template')">跳转</button></span></div>
+                <div class="knowledge-row"><strong>当前缺口</strong><span>${escapeHtml(gaps.slice(0, 5).join(' / ') || '暂无匹配缺口')}</span><span><button class="model-detail-btn" onclick="switchTab('readiness-dashboard')">看仪表盘</button></span></div>
+            `;
+
+            referenceEl.innerHTML = `
+                <div class="knowledge-row"><strong>相关信号</strong><span>${escapeHtml(signals.map(item => `${item.signal_name}(${item.reference_value_or_waveform || '无参考值'})`).join(' / ') || '暂无匹配信号')}</span><span><button class="model-detail-btn" onclick="switchTab('mtk-signals')">查信号</button></span></div>
+                <div class="knowledge-row"><strong>SOP 草案</strong><span>${escapeHtml(sops.map(item => item.title).join(' / ') || '暂无 SOP 草案')}</span><span><button class="model-detail-btn" onclick="switchTab('sop-drafts')">查看</button></span></div>
+                <div class="knowledge-row"><strong>L4 依据</strong><span>${escapeHtml(asArray(pack?.l4_evidence).map(item => `${item.metric} ${item.count}`).join(' / ') || '暂无匹配 L4 依据')}</span><span><button class="model-detail-btn" onclick="switchTab('l4-insights')">看报告</button></span></div>
+            `;
         }
 
         function renderCaseTemplate() {
