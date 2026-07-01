@@ -206,5 +206,70 @@
     "source_ids": [
       "SRC-20260622-001"
     ]
+  },
+  {
+    "request_id": "GAP-20260701-001",
+    "related_model": [],
+    "related_fault": [
+      "不开机",
+      "不充电",
+      "Memory Failure",
+      "PMU Failure",
+      "无服务",
+      "显示异常",
+      "触摸异常",
+      "摄像头异常"
+    ],
+    "gap_type": "MTK 手册到售后 SOP 转译",
+    "description": "制造中心提供的 MTK 手机维修通用操作指导书已经覆盖大量模块原理和故障分析处理流程，但当前仍是工程手册形态，需要转译为海外维修员可执行的步骤、输入项、判断条件和升级边界。",
+    "provider": "制造中心 / 技术支持 / 中方技术人员",
+    "priority": "高",
+    "status": "待转译",
+    "next_action": "优先选择不开机、不充电、Memory Failure、PMU Failure、无服务等高频故障，拆成第一批交互式 SOP 草案。",
+    "source_ids": [
+      "SRC-20260701-001"
+    ]
+  },
+  {
+    "request_id": "GAP-20260701-002",
+    "related_model": [],
+    "related_fault": [],
+    "gap_type": "手册图片与电路图结构化",
+    "description": "该手册包含 58 张图片，含主板元器件位置图、电路图、流程图或波形图。当前已保存原始 Word，但图片内容尚未结构化，页面也还无法按模块检索图片。",
+    "provider": "制造中心 / 资料整理人",
+    "priority": "高",
+    "status": "待补充",
+    "next_action": "抽取手册图片并按章节命名，优先结构化主板元器件位置图、开机/充电/Memory/射频/显示相关图片。",
+    "source_ids": [
+      "SRC-20260701-001"
+    ]
+  },
+  {
+    "request_id": "GAP-20260701-003",
+    "related_model": [
+      "BG6m",
+      "KM4",
+      "KL4",
+      "CM6",
+      "KL5",
+      "KM5",
+      "C671L"
+    ],
+    "related_fault": [
+      "420-Memory Failure",
+      "400-CPU Failure",
+      "410-PMU Failure",
+      "430-RF IC Failure"
+    ],
+    "gap_type": "MTK 手册与 L4 维修报告映射",
+    "description": "CI L4 维修报告中的高频故障代码需要与 MTK 手册中的模块、信号和故障流程建立映射，例如 Memory Failure 对应 UFS/LPDDR，PMU Failure 对应开机电源管理和各路供电。",
+    "provider": "技术支持 / L4 负责人 / 制造中心维修工程师",
+    "priority": "高",
+    "status": "待补充",
+    "next_action": "建立故障代码到手册章节、关键测试信号、常见维修动作的映射表，用于页面按故障代码检索。",
+    "source_ids": [
+      "SRC-20260701-001",
+      "SRC-20260622-001"
+    ]
   }
 ]

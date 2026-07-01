@@ -350,5 +350,93 @@
     ],
     "processing_status": "已完成脱敏汇总入库，未入库原始明细",
     "notes": "该报告适合用于确定第一阶段优先机型和优先故障，不应直接当作诊断 SOP 使用。"
+  },
+  {
+    "source_id": "SRC-20260701-001",
+    "file_name": "手机维修通用操作指导书.docx",
+    "original_path": "D:/Feishu/手机维修通用操作指导书.docx",
+    "stored_path": "source-materials/manufacturing-center/2026-07-01_MTK_手机维修通用操作指导书.docx",
+    "file_type": "Word",
+    "received_date": "2026-07-01",
+    "main_category": "平台维修手册库",
+    "secondary_categories": [
+      "培训资料库",
+      "模块原理库",
+      "诊断SOP库",
+      "器件与点位库",
+      "故障知识库"
+    ],
+    "related_models": [],
+    "related_platforms": [
+      "MTK"
+    ],
+    "related_faults": [
+      "不开机",
+      "不充电",
+      "快充异常",
+      "Memory Failure",
+      "CPU Failure",
+      "PMU Failure",
+      "无服务",
+      "GPS异常",
+      "WIFI异常",
+      "显示异常",
+      "触摸异常",
+      "摄像头异常",
+      "SIM卡异常",
+      "USB异常",
+      "音频异常",
+      "指纹异常"
+    ],
+    "related_components": [
+      "MTK CPU",
+      "PMU",
+      "Charge IC",
+      "Charge Pump",
+      "UFS",
+      "LPDDR",
+      "RF Transceiver",
+      "WCN",
+      "LCD/AMOLED",
+      "TP",
+      "Camera",
+      "Sensor",
+      "SIM",
+      "USB Type-C",
+      "Audio"
+    ],
+    "related_tools": [
+      "直流稳压电源",
+      "频谱仪",
+      "WBG工位",
+      "万用表",
+      "示波器"
+    ],
+    "summary": "制造中心提供的 MTK 平台手机维修通用操作指导书，版本 V1.0。内容包含产品简介、主板/副板元器件位置图、手机原理、开机电源、充电、时钟、Memory、射频、显示、触摸、摄像头、传感器、按键、音频、SIM、USB、BT、FM、NFC、指纹和红外等模块的原理说明、故障分析处理流程和信号汇总。",
+    "extractable_items": [
+      "MTK 平台维修手册章节结构",
+      "开机故障电流分型",
+      "充电与快充故障分析基础",
+      "Memory / UFS / LPDDR 信号说明",
+      "射频接收/发射/GPS/WIFI 通路说明",
+      "显示、触摸、摄像头、传感器、音频、SIM、USB 等外围电路故障处理流程",
+      "138 条信号名称、功能说明和测试参考值"
+    ],
+    "missing_fields": [
+      "图片、电路图、流程图和波形图的结构化解析",
+      "各故障流程对应的标准操作步骤和判定条件",
+      "适用机型范围和不适用边界",
+      "修后验证标准",
+      "与 L4 工单故障代码的正式映射关系"
+    ],
+    "target_knowledge_base": [
+      "platform-repair-manuals",
+      "mtk-signal-reference",
+      "module-principles",
+      "sop-drafts",
+      "gap-requests"
+    ],
+    "processing_status": "已保存原始文件并完成第一版结构化入库",
+    "notes": "这是当前项目最重要的平台级维修资料之一。正式给海外维修员使用前，需要继续完成流程转译、图片结构化和工程确认。"
   }
 ]

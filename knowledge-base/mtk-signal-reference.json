@@ -1,0 +1,1392 @@
+{
+  "library_id": "MTK-SIGNAL-REF-20260701",
+  "title": "MTK平台主板维修信号参考库",
+  "source_ids": [
+    "SRC-20260701-001"
+  ],
+  "source_file": "2026-07-01_MTK_手机维修通用操作指导书.docx",
+  "entry_count": 138,
+  "notes": "由手册中的信号汇总表抽取，适合后续接入器件点位/测试值查询；图片、波形图和电路图未在本文件中结构化。",
+  "entries": [
+    {
+      "signal_id": "MTK-SIG-20260701-001",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "开机电源管理电路",
+      "signal_name": "VBAT",
+      "function": "电池电压",
+      "reference_value_or_waveform": "3.4V-4.35V",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-002",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "开机电源管理电路",
+      "signal_name": "VCORE",
+      "function": "芯片核心电压",
+      "reference_value_or_waveform": "1.1V",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-003",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "开机电源管理电路",
+      "signal_name": "VPROC",
+      "function": "处理器电压",
+      "reference_value_or_waveform": "1.15V",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-004",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "开机电源管理电路",
+      "signal_name": "VDD18",
+      "function": "IO电压",
+      "reference_value_or_waveform": "1.8V",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-005",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "充电管理电路",
+      "signal_name": "VBUS/VBUS_OVP",
+      "function": "充电电源输入/VBUS经过OVP防护管电压",
+      "reference_value_or_waveform": "5V~9V",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-006",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "充电管理电路",
+      "signal_name": "VSYS",
+      "function": "手机系统供电",
+      "reference_value_or_waveform": "电池电压",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-007",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "充电管理电路",
+      "signal_name": "VBAT_2/BATADC_P/VBATS",
+      "function": "电池正极/电池正极电压采样（电量计）/电池正极侦测",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-008",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "充电管理电路",
+      "signal_name": "SCL6/SDA6;SCL0/SDA0",
+      "function": "主电荷泵/辅电荷泵和CPU I2C通讯信号",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-009",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "充电管理电路",
+      "signal_name": "EINT19_HVDC",
+      "function": "快充电中断信号",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-010",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "充电管理电路",
+      "signal_name": "HL7139_DM/DP",
+      "function": "主电荷泵快充协议通讯信号",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-011",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "充电管理电路",
+      "signal_name": "BATS+/BATS-",
+      "function": "电池电芯电压采样信号正/负",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-012",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "充电管理电路",
+      "signal_name": "VBAT",
+      "function": "电池正极（电池辅BTB）",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-013",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "充电管理电路",
+      "signal_name": "CS_N/CS_P",
+      "function": "电流采样信号",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-014",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "充电管理电路",
+      "signal_name": "BATON",
+      "function": "电池温度采样信号",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-015",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "充电管理电路",
+      "signal_name": "AUX_BAT",
+      "function": "电池ID脚",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-016",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "Memory电路",
+      "signal_name": "VUFS_PMU",
+      "function": "Power Supply for Flash",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-017",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "Memory电路",
+      "signal_name": "PMIC_CLK_EXT",
+      "function": "UFS时钟信号",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-018",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "Memory电路",
+      "signal_name": "UFS_TX0_P/N",
+      "function": "UFS差分输入信号",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-019",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "Memory电路",
+      "signal_name": "UFS_RST_N",
+      "function": "UFS复位信号",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-020",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "Memory电路",
+      "signal_name": "UFS_RX0_RXP/N",
+      "function": "UFS差分输出信号",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-021",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "WIFI通道",
+      "signal_name": "WB_SDATA",
+      "function": "WIFI/BT数据信号",
+      "reference_value_or_waveform": "/",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-022",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "WIFI通道",
+      "signal_name": "WB_SCLK",
+      "function": "WIFI/BT数据传输CLK信号",
+      "reference_value_or_waveform": "/",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-023",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "WIFI通道",
+      "signal_name": "WB_CTRL0~ WB_CTRL5",
+      "function": "WIFI/BT控制信号",
+      "reference_value_or_waveform": "/",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-024",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "WIFI通道",
+      "signal_name": "CLK_IN_WCN",
+      "function": "时钟信号",
+      "reference_value_or_waveform": "/",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-025",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "WIFI通道",
+      "signal_name": "WIFI_5G_0",
+      "function": "WIFI 5G MIMIO1(多输入多输出)",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-026",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "WIFI通道",
+      "signal_name": "WIFI_5G_1",
+      "function": "WIFI 5G MIMIO2(多输入多输出)",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-027",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "WIFI通道",
+      "signal_name": "WIFI_2.4G_0",
+      "function": "WIFI 2.4G MIMO1(多输入多输出)",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-028",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "WIFI通道",
+      "signal_name": "WIFI_2.4G_1",
+      "function": "WIFI 2.4G MIMO2(多输入多输出)",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-029",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "显示",
+      "signal_name": "DSI0_D0/1/2/3P",
+      "function": "发送高速数据差分信号",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-030",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "显示",
+      "signal_name": "DSI0_D0/1/2/3N",
+      "function": "发送高速数据差分信号",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-031",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "显示",
+      "signal_name": "CP_GPIO3_CTP_RSTB",
+      "function": "触摸复位信号",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-032",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "显示",
+      "signal_name": "SCL0",
+      "function": "系统时钟信号",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-033",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "显示",
+      "signal_name": "SDA0",
+      "function": "系统数据信号",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-034",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "显示",
+      "signal_name": "AVDD_AMOLED",
+      "function": "显示屏模拟电路部分供电",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-035",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "显示",
+      "signal_name": "LCM_RST",
+      "function": "显示复位信号",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-036",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "显示",
+      "signal_name": "DSI_TE",
+      "function": "显示撕裂信号，显示屏用于和CPU进行帧的收发完成判定，防止画面有撕裂效应",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-037",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "显示",
+      "signal_name": "AUX_IN3_LCM",
+      "function": "显示屏ID信号",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-038",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "显示",
+      "signal_name": "ELVDD",
+      "function": "显示供电",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-039",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "显示",
+      "signal_name": "ELVSS",
+      "function": "显示供电",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-040",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "显示",
+      "signal_name": "VIO18_PMU",
+      "function": "显示屏IO脚供电",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-041",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "显示",
+      "signal_name": "SWIRE",
+      "function": "单线通讯信号控制模拟部分供电",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-042",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "触摸屏",
+      "signal_name": "SPI0_M0/MI/CLK/CSB",
+      "function": "TP控制信号",
+      "reference_value_or_waveform": "SPI通讯信号",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-043",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "触摸屏",
+      "signal_name": "VTP_PMU",
+      "function": "TP控制器电源",
+      "reference_value_or_waveform": "3.3V",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-044",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "触摸屏",
+      "signal_name": "EINT5_CTP",
+      "function": "TP控制器中断信号",
+      "reference_value_or_waveform": "低脉冲信号",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-045",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "触摸屏",
+      "signal_name": "CTP_RST",
+      "function": "TP控制器复位信号",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-046",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "前置摄像头",
+      "signal_name": "VCAMA_EXT1",
+      "function": "摄像头模拟电源",
+      "reference_value_or_waveform": "2.8V",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-047",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "前置摄像头",
+      "signal_name": "VCAMD_EXT1",
+      "function": "摄像头数字电源",
+      "reference_value_or_waveform": "1.1V",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-048",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "前置摄像头",
+      "signal_name": "VCAM18_PMU",
+      "function": "摄像头数字电源",
+      "reference_value_or_waveform": "1.8V",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-049",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "前置摄像头",
+      "signal_name": "VCAM_VDDAF1",
+      "function": "摄像头马达数字电源",
+      "reference_value_or_waveform": "2.8V",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-050",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "前置摄像头",
+      "signal_name": "VSYNC",
+      "function": "摄像头模组之间同步信号",
+      "reference_value_or_waveform": "/",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-051",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "前置摄像头",
+      "signal_name": "CAM_RST1",
+      "function": "摄像头模组复位信号",
+      "reference_value_or_waveform": "/",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-052",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "前置摄像头",
+      "signal_name": "CAM_CLK1",
+      "function": "系统给摄像头模组的基准时钟",
+      "reference_value_or_waveform": "数字脉冲信号",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-053",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "前置摄像头",
+      "signal_name": "SCL1",
+      "function": "摄像头I2C信号，用于传输控制和配置类数据",
+      "reference_value_or_waveform": "数字脉冲信号",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-054",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "前置摄像头",
+      "signal_name": "SDA1",
+      "function": "摄像头I2C信号，用于传输控制和配置类数据",
+      "reference_value_or_waveform": "数字脉冲信号",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-055",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "前置摄像头",
+      "signal_name": "CSIO_RDN/P(0/1/2/3) / CSIO_RCN/P",
+      "function": "摄像头MIPI差分数据信号",
+      "reference_value_or_waveform": "差分数据信号",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-056",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "后置摄像头",
+      "signal_name": "VCAMD_EXT1",
+      "function": "主摄像头数字电源",
+      "reference_value_or_waveform": "0.92V",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-057",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "后置摄像头",
+      "signal_name": "VCAM_OIS_VDD1",
+      "function": "潜望摄像头防抖数字电源",
+      "reference_value_or_waveform": "3.3V",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-058",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "后置摄像头",
+      "signal_name": "VCAM_OIS_VDD0",
+      "function": "主摄像头防抖数字电源",
+      "reference_value_or_waveform": "3.3V",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-059",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "后置摄像头",
+      "signal_name": "VCAM_VDDAF0",
+      "function": "摄像头对焦马达电源",
+      "reference_value_or_waveform": "3.3V",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-060",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "后置摄像头",
+      "signal_name": "CAM_CLK0",
+      "function": "系统给主摄像头模组的基准时钟",
+      "reference_value_or_waveform": "数字脉冲信号",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-061",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "后置摄像头",
+      "signal_name": "CSI1_T2A/B/C",
+      "function": "MIPI时钟信号",
+      "reference_value_or_waveform": "高速数字脉冲信号",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-062",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "后置摄像头",
+      "signal_name": "CSI1_T1A/B/C",
+      "function": "MIPI时钟信号",
+      "reference_value_or_waveform": "高速数字脉冲信号",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-063",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "后置摄像头",
+      "signal_name": "CSI1_T0A/B/C",
+      "function": "MIPI数据信号",
+      "reference_value_or_waveform": "高速数字脉冲信号",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-064",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "后置摄像头",
+      "signal_name": "VSYNC",
+      "function": "摄像头之间同步信号",
+      "reference_value_or_waveform": "/",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-065",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "后置摄像头",
+      "signal_name": "SCL9",
+      "function": "I2C控制信号",
+      "reference_value_or_waveform": "数字脉冲信号",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-066",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "后置摄像头",
+      "signal_name": "SDA9",
+      "function": "I2C控制信号",
+      "reference_value_or_waveform": "数字脉冲信号",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-067",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "后置摄像头",
+      "signal_name": "CAM_RST0",
+      "function": "摄像头模组初始化信号",
+      "reference_value_or_waveform": "低电平有效，正常工作时为高电平",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-068",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "后置摄像头",
+      "signal_name": "OISEN",
+      "function": "摄像头防抖使能信号",
+      "reference_value_or_waveform": "默认为低电平，对焦时为高电平",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-069",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "重力传感器",
+      "signal_name": "VIO18_PMU",
+      "function": "传感器供电电源",
+      "reference_value_or_waveform": "1.8V",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-070",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "重力传感器",
+      "signal_name": "SCP_EINT_A/GYRO1",
+      "function": "加速度传感器中断请求信号",
+      "reference_value_or_waveform": "低电平有效，无传输时为高电平",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-071",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "重力传感器",
+      "signal_name": "SPI2_CLK",
+      "function": "SPI信号_时钟",
+      "reference_value_or_waveform": "高低脉冲",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-072",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "重力传感器",
+      "signal_name": "SPI2_MO",
+      "function": "SPI信号_主输出从输入",
+      "reference_value_or_waveform": "高低脉冲",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-073",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "重力传感器",
+      "signal_name": "SPI2_MI",
+      "function": "SPI信号_主输入从输出",
+      "reference_value_or_waveform": "高低脉冲",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-074",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "重力传感器",
+      "signal_name": "SPI2_CSB",
+      "function": "SPI信号_片选",
+      "reference_value_or_waveform": "高低脉冲",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-075",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "重力传感器",
+      "signal_name": "SCP_OIS_SPI_MOSI",
+      "function": "防抖SPI信号_主输出从输入",
+      "reference_value_or_waveform": "高低脉冲",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-076",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "重力传感器",
+      "signal_name": "SCP_OIS_SPI_MISO",
+      "function": "防抖SPI信号_主输入从输出",
+      "reference_value_or_waveform": "高低脉冲",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-077",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "重力传感器",
+      "signal_name": "SCP_OIS_SPI_CS",
+      "function": "防抖SPI信号_片选",
+      "reference_value_or_waveform": "高低脉冲",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-078",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "重力传感器",
+      "signal_name": "SCP_OIS_SPI_CLK",
+      "function": "防抖SPI信号_时钟",
+      "reference_value_or_waveform": "高低脉冲",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-079",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "电子指南针",
+      "signal_name": "VIO18_PMU",
+      "function": "传感器电源",
+      "reference_value_or_waveform": "1.8V",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-080",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "电子指南针",
+      "signal_name": "SCP_SDA0",
+      "function": "I2C数据信号，用于读取加速度信息",
+      "reference_value_or_waveform": "高低脉冲",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-081",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "电子指南针",
+      "signal_name": "SCP_SCL0",
+      "function": "I2C时钟信号，用于读取加速度信息",
+      "reference_value_or_waveform": "高低脉冲",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-082",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "光距感传感器",
+      "signal_name": "VIO18_PMU",
+      "function": "传感器电源",
+      "reference_value_or_waveform": "1.8V",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-083",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "光距感传感器",
+      "signal_name": "EINT_ALPS",
+      "function": "光传感器中断请求信号",
+      "reference_value_or_waveform": "低电平有效，无传输时为高电平",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-084",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "光距感传感器",
+      "signal_name": "DSI_TE_IN",
+      "function": "监测屏幕帧率，在屏幕刷新的间隙做光感检测",
+      "reference_value_or_waveform": "高低脉冲",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-085",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "光距感传感器",
+      "signal_name": "RST_ALSPS",
+      "function": "光感初始化信号",
+      "reference_value_or_waveform": "低电平有效，正常工作时为高电平",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-086",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "光距感传感器",
+      "signal_name": "SCP_SCL0",
+      "function": "I2C信号，用于读取光照强度信息",
+      "reference_value_or_waveform": "高低脉冲",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-087",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "光距感传感器",
+      "signal_name": "SCP_SDA0",
+      "function": "I2C信号，用于读取光照强度信息",
+      "reference_value_or_waveform": "高低脉冲",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-088",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "按键",
+      "signal_name": "PWRKEY",
+      "function": "开机和关机",
+      "reference_value_or_waveform": "默认为高电平，按下为低电平",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-089",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "按键",
+      "signal_name": "KCOL1",
+      "function": "音量增大",
+      "reference_value_or_waveform": "默认为高电平，按下为低电平",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-090",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "按键",
+      "signal_name": "KCOL0",
+      "function": "音量减小",
+      "reference_value_or_waveform": "默认为高电平，按下为低电平",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-091",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "马达",
+      "signal_name": "VSYS",
+      "function": "马达电源驱动信号",
+      "reference_value_or_waveform": "1.8V",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-092",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "马达",
+      "signal_name": "SCL7",
+      "function": "马达I2C时钟控制信号",
+      "reference_value_or_waveform": "高低脉冲",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-093",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "马达",
+      "signal_name": "SDA7",
+      "function": "马达I2C数据控制信号",
+      "reference_value_or_waveform": "高低脉冲",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-094",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "马达",
+      "signal_name": "VIB_N",
+      "function": "马达差分信号",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-095",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "马达",
+      "signal_name": "VIB_P",
+      "function": "马达差分信号",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-096",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "马达",
+      "signal_name": "GPIO191 VIB_TRI",
+      "function": "马达信号触发信号",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-097",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "马达",
+      "signal_name": "EINT15_VIB",
+      "function": "马达中断信号",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-098",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "马达",
+      "signal_name": "GPIO192_VIB_RSTB",
+      "function": "马达复位信号",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-099",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "受话器",
+      "signal_name": "SPKP_T",
+      "function": "听筒差分输入正极",
+      "reference_value_or_waveform": "模拟差分信号",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-100",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "受话器",
+      "signal_name": "SPKN_T",
+      "function": "听筒差分输入负极",
+      "reference_value_or_waveform": "模拟差分信号",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-101",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "受话器",
+      "signal_name": "I2S3_LRCK",
+      "function": "帧时钟信号",
+      "reference_value_or_waveform": "高低脉冲",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-102",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "受话器",
+      "signal_name": "I2S3_BCK",
+      "function": "位时钟信号",
+      "reference_value_or_waveform": "高低脉冲",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-103",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "受话器",
+      "signal_name": "I2S0_DI",
+      "function": "输入信号",
+      "reference_value_or_waveform": "高低脉冲",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-104",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "受话器",
+      "signal_name": "I2S3_DO",
+      "function": "输出信号",
+      "reference_value_or_waveform": "高低脉冲",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-105",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "送话器",
+      "signal_name": "MICBIAS0",
+      "function": "MIC供电电源",
+      "reference_value_or_waveform": "1.4V",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-106",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "送话器",
+      "signal_name": "AU_VIN0_P",
+      "function": "主MIC差分信号输入正端",
+      "reference_value_or_waveform": "模拟差分信号",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-107",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "送话器",
+      "signal_name": "AU_VIN0_N",
+      "function": "主MIC差分信号输入负端",
+      "reference_value_or_waveform": "模拟差分信号",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-108",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "送话器",
+      "signal_name": "AU_VIN2_P",
+      "function": "副MIC差分信号输入正端",
+      "reference_value_or_waveform": "模拟差分信号",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-109",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "送话器",
+      "signal_name": "AU_VIN2_N",
+      "function": "副MIC差分信号输入负端",
+      "reference_value_or_waveform": "模拟差分信号",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-110",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "扬声器",
+      "signal_name": "SPKP_B",
+      "function": "扬声器差分信号正极输入",
+      "reference_value_or_waveform": "PWM信号",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-111",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "扬声器",
+      "signal_name": "SPKN_B",
+      "function": "扬声器差分信号负极输入",
+      "reference_value_or_waveform": "PWM信号",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-112",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "耳机",
+      "signal_name": "USB_CC1/USB_CC1",
+      "function": "耳机侦测信号",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-113",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "耳机",
+      "signal_name": "USB_DM_IO",
+      "function": "左声道信号",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-114",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "耳机",
+      "signal_name": "SBU1_C/SBU2_C",
+      "function": "模拟麦克风信号/音频接地",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-115",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "耳机",
+      "signal_name": "USB_DP_IO",
+      "function": "右声道信号",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-116",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "耳机",
+      "signal_name": "GND",
+      "function": "数字接地",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-117",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "SIM卡",
+      "signal_name": "SCLK",
+      "function": "时钟信号",
+      "reference_value_or_waveform": "/",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-118",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "SIM卡",
+      "signal_name": "SRST",
+      "function": "复位信号",
+      "reference_value_or_waveform": "/",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-119",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "SIM卡",
+      "signal_name": "VSIM_PMU",
+      "function": "电压信号",
+      "reference_value_or_waveform": "正常识别到卡的话，电压为3.0V",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-120",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "SIM卡",
+      "signal_name": "SIO",
+      "function": "数据信号",
+      "reference_value_or_waveform": "/",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-121",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "SIM卡",
+      "signal_name": "INT_SIM",
+      "function": "插入中断信号",
+      "reference_value_or_waveform": "/",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-122",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "BT",
+      "signal_name": "WIFI 2.4G MIMO1",
+      "function": "WIFI/BT数据信号",
+      "reference_value_or_waveform": "/",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-123",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "BT",
+      "signal_name": "BT_IP/N,BT_QP/N",
+      "function": "BT IQ传输信号",
+      "reference_value_or_waveform": "/",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-124",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "BT",
+      "signal_name": "CONN_BT_CLK",
+      "function": "BT时钟控制信号",
+      "reference_value_or_waveform": "/",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-125",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "BT",
+      "signal_name": "CONN_BT_DATA",
+      "function": "BT数据信号",
+      "reference_value_or_waveform": "/",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-126",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "FM",
+      "signal_name": "FM_ANT_P",
+      "function": "FM 差分输入信号正极",
+      "reference_value_or_waveform": "/",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-127",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "FM",
+      "signal_name": "FM_ANT_N",
+      "function": "FM差分输入信号负极",
+      "reference_value_or_waveform": "/",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-128",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "FM",
+      "signal_name": "AVDD15_GPS_FM",
+      "function": "FM和GPS共用供电",
+      "reference_value_or_waveform": "/",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-129",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "NFC",
+      "signal_name": "VDD_UP",
+      "function": "芯片工作电压",
+      "reference_value_or_waveform": "/",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-130",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "NFC",
+      "signal_name": "NFC_CLK_XTAK",
+      "function": "系统时钟",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-131",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "NFC",
+      "signal_name": "VIO18_PMU",
+      "function": "芯片工作电压",
+      "reference_value_or_waveform": "/",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-132",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "NFC",
+      "signal_name": "XTAL1/L2",
+      "function": "独立时钟",
+      "reference_value_or_waveform": "/",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-133",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "NFC",
+      "signal_name": "GPIO44_NFC_RST",
+      "function": "复位信号",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-134",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "指纹",
+      "signal_name": "GPIO53_FPS_RST",
+      "function": "指纹复位信号",
+      "reference_value_or_waveform": "/",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-135",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "指纹",
+      "signal_name": "VFP_PMU",
+      "function": "指纹器件供电信号",
+      "reference_value_or_waveform": "",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-136",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "指纹",
+      "signal_name": "SCP_SPI3_MO/MI",
+      "function": "SPI通信数据输入输出",
+      "reference_value_or_waveform": "高低脉冲信号",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-137",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "指纹",
+      "signal_name": "SCP_SPI3_CLK",
+      "function": "SPI通信时钟信号",
+      "reference_value_or_waveform": "高低脉冲信号",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    },
+    {
+      "signal_id": "MTK-SIG-20260701-138",
+      "source_id": "SRC-20260701-001",
+      "platform": "MTK",
+      "module": "指纹",
+      "signal_name": "SCP_SPI3_CSB",
+      "function": "SPI通信片选信号",
+      "reference_value_or_waveform": "高低脉冲信号",
+      "status": "从制造中心通用维修手册表格抽取，待工程确认后用于正式点位查询"
+    }
+  ]
+}
