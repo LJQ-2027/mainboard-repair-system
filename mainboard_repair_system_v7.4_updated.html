@@ -1858,6 +1858,7 @@
                 <div class="sidebar-group-title">规划模块</div>
                 <div class="tab-container">
                     <button class="tab-btn" data-tab="model-library" onclick="switchTab('model-library')">机型资料库</button>
+                    <button class="tab-btn" data-tab="fault-packages" onclick="switchTab('fault-packages')">故障包</button>
                     <button class="tab-btn" data-tab="source-overview" onclick="switchTab('source-overview')">资料总览</button>
                     <button class="tab-btn" data-tab="mtk-signals" onclick="switchTab('mtk-signals')">MTK 信号查询</button>
                     <button class="tab-btn" data-tab="l4-insights" onclick="switchTab('l4-insights')">L4 报告洞察</button>
@@ -2199,6 +2200,25 @@
                 <div class="knowledge-stat-grid" id="sourceStats"></div>
                 <div class="knowledge-grid" id="sourceOverviewList">
                     <div class="knowledge-state">正在加载资料总览...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="fault-packages-tab">
+            <div class="knowledge-shell">
+                <div class="knowledge-hero">
+                    <h2>故障包</h2>
+                    <p class="subtitle">按高频故障组织资料建设：现象定义、诊断 SOP、测试点、主板图、案例、维修边界和工程确认。这里用来决定下一批资料和 SOP 怎么补。</p>
+                    <div class="knowledge-toolbar">
+                        <input type="text" id="faultPackageSearchInput" placeholder="搜索故障包 / 模块 / 机型，例如 不开机、RF、BG6m" oninput="renderFaultPackages()">
+                        <select id="faultPackagePriorityFilter" onchange="renderFaultPackages()">
+                            <option value="">全部优先级</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="knowledge-stat-grid" id="faultPackageStats"></div>
+                <div class="knowledge-grid" id="faultPackageList">
+                    <div class="knowledge-state">正在加载故障包...</div>
                 </div>
             </div>
         </div>
@@ -2975,6 +2995,7 @@
             activeSignalModule: '',
             data: {
                 sources: [],
+                faultPackages: null,
                 trainingMaterials: [],
                 manuals: [],
                 modelAssets: null,
@@ -2987,6 +3008,7 @@
 
         const KNOWLEDGE_FILES = {
             sources: 'knowledge-base/source-records.json',
+            faultPackages: 'knowledge-base/fault-packages.json',
             trainingMaterials: 'knowledge-base/training-materials.json',
             manuals: 'knowledge-base/platform-repair-manuals.json',
             modelAssets: 'knowledge-base/model-board-assets.json',
@@ -3089,11 +3111,20 @@
                 }).join('');
             }
 
+            const faultPackagePriorityFilter = document.getElementById('faultPackagePriorityFilter');
+            if (faultPackagePriorityFilter) {
+                const priorities = [...new Set((knowledgeBaseState.data.faultPackages?.packages || []).map(item => item.priority).filter(Boolean))].sort();
+                faultPackagePriorityFilter.innerHTML = '<option value="">全部优先级</option>' + priorities.map(priority => {
+                    return `<option value="${escapeHtml(priority)}">${escapeHtml(priority)}</option>`;
+                }).join('');
+            }
+
             renderSignalModuleFilter();
         }
 
         function renderAllKnowledgePages() {
             renderModelLibrary();
+            renderFaultPackages();
             renderSourceOverview();
             renderMtkSignals();
             renderL4Insights();
@@ -3261,6 +3292,122 @@
                         <div class="material-checklist">${renderMaterialChecklist(model, library)}</div>
                         <p><strong>维修边界：</strong>${escapeHtml(model.repair_boundary?.note || '待确认')}</p>
                         <p><strong>工程确认：</strong>${escapeHtml(model.engineering_confirmation?.note || '待确认')}</p>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        function calculatePackageReadiness(pack, library) {
+            const groups = library?.readiness_model?.required_groups || [];
+            let score = 0;
+            const missing = [];
+            groups.forEach(group => {
+                const material = pack.required_materials?.[group.group_id];
+                const status = material?.status || 'missing';
+                if (status === 'ready' || status === 'confirmed') {
+                    score += group.weight;
+                } else if (status === 'partial') {
+                    score += Math.round(group.weight * 0.5);
+                    missing.push(`${group.label}部分缺失`);
+                } else {
+                    missing.push(group.label);
+                }
+            });
+            let level = '待建设';
+            if (score >= 85) level = '可内测';
+            else if (score >= 60) level = '待审核';
+            else if (score >= 30) level = '已有基础';
+            return { score, level, blockers: missing };
+        }
+
+        function renderPackageReadiness(pack, library) {
+            const readiness = calculatePackageReadiness(pack, library);
+            const score = Math.max(0, Math.min(100, readiness.score || 0));
+            return `
+                <div class="readiness-meter">
+                    <div class="readiness-track"><div class="readiness-fill" style="width:${score}%;"></div></div>
+                    <div class="readiness-label"><span>${escapeHtml(readiness.level)}</span><strong>${score}%</strong></div>
+                </div>
+            `;
+        }
+
+        function toggleFaultPackageDetail(packageId) {
+            const detail = document.getElementById(`fault-package-detail-${packageId}`);
+            const button = document.getElementById(`fault-package-detail-btn-${packageId}`);
+            if (!detail) return;
+            detail.classList.toggle('active');
+            if (button) button.textContent = detail.classList.contains('active') ? '收起详情' : '查看详情';
+        }
+
+        function renderPackageMaterialChecklist(pack, library) {
+            const groups = library?.readiness_model?.required_groups || [];
+            return groups.map(group => {
+                const material = pack.required_materials?.[group.group_id] || {};
+                const missing = asArray(material.missing_items).join('、') || '无';
+                return `
+                    <div class="material-row">
+                        <strong>${escapeHtml(group.label)}</strong>
+                        <span>${escapeHtml(formatMaterialStatus(material.status))}${missing !== '无' ? `：${escapeHtml(missing)}` : ''}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderFaultPackages() {
+            const statsEl = document.getElementById('faultPackageStats');
+            const listEl = document.getElementById('faultPackageList');
+            if (!statsEl || !listEl) return;
+            if (!knowledgeBaseState.loaded) return;
+
+            const library = knowledgeBaseState.data.faultPackages;
+            const packages = library?.packages || [];
+            const keyword = document.getElementById('faultPackageSearchInput')?.value.trim() || '';
+            const priority = document.getElementById('faultPackagePriorityFilter')?.value || '';
+            const filtered = packages.filter(pack => {
+                const priorityMatched = !priority || pack.priority === priority;
+                const keywordMatched = includesKeyword(pack, keyword, ['title', 'priority', 'status', 'next_action']) ||
+                    asArray(pack.related_models).join(' ').toLowerCase().includes(keyword.toLowerCase()) ||
+                    asArray(pack.related_modules).join(' ').toLowerCase().includes(keyword.toLowerCase()) ||
+                    asArray(pack.related_fault_codes).join(' ').toLowerCase().includes(keyword.toLowerCase());
+                return priorityMatched && keywordMatched;
+            });
+
+            const p0Count = packages.filter(pack => pack.priority === 'P0').length;
+            const draftCount = packages.filter(pack => pack.status === 'draft_available').length;
+            const planningCount = packages.filter(pack => pack.status === 'planning').length;
+            statsEl.innerHTML = `
+                <div class="knowledge-stat"><strong>${packages.length}</strong><span>故障包</span></div>
+                <div class="knowledge-stat"><strong>${p0Count}</strong><span>P0 优先</span></div>
+                <div class="knowledge-stat"><strong>${draftCount}</strong><span>已有草案</span></div>
+                <div class="knowledge-stat"><strong>${planningCount}</strong><span>待建设</span></div>
+            `;
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = '<div class="knowledge-state">没有匹配的故障包。可以换一个故障、模块或机型关键词。</div>';
+                return;
+            }
+
+            listEl.innerHTML = filtered.map(pack => `
+                <article class="knowledge-card">
+                    <h3>${escapeHtml(pack.title)}</h3>
+                    ${renderPackageReadiness(pack, library)}
+                    <p><strong>优先级：</strong>${escapeHtml(pack.priority || '未标注')}　<strong>状态：</strong>${escapeHtml(pack.status || '未标注')}</p>
+                    <p><strong>下一步：</strong>${escapeHtml(pack.next_action || '待补充')}</p>
+                    <div class="knowledge-meta">
+                        <span class="knowledge-pill ${pack.priority === 'P0' ? 'high' : 'medium'}">${escapeHtml(pack.priority || '未标注')}</span>
+                        ${renderPills(pack.related_models)}
+                        ${renderPills(pack.related_modules)}
+                    </div>
+                    <div class="knowledge-meta">
+                        ${renderPills(pack.related_fault_codes)}
+                    </div>
+                    <button type="button" class="model-detail-btn" id="fault-package-detail-btn-${escapeHtml(pack.package_id)}" onclick="toggleFaultPackageDetail('${escapeHtml(pack.package_id)}')">查看详情</button>
+                    <div class="model-detail" id="fault-package-detail-${escapeHtml(pack.package_id)}">
+                        <p><strong>L4 依据：</strong>${escapeHtml(asArray(pack.l4_evidence).map(item => `${item.metric} ${item.count}`).join(' / ') || '待补充')}</p>
+                        <p><strong>信号关键词：</strong>${escapeHtml(asArray(pack.related_signal_keywords).join(' / ') || '待补充')}</p>
+                        <div class="material-checklist">${renderPackageMaterialChecklist(pack, library)}</div>
+                        <p><strong>关联故障知识：</strong>${escapeHtml(asArray(pack.linked_fault_knowledge).join(' / ') || '待补充')}</p>
+                        <p><strong>关联 SOP：</strong>${escapeHtml(asArray(pack.linked_sops).join(' / ') || '待补充')}</p>
                     </div>
                 </article>
             `).join('');

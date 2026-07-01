@@ -1,0 +1,149 @@
+{
+  "library_id": "FAULT-PACKAGES-20260701",
+  "title": "高频主板故障包建设库",
+  "status": "phase_1_planning",
+  "notes": "故障包用于组织第一阶段知识建设，不等同于正式维修 SOP。每个故障包都需要制造中心/技术支持确认后才能作为正式培训和维修指导。",
+  "readiness_model": {
+    "required_groups": [
+      { "group_id": "symptom_definition", "label": "现象定义", "weight": 10 },
+      { "group_id": "diagnosis_sop", "label": "诊断SOP", "weight": 25 },
+      { "group_id": "test_points", "label": "测试点/信号", "weight": 20 },
+      { "group_id": "board_assets", "label": "主板图/点位图", "weight": 15 },
+      { "group_id": "repair_cases", "label": "验证案例", "weight": 15 },
+      { "group_id": "repair_boundary", "label": "维修边界", "weight": 10 },
+      { "group_id": "engineering_confirmation", "label": "工程确认", "weight": 5 }
+    ]
+  },
+  "packages": [
+    {
+      "package_id": "FP-NO-POWER",
+      "title": "不开机故障包",
+      "priority": "P0",
+      "status": "planning",
+      "l4_evidence": [
+        { "metric": "PWR01-No power on", "count": 1298 },
+        { "metric": "PWR02-Power on stopped at Logo", "count": 120 },
+        { "metric": "PWR03-Boot and robot appear,can't power on correctly", "count": 28 }
+      ],
+      "related_models": ["BG6m", "KM4", "KL4", "CM6", "KL5"],
+      "related_fault_codes": ["400-CPU Failure", "410-PMU Failure", "420-Memory Failure"],
+      "related_modules": ["开机电源管理电路", "PMU", "CPU/主控相关", "Memory电路", "时钟/复位"],
+      "related_signal_keywords": ["VBAT", "VCORE", "VPROC", "PWRKEY", "RESET"],
+      "linked_fault_knowledge": [],
+      "linked_sops": [],
+      "required_materials": {
+        "symptom_definition": { "status": "partial", "missing_items": ["现场现象分型：无电流/小电流/大电流/卡Logo"] },
+        "diagnosis_sop": { "status": "missing", "missing_items": ["不开机标准诊断SOP"] },
+        "test_points": { "status": "partial", "missing_items": ["各Top机型关键测试点坐标", "正常电压/阻值范围"] },
+        "board_assets": { "status": "missing", "missing_items": ["Top20机型主板图", "点位图"] },
+        "repair_cases": { "status": "missing", "missing_items": ["已验证不开机维修案例"] },
+        "repair_boundary": { "status": "missing", "missing_items": ["CPU/Memory/PMU类故障维修边界"] },
+        "engineering_confirmation": { "status": "missing", "missing_items": ["制造中心确认诊断路径和边界"] }
+      },
+      "next_action": "优先向制造中心索要不开机相关 Top 机型点位图、关键电源 rail、PWRKEY/PMU/Memory 测试点和典型案例。"
+    },
+    {
+      "package_id": "FP-NO-SERVICE",
+      "title": "无服务 / 无网络故障包",
+      "priority": "P0",
+      "status": "planning",
+      "l4_evidence": [
+        { "metric": "CLA01-No signal/No Service/No network", "count": 907 },
+        { "metric": "430-RF IC Failure", "count": 85 }
+      ],
+      "related_models": ["BG6m", "KM4", "KL4", "KM5"],
+      "related_fault_codes": ["430-RF IC Failure", "470-Other IC Failure"],
+      "related_modules": ["射频接收通道", "射频发射通道", "SIM卡", "天线/射频前端"],
+      "related_signal_keywords": ["RF", "SIM", "GPS", "WIFI"],
+      "linked_fault_knowledge": [],
+      "linked_sops": [],
+      "required_materials": {
+        "symptom_definition": { "status": "partial", "missing_items": ["无服务/信号弱/校准失败分型"] },
+        "diagnosis_sop": { "status": "missing", "missing_items": ["无服务标准诊断SOP"] },
+        "test_points": { "status": "missing", "missing_items": ["RF/SIM关键测试点", "校准Log判定标准"] },
+        "board_assets": { "status": "missing", "missing_items": ["射频区域点位图", "天线相关位置图"] },
+        "repair_cases": { "status": "missing", "missing_items": ["无服务已验证案例"] },
+        "repair_boundary": { "status": "missing", "missing_items": ["射频复杂维修边界"] },
+        "engineering_confirmation": { "status": "missing", "missing_items": ["制造中心确认RF诊断口径"] }
+      },
+      "next_action": "向制造中心/技术支持索要无服务诊断路径、RF/SIM点位、校准Log样例和典型维修案例。"
+    },
+    {
+      "package_id": "FP-RESTART-LOGO",
+      "title": "重启 / 卡 Logo 故障包",
+      "priority": "P1",
+      "status": "planning",
+      "l4_evidence": [
+        { "metric": "PWR07-Restart", "count": 221 },
+        { "metric": "PWR02-Power on stopped at Logo", "count": 120 }
+      ],
+      "related_models": ["BG6m", "KM4", "KL4", "C671L"],
+      "related_fault_codes": ["420-Memory Failure", "400-CPU Failure", "410-PMU Failure"],
+      "related_modules": ["Memory电路", "CPU/主控相关", "PMU", "软件/刷机链路"],
+      "related_signal_keywords": ["VCORE", "VPROC", "Memory", "RESET"],
+      "linked_fault_knowledge": [],
+      "linked_sops": [],
+      "required_materials": {
+        "symptom_definition": { "status": "partial", "missing_items": ["重启/卡Logo/进Recovery分型"] },
+        "diagnosis_sop": { "status": "missing", "missing_items": ["重启卡Logo诊断SOP"] },
+        "test_points": { "status": "missing", "missing_items": ["Memory/PMU关键点位和电压范围"] },
+        "board_assets": { "status": "missing", "missing_items": ["Memory/CPU/PMU区域点位图"] },
+        "repair_cases": { "status": "missing", "missing_items": ["重启或卡Logo案例"] },
+        "repair_boundary": { "status": "missing", "missing_items": ["软件/硬件分界和不可修边界"] },
+        "engineering_confirmation": { "status": "missing", "missing_items": ["制造中心确认"] }
+      },
+      "next_action": "收集刷机/Log判断方法、Memory类案例、PMU供电检查点和不可修边界。"
+    },
+    {
+      "package_id": "FP-NO-CHARGE",
+      "title": "不充电故障包",
+      "priority": "P1",
+      "status": "planning",
+      "l4_evidence": [
+        { "metric": "CHG01-Can not charging", "count": 56 },
+        { "metric": "461-Charger IC Failure", "count": 16 }
+      ],
+      "related_models": ["BG6m", "KM4", "KL4"],
+      "related_fault_codes": ["461-Charger IC Failure", "480-Resistor/Capacitor/Inductor Failure"],
+      "related_modules": ["充电管理电路", "USB接口", "电池BTB", "VBAT/VBUS"],
+      "related_signal_keywords": ["VBAT", "VBUS", "BATON", "USB"],
+      "linked_fault_knowledge": [],
+      "linked_sops": [],
+      "required_materials": {
+        "symptom_definition": { "status": "partial", "missing_items": ["不充电/慢充/快充不识别分型"] },
+        "diagnosis_sop": { "status": "missing", "missing_items": ["不充电标准诊断SOP"] },
+        "test_points": { "status": "partial", "missing_items": ["各机型充电IC周边点位"] },
+        "board_assets": { "status": "missing", "missing_items": ["充电区域点位图"] },
+        "repair_cases": { "status": "missing", "missing_items": ["不充电维修案例"] },
+        "repair_boundary": { "status": "missing", "missing_items": ["USB/充电IC维修边界"] },
+        "engineering_confirmation": { "status": "missing", "missing_items": ["制造中心确认"] }
+      },
+      "next_action": "结合 MTK 手册充电管理电路，向制造中心索要充电IC周边点位、VBUS/VBAT判断标准和案例。"
+    },
+    {
+      "package_id": "FP-CURRENT-LEAKAGE",
+      "title": "漏电流 / 待机电流异常故障包",
+      "priority": "P1",
+      "status": "draft_available",
+      "l4_evidence": [
+        { "metric": "已有技术支持资料", "count": 2 }
+      ],
+      "related_models": ["待按真实案例补充"],
+      "related_fault_codes": ["功耗不良", "关机漏电", "待机电流异常"],
+      "related_modules": ["PMIC", "VBAT", "VBAT_SYS", "BUCK/LDO支路", "软件驱动"],
+      "related_signal_keywords": ["VBAT", "VBAT_SYS", "BUCK", "LDO"],
+      "linked_fault_knowledge": ["FLT-20260604-001", "FLT-20260604-002"],
+      "linked_sops": ["SOP-20260604-001"],
+      "required_materials": {
+        "symptom_definition": { "status": "ready", "missing_items": [] },
+        "diagnosis_sop": { "status": "partial", "missing_items": ["各机型阈值", "工程确认"] },
+        "test_points": { "status": "missing", "missing_items": ["BUCK/LDO支路正常范围", "机型点位"] },
+        "board_assets": { "status": "missing", "missing_items": ["电源支路点位图"] },
+        "repair_cases": { "status": "missing", "missing_items": ["已验证案例"] },
+        "repair_boundary": { "status": "missing", "missing_items": ["PMIC/CPU相关边界"] },
+        "engineering_confirmation": { "status": "missing", "missing_items": ["技术支持/制造中心确认"] }
+      },
+      "next_action": "以现有 SOP 草案为样板，补齐各机型电流阈值、支路点位和真实案例。"
+    }
+  ]
+}
