@@ -11,11 +11,26 @@ It should feel like a durable diagnostic console and repair knowledge system, no
 Use a professional light-mode operations console:
 
 - Diagnostic Workbench is the default entry.
-- Sidebar navigation is organized by real work areas.
+- Sidebar navigation is organized by real work areas, not by every underlying page.
 - Top area becomes a compact command and status bar.
 - Large empty overview panels are removed from the default path.
 - Knowledge, model, fault, SOP, case, and signal data are surfaced as related diagnostic assets.
 - AI remains an assistive layer, not the visual protagonist.
+
+## Navigation rule
+
+The sidebar should expose only primary work destinations:
+
+- Diagnostic Workbench
+- Knowledge Center
+- Model Materials
+- Fault Packages
+- SOP and Cases
+- Readiness Board
+
+Utility tools such as historical diagnosis, SN material lookup, and log analysis can stay as compact secondary actions.
+
+Detailed pages such as MTK signal lookup, L4 report insights, gap requests, SOP drafts, and case templates should be reached from diagnostic results or their parent pages, not from the main sidebar.
 
 ## Visual rules
 

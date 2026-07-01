@@ -1982,28 +1982,51 @@
 
         /* ========== Professional console redesign overrides ========== */
         .container {
-            grid-template-columns: 248px minmax(0, 1fr);
+            grid-template-columns: 286px minmax(0, 1fr);
             background: transparent;
         }
 
         .workbench-sidebar {
-            background: rgba(238, 243, 247, 0.92);
+            background:
+                linear-gradient(180deg, rgba(231, 238, 245, 0.96), rgba(239, 244, 248, 0.94)),
+                var(--console-panel);
             border-right: 1px solid var(--console-border);
-            padding: 20px 14px;
+            padding: 18px 14px;
             gap: 18px;
             overflow-y: auto;
             scrollbar-width: thin;
         }
 
         .brand-block {
-            padding: 6px 8px 18px;
-            border-bottom: 1px solid var(--console-border);
+            display: grid;
+            grid-template-columns: 42px minmax(0, 1fr);
+            gap: 12px;
+            align-items: center;
+            padding: 13px;
+            border: 1px solid rgba(188, 201, 216, 0.78);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.72);
+            box-shadow: 0 10px 26px rgba(16, 24, 40, 0.06);
+        }
+
+        .brand-mark {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            background: var(--console-accent-strong);
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 900;
+            letter-spacing: 0.04em;
         }
 
         .brand-title {
             color: var(--console-accent-strong);
-            font-size: 18px;
+            font-size: 16px;
             letter-spacing: 0;
+            line-height: 1.25;
         }
 
         .brand-kicker {
@@ -2013,7 +2036,7 @@
         }
 
         .sidebar-group-title {
-            margin: 2px 8px 8px;
+            margin: 0 7px 8px;
             color: #7a8798;
             font-size: 11px;
             letter-spacing: 0.08em;
@@ -2057,6 +2080,128 @@
             width: 3px;
             border-radius: 999px;
             background: var(--console-accent);
+        }
+
+        .sidebar-section {
+            display: grid;
+            gap: 8px;
+        }
+
+        .nav-card {
+            display: grid;
+            grid-template-columns: 34px minmax(0, 1fr);
+            gap: 10px;
+            min-height: 58px;
+            padding: 10px;
+            border: 1px solid rgba(188, 201, 216, 0.82);
+            border-radius: 11px;
+            background: rgba(255, 255, 255, 0.64);
+            color: var(--console-text);
+            text-align: left;
+            box-shadow: 0 1px 0 rgba(16, 24, 40, 0.03);
+        }
+
+        .nav-card:hover {
+            background: #ffffff;
+            border-color: #9fb9cf;
+            color: var(--console-accent-strong);
+            transform: translateY(-1px);
+            box-shadow: 0 12px 24px rgba(21, 76, 121, 0.08);
+        }
+
+        .nav-card.active {
+            background: #ffffff;
+            border-color: #8eb0cc;
+            box-shadow: 0 14px 28px rgba(21, 76, 121, 0.1);
+        }
+
+        .nav-card.active::before {
+            display: none;
+        }
+
+        .nav-card-code {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            display: grid;
+            place-items: center;
+            background: var(--console-accent-soft);
+            color: var(--console-accent-strong);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0.02em;
+        }
+
+        .nav-card.active .nav-card-code {
+            background: var(--console-accent-strong);
+            color: #ffffff;
+        }
+
+        .nav-card-label {
+            display: block;
+            color: inherit;
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1.25;
+        }
+
+        .nav-card-meta {
+            display: block;
+            margin-top: 3px;
+            color: var(--console-muted);
+            font-size: 11px;
+            font-weight: 600;
+            line-height: 1.35;
+        }
+
+        .utility-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 6px;
+        }
+
+        .utility-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 34px;
+            padding: 8px 10px;
+            border-radius: 9px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: #475467;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .utility-btn::after {
+            content: ">";
+            color: #98a2b3;
+            font-size: 11px;
+        }
+
+        .utility-btn:hover,
+        .utility-btn.active {
+            background: rgba(255, 255, 255, 0.72);
+            border-color: var(--console-border);
+            color: var(--console-accent-strong);
+            transform: none;
+            box-shadow: none;
+        }
+
+        .utility-btn.active::before {
+            display: none;
+        }
+
+        .sidebar-note {
+            margin-top: auto;
+            padding: 11px;
+            border: 1px dashed #b8c9da;
+            border-radius: 11px;
+            background: rgba(255, 255, 255, 0.48);
+            color: var(--console-muted);
+            font-size: 11px;
+            line-height: 1.55;
         }
 
         .sidebar-secondary {
@@ -2485,46 +2630,73 @@
     <div class="container">
         <aside class="workbench-sidebar">
             <div class="brand-block">
-                <div class="brand-title">海外主板维修<br>诊断工作台</div>
-                <div class="brand-kicker">Engineering Knowledge Console</div>
+                <div class="brand-mark">MRE</div>
+                <div>
+                    <div class="brand-title">海外主板维修诊断工作台</div>
+                    <div class="brand-kicker">Engineering Knowledge Console</div>
+                </div>
             </div>
 
             <nav>
-                <div class="sidebar-group-title">Workbench</div>
-                <div class="tab-container">
-                    <button class="tab-btn active" data-tab="diagnostic-workbench" onclick="switchTab('diagnostic-workbench')">诊断工作台</button>
-                    <button class="tab-btn" data-tab="diagnosis" onclick="switchTab('diagnosis')">故障诊断</button>
-                    <button class="tab-btn" data-tab="resources" onclick="switchTab('resources')">资料查询</button>
-                    <button class="tab-btn" data-tab="log-analysis" onclick="switchTab('log-analysis')">校准 Log 分析</button>
+                <div class="sidebar-group-title">Primary</div>
+                <div class="sidebar-section">
+                    <button class="tab-btn nav-card active" data-tab="diagnostic-workbench" onclick="switchTab('diagnostic-workbench')">
+                        <span class="nav-card-code">DX</span>
+                        <span>
+                            <span class="nav-card-label">诊断工作台</span>
+                            <span class="nav-card-meta">一个入口聚合机型、故障、SOP 和案例</span>
+                        </span>
+                    </button>
+                    <button class="tab-btn nav-card" data-tab="source-overview" onclick="switchTab('source-overview')">
+                        <span class="nav-card-code">KB</span>
+                        <span>
+                            <span class="nav-card-label">资料中心</span>
+                            <span class="nav-card-meta">查看已入库资料、来源和结构化状态</span>
+                        </span>
+                    </button>
+                    <button class="tab-btn nav-card" data-tab="model-library" onclick="switchTab('model-library')">
+                        <span class="nav-card-code">MD</span>
+                        <span>
+                            <span class="nav-card-label">机型资料</span>
+                            <span class="nav-card-meta">承接 Top20 主板图、点位图和完整度</span>
+                        </span>
+                    </button>
+                    <button class="tab-btn nav-card" data-tab="fault-packages" onclick="switchTab('fault-packages')">
+                        <span class="nav-card-code">FP</span>
+                        <span>
+                            <span class="nav-card-label">故障包</span>
+                            <span class="nav-card-meta">按高频故障组织 SOP、点位和边界</span>
+                        </span>
+                    </button>
+                    <button class="tab-btn nav-card" data-tab="interactive-sop" onclick="switchTab('interactive-sop')">
+                        <span class="nav-card-code">SP</span>
+                        <span>
+                            <span class="nav-card-label">SOP 与案例</span>
+                            <span class="nav-card-meta">交互式流程、案例回流和训练材料</span>
+                        </span>
+                    </button>
+                    <button class="tab-btn nav-card" data-tab="readiness-dashboard" onclick="switchTab('readiness-dashboard')">
+                        <span class="nav-card-code">RD</span>
+                        <span>
+                            <span class="nav-card-label">建设看板</span>
+                            <span class="nav-card-meta">跟踪资料缺口、完整度和下一步动作</span>
+                        </span>
+                    </button>
                 </div>
             </nav>
 
             <div class="sidebar-secondary">
                 <div>
-                    <div class="sidebar-group-title">Knowledge Base</div>
-                    <div class="tab-container">
-                        <button class="tab-btn" data-tab="readiness-dashboard" onclick="switchTab('readiness-dashboard')">完整度仪表盘</button>
-                        <button class="tab-btn" data-tab="model-library" onclick="switchTab('model-library')">机型资料库</button>
-                        <button class="tab-btn" data-tab="fault-packages" onclick="switchTab('fault-packages')">故障包</button>
-                        <button class="tab-btn" data-tab="mtk-signals" onclick="switchTab('mtk-signals')">MTK 信号查询</button>
-                        <button class="tab-btn" data-tab="source-overview" onclick="switchTab('source-overview')">资料总览</button>
+                    <div class="sidebar-group-title">Tools</div>
+                    <div class="utility-grid">
+                        <button class="tab-btn utility-btn" data-tab="diagnosis" onclick="switchTab('diagnosis')">历史/专业诊断</button>
+                        <button class="tab-btn utility-btn" data-tab="resources" onclick="switchTab('resources')">SN 资料查询</button>
+                        <button class="tab-btn utility-btn" data-tab="log-analysis" onclick="switchTab('log-analysis')">校准 Log 分析</button>
                     </div>
                 </div>
                 <div>
-                    <div class="sidebar-group-title">Enablement</div>
-                    <div class="tab-container">
-                        <button class="tab-btn" data-tab="interactive-sop" onclick="switchTab('interactive-sop')">交互式 SOP</button>
-                        <button class="tab-btn" data-tab="case-template" onclick="switchTab('case-template')">案例回流模板</button>
-                        <button class="tab-btn" data-tab="l4-insights" onclick="switchTab('l4-insights')">L4 报告洞察</button>
-                        <button class="tab-btn" data-tab="gap-requests" onclick="switchTab('gap-requests')">资料缺口清单</button>
-                        <button class="tab-btn" data-tab="sop-drafts" onclick="switchTab('sop-drafts')">SOP 草案</button>
-                    </div>
-                </div>
-                <div>
-                    <div class="sidebar-group-title">Planning</div>
-                    <div class="tab-container">
-                        <div class="sidebar-link-disabled">AI 软硬件检测封装</div>
-                        <div class="sidebar-link-disabled">轻量诊断治具接入</div>
+                    <div class="sidebar-note">
+                        其他细分页不再作为主导航展示。MTK 信号、L4 报告、资料缺口、SOP 草案和案例模板，会从诊断结果或对应工作页进入。
                     </div>
                 </div>
             </div>
@@ -3704,8 +3876,20 @@
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            const activeButton = document.querySelector(`[data-tab="${tabName}"]`);
-            if (activeButton) activeButton.classList.add('active');
+            const activeButton = document.querySelector(`.workbench-sidebar [data-tab="${tabName}"]`);
+            if (activeButton) {
+                activeButton.classList.add('active');
+            } else {
+                const fallbackTabs = {
+                    'mtk-signals': 'source-overview',
+                    'l4-insights': 'readiness-dashboard',
+                    'gap-requests': 'readiness-dashboard',
+                    'sop-drafts': 'interactive-sop',
+                    'case-template': 'interactive-sop'
+                };
+                const fallbackButton = document.querySelector(`.workbench-sidebar [data-tab="${fallbackTabs[tabName]}"]`);
+                if (fallbackButton) fallbackButton.classList.add('active');
+            }
             
             // 切换Tab内容
             document.querySelectorAll('.tab-content').forEach(content => {
