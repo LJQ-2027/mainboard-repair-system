@@ -10,6 +10,7 @@
 - `training-materials.json`：培训资料条目。
 - `module-principles.json`：手机模块原理、关键链路和后续可转化为诊断说明的基础知识。
 - `platform-repair-manuals.json`：制造中心提供的平台级主板维修通用手册摘要。
+- `model-board-assets.json`：Top20 候选机型的主板图、点位图和机型级资料槽位登记。
 - `mtk-signal-reference.json`：MTK 平台手册中抽取的信号名称、功能说明和测试参考值。
 - `fault-knowledge.json`：故障现象、常见原因、初步判断方法和建议检测方向。
 - `sop-drafts.json`：从现有资料中抽取的诊断 SOP 草案，后续需由技术支持或制造中心确认。

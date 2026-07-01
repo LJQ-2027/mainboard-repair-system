@@ -1,0 +1,165 @@
+{
+  "library_id": "MODEL-BOARD-ASSETS-20260701",
+  "title": "Top20机型主板图与点位图资料库",
+  "status": "awaiting_manufacturing_center_assets",
+  "notes": "该资料库先承接制造中心拟提供的 Top20 主板维修机型图纸。当前以 L4 报告高频机型作为第一批候选清单，图片路径待资料到位后补齐。",
+  "storage_root": "source-materials/manufacturing-center/top20-model-board-assets",
+  "asset_slots": [
+    "board_front",
+    "board_back",
+    "point_map_front",
+    "point_map_back",
+    "schematic",
+    "bom"
+  ],
+  "models": [
+    {
+      "model_id": "MODEL-BG6M",
+      "model_name": "BG6m",
+      "aliases": [],
+      "priority_source": "CI L4 PCBA report top model",
+      "l4_report_rank": 1,
+      "l4_record_count": 889,
+      "related_faults": [
+        "PWR01-No power on",
+        "420-Memory Failure",
+        "400-CPU Failure"
+      ],
+      "asset_status": "pending_assets",
+      "assets": {},
+      "next_action": "等待制造中心提供主板正反面图和点位图。"
+    },
+    {
+      "model_id": "MODEL-KM4",
+      "model_name": "KM4",
+      "aliases": [],
+      "priority_source": "CI L4 PCBA report top model",
+      "l4_report_rank": 2,
+      "l4_record_count": 792,
+      "related_faults": [
+        "420-Memory Failure",
+        "400-CPU Failure",
+        "PWR01-No power on"
+      ],
+      "asset_status": "pending_assets",
+      "assets": {},
+      "next_action": "等待制造中心提供主板正反面图和点位图。"
+    },
+    {
+      "model_id": "MODEL-KL4",
+      "model_name": "KL4",
+      "aliases": [],
+      "priority_source": "CI L4 PCBA report top model",
+      "l4_report_rank": 3,
+      "l4_record_count": 508,
+      "related_faults": [
+        "420-Memory Failure",
+        "400-CPU Failure",
+        "410-PMU Failure"
+      ],
+      "asset_status": "pending_assets",
+      "assets": {},
+      "next_action": "等待制造中心提供主板正反面图和点位图。"
+    },
+    {
+      "model_id": "MODEL-CM6",
+      "model_name": "CM6",
+      "aliases": [],
+      "priority_source": "CI L4 PCBA report top model",
+      "l4_report_rank": 4,
+      "l4_record_count": 391,
+      "related_faults": [
+        "PWR01-No power on"
+      ],
+      "asset_status": "pending_assets",
+      "assets": {},
+      "next_action": "等待制造中心提供主板正反面图和点位图。"
+    },
+    {
+      "model_id": "MODEL-KL5",
+      "model_name": "KL5",
+      "aliases": [],
+      "priority_source": "CI L4 PCBA report top model",
+      "l4_report_rank": 5,
+      "l4_record_count": 233,
+      "related_faults": [
+        "PWR01-No power on"
+      ],
+      "asset_status": "pending_assets",
+      "assets": {},
+      "next_action": "等待制造中心提供主板正反面图和点位图。"
+    },
+    {
+      "model_id": "MODEL-KM5",
+      "model_name": "KM5",
+      "aliases": [],
+      "priority_source": "CI L4 PCBA report top model",
+      "l4_report_rank": 6,
+      "l4_record_count": 232,
+      "related_faults": [
+        "420-Memory Failure"
+      ],
+      "asset_status": "pending_assets",
+      "assets": {},
+      "next_action": "等待制造中心提供主板正反面图和点位图。"
+    },
+    {
+      "model_id": "MODEL-C671L",
+      "model_name": "C671L",
+      "aliases": [],
+      "priority_source": "CI L4 PCBA report top model",
+      "l4_report_rank": 7,
+      "l4_record_count": 185,
+      "related_faults": [
+        "420-Memory Failure"
+      ],
+      "asset_status": "pending_assets",
+      "assets": {},
+      "next_action": "等待制造中心提供主板正反面图和点位图。"
+    },
+    {
+      "model_id": "MODEL-A6611L",
+      "model_name": "A6611L",
+      "aliases": [],
+      "priority_source": "CI L4 PCBA report top model",
+      "l4_report_rank": 8,
+      "l4_record_count": 148,
+      "related_faults": [
+        "420-Memory Failure"
+      ],
+      "asset_status": "pending_assets",
+      "assets": {},
+      "next_action": "等待制造中心提供主板正反面图和点位图。"
+    },
+    {
+      "model_id": "MODEL-KM7",
+      "model_name": "KM7",
+      "aliases": [],
+      "priority_source": "CI L4 PCBA report top model",
+      "l4_report_rank": 9,
+      "l4_record_count": 141,
+      "related_faults": [],
+      "asset_status": "pending_assets",
+      "assets": {},
+      "next_action": "等待制造中心提供主板正反面图和点位图。"
+    },
+    {
+      "model_id": "MODEL-CL6K",
+      "model_name": "CL6k",
+      "aliases": [],
+      "priority_source": "CI L4 PCBA report top model",
+      "l4_report_rank": 10,
+      "l4_record_count": 86,
+      "related_faults": [],
+      "asset_status": "pending_assets",
+      "assets": {},
+      "next_action": "等待制造中心提供主板正反面图和点位图。"
+    }
+  ],
+  "open_questions": [
+    "制造中心 Top20 清单是否与 L4 报告 Top10 完全一致。",
+    "每个机型是否存在多个主板版本。",
+    "点位图是图片、PDF、BoardView 截图还是原始工程文件。",
+    "哪些图纸可以直接用于海外售后培训，哪些仅限内部工程协作。"
+  ]
+}

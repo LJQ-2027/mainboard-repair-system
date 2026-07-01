@@ -1784,6 +1784,7 @@
             <div class="sidebar-secondary">
                 <div class="sidebar-group-title">规划模块</div>
                 <div class="tab-container">
+                    <button class="tab-btn" data-tab="model-library" onclick="switchTab('model-library')">机型资料库</button>
                     <button class="tab-btn" data-tab="source-overview" onclick="switchTab('source-overview')">资料总览</button>
                     <button class="tab-btn" data-tab="mtk-signals" onclick="switchTab('mtk-signals')">MTK 信号查询</button>
                     <button class="tab-btn" data-tab="l4-insights" onclick="switchTab('l4-insights')">L4 报告洞察</button>
@@ -2088,6 +2089,25 @@
             <div id="aiLogSection" style="display:none; margin-top: 20px;">
                 <button class="ai-log-btn" onclick="startAILogAnalysis()" id="aiLogBtn">AI 深度解读 Log</button>
                 <div id="aiLogResult"></div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="model-library-tab">
+            <div class="knowledge-shell">
+                <div class="knowledge-hero">
+                    <h2>机型资料库</h2>
+                    <p class="subtitle">承接制造中心即将分享的 Top20 主板图和点位图。当前先登记候选机型、资料槽位和缺口，图片到位后即可直接挂载。</p>
+                    <div class="knowledge-toolbar">
+                        <input type="text" id="modelSearchInput" placeholder="搜索机型 / 故障 / 状态，例如 BG6m、Memory、待补图" oninput="renderModelLibrary()">
+                        <select id="modelStatusFilter" onchange="renderModelLibrary()">
+                            <option value="">全部状态</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="knowledge-stat-grid" id="modelLibraryStats"></div>
+                <div class="knowledge-grid" id="modelLibraryList">
+                    <div class="knowledge-state">正在加载机型资料库...</div>
+                </div>
             </div>
         </div>
 
@@ -2884,6 +2904,7 @@
                 sources: [],
                 trainingMaterials: [],
                 manuals: [],
+                modelAssets: null,
                 mtkSignals: null,
                 reportSummaries: [],
                 gapRequests: [],
@@ -2895,6 +2916,7 @@
             sources: 'knowledge-base/source-records.json',
             trainingMaterials: 'knowledge-base/training-materials.json',
             manuals: 'knowledge-base/platform-repair-manuals.json',
+            modelAssets: 'knowledge-base/model-board-assets.json',
             mtkSignals: 'knowledge-base/mtk-signal-reference.json',
             reportSummaries: 'knowledge-base/repair-report-summaries.json',
             gapRequests: 'knowledge-base/gap-requests.json',
@@ -2986,15 +3008,107 @@
                 }).join('');
             }
 
+            const modelStatusFilter = document.getElementById('modelStatusFilter');
+            if (modelStatusFilter) {
+                const statuses = [...new Set((knowledgeBaseState.data.modelAssets?.models || []).map(item => item.asset_status).filter(Boolean))].sort();
+                modelStatusFilter.innerHTML = '<option value="">全部状态</option>' + statuses.map(status => {
+                    return `<option value="${escapeHtml(status)}">${escapeHtml(formatAssetStatus(status))}</option>`;
+                }).join('');
+            }
+
             renderSignalModuleFilter();
         }
 
         function renderAllKnowledgePages() {
+            renderModelLibrary();
             renderSourceOverview();
             renderMtkSignals();
             renderL4Insights();
             renderGapRequests();
             renderSopDrafts();
+        }
+
+        function formatAssetStatus(status) {
+            const labels = {
+                pending_assets: '待补图',
+                partial_assets: '部分资料',
+                ready_for_review: '待审核',
+                ready_for_beta: '可内测'
+            };
+            return labels[status] || status || '未标注';
+        }
+
+        function modelStatusClass(status) {
+            if (status === 'ready_for_beta') return 'low';
+            if (status === 'ready_for_review' || status === 'partial_assets') return 'medium';
+            return 'high';
+        }
+
+        function renderAssetSlots(model, slots) {
+            const assets = model.assets || {};
+            return asArray(slots).map(slot => {
+                const hasAsset = Boolean(assets[slot]);
+                const labelMap = {
+                    board_front: '正面主板图',
+                    board_back: '反面主板图',
+                    point_map_front: '正面点位图',
+                    point_map_back: '反面点位图',
+                    schematic: '原理图',
+                    bom: 'BOM'
+                };
+                return `<span class="knowledge-pill ${hasAsset ? 'low' : 'high'}">${escapeHtml(labelMap[slot] || slot)}：${hasAsset ? '已登记' : '待补'}</span>`;
+            }).join('');
+        }
+
+        function renderModelLibrary() {
+            const statsEl = document.getElementById('modelLibraryStats');
+            const listEl = document.getElementById('modelLibraryList');
+            if (!statsEl || !listEl) return;
+            if (!knowledgeBaseState.loaded) return;
+
+            const library = knowledgeBaseState.data.modelAssets;
+            const models = library?.models || [];
+            const slots = library?.asset_slots || [];
+            const keyword = document.getElementById('modelSearchInput')?.value.trim() || '';
+            const status = document.getElementById('modelStatusFilter')?.value || '';
+            const filtered = models.filter(model => {
+                const statusMatched = !status || model.asset_status === status;
+                const keywordMatched = includesKeyword(model, keyword, ['model_name', 'priority_source', 'asset_status', 'next_action']) ||
+                    asArray(model.related_faults).join(' ').toLowerCase().includes(keyword.toLowerCase()) ||
+                    asArray(model.aliases).join(' ').toLowerCase().includes(keyword.toLowerCase());
+                return statusMatched && keywordMatched;
+            });
+
+            const readyCount = models.filter(model => model.asset_status === 'ready_for_beta').length;
+            const partialCount = models.filter(model => model.asset_status === 'partial_assets' || model.asset_status === 'ready_for_review').length;
+            const pendingCount = models.filter(model => model.asset_status === 'pending_assets').length;
+            statsEl.innerHTML = `
+                <div class="knowledge-stat"><strong>${models.length}</strong><span>候选机型</span></div>
+                <div class="knowledge-stat"><strong>${pendingCount}</strong><span>待补图纸</span></div>
+                <div class="knowledge-stat"><strong>${partialCount}</strong><span>部分资料 / 待审核</span></div>
+                <div class="knowledge-stat"><strong>${readyCount}</strong><span>可内测机型</span></div>
+            `;
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = '<div class="knowledge-state">没有匹配的机型。可以换一个机型名、故障关键词或状态。</div>';
+                return;
+            }
+
+            listEl.innerHTML = filtered.map(model => `
+                <article class="knowledge-card">
+                    <h3>${escapeHtml(model.model_name)}</h3>
+                    <p><strong>优先级来源：</strong>${escapeHtml(model.priority_source || '待确认')}</p>
+                    <p><strong>L4 记录：</strong>${escapeHtml(model.l4_record_count || 0)} 条${model.l4_report_rank ? `，排名 ${escapeHtml(model.l4_report_rank)}` : ''}</p>
+                    <p><strong>下一步：</strong>${escapeHtml(model.next_action || '等待补充资料。')}</p>
+                    <div class="knowledge-meta">
+                        <span class="knowledge-pill ${modelStatusClass(model.asset_status)}">${escapeHtml(formatAssetStatus(model.asset_status))}</span>
+                        ${renderPills(model.related_faults)}
+                    </div>
+                    <div class="knowledge-meta">
+                        ${renderAssetSlots(model, slots)}
+                    </div>
+                </article>
+            `).join('');
         }
 
         function renderSourceOverview() {
