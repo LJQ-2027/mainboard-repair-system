@@ -505,6 +505,210 @@
             font-size: 12px;
         }
 
+        .knowledge-shell {
+            display: grid;
+            gap: 18px;
+        }
+
+        .knowledge-hero {
+            background: #ffffff;
+            border: 1px solid #dce3ec;
+            border-radius: 8px;
+            padding: 22px;
+        }
+
+        .knowledge-hero h2 {
+            color: #111827;
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .knowledge-toolbar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        .knowledge-toolbar input,
+        .knowledge-toolbar select {
+            min-width: 220px;
+            flex: 1 1 220px;
+            padding: 11px 13px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            background: #ffffff;
+            color: #1f2937;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .knowledge-toolbar input:focus,
+        .knowledge-toolbar select:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .knowledge-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 14px;
+        }
+
+        .knowledge-card {
+            background: #ffffff;
+            border: 1px solid #dce3ec;
+            border-radius: 8px;
+            padding: 16px;
+            min-width: 0;
+        }
+
+        .knowledge-card h3 {
+            color: #111827;
+            font-size: 17px;
+            margin-bottom: 8px;
+            line-height: 1.35;
+        }
+
+        .knowledge-card p {
+            color: #475569;
+            font-size: 13px;
+            line-height: 1.65;
+            margin-bottom: 8px;
+        }
+
+        .knowledge-meta {
+            display: flex;
+            gap: 7px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .knowledge-pill {
+            display: inline-flex;
+            align-items: center;
+            min-height: 24px;
+            padding: 4px 8px;
+            border-radius: 999px;
+            background: #eef2f7;
+            color: #334155;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .knowledge-pill.high {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .knowledge-pill.medium {
+            background: #fef3c7;
+            color: #854d0e;
+        }
+
+        .knowledge-pill.low {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .knowledge-pill.draft {
+            background: #e0f2fe;
+            color: #075985;
+        }
+
+        .knowledge-stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+        }
+
+        .knowledge-stat {
+            background: #ffffff;
+            border: 1px solid #dce3ec;
+            border-radius: 8px;
+            padding: 14px;
+        }
+
+        .knowledge-stat strong {
+            display: block;
+            color: #0f172a;
+            font-size: 24px;
+            line-height: 1.2;
+        }
+
+        .knowledge-stat span {
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .knowledge-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .knowledge-row {
+            display: grid;
+            grid-template-columns: minmax(150px, 1.1fr) minmax(170px, 1.4fr) minmax(120px, 0.8fr);
+            gap: 12px;
+            align-items: start;
+            background: #ffffff;
+            border: 1px solid #dce3ec;
+            border-radius: 8px;
+            padding: 13px 14px;
+        }
+
+        .knowledge-row strong {
+            color: #0f172a;
+            font-size: 14px;
+        }
+
+        .knowledge-row span {
+            color: #475569;
+            font-size: 13px;
+            line-height: 1.55;
+            overflow-wrap: anywhere;
+        }
+
+        .module-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 14px 0;
+        }
+
+        .module-filter button {
+            padding: 7px 11px;
+            border-radius: 999px;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            color: #334155;
+            font-size: 12px;
+            box-shadow: none;
+        }
+
+        .module-filter button.active {
+            background: #0e3566;
+            color: #ffffff;
+            border-color: #0e3566;
+        }
+
+        .module-filter button:hover {
+            transform: none;
+            box-shadow: none;
+            border-color: #0e3566;
+        }
+
+        .knowledge-state {
+            background: #ffffff;
+            border: 1px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 22px;
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
         .diagnosis-toolbar, .resource-toolbar {
             display: flex;
             gap: 10px;
@@ -1507,11 +1711,36 @@
             .workbench-sidebar {
                 position: static;
                 height: auto;
+                width: 100%;
+            }
+
+            .workbench-main {
+                padding: 22px 18px 28px;
             }
 
             .workbench-topbar,
             .workbench-overview {
                 grid-template-columns: 1fr;
+            }
+
+            .global-search,
+            .global-search input,
+            .knowledge-toolbar input,
+            .knowledge-toolbar select,
+            input[type="text"],
+            textarea {
+                min-width: 0;
+                width: 100%;
+            }
+
+            .knowledge-row {
+                grid-template-columns: 1fr;
+                gap: 6px;
+            }
+
+            .knowledge-card,
+            .knowledge-hero {
+                padding: 15px;
             }
 
             .entry-grid {
@@ -1554,12 +1783,13 @@
 
             <div class="sidebar-secondary">
                 <div class="sidebar-group-title">规划模块</div>
-                <div class="sidebar-link-disabled">机型资料库</div>
-                <div class="sidebar-link-disabled">故障知识库</div>
-                <div class="sidebar-link-disabled">器件与点位</div>
-                <div class="sidebar-link-disabled">维修培训</div>
-                <div class="sidebar-link-disabled">案例沉淀</div>
-                <div class="sidebar-link-disabled">能力路线图</div>
+                <div class="tab-container">
+                    <button class="tab-btn" data-tab="source-overview" onclick="switchTab('source-overview')">资料总览</button>
+                    <button class="tab-btn" data-tab="mtk-signals" onclick="switchTab('mtk-signals')">MTK 信号查询</button>
+                    <button class="tab-btn" data-tab="l4-insights" onclick="switchTab('l4-insights')">L4 报告洞察</button>
+                    <button class="tab-btn" data-tab="gap-requests" onclick="switchTab('gap-requests')">资料缺口清单</button>
+                    <button class="tab-btn" data-tab="sop-drafts" onclick="switchTab('sop-drafts')">SOP 草案</button>
+                </div>
             </div>
         </aside>
 
@@ -1858,6 +2088,87 @@
             <div id="aiLogSection" style="display:none; margin-top: 20px;">
                 <button class="ai-log-btn" onclick="startAILogAnalysis()" id="aiLogBtn">AI 深度解读 Log</button>
                 <div id="aiLogResult"></div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="source-overview-tab">
+            <div class="knowledge-shell">
+                <div class="knowledge-hero">
+                    <h2>资料总览</h2>
+                    <p class="subtitle">查看当前已沉淀到知识库的资料来源、结构化状态和可复用内容。这里解决“系统里已经有什么”的问题。</p>
+                    <div class="knowledge-toolbar">
+                        <input type="text" id="sourceSearchInput" placeholder="搜索文件名 / 摘要 / 分类 / 工具" oninput="renderSourceOverview()">
+                        <select id="sourceCategoryFilter" onchange="renderSourceOverview()">
+                            <option value="">全部分类</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="knowledge-stat-grid" id="sourceStats"></div>
+                <div class="knowledge-grid" id="sourceOverviewList">
+                    <div class="knowledge-state">正在加载资料总览...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="mtk-signals-tab">
+            <div class="knowledge-shell">
+                <div class="knowledge-hero">
+                    <h2>MTK 信号查询</h2>
+                    <p class="subtitle">基于制造中心 MTK 平台通用主板维修手册抽取的信号参考。当前用于学习、检索和 SOP 转译，正式维修前仍需工程确认。</p>
+                    <div class="knowledge-toolbar">
+                        <input type="text" id="signalSearchInput" placeholder="搜索模块 / 信号名 / 功能 / 参考值，例如 VBAT、充电、SIM" oninput="renderMtkSignals()">
+                    </div>
+                    <div class="module-filter" id="signalModuleFilter"></div>
+                </div>
+                <div class="knowledge-list" id="signalResultList">
+                    <div class="knowledge-state">正在加载 MTK 信号库...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="l4-insights-tab">
+            <div class="knowledge-shell">
+                <div class="knowledge-hero">
+                    <h2>L4 报告洞察</h2>
+                    <p class="subtitle">从脱敏 L4 PCBA 维修报告中提炼高频机型、现象、故障归因和维修动作，用于决定第一阶段优先补哪些知识。</p>
+                </div>
+                <div class="knowledge-stat-grid" id="l4Stats"></div>
+                <div class="knowledge-grid" id="l4InsightCards">
+                    <div class="knowledge-state">正在加载 L4 报告摘要...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="gap-requests-tab">
+            <div class="knowledge-shell">
+                <div class="knowledge-hero">
+                    <h2>资料缺口清单</h2>
+                    <p class="subtitle">把“还缺什么资料”变成可跟进清单，方便继续向技术支持、制造中心和中方技术人员索要材料。</p>
+                    <div class="knowledge-toolbar">
+                        <input type="text" id="gapSearchInput" placeholder="搜索缺口类型 / 描述 / 下一步动作" oninput="renderGapRequests()">
+                        <select id="gapPriorityFilter" onchange="renderGapRequests()">
+                            <option value="">全部优先级</option>
+                        </select>
+                        <select id="gapProviderFilter" onchange="renderGapRequests()">
+                            <option value="">全部提供方</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="knowledge-grid" id="gapRequestList">
+                    <div class="knowledge-state">正在加载资料缺口...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="sop-drafts-tab">
+            <div class="knowledge-shell">
+                <div class="knowledge-hero">
+                    <h2>SOP 草案</h2>
+                    <p class="subtitle">这里仅展示草案和待确认流程，不作为正式维修指导。下一步要把制造中心手册和真实案例转译成可执行、可培训、可验证的 SOP。</p>
+                </div>
+                <div class="knowledge-grid" id="sopDraftList">
+                    <div class="knowledge-state">正在加载 SOP 草案...</div>
+                </div>
             </div>
         </div>
 
@@ -2528,13 +2839,15 @@
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            const activeButton = document.querySelector(`[data-tab="${tabName}"]`);
+            if (activeButton) activeButton.classList.add('active');
             
             // 切换Tab内容
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.remove('active');
             });
-            document.getElementById(`${tabName}-tab`).classList.add('active');
+            const activeContent = document.getElementById(`${tabName}-tab`);
+            if (activeContent) activeContent.classList.add('active');
         }
 
         // 诊断模式切换
@@ -2561,6 +2874,356 @@
             if (mode === 'ai') {
                 populateAIProjectSelector();
             }
+        }
+
+        const knowledgeBaseState = {
+            loaded: false,
+            error: '',
+            activeSignalModule: '',
+            data: {
+                sources: [],
+                trainingMaterials: [],
+                manuals: [],
+                mtkSignals: null,
+                reportSummaries: [],
+                gapRequests: [],
+                sopDrafts: []
+            }
+        };
+
+        const KNOWLEDGE_FILES = {
+            sources: 'knowledge-base/source-records.json',
+            trainingMaterials: 'knowledge-base/training-materials.json',
+            manuals: 'knowledge-base/platform-repair-manuals.json',
+            mtkSignals: 'knowledge-base/mtk-signal-reference.json',
+            reportSummaries: 'knowledge-base/repair-report-summaries.json',
+            gapRequests: 'knowledge-base/gap-requests.json',
+            sopDrafts: 'knowledge-base/sop-drafts.json'
+        };
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function asArray(value) {
+            if (Array.isArray(value)) return value;
+            if (value === undefined || value === null || value === '') return [];
+            return [value];
+        }
+
+        function includesKeyword(item, keyword, fields) {
+            if (!keyword) return true;
+            const haystack = fields.map(field => {
+                const value = field.split('.').reduce((obj, key) => obj && obj[key], item);
+                return Array.isArray(value) ? value.join(' ') : value;
+            }).join(' ').toLowerCase();
+            return haystack.includes(keyword.toLowerCase());
+        }
+
+        function renderPills(items, extraClass = '') {
+            return asArray(items).filter(Boolean).slice(0, 8).map(item => {
+                return `<span class="knowledge-pill ${extraClass}">${escapeHtml(item)}</span>`;
+            }).join('');
+        }
+
+        function setKnowledgeError(message) {
+            ['sourceOverviewList', 'signalResultList', 'l4InsightCards', 'gapRequestList', 'sopDraftList'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = `<div class="knowledge-state">${escapeHtml(message)}</div>`;
+            });
+        }
+
+        async function loadKnowledgeBase() {
+            try {
+                const entries = await Promise.all(Object.entries(KNOWLEDGE_FILES).map(async ([key, path]) => {
+                    const response = await fetch(path, { cache: 'no-store' });
+                    if (!response.ok) throw new Error(`${path} 加载失败：${response.status}`);
+                    return [key, await response.json()];
+                }));
+                entries.forEach(([key, value]) => {
+                    knowledgeBaseState.data[key] = value;
+                });
+                knowledgeBaseState.loaded = true;
+                knowledgeBaseState.error = '';
+                initializeKnowledgeFilters();
+                renderAllKnowledgePages();
+            } catch (error) {
+                knowledgeBaseState.loaded = false;
+                knowledgeBaseState.error = error.message || '知识库加载失败';
+                setKnowledgeError(`知识库加载失败：${knowledgeBaseState.error}`);
+            }
+        }
+
+        function initializeKnowledgeFilters() {
+            const sources = knowledgeBaseState.data.sources || [];
+            const sourceCategoryFilter = document.getElementById('sourceCategoryFilter');
+            if (sourceCategoryFilter) {
+                const categories = [...new Set(sources.map(item => item.main_category).filter(Boolean))].sort();
+                sourceCategoryFilter.innerHTML = '<option value="">全部分类</option>' + categories.map(category => {
+                    return `<option value="${escapeHtml(category)}">${escapeHtml(category)}</option>`;
+                }).join('');
+            }
+
+            const gaps = knowledgeBaseState.data.gapRequests || [];
+            const priorityFilter = document.getElementById('gapPriorityFilter');
+            if (priorityFilter) {
+                const priorities = [...new Set(gaps.map(item => item.priority).filter(Boolean))];
+                priorityFilter.innerHTML = '<option value="">全部优先级</option>' + priorities.map(priority => {
+                    return `<option value="${escapeHtml(priority)}">${escapeHtml(priority)}</option>`;
+                }).join('');
+            }
+
+            const providerFilter = document.getElementById('gapProviderFilter');
+            if (providerFilter) {
+                const providers = [...new Set(gaps.map(item => item.provider).filter(Boolean))].sort();
+                providerFilter.innerHTML = '<option value="">全部提供方</option>' + providers.map(provider => {
+                    return `<option value="${escapeHtml(provider)}">${escapeHtml(provider)}</option>`;
+                }).join('');
+            }
+
+            renderSignalModuleFilter();
+        }
+
+        function renderAllKnowledgePages() {
+            renderSourceOverview();
+            renderMtkSignals();
+            renderL4Insights();
+            renderGapRequests();
+            renderSopDrafts();
+        }
+
+        function renderSourceOverview() {
+            const listEl = document.getElementById('sourceOverviewList');
+            const statsEl = document.getElementById('sourceStats');
+            if (!listEl || !statsEl) return;
+            if (!knowledgeBaseState.loaded) return;
+
+            const keyword = document.getElementById('sourceSearchInput')?.value.trim() || '';
+            const category = document.getElementById('sourceCategoryFilter')?.value || '';
+            const sources = (knowledgeBaseState.data.sources || []).filter(item => {
+                const categoryMatched = !category || item.main_category === category;
+                const keywordMatched = includesKeyword(item, keyword, ['file_name', 'summary', 'main_category', 'processing_status', 'notes']) ||
+                    asArray(item.related_tools).join(' ').toLowerCase().includes(keyword.toLowerCase()) ||
+                    asArray(item.related_components).join(' ').toLowerCase().includes(keyword.toLowerCase());
+                return categoryMatched && keywordMatched;
+            });
+
+            const manuals = knowledgeBaseState.data.manuals || [];
+            const signals = knowledgeBaseState.data.mtkSignals?.entries || [];
+            const reports = knowledgeBaseState.data.reportSummaries || [];
+            const gaps = knowledgeBaseState.data.gapRequests || [];
+            statsEl.innerHTML = `
+                <div class="knowledge-stat"><strong>${sources.length}</strong><span>当前筛选资料</span></div>
+                <div class="knowledge-stat"><strong>${manuals.length}</strong><span>平台维修手册</span></div>
+                <div class="knowledge-stat"><strong>${signals.length}</strong><span>MTK 信号条目</span></div>
+                <div class="knowledge-stat"><strong>${reports.length}</strong><span>L4 报告摘要</span></div>
+                <div class="knowledge-stat"><strong>${gaps.length}</strong><span>待补资料缺口</span></div>
+            `;
+
+            if (sources.length === 0) {
+                listEl.innerHTML = '<div class="knowledge-state">没有匹配的资料。可以换一个关键词或分类。</div>';
+                return;
+            }
+
+            listEl.innerHTML = sources.map(item => `
+                <article class="knowledge-card">
+                    <h3>${escapeHtml(item.file_name || item.source_id)}</h3>
+                    <p>${escapeHtml(item.summary || '暂无摘要')}</p>
+                    <p><strong>处理状态：</strong>${escapeHtml(item.processing_status || '未标注')}</p>
+                    <p><strong>内部留痕：</strong>${escapeHtml(item.original_path || item.raw_file_saved_path || '未记录')}</p>
+                    <div class="knowledge-meta">
+                        ${renderPills([item.main_category])}
+                        ${renderPills(item.target_knowledge_base)}
+                        ${renderPills(item.related_tools)}
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        function renderSignalModuleFilter() {
+            const container = document.getElementById('signalModuleFilter');
+            if (!container) return;
+            const entries = knowledgeBaseState.data.mtkSignals?.entries || [];
+            const modules = [...new Set(entries.map(item => item.module).filter(Boolean))].sort();
+            const buttons = [''].concat(modules).map(module => {
+                const label = module || '全部模块';
+                const active = knowledgeBaseState.activeSignalModule === module ? 'active' : '';
+                return `<button type="button" class="${active}" onclick="setSignalModule('${escapeHtml(module)}')">${escapeHtml(label)}</button>`;
+            }).join('');
+            container.innerHTML = buttons;
+        }
+
+        function setSignalModule(moduleName) {
+            knowledgeBaseState.activeSignalModule = moduleName;
+            renderSignalModuleFilter();
+            renderMtkSignals();
+        }
+
+        function renderMtkSignals() {
+            const container = document.getElementById('signalResultList');
+            if (!container) return;
+            if (!knowledgeBaseState.loaded) return;
+
+            const keyword = document.getElementById('signalSearchInput')?.value.trim() || '';
+            const entries = knowledgeBaseState.data.mtkSignals?.entries || [];
+            const filtered = entries.filter(item => {
+                const moduleMatched = !knowledgeBaseState.activeSignalModule || item.module === knowledgeBaseState.activeSignalModule;
+                const keywordMatched = includesKeyword(item, keyword, ['module', 'signal_name', 'function', 'reference_value_or_waveform', 'status']);
+                return moduleMatched && keywordMatched;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="knowledge-state">没有匹配的信号。可以尝试输入模块名、信号名或参考值。</div>';
+                return;
+            }
+
+            container.innerHTML = filtered.slice(0, 80).map(item => `
+                <div class="knowledge-row">
+                    <div>
+                        <strong>${escapeHtml(item.signal_name)}</strong>
+                        <span>${escapeHtml(item.module)}</span>
+                    </div>
+                    <span>${escapeHtml(item.function)}</span>
+                    <span>${escapeHtml(item.reference_value_or_waveform || '未提供参考值')}</span>
+                </div>
+            `).join('') + (filtered.length > 80 ? `<div class="knowledge-state">已显示前 80 条，共 ${filtered.length} 条。请继续输入关键词缩小范围。</div>` : '');
+        }
+
+        function renderTopList(title, items, labelKey, countKey = 'count') {
+            const rows = asArray(items).slice(0, 8).map(item => `
+                <div class="knowledge-row">
+                    <strong>${escapeHtml(item[labelKey] || item.model || item.fault || item.symptom || item.service)}</strong>
+                    <span>${escapeHtml(item.fault && item.model ? item.fault : '')}</span>
+                    <span>${escapeHtml(item[countKey])} 条</span>
+                </div>
+            `).join('');
+            return `
+                <article class="knowledge-card">
+                    <h3>${escapeHtml(title)}</h3>
+                    <div class="knowledge-list">${rows || '<div class="knowledge-state">暂无数据</div>'}</div>
+                </article>
+            `;
+        }
+
+        function renderL4Insights() {
+            const statsEl = document.getElementById('l4Stats');
+            const cardsEl = document.getElementById('l4InsightCards');
+            if (!statsEl || !cardsEl) return;
+            if (!knowledgeBaseState.loaded) return;
+            const report = (knowledgeBaseState.data.reportSummaries || [])[0];
+            if (!report) {
+                statsEl.innerHTML = '';
+                cardsEl.innerHTML = '<div class="knowledge-state">暂无 L4 报告摘要。</div>';
+                return;
+            }
+
+            const completed = asArray(report.status_counts).find(item => item.status === 'Repair Completed')?.count || 0;
+            statsEl.innerHTML = `
+                <div class="knowledge-stat"><strong>${escapeHtml(report.scope?.record_count || 0)}</strong><span>脱敏记录数</span></div>
+                <div class="knowledge-stat"><strong>${escapeHtml(completed)}</strong><span>Repair Completed</span></div>
+                <div class="knowledge-stat"><strong>${escapeHtml(report.top_models?.[0]?.model || '-')}</strong><span>最高频机型</span></div>
+                <div class="knowledge-stat"><strong>${escapeHtml(report.top_symptoms?.[0]?.symptom || '-')}</strong><span>最高频现象</span></div>
+            `;
+
+            cardsEl.innerHTML = `
+                <article class="knowledge-card">
+                    <h3>${escapeHtml(report.title)}</h3>
+                    <p>${escapeHtml(report.scope?.ingestion_policy || '仅保存脱敏统计摘要。')}</p>
+                    <div class="knowledge-meta">${renderPills(report.phase_1_implications, 'draft')}</div>
+                </article>
+                ${renderTopList('高频机型', report.top_models, 'model')}
+                ${renderTopList('高频故障现象', report.top_symptoms, 'symptom')}
+                ${renderTopList('高频故障归因', report.top_faults, 'fault')}
+                ${renderTopList('高频维修动作', report.top_services, 'service')}
+                ${renderTopList('已完成维修：机型 x 故障组合', report.top_model_fault_completed, 'model')}
+                <article class="knowledge-card">
+                    <h3>数据质量提示</h3>
+                    <div class="knowledge-meta">${renderPills(report.data_quality_notes)}</div>
+                </article>
+            `;
+        }
+
+        function priorityClass(priority) {
+            if (priority === '高') return 'high';
+            if (priority === '中') return 'medium';
+            if (priority === '低') return 'low';
+            return '';
+        }
+
+        function renderGapRequests() {
+            const container = document.getElementById('gapRequestList');
+            if (!container) return;
+            if (!knowledgeBaseState.loaded) return;
+
+            const keyword = document.getElementById('gapSearchInput')?.value.trim() || '';
+            const priority = document.getElementById('gapPriorityFilter')?.value || '';
+            const provider = document.getElementById('gapProviderFilter')?.value || '';
+            const gaps = (knowledgeBaseState.data.gapRequests || []).filter(item => {
+                const priorityMatched = !priority || item.priority === priority;
+                const providerMatched = !provider || item.provider === provider;
+                const keywordMatched = includesKeyword(item, keyword, ['gap_type', 'description', 'provider', 'status', 'next_action']);
+                return priorityMatched && providerMatched && keywordMatched;
+            });
+
+            if (gaps.length === 0) {
+                container.innerHTML = '<div class="knowledge-state">没有匹配的资料缺口。</div>';
+                return;
+            }
+
+            container.innerHTML = gaps.map(item => `
+                <article class="knowledge-card">
+                    <h3>${escapeHtml(item.gap_type || item.request_id)}</h3>
+                    <p>${escapeHtml(item.description)}</p>
+                    <p><strong>建议动作：</strong>${escapeHtml(item.next_action || '未记录')}</p>
+                    <p><strong>提供方：</strong>${escapeHtml(item.provider || '未指定')}</p>
+                    <div class="knowledge-meta">
+                        <span class="knowledge-pill ${priorityClass(item.priority)}">${escapeHtml(item.priority || '未定优先级')}</span>
+                        ${renderPills(item.related_fault)}
+                        ${renderPills(item.source_ids)}
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        function renderSopDrafts() {
+            const container = document.getElementById('sopDraftList');
+            if (!container) return;
+            if (!knowledgeBaseState.loaded) return;
+            const drafts = knowledgeBaseState.data.sopDrafts || [];
+            const manuals = knowledgeBaseState.data.manuals || [];
+
+            const manualCards = manuals.map(manual => `
+                <article class="knowledge-card">
+                    <h3>${escapeHtml(manual.title)}：待转译 SOP</h3>
+                    <p>${escapeHtml(manual.scope_summary)}</p>
+                    <p><strong>当前状态：</strong>${escapeHtml(manual.status)}</p>
+                    <div class="knowledge-meta">
+                        <span class="knowledge-pill draft">待转译</span>
+                        ${renderPills(manual.high_value_modules?.map(item => item.module))}
+                    </div>
+                </article>
+            `).join('');
+
+            const draftCards = drafts.map(draft => `
+                <article class="knowledge-card">
+                    <h3>${escapeHtml(draft.title)}</h3>
+                    <p>${escapeHtml(draft.status || 'SOP 草案，待确认。')}</p>
+                    <p><strong>适用角色：</strong>${escapeHtml(asArray(draft.target_role).join(' / ') || '未标注')}</p>
+                    <p><strong>步骤数量：</strong>${escapeHtml(asArray(draft.steps).length)} 步</p>
+                    <div class="knowledge-meta">
+                        <span class="knowledge-pill draft">草案</span>
+                        ${renderPills(draft.required_tools)}
+                        ${renderPills(draft.open_questions)}
+                    </div>
+                </article>
+            `).join('');
+
+            container.innerHTML = (draftCards + manualCards) || '<div class="knowledge-state">暂无 SOP 草案。</div>';
         }
 
         // 快捷输入
@@ -3903,6 +4566,7 @@ ${keyLogSnippet || '无关键行'}
 
             // 初始化项目选择器（延迟加载，确保 DOM 就绪）
             setTimeout(() => populateAIProjectSelector(), 100);
+            loadKnowledgeBase();
 
             document.getElementById('symptomInput').addEventListener('keydown', function(event) {
                 if (event.key === 'Enter') {
