@@ -14,6 +14,8 @@
 - `mtk-signal-reference.json`：MTK 平台手册中抽取的信号名称、功能说明和测试参考值。
 - `fault-knowledge.json`：故障现象、常见原因、初步判断方法和建议检测方向。
 - `fault-packages.json`：高频主板故障包，用于组织 SOP、测试点、案例、点位图和维修边界建设。
+- `repair-case-template.json`：主板维修案例回流模板，定义字段、证据清单和审核状态。
+- `interactive-sop-prototypes.json`：交互式 SOP 步骤树原型，当前用于漏电流/待机电流异常草案。
 - `sop-drafts.json`：从现有资料中抽取的诊断 SOP 草案，后续需由技术支持或制造中心确认。
 - `repair-report-summaries.json`：L4 维修报告等明细数据的脱敏汇总，不保存 IMEI、序列号、技师姓名和原始工单明细。
 - `repair-boundaries.json`：维修能力边界、试点门槛和流程要求。

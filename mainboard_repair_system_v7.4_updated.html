@@ -782,6 +782,122 @@
             background: #eef3f9;
         }
 
+        .asset-viewer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .asset-viewer-card {
+            border: 1px solid #dce3ec;
+            border-radius: 8px;
+            background: #f8fafc;
+            min-height: 126px;
+            padding: 10px;
+            display: grid;
+            align-content: space-between;
+            gap: 8px;
+        }
+
+        .asset-preview {
+            min-height: 76px;
+            border-radius: 6px;
+            border: 1px dashed #cbd5e1;
+            background: #ffffff;
+            display: grid;
+            place-items: center;
+            color: #64748b;
+            font-size: 12px;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .asset-preview img {
+            width: 100%;
+            max-height: 150px;
+            object-fit: contain;
+            transform: scale(var(--zoom, 1));
+            transform-origin: center;
+        }
+
+        .asset-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .asset-actions button,
+        .asset-actions a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 26px;
+            padding: 4px 8px;
+            border-radius: 5px;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #0e3566;
+            font-size: 12px;
+            text-decoration: none;
+            box-shadow: none;
+        }
+
+        .dashboard-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 14px;
+        }
+
+        .dashboard-section .knowledge-row {
+            grid-template-columns: 1fr;
+            gap: 5px;
+        }
+
+        .sop-step-layout {
+            display: grid;
+            grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.4fr);
+            gap: 14px;
+        }
+
+        .sop-step-list {
+            display: grid;
+            gap: 8px;
+        }
+
+        .sop-step-item {
+            border: 1px solid #dce3ec;
+            border-radius: 7px;
+            padding: 10px;
+            background: #ffffff;
+            color: #334155;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .sop-step-item.active {
+            border-color: #0e3566;
+            background: #e8eef7;
+            color: #0e3566;
+            font-weight: 700;
+        }
+
+        .sop-option-grid {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .sop-option-grid button {
+            padding: 9px 12px;
+            border-radius: 6px;
+            background: #0e3566;
+            color: #ffffff;
+            font-size: 13px;
+            box-shadow: none;
+        }
+
         .diagnosis-toolbar, .resource-toolbar {
             display: flex;
             gap: 10px;
@@ -1857,8 +1973,11 @@
             <div class="sidebar-secondary">
                 <div class="sidebar-group-title">规划模块</div>
                 <div class="tab-container">
+                    <button class="tab-btn" data-tab="readiness-dashboard" onclick="switchTab('readiness-dashboard')">完整度仪表盘</button>
                     <button class="tab-btn" data-tab="model-library" onclick="switchTab('model-library')">机型资料库</button>
                     <button class="tab-btn" data-tab="fault-packages" onclick="switchTab('fault-packages')">故障包</button>
+                    <button class="tab-btn" data-tab="case-template" onclick="switchTab('case-template')">案例回流模板</button>
+                    <button class="tab-btn" data-tab="interactive-sop" onclick="switchTab('interactive-sop')">交互式 SOP</button>
                     <button class="tab-btn" data-tab="source-overview" onclick="switchTab('source-overview')">资料总览</button>
                     <button class="tab-btn" data-tab="mtk-signals" onclick="switchTab('mtk-signals')">MTK 信号查询</button>
                     <button class="tab-btn" data-tab="l4-insights" onclick="switchTab('l4-insights')">L4 报告洞察</button>
@@ -2166,6 +2285,30 @@
             </div>
         </div>
 
+        <div class="tab-content" id="readiness-dashboard-tab">
+            <div class="knowledge-shell">
+                <div class="knowledge-hero">
+                    <h2>完整度仪表盘</h2>
+                    <p class="subtitle">汇总机型资料、故障包、SOP、案例和工程确认的缺口，帮助判断下一步该向谁要什么资料。</p>
+                </div>
+                <div class="knowledge-stat-grid" id="readinessDashboardStats"></div>
+                <div class="dashboard-section">
+                    <div class="knowledge-card">
+                        <h3>机型资料完整度</h3>
+                        <div class="knowledge-list" id="modelReadinessList"></div>
+                    </div>
+                    <div class="knowledge-card">
+                        <h3>故障包建设完整度</h3>
+                        <div class="knowledge-list" id="faultPackageReadinessList"></div>
+                    </div>
+                    <div class="knowledge-card">
+                        <h3>优先补齐事项</h3>
+                        <div class="knowledge-list" id="priorityGapList"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="tab-content" id="model-library-tab">
             <div class="knowledge-shell">
                 <div class="knowledge-hero">
@@ -2281,6 +2424,34 @@
                 </div>
                 <div class="knowledge-grid" id="sopDraftList">
                     <div class="knowledge-state">正在加载 SOP 草案...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="case-template-tab">
+            <div class="knowledge-shell">
+                <div class="knowledge-hero">
+                    <h2>案例回流模板</h2>
+                    <p class="subtitle">用于把中方技术员、L4 技术员和海外现场的维修经验沉淀成可审核、可复用、可反哺 SOP 的结构化案例。</p>
+                </div>
+                <div class="knowledge-grid" id="caseTemplateFields">
+                    <div class="knowledge-state">正在加载案例模板...</div>
+                </div>
+                <div class="knowledge-card">
+                    <h3>证据清单</h3>
+                    <div class="knowledge-meta" id="caseEvidenceChecklist"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="interactive-sop-tab">
+            <div class="knowledge-shell">
+                <div class="knowledge-hero">
+                    <h2>交互式 SOP</h2>
+                    <p class="subtitle">把静态 SOP 草案拆成可点击的步骤树。当前先用漏电流 / 待机电流异常做原型，不作为正式维修指导。</p>
+                </div>
+                <div class="knowledge-card" id="interactiveSopPanel">
+                    <div class="knowledge-state">正在加载交互式 SOP 原型...</div>
                 </div>
             </div>
         </div>
@@ -2996,6 +3167,8 @@
             data: {
                 sources: [],
                 faultPackages: null,
+                caseTemplate: null,
+                interactiveSops: null,
                 trainingMaterials: [],
                 manuals: [],
                 modelAssets: null,
@@ -3009,6 +3182,8 @@
         const KNOWLEDGE_FILES = {
             sources: 'knowledge-base/source-records.json',
             faultPackages: 'knowledge-base/fault-packages.json',
+            caseTemplate: 'knowledge-base/repair-case-template.json',
+            interactiveSops: 'knowledge-base/interactive-sop-prototypes.json',
             trainingMaterials: 'knowledge-base/training-materials.json',
             manuals: 'knowledge-base/platform-repair-manuals.json',
             modelAssets: 'knowledge-base/model-board-assets.json',
@@ -3123,8 +3298,11 @@
         }
 
         function renderAllKnowledgePages() {
+            renderReadinessDashboard();
             renderModelLibrary();
             renderFaultPackages();
+            renderCaseTemplate();
+            renderInteractiveSop();
             renderSourceOverview();
             renderMtkSignals();
             renderL4Insights();
@@ -3213,6 +3391,49 @@
             return labels[status] || status || '未标注';
         }
 
+        function renderAssetViewer(model, slots) {
+            const assets = model.assets || {};
+            const labelMap = {
+                board_front: '正面主板图',
+                board_back: '反面主板图',
+                point_map_front: '正面点位图',
+                point_map_back: '反面点位图',
+                schematic: '原理图',
+                bom: 'BOM'
+            };
+            return `
+                <div class="asset-viewer-grid">
+                    ${asArray(slots).slice(0, 4).map(slot => {
+                        const assetPath = assets[slot];
+                        const isImage = assetPath && /\.(png|jpe?g|webp|gif)$/i.test(assetPath);
+                        const previewId = `asset-preview-${model.model_id}-${slot}`;
+                        return `
+                            <div class="asset-viewer-card">
+                                <strong>${escapeHtml(labelMap[slot] || slot)}</strong>
+                                <div class="asset-preview" id="${escapeHtml(previewId)}">
+                                    ${assetPath ? (isImage ? `<img src="${escapeHtml(assetPath)}" alt="${escapeHtml(labelMap[slot] || slot)}">` : `<span>${escapeHtml(assetPath)}</span>`) : '<span>待制造中心提供</span>'}
+                                </div>
+                                <div class="asset-actions">
+                                    <button type="button" onclick="zoomAssetPreview('${escapeHtml(previewId)}', 0.15)">放大</button>
+                                    <button type="button" onclick="zoomAssetPreview('${escapeHtml(previewId)}', -0.15)">缩小</button>
+                                    ${assetPath ? `<a href="${escapeHtml(assetPath)}" target="_blank">打开</a>` : '<span class="knowledge-pill high">缺失</span>'}
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        function zoomAssetPreview(previewId, delta) {
+            const preview = document.getElementById(previewId);
+            if (!preview) return;
+            const current = Number(preview.dataset.zoom || '1');
+            const next = Math.max(0.6, Math.min(2.4, current + delta));
+            preview.dataset.zoom = String(next);
+            preview.style.setProperty('--zoom', String(next));
+        }
+
         function renderMaterialChecklist(model, library) {
             const groups = library?.readiness_model?.required_groups || [];
             return groups.map(group => {
@@ -3289,6 +3510,7 @@
                         <p><strong>平台：</strong>${escapeHtml(model.platform || '待确认')}</p>
                         <p><strong>主板版本：</strong>${escapeHtml(asArray(model.board_versions).join(' / ') || '待确认')}</p>
                         <p><strong>适用区域：</strong>${escapeHtml(asArray(model.region_scope).join(' / ') || '待确认')}</p>
+                        ${renderAssetViewer(model, slots)}
                         <div class="material-checklist">${renderMaterialChecklist(model, library)}</div>
                         <p><strong>维修边界：</strong>${escapeHtml(model.repair_boundary?.note || '待确认')}</p>
                         <p><strong>工程确认：</strong>${escapeHtml(model.engineering_confirmation?.note || '待确认')}</p>
@@ -3411,6 +3633,115 @@
                     </div>
                 </article>
             `).join('');
+        }
+
+        function renderReadinessDashboard() {
+            const statsEl = document.getElementById('readinessDashboardStats');
+            const modelListEl = document.getElementById('modelReadinessList');
+            const packageListEl = document.getElementById('faultPackageReadinessList');
+            const gapListEl = document.getElementById('priorityGapList');
+            if (!statsEl || !modelListEl || !packageListEl || !gapListEl) return;
+            if (!knowledgeBaseState.loaded) return;
+
+            const modelLibrary = knowledgeBaseState.data.modelAssets;
+            const models = modelLibrary?.models || [];
+            const packageLibrary = knowledgeBaseState.data.faultPackages;
+            const packages = packageLibrary?.packages || [];
+            const modelScores = models.map(model => ({ name: model.model_name, score: calculateModelReadiness(model, modelLibrary).score, next: model.next_action }));
+            const packageScores = packages.map(pack => ({ name: pack.title, score: calculatePackageReadiness(pack, packageLibrary).score, next: pack.next_action, priority: pack.priority }));
+            const avgModel = modelScores.length ? Math.round(modelScores.reduce((sum, item) => sum + item.score, 0) / modelScores.length) : 0;
+            const avgPackage = packageScores.length ? Math.round(packageScores.reduce((sum, item) => sum + item.score, 0) / packageScores.length) : 0;
+
+            statsEl.innerHTML = `
+                <div class="knowledge-stat"><strong>${avgModel}%</strong><span>机型平均完整度</span></div>
+                <div class="knowledge-stat"><strong>${avgPackage}%</strong><span>故障包平均完整度</span></div>
+                <div class="knowledge-stat"><strong>${modelScores.filter(item => item.score >= 86).length}</strong><span>可内测机型</span></div>
+                <div class="knowledge-stat"><strong>${packageScores.filter(item => item.score >= 86).length}</strong><span>可内测故障包</span></div>
+            `;
+
+            modelListEl.innerHTML = modelScores.slice().sort((a, b) => a.score - b.score).slice(0, 8).map(item => `
+                <div class="knowledge-row"><strong>${escapeHtml(item.name)}</strong><span>完整度 ${escapeHtml(item.score)}%</span><span>${escapeHtml(item.next || '待补充')}</span></div>
+            `).join('');
+
+            packageListEl.innerHTML = packageScores.slice().sort((a, b) => a.score - b.score).map(item => `
+                <div class="knowledge-row"><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.priority)} · 完整度 ${escapeHtml(item.score)}%</span><span>${escapeHtml(item.next || '待补充')}</span></div>
+            `).join('');
+
+            const gapItems = [];
+            models.forEach(model => {
+                asArray(calculateModelReadiness(model, modelLibrary).blockers).slice(0, 3).forEach(blocker => gapItems.push({ owner: model.model_name, blocker, type: '机型' }));
+            });
+            packages.forEach(pack => {
+                asArray(calculatePackageReadiness(pack, packageLibrary).blockers).slice(0, 3).forEach(blocker => gapItems.push({ owner: pack.title, blocker, type: '故障包' }));
+            });
+            gapListEl.innerHTML = gapItems.slice(0, 12).map(item => `
+                <div class="knowledge-row"><strong>${escapeHtml(item.blocker)}</strong><span>${escapeHtml(item.type)}</span><span>${escapeHtml(item.owner)}</span></div>
+            `).join('');
+        }
+
+        function renderCaseTemplate() {
+            const fieldsEl = document.getElementById('caseTemplateFields');
+            const evidenceEl = document.getElementById('caseEvidenceChecklist');
+            if (!fieldsEl || !evidenceEl) return;
+            if (!knowledgeBaseState.loaded) return;
+            const template = knowledgeBaseState.data.caseTemplate;
+            const fields = template?.required_fields || [];
+            fieldsEl.innerHTML = fields.map(field => `
+                <article class="knowledge-card">
+                    <h3>${escapeHtml(field.label)}</h3>
+                    <p><strong>字段类型：</strong>${escapeHtml(field.type)}</p>
+                    <p><strong>示例：</strong>${escapeHtml(field.example || '待补充')}</p>
+                    <div class="knowledge-meta"><span class="knowledge-pill draft">${escapeHtml(field.field_id)}</span></div>
+                </article>
+            `).join('');
+            evidenceEl.innerHTML = renderPills(template?.evidence_checklist || []);
+        }
+
+        let activeSopPrototypeId = '';
+        let activeSopStepId = '';
+
+        function getActiveSopPrototype() {
+            const prototypes = knowledgeBaseState.data.interactiveSops?.prototypes || [];
+            if (!activeSopPrototypeId && prototypes[0]) {
+                activeSopPrototypeId = prototypes[0].prototype_id;
+                activeSopStepId = prototypes[0].steps?.[0]?.step_id || '';
+            }
+            return prototypes.find(item => item.prototype_id === activeSopPrototypeId) || prototypes[0];
+        }
+
+        function setInteractiveSopStep(stepId) {
+            activeSopStepId = stepId;
+            renderInteractiveSop();
+        }
+
+        function renderInteractiveSop() {
+            const panel = document.getElementById('interactiveSopPanel');
+            if (!panel) return;
+            if (!knowledgeBaseState.loaded) return;
+            const prototype = getActiveSopPrototype();
+            if (!prototype) {
+                panel.innerHTML = '<div class="knowledge-state">暂无交互式 SOP 原型。</div>';
+                return;
+            }
+            const steps = prototype.steps || [];
+            const activeStep = steps.find(step => step.step_id === activeSopStepId) || steps[0];
+            if (!activeSopStepId && activeStep) activeSopStepId = activeStep.step_id;
+            panel.innerHTML = `
+                <h3>${escapeHtml(prototype.title)}</h3>
+                <p>${escapeHtml(prototype.warning || '')}</p>
+                <div class="sop-step-layout">
+                    <div class="sop-step-list">
+                        ${steps.map(step => `<div class="sop-step-item ${step.step_id === activeStep.step_id ? 'active' : ''}" onclick="setInteractiveSopStep('${escapeHtml(step.step_id)}')">${escapeHtml(step.title)}</div>`).join('')}
+                    </div>
+                    <div class="knowledge-card">
+                        <h3>${escapeHtml(activeStep.title)}</h3>
+                        <p>${escapeHtml(activeStep.instruction)}</p>
+                        <div class="sop-option-grid">
+                            ${asArray(activeStep.options).map(option => `<button type="button" onclick="setInteractiveSopStep('${escapeHtml(option.next_step_id)}')">${escapeHtml(option.label)}</button>`).join('') || '<span class="knowledge-pill draft">终点步骤：请记录结果并复测</span>'}
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
         function renderSourceOverview() {

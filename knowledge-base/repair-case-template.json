@@ -1,0 +1,39 @@
+{
+  "template_id": "REPAIR-CASE-TEMPLATE-20260701",
+  "title": "主板维修案例回流模板",
+  "status": "draft",
+  "purpose": "用于中方技术人员、L4 技术员和海外现场沉淀真实维修案例，后续反哺故障知识、SOP 和 AI/检测治具标准答案。",
+  "required_fields": [
+    { "field_id": "case_title", "label": "案例标题", "type": "text", "example": "BG6m 不开机 Memory Failure 维修案例" },
+    { "field_id": "model_name", "label": "机型", "type": "text", "example": "BG6m" },
+    { "field_id": "board_version", "label": "主板版本", "type": "text", "example": "待制造中心确认" },
+    { "field_id": "fault_package", "label": "关联故障包", "type": "select", "example": "不开机故障包" },
+    { "field_id": "symptom", "label": "故障现象", "type": "textarea", "example": "按开机键无反应，接电源小电流。" },
+    { "field_id": "precheck", "label": "外观/进水/摔机预检", "type": "textarea", "example": "外观无明显烧毁，无进水痕迹。" },
+    { "field_id": "measurements", "label": "关键测量值", "type": "table", "example": "测试点、档位、实测值、正常范围、结论" },
+    { "field_id": "diagnosis_process", "label": "定位过程", "type": "textarea", "example": "依次检查 VBAT、VCORE、Memory 供电..." },
+    { "field_id": "repair_action", "label": "维修动作", "type": "textarea", "example": "更换/补焊/清洁/飞线/判定不可修" },
+    { "field_id": "replaced_components", "label": "更换器件", "type": "table", "example": "位号、名称、型号、来源" },
+    { "field_id": "verification", "label": "修后验证", "type": "textarea", "example": "开机、充电、网络、老化、复测电流" },
+    { "field_id": "result", "label": "维修结果", "type": "select", "example": "修复 / 不可修 / 升级中方技术员 / 待制造中心确认" },
+    { "field_id": "return_risk", "label": "返修风险", "type": "textarea", "example": "是否有二返、是否需要复测周期" },
+    { "field_id": "review_conclusion", "label": "中方技术员审核结论", "type": "textarea", "example": "该案例可沉淀为 SOP 样例 / 仅作参考" }
+  ],
+  "evidence_checklist": [
+    "主板正反面照片",
+    "关键测试点照片或点位截图",
+    "测量值记录",
+    "更换器件照片",
+    "修后功能测试结果",
+    "必要时附 Log 或热像图",
+    "审核人和审核结论"
+  ],
+  "case_status_flow": [
+    "draft",
+    "submitted",
+    "reviewing",
+    "verified",
+    "needs_manufacturing_center_confirmation",
+    "rejected_or_reference_only"
+  ]
+}
