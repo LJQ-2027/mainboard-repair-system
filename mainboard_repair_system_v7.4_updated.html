@@ -12,11 +12,37 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --console-bg: #f3f5f8;
+            --console-surface: #ffffff;
+            --console-surface-muted: #f8fafc;
+            --console-panel: #eef3f7;
+            --console-border: #d8e0ea;
+            --console-border-strong: #bcc9d8;
+            --console-text: #101828;
+            --console-muted: #667085;
+            --console-subtle: #8a97a8;
+            --console-accent: #154c79;
+            --console-accent-strong: #0f3557;
+            --console-accent-soft: #e7f0f8;
+            --console-green: #087a5b;
+            --console-green-soft: #dff7ec;
+            --console-amber: #9a5b00;
+            --console-amber-soft: #fff1c7;
+            --console-red: #b42318;
+            --console-red-soft: #fee4e2;
+            --console-shadow: 0 18px 45px rgba(16, 24, 40, 0.08);
+            --console-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
         body {
-            font-family: "Microsoft YaHei", "PingFang SC", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: #f6f7f9;
-            color: #1f2937;
+            font-family: "Microsoft YaHei UI", "Microsoft YaHei", "PingFang SC", "Segoe UI", system-ui, sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(21, 76, 121, 0.08), transparent 28rem),
+                linear-gradient(180deg, #f8fafc 0%, var(--console-bg) 44%, #eef2f6 100%);
+            color: var(--console-text);
             min-height: 100vh;
+            font-variant-numeric: tabular-nums;
         }
 
         .container {
@@ -172,20 +198,22 @@
         }
 
         button {
-            padding: 15px 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 11px 18px;
+            background: var(--console-accent);
             color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
+            border: 1px solid var(--console-accent);
+            border-radius: 7px;
+            font-size: 14px;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: background 180ms var(--console-ease), border-color 180ms var(--console-ease), color 180ms var(--console-ease), transform 180ms var(--console-ease), box-shadow 180ms var(--console-ease);
         }
 
         button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+            background: var(--console-accent-strong);
+            border-color: var(--console-accent-strong);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 18px rgba(21, 76, 121, 0.18);
         }
 
         button:active {
@@ -1951,39 +1979,553 @@
                 font-size: 13px;
             }
         }
+
+        /* ========== Professional console redesign overrides ========== */
+        .container {
+            grid-template-columns: 248px minmax(0, 1fr);
+            background: transparent;
+        }
+
+        .workbench-sidebar {
+            background: rgba(238, 243, 247, 0.92);
+            border-right: 1px solid var(--console-border);
+            padding: 20px 14px;
+            gap: 18px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+
+        .brand-block {
+            padding: 6px 8px 18px;
+            border-bottom: 1px solid var(--console-border);
+        }
+
+        .brand-title {
+            color: var(--console-accent-strong);
+            font-size: 18px;
+            letter-spacing: 0;
+        }
+
+        .brand-kicker {
+            color: var(--console-muted);
+            font-size: 10px;
+            letter-spacing: 0.12em;
+        }
+
+        .sidebar-group-title {
+            margin: 2px 8px 8px;
+            color: #7a8798;
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .tab-container {
+            gap: 4px;
+        }
+
+        .tab-btn {
+            min-height: 38px;
+            padding: 9px 10px 9px 13px;
+            border-radius: 7px;
+            color: #344054;
+            font-size: 13px;
+            font-weight: 700;
+            transition: background 180ms var(--console-ease), border-color 180ms var(--console-ease), color 180ms var(--console-ease), transform 180ms var(--console-ease);
+        }
+
+        .tab-btn:hover {
+            color: var(--console-accent-strong);
+            background: rgba(255, 255, 255, 0.68);
+            border-color: var(--console-border);
+            transform: translateX(1px);
+        }
+
+        .tab-btn.active {
+            color: var(--console-accent-strong);
+            background: var(--console-surface);
+            border-color: var(--console-border-strong);
+            box-shadow: 0 8px 20px rgba(16, 24, 40, 0.06);
+        }
+
+        .tab-btn.active::before {
+            content: "";
+            position: absolute;
+            left: 5px;
+            top: 9px;
+            bottom: 9px;
+            width: 3px;
+            border-radius: 999px;
+            background: var(--console-accent);
+        }
+
+        .sidebar-secondary {
+            gap: 14px;
+        }
+
+        .workbench-main {
+            padding: 26px clamp(20px, 3vw, 38px) 42px;
+            max-width: 1560px;
+            width: auto;
+            min-width: 0;
+        }
+
+        .workbench-topbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            grid-template-columns: minmax(0, 1fr) minmax(320px, 500px) auto;
+            gap: 14px;
+            margin: -26px calc(clamp(20px, 3vw, 38px) * -1) 22px;
+            padding: 18px clamp(20px, 3vw, 38px);
+            border-bottom: 1px solid rgba(216, 224, 234, 0.86);
+            background: rgba(248, 250, 252, 0.92);
+            backdrop-filter: blur(14px);
+        }
+
+        .workbench-topbar h1 {
+            margin: 0 0 4px;
+            color: var(--console-text);
+            font-size: 24px;
+            line-height: 1.18;
+            text-wrap: balance;
+        }
+
+        .subtitle {
+            color: var(--console-muted);
+            font-size: 13px;
+            line-height: 1.55;
+        }
+
+        .topbar-status {
+            display: flex;
+            gap: 7px;
+            flex-wrap: wrap;
+            margin-top: 9px;
+        }
+
+        .status-chip {
+            display: inline-flex;
+            align-items: center;
+            min-height: 23px;
+            padding: 3px 8px;
+            border: 1px solid var(--console-border);
+            border-radius: 6px;
+            background: var(--console-surface);
+            color: #475467;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .status-chip.primary {
+            border-color: #b5cde2;
+            background: var(--console-accent-soft);
+            color: var(--console-accent-strong);
+        }
+
+        .status-chip.muted {
+            color: var(--console-muted);
+            background: #f7f9fb;
+        }
+
+        .global-search {
+            min-height: 44px;
+            border-color: var(--console-border);
+            border-radius: 8px;
+            padding: 8px 10px;
+            background: var(--console-surface);
+            box-shadow: 0 1px 0 rgba(16, 24, 40, 0.03);
+            cursor: text;
+        }
+
+        .global-search:hover,
+        .global-search:focus-within {
+            border-color: #9fb9cf;
+            box-shadow: 0 0 0 3px rgba(21, 76, 121, 0.1);
+        }
+
+        .shortcut {
+            border-color: #c6d6e5;
+            color: var(--console-accent-strong);
+            background: var(--console-accent-soft);
+            font-weight: 700;
+        }
+
+        .settings-gear {
+            min-height: 44px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            background: var(--console-accent-strong);
+            border-color: var(--console-accent-strong);
+            color: #fff;
+            white-space: nowrap;
+            box-shadow: none;
+        }
+
+        .settings-gear:hover {
+            background: #092844;
+            border-color: #092844;
+            transform: translateY(-1px);
+        }
+
+        .workbench-overview {
+            display: none;
+        }
+
+        .knowledge-shell {
+            gap: 14px;
+        }
+
+        .knowledge-hero {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--console-border);
+            border-radius: 10px;
+            padding: 20px;
+            background:
+                linear-gradient(135deg, rgba(21, 76, 121, 0.07), transparent 46%),
+                var(--console-surface);
+            box-shadow: 0 1px 0 rgba(16, 24, 40, 0.04);
+        }
+
+        .knowledge-hero h2 {
+            margin-bottom: 7px;
+            color: var(--console-text);
+            font-size: 22px;
+            line-height: 1.25;
+        }
+
+        .knowledge-toolbar {
+            display: grid;
+            grid-template-columns: minmax(260px, 1.6fr) minmax(170px, 0.7fr) minmax(170px, 0.7fr);
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .knowledge-toolbar input,
+        .knowledge-toolbar select,
+        input[type="text"],
+        textarea,
+        .project-selector-bar select,
+        .setting-row input,
+        .setting-row select {
+            border: 1px solid var(--console-border-strong);
+            border-radius: 8px;
+            background: var(--console-surface);
+            color: var(--console-text);
+            box-shadow: 0 1px 0 rgba(16, 24, 40, 0.03);
+        }
+
+        .knowledge-toolbar input:focus,
+        .knowledge-toolbar select:focus,
+        input[type="text"]:focus,
+        textarea:focus,
+        .project-selector-bar select:focus,
+        .setting-row input:focus,
+        .setting-row select:focus {
+            border-color: #7aa5c7;
+            box-shadow: 0 0 0 3px rgba(21, 76, 121, 0.12);
+        }
+
+        .knowledge-stat-grid {
+            grid-template-columns: repeat(4, minmax(150px, 1fr));
+            gap: 10px;
+        }
+
+        .knowledge-stat {
+            border-color: var(--console-border);
+            border-radius: 8px;
+            padding: 13px 14px;
+            background: var(--console-surface);
+            box-shadow: 0 1px 0 rgba(16, 24, 40, 0.03);
+        }
+
+        .knowledge-stat strong {
+            color: var(--console-accent-strong);
+            font-size: 22px;
+        }
+
+        .knowledge-stat span {
+            color: var(--console-muted);
+            font-weight: 700;
+        }
+
+        .dashboard-section {
+            grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr) minmax(0, 1.08fr);
+            gap: 12px;
+            align-items: start;
+        }
+
+        .knowledge-card {
+            border-color: var(--console-border);
+            border-radius: 9px;
+            background: var(--console-surface);
+            box-shadow: 0 1px 0 rgba(16, 24, 40, 0.03);
+            min-width: 0;
+        }
+
+        .knowledge-card h3 {
+            margin-bottom: 11px;
+            padding-bottom: 9px;
+            border-bottom: 1px solid var(--console-border);
+            color: var(--console-text);
+            font-size: 15px;
+        }
+
+        .knowledge-row {
+            grid-template-columns: minmax(96px, 0.85fr) minmax(0, 1.35fr) minmax(76px, 0.62fr);
+            gap: 10px;
+            border-color: #e2e8f0;
+            border-radius: 7px;
+            background: var(--console-surface-muted);
+            padding: 11px 12px;
+        }
+
+        .dashboard-section .knowledge-row {
+            grid-template-columns: minmax(86px, 0.8fr) minmax(0, 1.25fr) minmax(72px, 0.56fr);
+        }
+
+        .knowledge-row strong {
+            color: var(--console-text);
+            font-size: 13px;
+            min-width: 0;
+        }
+
+        .knowledge-row span {
+            color: #526071;
+            font-size: 12px;
+            min-width: 0;
+        }
+
+        .knowledge-grid {
+            grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+            gap: 12px;
+        }
+
+        .knowledge-pill {
+            border-radius: 6px;
+            background: #edf2f7;
+            color: #344054;
+        }
+
+        .knowledge-pill.high {
+            background: var(--console-red-soft);
+            color: var(--console-red);
+        }
+
+        .knowledge-pill.medium {
+            background: var(--console-amber-soft);
+            color: var(--console-amber);
+        }
+
+        .knowledge-pill.low {
+            background: var(--console-green-soft);
+            color: var(--console-green);
+        }
+
+        .knowledge-pill.draft {
+            background: var(--console-accent-soft);
+            color: var(--console-accent-strong);
+        }
+
+        .knowledge-state {
+            background: var(--console-surface);
+            border-color: var(--console-border-strong);
+            color: var(--console-muted);
+        }
+
+        .model-detail-btn,
+        .secondary-btn,
+        .quick-btn,
+        .asset-actions button,
+        .asset-actions a,
+        .module-filter button {
+            background: var(--console-surface);
+            border: 1px solid var(--console-border-strong);
+            color: var(--console-accent-strong);
+            border-radius: 7px;
+            box-shadow: none;
+        }
+
+        .model-detail-btn:hover,
+        .secondary-btn:hover,
+        .quick-btn:hover,
+        .asset-actions button:hover,
+        .asset-actions a:hover,
+        .module-filter button:hover {
+            background: var(--console-accent-soft);
+            border-color: #9fb9cf;
+            color: var(--console-accent-strong);
+            transform: translateY(-1px);
+            box-shadow: none;
+        }
+
+        .module-filter button.active,
+        .mode-btn.active {
+            background: var(--console-accent-strong);
+            border-color: var(--console-accent-strong);
+            color: #ffffff;
+        }
+
+        .mode-btn.ai-mode,
+        .mode-btn.ai-mode:hover {
+            border-color: var(--console-border);
+            background: var(--console-surface);
+            box-shadow: none;
+        }
+
+        .mode-btn.ai-mode::after {
+            display: none;
+        }
+
+        .mode-btn.ai-mode.active {
+            background: var(--console-accent-strong);
+            border-color: var(--console-accent-strong);
+            color: #ffffff;
+        }
+
+        .mode-btn.ai-mode .badge,
+        .mode-btn.ai-mode.active .badge {
+            border-radius: 5px;
+            background: var(--console-accent-soft);
+            color: var(--console-accent-strong);
+        }
+
+        .mode-btn {
+            border: 1px solid var(--console-border);
+            border-radius: 9px;
+            background: var(--console-surface);
+            box-shadow: none;
+        }
+
+        .mode-btn:hover {
+            border-color: #9fb9cf;
+            background: var(--console-accent-soft);
+            box-shadow: none;
+            transform: translateY(-1px);
+        }
+
+        .mode-desc,
+        .mode-btn:not(.active) .mode-desc {
+            color: var(--console-muted);
+        }
+
+        .mode-btn.active .mode-desc {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .search-section,
+        .history-panel,
+        .project-info,
+        .upload-panel {
+            border: 1px solid var(--console-border);
+            border-radius: 10px;
+            background: var(--console-surface);
+            box-shadow: 0 1px 0 rgba(16, 24, 40, 0.03);
+        }
+
+        .analysis-tip,
+        .resource-summary {
+            border-color: #c6d6e5;
+            background: var(--console-accent-soft);
+            color: var(--console-accent-strong);
+        }
+
+        *:focus-visible {
+            outline: 3px solid rgba(21, 76, 121, 0.28);
+            outline-offset: 2px;
+        }
+
+        @media (max-width: 1180px) {
+            .knowledge-stat-grid,
+            .dashboard-section {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 980px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .workbench-sidebar {
+                position: static;
+                height: auto;
+                max-height: none;
+            }
+
+            .workbench-topbar {
+                position: static;
+                grid-template-columns: 1fr;
+                margin: 0 0 18px;
+                padding: 0 0 18px;
+                background: transparent;
+                backdrop-filter: none;
+            }
+
+            .knowledge-toolbar,
+            .knowledge-stat-grid,
+            .dashboard-section {
+                grid-template-columns: 1fr;
+            }
+
+            .knowledge-row,
+            .dashboard-section .knowledge-row {
+                grid-template-columns: 1fr;
+            }
+
+            .workbench-main {
+                padding: 20px 16px 30px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <aside class="workbench-sidebar">
             <div class="brand-block">
-                <div class="brand-title">主板维修<br>知识工作台</div>
-                <div class="brand-kicker">Repair Knowledge Workbench</div>
+                <div class="brand-title">海外主板维修<br>诊断工作台</div>
+                <div class="brand-kicker">Engineering Knowledge Console</div>
             </div>
 
             <nav>
-                <div class="sidebar-group-title">当前可用</div>
+                <div class="sidebar-group-title">Workbench</div>
                 <div class="tab-container">
-                    <button class="tab-btn active" data-tab="resources" onclick="switchTab('resources')">资料查询</button>
+                    <button class="tab-btn active" data-tab="diagnostic-workbench" onclick="switchTab('diagnostic-workbench')">诊断工作台</button>
                     <button class="tab-btn" data-tab="diagnosis" onclick="switchTab('diagnosis')">故障诊断</button>
+                    <button class="tab-btn" data-tab="resources" onclick="switchTab('resources')">资料查询</button>
                     <button class="tab-btn" data-tab="log-analysis" onclick="switchTab('log-analysis')">校准 Log 分析</button>
                 </div>
             </nav>
 
             <div class="sidebar-secondary">
-                <div class="sidebar-group-title">规划模块</div>
-                <div class="tab-container">
-                    <button class="tab-btn" data-tab="diagnostic-workbench" onclick="switchTab('diagnostic-workbench')">诊断工作台</button>
-                    <button class="tab-btn" data-tab="readiness-dashboard" onclick="switchTab('readiness-dashboard')">完整度仪表盘</button>
-                    <button class="tab-btn" data-tab="model-library" onclick="switchTab('model-library')">机型资料库</button>
-                    <button class="tab-btn" data-tab="fault-packages" onclick="switchTab('fault-packages')">故障包</button>
-                    <button class="tab-btn" data-tab="case-template" onclick="switchTab('case-template')">案例回流模板</button>
-                    <button class="tab-btn" data-tab="interactive-sop" onclick="switchTab('interactive-sop')">交互式 SOP</button>
-                    <button class="tab-btn" data-tab="source-overview" onclick="switchTab('source-overview')">资料总览</button>
-                    <button class="tab-btn" data-tab="mtk-signals" onclick="switchTab('mtk-signals')">MTK 信号查询</button>
-                    <button class="tab-btn" data-tab="l4-insights" onclick="switchTab('l4-insights')">L4 报告洞察</button>
-                    <button class="tab-btn" data-tab="gap-requests" onclick="switchTab('gap-requests')">资料缺口清单</button>
-                    <button class="tab-btn" data-tab="sop-drafts" onclick="switchTab('sop-drafts')">SOP 草案</button>
+                <div>
+                    <div class="sidebar-group-title">Knowledge Base</div>
+                    <div class="tab-container">
+                        <button class="tab-btn" data-tab="readiness-dashboard" onclick="switchTab('readiness-dashboard')">完整度仪表盘</button>
+                        <button class="tab-btn" data-tab="model-library" onclick="switchTab('model-library')">机型资料库</button>
+                        <button class="tab-btn" data-tab="fault-packages" onclick="switchTab('fault-packages')">故障包</button>
+                        <button class="tab-btn" data-tab="mtk-signals" onclick="switchTab('mtk-signals')">MTK 信号查询</button>
+                        <button class="tab-btn" data-tab="source-overview" onclick="switchTab('source-overview')">资料总览</button>
+                    </div>
+                </div>
+                <div>
+                    <div class="sidebar-group-title">Enablement</div>
+                    <div class="tab-container">
+                        <button class="tab-btn" data-tab="interactive-sop" onclick="switchTab('interactive-sop')">交互式 SOP</button>
+                        <button class="tab-btn" data-tab="case-template" onclick="switchTab('case-template')">案例回流模板</button>
+                        <button class="tab-btn" data-tab="l4-insights" onclick="switchTab('l4-insights')">L4 报告洞察</button>
+                        <button class="tab-btn" data-tab="gap-requests" onclick="switchTab('gap-requests')">资料缺口清单</button>
+                        <button class="tab-btn" data-tab="sop-drafts" onclick="switchTab('sop-drafts')">SOP 草案</button>
+                    </div>
+                </div>
+                <div>
+                    <div class="sidebar-group-title">Planning</div>
+                    <div class="tab-container">
+                        <div class="sidebar-link-disabled">AI 软硬件检测封装</div>
+                        <div class="sidebar-link-disabled">轻量诊断治具接入</div>
+                    </div>
                 </div>
             </div>
         </aside>
@@ -1991,8 +2533,13 @@
         <main class="workbench-main">
             <div class="workbench-topbar">
                 <div>
-                    <h1>海外主板维修知识工作台</h1>
-                    <p class="subtitle">沉淀机型资料、故障案例、器件点位和培训标准；AI 作为辅助层，不替代工程判断。 <span id="aiStatusInline" style="font-size:12px;color:#64748b;">AI: 按需检测</span></p>
+                    <h1>海外主板维修诊断工作台</h1>
+                    <p class="subtitle">从技术员已知信息出发，聚合机型资料、故障包、信号、SOP、案例和资料缺口。AI 保留为辅助层，不替代工程判断。</p>
+                    <div class="topbar-status">
+                        <span class="status-chip primary">Phase 1A 内测</span>
+                        <span class="status-chip">知识库优先</span>
+                        <span class="status-chip muted" id="aiStatusInline">AI: 按需检测</span>
+                    </div>
                 </div>
                 <label class="global-search" onclick="switchTab('diagnostic-workbench'); setTimeout(() => document.getElementById('diagnosticQueryInput')?.focus(), 0);">
                     <span style="color:#64748b;">搜索</span>
@@ -2047,7 +2594,7 @@
             </section>
 
         <!-- Tab 1: 资料查询 -->
-        <div class="tab-content active" id="resources-tab">
+        <div class="tab-content" id="resources-tab">
             <div class="search-section">
                 <p class="hint">输入主板 SN 号，从项目资料库中查询对应原理图、位号图和维修资料。</p>
                 
@@ -2286,11 +2833,11 @@
             </div>
         </div>
 
-        <div class="tab-content" id="diagnostic-workbench-tab">
+        <div class="tab-content active" id="diagnostic-workbench-tab">
             <div class="knowledge-shell">
                 <div class="knowledge-hero">
-                    <h2>诊断工作台</h2>
-                    <p class="subtitle">输入已知信息，系统自动匹配机型、故障包、信号、SOP、案例模板和资料缺口。适合技术员从一个页面开始排查。</p>
+                    <h2>从一个入口开始排查</h2>
+                    <p class="subtitle">输入技术员已知的信息，系统会自动匹配机型、故障包、信号、SOP、案例模板和资料缺口。目标是先把“该查什么资料、该走哪条路径”变清楚。</p>
                     <div class="knowledge-toolbar">
                         <input type="text" id="diagnosticQueryInput" placeholder="输入机型 / SN / 故障现象 / 故障代码 / 信号，例如 BG6m 不开机 VBAT" oninput="renderDiagnosticWorkbench()">
                         <select id="diagnosticModelSelect" onchange="renderDiagnosticWorkbench()">
