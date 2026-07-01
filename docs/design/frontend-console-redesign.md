@@ -56,7 +56,7 @@ The Stitch-generated `Engineering Repair Console` concept is used as a structura
 
 Adopted ideas:
 
-- fixed left product navigation with six primary destinations and compact utility tools;
+- collapsible left product navigation with six primary destinations and compact utility tools;
 - command input as the first diagnostic action;
 - diagnostic status strip under the command input;
 - three-column console structure: diagnosis context, priority actions, signals and evidence;
@@ -68,3 +68,9 @@ Rejected from direct migration:
 - Tailwind CDN, Google Fonts, and Material Symbols dependencies;
 - English-only labels;
 - AI as a visual protagonist.
+
+Navigation icon rule:
+
+- Expanded sidebar shows emoji icon plus Chinese label.
+- Collapsed sidebar shows emoji icons only, so the main diagnostic canvas can use more horizontal space.
+- Avoid English abbreviation boxes such as DX, KB, MD, FP, SP, RD, BD, MR, FR.

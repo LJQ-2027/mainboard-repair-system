@@ -3182,13 +3182,174 @@
                 min-height: 80px;
             }
         }
+
+        /* ========== Collapsible sidebar with emoji iconography ========== */
+        .container.sidebar-collapsed {
+            grid-template-columns: 72px minmax(0, 1fr);
+        }
+
+        .sidebar-toggle {
+            position: absolute;
+            right: 12px;
+            top: 16px;
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            border-radius: 8px;
+            border: 1px solid #d7e0ea;
+            background: #ffffff;
+            color: #334155;
+            font-size: 15px;
+            line-height: 1;
+            box-shadow: none;
+        }
+
+        .sidebar-toggle:hover {
+            background: #e0f2fe;
+            color: #0369a1;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .workbench-sidebar {
+            position: sticky;
+        }
+
+        .brand-block {
+            position: relative;
+        }
+
+        .brand-mark,
+        .nav-card-code,
+        .utility-btn::before,
+        .diagnostic-stat-mark,
+        .action-item-icon {
+            font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", "Microsoft YaHei UI", sans-serif;
+            letter-spacing: 0;
+        }
+
+        .brand-mark {
+            display: grid;
+            width: 34px;
+            height: 34px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            place-items: center;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-size: 19px;
+        }
+
+        .nav-card-code,
+        .utility-btn::before {
+            width: 24px;
+            height: 24px;
+            border: 0;
+            border-radius: 6px;
+            background: transparent;
+            font-size: 17px;
+        }
+
+        .nav-card.active .nav-card-code {
+            background: transparent;
+        }
+
+        .diagnostic-stat-mark {
+            min-width: 36px;
+            font-size: 18px;
+        }
+
+        .action-item-icon {
+            font-size: 20px;
+        }
+
+        .container.sidebar-collapsed .workbench-sidebar {
+            overflow-x: hidden;
+        }
+
+        .container.sidebar-collapsed .brand-block {
+            min-height: 82px;
+            padding: 16px 12px;
+            display: grid;
+            place-items: center;
+        }
+
+        .container.sidebar-collapsed .brand-block > div:not(.brand-mark) {
+            display: none;
+        }
+
+        .container.sidebar-collapsed .brand-mark {
+            margin: 0;
+        }
+
+        .container.sidebar-collapsed .sidebar-toggle {
+            right: 50%;
+            top: 58px;
+            transform: translateX(50%);
+            width: 28px;
+            height: 24px;
+            font-size: 13px;
+        }
+
+        .container.sidebar-collapsed .workbench-sidebar nav,
+        .container.sidebar-collapsed .sidebar-secondary {
+            padding-left: 8px;
+            padding-right: 8px;
+        }
+
+        .container.sidebar-collapsed .nav-card,
+        .container.sidebar-collapsed .utility-btn {
+            justify-content: center;
+            padding: 10px 0;
+            gap: 0;
+        }
+
+        .container.sidebar-collapsed .nav-card-label,
+        .container.sidebar-collapsed .utility-btn {
+            font-size: 0;
+        }
+
+        .container.sidebar-collapsed .nav-card span:not(.nav-card-code) {
+            display: none;
+        }
+
+        .container.sidebar-collapsed .utility-btn::before {
+            font-size: 17px;
+        }
+
+        @media (max-width: 980px) {
+            .container.sidebar-collapsed {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar-toggle {
+                display: none;
+            }
+
+            .container.sidebar-collapsed .brand-block > div:not(.brand-mark),
+            .container.sidebar-collapsed .nav-card span:not(.nav-card-code) {
+                display: block;
+            }
+
+            .container.sidebar-collapsed .nav-card,
+            .container.sidebar-collapsed .utility-btn {
+                justify-content: flex-start;
+                gap: 13px;
+            }
+
+            .container.sidebar-collapsed .nav-card-label,
+            .container.sidebar-collapsed .utility-btn {
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <aside class="workbench-sidebar">
             <div class="brand-block">
-                <div class="brand-mark">MRE</div>
+                <button class="sidebar-toggle" type="button" onclick="toggleSidebar()" aria-label="收起侧边栏" title="收起侧边栏">‹</button>
+                <div class="brand-mark" aria-hidden="true">🛠️</div>
                 <div>
                     <div class="brand-title">海外主板维修诊断工作台</div>
                     <div class="brand-kicker">Engineering Knowledge Console</div>
@@ -3199,42 +3360,42 @@
                 <div class="sidebar-group-title">Primary</div>
                 <div class="sidebar-section">
                     <button class="tab-btn nav-card active" data-tab="diagnostic-workbench" onclick="switchTab('diagnostic-workbench')">
-                        <span class="nav-card-code">DX</span>
+                        <span class="nav-card-code" aria-hidden="true">🩺</span>
                         <span>
                             <span class="nav-card-label">诊断工作台</span>
                             <span class="nav-card-meta">一个入口聚合机型、故障、SOP 和案例</span>
                         </span>
                     </button>
                     <button class="tab-btn nav-card" data-tab="source-overview" onclick="switchTab('source-overview')">
-                        <span class="nav-card-code">KB</span>
+                        <span class="nav-card-code" aria-hidden="true">📚</span>
                         <span>
                             <span class="nav-card-label">资料中心</span>
                             <span class="nav-card-meta">查看已入库资料、来源和结构化状态</span>
                         </span>
                     </button>
                     <button class="tab-btn nav-card" data-tab="model-library" onclick="switchTab('model-library')">
-                        <span class="nav-card-code">MD</span>
+                        <span class="nav-card-code" aria-hidden="true">📱</span>
                         <span>
                             <span class="nav-card-label">机型资料</span>
                             <span class="nav-card-meta">承接 Top20 主板图、点位图和完整度</span>
                         </span>
                     </button>
                     <button class="tab-btn nav-card" data-tab="fault-packages" onclick="switchTab('fault-packages')">
-                        <span class="nav-card-code">FP</span>
+                        <span class="nav-card-code" aria-hidden="true">🧩</span>
                         <span>
                             <span class="nav-card-label">故障包</span>
                             <span class="nav-card-meta">按高频故障组织 SOP、点位和边界</span>
                         </span>
                     </button>
                     <button class="tab-btn nav-card" data-tab="interactive-sop" onclick="switchTab('interactive-sop')">
-                        <span class="nav-card-code">SP</span>
+                        <span class="nav-card-code" aria-hidden="true">📋</span>
                         <span>
                             <span class="nav-card-label">SOP 与案例</span>
                             <span class="nav-card-meta">交互式流程、案例回流和训练材料</span>
                         </span>
                     </button>
                     <button class="tab-btn nav-card" data-tab="readiness-dashboard" onclick="switchTab('readiness-dashboard')">
-                        <span class="nav-card-code">RD</span>
+                        <span class="nav-card-code" aria-hidden="true">📊</span>
                         <span>
                             <span class="nav-card-label">建设看板</span>
                             <span class="nav-card-meta">跟踪资料缺口、完整度和下一步动作</span>
@@ -3247,9 +3408,9 @@
                 <div>
                     <div class="sidebar-group-title">Tools</div>
                     <div class="utility-grid">
-                        <button class="tab-btn utility-btn" data-tab="diagnosis" data-icon="HD" onclick="switchTab('diagnosis')">历史/专业诊断</button>
-                        <button class="tab-btn utility-btn" data-tab="resources" data-icon="SN" onclick="switchTab('resources')">SN 资料查询</button>
-                        <button class="tab-btn utility-btn" data-tab="log-analysis" data-icon="LG" onclick="switchTab('log-analysis')">校准 Log 分析</button>
+                        <button class="tab-btn utility-btn" data-tab="diagnosis" data-icon="🧠" onclick="switchTab('diagnosis')">历史/专业诊断</button>
+                        <button class="tab-btn utility-btn" data-tab="resources" data-icon="🔎" onclick="switchTab('resources')">SN 资料查询</button>
+                        <button class="tab-btn utility-btn" data-tab="log-analysis" data-icon="🧾" onclick="switchTab('log-analysis')">校准 Log 分析</button>
                     </div>
                 </div>
                 <div>
@@ -3861,6 +4022,18 @@
     <script src="data/log-knowledge-base.js"></script>
     <script>
         // 核心导航功能
+        function toggleSidebar() {
+            const shell = document.querySelector('.container');
+            const button = document.querySelector('.sidebar-toggle');
+            if (!shell) return;
+            const collapsed = shell.classList.toggle('sidebar-collapsed');
+            if (button) {
+                button.textContent = collapsed ? '›' : '‹';
+                button.setAttribute('aria-label', collapsed ? '展开侧边栏' : '收起侧边栏');
+                button.title = collapsed ? '展开侧边栏' : '收起侧边栏';
+            }
+        }
+
         function switchTab(tabId) {
             // 隐藏所有Tab内容
             document.querySelectorAll('.tab-content').forEach(content => {
@@ -5095,10 +5268,10 @@
             const sopsText = sops.map(item => item.title).join(' / ');
 
             statsEl.innerHTML = `
-                <div class="diagnostic-stat"><div><span>Matched Model</span><strong>${escapeHtml(model ? model.model_name : '-')}</strong></div><div class="diagnostic-stat-mark">MD</div></div>
-                <div class="diagnostic-stat"><div><span>Fault Priority</span><strong>${escapeHtml(pack ? pack.priority : '-')}</strong></div><div class="diagnostic-stat-mark">P</div></div>
-                <div class="diagnostic-stat"><div><span>Model Readiness</span><strong>${modelReadiness ? `${escapeHtml(modelReadiness.score)}%` : '-'}</strong></div><div class="diagnostic-stat-mark">MR</div></div>
-                <div class="diagnostic-stat"><div><span>Fault Readiness</span><strong>${packageReadiness ? `${escapeHtml(packageReadiness.score)}%` : '-'}</strong></div><div class="diagnostic-stat-mark">FR</div></div>
+                <div class="diagnostic-stat"><div><span>Matched Model</span><strong>${escapeHtml(model ? model.model_name : '-')}</strong></div><div class="diagnostic-stat-mark" aria-hidden="true">📱</div></div>
+                <div class="diagnostic-stat"><div><span>Fault Priority</span><strong>${escapeHtml(pack ? pack.priority : '-')}</strong></div><div class="diagnostic-stat-mark" aria-hidden="true">⚠️</div></div>
+                <div class="diagnostic-stat"><div><span>Model Readiness</span><strong>${modelReadiness ? `${escapeHtml(modelReadiness.score)}%` : '-'}</strong></div><div class="diagnostic-stat-mark" aria-hidden="true">📈</div></div>
+                <div class="diagnostic-stat"><div><span>Fault Readiness</span><strong>${packageReadiness ? `${escapeHtml(packageReadiness.score)}%` : '-'}</strong></div><div class="diagnostic-stat-mark" aria-hidden="true">🧩</div></div>
             `;
 
             contextEl.innerHTML = `
@@ -5110,22 +5283,22 @@
 
             actionEl.innerHTML = `
                 <div class="action-item primary">
-                    <div class="action-item-icon">BD</div>
+                    <div class="action-item-icon" aria-hidden="true">🗺️</div>
                     <div><strong>查看机型资料</strong><span>${escapeHtml(model ? `${model.model_name} 主板图、点位图、完整度` : '先选择或输入机型')}</span></div>
                     <button class="model-detail-btn" onclick="switchTab('model-library')">进入</button>
                 </div>
                 <div class="action-item">
-                    <div class="action-item-icon">FP</div>
+                    <div class="action-item-icon" aria-hidden="true">🧩</div>
                     <div><strong>查看故障包</strong><span>${escapeHtml(pack ? pack.title : '先选择或输入故障现象')}</span></div>
                     <button class="model-detail-btn" onclick="switchTab('fault-packages')">进入</button>
                 </div>
                 <div class="action-item">
-                    <div class="action-item-icon">SP</div>
+                    <div class="action-item-icon" aria-hidden="true">📋</div>
                     <div><strong>进入交互式 SOP</strong><span>${escapeHtml(interactive[0]?.title || '暂无 SOP 原型')}</span></div>
                     <button class="model-detail-btn" onclick="switchTab('interactive-sop')">进入</button>
                 </div>
                 <div class="action-item">
-                    <div class="action-item-icon">CS</div>
+                    <div class="action-item-icon" aria-hidden="true">✍️</div>
                     <div><strong>记录维修案例</strong><span>按模板沉淀测量值、维修动作和验证结果</span></div>
                     <button class="model-detail-btn" onclick="switchTab('case-template')">记录</button>
                 </div>
