@@ -709,6 +709,79 @@
             line-height: 1.7;
         }
 
+        .readiness-meter {
+            margin: 12px 0;
+        }
+
+        .readiness-track {
+            height: 8px;
+            border-radius: 999px;
+            background: #e5e7eb;
+            overflow: hidden;
+        }
+
+        .readiness-fill {
+            height: 100%;
+            border-radius: inherit;
+            background: #2563eb;
+        }
+
+        .readiness-label {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 6px;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .model-detail {
+            display: none;
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .model-detail.active {
+            display: block;
+        }
+
+        .material-checklist {
+            display: grid;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .material-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: flex-start;
+            padding: 9px 10px;
+            border-radius: 6px;
+            background: #f8fafc;
+            color: #334155;
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        .model-detail-btn {
+            margin-top: 12px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            background: #ffffff;
+            border: 1px solid #0e3566;
+            color: #0e3566;
+            font-size: 13px;
+            box-shadow: none;
+        }
+
+        .model-detail-btn:hover {
+            transform: none;
+            box-shadow: none;
+            background: #eef3f9;
+        }
+
         .diagnosis-toolbar, .resource-toolbar {
             display: flex;
             gap: 10px;
@@ -3060,6 +3133,77 @@
             }).join('');
         }
 
+        function calculateModelReadiness(model, library) {
+            const groups = library?.readiness_model?.required_groups || [];
+            if (model.readiness && typeof model.readiness.score === 'number' && model.readiness.score > 0) return model.readiness;
+            let score = 0;
+            const missing = [];
+            groups.forEach(group => {
+                const material = model.required_materials?.[group.group_id];
+                const status = material?.status || 'missing';
+                if (status === 'ready' || status === 'confirmed') {
+                    score += group.weight;
+                    return;
+                }
+                if (status === 'partial') {
+                    score += Math.round(group.weight * 0.5);
+                    missing.push(`${group.label}部分缺失`);
+                    return;
+                }
+                missing.push(group.label);
+            });
+            let level = '资料待收集';
+            if (score >= 86) level = '可进入内测';
+            else if (score >= 61) level = '待审核完善';
+            else if (score >= 31) level = '部分资料可整理';
+            return { score, level, blockers: missing };
+        }
+
+        function renderReadiness(model, library) {
+            const readiness = calculateModelReadiness(model, library);
+            const score = Math.max(0, Math.min(100, readiness.score || 0));
+            return `
+                <div class="readiness-meter">
+                    <div class="readiness-track"><div class="readiness-fill" style="width:${score}%;"></div></div>
+                    <div class="readiness-label"><span>${escapeHtml(readiness.level || '资料待收集')}</span><strong>${score}%</strong></div>
+                </div>
+            `;
+        }
+
+        function formatMaterialStatus(status) {
+            const labels = {
+                missing: '缺失',
+                partial: '部分',
+                ready: '已具备',
+                confirmed: '已确认',
+                pending_confirmation: '待确认',
+                not_confirmed: '未确认'
+            };
+            return labels[status] || status || '未标注';
+        }
+
+        function renderMaterialChecklist(model, library) {
+            const groups = library?.readiness_model?.required_groups || [];
+            return groups.map(group => {
+                const material = model.required_materials?.[group.group_id] || {};
+                const missing = asArray(material.missing_items).join('、') || '无';
+                return `
+                    <div class="material-row">
+                        <strong>${escapeHtml(group.label)}</strong>
+                        <span>${escapeHtml(formatMaterialStatus(material.status))}${missing !== '无' ? `：${escapeHtml(missing)}` : ''}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleModelDetail(modelId) {
+            const detail = document.getElementById(`model-detail-${modelId}`);
+            const button = document.getElementById(`model-detail-btn-${modelId}`);
+            if (!detail) return;
+            detail.classList.toggle('active');
+            if (button) button.textContent = detail.classList.contains('active') ? '收起详情' : '查看详情';
+        }
+
         function renderModelLibrary() {
             const statsEl = document.getElementById('modelLibraryStats');
             const listEl = document.getElementById('modelLibraryList');
@@ -3097,15 +3241,26 @@
             listEl.innerHTML = filtered.map(model => `
                 <article class="knowledge-card">
                     <h3>${escapeHtml(model.model_name)}</h3>
+                    ${renderReadiness(model, library)}
                     <p><strong>优先级来源：</strong>${escapeHtml(model.priority_source || '待确认')}</p>
                     <p><strong>L4 记录：</strong>${escapeHtml(model.l4_record_count || 0)} 条${model.l4_report_rank ? `，排名 ${escapeHtml(model.l4_report_rank)}` : ''}</p>
                     <p><strong>下一步：</strong>${escapeHtml(model.next_action || '等待补充资料。')}</p>
                     <div class="knowledge-meta">
                         <span class="knowledge-pill ${modelStatusClass(model.asset_status)}">${escapeHtml(formatAssetStatus(model.asset_status))}</span>
                         ${renderPills(model.related_faults)}
+                        ${renderPills(model.related_modules)}
                     </div>
                     <div class="knowledge-meta">
                         ${renderAssetSlots(model, slots)}
+                    </div>
+                    <button type="button" class="model-detail-btn" id="model-detail-btn-${escapeHtml(model.model_id)}" onclick="toggleModelDetail('${escapeHtml(model.model_id)}')">查看详情</button>
+                    <div class="model-detail" id="model-detail-${escapeHtml(model.model_id)}">
+                        <p><strong>平台：</strong>${escapeHtml(model.platform || '待确认')}</p>
+                        <p><strong>主板版本：</strong>${escapeHtml(asArray(model.board_versions).join(' / ') || '待确认')}</p>
+                        <p><strong>适用区域：</strong>${escapeHtml(asArray(model.region_scope).join(' / ') || '待确认')}</p>
+                        <div class="material-checklist">${renderMaterialChecklist(model, library)}</div>
+                        <p><strong>维修边界：</strong>${escapeHtml(model.repair_boundary?.note || '待确认')}</p>
+                        <p><strong>工程确认：</strong>${escapeHtml(model.engineering_confirmation?.note || '待确认')}</p>
                     </div>
                 </article>
             `).join('');

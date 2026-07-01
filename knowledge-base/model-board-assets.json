@@ -27,7 +27,81 @@
       ],
       "asset_status": "pending_assets",
       "assets": {},
-      "next_action": "等待制造中心提供主板正反面图和点位图。"
+      "next_action": "等待制造中心提供主板正反面图和点位图。",
+      "platform": "待制造中心确认",
+      "board_versions": [],
+      "region_scope": [
+        "待确认"
+      ],
+      "related_modules": [
+        "开机电源管理电路",
+        "Memory电路",
+        "CPU/主控相关"
+      ],
+      "linked_sops": [],
+      "linked_cases": [],
+      "linked_training": [],
+      "repair_boundary": {
+        "status": "pending_confirmation",
+        "note": "待技术支持/制造中心确认该机型可下放维修范围。"
+      },
+      "engineering_confirmation": {
+        "status": "not_confirmed",
+        "owner": "制造中心 / 技术支持",
+        "note": "待确认图纸版本、适用范围和是否可用于售后赋能。"
+      },
+      "required_materials": {
+        "board_images": {
+          "status": "missing",
+          "missing_items": [
+            "board_front",
+            "board_back"
+          ]
+        },
+        "point_maps": {
+          "status": "missing",
+          "missing_items": [
+            "point_map_front",
+            "point_map_back"
+          ]
+        },
+        "diagnosis_sop": {
+          "status": "missing",
+          "missing_items": [
+            "model_fault_diagnosis_sop"
+          ]
+        },
+        "repair_cases": {
+          "status": "missing",
+          "missing_items": [
+            "verified_repair_cases"
+          ]
+        },
+        "repair_boundary": {
+          "status": "missing",
+          "missing_items": [
+            "model_repair_boundary"
+          ]
+        },
+        "engineering_confirmation": {
+          "status": "missing",
+          "missing_items": [
+            "asset_version_confirmation",
+            "usage_permission_confirmation"
+          ]
+        }
+      },
+      "readiness": {
+        "score": 0,
+        "level": "资料待收集",
+        "blockers": [
+          "主板图未到位",
+          "点位图未到位",
+          "SOP未确认",
+          "案例未关联",
+          "维修边界未确认"
+        ]
+      }
     },
     {
       "model_id": "MODEL-KM4",
@@ -43,7 +117,81 @@
       ],
       "asset_status": "pending_assets",
       "assets": {},
-      "next_action": "等待制造中心提供主板正反面图和点位图。"
+      "next_action": "等待制造中心提供主板正反面图和点位图。",
+      "platform": "待制造中心确认",
+      "board_versions": [],
+      "region_scope": [
+        "待确认"
+      ],
+      "related_modules": [
+        "开机电源管理电路",
+        "Memory电路",
+        "CPU/主控相关"
+      ],
+      "linked_sops": [],
+      "linked_cases": [],
+      "linked_training": [],
+      "repair_boundary": {
+        "status": "pending_confirmation",
+        "note": "待技术支持/制造中心确认该机型可下放维修范围。"
+      },
+      "engineering_confirmation": {
+        "status": "not_confirmed",
+        "owner": "制造中心 / 技术支持",
+        "note": "待确认图纸版本、适用范围和是否可用于售后赋能。"
+      },
+      "required_materials": {
+        "board_images": {
+          "status": "missing",
+          "missing_items": [
+            "board_front",
+            "board_back"
+          ]
+        },
+        "point_maps": {
+          "status": "missing",
+          "missing_items": [
+            "point_map_front",
+            "point_map_back"
+          ]
+        },
+        "diagnosis_sop": {
+          "status": "missing",
+          "missing_items": [
+            "model_fault_diagnosis_sop"
+          ]
+        },
+        "repair_cases": {
+          "status": "missing",
+          "missing_items": [
+            "verified_repair_cases"
+          ]
+        },
+        "repair_boundary": {
+          "status": "missing",
+          "missing_items": [
+            "model_repair_boundary"
+          ]
+        },
+        "engineering_confirmation": {
+          "status": "missing",
+          "missing_items": [
+            "asset_version_confirmation",
+            "usage_permission_confirmation"
+          ]
+        }
+      },
+      "readiness": {
+        "score": 0,
+        "level": "资料待收集",
+        "blockers": [
+          "主板图未到位",
+          "点位图未到位",
+          "SOP未确认",
+          "案例未关联",
+          "维修边界未确认"
+        ]
+      }
     },
     {
       "model_id": "MODEL-KL4",
@@ -59,7 +207,81 @@
       ],
       "asset_status": "pending_assets",
       "assets": {},
-      "next_action": "等待制造中心提供主板正反面图和点位图。"
+      "next_action": "等待制造中心提供主板正反面图和点位图。",
+      "platform": "待制造中心确认",
+      "board_versions": [],
+      "region_scope": [
+        "待确认"
+      ],
+      "related_modules": [
+        "开机电源管理电路",
+        "Memory电路",
+        "CPU/主控相关"
+      ],
+      "linked_sops": [],
+      "linked_cases": [],
+      "linked_training": [],
+      "repair_boundary": {
+        "status": "pending_confirmation",
+        "note": "待技术支持/制造中心确认该机型可下放维修范围。"
+      },
+      "engineering_confirmation": {
+        "status": "not_confirmed",
+        "owner": "制造中心 / 技术支持",
+        "note": "待确认图纸版本、适用范围和是否可用于售后赋能。"
+      },
+      "required_materials": {
+        "board_images": {
+          "status": "missing",
+          "missing_items": [
+            "board_front",
+            "board_back"
+          ]
+        },
+        "point_maps": {
+          "status": "missing",
+          "missing_items": [
+            "point_map_front",
+            "point_map_back"
+          ]
+        },
+        "diagnosis_sop": {
+          "status": "missing",
+          "missing_items": [
+            "model_fault_diagnosis_sop"
+          ]
+        },
+        "repair_cases": {
+          "status": "missing",
+          "missing_items": [
+            "verified_repair_cases"
+          ]
+        },
+        "repair_boundary": {
+          "status": "missing",
+          "missing_items": [
+            "model_repair_boundary"
+          ]
+        },
+        "engineering_confirmation": {
+          "status": "missing",
+          "missing_items": [
+            "asset_version_confirmation",
+            "usage_permission_confirmation"
+          ]
+        }
+      },
+      "readiness": {
+        "score": 0,
+        "level": "资料待收集",
+        "blockers": [
+          "主板图未到位",
+          "点位图未到位",
+          "SOP未确认",
+          "案例未关联",
+          "维修边界未确认"
+        ]
+      }
     },
     {
       "model_id": "MODEL-CM6",
@@ -73,7 +295,79 @@
       ],
       "asset_status": "pending_assets",
       "assets": {},
-      "next_action": "等待制造中心提供主板正反面图和点位图。"
+      "next_action": "等待制造中心提供主板正反面图和点位图。",
+      "platform": "待制造中心确认",
+      "board_versions": [],
+      "region_scope": [
+        "待确认"
+      ],
+      "related_modules": [
+        "开机电源管理电路"
+      ],
+      "linked_sops": [],
+      "linked_cases": [],
+      "linked_training": [],
+      "repair_boundary": {
+        "status": "pending_confirmation",
+        "note": "待技术支持/制造中心确认该机型可下放维修范围。"
+      },
+      "engineering_confirmation": {
+        "status": "not_confirmed",
+        "owner": "制造中心 / 技术支持",
+        "note": "待确认图纸版本、适用范围和是否可用于售后赋能。"
+      },
+      "required_materials": {
+        "board_images": {
+          "status": "missing",
+          "missing_items": [
+            "board_front",
+            "board_back"
+          ]
+        },
+        "point_maps": {
+          "status": "missing",
+          "missing_items": [
+            "point_map_front",
+            "point_map_back"
+          ]
+        },
+        "diagnosis_sop": {
+          "status": "missing",
+          "missing_items": [
+            "model_fault_diagnosis_sop"
+          ]
+        },
+        "repair_cases": {
+          "status": "missing",
+          "missing_items": [
+            "verified_repair_cases"
+          ]
+        },
+        "repair_boundary": {
+          "status": "missing",
+          "missing_items": [
+            "model_repair_boundary"
+          ]
+        },
+        "engineering_confirmation": {
+          "status": "missing",
+          "missing_items": [
+            "asset_version_confirmation",
+            "usage_permission_confirmation"
+          ]
+        }
+      },
+      "readiness": {
+        "score": 0,
+        "level": "资料待收集",
+        "blockers": [
+          "主板图未到位",
+          "点位图未到位",
+          "SOP未确认",
+          "案例未关联",
+          "维修边界未确认"
+        ]
+      }
     },
     {
       "model_id": "MODEL-KL5",
@@ -87,7 +381,79 @@
       ],
       "asset_status": "pending_assets",
       "assets": {},
-      "next_action": "等待制造中心提供主板正反面图和点位图。"
+      "next_action": "等待制造中心提供主板正反面图和点位图。",
+      "platform": "待制造中心确认",
+      "board_versions": [],
+      "region_scope": [
+        "待确认"
+      ],
+      "related_modules": [
+        "开机电源管理电路"
+      ],
+      "linked_sops": [],
+      "linked_cases": [],
+      "linked_training": [],
+      "repair_boundary": {
+        "status": "pending_confirmation",
+        "note": "待技术支持/制造中心确认该机型可下放维修范围。"
+      },
+      "engineering_confirmation": {
+        "status": "not_confirmed",
+        "owner": "制造中心 / 技术支持",
+        "note": "待确认图纸版本、适用范围和是否可用于售后赋能。"
+      },
+      "required_materials": {
+        "board_images": {
+          "status": "missing",
+          "missing_items": [
+            "board_front",
+            "board_back"
+          ]
+        },
+        "point_maps": {
+          "status": "missing",
+          "missing_items": [
+            "point_map_front",
+            "point_map_back"
+          ]
+        },
+        "diagnosis_sop": {
+          "status": "missing",
+          "missing_items": [
+            "model_fault_diagnosis_sop"
+          ]
+        },
+        "repair_cases": {
+          "status": "missing",
+          "missing_items": [
+            "verified_repair_cases"
+          ]
+        },
+        "repair_boundary": {
+          "status": "missing",
+          "missing_items": [
+            "model_repair_boundary"
+          ]
+        },
+        "engineering_confirmation": {
+          "status": "missing",
+          "missing_items": [
+            "asset_version_confirmation",
+            "usage_permission_confirmation"
+          ]
+        }
+      },
+      "readiness": {
+        "score": 0,
+        "level": "资料待收集",
+        "blockers": [
+          "主板图未到位",
+          "点位图未到位",
+          "SOP未确认",
+          "案例未关联",
+          "维修边界未确认"
+        ]
+      }
     },
     {
       "model_id": "MODEL-KM5",
@@ -101,7 +467,79 @@
       ],
       "asset_status": "pending_assets",
       "assets": {},
-      "next_action": "等待制造中心提供主板正反面图和点位图。"
+      "next_action": "等待制造中心提供主板正反面图和点位图。",
+      "platform": "待制造中心确认",
+      "board_versions": [],
+      "region_scope": [
+        "待确认"
+      ],
+      "related_modules": [
+        "Memory电路"
+      ],
+      "linked_sops": [],
+      "linked_cases": [],
+      "linked_training": [],
+      "repair_boundary": {
+        "status": "pending_confirmation",
+        "note": "待技术支持/制造中心确认该机型可下放维修范围。"
+      },
+      "engineering_confirmation": {
+        "status": "not_confirmed",
+        "owner": "制造中心 / 技术支持",
+        "note": "待确认图纸版本、适用范围和是否可用于售后赋能。"
+      },
+      "required_materials": {
+        "board_images": {
+          "status": "missing",
+          "missing_items": [
+            "board_front",
+            "board_back"
+          ]
+        },
+        "point_maps": {
+          "status": "missing",
+          "missing_items": [
+            "point_map_front",
+            "point_map_back"
+          ]
+        },
+        "diagnosis_sop": {
+          "status": "missing",
+          "missing_items": [
+            "model_fault_diagnosis_sop"
+          ]
+        },
+        "repair_cases": {
+          "status": "missing",
+          "missing_items": [
+            "verified_repair_cases"
+          ]
+        },
+        "repair_boundary": {
+          "status": "missing",
+          "missing_items": [
+            "model_repair_boundary"
+          ]
+        },
+        "engineering_confirmation": {
+          "status": "missing",
+          "missing_items": [
+            "asset_version_confirmation",
+            "usage_permission_confirmation"
+          ]
+        }
+      },
+      "readiness": {
+        "score": 0,
+        "level": "资料待收集",
+        "blockers": [
+          "主板图未到位",
+          "点位图未到位",
+          "SOP未确认",
+          "案例未关联",
+          "维修边界未确认"
+        ]
+      }
     },
     {
       "model_id": "MODEL-C671L",
@@ -115,7 +553,79 @@
       ],
       "asset_status": "pending_assets",
       "assets": {},
-      "next_action": "等待制造中心提供主板正反面图和点位图。"
+      "next_action": "等待制造中心提供主板正反面图和点位图。",
+      "platform": "待制造中心确认",
+      "board_versions": [],
+      "region_scope": [
+        "待确认"
+      ],
+      "related_modules": [
+        "Memory电路"
+      ],
+      "linked_sops": [],
+      "linked_cases": [],
+      "linked_training": [],
+      "repair_boundary": {
+        "status": "pending_confirmation",
+        "note": "待技术支持/制造中心确认该机型可下放维修范围。"
+      },
+      "engineering_confirmation": {
+        "status": "not_confirmed",
+        "owner": "制造中心 / 技术支持",
+        "note": "待确认图纸版本、适用范围和是否可用于售后赋能。"
+      },
+      "required_materials": {
+        "board_images": {
+          "status": "missing",
+          "missing_items": [
+            "board_front",
+            "board_back"
+          ]
+        },
+        "point_maps": {
+          "status": "missing",
+          "missing_items": [
+            "point_map_front",
+            "point_map_back"
+          ]
+        },
+        "diagnosis_sop": {
+          "status": "missing",
+          "missing_items": [
+            "model_fault_diagnosis_sop"
+          ]
+        },
+        "repair_cases": {
+          "status": "missing",
+          "missing_items": [
+            "verified_repair_cases"
+          ]
+        },
+        "repair_boundary": {
+          "status": "missing",
+          "missing_items": [
+            "model_repair_boundary"
+          ]
+        },
+        "engineering_confirmation": {
+          "status": "missing",
+          "missing_items": [
+            "asset_version_confirmation",
+            "usage_permission_confirmation"
+          ]
+        }
+      },
+      "readiness": {
+        "score": 0,
+        "level": "资料待收集",
+        "blockers": [
+          "主板图未到位",
+          "点位图未到位",
+          "SOP未确认",
+          "案例未关联",
+          "维修边界未确认"
+        ]
+      }
     },
     {
       "model_id": "MODEL-A6611L",
@@ -129,7 +639,79 @@
       ],
       "asset_status": "pending_assets",
       "assets": {},
-      "next_action": "等待制造中心提供主板正反面图和点位图。"
+      "next_action": "等待制造中心提供主板正反面图和点位图。",
+      "platform": "待制造中心确认",
+      "board_versions": [],
+      "region_scope": [
+        "待确认"
+      ],
+      "related_modules": [
+        "Memory电路"
+      ],
+      "linked_sops": [],
+      "linked_cases": [],
+      "linked_training": [],
+      "repair_boundary": {
+        "status": "pending_confirmation",
+        "note": "待技术支持/制造中心确认该机型可下放维修范围。"
+      },
+      "engineering_confirmation": {
+        "status": "not_confirmed",
+        "owner": "制造中心 / 技术支持",
+        "note": "待确认图纸版本、适用范围和是否可用于售后赋能。"
+      },
+      "required_materials": {
+        "board_images": {
+          "status": "missing",
+          "missing_items": [
+            "board_front",
+            "board_back"
+          ]
+        },
+        "point_maps": {
+          "status": "missing",
+          "missing_items": [
+            "point_map_front",
+            "point_map_back"
+          ]
+        },
+        "diagnosis_sop": {
+          "status": "missing",
+          "missing_items": [
+            "model_fault_diagnosis_sop"
+          ]
+        },
+        "repair_cases": {
+          "status": "missing",
+          "missing_items": [
+            "verified_repair_cases"
+          ]
+        },
+        "repair_boundary": {
+          "status": "missing",
+          "missing_items": [
+            "model_repair_boundary"
+          ]
+        },
+        "engineering_confirmation": {
+          "status": "missing",
+          "missing_items": [
+            "asset_version_confirmation",
+            "usage_permission_confirmation"
+          ]
+        }
+      },
+      "readiness": {
+        "score": 0,
+        "level": "资料待收集",
+        "blockers": [
+          "主板图未到位",
+          "点位图未到位",
+          "SOP未确认",
+          "案例未关联",
+          "维修边界未确认"
+        ]
+      }
     },
     {
       "model_id": "MODEL-KM7",
@@ -141,7 +723,77 @@
       "related_faults": [],
       "asset_status": "pending_assets",
       "assets": {},
-      "next_action": "等待制造中心提供主板正反面图和点位图。"
+      "next_action": "等待制造中心提供主板正反面图和点位图。",
+      "platform": "待制造中心确认",
+      "board_versions": [],
+      "region_scope": [
+        "待确认"
+      ],
+      "related_modules": [],
+      "linked_sops": [],
+      "linked_cases": [],
+      "linked_training": [],
+      "repair_boundary": {
+        "status": "pending_confirmation",
+        "note": "待技术支持/制造中心确认该机型可下放维修范围。"
+      },
+      "engineering_confirmation": {
+        "status": "not_confirmed",
+        "owner": "制造中心 / 技术支持",
+        "note": "待确认图纸版本、适用范围和是否可用于售后赋能。"
+      },
+      "required_materials": {
+        "board_images": {
+          "status": "missing",
+          "missing_items": [
+            "board_front",
+            "board_back"
+          ]
+        },
+        "point_maps": {
+          "status": "missing",
+          "missing_items": [
+            "point_map_front",
+            "point_map_back"
+          ]
+        },
+        "diagnosis_sop": {
+          "status": "missing",
+          "missing_items": [
+            "model_fault_diagnosis_sop"
+          ]
+        },
+        "repair_cases": {
+          "status": "missing",
+          "missing_items": [
+            "verified_repair_cases"
+          ]
+        },
+        "repair_boundary": {
+          "status": "missing",
+          "missing_items": [
+            "model_repair_boundary"
+          ]
+        },
+        "engineering_confirmation": {
+          "status": "missing",
+          "missing_items": [
+            "asset_version_confirmation",
+            "usage_permission_confirmation"
+          ]
+        }
+      },
+      "readiness": {
+        "score": 0,
+        "level": "资料待收集",
+        "blockers": [
+          "主板图未到位",
+          "点位图未到位",
+          "SOP未确认",
+          "案例未关联",
+          "维修边界未确认"
+        ]
+      }
     },
     {
       "model_id": "MODEL-CL6K",
@@ -153,7 +805,77 @@
       "related_faults": [],
       "asset_status": "pending_assets",
       "assets": {},
-      "next_action": "等待制造中心提供主板正反面图和点位图。"
+      "next_action": "等待制造中心提供主板正反面图和点位图。",
+      "platform": "待制造中心确认",
+      "board_versions": [],
+      "region_scope": [
+        "待确认"
+      ],
+      "related_modules": [],
+      "linked_sops": [],
+      "linked_cases": [],
+      "linked_training": [],
+      "repair_boundary": {
+        "status": "pending_confirmation",
+        "note": "待技术支持/制造中心确认该机型可下放维修范围。"
+      },
+      "engineering_confirmation": {
+        "status": "not_confirmed",
+        "owner": "制造中心 / 技术支持",
+        "note": "待确认图纸版本、适用范围和是否可用于售后赋能。"
+      },
+      "required_materials": {
+        "board_images": {
+          "status": "missing",
+          "missing_items": [
+            "board_front",
+            "board_back"
+          ]
+        },
+        "point_maps": {
+          "status": "missing",
+          "missing_items": [
+            "point_map_front",
+            "point_map_back"
+          ]
+        },
+        "diagnosis_sop": {
+          "status": "missing",
+          "missing_items": [
+            "model_fault_diagnosis_sop"
+          ]
+        },
+        "repair_cases": {
+          "status": "missing",
+          "missing_items": [
+            "verified_repair_cases"
+          ]
+        },
+        "repair_boundary": {
+          "status": "missing",
+          "missing_items": [
+            "model_repair_boundary"
+          ]
+        },
+        "engineering_confirmation": {
+          "status": "missing",
+          "missing_items": [
+            "asset_version_confirmation",
+            "usage_permission_confirmation"
+          ]
+        }
+      },
+      "readiness": {
+        "score": 0,
+        "level": "资料待收集",
+        "blockers": [
+          "主板图未到位",
+          "点位图未到位",
+          "SOP未确认",
+          "案例未关联",
+          "维修边界未确认"
+        ]
+      }
     }
   ],
   "open_questions": [
@@ -161,5 +883,53 @@
     "每个机型是否存在多个主板版本。",
     "点位图是图片、PDF、BoardView 截图还是原始工程文件。",
     "哪些图纸可以直接用于海外售后培训，哪些仅限内部工程协作。"
-  ]
+  ],
+  "readiness_model": {
+    "required_groups": [
+      {
+        "group_id": "board_images",
+        "label": "主板图",
+        "weight": 25,
+        "required_slots": [
+          "board_front",
+          "board_back"
+        ]
+      },
+      {
+        "group_id": "point_maps",
+        "label": "点位图",
+        "weight": 25,
+        "required_slots": [
+          "point_map_front",
+          "point_map_back"
+        ]
+      },
+      {
+        "group_id": "diagnosis_sop",
+        "label": "诊断SOP",
+        "weight": 20
+      },
+      {
+        "group_id": "repair_cases",
+        "label": "维修案例",
+        "weight": 15
+      },
+      {
+        "group_id": "repair_boundary",
+        "label": "维修边界",
+        "weight": 10
+      },
+      {
+        "group_id": "engineering_confirmation",
+        "label": "工程确认",
+        "weight": 5
+      }
+    ],
+    "score_meaning": {
+      "0-30": "资料待收集，只适合登记和跟进",
+      "31-60": "具备部分资料，可用于内部协作整理",
+      "61-85": "资料较完整，可进入中方技术员/制造中心审核",
+      "86-100": "可进入内测使用"
+    }
+  }
 }
