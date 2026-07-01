@@ -49,3 +49,22 @@ After implementation, verify:
 - Sidebar navigation, top search, diagnostic input, selects, quick actions, and buttons remain usable.
 - Active, hover, and focus states keep sufficient text/background readability.
 - Browser console has no runtime errors on the primary path.
+
+## Stitch reference migration
+
+The Stitch-generated `Engineering Repair Console` concept is used as a structural reference, not as source code.
+
+Adopted ideas:
+
+- fixed left product navigation with six primary destinations and compact utility tools;
+- command input as the first diagnostic action;
+- diagnostic status strip under the command input;
+- three-column console structure: diagnosis context, priority actions, signals and evidence;
+- light engineering surface, low-contrast borders, and restrained blue active states.
+
+Rejected from direct migration:
+
+- fake users, fake model numbers, fake measurements, and decorative demo data;
+- Tailwind CDN, Google Fonts, and Material Symbols dependencies;
+- English-only labels;
+- AI as a visual protagonist.

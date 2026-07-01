@@ -2624,6 +2624,564 @@
                 padding: 20px 16px 30px;
             }
         }
+
+        /* ========== Stitch-inspired engineering console migration ========== */
+        .container {
+            grid-template-columns: 240px minmax(0, 1fr);
+        }
+
+        .workbench-sidebar {
+            padding: 0;
+            gap: 0;
+            background: #f8fafc;
+            border-right-color: #dfe5ee;
+        }
+
+        .brand-block {
+            display: block;
+            padding: 26px 24px 24px;
+            border: 0;
+            border-bottom: 1px solid #dfe5ee;
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+        }
+
+        .brand-mark {
+            display: none;
+        }
+
+        .brand-title {
+            max-width: 150px;
+            color: #00288e;
+            font-size: 19px;
+            font-weight: 900;
+            line-height: 1.2;
+        }
+
+        .brand-kicker {
+            margin-top: 8px;
+            color: #64748b;
+            font-size: 12px;
+            letter-spacing: 0.01em;
+            text-transform: none;
+        }
+
+        .workbench-sidebar nav {
+            padding: 22px 12px 0;
+        }
+
+        .sidebar-group-title {
+            display: none;
+        }
+
+        .sidebar-section,
+        .utility-grid {
+            gap: 3px;
+        }
+
+        .nav-card,
+        .utility-btn {
+            display: flex;
+            grid-template-columns: none;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 13px;
+            min-height: 44px;
+            padding: 10px 13px;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            background: transparent;
+            color: #52637a;
+            box-shadow: none;
+        }
+
+        .nav-card:hover,
+        .utility-btn:hover {
+            background: #eef4fb;
+            border-color: transparent;
+            color: #00288e;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .nav-card.active,
+        .utility-btn.active {
+            background: #e0f2fe;
+            border-color: transparent;
+            color: #0369a1;
+            box-shadow: none;
+        }
+
+        .nav-card-code {
+            width: 22px;
+            height: 22px;
+            border-radius: 5px;
+            border: 1px solid currentColor;
+            background: transparent;
+            color: currentColor;
+            font-size: 9px;
+            line-height: 1;
+        }
+
+        .nav-card.active .nav-card-code {
+            background: transparent;
+            color: currentColor;
+        }
+
+        .nav-card-label {
+            color: inherit;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .nav-card-meta {
+            display: none;
+        }
+
+        .sidebar-secondary {
+            margin-top: auto;
+            padding: 12px;
+            border-top: 1px solid #dfe5ee;
+        }
+
+        .utility-btn {
+            min-height: 42px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .utility-btn::before {
+            content: attr(data-icon);
+            width: 22px;
+            height: 22px;
+            border: 1px solid currentColor;
+            border-radius: 5px;
+            display: grid;
+            place-items: center;
+            font-size: 9px;
+            font-weight: 900;
+        }
+
+        .utility-btn::after {
+            display: none;
+        }
+
+        .sidebar-note {
+            display: none;
+        }
+
+        .workbench-main {
+            max-width: none;
+            padding: 0;
+        }
+
+        .workbench-topbar {
+            margin: 0;
+            padding: 18px 28px;
+            border-bottom-color: #dfe5ee;
+            background: rgba(255, 255, 255, 0.92);
+        }
+
+        .workbench-topbar h1 {
+            color: #0f172a;
+            font-size: 24px;
+        }
+
+        .global-search {
+            min-height: 42px;
+        }
+
+        .tab-content {
+            padding: 24px 28px 34px;
+        }
+
+        .tab-content#diagnostic-workbench-tab {
+            padding: 24px 28px 34px;
+        }
+
+        .diagnostic-console {
+            display: grid;
+            gap: 20px;
+        }
+
+        .diagnostic-command {
+            display: grid;
+            gap: 12px;
+        }
+
+        .diagnostic-command-input {
+            position: relative;
+            display: grid;
+            align-items: center;
+        }
+
+        .diagnostic-command-input::before {
+            content: "⌕";
+            position: absolute;
+            left: 17px;
+            z-index: 1;
+            color: #64748b;
+            font-size: 22px;
+            line-height: 1;
+        }
+
+        .diagnostic-command-input input {
+            width: 100%;
+            min-height: 54px;
+            padding: 14px 128px 14px 48px;
+            border: 1px solid #d7e0ea;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #0f172a;
+            font-size: 16px;
+            letter-spacing: 0.01em;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+        }
+
+        .diagnostic-command-input input:focus {
+            border-color: #1e40af;
+            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.12);
+        }
+
+        .command-kbd {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 5px 9px;
+            border-radius: 7px;
+            background: #eef2f7;
+            color: #475569;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .diagnostic-filters {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(180px, 260px));
+            gap: 10px;
+            justify-content: end;
+        }
+
+        .diagnostic-filters select {
+            width: 100%;
+            min-height: 40px;
+            border: 1px solid #d7e0ea;
+            border-radius: 7px;
+            background: #ffffff;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .diagnostic-status-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .diagnostic-stat {
+            min-height: 96px;
+            display: flex;
+            justify-content: space-between;
+            gap: 18px;
+            padding: 17px;
+            border: 1px solid #dfe5ee;
+            border-radius: 8px;
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+        }
+
+        .diagnostic-stat span {
+            display: block;
+            margin-bottom: 9px;
+            color: #334155;
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .diagnostic-stat strong {
+            display: block;
+            color: #00288e;
+            font-size: 23px;
+            line-height: 1.1;
+            overflow-wrap: anywhere;
+        }
+
+        .diagnostic-stat-mark {
+            align-self: flex-start;
+            min-width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            display: grid;
+            place-items: center;
+            background: #eef2ff;
+            color: #1e40af;
+            font-size: 11px;
+            font-weight: 900;
+        }
+
+        .diagnostic-grid {
+            display: grid;
+            grid-template-columns: minmax(260px, 0.82fr) minmax(420px, 1.48fr) minmax(260px, 0.84fr);
+            gap: 20px;
+            align-items: start;
+        }
+
+        .diagnostic-panel {
+            border: 1px solid #dfe5ee;
+            border-radius: 8px;
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+            overflow: hidden;
+        }
+
+        .diagnostic-panel h3 {
+            margin: 0;
+            padding: 14px 18px;
+            border-bottom: 1px solid #dfe5ee;
+            background: #f7f9fb;
+            color: #0f172a;
+            font-size: 12px;
+            font-weight: 900;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .diagnostic-panel-body {
+            display: grid;
+            gap: 10px;
+            padding: 16px;
+        }
+
+        .context-row,
+        .evidence-row {
+            display: grid;
+            gap: 6px;
+            padding: 12px 0;
+            border-bottom: 1px solid #edf1f6;
+        }
+
+        .context-row:last-child,
+        .evidence-row:last-child {
+            border-bottom: 0;
+        }
+
+        .context-row strong,
+        .evidence-row strong {
+            color: #0f172a;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .context-row span,
+        .evidence-row span {
+            color: #475569;
+            font-size: 13px;
+            line-height: 1.55;
+            overflow-wrap: anywhere;
+        }
+
+        .action-item {
+            display: grid;
+            grid-template-columns: 46px minmax(0, 1fr) auto;
+            gap: 14px;
+            align-items: center;
+            padding: 16px;
+            border: 1px solid #dfe5ee;
+            border-radius: 8px;
+            background: #ffffff;
+        }
+
+        .action-item.primary {
+            background: #00288e;
+            border-color: #00288e;
+            color: #ffffff;
+        }
+
+        .action-item-icon {
+            width: 46px;
+            height: 46px;
+            display: grid;
+            place-items: center;
+            border-radius: 9px;
+            background: #eef2f7;
+            color: #00288e;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .action-item.primary .action-item-icon {
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+        }
+
+        .action-item strong {
+            display: block;
+            color: inherit;
+            font-size: 15px;
+            font-weight: 900;
+            line-height: 1.35;
+        }
+
+        .action-item span {
+            display: block;
+            margin-top: 3px;
+            color: #475569;
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        .action-item.primary span {
+            color: rgba(255, 255, 255, 0.82);
+        }
+
+        .action-item .model-detail-btn {
+            margin: 0;
+            min-width: 72px;
+            background: #ffffff;
+            border-color: #cad6e4;
+        }
+
+        .action-item.primary .model-detail-btn {
+            background: rgba(255, 255, 255, 0.14);
+            border-color: rgba(255, 255, 255, 0.34);
+            color: #ffffff;
+        }
+
+        .diagnostic-preview {
+            min-height: 235px;
+            display: grid;
+            place-items: center;
+            margin-top: 18px;
+            padding: 22px;
+            border: 1px solid #dfe5ee;
+            border-radius: 8px;
+            background-image: radial-gradient(#dbe4ef 1px, transparent 1px);
+            background-size: 22px 22px;
+            background-color: #fbfdff;
+            color: #475569;
+            text-align: center;
+        }
+
+        .diagnostic-preview strong {
+            display: block;
+            margin-bottom: 8px;
+            color: #0f172a;
+            font-size: 14px;
+        }
+
+        .diagnostic-preview span {
+            display: block;
+            max-width: 36rem;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .diagnostic-todo {
+            display: grid;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .diagnostic-todo-item {
+            padding: 12px;
+            border: 1px solid #f3b8b1;
+            border-radius: 8px;
+            background: #fff7f5;
+            color: #9f1d16;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .diagnostic-todo-item strong {
+            display: block;
+            margin-bottom: 4px;
+            color: #8f140f;
+        }
+
+        @media (max-width: 1280px) {
+            .diagnostic-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .diagnostic-panel.evidence-panel {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (max-width: 980px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .workbench-sidebar {
+                position: static;
+                height: auto;
+                width: 100%;
+                max-height: none;
+            }
+
+            .workbench-sidebar nav,
+            .sidebar-secondary {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+
+            .workbench-main {
+                min-width: 0;
+            }
+
+            .workbench-topbar {
+                position: static;
+                grid-template-columns: 1fr;
+                margin: 0;
+                padding: 18px 16px;
+                background: #ffffff;
+                backdrop-filter: none;
+            }
+
+            .tab-content,
+            .tab-content#diagnostic-workbench-tab {
+                padding: 18px 16px 28px;
+            }
+
+            .diagnostic-filters,
+            .diagnostic-status-grid,
+            .diagnostic-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .diagnostic-panel.evidence-panel {
+                grid-column: auto;
+            }
+
+            .diagnostic-command-input input {
+                min-width: 0;
+                padding-right: 16px;
+                font-size: 14px;
+            }
+
+            .command-kbd {
+                display: none;
+            }
+
+            .action-item {
+                grid-template-columns: 38px minmax(0, 1fr);
+            }
+
+            .action-item .model-detail-btn {
+                grid-column: 2;
+                justify-self: start;
+            }
+
+            .diagnostic-stat {
+                min-height: 80px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -2689,9 +3247,9 @@
                 <div>
                     <div class="sidebar-group-title">Tools</div>
                     <div class="utility-grid">
-                        <button class="tab-btn utility-btn" data-tab="diagnosis" onclick="switchTab('diagnosis')">历史/专业诊断</button>
-                        <button class="tab-btn utility-btn" data-tab="resources" onclick="switchTab('resources')">SN 资料查询</button>
-                        <button class="tab-btn utility-btn" data-tab="log-analysis" onclick="switchTab('log-analysis')">校准 Log 分析</button>
+                        <button class="tab-btn utility-btn" data-tab="diagnosis" data-icon="HD" onclick="switchTab('diagnosis')">历史/专业诊断</button>
+                        <button class="tab-btn utility-btn" data-tab="resources" data-icon="SN" onclick="switchTab('resources')">SN 资料查询</button>
+                        <button class="tab-btn utility-btn" data-tab="log-analysis" data-icon="LG" onclick="switchTab('log-analysis')">校准 Log 分析</button>
                     </div>
                 </div>
                 <div>
@@ -3006,12 +3564,13 @@
         </div>
 
         <div class="tab-content active" id="diagnostic-workbench-tab">
-            <div class="knowledge-shell">
-                <div class="knowledge-hero">
-                    <h2>从一个入口开始排查</h2>
-                    <p class="subtitle">输入技术员已知的信息，系统会自动匹配机型、故障包、信号、SOP、案例模板和资料缺口。目标是先把“该查什么资料、该走哪条路径”变清楚。</p>
-                    <div class="knowledge-toolbar">
+            <div class="diagnostic-console">
+                <section class="diagnostic-command">
+                    <div class="diagnostic-command-input">
                         <input type="text" id="diagnosticQueryInput" placeholder="输入机型 / SN / 故障现象 / 故障代码 / 信号，例如 BG6m 不开机 VBAT" oninput="renderDiagnosticWorkbench()">
+                        <span class="command-kbd">诊断入口</span>
+                    </div>
+                    <div class="diagnostic-filters">
                         <select id="diagnosticModelSelect" onchange="renderDiagnosticWorkbench()">
                             <option value="">选择机型（可选）</option>
                         </select>
@@ -3019,21 +3578,27 @@
                             <option value="">选择故障包（可选）</option>
                         </select>
                     </div>
-                </div>
-                <div class="knowledge-stat-grid" id="diagnosticContextStats"></div>
-                <div class="dashboard-section">
-                    <div class="knowledge-card">
-                        <h3>当前诊断上下文</h3>
-                        <div id="diagnosticContextPanel" class="knowledge-list"></div>
-                    </div>
-                    <div class="knowledge-card">
-                        <h3>推荐资料与入口</h3>
-                        <div id="diagnosticActionPanel" class="knowledge-list"></div>
-                    </div>
-                    <div class="knowledge-card">
-                        <h3>相关信号 / SOP / 案例</h3>
-                        <div id="diagnosticReferencePanel" class="knowledge-list"></div>
-                    </div>
+                </section>
+                <div class="diagnostic-status-grid" id="diagnosticContextStats"></div>
+                <div class="diagnostic-grid">
+                    <aside class="diagnostic-panel">
+                        <h3>Diagnosis Context</h3>
+                        <div id="diagnosticContextPanel" class="diagnostic-panel-body"></div>
+                    </aside>
+                    <section class="diagnostic-panel">
+                        <h3>Priority Actions & Documentation</h3>
+                        <div class="diagnostic-panel-body">
+                            <div id="diagnosticActionPanel" class="knowledge-list"></div>
+                            <div id="diagnosticPreviewPanel" class="diagnostic-preview"></div>
+                        </div>
+                    </section>
+                    <aside class="diagnostic-panel evidence-panel">
+                        <h3>Signals & Evidence</h3>
+                        <div class="diagnostic-panel-body">
+                            <div id="diagnosticReferencePanel" class="knowledge-list"></div>
+                            <div id="diagnosticTodoPanel" class="diagnostic-todo"></div>
+                        </div>
+                    </aside>
                 </div>
             </div>
         </div>
@@ -4505,6 +5070,8 @@
             const contextEl = document.getElementById('diagnosticContextPanel');
             const actionEl = document.getElementById('diagnosticActionPanel');
             const referenceEl = document.getElementById('diagnosticReferencePanel');
+            const previewEl = document.getElementById('diagnosticPreviewPanel');
+            const todoEl = document.getElementById('diagnosticTodoPanel');
             if (!statsEl || !contextEl || !actionEl || !referenceEl) return;
             if (!knowledgeBaseState.loaded) return;
 
@@ -4522,33 +5089,69 @@
             if (modelReadiness) asArray(modelReadiness.blockers).slice(0, 4).forEach(item => gaps.push(`机型缺口：${item}`));
             if (packageReadiness) asArray(packageReadiness.blockers).slice(0, 4).forEach(item => gaps.push(`故障包缺口：${item}`));
 
+            const relatedModules = asArray(pack?.related_modules).join(' / ') || asArray(model?.related_modules).join(' / ');
+            const signalText = signals.map(item => `${item.signal_name}(${item.reference_value_or_waveform || '无参考值'})`).join(' / ');
+            const l4Text = asArray(pack?.l4_evidence).map(item => `${item.metric} ${item.count}`).join(' / ');
+            const sopsText = sops.map(item => item.title).join(' / ');
+
             statsEl.innerHTML = `
-                <div class="knowledge-stat"><strong>${model ? model.model_name : '-'}</strong><span>匹配机型</span></div>
-                <div class="knowledge-stat"><strong>${pack ? pack.priority : '-'}</strong><span>故障优先级</span></div>
-                <div class="knowledge-stat"><strong>${modelReadiness ? `${modelReadiness.score}%` : '-'}</strong><span>机型完整度</span></div>
-                <div class="knowledge-stat"><strong>${packageReadiness ? `${packageReadiness.score}%` : '-'}</strong><span>故障包完整度</span></div>
+                <div class="diagnostic-stat"><div><span>Matched Model</span><strong>${escapeHtml(model ? model.model_name : '-')}</strong></div><div class="diagnostic-stat-mark">MD</div></div>
+                <div class="diagnostic-stat"><div><span>Fault Priority</span><strong>${escapeHtml(pack ? pack.priority : '-')}</strong></div><div class="diagnostic-stat-mark">P</div></div>
+                <div class="diagnostic-stat"><div><span>Model Readiness</span><strong>${modelReadiness ? `${escapeHtml(modelReadiness.score)}%` : '-'}</strong></div><div class="diagnostic-stat-mark">MR</div></div>
+                <div class="diagnostic-stat"><div><span>Fault Readiness</span><strong>${packageReadiness ? `${escapeHtml(packageReadiness.score)}%` : '-'}</strong></div><div class="diagnostic-stat-mark">FR</div></div>
             `;
 
             contextEl.innerHTML = `
-                <div class="knowledge-row"><strong>输入内容</strong><span>${escapeHtml(query || '未输入')}</span><span>${query ? '已分析' : '可输入机型、故障、信号'}</span></div>
-                <div class="knowledge-row"><strong>机型</strong><span>${escapeHtml(model?.model_name || '未匹配')}</span><span>${escapeHtml(model?.next_action || '可通过下拉选择机型')}</span></div>
-                <div class="knowledge-row"><strong>故障包</strong><span>${escapeHtml(pack?.title || '未匹配')}</span><span>${escapeHtml(pack?.next_action || '可输入故障现象或选择故障包')}</span></div>
-                <div class="knowledge-row"><strong>推荐模块</strong><span>${escapeHtml(asArray(pack?.related_modules).join(' / ') || asArray(model?.related_modules).join(' / ') || '待匹配')}</span><span>用于决定先查哪块电路</span></div>
+                <div class="context-row"><strong>输入内容</strong><span>${escapeHtml(query || '未输入。可以输入机型、SN、故障现象、故障代码或信号名。')}</span></div>
+                <div class="context-row"><strong>匹配机型</strong><span>${escapeHtml(model?.model_name || '未匹配。可通过右上方下拉选择机型。')}</span></div>
+                <div class="context-row"><strong>匹配故障包</strong><span>${escapeHtml(pack?.title || '未匹配。可输入故障现象或选择故障包。')}</span></div>
+                <div class="context-row"><strong>推荐模块</strong><span>${escapeHtml(relatedModules || '待匹配。用于决定先查哪块电路。')}</span></div>
             `;
 
             actionEl.innerHTML = `
-                <div class="knowledge-row"><strong>查看机型资料</strong><span>${escapeHtml(model ? `${model.model_name} 主板图、点位图、完整度` : '先选择或输入机型')}</span><span><button class="model-detail-btn" onclick="switchTab('model-library')">跳转</button></span></div>
-                <div class="knowledge-row"><strong>查看故障包</strong><span>${escapeHtml(pack ? pack.title : '先选择或输入故障现象')}</span><span><button class="model-detail-btn" onclick="switchTab('fault-packages')">跳转</button></span></div>
-                <div class="knowledge-row"><strong>进入交互式 SOP</strong><span>${escapeHtml(interactive[0]?.title || '暂无 SOP 原型')}</span><span><button class="model-detail-btn" onclick="switchTab('interactive-sop')">跳转</button></span></div>
-                <div class="knowledge-row"><strong>记录维修案例</strong><span>按模板沉淀测量值、维修动作和验证结果</span><span><button class="model-detail-btn" onclick="switchTab('case-template')">跳转</button></span></div>
-                <div class="knowledge-row"><strong>当前缺口</strong><span>${escapeHtml(gaps.slice(0, 5).join(' / ') || '暂无匹配缺口')}</span><span><button class="model-detail-btn" onclick="switchTab('readiness-dashboard')">看仪表盘</button></span></div>
+                <div class="action-item primary">
+                    <div class="action-item-icon">BD</div>
+                    <div><strong>查看机型资料</strong><span>${escapeHtml(model ? `${model.model_name} 主板图、点位图、完整度` : '先选择或输入机型')}</span></div>
+                    <button class="model-detail-btn" onclick="switchTab('model-library')">进入</button>
+                </div>
+                <div class="action-item">
+                    <div class="action-item-icon">FP</div>
+                    <div><strong>查看故障包</strong><span>${escapeHtml(pack ? pack.title : '先选择或输入故障现象')}</span></div>
+                    <button class="model-detail-btn" onclick="switchTab('fault-packages')">进入</button>
+                </div>
+                <div class="action-item">
+                    <div class="action-item-icon">SP</div>
+                    <div><strong>进入交互式 SOP</strong><span>${escapeHtml(interactive[0]?.title || '暂无 SOP 原型')}</span></div>
+                    <button class="model-detail-btn" onclick="switchTab('interactive-sop')">进入</button>
+                </div>
+                <div class="action-item">
+                    <div class="action-item-icon">CS</div>
+                    <div><strong>记录维修案例</strong><span>按模板沉淀测量值、维修动作和验证结果</span></div>
+                    <button class="model-detail-btn" onclick="switchTab('case-template')">记录</button>
+                </div>
             `;
 
             referenceEl.innerHTML = `
-                <div class="knowledge-row"><strong>相关信号</strong><span>${escapeHtml(signals.map(item => `${item.signal_name}(${item.reference_value_or_waveform || '无参考值'})`).join(' / ') || '暂无匹配信号')}</span><span><button class="model-detail-btn" onclick="switchTab('mtk-signals')">查信号</button></span></div>
-                <div class="knowledge-row"><strong>SOP 草案</strong><span>${escapeHtml(sops.map(item => item.title).join(' / ') || '暂无 SOP 草案')}</span><span><button class="model-detail-btn" onclick="switchTab('sop-drafts')">查看</button></span></div>
-                <div class="knowledge-row"><strong>L4 依据</strong><span>${escapeHtml(asArray(pack?.l4_evidence).map(item => `${item.metric} ${item.count}`).join(' / ') || '暂无匹配 L4 依据')}</span><span><button class="model-detail-btn" onclick="switchTab('l4-insights')">看报告</button></span></div>
+                <div class="evidence-row"><strong>相关信号</strong><span>${escapeHtml(signalText || '暂无匹配信号')}</span><button class="model-detail-btn" onclick="switchTab('mtk-signals')">查信号</button></div>
+                <div class="evidence-row"><strong>SOP 草案</strong><span>${escapeHtml(sopsText || '暂无 SOP 草案')}</span><button class="model-detail-btn" onclick="switchTab('sop-drafts')">查看</button></div>
+                <div class="evidence-row"><strong>L4 依据</strong><span>${escapeHtml(l4Text || '暂无匹配 L4 依据')}</span><button class="model-detail-btn" onclick="switchTab('l4-insights')">看报告</button></div>
             `;
+
+            if (previewEl) {
+                previewEl.innerHTML = `
+                    <div>
+                        <strong>${escapeHtml(model ? `${model.model_name} 资料预览槽位` : '等待选择机型')}</strong>
+                        <span>${escapeHtml(model ? (model.next_action || '主板图、点位图和原理图到位后，这里可以承接第一屏预览。') : '输入机型或故障后，系统会把可用资料、SOP、信号和案例聚合到当前控制台。')}</span>
+                    </div>
+                `;
+            }
+
+            if (todoEl) {
+                const todoItems = gaps.slice(0, 3);
+                todoEl.innerHTML = todoItems.length
+                    ? todoItems.map(item => `<div class="diagnostic-todo-item"><strong>资料缺口</strong>${escapeHtml(item)}</div>`).join('')
+                    : '<div class="diagnostic-todo-item"><strong>资料缺口</strong>暂无匹配缺口。可继续补充机型、故障包或 L4 案例。</div>';
+            }
         }
 
         function renderCaseTemplate() {
