@@ -2,15 +2,16 @@
   "library_id": "MODEL-BOARD-ASSETS-20260701",
   "title": "Top20机型主板图与点位图资料库",
   "status": "inhouse_top20_assets_received",
-  "notes": "2026-07-02 已收到制造中心提供的 Top20 中 11 个内研项目资料包，包含维修指导书、主/副板维修原理图、位号图和少量对照表。外研项目资料制造中心同事反馈无法提供。当前仅完成清单登记，待结构化抽取和工程确认。",
+  "notes": "2026-07-02 已收到制造中心提供的 Top20 中 11 个内研项目资料包。前端机型卡片按真实资料类型展示维修指导书、主板维修原理图、主板位号图、副板资料、对照表和主板实物照片缺口。",
   "storage_root": "source-materials/manufacturing-center/top20-model-board-assets",
   "asset_slots": [
-    "board_front",
-    "board_back",
-    "point_map_front",
-    "point_map_back",
-    "schematic",
-    "bom"
+    "repair_guide",
+    "main_schematic",
+    "main_point_map",
+    "sub_board_schematic",
+    "sub_board_point_map",
+    "comparison_table",
+    "board_photo"
   ],
   "models": [
     {
@@ -30,8 +31,16 @@
         "400-CPU Failure"
       ],
       "asset_status": "engineering_drawings_received",
-      "assets": {},
-      "next_action": "完成文件命名规范化，抽取维修指导书章节、主板版本、位号图和维修原理图，并送制造中心/技术支持确认适用范围。",
+      "assets": {
+        "repair_guide": "",
+        "main_schematic": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/BG6M-F069M/J6765_F069M_MAIN_SCH_维修原理图_V1.0.pdf",
+        "main_point_map": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/BG6M-F069M/F069M_MAIN_PCB_V1.0_位号图(A1).pdf",
+        "sub_board_schematic": "",
+        "sub_board_point_map": "",
+        "comparison_table": "",
+        "board_photo": ""
+      },
+      "next_action": "图纸和位号图已挂载到前端卡片，下一步补齐维修指导书，并确认图纸版本适用范围。",
       "platform": "待制造中心确认",
       "board_versions": [
         "F069M_MAIN_PCB_V1.0"
@@ -57,23 +66,24 @@
         "note": "资料包已收到，待确认图纸版本、适用机型、售后可用范围和是否可转为培训/SOP。"
       },
       "required_materials": {
-        "board_images": {
+        "repair_guide": {
           "status": "missing",
           "missing_items": [
-            "board_front",
-            "board_back"
+            "repair_guide"
           ]
         },
-        "point_maps": {
-          "status": "partial",
-          "missing_items": [
-            "point_map_back_or_side_confirmation"
-          ]
+        "main_schematic": {
+          "status": "available",
+          "missing_items": []
         },
-        "diagnosis_sop": {
+        "main_point_map": {
+          "status": "available",
+          "missing_items": []
+        },
+        "sub_board_materials": {
           "status": "missing",
           "missing_items": [
-            "model_fault_diagnosis_sop"
+            "sub_board_materials"
           ]
         },
         "repair_cases": {
@@ -97,11 +107,10 @@
         }
       },
       "readiness": {
-        "score": 0,
-        "level": "资料已登记，待转译",
+        "score": 40,
+        "level": "资料已到位，待转译",
         "blockers": [
-          "主板实物照片未到位",
-          "工程资料尚未转译为售后 SOP",
+          "维修指导书未登记",
           "真实维修案例未关联",
           "维修边界未确认",
           "图纸版本适用范围未确认"
@@ -122,7 +131,20 @@
           "F069M_MAIN_PCB_V1.0_位号图(A1).pdf"
         ],
         "local_extract_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages",
-        "note": "仅识别到主板维修原理图和主板位号图，未识别到独立维修操作指导书。"
+        "note": "仅识别到主板维修原理图和主板位号图，未识别到独立维修操作指导书。",
+        "package_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/BG6M-F069M",
+        "files": [
+          {
+            "name": "F069M_MAIN_PCB_V1.0_位号图(A1).pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/BG6M-F069M/F069M_MAIN_PCB_V1.0_位号图(A1).pdf",
+            "size_kb": 876
+          },
+          {
+            "name": "J6765_F069M_MAIN_SCH_维修原理图_V1.0.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/BG6M-F069M/J6765_F069M_MAIN_SCH_维修原理图_V1.0.pdf",
+            "size_kb": 2360
+          }
+        ]
       }
     },
     {
@@ -142,8 +164,16 @@
         "PWR01-No power on"
       ],
       "asset_status": "repair_package_received",
-      "assets": {},
-      "next_action": "完成文件命名规范化，抽取维修指导书章节、主板版本、位号图和维修原理图，并送制造中心/技术支持确认适用范围。",
+      "assets": {
+        "repair_guide": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/TECNO-L6735-KM4-F151手机维修通用操作指导书V1.0_20250331.pdf",
+        "main_schematic": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/F151_MAIN_PCB_1_维修原理图_V1.2_20250310.pdf",
+        "main_point_map": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/F151_MAIN_PCB_V1.2_位号图.pdf",
+        "sub_board_schematic": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/F151_SUB_PCB_1_维修原理图_V1.1_20250310.pdf",
+        "sub_board_point_map": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/F151_SUB_PCB_1_V1.1_零件位号.pdf",
+        "comparison_table": "",
+        "board_photo": ""
+      },
+      "next_action": "资料已挂载到前端卡片，下一步抽取维修指导书章节、测试点和故障分支，转译为售后可执行 SOP。",
       "platform": "待制造中心确认",
       "board_versions": [
         "F151_MAIN_PCB_V1.2",
@@ -170,24 +200,21 @@
         "note": "资料包已收到，待确认图纸版本、适用机型、售后可用范围和是否可转为培训/SOP。"
       },
       "required_materials": {
-        "board_images": {
-          "status": "missing",
-          "missing_items": [
-            "board_front",
-            "board_back"
-          ]
+        "repair_guide": {
+          "status": "available",
+          "missing_items": []
         },
-        "point_maps": {
-          "status": "partial",
-          "missing_items": [
-            "point_map_back_or_side_confirmation"
-          ]
+        "main_schematic": {
+          "status": "available",
+          "missing_items": []
         },
-        "diagnosis_sop": {
-          "status": "draft_source_available",
-          "missing_items": [
-            "model_fault_diagnosis_sop_translated_for_after_sales"
-          ]
+        "main_point_map": {
+          "status": "available",
+          "missing_items": []
+        },
+        "sub_board_materials": {
+          "status": "available",
+          "missing_items": []
         },
         "repair_cases": {
           "status": "missing",
@@ -210,11 +237,9 @@
         }
       },
       "readiness": {
-        "score": 0,
-        "level": "资料已登记，待转译",
+        "score": 70,
+        "level": "待审核完善",
         "blockers": [
-          "主板实物照片未到位",
-          "工程资料尚未转译为售后 SOP",
           "真实维修案例未关联",
           "维修边界未确认",
           "图纸版本适用范围未确认"
@@ -239,7 +264,40 @@
           "F151_SUB_PCB_1_维修原理图_V1.1_20250310.pdf"
         ],
         "local_extract_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages",
-        "note": "该机型已在 L4 报告 Top 机型中出现，可优先进入资料审核。"
+        "note": "该机型已在 L4 报告 Top 机型中出现，可优先进入资料审核。",
+        "package_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151",
+        "files": [
+          {
+            "name": "F151_MAIN_PCB_1_维修原理图_V1.2_20250310.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/F151_MAIN_PCB_1_维修原理图_V1.2_20250310.pdf",
+            "size_kb": 6543
+          },
+          {
+            "name": "F151_MAIN_PCB_V1.2_位号图.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/F151_MAIN_PCB_V1.2_位号图.pdf",
+            "size_kb": 916
+          },
+          {
+            "name": "F151_SUB_PCB_1_V1.1_零件位号.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/F151_SUB_PCB_1_V1.1_零件位号.pdf",
+            "size_kb": 90
+          },
+          {
+            "name": "F151_SUB_PCB_1_维修原理图_V1.1_20250310.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/F151_SUB_PCB_1_维修原理图_V1.1_20250310.pdf",
+            "size_kb": 186
+          },
+          {
+            "name": "TECNO-L6735-KM4-F151手机维修通用操作指导书V1.0_20250331.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/TECNO-L6735-KM4-F151手机维修通用操作指导书V1.0_20250331.pdf",
+            "size_kb": 2645
+          },
+          {
+            "name": "内部公开-Internal Use.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/内部公开-Internal Use.pdf",
+            "size_kb": 99
+          }
+        ]
       }
     },
     {
@@ -259,8 +317,16 @@
         "410-PMU Failure"
       ],
       "asset_status": "repair_package_received",
-      "assets": {},
-      "next_action": "完成文件命名规范化，抽取维修指导书章节、主板版本、位号图和维修原理图，并送制造中心/技术支持确认适用范围。",
+      "assets": {
+        "repair_guide": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KL4-F201/TECNO_K6735_KL4-F201维修操作指导书_V1.0_20240705.pdf",
+        "main_schematic": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KL4-F201/K6735_F201_MAIN_SCH_V1.2维修原理图20240614.pdf",
+        "main_point_map": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KL4-F201/F201_MAIN_V1.2_零件位号.pdf",
+        "sub_board_schematic": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KL4-F201/K6735_F201_SUB_SCH_1_V1.2维修原理图20240614.pdf",
+        "sub_board_point_map": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KL4-F201/F201_SUB_PCB_1_V1.2_位号图.pdf",
+        "comparison_table": "",
+        "board_photo": ""
+      },
+      "next_action": "资料已挂载到前端卡片，下一步抽取维修指导书章节、测试点和故障分支，转译为售后可执行 SOP。",
       "platform": "待制造中心确认",
       "board_versions": [
         "F201_MAIN_V1.2",
@@ -287,24 +353,21 @@
         "note": "资料包已收到，待确认图纸版本、适用机型、售后可用范围和是否可转为培训/SOP。"
       },
       "required_materials": {
-        "board_images": {
-          "status": "missing",
-          "missing_items": [
-            "board_front",
-            "board_back"
-          ]
+        "repair_guide": {
+          "status": "available",
+          "missing_items": []
         },
-        "point_maps": {
-          "status": "partial",
-          "missing_items": [
-            "point_map_back_or_side_confirmation"
-          ]
+        "main_schematic": {
+          "status": "available",
+          "missing_items": []
         },
-        "diagnosis_sop": {
-          "status": "draft_source_available",
-          "missing_items": [
-            "model_fault_diagnosis_sop_translated_for_after_sales"
-          ]
+        "main_point_map": {
+          "status": "available",
+          "missing_items": []
+        },
+        "sub_board_materials": {
+          "status": "available",
+          "missing_items": []
         },
         "repair_cases": {
           "status": "missing",
@@ -327,11 +390,9 @@
         }
       },
       "readiness": {
-        "score": 0,
-        "level": "资料已登记，待转译",
+        "score": 70,
+        "level": "待审核完善",
         "blockers": [
-          "主板实物照片未到位",
-          "工程资料尚未转译为售后 SOP",
           "真实维修案例未关联",
           "维修边界未确认",
           "图纸版本适用范围未确认"
@@ -356,7 +417,40 @@
           "K6735_F201_SUB_SCH_1_V1.2维修原理图20240614.pdf"
         ],
         "local_extract_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages",
-        "note": "该机型已在 L4 报告 Top 机型中出现，可优先进入资料审核。"
+        "note": "该机型已在 L4 报告 Top 机型中出现，可优先进入资料审核。",
+        "package_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KL4-F201",
+        "files": [
+          {
+            "name": "F201_MAIN_V1.2_零件位号.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KL4-F201/F201_MAIN_V1.2_零件位号.pdf",
+            "size_kb": 867
+          },
+          {
+            "name": "F201_SUB_PCB_1_V1.2_位号图.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KL4-F201/F201_SUB_PCB_1_V1.2_位号图.pdf",
+            "size_kb": 91
+          },
+          {
+            "name": "K6735_F201_MAIN_SCH_V1.2维修原理图20240614.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KL4-F201/K6735_F201_MAIN_SCH_V1.2维修原理图20240614.pdf",
+            "size_kb": 2824
+          },
+          {
+            "name": "K6735_F201_SUB_SCH_1_V1.2维修原理图20240614.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KL4-F201/K6735_F201_SUB_SCH_1_V1.2维修原理图20240614.pdf",
+            "size_kb": 189
+          },
+          {
+            "name": "TECNO_K6735_KL4-F201维修操作指导书_V1.0_20240705.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KL4-F201/TECNO_K6735_KL4-F201维修操作指导书_V1.0_20240705.pdf",
+            "size_kb": 2625
+          },
+          {
+            "name": "内部公开 INTERNAL USE.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KL4-F201/内部公开 INTERNAL USE.pdf",
+            "size_kb": 143
+          }
+        ]
       }
     },
     {
@@ -374,8 +468,16 @@
         "PWR01-No power on"
       ],
       "asset_status": "repair_package_received",
-      "assets": {},
-      "next_action": "完成文件命名规范化，抽取维修指导书章节、主板版本、位号图和维修原理图，并送制造中心/技术支持确认适用范围。",
+      "assets": {
+        "repair_guide": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM6-H8918/Tecno-CM6-H8918╩╓╗·╬¼╨▐═¿╙├▓┘╫≈╓╕╡╝╩ΘV1.0_20241218.pdf",
+        "main_schematic": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM6-H8918/K6855_H8918_MAIN_PCB_V1.2_╬¼╨▐╘¡└φ═╝.pdf",
+        "main_point_map": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM6-H8918/H8918_MAIN_PCB_V1.2_╬╗║┼═╝20241030.pdf",
+        "sub_board_schematic": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM6-H8918/H8918_SUB_PCB_1_V1.3_╬¼╨▐╘¡└φ═╝.pdf",
+        "sub_board_point_map": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM6-H8918/H8918_SUB_PCB_1_V1.3-╬╗║┼═╝.pdf",
+        "comparison_table": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM6-H8918/CM6╧ε─┐╠∞╧▀╨≥║┼╢╘╒╒▒φ11.1.xlsx",
+        "board_photo": ""
+      },
+      "next_action": "资料已挂载到前端卡片，下一步抽取维修指导书章节、测试点和故障分支，转译为售后可执行 SOP。",
       "platform": "待制造中心确认",
       "board_versions": [
         "H8918_MAIN_PCB_V1.2",
@@ -400,24 +502,21 @@
         "note": "资料包已收到，待确认图纸版本、适用机型、售后可用范围和是否可转为培训/SOP。"
       },
       "required_materials": {
-        "board_images": {
-          "status": "missing",
-          "missing_items": [
-            "board_front",
-            "board_back"
-          ]
+        "repair_guide": {
+          "status": "available",
+          "missing_items": []
         },
-        "point_maps": {
-          "status": "partial",
-          "missing_items": [
-            "point_map_back_or_side_confirmation"
-          ]
+        "main_schematic": {
+          "status": "available",
+          "missing_items": []
         },
-        "diagnosis_sop": {
-          "status": "draft_source_available",
-          "missing_items": [
-            "model_fault_diagnosis_sop_translated_for_after_sales"
-          ]
+        "main_point_map": {
+          "status": "available",
+          "missing_items": []
+        },
+        "sub_board_materials": {
+          "status": "available",
+          "missing_items": []
         },
         "repair_cases": {
           "status": "missing",
@@ -440,11 +539,9 @@
         }
       },
       "readiness": {
-        "score": 0,
-        "level": "资料已登记，待转译",
+        "score": 70,
+        "level": "待审核完善",
         "blockers": [
-          "主板实物照片未到位",
-          "工程资料尚未转译为售后 SOP",
           "真实维修案例未关联",
           "维修边界未确认",
           "图纸版本适用范围未确认"
@@ -471,7 +568,55 @@
           "CM6 对照表"
         ],
         "local_extract_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages",
-        "note": "该机型已在 L4 报告 Top 机型中出现，可优先进入资料审核。"
+        "note": "该机型已在 L4 报告 Top 机型中出现，可优先进入资料审核。",
+        "package_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM6-H8918",
+        "files": [
+          {
+            "name": "CM6╧ε─┐╠∞╧▀╨≥║┼╢╘╒╒▒φ11.1.xlsx",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM6-H8918/CM6╧ε─┐╠∞╧▀╨≥║┼╢╘╒╒▒φ11.1.xlsx",
+            "size_kb": 146
+          },
+          {
+            "name": "H8918_MAIN_PCB_V1.2_╬╗║┼═╝20241030.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM6-H8918/H8918_MAIN_PCB_V1.2_╬╗║┼═╝20241030.pdf",
+            "size_kb": 885
+          },
+          {
+            "name": "H8918_SIM_PCB_1_V1.1_SCH&PCB_20240919.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM6-H8918/H8918_SIM_PCB_1_V1.1_SCH&PCB_20240919.pdf",
+            "size_kb": 128
+          },
+          {
+            "name": "H8918_SIM_PCB_1_V1.1_╬╗║┼═╝_20240924.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM6-H8918/H8918_SIM_PCB_1_V1.1_╬╗║┼═╝_20240924.pdf",
+            "size_kb": 58
+          },
+          {
+            "name": "H8918_SUB_PCB_1_V1.3-╬╗║┼═╝.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM6-H8918/H8918_SUB_PCB_1_V1.3-╬╗║┼═╝.pdf",
+            "size_kb": 102
+          },
+          {
+            "name": "H8918_SUB_PCB_1_V1.3_╬¼╨▐╘¡└φ═╝.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM6-H8918/H8918_SUB_PCB_1_V1.3_╬¼╨▐╘¡└φ═╝.pdf",
+            "size_kb": 204
+          },
+          {
+            "name": "K6855_H8918_MAIN_PCB_V1.2_╬¼╨▐╘¡└φ═╝.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM6-H8918/K6855_H8918_MAIN_PCB_V1.2_╬¼╨▐╘¡└φ═╝.pdf",
+            "size_kb": 2718
+          },
+          {
+            "name": "Tecno-CM6-H8918╩╓╗·╬¼╨▐═¿╙├▓┘╫≈╓╕╡╝╩ΘV1.0_20241218.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM6-H8918/Tecno-CM6-H8918╩╓╗·╬¼╨▐═¿╙├▓┘╫≈╓╕╡╝╩ΘV1.0_20241218.pdf",
+            "size_kb": 5498
+          },
+          {
+            "name": "─┌▓┐╣½┐¬ INTERNAL USE.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM6-H8918/─┌▓┐╣½┐¬ INTERNAL USE.pdf",
+            "size_kb": 144
+          }
+        ]
       }
     },
     {
@@ -995,8 +1140,16 @@
       "l4_record_count": null,
       "related_faults": [],
       "asset_status": "repair_package_received",
-      "assets": {},
-      "next_action": "完成文件命名规范化，抽取维修指导书章节、主板版本、位号图和维修原理图，并送制造中心/技术支持确认适用范围。",
+      "assets": {
+        "repair_guide": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/X6880-H8912/Infinix_K6789_X6880-H8912维修操作指导书_V1.0_20240815.pdf",
+        "main_schematic": "",
+        "main_point_map": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/X6880-H8912/H8912_MAIN_PCB_V1.1_位号图_20240605.pdf",
+        "sub_board_schematic": "",
+        "sub_board_point_map": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/X6880-H8912/H8912_SUB_PCB_1_V1.1_位号图.pdf",
+        "comparison_table": "",
+        "board_photo": ""
+      },
+      "next_action": "资料已挂载到前端卡片，下一步抽取维修指导书章节、测试点和故障分支，转译为售后可执行 SOP。",
       "platform": "待制造中心确认",
       "board_versions": [
         "H8912_MAIN_PCB_V1.1",
@@ -1019,23 +1172,24 @@
         "note": "资料包已收到，待确认图纸版本、适用机型、售后可用范围和是否可转为培训/SOP。"
       },
       "required_materials": {
-        "board_images": {
+        "repair_guide": {
+          "status": "available",
+          "missing_items": []
+        },
+        "main_schematic": {
           "status": "missing",
           "missing_items": [
-            "board_front",
-            "board_back"
+            "main_schematic"
           ]
         },
-        "point_maps": {
+        "main_point_map": {
+          "status": "available",
+          "missing_items": []
+        },
+        "sub_board_materials": {
           "status": "partial",
           "missing_items": [
-            "point_map_back_or_side_confirmation"
-          ]
-        },
-        "diagnosis_sop": {
-          "status": "draft_source_available",
-          "missing_items": [
-            "model_fault_diagnosis_sop_translated_for_after_sales"
+            "sub_board_schematic_or_point_map"
           ]
         },
         "repair_cases": {
@@ -1059,11 +1213,10 @@
         }
       },
       "readiness": {
-        "score": 0,
-        "level": "资料已登记，待转译",
+        "score": 45,
+        "level": "资料已到位，待转译",
         "blockers": [
-          "主板实物照片未到位",
-          "工程资料尚未转译为售后 SOP",
+          "主板原理图未登记",
           "真实维修案例未关联",
           "维修边界未确认",
           "图纸版本适用范围未确认"
@@ -1089,7 +1242,40 @@
           "H8912_SUB_PCB_1_V1.1.pdf"
         ],
         "local_extract_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages",
-        "note": "包含维修指导书、主板图纸、主板位号图和副板资料。"
+        "note": "包含维修指导书、主板图纸、主板位号图和副板资料。",
+        "package_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/X6880-H8912",
+        "files": [
+          {
+            "name": "H8912_MAIN_PCB_V1.1.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/X6880-H8912/H8912_MAIN_PCB_V1.1.pdf",
+            "size_kb": 2680
+          },
+          {
+            "name": "H8912_MAIN_PCB_V1.1_位号图_20240605.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/X6880-H8912/H8912_MAIN_PCB_V1.1_位号图_20240605.pdf",
+            "size_kb": 923
+          },
+          {
+            "name": "H8912_SUB_PCB_1_V1.1.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/X6880-H8912/H8912_SUB_PCB_1_V1.1.pdf",
+            "size_kb": 183
+          },
+          {
+            "name": "H8912_SUB_PCB_1_V1.1_位号图.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/X6880-H8912/H8912_SUB_PCB_1_V1.1_位号图.pdf",
+            "size_kb": 84
+          },
+          {
+            "name": "Infinix_K6789_X6880-H8912维修操作指导书_V1.0_20240815.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/X6880-H8912/Infinix_K6789_X6880-H8912维修操作指导书_V1.0_20240815.pdf",
+            "size_kb": 3790
+          },
+          {
+            "name": "内部公开 INTERNAL USE.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/X6880-H8912/内部公开 INTERNAL USE.pdf",
+            "size_kb": 144
+          }
+        ]
       }
     },
     {
@@ -1104,8 +1290,16 @@
       "l4_record_count": null,
       "related_faults": [],
       "asset_status": "repair_package_received",
-      "assets": {},
-      "next_action": "完成文件命名规范化，抽取维修指导书章节、主板版本、位号图和维修原理图，并送制造中心/技术支持确认适用范围。",
+      "assets": {
+        "repair_guide": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CK6N-H6929/TECNO_CK6N-H6929╬¼╨▐▓┘╫≈╓╕╡╝╩Θ_V1.0_20230307.pdf",
+        "main_schematic": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CK6N-H6929/H6929_MAIN_V1.1_╬¼╨▐╘¡└φ═╝.pdf",
+        "main_point_map": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CK6N-H6929/H6929_MAIN_PCB_V1.1_╬╗║┼═╝_BOT.pdf",
+        "sub_board_schematic": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CK6N-H6929/H894_SUB_SCH_2_V1.0_╬¼╨▐╘¡└φ═╝_20221109.pdf",
+        "sub_board_point_map": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CK6N-H6929/H894_SUB_PCB_3_V1.1_╬╗║┼═╝.pdf",
+        "comparison_table": "",
+        "board_photo": ""
+      },
+      "next_action": "资料已挂载到前端卡片，下一步抽取维修指导书章节、测试点和故障分支，转译为售后可执行 SOP。",
       "platform": "待制造中心确认",
       "board_versions": [
         "H6929_MAIN_V1.1",
@@ -1128,22 +1322,21 @@
         "note": "资料包已收到，待确认图纸版本、适用机型、售后可用范围和是否可转为培训/SOP。"
       },
       "required_materials": {
-        "board_images": {
-          "status": "missing",
-          "missing_items": [
-            "board_front",
-            "board_back"
-          ]
-        },
-        "point_maps": {
+        "repair_guide": {
           "status": "available",
           "missing_items": []
         },
-        "diagnosis_sop": {
-          "status": "draft_source_available",
-          "missing_items": [
-            "model_fault_diagnosis_sop_translated_for_after_sales"
-          ]
+        "main_schematic": {
+          "status": "available",
+          "missing_items": []
+        },
+        "main_point_map": {
+          "status": "available",
+          "missing_items": []
+        },
+        "sub_board_materials": {
+          "status": "available",
+          "missing_items": []
         },
         "repair_cases": {
           "status": "missing",
@@ -1166,11 +1359,9 @@
         }
       },
       "readiness": {
-        "score": 0,
-        "level": "资料已登记，待转译",
+        "score": 70,
+        "level": "待审核完善",
         "blockers": [
-          "主板实物照片未到位",
-          "工程资料尚未转译为售后 SOP",
           "真实维修案例未关联",
           "维修边界未确认",
           "图纸版本适用范围未确认"
@@ -1197,7 +1388,45 @@
           "H894_SUB_SCH_2_V1.0"
         ],
         "local_extract_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages",
-        "note": "部分文件名存在压缩包编码导致的乱码，需要后续按文件内容规范命名。"
+        "note": "部分文件名存在压缩包编码导致的乱码，需要后续按文件内容规范命名。",
+        "package_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CK6N-H6929",
+        "files": [
+          {
+            "name": "H6929_MAIN_PCB_V1.1_╬╗║┼═╝_BOT.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CK6N-H6929/H6929_MAIN_PCB_V1.1_╬╗║┼═╝_BOT.pdf",
+            "size_kb": 448
+          },
+          {
+            "name": "H6929_MAIN_PCB_V1.1_╬╗║┼═╝_TOP.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CK6N-H6929/H6929_MAIN_PCB_V1.1_╬╗║┼═╝_TOP.pdf",
+            "size_kb": 546
+          },
+          {
+            "name": "H6929_MAIN_V1.1_╬¼╨▐╘¡└φ═╝.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CK6N-H6929/H6929_MAIN_V1.1_╬¼╨▐╘¡└φ═╝.pdf",
+            "size_kb": 2650
+          },
+          {
+            "name": "H894_SUB_PCB_3_V1.1_╬╗║┼═╝.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CK6N-H6929/H894_SUB_PCB_3_V1.1_╬╗║┼═╝.pdf",
+            "size_kb": 103
+          },
+          {
+            "name": "H894_SUB_SCH_2_V1.0_╬¼╨▐╘¡└φ═╝_20221109.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CK6N-H6929/H894_SUB_SCH_2_V1.0_╬¼╨▐╘¡└φ═╝_20221109.pdf",
+            "size_kb": 166
+          },
+          {
+            "name": "TECNO_CK6N-H6929╬¼╨▐▓┘╫≈╓╕╡╝╩Θ_V1.0_20230307.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CK6N-H6929/TECNO_CK6N-H6929╬¼╨▐▓┘╫≈╓╕╡╝╩Θ_V1.0_20230307.pdf",
+            "size_kb": 4545
+          },
+          {
+            "name": "─┌▓┐╣½┐¬ INTERNAL USE.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CK6N-H6929/─┌▓┐╣½┐¬ INTERNAL USE.pdf",
+            "size_kb": 147
+          }
+        ]
       }
     },
     {
@@ -1213,8 +1442,16 @@
       "l4_record_count": null,
       "related_faults": [],
       "asset_status": "repair_package_received",
-      "assets": {},
-      "next_action": "完成文件命名规范化，抽取维修指导书章节、主板版本、位号图和维修原理图，并送制造中心/技术支持确认适用范围。",
+      "assets": {
+        "repair_guide": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/BG6H-F069/TECNO_J6563_BG6h-F069_维修操作指导书_V1.0_20231108.docx",
+        "main_schematic": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/BG6H-F069/F069_MAIN_PCB_V1.2 维修原理图 20230804.pdf",
+        "main_point_map": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/BG6H-F069/F069_MAIN_PCB_V1.2_位号图_20230823（A4）.pdf",
+        "sub_board_schematic": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/BG6H-F069/F069_SUB_PCB_1_V1.1 维修原理图 20230712.pdf",
+        "sub_board_point_map": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/BG6H-F069/F069_SUB_PCB_1_V1.1_位号图.pdf",
+        "comparison_table": "",
+        "board_photo": ""
+      },
+      "next_action": "资料已挂载到前端卡片，下一步抽取维修指导书章节、测试点和故障分支，转译为售后可执行 SOP。",
       "platform": "待制造中心确认",
       "board_versions": [
         "F069_MAIN_PCB_V1.2",
@@ -1237,24 +1474,21 @@
         "note": "资料包已收到，待确认图纸版本、适用机型、售后可用范围和是否可转为培训/SOP。"
       },
       "required_materials": {
-        "board_images": {
-          "status": "missing",
-          "missing_items": [
-            "board_front",
-            "board_back"
-          ]
+        "repair_guide": {
+          "status": "available",
+          "missing_items": []
         },
-        "point_maps": {
-          "status": "partial",
-          "missing_items": [
-            "point_map_back_or_side_confirmation"
-          ]
+        "main_schematic": {
+          "status": "available",
+          "missing_items": []
         },
-        "diagnosis_sop": {
-          "status": "draft_source_available",
-          "missing_items": [
-            "model_fault_diagnosis_sop_translated_for_after_sales"
-          ]
+        "main_point_map": {
+          "status": "available",
+          "missing_items": []
+        },
+        "sub_board_materials": {
+          "status": "available",
+          "missing_items": []
         },
         "repair_cases": {
           "status": "missing",
@@ -1277,11 +1511,9 @@
         }
       },
       "readiness": {
-        "score": 0,
-        "level": "资料已登记，待转译",
+        "score": 70,
+        "level": "待审核完善",
         "blockers": [
-          "主板实物照片未到位",
-          "工程资料尚未转译为售后 SOP",
           "真实维修案例未关联",
           "维修边界未确认",
           "图纸版本适用范围未确认"
@@ -1306,7 +1538,40 @@
           "F069_SUB_PCB_1_V1.1 维修原理图 20230712.pdf"
         ],
         "local_extract_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages",
-        "note": "包含 Word 维修指导书，适合后续抽取为机型 SOP 草案。"
+        "note": "包含 Word 维修指导书，适合后续抽取为机型 SOP 草案。",
+        "package_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/BG6H-F069",
+        "files": [
+          {
+            "name": "F069_MAIN_PCB_V1.2 维修原理图 20230804.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/BG6H-F069/F069_MAIN_PCB_V1.2 维修原理图 20230804.pdf",
+            "size_kb": 2399
+          },
+          {
+            "name": "F069_MAIN_PCB_V1.2_位号图_20230823（A4）.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/BG6H-F069/F069_MAIN_PCB_V1.2_位号图_20230823（A4）.pdf",
+            "size_kb": 1019
+          },
+          {
+            "name": "F069_SUB_PCB_1_V1.1 维修原理图 20230712.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/BG6H-F069/F069_SUB_PCB_1_V1.1 维修原理图 20230712.pdf",
+            "size_kb": 182
+          },
+          {
+            "name": "F069_SUB_PCB_1_V1.1_位号图.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/BG6H-F069/F069_SUB_PCB_1_V1.1_位号图.pdf",
+            "size_kb": 114
+          },
+          {
+            "name": "TECNO_J6563_BG6h-F069_维修操作指导书_V1.0_20231108.docx",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/BG6H-F069/TECNO_J6563_BG6h-F069_维修操作指导书_V1.0_20231108.docx",
+            "size_kb": 3022
+          },
+          {
+            "name": "内部公开-Internal Use.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/BG6H-F069/内部公开-Internal Use.pdf",
+            "size_kb": 158
+          }
+        ]
       }
     },
     {
@@ -1322,8 +1587,16 @@
       "l4_record_count": null,
       "related_faults": [],
       "asset_status": "repair_package_received",
-      "assets": {},
-      "next_action": "完成文件命名规范化，抽取维修指导书章节、主板版本、位号图和维修原理图，并送制造中心/技术支持确认适用范围。",
+      "assets": {
+        "repair_guide": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM5-H8918/Tecno-CM5-H8918╩╓╗·╬¼╨▐═¿╙├▓┘╫≈╓╕╡╝╩ΘV1.0_20241218.pdf",
+        "main_schematic": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM5-H8918/K6855_H8918_MAIN_PCB_V1.2_╬¼╨▐╘¡└φ═╝.pdf",
+        "main_point_map": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM5-H8918/H8918_MAIN_PCB_V1.2_╬╗║┼═╝20241030.pdf",
+        "sub_board_schematic": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM5-H8918/H8918_SUB_PCB_2_V1.2_╬¼╨▐╘¡└φ═╝.pdf.pdf",
+        "sub_board_point_map": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM5-H8918/H8918_SUB_PCB_2_V1.2-╬╗║┼═╝.pdf",
+        "comparison_table": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM5-H8918/CM5╧ε─┐╠∞╧▀╨≥║┼╢╘╒╒▒φ╫ε╨┬11.01.xlsx",
+        "board_photo": ""
+      },
+      "next_action": "资料已挂载到前端卡片，下一步抽取维修指导书章节、测试点和故障分支，转译为售后可执行 SOP。",
       "platform": "待制造中心确认",
       "board_versions": [
         "H8918_MAIN_PCB_V1.2",
@@ -1346,24 +1619,21 @@
         "note": "资料包已收到，待确认图纸版本、适用机型、售后可用范围和是否可转为培训/SOP。"
       },
       "required_materials": {
-        "board_images": {
-          "status": "missing",
-          "missing_items": [
-            "board_front",
-            "board_back"
-          ]
+        "repair_guide": {
+          "status": "available",
+          "missing_items": []
         },
-        "point_maps": {
-          "status": "partial",
-          "missing_items": [
-            "point_map_back_or_side_confirmation"
-          ]
+        "main_schematic": {
+          "status": "available",
+          "missing_items": []
         },
-        "diagnosis_sop": {
-          "status": "draft_source_available",
-          "missing_items": [
-            "model_fault_diagnosis_sop_translated_for_after_sales"
-          ]
+        "main_point_map": {
+          "status": "available",
+          "missing_items": []
+        },
+        "sub_board_materials": {
+          "status": "available",
+          "missing_items": []
         },
         "repair_cases": {
           "status": "missing",
@@ -1386,11 +1656,9 @@
         }
       },
       "readiness": {
-        "score": 0,
-        "level": "资料已登记，待转译",
+        "score": 70,
+        "level": "待审核完善",
         "blockers": [
-          "主板实物照片未到位",
-          "工程资料尚未转译为售后 SOP",
           "真实维修案例未关联",
           "维修边界未确认",
           "图纸版本适用范围未确认"
@@ -1417,7 +1685,65 @@
           "xlsx 对照表"
         ],
         "local_extract_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages",
-        "note": "与 CM6 共用 H8918 主板资料，需要后续确认差异和适用边界。"
+        "note": "与 CM6 共用 H8918 主板资料，需要后续确认差异和适用边界。",
+        "package_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM5-H8918",
+        "files": [
+          {
+            "name": "CM5-H8918_ANT_PCB_V1.0_╬¼╨▐╘¡└φ═╝.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM5-H8918/CM5-H8918_ANT_PCB_V1.0_╬¼╨▐╘¡└φ═╝.pdf",
+            "size_kb": 16
+          },
+          {
+            "name": "CM5╧ε─┐╠∞╧▀╨≥║┼╢╘╒╒▒φ╫ε╨┬11.01.xlsx",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM5-H8918/CM5╧ε─┐╠∞╧▀╨≥║┼╢╘╒╒▒φ╫ε╨┬11.01.xlsx",
+            "size_kb": 137
+          },
+          {
+            "name": "H8918_ANT_PCB_2_V1.0_╬╗║┼═╝_20241128.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM5-H8918/H8918_ANT_PCB_2_V1.0_╬╗║┼═╝_20241128.pdf",
+            "size_kb": 40
+          },
+          {
+            "name": "H8918_MAIN_PCB_V1.2_╬╗║┼═╝20241030.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM5-H8918/H8918_MAIN_PCB_V1.2_╬╗║┼═╝20241030.pdf",
+            "size_kb": 885
+          },
+          {
+            "name": "H8918_SIM_PCB_2_V1.1_SCH&PCB_20240925.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM5-H8918/H8918_SIM_PCB_2_V1.1_SCH&PCB_20240925.pdf",
+            "size_kb": 140
+          },
+          {
+            "name": "H8918_SIM_PCB_2_V1.1_╬╗║┼═╝_20240927.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM5-H8918/H8918_SIM_PCB_2_V1.1_╬╗║┼═╝_20240927.pdf",
+            "size_kb": 66
+          },
+          {
+            "name": "H8918_SUB_PCB_2_V1.2-╬╗║┼═╝.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM5-H8918/H8918_SUB_PCB_2_V1.2-╬╗║┼═╝.pdf",
+            "size_kb": 91
+          },
+          {
+            "name": "H8918_SUB_PCB_2_V1.2_╬¼╨▐╘¡└φ═╝.pdf.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM5-H8918/H8918_SUB_PCB_2_V1.2_╬¼╨▐╘¡└φ═╝.pdf.pdf",
+            "size_kb": 179
+          },
+          {
+            "name": "K6855_H8918_MAIN_PCB_V1.2_╬¼╨▐╘¡└φ═╝.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM5-H8918/K6855_H8918_MAIN_PCB_V1.2_╬¼╨▐╘¡└φ═╝.pdf",
+            "size_kb": 2718
+          },
+          {
+            "name": "Tecno-CM5-H8918╩╓╗·╬¼╨▐═¿╙├▓┘╫≈╓╕╡╝╩ΘV1.0_20241218.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM5-H8918/Tecno-CM5-H8918╩╓╗·╬¼╨▐═¿╙├▓┘╫≈╓╕╡╝╩ΘV1.0_20241218.pdf",
+            "size_kb": 5497
+          },
+          {
+            "name": "─┌▓┐╣½┐¬ INTERNAL USE.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM5-H8918/─┌▓┐╣½┐¬ INTERNAL USE.pdf",
+            "size_kb": 144
+          }
+        ]
       }
     },
     {
@@ -1433,8 +1759,16 @@
       "l4_record_count": null,
       "related_faults": [],
       "asset_status": "repair_package_received",
-      "assets": {},
-      "next_action": "完成文件命名规范化，抽取维修指导书章节、主板版本、位号图和维修原理图，并送制造中心/技术支持确认适用范围。",
+      "assets": {
+        "repair_guide": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CLA5-H8910/TECNO-J6789-CLA5-H8910手机维修通用操作指导书V1.0_20240805.pdf",
+        "main_schematic": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CLA5-H8910/J6789_H8910_MAIN_SCH_V1.1_维修原理图_20240513.pdf",
+        "main_point_map": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CLA5-H8910/H8910_MAIN_PCB_V1.1_位号图.pdf",
+        "sub_board_schematic": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CLA5-H8910/H8910_SUB_SCH_1_V1.0_维修原理图_20240513.pdf",
+        "sub_board_point_map": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CLA5-H8910/H8910_SUB_PCB_1_V1.0_位号图.pdf",
+        "comparison_table": "",
+        "board_photo": ""
+      },
+      "next_action": "资料已挂载到前端卡片，下一步抽取维修指导书章节、测试点和故障分支，转译为售后可执行 SOP。",
       "platform": "待制造中心确认",
       "board_versions": [
         "H8910_MAIN_PCB_V1.1",
@@ -1457,24 +1791,21 @@
         "note": "资料包已收到，待确认图纸版本、适用机型、售后可用范围和是否可转为培训/SOP。"
       },
       "required_materials": {
-        "board_images": {
-          "status": "missing",
-          "missing_items": [
-            "board_front",
-            "board_back"
-          ]
+        "repair_guide": {
+          "status": "available",
+          "missing_items": []
         },
-        "point_maps": {
-          "status": "partial",
-          "missing_items": [
-            "point_map_back_or_side_confirmation"
-          ]
+        "main_schematic": {
+          "status": "available",
+          "missing_items": []
         },
-        "diagnosis_sop": {
-          "status": "draft_source_available",
-          "missing_items": [
-            "model_fault_diagnosis_sop_translated_for_after_sales"
-          ]
+        "main_point_map": {
+          "status": "available",
+          "missing_items": []
+        },
+        "sub_board_materials": {
+          "status": "available",
+          "missing_items": []
         },
         "repair_cases": {
           "status": "missing",
@@ -1497,11 +1828,9 @@
         }
       },
       "readiness": {
-        "score": 0,
-        "level": "资料已登记，待转译",
+        "score": 70,
+        "level": "待审核完善",
         "blockers": [
-          "主板实物照片未到位",
-          "工程资料尚未转译为售后 SOP",
           "真实维修案例未关联",
           "维修边界未确认",
           "图纸版本适用范围未确认"
@@ -1528,7 +1857,40 @@
           "H8910_SUB_PCB_1_V1.0_位号图.pdf"
         ],
         "local_extract_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages",
-        "note": "资料结构较完整，可作为机型资料入库模板样本。"
+        "note": "资料结构较完整，可作为机型资料入库模板样本。",
+        "package_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CLA5-H8910",
+        "files": [
+          {
+            "name": "H8910_MAIN_PCB_V1.1_位号图.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CLA5-H8910/H8910_MAIN_PCB_V1.1_位号图.pdf",
+            "size_kb": 963
+          },
+          {
+            "name": "H8910_SUB_PCB_1_V1.0_位号图.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CLA5-H8910/H8910_SUB_PCB_1_V1.0_位号图.pdf",
+            "size_kb": 123
+          },
+          {
+            "name": "H8910_SUB_SCH_1_V1.0_维修原理图_20240513.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CLA5-H8910/H8910_SUB_SCH_1_V1.0_维修原理图_20240513.pdf",
+            "size_kb": 251
+          },
+          {
+            "name": "J6789_H8910_MAIN_SCH_V1.1_维修原理图_20240513.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CLA5-H8910/J6789_H8910_MAIN_SCH_V1.1_维修原理图_20240513.pdf",
+            "size_kb": 2794
+          },
+          {
+            "name": "TECNO-J6789-CLA5-H8910手机维修通用操作指导书V1.0_20240805.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CLA5-H8910/TECNO-J6789-CLA5-H8910手机维修通用操作指导书V1.0_20240805.pdf",
+            "size_kb": 5697
+          },
+          {
+            "name": "内部公开-Internal Use.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CLA5-H8910/内部公开-Internal Use.pdf",
+            "size_kb": 99
+          }
+        ]
       }
     },
     {
@@ -1544,8 +1906,16 @@
       "l4_record_count": null,
       "related_faults": [],
       "asset_status": "repair_package_received",
-      "assets": {},
-      "next_action": "完成文件命名规范化，抽取维修指导书章节、主板版本、位号图和维修原理图，并送制造中心/技术支持确认适用范围。",
+      "assets": {
+        "repair_guide": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KJ5-H6931/Tecno-KJ5-H6931手机维修通用操作指导书V1.0_20230915.docx",
+        "main_schematic": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KJ5-H6931/J6563_H6931_MAIN_SCH_维修原理图_V1.0_20230616-1535.pdf",
+        "main_point_map": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KJ5-H6931/H6931_MAIN_PCB_V1.0_ 位号图.pdf",
+        "sub_board_schematic": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KJ5-H6931/J6563_H6931_SUB_SCH_1_维修原理图_V1.0_20230616-1533.pdf",
+        "sub_board_point_map": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KJ5-H6931/H6931_SUB_PCB_1_V1.0_位号图.pdf",
+        "comparison_table": "",
+        "board_photo": ""
+      },
+      "next_action": "资料已挂载到前端卡片，下一步抽取维修指导书章节、测试点和故障分支，转译为售后可执行 SOP。",
       "platform": "待制造中心确认",
       "board_versions": [
         "H6931_MAIN_PCB_V1.0",
@@ -1568,24 +1938,21 @@
         "note": "资料包已收到，待确认图纸版本、适用机型、售后可用范围和是否可转为培训/SOP。"
       },
       "required_materials": {
-        "board_images": {
-          "status": "missing",
-          "missing_items": [
-            "board_front",
-            "board_back"
-          ]
+        "repair_guide": {
+          "status": "available",
+          "missing_items": []
         },
-        "point_maps": {
-          "status": "partial",
-          "missing_items": [
-            "point_map_back_or_side_confirmation"
-          ]
+        "main_schematic": {
+          "status": "available",
+          "missing_items": []
         },
-        "diagnosis_sop": {
-          "status": "draft_source_available",
-          "missing_items": [
-            "model_fault_diagnosis_sop_translated_for_after_sales"
-          ]
+        "main_point_map": {
+          "status": "available",
+          "missing_items": []
+        },
+        "sub_board_materials": {
+          "status": "available",
+          "missing_items": []
         },
         "repair_cases": {
           "status": "missing",
@@ -1608,11 +1975,9 @@
         }
       },
       "readiness": {
-        "score": 0,
-        "level": "资料已登记，待转译",
+        "score": 70,
+        "level": "待审核完善",
         "blockers": [
-          "主板实物照片未到位",
-          "工程资料尚未转译为售后 SOP",
           "真实维修案例未关联",
           "维修边界未确认",
           "图纸版本适用范围未确认"
@@ -1638,7 +2003,60 @@
           "H6931_MAIN_PCB_V1.0_ 位号图.pdf"
         ],
         "local_extract_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages",
-        "note": "存在多个主板版本，需要后续确认版本适用规则。"
+        "note": "存在多个主板版本，需要后续确认版本适用规则。",
+        "package_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KJ5-H6931",
+        "files": [
+          {
+            "name": "H6931_MAIN_PCB_V1.0_ 位号图.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KJ5-H6931/H6931_MAIN_PCB_V1.0_ 位号图.pdf",
+            "size_kb": 927
+          },
+          {
+            "name": "H6931_MAIN_PCB_V1.2_ 位号图.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KJ5-H6931/H6931_MAIN_PCB_V1.2_ 位号图.pdf",
+            "size_kb": 956
+          },
+          {
+            "name": "H6931_SUB_PCB_1_V1.0_位号图.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KJ5-H6931/H6931_SUB_PCB_1_V1.0_位号图.pdf",
+            "size_kb": 114
+          },
+          {
+            "name": "H6931_SUB_PCB_1_V1.1_位号图.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KJ5-H6931/H6931_SUB_PCB_1_V1.1_位号图.pdf",
+            "size_kb": 113
+          },
+          {
+            "name": "J6563_H6931_MAIN_SCH_维修原理图_V1.0_20230616-1535.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KJ5-H6931/J6563_H6931_MAIN_SCH_维修原理图_V1.0_20230616-1535.pdf",
+            "size_kb": 2263
+          },
+          {
+            "name": "J6563_H6931_MAIN_SCH_维修原理图_V1.1_20230727-0926.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KJ5-H6931/J6563_H6931_MAIN_SCH_维修原理图_V1.1_20230727-0926.pdf",
+            "size_kb": 2263
+          },
+          {
+            "name": "J6563_H6931_SUB_SCH_1_维修原理图_V1.0_20230616-1533.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KJ5-H6931/J6563_H6931_SUB_SCH_1_维修原理图_V1.0_20230616-1533.pdf",
+            "size_kb": 184
+          },
+          {
+            "name": "J6563_H6931_SUB_SCH_1_维修原理图_V1.1_20230727-0928.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KJ5-H6931/J6563_H6931_SUB_SCH_1_维修原理图_V1.1_20230727-0928.pdf",
+            "size_kb": 183
+          },
+          {
+            "name": "Tecno-KJ5-H6931手机维修通用操作指导书V1.0_20230915.docx",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KJ5-H6931/Tecno-KJ5-H6931手机维修通用操作指导书V1.0_20230915.docx",
+            "size_kb": 5578
+          },
+          {
+            "name": "内部公开-Internal Use.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KJ5-H6931/内部公开-Internal Use.pdf",
+            "size_kb": 98
+          }
+        ]
       }
     },
     {
@@ -1653,8 +2071,16 @@
       "l4_record_count": null,
       "related_faults": [],
       "asset_status": "repair_package_received",
-      "assets": {},
-      "next_action": "完成文件命名规范化，抽取维修指导书章节、主板版本、位号图和维修原理图，并送制造中心/技术支持确认适用范围。",
+      "assets": {
+        "repair_guide": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM7K-H8921/TECNO-KM7K-H8921手机维修通用操作指导书V1.0_20250718.pdf",
+        "main_schematic": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM7K-H8921/H8921_MAIN_SCH_维修原理图_V1.2_20250402_2048.pdf",
+        "main_point_map": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM7K-H8921/H8921_MAIN_PCB_V1.2_位号图.pdf",
+        "sub_board_schematic": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM7K-H8921/H8921_SUB_SCH_1_维修原理图_V1.2_20250402-2053.pdf",
+        "sub_board_point_map": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM7K-H8921/H8921_SUB_PCB_1_V1.2_位号图.pdf",
+        "comparison_table": "",
+        "board_photo": ""
+      },
+      "next_action": "资料已挂载到前端卡片，下一步抽取维修指导书章节、测试点和故障分支，转译为售后可执行 SOP。",
       "platform": "待制造中心确认",
       "board_versions": [
         "H8921_MAIN_PCB_V1.2",
@@ -1677,24 +2103,21 @@
         "note": "资料包已收到，待确认图纸版本、适用机型、售后可用范围和是否可转为培训/SOP。"
       },
       "required_materials": {
-        "board_images": {
-          "status": "missing",
-          "missing_items": [
-            "board_front",
-            "board_back"
-          ]
+        "repair_guide": {
+          "status": "available",
+          "missing_items": []
         },
-        "point_maps": {
-          "status": "partial",
-          "missing_items": [
-            "point_map_back_or_side_confirmation"
-          ]
+        "main_schematic": {
+          "status": "available",
+          "missing_items": []
         },
-        "diagnosis_sop": {
-          "status": "draft_source_available",
-          "missing_items": [
-            "model_fault_diagnosis_sop_translated_for_after_sales"
-          ]
+        "main_point_map": {
+          "status": "available",
+          "missing_items": []
+        },
+        "sub_board_materials": {
+          "status": "available",
+          "missing_items": []
         },
         "repair_cases": {
           "status": "missing",
@@ -1717,11 +2140,9 @@
         }
       },
       "readiness": {
-        "score": 0,
-        "level": "资料已登记，待转译",
+        "score": 70,
+        "level": "待审核完善",
         "blockers": [
-          "主板实物照片未到位",
-          "工程资料尚未转译为售后 SOP",
           "真实维修案例未关联",
           "维修边界未确认",
           "图纸版本适用范围未确认"
@@ -1746,7 +2167,40 @@
           "H8921_SUB_SCH_1_维修原理图_V1.2_20250402-2053.pdf"
         ],
         "local_extract_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages",
-        "note": "资料日期晚于当前系统日期，需后续和制造中心确认版本有效性。"
+        "note": "资料日期晚于当前系统日期，需后续和制造中心确认版本有效性。",
+        "package_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM7K-H8921",
+        "files": [
+          {
+            "name": "H8921_MAIN_PCB_V1.2_位号图.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM7K-H8921/H8921_MAIN_PCB_V1.2_位号图.pdf",
+            "size_kb": 954
+          },
+          {
+            "name": "H8921_MAIN_SCH_维修原理图_V1.2_20250402_2048.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM7K-H8921/H8921_MAIN_SCH_维修原理图_V1.2_20250402_2048.pdf",
+            "size_kb": 2747
+          },
+          {
+            "name": "H8921_SUB_PCB_1_V1.2_位号图.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM7K-H8921/H8921_SUB_PCB_1_V1.2_位号图.pdf",
+            "size_kb": 67
+          },
+          {
+            "name": "H8921_SUB_SCH_1_维修原理图_V1.2_20250402-2053.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM7K-H8921/H8921_SUB_SCH_1_维修原理图_V1.2_20250402-2053.pdf",
+            "size_kb": 113
+          },
+          {
+            "name": "TECNO-KM7K-H8921手机维修通用操作指导书V1.0_20250718.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM7K-H8921/TECNO-KM7K-H8921手机维修通用操作指导书V1.0_20250718.pdf",
+            "size_kb": 3932
+          },
+          {
+            "name": "内部公开 INTERNAL USE.pdf",
+            "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM7K-H8921/内部公开 INTERNAL USE.pdf",
+            "size_kb": 144
+          }
+        ]
       }
     }
   ],
@@ -1763,27 +2217,24 @@
   "readiness_model": {
     "required_groups": [
       {
-        "group_id": "board_images",
-        "label": "主板图",
-        "weight": 25,
-        "required_slots": [
-          "board_front",
-          "board_back"
-        ]
-      },
-      {
-        "group_id": "point_maps",
-        "label": "点位图",
-        "weight": 25,
-        "required_slots": [
-          "point_map_front",
-          "point_map_back"
-        ]
-      },
-      {
-        "group_id": "diagnosis_sop",
-        "label": "诊断SOP",
+        "group_id": "repair_guide",
+        "label": "维修指导书",
         "weight": 20
+      },
+      {
+        "group_id": "main_schematic",
+        "label": "主板原理图",
+        "weight": 20
+      },
+      {
+        "group_id": "main_point_map",
+        "label": "主板位号图",
+        "weight": 20
+      },
+      {
+        "group_id": "sub_board_materials",
+        "label": "副板资料",
+        "weight": 10
       },
       {
         "group_id": "repair_cases",

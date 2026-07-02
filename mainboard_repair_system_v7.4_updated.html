@@ -3792,9 +3792,9 @@
             <div class="knowledge-shell">
                 <div class="knowledge-hero">
                     <h2>机型资料库</h2>
-                    <p class="subtitle">承接制造中心即将分享的 Top20 主板图和点位图。当前先登记候选机型、资料槽位和缺口，图片到位后即可直接挂载。</p>
+                    <p class="subtitle">承接制造中心提供的 Top20 内研项目资料包，按机型展示维修指导书、主板原理图、位号图、副板资料、对照表和后续缺口。</p>
                     <div class="knowledge-toolbar">
-                        <input type="text" id="modelSearchInput" placeholder="搜索机型 / 故障 / 状态，例如 BG6m、Memory、待补图" oninput="renderModelLibrary()">
+                        <input type="text" id="modelSearchInput" placeholder="搜索机型 / 故障 / 状态，例如 BG6m、Memory、维修包" oninput="renderModelLibrary()">
                         <select id="modelStatusFilter" onchange="renderModelLibrary()">
                             <option value="">全部状态</option>
                         </select>
@@ -4853,12 +4853,13 @@
             return asArray(slots).map(slot => {
                 const hasAsset = Boolean(assets[slot]);
                 const labelMap = {
-                    board_front: '正面主板图',
-                    board_back: '反面主板图',
-                    point_map_front: '正面点位图',
-                    point_map_back: '反面点位图',
-                    schematic: '原理图',
-                    bom: 'BOM'
+                    repair_guide: '维修指导书',
+                    main_schematic: '主板原理图',
+                    main_point_map: '主板位号图',
+                    sub_board_schematic: '副板原理图',
+                    sub_board_point_map: '副板位号图',
+                    comparison_table: '对照表',
+                    board_photo: '主板实物照片'
                 };
                 return `<span class="knowledge-pill ${hasAsset ? 'low' : 'high'}">${escapeHtml(labelMap[slot] || slot)}：${hasAsset ? '已登记' : '待补'}</span>`;
             }).join('');
@@ -4905,6 +4906,8 @@
             const labels = {
                 missing: '缺失',
                 partial: '部分',
+                available: '已登记',
+                draft_source_available: '已有资料源',
                 ready: '已具备',
                 confirmed: '已确认',
                 pending_confirmation: '待确认',
@@ -4916,16 +4919,17 @@
         function renderAssetViewer(model, slots) {
             const assets = model.assets || {};
             const labelMap = {
-                board_front: '正面主板图',
-                board_back: '反面主板图',
-                point_map_front: '正面点位图',
-                point_map_back: '反面点位图',
-                schematic: '原理图',
-                bom: 'BOM'
+                repair_guide: '维修指导书',
+                main_schematic: '主板维修原理图',
+                main_point_map: '主板位号图',
+                sub_board_schematic: '副板维修原理图',
+                sub_board_point_map: '副板位号图',
+                comparison_table: '对照表',
+                board_photo: '主板实物照片'
             };
             return `
                 <div class="asset-viewer-grid">
-                    ${asArray(slots).slice(0, 4).map(slot => {
+                    ${asArray(slots).map(slot => {
                         const assetPath = assets[slot];
                         const isImage = assetPath && /\.(png|jpe?g|webp|gif)$/i.test(assetPath);
                         const previewId = `asset-preview-${model.model_id}-${slot}`;
@@ -4933,7 +4937,7 @@
                             <div class="asset-viewer-card">
                                 <strong>${escapeHtml(labelMap[slot] || slot)}</strong>
                                 <div class="asset-preview" id="${escapeHtml(previewId)}">
-                                    ${assetPath ? (isImage ? `<img src="${escapeHtml(assetPath)}" alt="${escapeHtml(labelMap[slot] || slot)}">` : `<span>${escapeHtml(assetPath)}</span>`) : '<span>待制造中心提供</span>'}
+                                    ${assetPath ? (isImage ? `<img src="${escapeHtml(assetPath)}" alt="${escapeHtml(labelMap[slot] || slot)}">` : `<span>${escapeHtml(assetPath)}</span>`) : '<span>待补充或待转译</span>'}
                                 </div>
                                 <div class="asset-actions">
                                     <button type="button" onclick="zoomAssetPreview('${escapeHtml(previewId)}', 0.15)">放大</button>
@@ -4943,6 +4947,21 @@
                             </div>
                         `;
                     }).join('')}
+                </div>
+            `;
+        }
+
+        function renderModelFileList(model) {
+            const files = asArray(model.asset_inventory?.files);
+            if (files.length === 0) return '<div class="knowledge-state">暂无已登记文件清单。</div>';
+            return `
+                <div class="material-checklist">
+                    ${files.map(file => `
+                        <div class="material-row">
+                            <strong>${escapeHtml(file.name || '未命名文件')}</strong>
+                            <span>${file.size_kb ? `${escapeHtml(file.size_kb)} KB` : ''}${file.path ? ` · <a href="${escapeHtml(file.path)}" target="_blank">打开</a>` : ''}</span>
+                        </div>
+                    `).join('')}
                 </div>
             `;
         }
@@ -5001,11 +5020,12 @@
             const partialStatuses = ['partial_assets', 'ready_for_review', 'engineering_drawings_received', 'repair_package_received'];
             const partialCount = models.filter(model => partialStatuses.includes(model.asset_status)).length;
             const pendingCount = models.filter(model => model.asset_status === 'pending_assets').length;
+            const archivedFiles = models.reduce((sum, model) => sum + asArray(model.asset_inventory?.files).length, 0);
             statsEl.innerHTML = `
                 <div class="knowledge-stat"><strong>${models.length}</strong><span>候选机型</span></div>
-                <div class="knowledge-stat"><strong>${pendingCount}</strong><span>待补图纸</span></div>
-                <div class="knowledge-stat"><strong>${partialCount}</strong><span>部分资料 / 待审核</span></div>
-                <div class="knowledge-stat"><strong>${readyCount}</strong><span>可内测机型</span></div>
+                <div class="knowledge-stat"><strong>${partialCount}</strong><span>资料已挂载</span></div>
+                <div class="knowledge-stat"><strong>${archivedFiles}</strong><span>已登记文件</span></div>
+                <div class="knowledge-stat"><strong>${pendingCount}</strong><span>仍待补齐</span></div>
             `;
 
             if (filtered.length === 0) {
@@ -5034,6 +5054,8 @@
                         <p><strong>主板版本：</strong>${escapeHtml(asArray(model.board_versions).join(' / ') || '待确认')}</p>
                         <p><strong>适用区域：</strong>${escapeHtml(asArray(model.region_scope).join(' / ') || '待确认')}</p>
                         ${renderAssetViewer(model, slots)}
+                        <p><strong>已登记文件：</strong>${escapeHtml(asArray(model.asset_inventory?.files).length)} 个</p>
+                        ${renderModelFileList(model)}
                         <div class="material-checklist">${renderMaterialChecklist(model, library)}</div>
                         <p><strong>维修边界：</strong>${escapeHtml(model.repair_boundary?.note || '待确认')}</p>
                         <p><strong>工程确认：</strong>${escapeHtml(model.engineering_confirmation?.note || '待确认')}</p>
