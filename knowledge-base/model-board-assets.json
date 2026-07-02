@@ -121,7 +121,7 @@
           "J6765_F069M_MAIN_SCH_维修原理图_V1.0.pdf",
           "F069M_MAIN_PCB_V1.0_位号图(A1).pdf"
         ],
-        "local_extract_path": ".local/top20-inhouse-11-extracted",
+        "local_extract_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages",
         "note": "仅识别到主板维修原理图和主板位号图，未识别到独立维修操作指导书。"
       }
     },
@@ -238,7 +238,7 @@
           "F151_MAIN_PCB_V1.2_位号图.pdf",
           "F151_SUB_PCB_1_维修原理图_V1.1_20250310.pdf"
         ],
-        "local_extract_path": ".local/top20-inhouse-11-extracted",
+        "local_extract_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages",
         "note": "该机型已在 L4 报告 Top 机型中出现，可优先进入资料审核。"
       }
     },
@@ -355,7 +355,7 @@
           "F201_MAIN_V1.2_零件位号.pdf",
           "K6735_F201_SUB_SCH_1_V1.2维修原理图20240614.pdf"
         ],
-        "local_extract_path": ".local/top20-inhouse-11-extracted",
+        "local_extract_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages",
         "note": "该机型已在 L4 报告 Top 机型中出现，可优先进入资料审核。"
       }
     },
@@ -470,7 +470,7 @@
           "H8918_SUB_PCB_1_V1.3_维修原理图.pdf",
           "CM6 对照表"
         ],
-        "local_extract_path": ".local/top20-inhouse-11-extracted",
+        "local_extract_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages",
         "note": "该机型已在 L4 报告 Top 机型中出现，可优先进入资料审核。"
       }
     },
@@ -1088,7 +1088,7 @@
           "H8912_MAIN_PCB_V1.1_位号图_20240605.pdf",
           "H8912_SUB_PCB_1_V1.1.pdf"
         ],
-        "local_extract_path": ".local/top20-inhouse-11-extracted",
+        "local_extract_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages",
         "note": "包含维修指导书、主板图纸、主板位号图和副板资料。"
       }
     },
@@ -1196,7 +1196,7 @@
           "H6929_MAIN_PCB_V1.1_BOT",
           "H894_SUB_SCH_2_V1.0"
         ],
-        "local_extract_path": ".local/top20-inhouse-11-extracted",
+        "local_extract_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages",
         "note": "部分文件名存在压缩包编码导致的乱码，需要后续按文件内容规范命名。"
       }
     },
@@ -1305,7 +1305,7 @@
           "F069_MAIN_PCB_V1.2_位号图_20230823（A4）.pdf",
           "F069_SUB_PCB_1_V1.1 维修原理图 20230712.pdf"
         ],
-        "local_extract_path": ".local/top20-inhouse-11-extracted",
+        "local_extract_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages",
         "note": "包含 Word 维修指导书，适合后续抽取为机型 SOP 草案。"
       }
     },
@@ -1416,7 +1416,7 @@
           "H8918_SUB_PCB_2_V1.2_维修原理图.pdf",
           "xlsx 对照表"
         ],
-        "local_extract_path": ".local/top20-inhouse-11-extracted",
+        "local_extract_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages",
         "note": "与 CM6 共用 H8918 主板资料，需要后续确认差异和适用边界。"
       }
     },
@@ -1527,7 +1527,7 @@
           "H8910_SUB_SCH_1_V1.0_维修原理图_20240513.pdf",
           "H8910_SUB_PCB_1_V1.0_位号图.pdf"
         ],
-        "local_extract_path": ".local/top20-inhouse-11-extracted",
+        "local_extract_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages",
         "note": "资料结构较完整，可作为机型资料入库模板样本。"
       }
     },
@@ -1637,7 +1637,7 @@
           "H6931_MAIN_PCB_V1.2_ 位号图.pdf",
           "H6931_MAIN_PCB_V1.0_ 位号图.pdf"
         ],
-        "local_extract_path": ".local/top20-inhouse-11-extracted",
+        "local_extract_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages",
         "note": "存在多个主板版本，需要后续确认版本适用规则。"
       }
     },
@@ -1745,7 +1745,7 @@
           "H8921_MAIN_PCB_V1.2_位号图.pdf",
           "H8921_SUB_SCH_1_维修原理图_V1.2_20250402-2053.pdf"
         ],
-        "local_extract_path": ".local/top20-inhouse-11-extracted",
+        "local_extract_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages",
         "note": "资料日期晚于当前系统日期，需后续和制造中心确认版本有效性。"
       }
     }
@@ -1813,9 +1813,9 @@
     "received_scope": "Top20 机型中的 11 个内研项目资料",
     "unavailable_scope": "Top20 外研项目资料制造中心同事反馈无法提供",
     "raw_archive_path": "D:/Feishu/top20机型中内研的11个.zip",
-    "local_extract_path": ".local/top20-inhouse-11-extracted",
+    "local_extract_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages",
     "inventory_file": "knowledge-base/inhouse-top20-materials.json",
     "source_id": "SRC-20260702-001",
-    "commit_policy": "仅提交结构化清单和资料状态，不提交原始大文件。"
+    "commit_policy": "已保存原始压缩包和解包资料，并提交结构化清单和资料状态。"
   }
 }

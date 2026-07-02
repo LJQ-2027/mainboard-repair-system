@@ -4,8 +4,8 @@
   "received_date": "2026-07-02",
   "source_id": "SRC-20260702-001",
   "raw_archive_path": "D:/Feishu/top20机型中内研的11个.zip",
-  "local_extract_path": ".local/top20-inhouse-11-extracted",
-  "commit_policy": "当前仅提交结构化清单和资料状态，不提交原始压缩包、PDF、Word、Excel 等大文件。",
+  "local_extract_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages",
+  "commit_policy": "当前已在 source-materials 中保存原始压缩包和解包资料，同时提交结构化清单和资料状态。",
   "scope": {
     "received": "Top20 机型中的 11 个内研项目资料",
     "unavailable": "Top20 外研项目资料，制造中心同事反馈无法提供。",
