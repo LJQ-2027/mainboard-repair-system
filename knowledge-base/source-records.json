@@ -438,5 +438,63 @@
     ],
     "processing_status": "已保存原始文件并完成第一版结构化入库",
     "notes": "这是当前项目最重要的平台级维修资料之一。正式给海外维修员使用前，需要继续完成流程转译、图片结构化和工程确认。"
+  },
+  {
+    "source_id": "SRC-20260702-001",
+    "file_name": "top20机型中内研的11个.zip",
+    "original_path": "D:/Feishu/top20机型中内研的11个.zip",
+    "stored_path": "仅登记结构化清单；原始资料暂不提交仓库",
+    "file_type": "Archive",
+    "received_date": "2026-07-02",
+    "main_category": "机型资料库",
+    "secondary_categories": [
+      "器件与点位库",
+      "平台维修手册库",
+      "诊断SOP库",
+      "缺口与需求库"
+    ],
+    "related_models": [
+      "BG6m",
+      "X6880",
+      "CK6N",
+      "BG6h",
+      "KL4",
+      "CM5",
+      "CM6",
+      "CLA5",
+      "KJ5",
+      "KM7K",
+      "KM4"
+    ],
+    "related_faults": [],
+    "related_components": [],
+    "related_tools": [],
+    "summary": "制造中心提供的 Top20 内研项目资料包，共 11 个机型/项目包，包含维修操作指导书、主/副板维修原理图、主/副板位号图和少量对照表。外研项目资料制造中心同事反馈无法提供。",
+    "extractable_items": [
+      "机型级维修指导书",
+      "主板维修原理图",
+      "主板位号图 / 零件位号图",
+      "副板维修原理图",
+      "部分副板位号图",
+      "部分机型差异或对照表",
+      "主板版本信息"
+    ],
+    "missing_fields": [
+      "外研 Top20 机型资料",
+      "主板实物正反面高清照片",
+      "BOM 和器件替代表",
+      "真实维修案例、测量数据和修后验证记录",
+      "机型维修边界和可下放范围",
+      "图纸版本适用范围的工程确认",
+      "部分压缩包中文文件名需要规范化"
+    ],
+    "target_knowledge_base": [
+      "model-board-assets",
+      "inhouse-top20-materials",
+      "sop-drafts",
+      "gap-requests"
+    ],
+    "processing_status": "已完成资料包解包和清单登记，待结构化抽取",
+    "notes": "该资料包显著提升机型资料库完整度，但仍不能直接等同于海外可执行 SOP，需要继续做章节抽取、图纸映射和工程确认。"
   }
 ]

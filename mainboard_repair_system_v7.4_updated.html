@@ -4834,6 +4834,8 @@
             const labels = {
                 pending_assets: '待补图',
                 partial_assets: '部分资料',
+                engineering_drawings_received: '图纸已登记',
+                repair_package_received: '维修包已登记',
                 ready_for_review: '待审核',
                 ready_for_beta: '可内测'
             };
@@ -4842,7 +4844,7 @@
 
         function modelStatusClass(status) {
             if (status === 'ready_for_beta') return 'low';
-            if (status === 'ready_for_review' || status === 'partial_assets') return 'medium';
+            if (['ready_for_review', 'partial_assets', 'engineering_drawings_received', 'repair_package_received'].includes(status)) return 'medium';
             return 'high';
         }
 
@@ -4870,11 +4872,11 @@
             groups.forEach(group => {
                 const material = model.required_materials?.[group.group_id];
                 const status = material?.status || 'missing';
-                if (status === 'ready' || status === 'confirmed') {
+                if (['ready', 'confirmed', 'available'].includes(status)) {
                     score += group.weight;
                     return;
                 }
-                if (status === 'partial') {
+                if (['partial', 'draft_source_available'].includes(status)) {
                     score += Math.round(group.weight * 0.5);
                     missing.push(`${group.label}部分缺失`);
                     return;
@@ -4996,7 +4998,8 @@
             });
 
             const readyCount = models.filter(model => model.asset_status === 'ready_for_beta').length;
-            const partialCount = models.filter(model => model.asset_status === 'partial_assets' || model.asset_status === 'ready_for_review').length;
+            const partialStatuses = ['partial_assets', 'ready_for_review', 'engineering_drawings_received', 'repair_package_received'];
+            const partialCount = models.filter(model => partialStatuses.includes(model.asset_status)).length;
             const pendingCount = models.filter(model => model.asset_status === 'pending_assets').length;
             statsEl.innerHTML = `
                 <div class="knowledge-stat"><strong>${models.length}</strong><span>候选机型</span></div>
@@ -5046,9 +5049,9 @@
             groups.forEach(group => {
                 const material = pack.required_materials?.[group.group_id];
                 const status = material?.status || 'missing';
-                if (status === 'ready' || status === 'confirmed') {
+                if (['ready', 'confirmed', 'available'].includes(status)) {
                     score += group.weight;
-                } else if (status === 'partial') {
+                } else if (['partial', 'draft_source_available'].includes(status)) {
                     score += Math.round(group.weight * 0.5);
                     missing.push(`${group.label}部分缺失`);
                 } else {
