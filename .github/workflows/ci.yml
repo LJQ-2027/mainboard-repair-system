@@ -58,9 +58,7 @@ jobs:
           npm run build
 
       - name: Run Jest tests
-        run: |
-          cd frontend
-          npx jest --passWithNoTests
+        run: npx jest --passWithNoTests
 
   build-docker:
     name: Docker Build (smoke test)

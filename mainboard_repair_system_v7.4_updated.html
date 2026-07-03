@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>智能主板维修系统 v9.0 Pro</title>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="/js/marked.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -80,6 +80,24 @@
             font-size: 18px;
             width: 24px;
             text-align: center;
+        }
+        .global-project-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            background: rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 8px;
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .global-project-badge.active {
+            background: rgba(255,255,255,0.25);
+            color: #fff;
         }
         .sidebar-footer {
             padding: 16px 20px;
@@ -684,6 +702,45 @@
             margin-top: 14px;
             color: #555;
             font-size: 14px;
+        }
+
+        .upload-progress {
+            width: 100%;
+            max-width: 400px;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            margin: 14px auto 0;
+            overflow: hidden;
+            display: none;
+        }
+        .upload-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #60a5fa);
+            border-radius: 4px;
+            transition: width 0.2s;
+            width: 0%;
+        }
+        .upload-error {
+            color: #dc2626;
+            font-size: 13px;
+            margin-top: 12px;
+            padding: 10px 14px;
+            background: #fef2f2;
+            border-radius: 8px;
+            display: none;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .upload-success {
+            color: #059669;
+            font-size: 13px;
+            margin-top: 12px;
+            padding: 10px 14px;
+            background: #ecfdf5;
+            border-radius: 8px;
+            display: none;
         }
 
         .log-result-grid {
@@ -1367,6 +1424,7 @@
             <a href="/admin/projects" target="_blank"><span class="nav-icon">📂</span> 管理后台</a>
         </div>
         <div class="sidebar-footer">
+            <div id="globalProjectIndicator" class="global-project-badge">当前项目：未选择</div>
             <div class="ai-status"><span class="ai-dot offline" id="aiDot"></span><span id="aiStatusLabel">检测中...</span></div>
             <div style="font-size:10px;margin-top:4px">DeepSeek · deepseek-chat</div>
         </div>
@@ -1565,6 +1623,9 @@
                             <span style="font-size:11px;color:#059669;">AI 会直接从原理图中读取真实位号进行诊断</span>
                         </div>
                         <input type="file" id="schematicImageInput" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="handleSchematicUpload(event)">
+                        <div class="upload-progress" id="schematicUploadProgress" style="margin-top:12px;"><div class="upload-progress-bar" id="schematicUploadProgressBar"></div></div>
+                        <div class="upload-error" id="schematicUploadError"></div>
+                        <div class="upload-success" id="schematicUploadSuccess"></div>
                         <div class="schematic-preview" id="schematicPreview" style="display:none;">
                             <img id="schematicPreviewImg" src="" alt="原理图预览">
                             <button class="schematic-clear-btn" onclick="clearSchematicImage()" title="移除图片">✕</button>
@@ -1599,6 +1660,9 @@
                     </div>
                     <input type="file" id="logFileInput" accept=".log,.txt,.csv,.xml,.json" style="display:none;">
                     <div class="file-meta" id="logFileMeta">当前未选择文件</div>
+                    <div class="upload-progress" id="logUploadProgress"><div class="upload-progress-bar" id="logUploadProgressBar"></div></div>
+                    <div class="upload-error" id="logUploadError"></div>
+                    <div class="upload-success" id="logUploadSuccess"></div>
                 </div>
 
                 <div class="analysis-tip" id="logAnalysisTip"><strong>分析范围：</strong>优先按“明确报错 → 回溯最近校准流程 → 锁定频段/项目 → 提炼故障结论”分析，不再只按关键词抓 Band；输出定位方式、校准项目、问题频段、故障原因、结论和关键定位行。</div>
@@ -1673,7 +1737,7 @@
             <div class="settings-tab-content" id="settingsTab-component">
                 <div style="margin-bottom:12px;">
                     <label style="font-size:13px;font-weight:600;">选择项目</label>
-                    <select class="component-mgmt-project-select" id="mgmtProjectSelect" onchange="renderComponentMgmtModules()">
+                    <select class="component-mgmt-project-select" id="mgmtProjectSelect" onchange="onMgmtProjectChange()">
                         <option value="">-- 选择或新建项目 --</option>
                     </select>
                     <div style="display:flex;gap:8px;">
@@ -1807,9 +1871,61 @@
         }
 
         // 当前选中的项目（AI 诊断用）
-        let selectedAIProject = '';
-        // 资料查询中当前查询到的项目
+        // 全局选中的项目（跨标签页统一）
+        const GLOBAL_PROJECT_KEY = 'globalSelectedProject';
+        let globalSelectedProject = '';
+        // 资料查询中当前查询到的项目（兼容旧逻辑，实际值与 globalSelectedProject 同步）
         let currentResourceProject = '';
+
+        function getGlobalProject() {
+            return globalSelectedProject;
+        }
+
+        function setGlobalProject(projectCode) {
+            globalSelectedProject = projectCode || '';
+            currentResourceProject = globalSelectedProject;
+            try {
+                if (globalSelectedProject) {
+                    localStorage.setItem(GLOBAL_PROJECT_KEY, globalSelectedProject);
+                    // 兼容旧 key
+                    localStorage.setItem('aiSelectedProject', globalSelectedProject);
+                } else {
+                    localStorage.removeItem(GLOBAL_PROJECT_KEY);
+                    localStorage.removeItem('aiSelectedProject');
+                }
+            } catch (e) {}
+            syncAllProjectSelectors(globalSelectedProject);
+            updateGlobalProjectIndicator(globalSelectedProject);
+        }
+
+        function syncAllProjectSelectors(projectCode) {
+            const selectors = [
+                document.getElementById('aiProjectSelect'),
+                document.getElementById('projectQuickSelect'),
+                document.getElementById('mgmtProjectSelect')
+            ];
+            selectors.forEach(sel => {
+                if (sel && sel.value !== projectCode) {
+                    sel.value = projectCode;
+                }
+            });
+            // 触发各自更新逻辑
+            if (document.getElementById('aiProjectSelect')) {
+                updateAIProjectCoverage(projectCode);
+            }
+        }
+
+        function updateGlobalProjectIndicator(projectCode) {
+            const el = document.getElementById('globalProjectIndicator');
+            if (!el) return;
+            if (projectCode) {
+                el.textContent = `当前项目：${projectCode}`;
+                el.className = 'global-project-badge active';
+            } else {
+                el.textContent = '当前项目：未选择';
+                el.className = 'global-project-badge';
+            }
+        }
 
         function populateAIProjectSelector() {
             const select = document.getElementById('aiProjectSelect');
@@ -1824,19 +1940,17 @@
                 option.textContent = `${p} (${cov.label})`;
                 select.appendChild(option);
             });
-            // 恢复上次选择
-            if (selectedAIProject && projects.includes(selectedAIProject)) {
-                select.value = selectedAIProject;
-                updateAIProjectCoverage(selectedAIProject);
+            // 恢复全局选择
+            if (globalSelectedProject && projects.includes(globalSelectedProject)) {
+                select.value = globalSelectedProject;
+                updateAIProjectCoverage(globalSelectedProject);
             }
         }
 
         function onAIProjectChange() {
             const select = document.getElementById('aiProjectSelect');
-            selectedAIProject = select ? select.value : '';
-            updateAIProjectCoverage(selectedAIProject);
-            // 保存选择到 localStorage
-            try { localStorage.setItem('aiSelectedProject', selectedAIProject); } catch(e) {}
+            const projectCode = select ? select.value : '';
+            setGlobalProject(projectCode);
         }
 
         function updateAIProjectCoverage(projectModel) {
@@ -1868,9 +1982,8 @@
                 alert('请先在资料查询中输入SN号查询项目');
                 return;
             }
-            // 预选项目
-            selectedAIProject = currentResourceProject;
-            try { localStorage.setItem('aiSelectedProject', selectedAIProject); } catch(e) {}
+            // 同步全局项目
+            setGlobalProject(currentResourceProject);
             // 切换到诊断 Tab → AI 模式
             switchTab('diagnosis');
             switchDiagnosisMode('ai');
@@ -1943,8 +2056,19 @@
                 option.textContent = `${p} (${cov.count} 个器件, ${cov.modules} 个模块)`;
                 select.appendChild(option);
             });
+            // 同步全局项目
+            if (globalSelectedProject && projects.includes(globalSelectedProject)) {
+                select.value = globalSelectedProject;
+            }
         }
 
+        function onMgmtProjectChange() {
+            const select = document.getElementById('mgmtProjectSelect');
+            if (select && select.value) {
+                setGlobalProject(select.value);
+            }
+            renderComponentMgmtModules();
+        }
         function renderComponentMgmtModules() {
             const project = document.getElementById('mgmtProjectSelect').value;
             const container = document.getElementById('mgmtModules');
@@ -2222,6 +2346,55 @@
             return hits;
         }
 
+        /**
+         * 判断用户输入的症状是否匹配某个标准故障类型
+         * 支持：精确子串匹配、同义词映射、反向包含
+         */
+        function symptomMatchesFault(symptom, faultType) {
+            if (!symptom || !faultType) return false;
+            const lowerSymptom = symptom.toLowerCase();
+            const lowerFault = faultType.toLowerCase();
+
+            // 1. 直接子串匹配（原有逻辑）
+            if (lowerSymptom.includes(lowerFault) || lowerFault.includes(lowerSymptom)) {
+                return true;
+            }
+
+            // 2. 同义词库匹配（优先使用项目内或全局的同义词表）
+            const synonyms = (typeof projectFaultSynonyms !== 'undefined' && projectFaultSynonyms[faultType])
+                || (typeof faultSynonyms !== 'undefined' && faultSynonyms[faultType])
+                || [];
+            for (const syn of synonyms) {
+                const lowerSyn = syn.toLowerCase();
+                if (lowerSymptom.includes(lowerSyn) || lowerSyn.includes(lowerSymptom)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /**
+         * 对症状进行标准化：如果命中某个故障类型的同义词，返回标准名称
+         * 用于关键词提示和 AI 上下文
+         */
+        function normalizeSymptom(symptom) {
+            if (!symptom) return symptom;
+            const lowerSymptom = symptom.toLowerCase();
+            const allSynonyms = (typeof projectFaultSynonyms !== 'undefined' ? projectFaultSynonyms : {});
+            Object.assign(allSynonyms, typeof faultSynonyms !== 'undefined' ? faultSynonyms : {});
+
+            for (const [faultType, synonyms] of Object.entries(allSynonyms)) {
+                for (const syn of synonyms) {
+                    const lowerSyn = syn.toLowerCase();
+                    if (lowerSymptom.includes(lowerSyn) || lowerSyn.includes(lowerSymptom)) {
+                        return faultType;
+                    }
+                }
+            }
+            return symptom;
+        }
+
         function getDiagnosisHistory() {
             try {
                 return JSON.parse(localStorage.getItem(DIAGNOSIS_HISTORY_KEY) || '[]');
@@ -2367,6 +2540,8 @@
             const val = select.value;
             if (!val) return;
             document.getElementById('snInput').value = val;
+            // 同步全局项目
+            setGlobalProject(val);
             // 同时自动触发查找
             searchProjectResources();
         }
@@ -2388,6 +2563,74 @@
                 return;
             }
             meta.innerHTML = `<strong>已选择：</strong>${file.name}（${formatFileSize(file.size)}）${extra ? `<br>${extra}` : ''}`;
+        }
+
+        // ---- 文件上传通用工具 ----
+        function validateLogFile(file) {
+            const maxSize = 50 * 1024 * 1024; // 50MB
+            const allowedExts = ['.log', '.txt', '.csv', '.xml', '.json'];
+            const ext = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
+            if (!allowedExts.includes(ext)) {
+                return { valid: false, error: `不支持的文件类型：${ext}。请上传 ${allowedExts.join(' / ')}` };
+            }
+            if (file.size > maxSize) {
+                return { valid: false, error: `文件过大：${formatFileSize(file.size)}，最大支持 ${formatFileSize(maxSize)}` };
+            }
+            return { valid: true };
+        }
+
+        function validateImageFile(file) {
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            const allowedTypes = ['image/png', 'image/jpeg', 'image/webp'];
+            if (!allowedTypes.includes(file.type)) {
+                return { valid: false, error: `不支持的图片格式：${file.type}。请上传 PNG / JPEG / WebP` };
+            }
+            if (file.size > maxSize) {
+                return { valid: false, error: `图片过大：${formatFileSize(file.size)}，最大支持 ${formatFileSize(maxSize)}` };
+            }
+            return { valid: true };
+        }
+
+        function setUploadStatus(type, message, containerId) {
+            // type: 'progress' | 'error' | 'success' | 'clear'
+            const errorEl = document.getElementById(containerId + 'Error');
+            const successEl = document.getElementById(containerId + 'Success');
+            const progressEl = document.getElementById(containerId + 'Progress');
+            const barEl = document.getElementById(containerId + 'ProgressBar');
+
+            if (errorEl) errorEl.style.display = 'none';
+            if (successEl) successEl.style.display = 'none';
+            if (progressEl) progressEl.style.display = 'none';
+
+            if (type === 'error' && errorEl) {
+                errorEl.textContent = message;
+                errorEl.style.display = 'block';
+            } else if (type === 'success' && successEl) {
+                successEl.textContent = message;
+                successEl.style.display = 'block';
+            } else if (type === 'progress') {
+                if (progressEl) progressEl.style.display = 'block';
+                if (barEl) barEl.style.width = message + '%';
+            }
+        }
+
+        async function readFileWithProgress(file, onProgress) {
+            const chunkSize = 64 * 1024; // 64KB
+            let offset = 0;
+            let text = '';
+            const decoder = new TextDecoder('utf-8', { fatal: false });
+
+            while (offset < file.size) {
+                const chunk = file.slice(offset, Math.min(offset + chunkSize, file.size));
+                const arrayBuffer = await chunk.arrayBuffer();
+                text += decoder.decode(arrayBuffer, { stream: offset + chunkSize < file.size });
+                offset += chunkSize;
+                if (onProgress) {
+                    const percent = Math.min(100, Math.round((offset / file.size) * 100));
+                    onProgress(percent);
+                }
+            }
+            return text;
         }
 
         function detectLogTypes(text) {
@@ -2858,6 +3101,8 @@
             if (projectDatabase[projectModel]) {
                 const project = projectDatabase[projectModel];
                 currentResourceProject = projectModel;
+                // 同步全局项目
+                setGlobalProject(projectModel);
 
                 // 显示项目信息
                 document.getElementById('projectName').textContent = project.name;
@@ -2974,7 +3219,7 @@
             // 1. 项目专属规则优先
             if (projCase) {
                 for (const [faultType, points] of Object.entries(activeRules)) {
-                    if (symptom.includes(faultType)) {
+                    if (symptomMatchesFault(symptom, faultType)) {
                         matchedPoints = points;
                         matchedRule = faultType;
                         break;
@@ -2983,7 +3228,7 @@
                 // 项目专属现象索引
                 if (matchedPoints.length === 0) {
                     for (const [keyword, data] of Object.entries(activePhenomena)) {
-                        if (symptom.includes(keyword) || keyword.includes(symptom)) {
+                        if (symptomMatchesFault(symptom, keyword)) {
                             matchedPoints = data.top_components;
                             matchedRule = data.phenomena;
                             break;
@@ -3005,7 +3250,7 @@
             // 2. 全局规则回退（仅在未选项目时，选了项目不用其他项目数据）
             if (matchedPoints.length === 0 && !currentProject) {
                 for (const [faultType, points] of Object.entries(diagnosisRules)) {
-                    if (symptom.includes(faultType)) {
+                    if (symptomMatchesFault(symptom, faultType)) {
                         matchedPoints = points;
                         matchedRule = faultType;
                         dataSource = '全局诊断规则库(⚠️未选项目)';
@@ -3017,7 +3262,7 @@
             // 3. 全局现象索引回退（仅在未选项目时使用）
             if (matchedPoints.length === 0 && !currentProject) {
                 for (const [keyword, data] of Object.entries(phenomenaSearchIndex)) {
-                    if (symptom.includes(keyword) || keyword.includes(symptom)) {
+                    if (symptomMatchesFault(symptom, keyword)) {
                         matchedPoints = data.top_components;
                         matchedRule = data.phenomena;
                         dataSource = '全局案例库(⚠️未选项目)';
@@ -3028,7 +3273,7 @@
                 if (matchedPoints.length === 0) {
                     const symptomLower = symptom.toLowerCase();
                     for (const [keyword, data] of Object.entries(phenomenaSearchIndex)) {
-                        if (keyword.toLowerCase().includes(symptomLower) || symptomLower.includes(keyword.toLowerCase())) {
+                        if (symptomMatchesFault(symptom, keyword)) {
                             matchedPoints = data.top_components;
                             matchedRule = data.phenomena;
                             dataSource = '全局案例库(⚠️未选项目)';
@@ -3418,14 +3663,39 @@
         function handleSchematicUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
+
+            // 校验
+            const validation = validateImageFile(file);
+            if (!validation.valid) {
+                setUploadStatus('error', validation.error, 'schematicUpload');
+                schematicImageData = null;
+                document.getElementById('schematicPreview').style.display = 'none';
+                document.getElementById('schematicDropZone').style.display = 'flex';
+                return;
+            }
+
+            setUploadStatus('clear', '', 'schematicUpload');
+            setUploadStatus('progress', 0, 'schematicUpload');
+
             const reader = new FileReader();
+            reader.onprogress = function(e) {
+                if (e.lengthComputable) {
+                    const pct = Math.round((e.loaded / e.total) * 100);
+                    setUploadStatus('progress', pct, 'schematicUpload');
+                }
+            };
             reader.onload = function(e) {
+                setUploadStatus('progress', 100, 'schematicUpload');
                 const base64 = e.target.result.split(',')[1];
                 const mediaType = file.type || 'image/png';
                 schematicImageData = { base64, media_type: mediaType };
                 document.getElementById('schematicPreviewImg').src = e.target.result;
                 document.getElementById('schematicPreview').style.display = 'inline-block';
                 document.getElementById('schematicDropZone').style.display = 'none';
+                setUploadStatus('success', `图片已加载：${file.name}（${formatFileSize(file.size)}）`, 'schematicUpload');
+            };
+            reader.onerror = function() {
+                setUploadStatus('error', '图片读取失败，请重试', 'schematicUpload');
             };
             reader.readAsDataURL(file);
         }
@@ -3435,6 +3705,7 @@
             document.getElementById('schematicPreview').style.display = 'none';
             document.getElementById('schematicDropZone').style.display = 'flex';
             document.getElementById('schematicImageInput').value = '';
+            setUploadStatus('clear', '', 'schematicUpload');
         }
 
         // =========================
@@ -3448,7 +3719,7 @@
         }
 
         function buildDiagnosisContext(symptom, projectModel) {
-            const proj = projectModel || selectedAIProject;
+            const proj = projectModel || getGlobalProject();
             const symptomLower = symptom.toLowerCase();
 
             // ---- Step 1: 获取项目专属案例（优先）----
@@ -3464,7 +3735,7 @@
 
             // 先查项目专属规则
             for (const [faultType, points] of Object.entries(projRules)) {
-                if (symptomLower.includes(faultType.toLowerCase())) {
+                if (symptomMatchesFault(symptom, faultType)) {
                     localMatchInfo += `\n【${projCase.projectName} 专属案例 - ${faultType}】\n`;
                     points.slice(0, 5).forEach((p, i) => {
                         localMatchInfo += `  ${i + 1}. ${p.point} (${p.point_name || ''}) - 概率${p.probability}% - ${p.case_count}例 - ${p.repair_method}\n`;
@@ -3477,7 +3748,7 @@
             // 回退到全局规则（仅在未选项目时使用，选了项目就不应该用其他项目的数据）
             if (!localMatchInfo && !proj) {
                 for (const [faultType, points] of Object.entries(diagnosisRules)) {
-                    if (symptomLower.includes(faultType.toLowerCase())) {
+                    if (symptomMatchesFault(symptom, faultType)) {
                         localMatchInfo += `\n【全局案例库 - ${faultType}】⚠️ 未选择项目，以下位号仅供参考，可能不准确\n`;
                         points.slice(0, 5).forEach((p, i) => {
                             localMatchInfo += `  ${i + 1}. ${p.point} (${p.point_name}) - 概率${p.probability}% - ${p.case_count}例 - ${p.repair_method}\n`;
@@ -3491,7 +3762,7 @@
             // ---- Step 3: 现象搜索索引（项目优先 → 全局回退）----
             if (!localMatchInfo) {
                 for (const [keyword, data] of Object.entries(projPhenomena)) {
-                    if (symptomLower.includes(keyword.toLowerCase())) {
+                    if (symptomMatchesFault(symptom, keyword)) {
                         localMatchInfo += `\n【${projCase.projectName} 案例索引 - ${data.phenomena}】共${data.total_count}例\n`;
                         data.top_components.slice(0, 5).forEach((p, i) => {
                             localMatchInfo += `  ${i + 1}. ${p.point} - 概率${p.probability}% - ${p.case_count}例 - ${p.repair_method}\n`;
@@ -3503,7 +3774,7 @@
                 // 全局回退仅在未选项目时（选了项目就不该用其他项目数据）
                 if (!localMatchInfo && !proj) {
                     for (const [keyword, data] of Object.entries(phenomenaSearchIndex)) {
-                        if (symptomLower.includes(keyword.toLowerCase())) {
+                        if (symptomMatchesFault(symptom, keyword)) {
                             localMatchInfo += `\n【全局案例索引 - ${data.phenomena}】⚠️ 未选项目，数据可能不准确。共${data.total_count}例\n`;
                             data.top_components.slice(0, 5).forEach((p, i) => {
                                 localMatchInfo += `  ${i + 1}. ${p.point} - 概率${p.probability}% - ${p.case_count}例 - ${p.repair_method}\n`;
@@ -3587,7 +3858,7 @@
                 html = fullText.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/\n/g, '<br>');
             }
 
-            const projectLabel = selectedAIProject ? ` · 项目: ${selectedAIProject}` : '';
+            const projectLabel = getGlobalProject() ? ` · 项目: ${getGlobalProject()}` : ' (通用位号)';
             const cursorClass = isComplete ? '' : ' ai-typing-cursor';
             container.innerHTML = `
                 <div class="ai-result-container">
@@ -3628,7 +3899,7 @@
 
             // 读取当前选中的项目
             const projectSelect = document.getElementById('aiProjectSelect');
-            const currentProject = projectSelect ? projectSelect.value : (selectedAIProject || '');
+            const currentProject = projectSelect ? projectSelect.value : (getGlobalProject() || '');
 
             // 收集本地上下文（含项目位号映射）
             const ctx = buildDiagnosisContext(symptom, currentProject);
@@ -3664,7 +3935,7 @@ ${ctx.hasProjectMap ? '## 项目真实器件位号映射（优先使用）\n' + 
 
 ${ctx.localMatchInfo ? '## 本地案例库供参考\n' + ctx.localMatchInfo : ''}
 
-${ctx.hasProjectMap ? `\n## ⚠️ 位号强约束\n当前诊断项目：${ctx.projectName || selectedAIProject}\n**你必须且只能使用上述项目中列出的真实位号进行诊断！**\n如果故障现象对应的案例位号不在该项目位号列表中，请明确指出"根据该项目位号映射，未找到直接匹配的案例，建议参考以下通用排查思路"。\n**禁止编造或使用其他项目的位号！**` : ''}
+${ctx.hasProjectMap ? `\n## ⚠️ 位号强约束\n当前诊断项目：${ctx.projectName || getGlobalProject()}\n**你必须且只能使用上述项目中列出的真实位号进行诊断！**\n如果故障现象对应的案例位号不在该项目位号列表中，请明确指出"根据该项目位号映射，未找到直接匹配的案例，建议参考以下通用排查思路"。\n**禁止编造或使用其他项目的位号！**` : ''}
 
 请给出结构化诊断报告，格式如下：
 
@@ -3819,16 +4090,23 @@ ${keyLogSnippet || '无关键行'}
             setInterval(checkAIStatus, 30000); // 每30秒检测一次
             renderDiagnosisHistory();
 
-            // 恢复上次选择的 AI 诊断项目
+            // 恢复上次选择的项目（兼容旧 key）
             try {
-                const saved = localStorage.getItem('aiSelectedProject');
-                if (saved) { selectedAIProject = saved; }
+                const saved = localStorage.getItem(GLOBAL_PROJECT_KEY) || localStorage.getItem('aiSelectedProject');
+                if (saved) {
+                    globalSelectedProject = saved;
+                    currentResourceProject = saved;
+                }
             } catch(e) {}
 
             // 初始化项目选择器（延迟加载，确保 DOM 就绪）
-            setTimeout(() => populateAIProjectSelector(), 100);
-            // 初始化资料查询的项目下拉框
-            setTimeout(() => populateProjectQuickSelect(), 200);
+            setTimeout(() => {
+                populateAIProjectSelector();
+                populateProjectQuickSelect();
+                populateMgmtProjectSelect();
+                syncAllProjectSelectors(globalSelectedProject);
+                updateGlobalProjectIndicator(globalSelectedProject);
+            }, 100);
 
             document.getElementById('symptomInput').addEventListener('keydown', function(event) {
                 if (event.key === 'Enter') {
@@ -3879,14 +4157,31 @@ ${keyLogSnippet || '无关键行'}
             });
             dropZone.addEventListener('drop', function(e) {
                 const file = e.dataTransfer.files[0];
-                if (!file || !file.type.startsWith('image/')) return;
+                if (!file) return;
+                const validation = validateImageFile(file);
+                if (!validation.valid) {
+                    setUploadStatus('error', validation.error, 'schematicUpload');
+                    return;
+                }
+                setUploadStatus('clear', '', 'schematicUpload');
+                setUploadStatus('progress', 0, 'schematicUpload');
                 const reader = new FileReader();
+                reader.onprogress = function(ev) {
+                    if (ev.lengthComputable) {
+                        setUploadStatus('progress', Math.round((ev.loaded / ev.total) * 100), 'schematicUpload');
+                    }
+                };
                 reader.onload = function(ev) {
+                    setUploadStatus('progress', 100, 'schematicUpload');
                     const base64 = ev.target.result.split(',')[1];
                     schematicImageData = { base64, media_type: file.type || 'image/png' };
                     document.getElementById('schematicPreviewImg').src = ev.target.result;
                     document.getElementById('schematicPreview').style.display = 'inline-block';
                     document.getElementById('schematicDropZone').style.display = 'none';
+                    setUploadStatus('success', `图片已加载：${file.name}（${formatFileSize(file.size)}）`, 'schematicUpload');
+                };
+                reader.onerror = function() {
+                    setUploadStatus('error', '图片读取失败，请重试', 'schematicUpload');
                 };
                 reader.readAsDataURL(file);
             });
@@ -3902,13 +4197,26 @@ ${keyLogSnippet || '无关键行'}
                     if (item.type.startsWith('image/')) {
                         e.preventDefault();
                         const blob = item.getAsFile();
+                        if (!blob) continue;
+                        setUploadStatus('clear', '', 'schematicUpload');
+                        setUploadStatus('progress', 0, 'schematicUpload');
                         const reader = new FileReader();
+                        reader.onprogress = function(ev) {
+                            if (ev.lengthComputable) {
+                                setUploadStatus('progress', Math.round((ev.loaded / ev.total) * 100), 'schematicUpload');
+                            }
+                        };
                         reader.onload = function(ev) {
+                            setUploadStatus('progress', 100, 'schematicUpload');
                             const base64 = ev.target.result.split(',')[1];
                             schematicImageData = { base64, media_type: item.type };
                             document.getElementById('schematicPreviewImg').src = ev.target.result;
                             document.getElementById('schematicPreview').style.display = 'inline-block';
                             document.getElementById('schematicDropZone').style.display = 'none';
+                            setUploadStatus('success', '截图已粘贴并加载', 'schematicUpload');
+                        };
+                        reader.onerror = function() {
+                            setUploadStatus('error', '截图读取失败，请重试', 'schematicUpload');
                         };
                         reader.readAsDataURL(blob);
                         break;
@@ -3934,9 +4242,28 @@ ${keyLogSnippet || '无关键行'}
             logFileInput.addEventListener('change', async function(event) {
                 const file = event.target.files[0];
                 if (!file) return;
+                const validation = validateLogFile(file);
+                if (!validation.valid) {
+                    setUploadStatus('error', validation.error, 'logUpload');
+                    uploadedLogFile = null;
+                    uploadedLogContent = '';
+                    updateLogFileMeta(null);
+                    return;
+                }
+                setUploadStatus('clear', '', 'logUpload');
                 uploadedLogFile = file;
-                uploadedLogContent = await file.text();
-                updateLogFileMeta(file, `已读取 ${uploadedLogContent.split(/\r?\n/).length} 行，可直接开始分析`);
+                try {
+                    uploadedLogContent = await readFileWithProgress(file, (pct) => {
+                        setUploadStatus('progress', pct, 'logUpload');
+                    });
+                    const lineCount = uploadedLogContent.split(/\r?\n/).length;
+                    updateLogFileMeta(file, `已读取 ${lineCount} 行，可直接开始分析`);
+                    setUploadStatus('success', `文件读取完成：${file.name}，共 ${lineCount} 行`, 'logUpload');
+                } catch (err) {
+                    setUploadStatus('error', `文件读取失败：${err.message}`, 'logUpload');
+                    uploadedLogFile = null;
+                    uploadedLogContent = '';
+                }
             });
 
             ['dragenter', 'dragover'].forEach(eventName => {
@@ -3956,9 +4283,28 @@ ${keyLogSnippet || '无关键行'}
             logUploadPanel.addEventListener('drop', async function(event) {
                 const file = event.dataTransfer.files[0];
                 if (!file) return;
+                const validation = validateLogFile(file);
+                if (!validation.valid) {
+                    setUploadStatus('error', validation.error, 'logUpload');
+                    uploadedLogFile = null;
+                    uploadedLogContent = '';
+                    updateLogFileMeta(null);
+                    return;
+                }
+                setUploadStatus('clear', '', 'logUpload');
                 uploadedLogFile = file;
-                uploadedLogContent = await file.text();
-                updateLogFileMeta(file, `已读取 ${uploadedLogContent.split(/\r?\n/).length} 行，可直接开始分析`);
+                try {
+                    uploadedLogContent = await readFileWithProgress(file, (pct) => {
+                        setUploadStatus('progress', pct, 'logUpload');
+                    });
+                    const lineCount = uploadedLogContent.split(/\r?\n/).length;
+                    updateLogFileMeta(file, `已读取 ${lineCount} 行，可直接开始分析`);
+                    setUploadStatus('success', `文件读取完成：${file.name}，共 ${lineCount} 行`, 'logUpload');
+                } catch (err) {
+                    setUploadStatus('error', `文件读取失败：${err.message}`, 'logUpload');
+                    uploadedLogFile = null;
+                    uploadedLogContent = '';
+                }
             });
         });
     </script>

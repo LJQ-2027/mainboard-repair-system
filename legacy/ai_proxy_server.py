@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# DEPRECATED: 此文件为 v8.x 旧版代理服务器，已废弃
+# 当前使用 backend/ 目录下的 FastAPI 服务（v9.0）
+# 保留此文件仅作为历史参考，请勿用于生产环境
+# 新版启动方式: cd backend && python run.py
 """
 AI 代理服务器 - 智能主板维修系统 v8.5
 支持平台: Kimi Vision / Anthropic Claude / DeepSeek
