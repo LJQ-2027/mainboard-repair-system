@@ -1,7 +1,8 @@
 """数据库配置 - SQLAlchemy"""
 
 import os
-from sqlalchemy import create_engine
+from datetime import datetime, timezone
+from sqlalchemy import create_engine, event
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 from app.config import get_settings
@@ -13,7 +14,15 @@ DB_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
 os.makedirs(DB_DIR, exist_ok=True)
 DB_PATH = os.path.join(DB_DIR, "mainboard.db")
 
-SQLALCHEMY_DATABASE_URL = f"sqlite:///{DB_PATH}"
+# 测试环境使用内存数据库
+TESTING = os.environ.get("TESTING", "").lower() == "true"
+SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:" if TESTING else f"sqlite:///{DB_PATH}"
+
+
+def _now_utc() -> datetime:
+    """返回当前 UTC 时间（带时区信息）"""
+    return datetime.now(timezone.utc)
+
 
 # 启用 WAL 模式提高并发性能
 engine = create_engine(
@@ -21,6 +30,15 @@ engine = create_engine(
     connect_args={"check_same_thread": False},
     echo=settings.log_level == "DEBUG",
 )
+
+
+@event.listens_for(engine, "connect")
+def _set_sqlite_pragma(dbapi_conn, connection_record):
+    """连接时启用 WAL 模式"""
+    cursor = dbapi_conn.cursor()
+    cursor.execute("PRAGMA journal_mode=WAL")
+    cursor.close()
+
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()

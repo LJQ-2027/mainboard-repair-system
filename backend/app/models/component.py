@@ -1,8 +1,6 @@
-from datetime import datetime
-
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
 
-from app.database import Base
+from app.database import Base, _now_utc
 
 
 class ComponentMapEntry(Base):
@@ -13,4 +11,4 @@ class ComponentMapEntry(Base):
     project = Column(String(50), nullable=False)
     module = Column(String(50), nullable=False)
     component_json = Column(Text, nullable=False)  # JSON 字符串
-    updated_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=_now_utc, onupdate=_now_utc)

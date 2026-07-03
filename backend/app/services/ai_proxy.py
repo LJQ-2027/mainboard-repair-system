@@ -1,7 +1,7 @@
 """AI 代理服务 - 支持 Kimi / Anthropic / DeepSeek 多平台"""
 
 import json
-from typing import Any, AsyncGenerator, Dict, Literal, Tuple
+from typing import Any, AsyncGenerator, Dict, Tuple
 
 import httpx
 from fastapi import HTTPException
@@ -55,11 +55,11 @@ PROVIDERS: Dict[str, Dict[str, Any]] = {
 }
 
 # 注意：sk- 前缀同时匹配 kimi 和 deepseek
-# 如果无法自动区分，请用户在 .env 中设置 AI_PROVIDER
+# 如果无法自动区分，请在 .env 中设置 AI_PROVIDER
 
 
 def detect_provider(api_key: str) -> Tuple[str, Dict[str, Any]]:
-    """检测 API 提供商"""
+    """检测 API 提供商，无法识别时抛出异常"""
     settings = get_settings()
     manual = settings.ai_provider
     if manual in PROVIDERS:
@@ -69,7 +69,25 @@ def detect_provider(api_key: str) -> Tuple[str, Dict[str, Any]]:
         if api_key.startswith(config["key_prefix"]):
             return pid, config
 
-    return "deepseek", PROVIDERS["deepseek"]
+    raise HTTPException(
+        status_code=400,
+        detail=(
+            "无法识别 API Key 对应的提供商，请在 .env 中设置 AI_PROVIDER 为以下之一: "
+            f"{list(PROVIDERS.keys())}"
+        ),
+    )
+
+
+def _validate_and_detect_provider() -> Tuple[str, str, Dict[str, Any]]:
+    """校验 API Key 并检测 provider，返回 (api_key, provider_id, config)"""
+    settings = get_settings()
+    api_key = settings.anthropic_api_key
+
+    if not api_key:
+        raise HTTPException(status_code=500, detail="未配置 ANTHROPIC_API_KEY")
+
+    provider_id, config = detect_provider(api_key)
+    return api_key, provider_id, config
 
 
 def _convert_anthropic_content_to_openai(
@@ -140,6 +158,42 @@ def _build_openai_payload(payload: Dict[str, Any], provider_id: str) -> Dict[str
     }
 
 
+def _build_request(
+    payload: Dict[str, Any],
+    api_key: str,
+    provider_id: str,
+    config: Dict[str, Any],
+    stream: bool,
+) -> Tuple[Dict[str, Any], Dict[str, str]]:
+    """根据 api_format 构建统一的请求体和 headers"""
+    api_format = config.get("api_format", "openai")
+
+    if api_format == "openai":
+        api_payload = _build_openai_payload(payload, provider_id)
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        }
+    else:
+        api_payload = {
+            "model": payload.get("model", config["default_model"]),
+            "max_tokens": payload.get("max_tokens", 4096),
+            "messages": payload.get("messages", []),
+            "temperature": payload.get("temperature", 0.7),
+            "stream": stream,
+        }
+        system = payload.get("system", "")
+        if system:
+            api_payload["system"] = system
+        headers = {
+            "x-api-key": api_key,
+            "anthropic-version": "2023-06-01",
+            "Content-Type": "application/json",
+        }
+
+    return api_payload, headers
+
+
 def _convert_openai_sse_to_anthropic(chunk: str) -> str | None:
     """将 OpenAI SSE chunk 转为 Anthropic 格式"""
     try:
@@ -171,44 +225,54 @@ def _convert_openai_sse_to_anthropic(chunk: str) -> str | None:
     return None
 
 
+def _parse_api_error(status_code: int, body: bytes) -> str:
+    """解析上游 API 错误，返回友好提示"""
+    try:
+        data = json.loads(body.decode("utf-8", errors="replace"))
+        if isinstance(data, dict):
+            if "error" in data and isinstance(data["error"], dict):
+                msg = data["error"].get("message", "")
+                if msg:
+                    return msg
+            msg = data.get("message", data.get("error", ""))
+            if msg:
+                return str(msg)
+    except Exception:
+        pass
+    if status_code == 401:
+        return "API Key 无效或已过期，请检查 .env 配置"
+    if status_code == 403:
+        return "没有权限访问该 API，请确认 Key 是否有相应权限"
+    if status_code == 429:
+        return "API 请求过于频繁，请稍后再试"
+    if status_code >= 500:
+        return "AI 服务商暂时不可用，请稍后再试"
+    return f"AI 服务返回错误 (HTTP {status_code})"
+
+
+def _handle_http_error(status_code: int, body: bytes) -> None:
+    """统一处理 HTTP 错误并抛出 HTTPException"""
+    detail = _parse_api_error(status_code, body)
+    raise HTTPException(status_code=status_code, detail=detail)
+
+
+def _handle_network_error(exc: Exception) -> None:
+    """统一处理网络异常并抛出 HTTPException"""
+    if isinstance(exc, httpx.TimeoutException):
+        raise HTTPException(status_code=504, detail="API 请求超时")
+    if isinstance(exc, httpx.ConnectError):
+        raise HTTPException(status_code=502, detail=f"无法连接到 API: {exc}")
+    raise HTTPException(status_code=502, detail=f"API 请求失败: {exc}")
+
+
 async def stream_chat(
     payload: Dict[str, Any],
 ) -> AsyncGenerator[str, None]:
     """流式聊天 API 调用"""
-    settings = get_settings()
-    api_key = settings.anthropic_api_key
-
-    if not api_key:
-        raise HTTPException(status_code=500, detail="未配置 ANTHROPIC_API_KEY")
-
-    provider_id, config = detect_provider(api_key)
-    api_format = config.get("api_format", "openai")
-
-    # 构建请求
-    if api_format == "openai":
-        api_payload = _build_openai_payload(payload, provider_id)
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-        }
-    else:
-        api_payload = {
-            "model": payload.get("model", config["default_model"]),
-            "max_tokens": payload.get("max_tokens", 4096),
-            "messages": payload.get("messages", []),
-            "temperature": payload.get("temperature", 0.7),
-            "stream": payload.get("stream", True),
-        }
-        system = payload.get("system", "")
-        if system:
-            api_payload["system"] = system
-        headers = {
-            "x-api-key": api_key,
-            "anthropic-version": "2023-06-01",
-            "Content-Type": "application/json",
-        }
-
+    api_key, provider_id, config = _validate_and_detect_provider()
     stream = payload.get("stream", True)
+    api_payload, headers = _build_request(payload, api_key, provider_id, config, stream)
+    api_format = config.get("api_format", "openai")
 
     async with httpx.AsyncClient(timeout=180.0) as client:
         try:
@@ -220,10 +284,7 @@ async def stream_chat(
             ) as response:
                 if response.status_code != 200:
                     err_body = await response.aread()
-                    raise HTTPException(
-                        status_code=response.status_code,
-                        detail=f"API 返回错误: {err_body.decode()[:300]}",
-                    )
+                    _handle_http_error(response.status_code, err_body)
 
                 if api_format == "openai" and stream:
                     # OpenAI 流式 → 转 Anthropic SSE
@@ -252,45 +313,15 @@ async def stream_chat(
                     body = await response.aread()
                     yield body.decode("utf-8")
 
-        except httpx.TimeoutException:
-            raise HTTPException(status_code=504, detail="API 请求超时")
-        except httpx.ConnectError as e:
-            raise HTTPException(status_code=502, detail=f"无法连接到 API: {e}")
+        except (httpx.TimeoutException, httpx.ConnectError) as e:
+            _handle_network_error(e)
 
 
 async def chat_sync(payload: Dict[str, Any]) -> Dict[str, Any]:
     """非流式聊天 API 调用"""
-    settings = get_settings()
-    api_key = settings.anthropic_api_key
-
-    if not api_key:
-        raise HTTPException(status_code=500, detail="未配置 ANTHROPIC_API_KEY")
-
-    provider_id, config = detect_provider(api_key)
+    api_key, provider_id, config = _validate_and_detect_provider()
+    api_payload, headers = _build_request(payload, api_key, provider_id, config, stream=False)
     api_format = config.get("api_format", "openai")
-
-    if api_format == "openai":
-        api_payload = _build_openai_payload(payload, provider_id)
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-        }
-    else:
-        api_payload = {
-            "model": payload.get("model", config["default_model"]),
-            "max_tokens": payload.get("max_tokens", 4096),
-            "messages": payload.get("messages", []),
-            "temperature": payload.get("temperature", 0.7),
-            "stream": False,
-        }
-        system = payload.get("system", "")
-        if system:
-            api_payload["system"] = system
-        headers = {
-            "x-api-key": api_key,
-            "anthropic-version": "2023-06-01",
-            "Content-Type": "application/json",
-        }
 
     async with httpx.AsyncClient(timeout=120.0) as client:
         try:
@@ -313,24 +344,47 @@ async def chat_sync(payload: Dict[str, Any]) -> Dict[str, Any]:
                 }
 
             return result
-        except httpx.TimeoutException:
-            raise HTTPException(status_code=504, detail="API 请求超时")
-        except httpx.ConnectError as e:
-            raise HTTPException(status_code=502, detail=f"无法连接到 API: {e}")
+        except httpx.HTTPStatusError as e:
+            body = await e.response.aread()
+            _handle_http_error(e.response.status_code, body)
+        except (httpx.TimeoutException, httpx.ConnectError) as e:
+            _handle_network_error(e)
 
 
 def get_health_info() -> Dict[str, Any]:
     """获取健康检查信息"""
     settings = get_settings()
     api_key = settings.anthropic_api_key
-    provider_id, config = detect_provider(api_key) if api_key else ("unknown", None)
 
-    return {
-        "status": "ok",
-        "api_configured": bool(api_key),
-        "provider": config["name"] if config else "未检测",
-        "provider_id": provider_id if config else "unknown",
-        "default_model": config["default_model"] if config else "N/A",
-        "supports_vision": config["supports_vision"] if config else False,
-        "models": config["models"] if config else [],
-    }
+    if not api_key:
+        return {
+            "status": "ok",
+            "api_configured": False,
+            "provider": "未检测",
+            "provider_id": "unknown",
+            "default_model": "N/A",
+            "supports_vision": False,
+            "models": [],
+        }
+
+    try:
+        provider_id, config = detect_provider(api_key)
+        return {
+            "status": "ok",
+            "api_configured": True,
+            "provider": config["name"],
+            "provider_id": provider_id,
+            "default_model": config["default_model"],
+            "supports_vision": config["supports_vision"],
+            "models": config["models"],
+        }
+    except HTTPException:
+        return {
+            "status": "ok",
+            "api_configured": True,
+            "provider": "无法识别",
+            "provider_id": "unknown",
+            "default_model": "N/A",
+            "supports_vision": False,
+            "models": [],
+        }

@@ -1,6 +1,6 @@
 """认证服务 - JWT + bcrypt 密码哈希"""
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from fastapi import Depends, HTTPException, status
@@ -24,6 +24,23 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_DAYS = 7
 
 
+def _get_secret_key(settings) -> str:
+    """获取 JWT 签名密钥，生产环境必须独立设置且长度 >= 32"""
+    secret = settings.secret_key
+    if not secret or secret == "change-me-in-production":
+        raise RuntimeError(
+            "SECURITY ERROR: SECRET_KEY 未设置或仍为默认值。"
+            "请在 .env 中设置一个至少 32 字符的随机字符串（如：openssl rand -base64 48），"
+            "且不可与 ANTHROPIC_API_KEY 相同。"
+        )
+    if len(secret) < 32:
+        raise RuntimeError(
+            "SECURITY ERROR: SECRET_KEY 长度不足 32 字符。"
+            "请在 .env 中设置一个至少 32 字符的随机字符串，且不可与 ANTHROPIC_API_KEY 相同。"
+        )
+    return secret
+
+
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
@@ -35,15 +52,17 @@ def get_password_hash(password: str) -> str:
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     settings = get_settings()
     to_encode = data.copy()
-    expire = datetime.utcnow() + (expires_delta or timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS))
+    expire = datetime.now(timezone.utc) + (expires_delta or timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS))
     to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, settings.anthropic_api_key or "fallback-secret-key", algorithm=ALGORITHM)
+    secret = _get_secret_key(settings)
+    return jwt.encode(to_encode, secret, algorithm=ALGORITHM)
 
 
 def decode_token(token: str) -> Optional[dict]:
     settings = get_settings()
+    secret = _get_secret_key(settings)
     try:
-        return jwt.decode(token, settings.anthropic_api_key or "fallback-secret-key", algorithms=[ALGORITHM])
+        return jwt.decode(token, secret, algorithms=[ALGORITHM])
     except JWTError:
         return None
 

@@ -18,15 +18,17 @@ LOG_FILE = os.path.join(LOG_DIR, "server.log")
 logger = logging.getLogger("mainboard-repair")
 logger.setLevel(logging.INFO)
 
-# 控制台输出
-console = logging.StreamHandler()
-console.setFormatter(logging.Formatter("[%(asctime)s] %(levelname)s %(message)s", datefmt="%Y-%m-%d %H:%M:%S"))
-logger.addHandler(console)
+# 仅在 logger 没有 handler 时注册，避免热重载/多 worker 重复追加
+if not logger.handlers:
+    # 控制台输出
+    console = logging.StreamHandler()
+    console.setFormatter(logging.Formatter("[%(asctime)s] %(levelname)s %(message)s", datefmt="%Y-%m-%d %H:%M:%S"))
+    logger.addHandler(console)
 
-# 文件轮转：单文件最大 10MB，保留 5 个备份
-file_handler = RotatingFileHandler(LOG_FILE, maxBytes=10 * 1024 * 1024, backupCount=5, encoding="utf-8")
-file_handler.setFormatter(logging.Formatter("[%(asctime)s] %(levelname)s %(message)s", datefmt="%Y-%m-%d %H:%M:%S"))
-logger.addHandler(file_handler)
+    # 文件轮转：单文件最大 10MB，保留 5 个备份
+    file_handler = RotatingFileHandler(LOG_FILE, maxBytes=10 * 1024 * 1024, backupCount=5, encoding="utf-8")
+    file_handler.setFormatter(logging.Formatter("[%(asctime)s] %(levelname)s %(message)s", datefmt="%Y-%m-%d %H:%M:%S"))
+    logger.addHandler(file_handler)
 
 
 class LoggingMiddleware(BaseHTTPMiddleware):

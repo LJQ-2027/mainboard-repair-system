@@ -97,3 +97,36 @@ def test_kimi_code_models():
     models = ai_proxy.PROVIDERS["kimi-code"]["models"]
     assert "kimi-for-coding" in models
     assert "kimi-k2-thinking" in models
+
+
+def test_detect_provider_unknown_raises(monkeypatch):
+    """无法识别的 API Key 应抛出异常"""
+    from fastapi import HTTPException
+    from app.config import Settings
+
+    fake_settings = Settings(SECRET_KEY="x" * 32, AI_PROVIDER="kimi-code")
+    # 绕过 Literal 限制，模拟配置文件中写了不支持的 provider
+    object.__setattr__(fake_settings, "ai_provider", "unknown")
+    monkeypatch.setattr(ai_proxy, "get_settings", lambda: fake_settings)
+
+    with pytest.raises(HTTPException):
+        ai_proxy.detect_provider("not-a-valid-key-prefix-12345")
+
+
+def test_build_request_unified():
+    """_build_request 应正确构建 OpenAI 格式请求"""
+    payload = {
+        "model": "deepseek-chat",
+        "messages": [{"role": "user", "content": "hello"}],
+        "stream": True,
+    }
+    api_payload, headers = ai_proxy._build_request(
+        payload,
+        api_key="sk-test",
+        provider_id="deepseek",
+        config=ai_proxy.PROVIDERS["deepseek"],
+        stream=True,
+    )
+    assert api_payload["model"] == "deepseek-chat"
+    assert headers["Authorization"] == "Bearer sk-test"
+    assert headers["Content-Type"] == "application/json"

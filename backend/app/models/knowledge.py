@@ -1,8 +1,6 @@
-from datetime import datetime
-
 from sqlalchemy import Boolean, Column, DateTime, Integer, String, Text
 
-from app.database import Base
+from app.database import Base, _now_utc
 
 
 class KnowledgeBaseEntry(Base):
@@ -15,4 +13,4 @@ class KnowledgeBaseEntry(Base):
     keywords = Column(String(500))  # 逗号分隔的关键词
     source = Column(String(500))
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=_now_utc)
