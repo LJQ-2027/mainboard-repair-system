@@ -2,29 +2,32 @@
 
 import os
 import shutil
-import sqlite3
 
 from fastapi import APIRouter, HTTPException
+from sqlalchemy import text
 
-from app.database import DB_PATH
+from app.database import DB_PATH, SQLALCHEMY_DATABASE_URL, engine
 from app.services.ai_proxy import get_health_info
 
 router = APIRouter(tags=["health"])
 
 
 def _check_database() -> dict[str, str]:
-    """检查 SQLite 数据库连通性"""
+    """检查数据库连通性"""
     try:
-        conn = sqlite3.connect(DB_PATH, timeout=2)
-        conn.execute("SELECT 1")
-        conn.close()
-        return {"status": "ok"}
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+        db_type = "sqlite" if SQLALCHEMY_DATABASE_URL.startswith("sqlite") else "postgresql"
+        return {"status": "ok", "type": db_type}
     except Exception as e:
         return {"status": "error", "detail": str(e)}
 
 
 def _check_disk() -> dict[str, str | float | bool]:
-    """检查数据目录磁盘空间"""
+    """检查数据目录磁盘空间（仅 SQLite 模式）"""
+    if not SQLALCHEMY_DATABASE_URL.startswith("sqlite") or not DB_PATH:
+        return {"status": "n/a"}
+
     try:
         data_dir = os.path.dirname(DB_PATH)
         usage = shutil.disk_usage(data_dir)
@@ -45,7 +48,7 @@ async def health_check():
         "version": "9.0.0",
     }
 
-    # AI 配置状态（已有）
+    # AI 配置状态
     result["ai"] = get_health_info()
 
     # 数据库连接检查

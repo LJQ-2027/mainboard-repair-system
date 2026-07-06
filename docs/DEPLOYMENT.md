@@ -87,6 +87,44 @@ alembic revision --autogenerate -m "描述变更内容"
 alembic upgrade head
 ```
 
+### 数据库
+
+项目默认使用 SQLite（`backend/data/mainboard.db`），适合开发和小规模试用。
+
+#### 生产环境：PostgreSQL
+
+1. 设置 `DATABASE_URL`：
+
+```bash
+DATABASE_URL=postgresql://user:password@host:5432/mainboard_repair
+```
+
+2. 安装 PostgreSQL 驱动（已包含在 requirements.txt）：
+
+```bash
+pip install psycopg2-binary
+```
+
+3. 执行迁移：
+
+```bash
+cd backend
+alembic upgrade head
+```
+
+#### Docker Compose（含 PostgreSQL）
+
+```bash
+# 复制并编辑 .env
+cp .env.example .env
+# 填写 ANTHROPIC_API_KEY、SECRET_KEY 等必填项
+
+# 启动服务（自动创建 PostgreSQL 并运行迁移）
+docker-compose up -d
+```
+
+注意：docker-compose.yml 中 backend 服务默认等待 db healthy 后启动，但首次仍需手动进入容器执行 `alembic upgrade head`。
+
 ### 后端（FastAPI）
 
 ```bash

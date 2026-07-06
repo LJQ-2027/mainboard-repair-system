@@ -6,6 +6,12 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+# 安装系统依赖（PostgreSQL 客户端库 + 构建工具）
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq-dev \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
 # 安装 Python 依赖
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt

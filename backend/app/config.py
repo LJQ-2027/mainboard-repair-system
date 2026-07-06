@@ -39,6 +39,9 @@ class Settings(BaseSettings):
     # 模型选择
     ai_model: str = Field(default="kimi-k2-thinking", alias="AI_MODEL")
 
+    # 数据库
+    database_url: str = Field(default="", alias="DATABASE_URL")
+
     # 服务端点
     port: int = Field(default=8899, alias="PORT")
     host: str = "0.0.0.0"
