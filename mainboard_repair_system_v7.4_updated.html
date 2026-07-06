@@ -3103,6 +3103,384 @@
             color: #8f140f;
         }
 
+        .repair-flow-shell {
+            display: grid;
+            gap: 18px;
+        }
+
+        .repair-flow-stepper {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .repair-flow-step {
+            min-height: 54px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border: 1px solid #d8e3ee;
+            border-radius: 16px;
+            background: #ffffff;
+            color: #6b7f92;
+        }
+
+        .repair-flow-step.done {
+            background: #edf9f0;
+            border-color: #bde5ca;
+            color: #17733b;
+        }
+
+        .repair-flow-step.active {
+            background: #083b76;
+            border-color: #083b76;
+            color: #ffffff;
+            box-shadow: 0 16px 36px rgba(8, 59, 118, 0.22);
+        }
+
+        .repair-flow-step-num {
+            width: 28px;
+            height: 28px;
+            flex: none;
+            display: grid;
+            place-items: center;
+            border-radius: 999px;
+            background: #e8f3ff;
+            color: #075ea8;
+            font-weight: 900;
+        }
+
+        .repair-flow-step.done .repair-flow-step-num {
+            background: #d5f4dd;
+            color: #14733a;
+        }
+
+        .repair-flow-step.active .repair-flow-step-num {
+            background: rgba(255, 255, 255, 0.16);
+            color: #ffffff;
+        }
+
+        .repair-flow-step strong {
+            display: block;
+            color: inherit;
+            font-size: 13px;
+            line-height: 1.2;
+        }
+
+        .repair-flow-work {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 380px;
+            gap: 18px;
+            align-items: stretch;
+        }
+
+        .repair-current-task {
+            position: relative;
+            min-height: 520px;
+            overflow: hidden;
+            padding: 28px;
+            border-radius: 28px;
+            background: #083b76;
+            color: #ffffff;
+            box-shadow: 0 24px 60px rgba(8, 59, 118, 0.28);
+        }
+
+        .repair-current-task::before {
+            content: "";
+            position: absolute;
+            right: -80px;
+            bottom: -120px;
+            width: 360px;
+            height: 360px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(81, 177, 255, 0.38), transparent 65%);
+        }
+
+        .repair-current-task::after {
+            content: "";
+            position: absolute;
+            right: 28px;
+            top: 30px;
+            width: 170px;
+            height: 116px;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 22px;
+            background:
+                repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.13) 0 1px, transparent 1px 20px),
+                repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.10) 0 1px, transparent 1px 20px);
+            opacity: 0.8;
+        }
+
+        .repair-step-kicker,
+        .repair-task-title,
+        .repair-task-subtitle,
+        .repair-primary-action,
+        .repair-checklist,
+        .repair-task-footer {
+            position: relative;
+            z-index: 1;
+        }
+
+        .repair-step-kicker {
+            display: inline-flex;
+            align-items: center;
+            min-height: 34px;
+            padding: 0 12px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.13);
+            color: rgba(255, 255, 255, 0.86);
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .repair-task-title {
+            max-width: 680px;
+            margin: 22px 0 10px;
+            color: #ffffff;
+            font-size: 46px;
+            line-height: 1.08;
+            letter-spacing: -0.03em;
+        }
+
+        .repair-task-subtitle {
+            max-width: 650px;
+            margin: 0;
+            color: rgba(255, 255, 255, 0.78);
+            font-size: 17px;
+            line-height: 1.65;
+        }
+
+        .repair-query-card {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 190px 190px;
+            gap: 10px;
+            margin-top: 22px;
+        }
+
+        .repair-query-card .diagnostic-command-input input,
+        .repair-query-card select {
+            min-height: 48px;
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.96);
+            color: #0f172a;
+            font-size: 14px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+        }
+
+        .repair-query-card .diagnostic-command-input input {
+            padding: 12px 18px 12px 44px;
+        }
+
+        .repair-query-card .diagnostic-command-input::before {
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .repair-primary-action {
+            display: grid;
+            grid-template-columns: 70px minmax(0, 1fr) 120px;
+            align-items: center;
+            gap: 18px;
+            margin-top: 28px;
+            padding: 18px;
+            border-radius: 24px;
+            background: #ffffff;
+            color: #071c33;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.16);
+        }
+
+        .repair-primary-action-num {
+            width: 70px;
+            height: 70px;
+            display: grid;
+            place-items: center;
+            border-radius: 22px;
+            background: #ffb13b;
+            color: #1b2b3d;
+            font-size: 30px;
+            font-weight: 950;
+        }
+
+        .repair-primary-action strong {
+            display: block;
+            margin-bottom: 6px;
+            color: #071c33;
+            font-size: 24px;
+        }
+
+        .repair-primary-action p {
+            margin: 0;
+            color: #52687e;
+            line-height: 1.45;
+        }
+
+        .repair-primary-action button {
+            min-height: 50px;
+            border: 0;
+            border-radius: 16px;
+            background: #083b76;
+            color: #ffffff;
+            font-weight: 900;
+            cursor: pointer;
+        }
+
+        .repair-checklist {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .repair-check-item {
+            min-height: 86px;
+            padding: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.10);
+        }
+
+        .repair-check-item strong {
+            display: block;
+            margin-bottom: 5px;
+            color: #ffffff;
+        }
+
+        .repair-check-item span {
+            color: rgba(255, 255, 255, 0.74);
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        .repair-task-footer {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .repair-footer-chip {
+            padding: 9px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.12);
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 13px;
+            font-weight: 760;
+        }
+
+        .repair-assist-panel {
+            display: grid;
+            grid-template-rows: 1.2fr 0.9fr;
+            gap: 18px;
+        }
+
+        .repair-location-card,
+        .repair-record-card {
+            overflow: hidden;
+            border: 1px solid #d8e3ee;
+            border-radius: 24px;
+            background: #ffffff;
+            box-shadow: 0 18px 45px rgba(9, 31, 53, 0.08);
+        }
+
+        .repair-assist-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 18px;
+            border-bottom: 1px solid #e7eef5;
+        }
+
+        .repair-assist-title strong {
+            color: #071c33;
+            font-size: 18px;
+        }
+
+        .repair-assist-title span {
+            color: #77899b;
+            font-size: 13px;
+            font-weight: 760;
+        }
+
+        .repair-board-preview {
+            position: relative;
+            height: 290px;
+            margin: 16px;
+            overflow: hidden;
+            border: 1px solid #c4d1d6;
+            border-radius: 22px;
+            background:
+                radial-gradient(circle at 34% 50%, #87cfa1 0 10px, transparent 11px),
+                radial-gradient(circle at 68% 61%, #f7c05f 0 9px, transparent 10px),
+                linear-gradient(135deg, #e3ebeb, #b4c4c7);
+        }
+
+        .repair-board-preview::before {
+            content: "";
+            position: absolute;
+            inset: 22px;
+            border: 2px solid rgba(15, 46, 70, 0.18);
+            border-radius: 18px;
+            background:
+                repeating-linear-gradient(90deg, rgba(18, 60, 82, 0.16) 0 1px, transparent 1px 18px),
+                repeating-linear-gradient(0deg, rgba(18, 60, 82, 0.12) 0 1px, transparent 1px 18px);
+        }
+
+        .repair-board-target {
+            position: absolute;
+            left: 37%;
+            top: 34%;
+            width: 104px;
+            height: 58px;
+            border: 3px solid #ff7a1a;
+            border-radius: 16px;
+            background: rgba(255, 122, 26, 0.18);
+            box-shadow: 0 0 0 7px rgba(255, 122, 26, 0.14);
+        }
+
+        .repair-record-list {
+            display: grid;
+            gap: 11px;
+            padding: 16px;
+        }
+
+        .repair-record-item {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 92px;
+            gap: 10px;
+            align-items: center;
+            padding: 13px;
+            border: 1px solid #e3ebf3;
+            border-radius: 16px;
+            background: #f8fbfd;
+        }
+
+        .repair-record-item strong {
+            display: block;
+            margin-bottom: 2px;
+            color: #10263d;
+        }
+
+        .repair-record-item span {
+            color: #6d8195;
+            font-size: 13px;
+        }
+
+        .repair-record-item button {
+            min-height: 38px;
+            border: 1px solid #c7d7e7;
+            border-radius: 12px;
+            background: #ffffff;
+            color: #083b76;
+            font-weight: 850;
+            cursor: pointer;
+        }
+
         @media (max-width: 1280px) {
             .diagnostic-grid {
                 grid-template-columns: 1fr 1fr;
@@ -3110,6 +3488,15 @@
 
             .diagnostic-panel.evidence-panel {
                 grid-column: 1 / -1;
+            }
+
+            .repair-flow-work {
+                grid-template-columns: 1fr;
+            }
+
+            .repair-assist-panel {
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: auto;
             }
         }
 
@@ -3152,6 +3539,26 @@
             .diagnostic-filters,
             .diagnostic-status-grid,
             .diagnostic-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .repair-flow-stepper,
+            .repair-query-card,
+            .repair-checklist,
+            .repair-assist-panel {
+                grid-template-columns: 1fr;
+            }
+
+            .repair-current-task {
+                min-height: auto;
+                padding: 22px;
+            }
+
+            .repair-task-title {
+                font-size: 34px;
+            }
+
+            .repair-primary-action {
                 grid-template-columns: 1fr;
             }
 
@@ -3362,8 +3769,8 @@
                     <button class="tab-btn nav-card active" data-tab="diagnostic-workbench" onclick="switchTab('diagnostic-workbench')">
                         <span class="nav-card-code" aria-hidden="true">🩺</span>
                         <span>
-                            <span class="nav-card-label">诊断工作台</span>
-                            <span class="nav-card-meta">一个入口聚合机型、故障、SOP 和案例</span>
+                            <span class="nav-card-label">流程诊断</span>
+                            <span class="nav-card-meta">按标准步骤完成排除、检测、处理和验证</span>
                         </span>
                     </button>
                     <button class="tab-btn nav-card" data-tab="source-overview" onclick="switchTab('source-overview')">
@@ -3415,7 +3822,7 @@
                 </div>
                 <div>
                     <div class="sidebar-note">
-                        其他细分页不再作为主导航展示。MTK 信号、L4 报告、资料缺口、SOP 草案和案例模板，会从诊断结果或对应工作页进入。
+                        其他工具不作为一线主入口展示。机型资料、维修步骤、SN 和 Log 工具，会在流程需要时进入。
                     </div>
                 </div>
             </div>
@@ -3425,7 +3832,7 @@
             <div class="workbench-topbar">
                 <div>
                     <h1>海外主板维修诊断工作台</h1>
-                    <p class="subtitle">从技术员已知信息出发，聚合机型资料、故障包、信号、SOP、案例和资料缺口。AI 保留为辅助层，不替代工程判断。</p>
+                    <p class="subtitle">按标准流程引导技术员完成故障录入、基础排除、检测定位、维修处理和修后验证。</p>
                     <div class="topbar-status">
                         <span class="status-chip primary">Phase 1A 内测</span>
                         <span class="status-chip">知识库优先</span>
@@ -3435,7 +3842,7 @@
                 <label class="global-search" onclick="switchTab('diagnostic-workbench'); setTimeout(() => document.getElementById('diagnosticQueryInput')?.focus(), 0);">
                     <span style="color:#64748b;">搜索</span>
                     <input type="text" placeholder="机型 / SN / 故障 / 位号" readonly>
-                    <span class="shortcut">诊断工作台</span>
+                    <span class="shortcut">流程诊断</span>
                 </label>
                 <button class="settings-gear" onclick="openSettings()" title="系统设置">系统设置</button>
             </div>
@@ -3725,39 +4132,36 @@
         </div>
 
         <div class="tab-content active" id="diagnostic-workbench-tab">
-            <div class="diagnostic-console">
-                <section class="diagnostic-command">
-                    <div class="diagnostic-command-input">
-                        <input type="text" id="diagnosticQueryInput" placeholder="输入机型 / SN / 故障现象 / 故障代码 / 信号，例如 BG6m 不开机 VBAT" oninput="renderDiagnosticWorkbench()">
-                        <span class="command-kbd">诊断入口</span>
-                    </div>
-                    <div class="diagnostic-filters">
-                        <select id="diagnosticModelSelect" onchange="renderDiagnosticWorkbench()">
-                            <option value="">选择机型（可选）</option>
-                        </select>
-                        <select id="diagnosticFaultSelect" onchange="renderDiagnosticWorkbench()">
-                            <option value="">选择故障包（可选）</option>
-                        </select>
-                    </div>
-                </section>
-                <div class="diagnostic-status-grid" id="diagnosticContextStats"></div>
-                <div class="diagnostic-grid">
-                    <aside class="diagnostic-panel">
-                        <h3>Diagnosis Context</h3>
-                        <div id="diagnosticContextPanel" class="diagnostic-panel-body"></div>
-                    </aside>
-                    <section class="diagnostic-panel">
-                        <h3>Priority Actions & Documentation</h3>
-                        <div class="diagnostic-panel-body">
-                            <div id="diagnosticActionPanel" class="knowledge-list"></div>
-                            <div id="diagnosticPreviewPanel" class="diagnostic-preview"></div>
+            <div class="repair-flow-shell">
+                <div class="repair-flow-stepper" id="repairFlowStepper"></div>
+                <div class="repair-flow-work">
+                    <section class="repair-current-task">
+                        <div class="repair-step-kicker" id="repairStepKicker">当前步骤 2 / 5</div>
+                        <h2 class="repair-task-title" id="repairTaskTitle">先确认这是不是主板问题</h2>
+                        <p class="repair-task-subtitle" id="repairTaskSubtitle">不要一上来就拆板。先排除外观、外设、电池、充电器、屏幕排线等明显问题。排除完成后，再进入主板检测。</p>
+                        <div class="repair-query-card">
+                            <div class="diagnostic-command-input">
+                                <input type="text" id="diagnosticQueryInput" placeholder="例如：CM6 不开机 / KM4 充电异常 / H8918 显示异常" oninput="renderDiagnosticWorkbench()">
+                            </div>
+                            <select id="diagnosticModelSelect" onchange="renderDiagnosticWorkbench()">
+                                <option value="">选择机型</option>
+                            </select>
+                            <select id="diagnosticFaultSelect" onchange="renderDiagnosticWorkbench()">
+                                <option value="">选择故障</option>
+                            </select>
                         </div>
+                        <div class="repair-primary-action" id="repairPrimaryAction"></div>
+                        <div class="repair-checklist" id="repairChecklist"></div>
+                        <div class="repair-task-footer" id="repairTaskFooter"></div>
                     </section>
-                    <aside class="diagnostic-panel evidence-panel">
-                        <h3>Signals & Evidence</h3>
-                        <div class="diagnostic-panel-body">
-                            <div id="diagnosticReferencePanel" class="knowledge-list"></div>
-                            <div id="diagnosticTodoPanel" class="diagnostic-todo"></div>
+                    <aside class="repair-assist-panel">
+                        <div class="repair-location-card">
+                            <div class="repair-assist-title"><strong id="repairLocationTitle">下一阶段测量位置</strong><span id="repairLocationMeta">预览</span></div>
+                            <div class="repair-board-preview"><div class="repair-board-target"></div></div>
+                        </div>
+                        <div class="repair-record-card">
+                            <div class="repair-assist-title"><strong id="repairRecordTitle">检查结果</strong><span id="repairRecordMeta">本步骤填写</span></div>
+                            <div class="repair-record-list" id="repairRecordList"></div>
                         </div>
                     </aside>
                 </div>
@@ -5290,14 +5694,145 @@
             }).slice(0, 8);
         }
 
+        let activeRepairFlowStep = 2;
+
+        const repairFlowSteps = [
+            {
+                id: 1,
+                label: '故障录入',
+                title: '先告诉我故障是什么',
+                subtitle: '输入机型、SN、故障现象或故障代码。系统会先识别机型和故障路径，再进入排查流程。',
+                actionTitle: '录入故障信息',
+                actionDesc: '填写已知信息，至少包含机型或故障现象。',
+                button: '已录入',
+                checks: [
+                    ['机型/SN', '输入机型、SN 或主板项目代号。'],
+                    ['故障现象', '记录不开机、不充电、无显示等现场描述。'],
+                    ['当前状态', '记录插电、电流、外观和客户描述。'],
+                    ['进入排除', '信息足够后进入基础排除。']
+                ],
+                records: [
+                    ['机型或 SN', '必填'],
+                    ['故障现象', '必填'],
+                    ['客户描述', '选填']
+                ],
+                locationTitle: '故障信息',
+                locationMeta: '录入'
+            },
+            {
+                id: 2,
+                label: '基础排除',
+                title: '先确认这是不是主板问题',
+                subtitle: '不要一上来就拆板。先排除外观、外设、电池、充电器、屏幕排线等明显问题。排除完成后，再进入主板检测。',
+                actionTitle: '完成基础排除检查',
+                actionDesc: '检查外观、配件、连接和可复测项，确认故障仍存在。',
+                button: '开始检查',
+                checks: [
+                    ['外观检查', '进水、烧蚀、接口损坏、主板变形。'],
+                    ['配件复测', '电池、充电器、线材、屏幕排线。'],
+                    ['软件确认', '可连接电脑时读取日志或基础状态。'],
+                    ['进入检测', '基础排除无效后测关键电源。']
+                ],
+                records: [
+                    ['外观是否异常', '选择'],
+                    ['更换配件后是否复现', '选择'],
+                    ['是否进入主板检测', '下一步']
+                ],
+                locationTitle: '下一阶段测量位置',
+                locationMeta: '预览'
+            },
+            {
+                id: 3,
+                label: '检测定位',
+                title: '按图测量关键点位',
+                subtitle: '根据故障路径测量关键电压、阻值或电流。先记录实测值，再按正常/异常分支继续判断。',
+                actionTitle: '测量 VBAT 和主供电',
+                actionDesc: '按右侧图示位置测量，填写实际数值。',
+                button: '开始测量',
+                checks: [
+                    ['VBAT 电压', '确认电池输入是否正常。'],
+                    ['主供电阻值', '判断是否存在明显短路。'],
+                    ['开机电流', '记录 0mA、跳变或异常电流。'],
+                    ['继续分支', '正常继续下一级，异常定位相关器件。']
+                ],
+                records: [
+                    ['VBAT 电压', '填写'],
+                    ['主供电阻值', '填写'],
+                    ['开机电流', '填写']
+                ],
+                locationTitle: '测量位置',
+                locationMeta: '当前步骤'
+            },
+            {
+                id: 4,
+                label: '维修处理',
+                title: '根据检测结果处理或升级',
+                subtitle: '能明确定位的简单问题按指导处理；复杂问题记录现象和测量值后交给中方技术员。',
+                actionTitle: '选择处理动作',
+                actionDesc: '清洁、补焊、更换器件，或记录后升级。',
+                button: '选择动作',
+                checks: [
+                    ['清洁处理', '腐蚀、脏污、接口异物。'],
+                    ['补焊处理', '连接器、可见虚焊或小料。'],
+                    ['器件更换', '按指导更换明确失效器件。'],
+                    ['升级处理', '复杂短路、BGA、疑难板交给中方技术员。']
+                ],
+                records: [
+                    ['维修动作', '选择'],
+                    ['更换器件', '填写'],
+                    ['是否升级', '选择']
+                ],
+                locationTitle: '处理位置',
+                locationMeta: '定位'
+            },
+            {
+                id: 5,
+                label: '验证记录',
+                title: '修完后必须验证并记录',
+                subtitle: '维修不是换完器件就结束。必须完成开机、电流、充电和基础功能验证，并保存维修记录。',
+                actionTitle: '完成修后验证',
+                actionDesc: '确认问题解决，记录测量值、维修动作和验证结果。',
+                button: '完成记录',
+                checks: [
+                    ['开机验证', '可正常开机并进入系统。'],
+                    ['电流验证', '待机/充电电流无明显异常。'],
+                    ['功能验证', '充电、显示、触摸、通信按故障类型验证。'],
+                    ['案例沉淀', '保存现象、测量值、动作和结果。']
+                ],
+                records: [
+                    ['开机结果', '选择'],
+                    ['充电/电流', '填写'],
+                    ['维修结论', '记录']
+                ],
+                locationTitle: '验证项目',
+                locationMeta: '收尾'
+            }
+        ];
+
+        function setRepairFlowStep(step) {
+            activeRepairFlowStep = Math.max(1, Math.min(5, Number(step) || 2));
+            renderDiagnosticWorkbench();
+        }
+
+        function getRepairStepForContext(query, model, pack) {
+            if (!query && !model && !pack) return 1;
+            return activeRepairFlowStep || 2;
+        }
+
         function renderDiagnosticWorkbench() {
-            const statsEl = document.getElementById('diagnosticContextStats');
-            const contextEl = document.getElementById('diagnosticContextPanel');
-            const actionEl = document.getElementById('diagnosticActionPanel');
-            const referenceEl = document.getElementById('diagnosticReferencePanel');
-            const previewEl = document.getElementById('diagnosticPreviewPanel');
-            const todoEl = document.getElementById('diagnosticTodoPanel');
-            if (!statsEl || !contextEl || !actionEl || !referenceEl) return;
+            const stepperEl = document.getElementById('repairFlowStepper');
+            const kickerEl = document.getElementById('repairStepKicker');
+            const titleEl = document.getElementById('repairTaskTitle');
+            const subtitleEl = document.getElementById('repairTaskSubtitle');
+            const actionEl = document.getElementById('repairPrimaryAction');
+            const checklistEl = document.getElementById('repairChecklist');
+            const footerEl = document.getElementById('repairTaskFooter');
+            const locationTitleEl = document.getElementById('repairLocationTitle');
+            const locationMetaEl = document.getElementById('repairLocationMeta');
+            const recordTitleEl = document.getElementById('repairRecordTitle');
+            const recordMetaEl = document.getElementById('repairRecordMeta');
+            const recordListEl = document.getElementById('repairRecordList');
+            if (!stepperEl || !kickerEl || !titleEl || !actionEl || !checklistEl || !recordListEl) return;
             if (!knowledgeBaseState.loaded) return;
 
             const query = document.getElementById('diagnosticQueryInput')?.value.trim() || '';
@@ -5305,78 +5840,67 @@
             const selectedPackageId = document.getElementById('diagnosticFaultSelect')?.value || '';
             const model = findDiagnosticModel(query, selectedModel);
             const pack = findDiagnosticFaultPackage(query, selectedPackageId, model);
-            const modelReadiness = model ? calculateModelReadiness(model, knowledgeBaseState.data.modelAssets) : null;
-            const packageReadiness = pack ? calculatePackageReadiness(pack, knowledgeBaseState.data.faultPackages) : null;
-            const signals = findDiagnosticSignals(query, pack);
-            const sops = knowledgeBaseState.data.sopDrafts || [];
-            const interactive = knowledgeBaseState.data.interactiveSops?.prototypes || [];
-            const gaps = [];
-            if (modelReadiness) asArray(modelReadiness.blockers).slice(0, 4).forEach(item => gaps.push(`机型缺口：${item}`));
-            if (packageReadiness) asArray(packageReadiness.blockers).slice(0, 4).forEach(item => gaps.push(`故障包缺口：${item}`));
+            activeRepairFlowStep = getRepairStepForContext(query, model, pack);
+            const step = repairFlowSteps.find(item => item.id === activeRepairFlowStep) || repairFlowSteps[1];
 
-            const relatedModules = asArray(pack?.related_modules).join(' / ') || asArray(model?.related_modules).join(' / ');
-            const signalText = signals.map(item => `${item.signal_name}(${item.reference_value_or_waveform || '无参考值'})`).join(' / ');
-            const l4Text = asArray(pack?.l4_evidence).map(item => `${item.metric} ${item.count}`).join(' / ');
-            const sopsText = sops.map(item => item.title).join(' / ');
+            stepperEl.innerHTML = repairFlowSteps.map(item => {
+                const state = item.id < activeRepairFlowStep ? 'done' : item.id === activeRepairFlowStep ? 'active' : '';
+                return `
+                    <button type="button" class="repair-flow-step ${state}" onclick="setRepairFlowStep(${item.id})">
+                        <span class="repair-flow-step-num">${item.id}</span>
+                        <strong>${escapeHtml(item.label)}</strong>
+                    </button>
+                `;
+            }).join('');
 
-            statsEl.innerHTML = `
-                <div class="diagnostic-stat"><div><span>Matched Model</span><strong>${escapeHtml(model ? model.model_name : '-')}</strong></div><div class="diagnostic-stat-mark" aria-hidden="true">📱</div></div>
-                <div class="diagnostic-stat"><div><span>Fault Priority</span><strong>${escapeHtml(pack ? pack.priority : '-')}</strong></div><div class="diagnostic-stat-mark" aria-hidden="true">⚠️</div></div>
-                <div class="diagnostic-stat"><div><span>Model Readiness</span><strong>${modelReadiness ? `${escapeHtml(modelReadiness.score)}%` : '-'}</strong></div><div class="diagnostic-stat-mark" aria-hidden="true">📈</div></div>
-                <div class="diagnostic-stat"><div><span>Fault Readiness</span><strong>${packageReadiness ? `${escapeHtml(packageReadiness.score)}%` : '-'}</strong></div><div class="diagnostic-stat-mark" aria-hidden="true">🧩</div></div>
-            `;
-
-            contextEl.innerHTML = `
-                <div class="context-row"><strong>输入内容</strong><span>${escapeHtml(query || '未输入。可以输入机型、SN、故障现象、故障代码或信号名。')}</span></div>
-                <div class="context-row"><strong>匹配机型</strong><span>${escapeHtml(model?.model_name || '未匹配。可通过右上方下拉选择机型。')}</span></div>
-                <div class="context-row"><strong>匹配故障包</strong><span>${escapeHtml(pack?.title || '未匹配。可输入故障现象或选择故障包。')}</span></div>
-                <div class="context-row"><strong>推荐模块</strong><span>${escapeHtml(relatedModules || '待匹配。用于决定先查哪块电路。')}</span></div>
-            `;
+            kickerEl.textContent = `当前步骤 ${step.id} / 5`;
+            titleEl.textContent = step.title;
+            subtitleEl.textContent = step.subtitle;
+            if (locationTitleEl) locationTitleEl.textContent = step.locationTitle;
+            if (locationMetaEl) locationMetaEl.textContent = step.locationMeta;
+            if (recordTitleEl) recordTitleEl.textContent = step.id === 3 ? '填写测量结果' : '检查结果';
+            if (recordMetaEl) recordMetaEl.textContent = step.id === 5 ? '完成记录' : '本步骤填写';
 
             actionEl.innerHTML = `
-                <div class="action-item primary">
-                    <div class="action-item-icon" aria-hidden="true">🗺️</div>
-                    <div><strong>查看机型资料</strong><span>${escapeHtml(model ? `${model.model_name} 主板图、点位图、完整度` : '先选择或输入机型')}</span></div>
-                    <button class="model-detail-btn" onclick="switchTab('model-library')">进入</button>
+                <div class="repair-primary-action-num">${step.id === 1 ? '录' : step.id}</div>
+                <div>
+                    <strong>${escapeHtml(step.actionTitle)}</strong>
+                    <p>${escapeHtml(step.actionDesc)}</p>
                 </div>
-                <div class="action-item">
-                    <div class="action-item-icon" aria-hidden="true">🧩</div>
-                    <div><strong>查看故障包</strong><span>${escapeHtml(pack ? pack.title : '先选择或输入故障现象')}</span></div>
-                    <button class="model-detail-btn" onclick="switchTab('fault-packages')">进入</button>
-                </div>
-                <div class="action-item">
-                    <div class="action-item-icon" aria-hidden="true">📋</div>
-                    <div><strong>进入交互式 SOP</strong><span>${escapeHtml(interactive[0]?.title || '暂无 SOP 原型')}</span></div>
-                    <button class="model-detail-btn" onclick="switchTab('interactive-sop')">进入</button>
-                </div>
-                <div class="action-item">
-                    <div class="action-item-icon" aria-hidden="true">✍️</div>
-                    <div><strong>记录维修案例</strong><span>按模板沉淀测量值、维修动作和验证结果</span></div>
-                    <button class="model-detail-btn" onclick="switchTab('case-template')">记录</button>
-                </div>
+                <button type="button" onclick="setRepairFlowStep(${Math.min(step.id + 1, 5)})">${escapeHtml(step.button)}</button>
             `;
 
-            referenceEl.innerHTML = `
-                <div class="evidence-row"><strong>相关信号</strong><span>${escapeHtml(signalText || '暂无匹配信号')}</span><button class="model-detail-btn" onclick="switchTab('mtk-signals')">查信号</button></div>
-                <div class="evidence-row"><strong>SOP 草案</strong><span>${escapeHtml(sopsText || '暂无 SOP 草案')}</span><button class="model-detail-btn" onclick="switchTab('sop-drafts')">查看</button></div>
-                <div class="evidence-row"><strong>L4 依据</strong><span>${escapeHtml(l4Text || '暂无匹配 L4 依据')}</span><button class="model-detail-btn" onclick="switchTab('l4-insights')">看报告</button></div>
-            `;
+            checklistEl.innerHTML = step.checks.map(([title, desc]) => `
+                <div class="repair-check-item">
+                    <strong>${escapeHtml(title)}</strong>
+                    <span>${escapeHtml(desc)}</span>
+                </div>
+            `).join('');
 
-            if (previewEl) {
-                previewEl.innerHTML = `
-                    <div>
-                        <strong>${escapeHtml(model ? `${model.model_name} 资料预览槽位` : '等待选择机型')}</strong>
-                        <span>${escapeHtml(model ? (model.next_action || '主板图、点位图和原理图到位后，这里可以承接第一屏预览。') : '输入机型或故障后，系统会把可用资料、SOP、信号和案例聚合到当前控制台。')}</span>
-                    </div>
-                `;
-            }
+            const contextChips = [
+                query ? `已输入：${query}` : '等待输入故障信息',
+                model ? `机型：${model.model_name}` : '机型：待识别',
+                pack ? `故障：${pack.title}` : '故障：待识别',
+                step.id < 5 ? `下一阶段：${repairFlowSteps[Math.min(step.id, 4)]?.label || '验证记录'}` : '流程结束：保存记录'
+            ];
+            footerEl.innerHTML = contextChips.map(item => `<span class="repair-footer-chip">${escapeHtml(item)}</span>`).join('');
 
-            if (todoEl) {
-                const todoItems = gaps.slice(0, 3);
-                todoEl.innerHTML = todoItems.length
-                    ? todoItems.map(item => `<div class="diagnostic-todo-item"><strong>资料缺口</strong>${escapeHtml(item)}</div>`).join('')
-                    : '<div class="diagnostic-todo-item"><strong>资料缺口</strong>暂无匹配缺口。可继续补充机型、故障包或 L4 案例。</div>';
-            }
+            recordListEl.innerHTML = step.records.map(([title, action]) => `
+                <div class="repair-record-item">
+                    <div><strong>${escapeHtml(title)}</strong><span>${escapeHtml(getRecordHint(title, model, pack))}</span></div>
+                    <button type="button">${escapeHtml(action)}</button>
+                </div>
+            `).join('');
+        }
+
+        function getRecordHint(title, model, pack) {
+            if (title.includes('机型')) return model?.model_name || '选择或输入机型';
+            if (title.includes('故障') || title.includes('现象')) return pack?.title || '填写现场现象';
+            if (title.includes('VBAT')) return '按图示测试点测量';
+            if (title.includes('主供电')) return '记录阻值或短路情况';
+            if (title.includes('开机')) return '确认是否正常开机';
+            if (title.includes('维修动作')) return '清洁 / 补焊 / 更换 / 升级';
+            return '按实际结果填写';
         }
 
         function renderCaseTemplate() {
