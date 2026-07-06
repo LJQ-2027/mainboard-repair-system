@@ -1,9 +1,10 @@
 """用户认证路由"""
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.middleware.rate_limit import rate_limit
 from app.models.user import User
 from app.schemas.user import LoginRequest, Token, UserCreate, UserResponse
 from app.services.auth import (
@@ -17,7 +18,8 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 @router.post("/register", response_model=UserResponse)
-def register(user_in: UserCreate, db: Session = Depends(get_db)):
+@rate_limit("5/minute")
+def register(request: Request, user_in: UserCreate, db: Session = Depends(get_db)):
     """用户注册"""
     db_user = db.query(User).filter(User.username == user_in.username).first()
     if db_user:
@@ -34,7 +36,8 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
 
 
 @router.post("/login", response_model=Token)
-def login(login_data: LoginRequest, db: Session = Depends(get_db)):
+@rate_limit("10/minute")
+def login(request: Request, login_data: LoginRequest, db: Session = Depends(get_db)):
     """用户登录 - 返回 JWT token"""
     user = db.query(User).filter(User.username == login_data.username).first()
     if not user or not verify_password(login_data.password, user.hashed_password):
@@ -48,6 +51,7 @@ def login(login_data: LoginRequest, db: Session = Depends(get_db)):
 
 
 @router.get("/me", response_model=UserResponse)
-def get_me(current_user: User = Depends(get_current_user)):
+@rate_limit("60/minute")
+def get_me(request: Request, current_user: User = Depends(get_current_user)):
     """获取当前登录用户信息"""
     return current_user

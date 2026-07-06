@@ -11,6 +11,7 @@ os.environ["ANTHROPIC_API_KEY"] = "sk-kimi-test-key-for-tests"
 os.environ["AI_PROVIDER"] = "kimi-code"
 os.environ["SECRET_KEY"] = "test-secret-key-must-be-at-least-32-characters-long"
 os.environ["CORS_ORIGINS"] = "http://localhost:3000"
+os.environ["RATE_LIMIT_ENABLED"] = "false"
 os.environ["TESTING"] = "true"
 
 # 必须在设置 TESTING 环境变量后再导入数据库模块

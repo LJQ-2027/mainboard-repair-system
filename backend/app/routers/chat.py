@@ -8,10 +8,11 @@
 
 import json
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.middleware.rate_limit import rate_limit
 from app.models.diagnosis import DiagnosisRecord
 from app.models.session import ChatSession
 from app.models.user import User
@@ -24,19 +25,23 @@ router = APIRouter(prefix="/api", tags=["chat"])
 
 
 @router.post("/chat")
+@rate_limit("10/minute")
 async def chat(
-    request: ChatRequest,
+    request: Request,
+    request_data: ChatRequest,
     current_user: User | None = Depends(get_optional_user),
     db: Session = Depends(get_db),
 ):
     """AI 对话接口 - 免登录可用，登录后保存记录"""
-    if request.stream:
-        return execute_chat_stream(request, current_user, db)
-    return await execute_chat_sync(db, current_user, request)
+    if request_data.stream:
+        return execute_chat_stream(request_data, current_user, db)
+    return await execute_chat_sync(db, current_user, request_data)
 
 
 @router.post("/chat/sessions")
+@rate_limit("20/minute")
 def create_session(
+    request: Request,
     current_user: User = Depends(get_current_active_user),
     db: Session = Depends(get_db),
 ):
@@ -49,7 +54,9 @@ def create_session(
 
 
 @router.get("/chat/sessions")
+@rate_limit("60/minute")
 def list_sessions(
+    request: Request,
     current_user: User = Depends(get_current_active_user),
     db: Session = Depends(get_db),
 ):
@@ -64,7 +71,9 @@ def list_sessions(
 
 
 @router.get("/history")
+@rate_limit("60/minute")
 def get_history(
+    request: Request,
     limit: int = 50,
     current_user: User = Depends(get_current_active_user),
     db: Session = Depends(get_db),
@@ -88,7 +97,9 @@ def get_history(
 
 
 @router.get("/history/{record_id}", response_model=DiagnosisRecordResponse)
+@rate_limit("60/minute")
 def get_history_detail(
+    request: Request,
     record_id: int,
     current_user: User = Depends(get_current_active_user),
     db: Session = Depends(get_db),

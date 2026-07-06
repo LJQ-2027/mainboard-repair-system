@@ -47,6 +47,9 @@ class Settings(BaseSettings):
     enable_hsts: bool = Field(default=False, alias="ENABLE_HSTS")
     hsts_max_age: int = Field(default=31536000, alias="HSTS_MAX_AGE")
 
+    # 速率限制
+    rate_limit_enabled: bool = Field(default=True, alias="RATE_LIMIT_ENABLED")
+
     # 日志
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
 
