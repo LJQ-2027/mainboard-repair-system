@@ -3,6 +3,7 @@
 import mimetypes
 import os
 import re
+from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,9 +13,52 @@ from fastapi.staticfiles import StaticFiles
 from app.config import get_settings
 from app.database import init_db
 from app.middleware.logging import LoggingMiddleware
+from app.middleware.rate_limit import RateLimitKeyMiddleware, get_limiter
 from app.middleware.security import SecurityHeadersMiddleware
 from app.routers import admin, auth, chat, health
 from app.services.auth import get_current_user
+from slowapi.errors import RateLimitExceeded
+from slowapi.extension import _rate_limit_exceeded_handler
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """应用生命周期管理"""
+    # 启动时初始化数据库并打印配置
+    init_db()
+
+    settings = get_settings()
+    from app.services.ai_proxy import detect_provider
+
+    # 尝试识别 AI 平台；无 Key 或无法识别时不应阻塞启动
+    config = None
+    if settings.anthropic_api_key:
+        try:
+            _, config = detect_provider(settings.anthropic_api_key)
+        except Exception as exc:  # noqa: BLE001
+            print(f"  [WARNING] AI 平台识别失败: {exc}")
+
+    print("=" * 60)
+    print("  AI 代理服务器 - 智能主板维修系统 v9.0 (团队版)")
+    print("=" * 60)
+    print(f"  文档地址: http://localhost:{settings.port}/docs")
+    print(f"  健康检查: http://localhost:{settings.port}/health")
+    print(f"  登录接口: POST http://localhost:{settings.port}/auth/login")
+    print(f"  API 端点: POST http://localhost:{settings.port}/api/chat")
+    print("-" * 60)
+    if config:
+        print(f"  识别平台: {config['name']}")
+        print(f"  默认模型: {config['default_model']}")
+        print(f"  视觉分析: {'支持' if config['supports_vision'] else '不支持'}")
+    else:
+        print("  [WARNING] 未设置 ANTHROPIC_API_KEY 或无法识别，AI 功能不可用")
+    print("=" * 60)
+
+    yield
+
+    # 关闭阶段（可选）：清理资源
+    print("  AI 代理服务器正在关闭...")
+
 
 # 创建应用实例
 app = FastAPI(
@@ -23,7 +67,12 @@ app = FastAPI(
     version="9.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
+    lifespan=lifespan,
 )
+
+# 注册 SlowAPI limiter
+app.state.limiter = get_limiter()
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # CORS 中间件（来源从配置读取，避免 allow_origins=["*"] 与 allow_credentials=True 同时存在）
 settings = get_settings()
@@ -49,6 +98,9 @@ app.add_middleware(SecurityHeadersMiddleware)
 
 # 请求日志中间件
 app.add_middleware(LoggingMiddleware)
+
+# 速率限制 key 解析中间件（需在 CORS 之后，路由之前）
+app.add_middleware(RateLimitKeyMiddleware)
 
 # 注册路由
 app.include_router(health.router)
@@ -125,30 +177,3 @@ async def serve_upload(
             "X-Content-Type-Options": "nosniff",
         },
     )
-
-
-@app.on_event("startup")
-async def startup():
-    """启动时初始化数据库并打印配置"""
-    # 初始化数据库
-    init_db()
-
-    settings = get_settings()
-    from app.services.ai_proxy import detect_provider
-
-    provider_id, config = detect_provider(settings.anthropic_api_key)
-    print("=" * 60)
-    print("  AI 代理服务器 - 智能主板维修系统 v9.0 (团队版)")
-    print("=" * 60)
-    print(f"  文档地址: http://localhost:{settings.port}/docs")
-    print(f"  健康检查: http://localhost:{settings.port}/health")
-    print(f"  登录接口: POST http://localhost:{settings.port}/auth/login")
-    print(f"  API 端点: POST http://localhost:{settings.port}/api/chat")
-    print("-" * 60)
-    if settings.anthropic_api_key:
-        print(f"  识别平台: {config['name']}")
-        print(f"  默认模型: {config['default_model']}")
-        print(f"  视觉分析: {'支持' if config['supports_vision'] else '不支持'}")
-    else:
-        print("  [WARNING] 未设置 ANTHROPIC_API_KEY")
-    print("=" * 60)
