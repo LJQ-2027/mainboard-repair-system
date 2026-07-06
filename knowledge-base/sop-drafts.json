@@ -81,5 +81,278 @@
       "BUCK/LDO 支路正常电流范围需要按机型或平台补齐。"
     ],
     "status": "SOP 草案，需技术支持或制造中心确认后才能作为正式操作流程"
+  },
+  {
+    "sop_id": "SOP-KM4-NO-POWER-001",
+    "title": "KM4/F151 不开机维修步骤指导",
+    "source_ids": [
+      "SRC-20260702-001"
+    ],
+    "source_materials": {
+      "repair_guide": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/TECNO-L6735-KM4-F151手机维修通用操作指导书V1.0_20250331.pdf",
+      "main_schematic": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/F151_MAIN_PCB_1_维修原理图_V1.2_20250310.pdf",
+      "main_point_map": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/F151_MAIN_PCB_V1.2_位号图.pdf",
+      "sub_schematic": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/F151_SUB_PCB_1_维修原理图_V1.1_20250310.pdf",
+      "sub_point_map": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/F151_SUB_PCB_1_V1.1_零件位号.pdf"
+    },
+    "derived_from_existing_materials": true,
+    "applicable_models": [
+      "KM4",
+      "L6735",
+      "F151"
+    ],
+    "applicable_faults": [
+      "PWR01-No power on",
+      "400-CPU Failure",
+      "410-PMU Failure",
+      "420-Memory Failure"
+    ],
+    "target_role": [
+      "L4 技术员",
+      "中方技术人员",
+      "技术支持"
+    ],
+    "required_tools": [
+      "直流稳压电源",
+      "假电池/电源夹具",
+      "万用表",
+      "示波器",
+      "热像仪或松香法",
+      "显微镜",
+      "热风枪/烙铁"
+    ],
+    "preconditions": [
+      "确认电池接口、主板外观、明显烧毁/腐蚀/变形等基础状态。",
+      "先排除环境因素、功能设置因素和整机结构装配问题。",
+      "使用直流稳压电源供电并记录按开机键前后的电流变化。"
+    ],
+    "source_extract_summary": [
+      "KM4/F151 采用 T615(UMS9230) 平台，PMU 为 UMP510G，Memory 为 EMMC + LPDDR4X 分离设计。",
+      "指导书将不开机电流分为三类：无电流或小于 10mA、小电流小于 100mA、大电流大于 1A。",
+      "指导书提供参考信号：VBAT 3.4V-4.35V，VDDCORE 1.15V，VDDEMMCCORE 3.3V 600mA，X2100 输出频率 26MHz。"
+    ],
+    "test_points_and_references": [
+      {
+        "signal": "VBAT",
+        "reference": "3.4V-4.35V",
+        "purpose": "确认电池输入和大电流短路入口"
+      },
+      {
+        "signal": "VSYS",
+        "reference": "接近系统供电，需结合图纸确认点位",
+        "purpose": "无电流分支中判断充电 IC / PMU 前后级"
+      },
+      {
+        "signal": "PWRKEY",
+        "reference": "默认高电平，按下为低电平",
+        "purpose": "确认开机键中断是否送达"
+      },
+      {
+        "signal": "VDDCORE",
+        "reference": "1.15V",
+        "purpose": "小电流分支中判断 CPU/PMU 核心供电"
+      },
+      {
+        "signal": "VDDEMMCCORE",
+        "reference": "3.3V 600mA",
+        "purpose": "小电流分支中判断 EMMC 供电"
+      },
+      {
+        "signal": "X2100",
+        "reference": "26MHz",
+        "purpose": "判断系统时钟是否工作"
+      }
+    ],
+    "steps": [
+      {
+        "step_no": 1,
+        "action": "基础外观和接口检查",
+        "operator_input": "检查电池接口、主板外观、连接器、明显腐蚀、烧毁、断裂或短路痕迹。",
+        "decision": "若电池接口或明显结构问题异常，先处理接口/结构；若外观无明显异常，进入电源电流分型。"
+      },
+      {
+        "step_no": 2,
+        "action": "使用直流稳压电源做电流分型",
+        "operator_input": "通过假电池或电源夹具供电，按开机键，记录电流表现。",
+        "decision": "小于 10mA 或近似无电流进入步骤 3；小于 100mA 小电流进入步骤 5；大于 1A 大电流进入步骤 8。"
+      },
+      {
+        "step_no": 3,
+        "action": "无电流分支：确认 PWRKEY 与 VSYS",
+        "operator_input": "测 PWRKEY 是否默认高电平、按下变低；测 VSYS 是否建立。",
+        "decision": "PWRKEY 异常优先查按键/连接路径；VSYS 异常优先查充电 IC / 电源管理 IC 输入输出；两者正常进入系统/Memory/CPU/晶振方向。"
+      },
+      {
+        "step_no": 4,
+        "action": "无电流分支：定位开机触发链路",
+        "operator_input": "结合主板位号图定位 PowerKey、PMU、充电 IC 周边，检查开机触发链路是否断路、虚焊或异常。",
+        "decision": "发现虚焊/断路/异常小料则处理并复测；未发现异常则记录数据并进入更深层 PMU/CPU/Memory 检查。"
+      },
+      {
+        "step_no": 5,
+        "action": "小电流分支：确认核心供电",
+        "operator_input": "测 VDDCORE、VDDEMMCCORE 是否达到参考值；记录具体电压。",
+        "decision": "供电异常优先查 PMU 输出和周边小料；供电正常进入 26MHz 时钟检查。"
+      },
+      {
+        "step_no": 6,
+        "action": "小电流分支：确认 26MHz 时钟",
+        "operator_input": "用示波器测 X2100 输出频率是否约 26MHz。",
+        "decision": "无 26MHz 或异常时优先处理晶振/时钟链路；26MHz 正常但仍不开机，进入 CPU/DDR/EMMC 相关检查。"
+      },
+      {
+        "step_no": 7,
+        "action": "小电流分支：判断 CPU/DDR/EMMC 方向",
+        "operator_input": "结合 VDDCORE、VDDEMMCCORE、X2100 结果和主板位号图检查 CPU/DDR/EMMC 周边小料、虚焊和异常发热。",
+        "decision": "若发现周边小料或虚焊可处理并复测；若疑似复杂主控/存储器问题，记录数据作为升级依据。"
+      },
+      {
+        "step_no": 8,
+        "action": "大电流分支：检测 VBAT 对地短路",
+        "operator_input": "断电后测 VBAT 对地阻值；必要时限流上电并使用热像仪或松香法找发热点。",
+        "decision": "VBAT 短路则沿 VBAT 通路查短路器件；不短路但大电流则继续查后级电源支路。"
+      },
+      {
+        "step_no": 9,
+        "action": "大电流分支：处理短路器件并复测",
+        "operator_input": "定位到发热或短路器件后，更换/清洁/补焊对应器件，记录处理动作。",
+        "decision": "处理后重新回到步骤 2 做电流分型；若仍大电流，继续沿供电通路定位。"
+      }
+    ],
+    "verification_required": [
+      "记录修前/修后按键前后电流表现。",
+      "记录 VBAT、VSYS、PWRKEY、VDDCORE、VDDEMMCCORE、X2100 的测量结果。",
+      "修后至少验证：可开机、可进入系统、充电识别、SIM/网络基础功能、显示触摸基础功能。",
+      "若处理过短路，复测待机发热和关机漏电表现。",
+      "保留主板位号图定位截图或维修位置照片，便于后续复盘。"
+    ],
+    "status": "基于 KM4/F151 现有资料设计的维修步骤指导，待技术支持或制造中心复核"
+  },
+  {
+    "sop_id": "SOP-KM4-NO-CHARGE-001",
+    "title": "KM4/F151 不充电与 USB 充电输入维修步骤指导",
+    "source_ids": [
+      "SRC-20260702-001"
+    ],
+    "source_materials": {
+      "repair_guide": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/TECNO-L6735-KM4-F151手机维修通用操作指导书V1.0_20250331.pdf",
+      "main_schematic": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/F151_MAIN_PCB_1_维修原理图_V1.2_20250310.pdf",
+      "main_point_map": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/F151_MAIN_PCB_V1.2_位号图.pdf",
+      "sub_schematic": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/F151_SUB_PCB_1_维修原理图_V1.1_20250310.pdf",
+      "sub_point_map": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/F151_SUB_PCB_1_V1.1_零件位号.pdf"
+    },
+    "derived_from_existing_materials": true,
+    "applicable_models": [
+      "KM4",
+      "L6735",
+      "F151"
+    ],
+    "applicable_faults": [
+      "CHG01-Can not charging",
+      "461-Charger IC Failure",
+      "USB 不识别"
+    ],
+    "target_role": [
+      "L4 技术员",
+      "中方技术人员",
+      "技术支持"
+    ],
+    "required_tools": [
+      "充电器",
+      "USB 数据线",
+      "直流稳压电源",
+      "万用表",
+      "显微镜",
+      "热风枪/烙铁"
+    ],
+    "preconditions": [
+      "确认充电器和 USB 线材在 OK 机器上可正常工作。",
+      "确认电池接触端口无明显损坏。",
+      "区分无充电指示、有充电指示但不进电、USB 不识别三类现象。"
+    ],
+    "source_extract_summary": [
+      "KM4/F151 采用 10W 充电方案。",
+      "过放电池小于 2.2V 时进入 2mA 涓流；2.2V 后 USB 模式约 70mA、充电器模式约 200mA；大于 3.3V 后进入 CC；超过 4.1V 后进入 CV；充满约 4.2V；超过 4.35V 触发硬件过压保护。",
+      "充电相关参考信号：VCHG 5V，VBAT 满电约 4.2V；USB 接口 VCHG 为 5V，USB_DM/USB_DP 为高速数字脉冲信号。"
+    ],
+    "test_points_and_references": [
+      {
+        "signal": "VCHG",
+        "reference": "5V",
+        "purpose": "确认充电输入是否到达板端"
+      },
+      {
+        "signal": "VBAT",
+        "reference": "满电约 4.2V，电池工作范围参考 3.4V-4.35V",
+        "purpose": "判断电池电压和充电阶段"
+      },
+      {
+        "signal": "ISENSE",
+        "reference": "充电电流检测输入，指导书未给固定电压",
+        "purpose": "判断充电电流检测链路"
+      },
+      {
+        "signal": "USB_DM",
+        "reference": "高速数字脉冲信号",
+        "purpose": "USB 数据识别路径"
+      },
+      {
+        "signal": "USB_DP",
+        "reference": "高速数字脉冲信号",
+        "purpose": "USB 数据识别路径"
+      }
+    ],
+    "steps": [
+      {
+        "step_no": 1,
+        "action": "确认外部充电条件",
+        "operator_input": "使用已确认正常的充电器和 USB 线，观察故障机是否有充电图标、充电电流或 USB 识别。",
+        "decision": "外部充电器/线材异常则更换；外部条件正常进入接口和通路检查。"
+      },
+      {
+        "step_no": 2,
+        "action": "检查 USB/充电接口和 FPC",
+        "operator_input": "显微镜检查 USB 接口是否虚焊、变形、腐蚀；确认 FPC 排线扣合和状态。",
+        "decision": "接口虚焊则补焊；FPC 不良则更换/重扣；无异常进入 VCHG 输入检查。"
+      },
+      {
+        "step_no": 3,
+        "action": "测量 VCHG 输入",
+        "operator_input": "插入充电器后测 VCHG 是否约 5V。",
+        "decision": "VCHG 无 5V，沿 USB 接口、副板、FPC、保护器件查断路/虚焊；VCHG 正常进入 VBAT/充电状态判断。"
+      },
+      {
+        "step_no": 4,
+        "action": "判断电池电压和充电阶段",
+        "operator_input": "测 VBAT，按电压判断是否处于过放、涓流、恒流或恒压阶段。",
+        "decision": "小于 2.2V 预期小电流涓流；2.2V-3.3V 预期 USB 约 70mA/充电器约 200mA；大于 3.3V 应进入 CC；接近 4.2V 应接近充满。"
+      },
+      {
+        "step_no": 5,
+        "action": "有充电显示但不进电",
+        "operator_input": "记录 VBAT 变化和充电电流，检查 ISENSE、VBAT_SENSE、电池端口和充电路径周边。",
+        "decision": "VBAT 不上升或电流异常，优先检查电池端口、采样电阻/电流检测链路和充电控制相关器件。"
+      },
+      {
+        "step_no": 6,
+        "action": "USB 不识别分支",
+        "operator_input": "检查 USB 插座焊接和外围器件，必要时观察 USB_DM/USB_DP 是否有高速数字脉冲信号。",
+        "decision": "接口或外围器件异常则补焊/更换；DM/DP 无信号或异常则沿副板、FPC、主板 USB 通路继续定位。"
+      },
+      {
+        "step_no": 7,
+        "action": "处理后复测",
+        "operator_input": "完成补焊、更换或清洁后，重新插入充电器并记录 VCHG、VBAT、充电电流和 USB 识别状态。",
+        "decision": "若充电图标、充电电流、VBAT 变化和 USB 识别恢复，进入修后验证；否则回到对应分支继续定位。"
+      }
+    ],
+    "verification_required": [
+      "确认插入充电器有充电识别。",
+      "确认 VCHG 约 5V。",
+      "确认 VBAT 随充电过程有合理变化，接近满电约 4.2V。",
+      "确认 USB 数据连接可识别，必要时验证 USB_DM/USB_DP。",
+      "复测充电稳定性，观察接口晃动、FPC 扣合和发热情况。"
+    ],
+    "status": "基于 KM4/F151 现有资料设计的维修步骤指导，待技术支持或制造中心复核"
   }
 ]

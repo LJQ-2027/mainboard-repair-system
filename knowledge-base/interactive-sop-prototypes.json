@@ -8,7 +8,11 @@
       "source_sop_id": "SOP-20260604-001",
       "title": "漏电流与飞行模式待机电流异常交互式SOP原型",
       "warning": "该流程为草案原型，仅用于内部流程设计，不作为正式维修指导。",
-      "target_role": ["L4 技术员", "中方技术人员", "技术支持"],
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
       "steps": [
         {
           "step_id": "start",
@@ -16,8 +20,14 @@
           "instruction": "先判断当前异常属于关机漏电流偏大，还是飞行模式待机电流偏大。",
           "input_type": "choice",
           "options": [
-            { "label": "关机漏电流偏大", "next_step_id": "power_off_current" },
-            { "label": "飞行模式待机电流偏大", "next_step_id": "airplane_current" }
+            {
+              "label": "关机漏电流偏大",
+              "next_step_id": "power_off_current"
+            },
+            {
+              "label": "飞行模式待机电流偏大",
+              "next_step_id": "airplane_current"
+            }
           ]
         },
         {
@@ -26,8 +36,14 @@
           "instruction": "使用程控电源给单板供电，电压范围参考 3.4V-4.35V，观察关机电流。",
           "input_type": "choice",
           "options": [
-            { "label": "电流明显偏高", "next_step_id": "charge_vs_sys" },
-            { "label": "电流正常", "next_step_id": "record_normal" }
+            {
+              "label": "电流明显偏高",
+              "next_step_id": "charge_vs_sys"
+            },
+            {
+              "label": "电流正常",
+              "next_step_id": "record_normal"
+            }
           ]
         },
         {
@@ -36,8 +52,14 @@
           "instruction": "使用低于 Charge IC 正常 SYS 输出门槛的电压供电，观察电流变化。",
           "input_type": "choice",
           "options": [
-            { "label": "低电压下电流仍高", "next_step_id": "suspect_charge_ic" },
-            { "label": "低电压下电流正常", "next_step_id": "suspect_vbat_sys" }
+            {
+              "label": "低电压下电流仍高",
+              "next_step_id": "suspect_charge_ic"
+            },
+            {
+              "label": "低电压下电流正常",
+              "next_step_id": "suspect_vbat_sys"
+            }
           ]
         },
         {
@@ -46,8 +68,14 @@
           "instruction": "使用程控电源 3.8V 供电，开机后设置飞行模式并灭屏，等待电流稳定后观察。",
           "input_type": "choice",
           "options": [
-            { "label": "电流跳变", "next_step_id": "check_software_command" },
-            { "label": "电流稳定但偏高", "next_step_id": "locate_hardware_branch" }
+            {
+              "label": "电流跳变",
+              "next_step_id": "check_software_command"
+            },
+            {
+              "label": "电流稳定但偏高",
+              "next_step_id": "locate_hardware_branch"
+            }
           ]
         },
         {
@@ -56,8 +84,14 @@
           "instruction": "抓取 Log，请软件侧确认飞行模式命令是否执行；必要时使用串口命令验证。",
           "input_type": "choice",
           "options": [
-            { "label": "强制命令后电流恢复", "next_step_id": "software_issue" },
-            { "label": "仍异常", "next_step_id": "locate_hardware_branch" }
+            {
+              "label": "强制命令后电流恢复",
+              "next_step_id": "software_issue"
+            },
+            {
+              "label": "仍异常",
+              "next_step_id": "locate_hardware_branch"
+            }
           ]
         },
         {
@@ -66,8 +100,14 @@
           "instruction": "根据电流大小选择触摸感知、红外热像、压差法或电流倒灌法定位异常支路。",
           "input_type": "choice",
           "options": [
-            { "label": "定位到疑似器件或支路", "next_step_id": "record_and_verify" },
-            { "label": "无法定位", "next_step_id": "escalate" }
+            {
+              "label": "定位到疑似器件或支路",
+              "next_step_id": "record_and_verify"
+            },
+            {
+              "label": "无法定位",
+              "next_step_id": "escalate"
+            }
           ]
         },
         {
@@ -104,6 +144,272 @@
           "step_id": "escalate",
           "title": "升级中方技术员或制造中心",
           "instruction": "整理现象、测量值、照片、Log 和已执行步骤，形成升级信息包。",
+          "input_type": "terminal"
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-KM4-NO-POWER-001",
+      "source_sop_id": "SOP-KM4-NO-POWER-001",
+      "title": "KM4/F151 不开机交互式 SOP",
+      "warning": "基于现有 KM4/F151 维修指导书、原理图和位号图设计，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "基础检查",
+          "instruction": "检查电池接口、主板外观、连接器、腐蚀、烧毁、断裂和明显短路痕迹。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "外观/接口异常",
+              "next_step_id": "handle_basic"
+            },
+            {
+              "label": "外观无明显异常",
+              "next_step_id": "current_classify"
+            }
+          ]
+        },
+        {
+          "step_id": "handle_basic",
+          "title": "处理基础异常",
+          "instruction": "先处理电池接口、连接器、腐蚀或明显结构问题，处理后重新上电观察。",
+          "input_type": "terminal"
+        },
+        {
+          "step_id": "current_classify",
+          "title": "电流分型",
+          "instruction": "外接维修电源，按开机键观察电流：小于 10mA/近似无电流，小于 100mA 小电流，或大于 1A 大电流。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "无电流 / <10mA",
+              "next_step_id": "no_current"
+            },
+            {
+              "label": "小电流 / <100mA",
+              "next_step_id": "small_current"
+            },
+            {
+              "label": "大电流 / >1A",
+              "next_step_id": "large_current"
+            }
+          ]
+        },
+        {
+          "step_id": "no_current",
+          "title": "无电流：查 PWRKEY / VSYS",
+          "instruction": "测 PWRKEY 默认高电平、按下低电平；测 VSYS 是否建立。异常时查按键、充电 IC、PMU 输入输出。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "PWRKEY 或 VSYS 异常",
+              "next_step_id": "power_path"
+            },
+            {
+              "label": "PWRKEY / VSYS 正常",
+              "next_step_id": "cpu_memory_clock"
+            }
+          ]
+        },
+        {
+          "step_id": "power_path",
+          "title": "定位开机触发/供电路径",
+          "instruction": "结合主板位号图定位 PowerKey、充电 IC、PMU 周边，检查断路、虚焊和异常小料。",
+          "input_type": "terminal"
+        },
+        {
+          "step_id": "small_current",
+          "title": "小电流：测核心供电",
+          "instruction": "测 VDDCORE 约 1.15V、VDDEMMCCORE 约 3.3V。供电异常先查 PMU 输出和周边小料。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "核心供电异常",
+              "next_step_id": "pmu_output"
+            },
+            {
+              "label": "核心供电正常",
+              "next_step_id": "clock_26m"
+            }
+          ]
+        },
+        {
+          "step_id": "pmu_output",
+          "title": "处理 PMU 输出方向",
+          "instruction": "定位 PMU 输出和周边小料，记录电压并处理虚焊/异常器件后复测。",
+          "input_type": "terminal"
+        },
+        {
+          "step_id": "clock_26m",
+          "title": "测 26MHz 时钟",
+          "instruction": "用示波器测 X2100 输出是否约 26MHz。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "26MHz 异常",
+              "next_step_id": "clock_fix"
+            },
+            {
+              "label": "26MHz 正常",
+              "next_step_id": "cpu_memory_clock"
+            }
+          ]
+        },
+        {
+          "step_id": "clock_fix",
+          "title": "处理晶振/时钟链路",
+          "instruction": "检查 X2100、晶振周边和时钟链路，处理后回到电流分型复测。",
+          "input_type": "terminal"
+        },
+        {
+          "step_id": "cpu_memory_clock",
+          "title": "CPU/Memory 方向记录",
+          "instruction": "结合 VDDCORE、VDDEMMCCORE、X2100 和位号图检查 CPU/DDR/EMMC 周边小料、虚焊和异常发热。",
+          "input_type": "terminal"
+        },
+        {
+          "step_id": "large_current",
+          "title": "大电流：查 VBAT 短路",
+          "instruction": "断电测 VBAT 对地阻值；必要时限流上电，用热像仪或松香法找发热点。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "VBAT 对地短路",
+              "next_step_id": "short_fix"
+            },
+            {
+              "label": "VBAT 不短但仍大电流",
+              "next_step_id": "branch_short"
+            }
+          ]
+        },
+        {
+          "step_id": "short_fix",
+          "title": "处理 VBAT 通路短路",
+          "instruction": "沿 VBAT 通路定位短路器件，更换/清洁/补焊后回到电流分型复测。",
+          "input_type": "terminal"
+        },
+        {
+          "step_id": "branch_short",
+          "title": "继续查后级支路",
+          "instruction": "继续沿后级供电支路查异常发热或短路点，记录定位依据。",
+          "input_type": "terminal"
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-KM4-NO-CHARGE-001",
+      "source_sop_id": "SOP-KM4-NO-CHARGE-001",
+      "title": "KM4/F151 不充电交互式 SOP",
+      "warning": "基于现有 KM4/F151 维修指导书、原理图和位号图设计，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "确认外部条件",
+          "instruction": "用 OK 充电器和 USB 线确认外部条件，观察是否无充电指示、有充电指示但不进电，或 USB 不识别。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "无充电指示",
+              "next_step_id": "check_interface"
+            },
+            {
+              "label": "有显示但不进电",
+              "next_step_id": "battery_stage"
+            },
+            {
+              "label": "USB 不识别",
+              "next_step_id": "usb_path"
+            }
+          ]
+        },
+        {
+          "step_id": "check_interface",
+          "title": "检查接口与 FPC",
+          "instruction": "检查 USB 接口虚焊、变形、腐蚀；确认 FPC 扣合和状态。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "接口/FPC 异常",
+              "next_step_id": "fix_interface"
+            },
+            {
+              "label": "接口/FPC 正常",
+              "next_step_id": "measure_vchg"
+            }
+          ]
+        },
+        {
+          "step_id": "fix_interface",
+          "title": "处理接口/FPC",
+          "instruction": "补焊 USB 接口、重扣或更换 FPC，处理后重新插充电器复测。",
+          "input_type": "terminal"
+        },
+        {
+          "step_id": "measure_vchg",
+          "title": "测 VCHG",
+          "instruction": "插入充电器后测 VCHG 是否约 5V。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "VCHG 无 5V",
+              "next_step_id": "vchg_path"
+            },
+            {
+              "label": "VCHG 约 5V",
+              "next_step_id": "battery_stage"
+            }
+          ]
+        },
+        {
+          "step_id": "vchg_path",
+          "title": "查 VCHG 输入路径",
+          "instruction": "沿 USB 接口、副板、FPC、保护器件查断路、虚焊或异常器件。",
+          "input_type": "terminal"
+        },
+        {
+          "step_id": "battery_stage",
+          "title": "判断 VBAT 与充电阶段",
+          "instruction": "测 VBAT：小于 2.2V 预期 2mA 涓流；2.2V 后 USB 约 70mA、充电器约 200mA；大于 3.3V 进入 CC；接近 4.2V 接近满电。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "VBAT 不上升 / 电流异常",
+              "next_step_id": "sense_path"
+            },
+            {
+              "label": "VBAT 和电流恢复正常",
+              "next_step_id": "verify"
+            }
+          ]
+        },
+        {
+          "step_id": "sense_path",
+          "title": "查采样和充电控制路径",
+          "instruction": "检查 ISENSE、VBAT_SENSE、电池端口和充电路径周边器件。",
+          "input_type": "terminal"
+        },
+        {
+          "step_id": "usb_path",
+          "title": "USB 数据识别路径",
+          "instruction": "检查 USB 插座焊接和外围器件，必要时观察 USB_DM/USB_DP 是否有高速数字脉冲信号。",
+          "input_type": "terminal"
+        },
+        {
+          "step_id": "verify",
+          "title": "修后验证",
+          "instruction": "验证充电识别、VCHG 约 5V、VBAT 合理变化、USB 数据识别、接口晃动稳定性和异常发热。",
           "input_type": "terminal"
         }
       ]

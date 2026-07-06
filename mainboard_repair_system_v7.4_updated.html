@@ -5382,6 +5382,14 @@
             return prototypes.find(item => item.prototype_id === activeSopPrototypeId) || prototypes[0];
         }
 
+        function setActiveSopPrototype(prototypeId) {
+            const prototypes = knowledgeBaseState.data.interactiveSops?.prototypes || [];
+            const prototype = prototypes.find(item => item.prototype_id === prototypeId);
+            activeSopPrototypeId = prototypeId;
+            activeSopStepId = prototype?.steps?.[0]?.step_id || '';
+            renderInteractiveSop();
+        }
+
         function setInteractiveSopStep(stepId) {
             activeSopStepId = stepId;
             renderInteractiveSop();
@@ -5396,10 +5404,16 @@
                 panel.innerHTML = '<div class="knowledge-state">暂无交互式 SOP 原型。</div>';
                 return;
             }
+            const prototypes = knowledgeBaseState.data.interactiveSops?.prototypes || [];
             const steps = prototype.steps || [];
             const activeStep = steps.find(step => step.step_id === activeSopStepId) || steps[0];
             if (!activeSopStepId && activeStep) activeSopStepId = activeStep.step_id;
             panel.innerHTML = `
+                <div class="knowledge-toolbar">
+                    <select onchange="setActiveSopPrototype(this.value)">
+                        ${prototypes.map(item => `<option value="${escapeHtml(item.prototype_id)}" ${item.prototype_id === prototype.prototype_id ? 'selected' : ''}>${escapeHtml(item.title)}</option>`).join('')}
+                    </select>
+                </div>
                 <h3>${escapeHtml(prototype.title)}</h3>
                 <p>${escapeHtml(prototype.warning || '')}</p>
                 <div class="sop-step-layout">
@@ -5633,8 +5647,32 @@
                 <article class="knowledge-card">
                     <h3>${escapeHtml(draft.title)}</h3>
                     <p>${escapeHtml(draft.status || 'SOP 草案，待确认。')}</p>
+                    ${draft.derived_from_existing_materials ? '<p><strong>生成方式：</strong>基于现有维修指导书、原理图和位号图设计，不依赖人工录入真实案例。</p>' : ''}
+                    ${asArray(draft.applicable_models).length ? `<p><strong>适用机型：</strong>${escapeHtml(asArray(draft.applicable_models).join(' / '))}</p>` : ''}
                     <p><strong>适用角色：</strong>${escapeHtml(asArray(draft.target_role).join(' / ') || '未标注')}</p>
                     <p><strong>步骤数量：</strong>${escapeHtml(asArray(draft.steps).length)} 步</p>
+                    ${asArray(draft.test_points_and_references).length ? `
+                        <div class="material-checklist">
+                            ${asArray(draft.test_points_and_references).map(item => `
+                                <div class="material-row">
+                                    <strong>${escapeHtml(item.signal)}</strong>
+                                    <span>${escapeHtml(item.reference || '未提供固定参考值')} · ${escapeHtml(item.purpose || '')}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                    ${asArray(draft.steps).length ? `
+                        <div class="knowledge-list">
+                            ${asArray(draft.steps).slice(0, 9).map(step => `
+                                <div class="knowledge-row">
+                                    <strong>${escapeHtml(step.step_no ? `步骤 ${step.step_no}` : '步骤')}</strong>
+                                    <span>${escapeHtml(step.action || '')}</span>
+                                    <span>${escapeHtml(step.decision || step.operator_input || '')}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                    ${asArray(draft.verification_required).length ? `<p><strong>修后验证：</strong>${escapeHtml(asArray(draft.verification_required).join('；'))}</p>` : ''}
                     <div class="knowledge-meta">
                         <span class="knowledge-pill draft">草案</span>
                         ${renderPills(draft.required_tools)}
