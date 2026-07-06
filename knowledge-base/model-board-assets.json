@@ -57,8 +57,8 @@
       "linked_cases": [],
       "linked_training": [],
       "repair_boundary": {
-        "status": "pending_confirmation",
-        "note": "资料包未直接定义海外可维修边界，需结合技术支持和中方技术人员经验确认。"
+        "status": "not_required_phase_1",
+        "note": "当前阶段不强制设置维修边界，优先建设维修步骤指导和修后验证。"
       },
       "engineering_confirmation": {
         "status": "pending_review",
@@ -93,10 +93,9 @@
           ]
         },
         "repair_boundary": {
-          "status": "missing",
-          "missing_items": [
-            "model_repair_boundary"
-          ]
+          "status": "not_required_phase_1",
+          "missing_items": [],
+          "note": "当前阶段不把维修边界作为 SOP 生成和前端可用性的前置条件。"
         },
         "engineering_confirmation": {
           "status": "missing",
@@ -112,7 +111,6 @@
         "blockers": [
           "维修指导书未登记",
           "真实维修案例未关联",
-          "维修边界未确认",
           "图纸版本适用范围未确认"
         ]
       },
@@ -191,8 +189,8 @@
       "linked_cases": [],
       "linked_training": [],
       "repair_boundary": {
-        "status": "pending_confirmation",
-        "note": "资料包未直接定义海外可维修边界，需结合技术支持和中方技术人员经验确认。"
+        "status": "not_required_phase_1",
+        "note": "当前阶段不强制设置维修边界，优先建设维修步骤指导和修后验证。"
       },
       "engineering_confirmation": {
         "status": "pending_review",
@@ -223,10 +221,9 @@
           ]
         },
         "repair_boundary": {
-          "status": "missing",
-          "missing_items": [
-            "model_repair_boundary"
-          ]
+          "status": "not_required_phase_1",
+          "missing_items": [],
+          "note": "当前阶段不把维修边界作为 SOP 生成和前端可用性的前置条件。"
         },
         "engineering_confirmation": {
           "status": "missing",
@@ -241,7 +238,6 @@
         "level": "待审核完善",
         "blockers": [
           "真实维修案例未关联",
-          "维修边界未确认",
           "图纸版本适用范围未确认"
         ]
       },
@@ -344,8 +340,8 @@
       "linked_cases": [],
       "linked_training": [],
       "repair_boundary": {
-        "status": "pending_confirmation",
-        "note": "资料包未直接定义海外可维修边界，需结合技术支持和中方技术人员经验确认。"
+        "status": "not_required_phase_1",
+        "note": "当前阶段不强制设置维修边界，优先建设维修步骤指导和修后验证。"
       },
       "engineering_confirmation": {
         "status": "pending_review",
@@ -376,10 +372,9 @@
           ]
         },
         "repair_boundary": {
-          "status": "missing",
-          "missing_items": [
-            "model_repair_boundary"
-          ]
+          "status": "not_required_phase_1",
+          "missing_items": [],
+          "note": "当前阶段不把维修边界作为 SOP 生成和前端可用性的前置条件。"
         },
         "engineering_confirmation": {
           "status": "missing",
@@ -394,7 +389,6 @@
         "level": "待审核完善",
         "blockers": [
           "真实维修案例未关联",
-          "维修边界未确认",
           "图纸版本适用范围未确认"
         ]
       },
@@ -493,8 +487,8 @@
       "linked_cases": [],
       "linked_training": [],
       "repair_boundary": {
-        "status": "pending_confirmation",
-        "note": "资料包未直接定义海外可维修边界，需结合技术支持和中方技术人员经验确认。"
+        "status": "not_required_phase_1",
+        "note": "当前阶段不强制设置维修边界，优先建设维修步骤指导和修后验证。"
       },
       "engineering_confirmation": {
         "status": "pending_review",
@@ -525,10 +519,9 @@
           ]
         },
         "repair_boundary": {
-          "status": "missing",
-          "missing_items": [
-            "model_repair_boundary"
-          ]
+          "status": "not_required_phase_1",
+          "missing_items": [],
+          "note": "当前阶段不把维修边界作为 SOP 生成和前端可用性的前置条件。"
         },
         "engineering_confirmation": {
           "status": "missing",
@@ -543,7 +536,6 @@
         "level": "待审核完善",
         "blockers": [
           "真实维修案例未关联",
-          "维修边界未确认",
           "图纸版本适用范围未确认"
         ]
       },
@@ -644,8 +636,8 @@
       "linked_cases": [],
       "linked_training": [],
       "repair_boundary": {
-        "status": "pending_confirmation",
-        "note": "待技术支持/制造中心确认该机型可下放维修范围。"
+        "status": "not_required_phase_1",
+        "note": "当前阶段不强制设置维修边界，优先建设维修步骤指导和修后验证。"
       },
       "engineering_confirmation": {
         "status": "not_confirmed",
@@ -680,10 +672,9 @@
           ]
         },
         "repair_boundary": {
-          "status": "missing",
-          "missing_items": [
-            "model_repair_boundary"
-          ]
+          "status": "not_required_phase_1",
+          "missing_items": [],
+          "note": "当前阶段不把维修边界作为 SOP 生成和前端可用性的前置条件。"
         },
         "engineering_confirmation": {
           "status": "missing",
@@ -700,8 +691,7 @@
           "主板图未到位",
           "点位图未到位",
           "SOP未确认",
-          "案例未关联",
-          "维修边界未确认"
+          "案例未关联"
         ]
       }
     },
@@ -730,8 +720,8 @@
       "linked_cases": [],
       "linked_training": [],
       "repair_boundary": {
-        "status": "pending_confirmation",
-        "note": "待技术支持/制造中心确认该机型可下放维修范围。"
+        "status": "not_required_phase_1",
+        "note": "当前阶段不强制设置维修边界，优先建设维修步骤指导和修后验证。"
       },
       "engineering_confirmation": {
         "status": "not_confirmed",
@@ -766,10 +756,9 @@
           ]
         },
         "repair_boundary": {
-          "status": "missing",
-          "missing_items": [
-            "model_repair_boundary"
-          ]
+          "status": "not_required_phase_1",
+          "missing_items": [],
+          "note": "当前阶段不把维修边界作为 SOP 生成和前端可用性的前置条件。"
         },
         "engineering_confirmation": {
           "status": "missing",
@@ -786,8 +775,7 @@
           "主板图未到位",
           "点位图未到位",
           "SOP未确认",
-          "案例未关联",
-          "维修边界未确认"
+          "案例未关联"
         ]
       }
     },
@@ -816,8 +804,8 @@
       "linked_cases": [],
       "linked_training": [],
       "repair_boundary": {
-        "status": "pending_confirmation",
-        "note": "待技术支持/制造中心确认该机型可下放维修范围。"
+        "status": "not_required_phase_1",
+        "note": "当前阶段不强制设置维修边界，优先建设维修步骤指导和修后验证。"
       },
       "engineering_confirmation": {
         "status": "not_confirmed",
@@ -852,10 +840,9 @@
           ]
         },
         "repair_boundary": {
-          "status": "missing",
-          "missing_items": [
-            "model_repair_boundary"
-          ]
+          "status": "not_required_phase_1",
+          "missing_items": [],
+          "note": "当前阶段不把维修边界作为 SOP 生成和前端可用性的前置条件。"
         },
         "engineering_confirmation": {
           "status": "missing",
@@ -872,8 +859,7 @@
           "主板图未到位",
           "点位图未到位",
           "SOP未确认",
-          "案例未关联",
-          "维修边界未确认"
+          "案例未关联"
         ]
       }
     },
@@ -902,8 +888,8 @@
       "linked_cases": [],
       "linked_training": [],
       "repair_boundary": {
-        "status": "pending_confirmation",
-        "note": "待技术支持/制造中心确认该机型可下放维修范围。"
+        "status": "not_required_phase_1",
+        "note": "当前阶段不强制设置维修边界，优先建设维修步骤指导和修后验证。"
       },
       "engineering_confirmation": {
         "status": "not_confirmed",
@@ -938,10 +924,9 @@
           ]
         },
         "repair_boundary": {
-          "status": "missing",
-          "missing_items": [
-            "model_repair_boundary"
-          ]
+          "status": "not_required_phase_1",
+          "missing_items": [],
+          "note": "当前阶段不把维修边界作为 SOP 生成和前端可用性的前置条件。"
         },
         "engineering_confirmation": {
           "status": "missing",
@@ -958,8 +943,7 @@
           "主板图未到位",
           "点位图未到位",
           "SOP未确认",
-          "案例未关联",
-          "维修边界未确认"
+          "案例未关联"
         ]
       }
     },
@@ -984,8 +968,8 @@
       "linked_cases": [],
       "linked_training": [],
       "repair_boundary": {
-        "status": "pending_confirmation",
-        "note": "待技术支持/制造中心确认该机型可下放维修范围。"
+        "status": "not_required_phase_1",
+        "note": "当前阶段不强制设置维修边界，优先建设维修步骤指导和修后验证。"
       },
       "engineering_confirmation": {
         "status": "not_confirmed",
@@ -1020,10 +1004,9 @@
           ]
         },
         "repair_boundary": {
-          "status": "missing",
-          "missing_items": [
-            "model_repair_boundary"
-          ]
+          "status": "not_required_phase_1",
+          "missing_items": [],
+          "note": "当前阶段不把维修边界作为 SOP 生成和前端可用性的前置条件。"
         },
         "engineering_confirmation": {
           "status": "missing",
@@ -1040,8 +1023,7 @@
           "主板图未到位",
           "点位图未到位",
           "SOP未确认",
-          "案例未关联",
-          "维修边界未确认"
+          "案例未关联"
         ]
       }
     },
@@ -1066,8 +1048,8 @@
       "linked_cases": [],
       "linked_training": [],
       "repair_boundary": {
-        "status": "pending_confirmation",
-        "note": "待技术支持/制造中心确认该机型可下放维修范围。"
+        "status": "not_required_phase_1",
+        "note": "当前阶段不强制设置维修边界，优先建设维修步骤指导和修后验证。"
       },
       "engineering_confirmation": {
         "status": "not_confirmed",
@@ -1102,10 +1084,9 @@
           ]
         },
         "repair_boundary": {
-          "status": "missing",
-          "missing_items": [
-            "model_repair_boundary"
-          ]
+          "status": "not_required_phase_1",
+          "missing_items": [],
+          "note": "当前阶段不把维修边界作为 SOP 生成和前端可用性的前置条件。"
         },
         "engineering_confirmation": {
           "status": "missing",
@@ -1122,8 +1103,7 @@
           "主板图未到位",
           "点位图未到位",
           "SOP未确认",
-          "案例未关联",
-          "维修边界未确认"
+          "案例未关联"
         ]
       }
     },
@@ -1163,8 +1143,8 @@
       "linked_cases": [],
       "linked_training": [],
       "repair_boundary": {
-        "status": "pending_confirmation",
-        "note": "资料包未直接定义海外可维修边界，需结合技术支持和中方技术人员经验确认。"
+        "status": "not_required_phase_1",
+        "note": "当前阶段不强制设置维修边界，优先建设维修步骤指导和修后验证。"
       },
       "engineering_confirmation": {
         "status": "pending_review",
@@ -1199,10 +1179,9 @@
           ]
         },
         "repair_boundary": {
-          "status": "missing",
-          "missing_items": [
-            "model_repair_boundary"
-          ]
+          "status": "not_required_phase_1",
+          "missing_items": [],
+          "note": "当前阶段不把维修边界作为 SOP 生成和前端可用性的前置条件。"
         },
         "engineering_confirmation": {
           "status": "missing",
@@ -1218,7 +1197,6 @@
         "blockers": [
           "主板原理图未登记",
           "真实维修案例未关联",
-          "维修边界未确认",
           "图纸版本适用范围未确认"
         ]
       },
@@ -1313,8 +1291,8 @@
       "linked_cases": [],
       "linked_training": [],
       "repair_boundary": {
-        "status": "pending_confirmation",
-        "note": "资料包未直接定义海外可维修边界，需结合技术支持和中方技术人员经验确认。"
+        "status": "not_required_phase_1",
+        "note": "当前阶段不强制设置维修边界，优先建设维修步骤指导和修后验证。"
       },
       "engineering_confirmation": {
         "status": "pending_review",
@@ -1345,10 +1323,9 @@
           ]
         },
         "repair_boundary": {
-          "status": "missing",
-          "missing_items": [
-            "model_repair_boundary"
-          ]
+          "status": "not_required_phase_1",
+          "missing_items": [],
+          "note": "当前阶段不把维修边界作为 SOP 生成和前端可用性的前置条件。"
         },
         "engineering_confirmation": {
           "status": "missing",
@@ -1363,7 +1340,6 @@
         "level": "待审核完善",
         "blockers": [
           "真实维修案例未关联",
-          "维修边界未确认",
           "图纸版本适用范围未确认"
         ]
       },
@@ -1465,8 +1441,8 @@
       "linked_cases": [],
       "linked_training": [],
       "repair_boundary": {
-        "status": "pending_confirmation",
-        "note": "资料包未直接定义海外可维修边界，需结合技术支持和中方技术人员经验确认。"
+        "status": "not_required_phase_1",
+        "note": "当前阶段不强制设置维修边界，优先建设维修步骤指导和修后验证。"
       },
       "engineering_confirmation": {
         "status": "pending_review",
@@ -1497,10 +1473,9 @@
           ]
         },
         "repair_boundary": {
-          "status": "missing",
-          "missing_items": [
-            "model_repair_boundary"
-          ]
+          "status": "not_required_phase_1",
+          "missing_items": [],
+          "note": "当前阶段不把维修边界作为 SOP 生成和前端可用性的前置条件。"
         },
         "engineering_confirmation": {
           "status": "missing",
@@ -1515,7 +1490,6 @@
         "level": "待审核完善",
         "blockers": [
           "真实维修案例未关联",
-          "维修边界未确认",
           "图纸版本适用范围未确认"
         ]
       },
@@ -1610,8 +1584,8 @@
       "linked_cases": [],
       "linked_training": [],
       "repair_boundary": {
-        "status": "pending_confirmation",
-        "note": "资料包未直接定义海外可维修边界，需结合技术支持和中方技术人员经验确认。"
+        "status": "not_required_phase_1",
+        "note": "当前阶段不强制设置维修边界，优先建设维修步骤指导和修后验证。"
       },
       "engineering_confirmation": {
         "status": "pending_review",
@@ -1642,10 +1616,9 @@
           ]
         },
         "repair_boundary": {
-          "status": "missing",
-          "missing_items": [
-            "model_repair_boundary"
-          ]
+          "status": "not_required_phase_1",
+          "missing_items": [],
+          "note": "当前阶段不把维修边界作为 SOP 生成和前端可用性的前置条件。"
         },
         "engineering_confirmation": {
           "status": "missing",
@@ -1660,7 +1633,6 @@
         "level": "待审核完善",
         "blockers": [
           "真实维修案例未关联",
-          "维修边界未确认",
           "图纸版本适用范围未确认"
         ]
       },
@@ -1782,8 +1754,8 @@
       "linked_cases": [],
       "linked_training": [],
       "repair_boundary": {
-        "status": "pending_confirmation",
-        "note": "资料包未直接定义海外可维修边界，需结合技术支持和中方技术人员经验确认。"
+        "status": "not_required_phase_1",
+        "note": "当前阶段不强制设置维修边界，优先建设维修步骤指导和修后验证。"
       },
       "engineering_confirmation": {
         "status": "pending_review",
@@ -1814,10 +1786,9 @@
           ]
         },
         "repair_boundary": {
-          "status": "missing",
-          "missing_items": [
-            "model_repair_boundary"
-          ]
+          "status": "not_required_phase_1",
+          "missing_items": [],
+          "note": "当前阶段不把维修边界作为 SOP 生成和前端可用性的前置条件。"
         },
         "engineering_confirmation": {
           "status": "missing",
@@ -1832,7 +1803,6 @@
         "level": "待审核完善",
         "blockers": [
           "真实维修案例未关联",
-          "维修边界未确认",
           "图纸版本适用范围未确认"
         ]
       },
@@ -1929,8 +1899,8 @@
       "linked_cases": [],
       "linked_training": [],
       "repair_boundary": {
-        "status": "pending_confirmation",
-        "note": "资料包未直接定义海外可维修边界，需结合技术支持和中方技术人员经验确认。"
+        "status": "not_required_phase_1",
+        "note": "当前阶段不强制设置维修边界，优先建设维修步骤指导和修后验证。"
       },
       "engineering_confirmation": {
         "status": "pending_review",
@@ -1961,10 +1931,9 @@
           ]
         },
         "repair_boundary": {
-          "status": "missing",
-          "missing_items": [
-            "model_repair_boundary"
-          ]
+          "status": "not_required_phase_1",
+          "missing_items": [],
+          "note": "当前阶段不把维修边界作为 SOP 生成和前端可用性的前置条件。"
         },
         "engineering_confirmation": {
           "status": "missing",
@@ -1979,7 +1948,6 @@
         "level": "待审核完善",
         "blockers": [
           "真实维修案例未关联",
-          "维修边界未确认",
           "图纸版本适用范围未确认"
         ]
       },
@@ -2094,8 +2062,8 @@
       "linked_cases": [],
       "linked_training": [],
       "repair_boundary": {
-        "status": "pending_confirmation",
-        "note": "资料包未直接定义海外可维修边界，需结合技术支持和中方技术人员经验确认。"
+        "status": "not_required_phase_1",
+        "note": "当前阶段不强制设置维修边界，优先建设维修步骤指导和修后验证。"
       },
       "engineering_confirmation": {
         "status": "pending_review",
@@ -2126,10 +2094,9 @@
           ]
         },
         "repair_boundary": {
-          "status": "missing",
-          "missing_items": [
-            "model_repair_boundary"
-          ]
+          "status": "not_required_phase_1",
+          "missing_items": [],
+          "note": "当前阶段不把维修边界作为 SOP 生成和前端可用性的前置条件。"
         },
         "engineering_confirmation": {
           "status": "missing",
@@ -2144,7 +2111,6 @@
         "level": "待审核完善",
         "blockers": [
           "真实维修案例未关联",
-          "维修边界未确认",
           "图纸版本适用范围未确认"
         ]
       },

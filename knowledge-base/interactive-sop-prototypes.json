@@ -413,6 +413,5302 @@
           "input_type": "terminal"
         }
       ]
+    },
+    {
+      "prototype_id": "ISOP-BG6H-NO_POWER-AUTO-001",
+      "source_sop_id": "SOP-BG6H-NO_POWER-AUTO-001",
+      "title": "BG6h 不开机交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "基础检查",
+          "instruction": "检查电池接口、主板外观、连接器、腐蚀、烧毁、断裂和明显短路痕迹。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "电流分型",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "无电流路径",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "小电流路径",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "电流分型",
+          "instruction": "外接维修电源并按开机键，记录无电流、小电流或大电流表现。 判断：无电流查 PWRKEY/VSYS；小电流查核心供电和时钟；大电流查 VBAT 或后级短路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "无电流路径",
+          "instruction": "测 PWRKEY 默认高电平、按下低电平；测 VSYS 是否建立。 判断：PWRKEY 异常查按键路径；VSYS 异常查充电 IC/PMU 输入输出。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "小电流路径",
+          "instruction": "测核心供电和 Memory 供电，必要时测 26MHz 时钟。 判断：供电异常查 PMU 输出；时钟异常查晶振；均正常则进入 CPU/Memory 周边检查。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_5"
+            }
+          ]
+        },
+        {
+          "step_id": "step_5",
+          "title": "大电流路径",
+          "instruction": "断电测 VBAT 对地阻值，必要时限流上电配合热像仪或松香法找发热点。 判断：定位短路器件后处理并回到电流分型复测。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-BG6H-NO_CHARGE-AUTO-001",
+      "source_sop_id": "SOP-BG6H-NO_CHARGE-AUTO-001",
+      "title": "BG6h 不充电交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "确认外部条件",
+          "instruction": "使用 OK 充电器和 USB 线，区分无充电指示、有显示但不进电或快充/慢充异常。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查接口和连接",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测充电输入",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "判断电池和采样链路",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查接口和连接",
+          "instruction": "检查 USB 口、FPC、充电相关连接器是否虚焊、变形、腐蚀或扣合异常。 判断：异常则补焊/更换/重扣后复测；正常进入输入电压检查。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测充电输入",
+          "instruction": "插入充电器后测 VCHG/VBUS 是否到达板端。 判断：无输入沿 USB、副板、FPC、保护器件查断路；输入正常进入电池和采样检查。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "判断电池和采样链路",
+          "instruction": "测 VBAT、ISENSE、VBAT_SENSE/BATON 等采样相关信号。 判断：VBAT 不上升或充电电流异常时，查电池端口、采样电阻和充电控制链路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_5"
+            }
+          ]
+        },
+        {
+          "step_id": "step_5",
+          "title": "复测",
+          "instruction": "处理后重新记录充电识别、电流、VBAT 变化和接口晃动稳定性。 判断：充电识别、电压变化和稳定性均正常后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-BG6H-USB-AUTO-001",
+      "source_sop_id": "SOP-BG6H-USB-AUTO-001",
+      "title": "BG6h USB 不识别交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "确认外部条件",
+          "instruction": "使用 OK 电脑/充电器和 OK USB 线确认是否能识别。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查 USB 连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测输入和数据线",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查 USB 连接器",
+          "instruction": "检查 USB 插座焊接、变形、腐蚀和外围器件。 判断：异常则补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测输入和数据线",
+          "instruction": "测 VCHG/VBUS；必要时观察 USB_DM/USB_DP 是否有高速数字脉冲信号。 判断：无输入查供电路径；DM/DP 异常查副板、FPC、主板 USB 通路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证 USB 数据识别和充电输入。 判断：两者恢复后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-BG6H-SIM-AUTO-001",
+      "source_sop_id": "SOP-BG6H-SIM-AUTO-001",
+      "title": "BG6h SIM 卡不识别交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "确认 SIM 卡本体",
+          "instruction": "将 SIM 卡放到 OK 机器验证是否可识别。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查卡座",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测 SIM 信号",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查卡座",
+          "instruction": "检查 SIM 卡座是否有胶、异物、腐蚀、变形或虚焊。 判断：异常则清洁、补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测 SIM 信号",
+          "instruction": "测 SIM 电源、复位、时钟和数据信号。 判断：电源异常查供电；复位/时钟/数据异常查连接器、周边小料和 CPU 侧链路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后插卡验证识别、注册网络和稳定性。 判断：识别和网络注册正常后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-BG6H-DISPLAY-AUTO-001",
+      "source_sop_id": "SOP-BG6H-DISPLAY-AUTO-001",
+      "title": "BG6h 显示异常/无显示交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证屏模组",
+          "instruction": "先用 OK 屏模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测显示供电和复位",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查连接器",
+          "instruction": "检查屏 BTB/连接器、FPC、周边小料是否异常。 判断：异常则清洁、补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测显示供电和复位",
+          "instruction": "测显示相关电源、复位和 MIPI/DSI 信号。 判断：供电/复位异常查电源路径；高速信号异常查连接器、通路和主控侧。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证开机显示、亮度、触摸联动和稳定性。 判断：显示稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-BG6H-TOUCH-AUTO-001",
+      "source_sop_id": "SOP-BG6H-TOUCH-AUTO-001",
+      "title": "BG6h 触摸异常交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证模组",
+          "instruction": "用 OK 触摸或屏模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测供电/复位/中断/通信",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查连接器",
+          "instruction": "检查 TP/CTP 连接器、FPC、异物、腐蚀和虚焊。 判断：异常则清洁、补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测供电/复位/中断/通信",
+          "instruction": "测 TP 供电、复位、中断和 I2C/SPI 通信。 判断：按异常信号定位供电、连接器或主控侧通路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证触摸全屏、边缘、长按和滑动稳定性。 判断：触摸稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-BG6H-FRONT_CAMERA-AUTO-001",
+      "source_sop_id": "SOP-BG6H-FRONT_CAMERA-AUTO-001",
+      "title": "BG6h 前置摄像头无显示交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证摄像头模组",
+          "instruction": "使用 OK 前置摄像头模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查摄像头 BTB",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测摄像头供电和控制信号",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查摄像头 BTB",
+          "instruction": "检查摄像头连接器是否虚焊、腐蚀、变形或接触不良。 判断：异常则加焊或更换 BTB。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测摄像头供电和控制信号",
+          "instruction": "测模拟电源、数字电源、IO 电源、I2C/MIPI/复位等信号。 判断：供电异常查电源模块；通信异常查连接器、通路和主控侧。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证相机打开、预览、拍照和切换稳定性。 判断：前摄稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-BG6H-REAR_CAMERA-AUTO-001",
+      "source_sop_id": "SOP-BG6H-REAR_CAMERA-AUTO-001",
+      "title": "BG6h 后置摄像头无显示交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证摄像头模组",
+          "instruction": "使用 OK 后置摄像头模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查摄像头连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测摄像头供电和控制信号",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查摄像头连接器",
+          "instruction": "检查后摄连接器是否虚焊、腐蚀、变形或接触不良。 判断：异常则加焊或更换 BTB。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测摄像头供电和控制信号",
+          "instruction": "测模拟电源、数字电源、IO 电源、I2C/MIPI/复位等信号。 判断：供电异常查电源模块；通信异常查连接器、通路和主控侧。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证相机打开、预览、拍照、录像和切换稳定性。 判断：后摄稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-CK6N-NO_POWER-AUTO-001",
+      "source_sop_id": "SOP-CK6N-NO_POWER-AUTO-001",
+      "title": "CK6N 不开机交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "基础检查",
+          "instruction": "检查电池接口、主板外观、连接器、腐蚀、烧毁、断裂和明显短路痕迹。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "电流分型",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "无电流路径",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "小电流路径",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "电流分型",
+          "instruction": "外接维修电源并按开机键，记录无电流、小电流或大电流表现。 判断：无电流查 PWRKEY/VSYS；小电流查核心供电和时钟；大电流查 VBAT 或后级短路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "无电流路径",
+          "instruction": "测 PWRKEY 默认高电平、按下低电平；测 VSYS 是否建立。 判断：PWRKEY 异常查按键路径；VSYS 异常查充电 IC/PMU 输入输出。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "小电流路径",
+          "instruction": "测核心供电和 Memory 供电，必要时测 26MHz 时钟。 判断：供电异常查 PMU 输出；时钟异常查晶振；均正常则进入 CPU/Memory 周边检查。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_5"
+            }
+          ]
+        },
+        {
+          "step_id": "step_5",
+          "title": "大电流路径",
+          "instruction": "断电测 VBAT 对地阻值，必要时限流上电配合热像仪或松香法找发热点。 判断：定位短路器件后处理并回到电流分型复测。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-CK6N-NO_CHARGE-AUTO-001",
+      "source_sop_id": "SOP-CK6N-NO_CHARGE-AUTO-001",
+      "title": "CK6N 不充电交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "确认外部条件",
+          "instruction": "使用 OK 充电器和 USB 线，区分无充电指示、有显示但不进电或快充/慢充异常。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查接口和连接",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测充电输入",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "判断电池和采样链路",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查接口和连接",
+          "instruction": "检查 USB 口、FPC、充电相关连接器是否虚焊、变形、腐蚀或扣合异常。 判断：异常则补焊/更换/重扣后复测；正常进入输入电压检查。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测充电输入",
+          "instruction": "插入充电器后测 VCHG/VBUS 是否到达板端。 判断：无输入沿 USB、副板、FPC、保护器件查断路；输入正常进入电池和采样检查。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "判断电池和采样链路",
+          "instruction": "测 VBAT、ISENSE、VBAT_SENSE/BATON 等采样相关信号。 判断：VBAT 不上升或充电电流异常时，查电池端口、采样电阻和充电控制链路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_5"
+            }
+          ]
+        },
+        {
+          "step_id": "step_5",
+          "title": "复测",
+          "instruction": "处理后重新记录充电识别、电流、VBAT 变化和接口晃动稳定性。 判断：充电识别、电压变化和稳定性均正常后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-CK6N-USB-AUTO-001",
+      "source_sop_id": "SOP-CK6N-USB-AUTO-001",
+      "title": "CK6N USB 不识别交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "确认外部条件",
+          "instruction": "使用 OK 电脑/充电器和 OK USB 线确认是否能识别。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查 USB 连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测输入和数据线",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查 USB 连接器",
+          "instruction": "检查 USB 插座焊接、变形、腐蚀和外围器件。 判断：异常则补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测输入和数据线",
+          "instruction": "测 VCHG/VBUS；必要时观察 USB_DM/USB_DP 是否有高速数字脉冲信号。 判断：无输入查供电路径；DM/DP 异常查副板、FPC、主板 USB 通路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证 USB 数据识别和充电输入。 判断：两者恢复后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-CK6N-SIM-AUTO-001",
+      "source_sop_id": "SOP-CK6N-SIM-AUTO-001",
+      "title": "CK6N SIM 卡不识别交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "确认 SIM 卡本体",
+          "instruction": "将 SIM 卡放到 OK 机器验证是否可识别。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查卡座",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测 SIM 信号",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查卡座",
+          "instruction": "检查 SIM 卡座是否有胶、异物、腐蚀、变形或虚焊。 判断：异常则清洁、补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测 SIM 信号",
+          "instruction": "测 SIM 电源、复位、时钟和数据信号。 判断：电源异常查供电；复位/时钟/数据异常查连接器、周边小料和 CPU 侧链路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后插卡验证识别、注册网络和稳定性。 判断：识别和网络注册正常后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-CK6N-DISPLAY-AUTO-001",
+      "source_sop_id": "SOP-CK6N-DISPLAY-AUTO-001",
+      "title": "CK6N 显示异常/无显示交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证屏模组",
+          "instruction": "先用 OK 屏模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测显示供电和复位",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查连接器",
+          "instruction": "检查屏 BTB/连接器、FPC、周边小料是否异常。 判断：异常则清洁、补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测显示供电和复位",
+          "instruction": "测显示相关电源、复位和 MIPI/DSI 信号。 判断：供电/复位异常查电源路径；高速信号异常查连接器、通路和主控侧。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证开机显示、亮度、触摸联动和稳定性。 判断：显示稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-CK6N-TOUCH-AUTO-001",
+      "source_sop_id": "SOP-CK6N-TOUCH-AUTO-001",
+      "title": "CK6N 触摸异常交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证模组",
+          "instruction": "用 OK 触摸或屏模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测供电/复位/中断/通信",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查连接器",
+          "instruction": "检查 TP/CTP 连接器、FPC、异物、腐蚀和虚焊。 判断：异常则清洁、补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测供电/复位/中断/通信",
+          "instruction": "测 TP 供电、复位、中断和 I2C/SPI 通信。 判断：按异常信号定位供电、连接器或主控侧通路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证触摸全屏、边缘、长按和滑动稳定性。 判断：触摸稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-CK6N-FRONT_CAMERA-AUTO-001",
+      "source_sop_id": "SOP-CK6N-FRONT_CAMERA-AUTO-001",
+      "title": "CK6N 前置摄像头无显示交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证摄像头模组",
+          "instruction": "使用 OK 前置摄像头模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查摄像头 BTB",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测摄像头供电和控制信号",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查摄像头 BTB",
+          "instruction": "检查摄像头连接器是否虚焊、腐蚀、变形或接触不良。 判断：异常则加焊或更换 BTB。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测摄像头供电和控制信号",
+          "instruction": "测模拟电源、数字电源、IO 电源、I2C/MIPI/复位等信号。 判断：供电异常查电源模块；通信异常查连接器、通路和主控侧。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证相机打开、预览、拍照和切换稳定性。 判断：前摄稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-CK6N-REAR_CAMERA-AUTO-001",
+      "source_sop_id": "SOP-CK6N-REAR_CAMERA-AUTO-001",
+      "title": "CK6N 后置摄像头无显示交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证摄像头模组",
+          "instruction": "使用 OK 后置摄像头模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查摄像头连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测摄像头供电和控制信号",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查摄像头连接器",
+          "instruction": "检查后摄连接器是否虚焊、腐蚀、变形或接触不良。 判断：异常则加焊或更换 BTB。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测摄像头供电和控制信号",
+          "instruction": "测模拟电源、数字电源、IO 电源、I2C/MIPI/复位等信号。 判断：供电异常查电源模块；通信异常查连接器、通路和主控侧。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证相机打开、预览、拍照、录像和切换稳定性。 判断：后摄稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-CLA5-NO_POWER-AUTO-001",
+      "source_sop_id": "SOP-CLA5-NO_POWER-AUTO-001",
+      "title": "CLA5 不开机交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "基础检查",
+          "instruction": "检查电池接口、主板外观、连接器、腐蚀、烧毁、断裂和明显短路痕迹。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "电流分型",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "无电流路径",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "小电流路径",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "电流分型",
+          "instruction": "外接维修电源并按开机键，记录无电流、小电流或大电流表现。 判断：无电流查 PWRKEY/VSYS；小电流查核心供电和时钟；大电流查 VBAT 或后级短路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "无电流路径",
+          "instruction": "测 PWRKEY 默认高电平、按下低电平；测 VSYS 是否建立。 判断：PWRKEY 异常查按键路径；VSYS 异常查充电 IC/PMU 输入输出。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "小电流路径",
+          "instruction": "测核心供电和 Memory 供电，必要时测 26MHz 时钟。 判断：供电异常查 PMU 输出；时钟异常查晶振；均正常则进入 CPU/Memory 周边检查。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_5"
+            }
+          ]
+        },
+        {
+          "step_id": "step_5",
+          "title": "大电流路径",
+          "instruction": "断电测 VBAT 对地阻值，必要时限流上电配合热像仪或松香法找发热点。 判断：定位短路器件后处理并回到电流分型复测。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-CLA5-NO_CHARGE-AUTO-001",
+      "source_sop_id": "SOP-CLA5-NO_CHARGE-AUTO-001",
+      "title": "CLA5 不充电交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "确认外部条件",
+          "instruction": "使用 OK 充电器和 USB 线，区分无充电指示、有显示但不进电或快充/慢充异常。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查接口和连接",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测充电输入",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "判断电池和采样链路",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查接口和连接",
+          "instruction": "检查 USB 口、FPC、充电相关连接器是否虚焊、变形、腐蚀或扣合异常。 判断：异常则补焊/更换/重扣后复测；正常进入输入电压检查。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测充电输入",
+          "instruction": "插入充电器后测 VCHG/VBUS 是否到达板端。 判断：无输入沿 USB、副板、FPC、保护器件查断路；输入正常进入电池和采样检查。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "判断电池和采样链路",
+          "instruction": "测 VBAT、ISENSE、VBAT_SENSE/BATON 等采样相关信号。 判断：VBAT 不上升或充电电流异常时，查电池端口、采样电阻和充电控制链路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_5"
+            }
+          ]
+        },
+        {
+          "step_id": "step_5",
+          "title": "复测",
+          "instruction": "处理后重新记录充电识别、电流、VBAT 变化和接口晃动稳定性。 判断：充电识别、电压变化和稳定性均正常后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-CLA5-USB-AUTO-001",
+      "source_sop_id": "SOP-CLA5-USB-AUTO-001",
+      "title": "CLA5 USB 不识别交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "确认外部条件",
+          "instruction": "使用 OK 电脑/充电器和 OK USB 线确认是否能识别。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查 USB 连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测输入和数据线",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查 USB 连接器",
+          "instruction": "检查 USB 插座焊接、变形、腐蚀和外围器件。 判断：异常则补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测输入和数据线",
+          "instruction": "测 VCHG/VBUS；必要时观察 USB_DM/USB_DP 是否有高速数字脉冲信号。 判断：无输入查供电路径；DM/DP 异常查副板、FPC、主板 USB 通路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证 USB 数据识别和充电输入。 判断：两者恢复后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-CLA5-SIM-AUTO-001",
+      "source_sop_id": "SOP-CLA5-SIM-AUTO-001",
+      "title": "CLA5 SIM 卡不识别交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "确认 SIM 卡本体",
+          "instruction": "将 SIM 卡放到 OK 机器验证是否可识别。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查卡座",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测 SIM 信号",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查卡座",
+          "instruction": "检查 SIM 卡座是否有胶、异物、腐蚀、变形或虚焊。 判断：异常则清洁、补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测 SIM 信号",
+          "instruction": "测 SIM 电源、复位、时钟和数据信号。 判断：电源异常查供电；复位/时钟/数据异常查连接器、周边小料和 CPU 侧链路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后插卡验证识别、注册网络和稳定性。 判断：识别和网络注册正常后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-CLA5-DISPLAY-AUTO-001",
+      "source_sop_id": "SOP-CLA5-DISPLAY-AUTO-001",
+      "title": "CLA5 显示异常/无显示交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证屏模组",
+          "instruction": "先用 OK 屏模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测显示供电和复位",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查连接器",
+          "instruction": "检查屏 BTB/连接器、FPC、周边小料是否异常。 判断：异常则清洁、补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测显示供电和复位",
+          "instruction": "测显示相关电源、复位和 MIPI/DSI 信号。 判断：供电/复位异常查电源路径；高速信号异常查连接器、通路和主控侧。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证开机显示、亮度、触摸联动和稳定性。 判断：显示稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-CLA5-TOUCH-AUTO-001",
+      "source_sop_id": "SOP-CLA5-TOUCH-AUTO-001",
+      "title": "CLA5 触摸异常交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证模组",
+          "instruction": "用 OK 触摸或屏模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测供电/复位/中断/通信",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查连接器",
+          "instruction": "检查 TP/CTP 连接器、FPC、异物、腐蚀和虚焊。 判断：异常则清洁、补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测供电/复位/中断/通信",
+          "instruction": "测 TP 供电、复位、中断和 I2C/SPI 通信。 判断：按异常信号定位供电、连接器或主控侧通路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证触摸全屏、边缘、长按和滑动稳定性。 判断：触摸稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-CLA5-FRONT_CAMERA-AUTO-001",
+      "source_sop_id": "SOP-CLA5-FRONT_CAMERA-AUTO-001",
+      "title": "CLA5 前置摄像头无显示交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证摄像头模组",
+          "instruction": "使用 OK 前置摄像头模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查摄像头 BTB",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测摄像头供电和控制信号",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查摄像头 BTB",
+          "instruction": "检查摄像头连接器是否虚焊、腐蚀、变形或接触不良。 判断：异常则加焊或更换 BTB。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测摄像头供电和控制信号",
+          "instruction": "测模拟电源、数字电源、IO 电源、I2C/MIPI/复位等信号。 判断：供电异常查电源模块；通信异常查连接器、通路和主控侧。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证相机打开、预览、拍照和切换稳定性。 判断：前摄稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-CLA5-REAR_CAMERA-AUTO-001",
+      "source_sop_id": "SOP-CLA5-REAR_CAMERA-AUTO-001",
+      "title": "CLA5 后置摄像头无显示交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证摄像头模组",
+          "instruction": "使用 OK 后置摄像头模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查摄像头连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测摄像头供电和控制信号",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查摄像头连接器",
+          "instruction": "检查后摄连接器是否虚焊、腐蚀、变形或接触不良。 判断：异常则加焊或更换 BTB。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测摄像头供电和控制信号",
+          "instruction": "测模拟电源、数字电源、IO 电源、I2C/MIPI/复位等信号。 判断：供电异常查电源模块；通信异常查连接器、通路和主控侧。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证相机打开、预览、拍照、录像和切换稳定性。 判断：后摄稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-CM5-NO_POWER-AUTO-001",
+      "source_sop_id": "SOP-CM5-NO_POWER-AUTO-001",
+      "title": "CM5 不开机交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "基础检查",
+          "instruction": "检查电池接口、主板外观、连接器、腐蚀、烧毁、断裂和明显短路痕迹。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "电流分型",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "无电流路径",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "小电流路径",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "电流分型",
+          "instruction": "外接维修电源并按开机键，记录无电流、小电流或大电流表现。 判断：无电流查 PWRKEY/VSYS；小电流查核心供电和时钟；大电流查 VBAT 或后级短路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "无电流路径",
+          "instruction": "测 PWRKEY 默认高电平、按下低电平；测 VSYS 是否建立。 判断：PWRKEY 异常查按键路径；VSYS 异常查充电 IC/PMU 输入输出。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "小电流路径",
+          "instruction": "测核心供电和 Memory 供电，必要时测 26MHz 时钟。 判断：供电异常查 PMU 输出；时钟异常查晶振；均正常则进入 CPU/Memory 周边检查。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_5"
+            }
+          ]
+        },
+        {
+          "step_id": "step_5",
+          "title": "大电流路径",
+          "instruction": "断电测 VBAT 对地阻值，必要时限流上电配合热像仪或松香法找发热点。 判断：定位短路器件后处理并回到电流分型复测。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-CM5-NO_CHARGE-AUTO-001",
+      "source_sop_id": "SOP-CM5-NO_CHARGE-AUTO-001",
+      "title": "CM5 不充电交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "确认外部条件",
+          "instruction": "使用 OK 充电器和 USB 线，区分无充电指示、有显示但不进电或快充/慢充异常。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查接口和连接",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测充电输入",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "判断电池和采样链路",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查接口和连接",
+          "instruction": "检查 USB 口、FPC、充电相关连接器是否虚焊、变形、腐蚀或扣合异常。 判断：异常则补焊/更换/重扣后复测；正常进入输入电压检查。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测充电输入",
+          "instruction": "插入充电器后测 VCHG/VBUS 是否到达板端。 判断：无输入沿 USB、副板、FPC、保护器件查断路；输入正常进入电池和采样检查。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "判断电池和采样链路",
+          "instruction": "测 VBAT、ISENSE、VBAT_SENSE/BATON 等采样相关信号。 判断：VBAT 不上升或充电电流异常时，查电池端口、采样电阻和充电控制链路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_5"
+            }
+          ]
+        },
+        {
+          "step_id": "step_5",
+          "title": "复测",
+          "instruction": "处理后重新记录充电识别、电流、VBAT 变化和接口晃动稳定性。 判断：充电识别、电压变化和稳定性均正常后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-CM5-USB-AUTO-001",
+      "source_sop_id": "SOP-CM5-USB-AUTO-001",
+      "title": "CM5 USB 不识别交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "确认外部条件",
+          "instruction": "使用 OK 电脑/充电器和 OK USB 线确认是否能识别。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查 USB 连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测输入和数据线",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查 USB 连接器",
+          "instruction": "检查 USB 插座焊接、变形、腐蚀和外围器件。 判断：异常则补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测输入和数据线",
+          "instruction": "测 VCHG/VBUS；必要时观察 USB_DM/USB_DP 是否有高速数字脉冲信号。 判断：无输入查供电路径；DM/DP 异常查副板、FPC、主板 USB 通路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证 USB 数据识别和充电输入。 判断：两者恢复后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-CM5-SIM-AUTO-001",
+      "source_sop_id": "SOP-CM5-SIM-AUTO-001",
+      "title": "CM5 SIM 卡不识别交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "确认 SIM 卡本体",
+          "instruction": "将 SIM 卡放到 OK 机器验证是否可识别。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查卡座",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测 SIM 信号",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查卡座",
+          "instruction": "检查 SIM 卡座是否有胶、异物、腐蚀、变形或虚焊。 判断：异常则清洁、补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测 SIM 信号",
+          "instruction": "测 SIM 电源、复位、时钟和数据信号。 判断：电源异常查供电；复位/时钟/数据异常查连接器、周边小料和 CPU 侧链路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后插卡验证识别、注册网络和稳定性。 判断：识别和网络注册正常后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-CM5-DISPLAY-AUTO-001",
+      "source_sop_id": "SOP-CM5-DISPLAY-AUTO-001",
+      "title": "CM5 显示异常/无显示交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证屏模组",
+          "instruction": "先用 OK 屏模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测显示供电和复位",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查连接器",
+          "instruction": "检查屏 BTB/连接器、FPC、周边小料是否异常。 判断：异常则清洁、补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测显示供电和复位",
+          "instruction": "测显示相关电源、复位和 MIPI/DSI 信号。 判断：供电/复位异常查电源路径；高速信号异常查连接器、通路和主控侧。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证开机显示、亮度、触摸联动和稳定性。 判断：显示稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-CM5-TOUCH-AUTO-001",
+      "source_sop_id": "SOP-CM5-TOUCH-AUTO-001",
+      "title": "CM5 触摸异常交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证模组",
+          "instruction": "用 OK 触摸或屏模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测供电/复位/中断/通信",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查连接器",
+          "instruction": "检查 TP/CTP 连接器、FPC、异物、腐蚀和虚焊。 判断：异常则清洁、补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测供电/复位/中断/通信",
+          "instruction": "测 TP 供电、复位、中断和 I2C/SPI 通信。 判断：按异常信号定位供电、连接器或主控侧通路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证触摸全屏、边缘、长按和滑动稳定性。 判断：触摸稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-CM5-FRONT_CAMERA-AUTO-001",
+      "source_sop_id": "SOP-CM5-FRONT_CAMERA-AUTO-001",
+      "title": "CM5 前置摄像头无显示交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证摄像头模组",
+          "instruction": "使用 OK 前置摄像头模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查摄像头 BTB",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测摄像头供电和控制信号",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查摄像头 BTB",
+          "instruction": "检查摄像头连接器是否虚焊、腐蚀、变形或接触不良。 判断：异常则加焊或更换 BTB。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测摄像头供电和控制信号",
+          "instruction": "测模拟电源、数字电源、IO 电源、I2C/MIPI/复位等信号。 判断：供电异常查电源模块；通信异常查连接器、通路和主控侧。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证相机打开、预览、拍照和切换稳定性。 判断：前摄稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-CM5-REAR_CAMERA-AUTO-001",
+      "source_sop_id": "SOP-CM5-REAR_CAMERA-AUTO-001",
+      "title": "CM5 后置摄像头无显示交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证摄像头模组",
+          "instruction": "使用 OK 后置摄像头模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查摄像头连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测摄像头供电和控制信号",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查摄像头连接器",
+          "instruction": "检查后摄连接器是否虚焊、腐蚀、变形或接触不良。 判断：异常则加焊或更换 BTB。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测摄像头供电和控制信号",
+          "instruction": "测模拟电源、数字电源、IO 电源、I2C/MIPI/复位等信号。 判断：供电异常查电源模块；通信异常查连接器、通路和主控侧。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证相机打开、预览、拍照、录像和切换稳定性。 判断：后摄稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-CM6-NO_POWER-AUTO-001",
+      "source_sop_id": "SOP-CM6-NO_POWER-AUTO-001",
+      "title": "CM6 不开机交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "基础检查",
+          "instruction": "检查电池接口、主板外观、连接器、腐蚀、烧毁、断裂和明显短路痕迹。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "电流分型",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "无电流路径",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "小电流路径",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "电流分型",
+          "instruction": "外接维修电源并按开机键，记录无电流、小电流或大电流表现。 判断：无电流查 PWRKEY/VSYS；小电流查核心供电和时钟；大电流查 VBAT 或后级短路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "无电流路径",
+          "instruction": "测 PWRKEY 默认高电平、按下低电平；测 VSYS 是否建立。 判断：PWRKEY 异常查按键路径；VSYS 异常查充电 IC/PMU 输入输出。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "小电流路径",
+          "instruction": "测核心供电和 Memory 供电，必要时测 26MHz 时钟。 判断：供电异常查 PMU 输出；时钟异常查晶振；均正常则进入 CPU/Memory 周边检查。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_5"
+            }
+          ]
+        },
+        {
+          "step_id": "step_5",
+          "title": "大电流路径",
+          "instruction": "断电测 VBAT 对地阻值，必要时限流上电配合热像仪或松香法找发热点。 判断：定位短路器件后处理并回到电流分型复测。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-CM6-NO_CHARGE-AUTO-001",
+      "source_sop_id": "SOP-CM6-NO_CHARGE-AUTO-001",
+      "title": "CM6 不充电交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "确认外部条件",
+          "instruction": "使用 OK 充电器和 USB 线，区分无充电指示、有显示但不进电或快充/慢充异常。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查接口和连接",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测充电输入",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "判断电池和采样链路",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查接口和连接",
+          "instruction": "检查 USB 口、FPC、充电相关连接器是否虚焊、变形、腐蚀或扣合异常。 判断：异常则补焊/更换/重扣后复测；正常进入输入电压检查。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测充电输入",
+          "instruction": "插入充电器后测 VCHG/VBUS 是否到达板端。 判断：无输入沿 USB、副板、FPC、保护器件查断路；输入正常进入电池和采样检查。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "判断电池和采样链路",
+          "instruction": "测 VBAT、ISENSE、VBAT_SENSE/BATON 等采样相关信号。 判断：VBAT 不上升或充电电流异常时，查电池端口、采样电阻和充电控制链路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_5"
+            }
+          ]
+        },
+        {
+          "step_id": "step_5",
+          "title": "复测",
+          "instruction": "处理后重新记录充电识别、电流、VBAT 变化和接口晃动稳定性。 判断：充电识别、电压变化和稳定性均正常后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-CM6-USB-AUTO-001",
+      "source_sop_id": "SOP-CM6-USB-AUTO-001",
+      "title": "CM6 USB 不识别交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "确认外部条件",
+          "instruction": "使用 OK 电脑/充电器和 OK USB 线确认是否能识别。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查 USB 连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测输入和数据线",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查 USB 连接器",
+          "instruction": "检查 USB 插座焊接、变形、腐蚀和外围器件。 判断：异常则补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测输入和数据线",
+          "instruction": "测 VCHG/VBUS；必要时观察 USB_DM/USB_DP 是否有高速数字脉冲信号。 判断：无输入查供电路径；DM/DP 异常查副板、FPC、主板 USB 通路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证 USB 数据识别和充电输入。 判断：两者恢复后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-CM6-SIM-AUTO-001",
+      "source_sop_id": "SOP-CM6-SIM-AUTO-001",
+      "title": "CM6 SIM 卡不识别交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "确认 SIM 卡本体",
+          "instruction": "将 SIM 卡放到 OK 机器验证是否可识别。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查卡座",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测 SIM 信号",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查卡座",
+          "instruction": "检查 SIM 卡座是否有胶、异物、腐蚀、变形或虚焊。 判断：异常则清洁、补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测 SIM 信号",
+          "instruction": "测 SIM 电源、复位、时钟和数据信号。 判断：电源异常查供电；复位/时钟/数据异常查连接器、周边小料和 CPU 侧链路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后插卡验证识别、注册网络和稳定性。 判断：识别和网络注册正常后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-CM6-DISPLAY-AUTO-001",
+      "source_sop_id": "SOP-CM6-DISPLAY-AUTO-001",
+      "title": "CM6 显示异常/无显示交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证屏模组",
+          "instruction": "先用 OK 屏模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测显示供电和复位",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查连接器",
+          "instruction": "检查屏 BTB/连接器、FPC、周边小料是否异常。 判断：异常则清洁、补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测显示供电和复位",
+          "instruction": "测显示相关电源、复位和 MIPI/DSI 信号。 判断：供电/复位异常查电源路径；高速信号异常查连接器、通路和主控侧。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证开机显示、亮度、触摸联动和稳定性。 判断：显示稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-CM6-TOUCH-AUTO-001",
+      "source_sop_id": "SOP-CM6-TOUCH-AUTO-001",
+      "title": "CM6 触摸异常交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证模组",
+          "instruction": "用 OK 触摸或屏模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测供电/复位/中断/通信",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查连接器",
+          "instruction": "检查 TP/CTP 连接器、FPC、异物、腐蚀和虚焊。 判断：异常则清洁、补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测供电/复位/中断/通信",
+          "instruction": "测 TP 供电、复位、中断和 I2C/SPI 通信。 判断：按异常信号定位供电、连接器或主控侧通路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证触摸全屏、边缘、长按和滑动稳定性。 判断：触摸稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-CM6-FRONT_CAMERA-AUTO-001",
+      "source_sop_id": "SOP-CM6-FRONT_CAMERA-AUTO-001",
+      "title": "CM6 前置摄像头无显示交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证摄像头模组",
+          "instruction": "使用 OK 前置摄像头模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查摄像头 BTB",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测摄像头供电和控制信号",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查摄像头 BTB",
+          "instruction": "检查摄像头连接器是否虚焊、腐蚀、变形或接触不良。 判断：异常则加焊或更换 BTB。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测摄像头供电和控制信号",
+          "instruction": "测模拟电源、数字电源、IO 电源、I2C/MIPI/复位等信号。 判断：供电异常查电源模块；通信异常查连接器、通路和主控侧。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证相机打开、预览、拍照和切换稳定性。 判断：前摄稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-CM6-REAR_CAMERA-AUTO-001",
+      "source_sop_id": "SOP-CM6-REAR_CAMERA-AUTO-001",
+      "title": "CM6 后置摄像头无显示交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证摄像头模组",
+          "instruction": "使用 OK 后置摄像头模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查摄像头连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测摄像头供电和控制信号",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查摄像头连接器",
+          "instruction": "检查后摄连接器是否虚焊、腐蚀、变形或接触不良。 判断：异常则加焊或更换 BTB。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测摄像头供电和控制信号",
+          "instruction": "测模拟电源、数字电源、IO 电源、I2C/MIPI/复位等信号。 判断：供电异常查电源模块；通信异常查连接器、通路和主控侧。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证相机打开、预览、拍照、录像和切换稳定性。 判断：后摄稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-KJ5-NO_POWER-AUTO-001",
+      "source_sop_id": "SOP-KJ5-NO_POWER-AUTO-001",
+      "title": "KJ5 不开机交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "基础检查",
+          "instruction": "检查电池接口、主板外观、连接器、腐蚀、烧毁、断裂和明显短路痕迹。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "电流分型",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "无电流路径",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "小电流路径",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "电流分型",
+          "instruction": "外接维修电源并按开机键，记录无电流、小电流或大电流表现。 判断：无电流查 PWRKEY/VSYS；小电流查核心供电和时钟；大电流查 VBAT 或后级短路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "无电流路径",
+          "instruction": "测 PWRKEY 默认高电平、按下低电平；测 VSYS 是否建立。 判断：PWRKEY 异常查按键路径；VSYS 异常查充电 IC/PMU 输入输出。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "小电流路径",
+          "instruction": "测核心供电和 Memory 供电，必要时测 26MHz 时钟。 判断：供电异常查 PMU 输出；时钟异常查晶振；均正常则进入 CPU/Memory 周边检查。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_5"
+            }
+          ]
+        },
+        {
+          "step_id": "step_5",
+          "title": "大电流路径",
+          "instruction": "断电测 VBAT 对地阻值，必要时限流上电配合热像仪或松香法找发热点。 判断：定位短路器件后处理并回到电流分型复测。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-KJ5-NO_CHARGE-AUTO-001",
+      "source_sop_id": "SOP-KJ5-NO_CHARGE-AUTO-001",
+      "title": "KJ5 不充电交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "确认外部条件",
+          "instruction": "使用 OK 充电器和 USB 线，区分无充电指示、有显示但不进电或快充/慢充异常。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查接口和连接",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测充电输入",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "判断电池和采样链路",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查接口和连接",
+          "instruction": "检查 USB 口、FPC、充电相关连接器是否虚焊、变形、腐蚀或扣合异常。 判断：异常则补焊/更换/重扣后复测；正常进入输入电压检查。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测充电输入",
+          "instruction": "插入充电器后测 VCHG/VBUS 是否到达板端。 判断：无输入沿 USB、副板、FPC、保护器件查断路；输入正常进入电池和采样检查。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "判断电池和采样链路",
+          "instruction": "测 VBAT、ISENSE、VBAT_SENSE/BATON 等采样相关信号。 判断：VBAT 不上升或充电电流异常时，查电池端口、采样电阻和充电控制链路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_5"
+            }
+          ]
+        },
+        {
+          "step_id": "step_5",
+          "title": "复测",
+          "instruction": "处理后重新记录充电识别、电流、VBAT 变化和接口晃动稳定性。 判断：充电识别、电压变化和稳定性均正常后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-KJ5-USB-AUTO-001",
+      "source_sop_id": "SOP-KJ5-USB-AUTO-001",
+      "title": "KJ5 USB 不识别交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "确认外部条件",
+          "instruction": "使用 OK 电脑/充电器和 OK USB 线确认是否能识别。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查 USB 连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测输入和数据线",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查 USB 连接器",
+          "instruction": "检查 USB 插座焊接、变形、腐蚀和外围器件。 判断：异常则补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测输入和数据线",
+          "instruction": "测 VCHG/VBUS；必要时观察 USB_DM/USB_DP 是否有高速数字脉冲信号。 判断：无输入查供电路径；DM/DP 异常查副板、FPC、主板 USB 通路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证 USB 数据识别和充电输入。 判断：两者恢复后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-KJ5-SIM-AUTO-001",
+      "source_sop_id": "SOP-KJ5-SIM-AUTO-001",
+      "title": "KJ5 SIM 卡不识别交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "确认 SIM 卡本体",
+          "instruction": "将 SIM 卡放到 OK 机器验证是否可识别。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查卡座",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测 SIM 信号",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查卡座",
+          "instruction": "检查 SIM 卡座是否有胶、异物、腐蚀、变形或虚焊。 判断：异常则清洁、补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测 SIM 信号",
+          "instruction": "测 SIM 电源、复位、时钟和数据信号。 判断：电源异常查供电；复位/时钟/数据异常查连接器、周边小料和 CPU 侧链路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后插卡验证识别、注册网络和稳定性。 判断：识别和网络注册正常后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-KJ5-DISPLAY-AUTO-001",
+      "source_sop_id": "SOP-KJ5-DISPLAY-AUTO-001",
+      "title": "KJ5 显示异常/无显示交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证屏模组",
+          "instruction": "先用 OK 屏模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测显示供电和复位",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查连接器",
+          "instruction": "检查屏 BTB/连接器、FPC、周边小料是否异常。 判断：异常则清洁、补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测显示供电和复位",
+          "instruction": "测显示相关电源、复位和 MIPI/DSI 信号。 判断：供电/复位异常查电源路径；高速信号异常查连接器、通路和主控侧。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证开机显示、亮度、触摸联动和稳定性。 判断：显示稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-KJ5-TOUCH-AUTO-001",
+      "source_sop_id": "SOP-KJ5-TOUCH-AUTO-001",
+      "title": "KJ5 触摸异常交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证模组",
+          "instruction": "用 OK 触摸或屏模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测供电/复位/中断/通信",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查连接器",
+          "instruction": "检查 TP/CTP 连接器、FPC、异物、腐蚀和虚焊。 判断：异常则清洁、补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测供电/复位/中断/通信",
+          "instruction": "测 TP 供电、复位、中断和 I2C/SPI 通信。 判断：按异常信号定位供电、连接器或主控侧通路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证触摸全屏、边缘、长按和滑动稳定性。 判断：触摸稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-KJ5-FRONT_CAMERA-AUTO-001",
+      "source_sop_id": "SOP-KJ5-FRONT_CAMERA-AUTO-001",
+      "title": "KJ5 前置摄像头无显示交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证摄像头模组",
+          "instruction": "使用 OK 前置摄像头模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查摄像头 BTB",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测摄像头供电和控制信号",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查摄像头 BTB",
+          "instruction": "检查摄像头连接器是否虚焊、腐蚀、变形或接触不良。 判断：异常则加焊或更换 BTB。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测摄像头供电和控制信号",
+          "instruction": "测模拟电源、数字电源、IO 电源、I2C/MIPI/复位等信号。 判断：供电异常查电源模块；通信异常查连接器、通路和主控侧。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证相机打开、预览、拍照和切换稳定性。 判断：前摄稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-KJ5-REAR_CAMERA-AUTO-001",
+      "source_sop_id": "SOP-KJ5-REAR_CAMERA-AUTO-001",
+      "title": "KJ5 后置摄像头无显示交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证摄像头模组",
+          "instruction": "使用 OK 后置摄像头模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查摄像头连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测摄像头供电和控制信号",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查摄像头连接器",
+          "instruction": "检查后摄连接器是否虚焊、腐蚀、变形或接触不良。 判断：异常则加焊或更换 BTB。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测摄像头供电和控制信号",
+          "instruction": "测模拟电源、数字电源、IO 电源、I2C/MIPI/复位等信号。 判断：供电异常查电源模块；通信异常查连接器、通路和主控侧。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证相机打开、预览、拍照、录像和切换稳定性。 判断：后摄稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-KL4-NO_POWER-AUTO-001",
+      "source_sop_id": "SOP-KL4-NO_POWER-AUTO-001",
+      "title": "KL4 不开机交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "基础检查",
+          "instruction": "检查电池接口、主板外观、连接器、腐蚀、烧毁、断裂和明显短路痕迹。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "电流分型",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "无电流路径",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "小电流路径",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "电流分型",
+          "instruction": "外接维修电源并按开机键，记录无电流、小电流或大电流表现。 判断：无电流查 PWRKEY/VSYS；小电流查核心供电和时钟；大电流查 VBAT 或后级短路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "无电流路径",
+          "instruction": "测 PWRKEY 默认高电平、按下低电平；测 VSYS 是否建立。 判断：PWRKEY 异常查按键路径；VSYS 异常查充电 IC/PMU 输入输出。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "小电流路径",
+          "instruction": "测核心供电和 Memory 供电，必要时测 26MHz 时钟。 判断：供电异常查 PMU 输出；时钟异常查晶振；均正常则进入 CPU/Memory 周边检查。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_5"
+            }
+          ]
+        },
+        {
+          "step_id": "step_5",
+          "title": "大电流路径",
+          "instruction": "断电测 VBAT 对地阻值，必要时限流上电配合热像仪或松香法找发热点。 判断：定位短路器件后处理并回到电流分型复测。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-KL4-NO_CHARGE-AUTO-001",
+      "source_sop_id": "SOP-KL4-NO_CHARGE-AUTO-001",
+      "title": "KL4 不充电交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "确认外部条件",
+          "instruction": "使用 OK 充电器和 USB 线，区分无充电指示、有显示但不进电或快充/慢充异常。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查接口和连接",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测充电输入",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "判断电池和采样链路",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查接口和连接",
+          "instruction": "检查 USB 口、FPC、充电相关连接器是否虚焊、变形、腐蚀或扣合异常。 判断：异常则补焊/更换/重扣后复测；正常进入输入电压检查。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测充电输入",
+          "instruction": "插入充电器后测 VCHG/VBUS 是否到达板端。 判断：无输入沿 USB、副板、FPC、保护器件查断路；输入正常进入电池和采样检查。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "判断电池和采样链路",
+          "instruction": "测 VBAT、ISENSE、VBAT_SENSE/BATON 等采样相关信号。 判断：VBAT 不上升或充电电流异常时，查电池端口、采样电阻和充电控制链路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_5"
+            }
+          ]
+        },
+        {
+          "step_id": "step_5",
+          "title": "复测",
+          "instruction": "处理后重新记录充电识别、电流、VBAT 变化和接口晃动稳定性。 判断：充电识别、电压变化和稳定性均正常后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-KL4-USB-AUTO-001",
+      "source_sop_id": "SOP-KL4-USB-AUTO-001",
+      "title": "KL4 USB 不识别交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "确认外部条件",
+          "instruction": "使用 OK 电脑/充电器和 OK USB 线确认是否能识别。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查 USB 连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测输入和数据线",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查 USB 连接器",
+          "instruction": "检查 USB 插座焊接、变形、腐蚀和外围器件。 判断：异常则补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测输入和数据线",
+          "instruction": "测 VCHG/VBUS；必要时观察 USB_DM/USB_DP 是否有高速数字脉冲信号。 判断：无输入查供电路径；DM/DP 异常查副板、FPC、主板 USB 通路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证 USB 数据识别和充电输入。 判断：两者恢复后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-KL4-SIM-AUTO-001",
+      "source_sop_id": "SOP-KL4-SIM-AUTO-001",
+      "title": "KL4 SIM 卡不识别交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "确认 SIM 卡本体",
+          "instruction": "将 SIM 卡放到 OK 机器验证是否可识别。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查卡座",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测 SIM 信号",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查卡座",
+          "instruction": "检查 SIM 卡座是否有胶、异物、腐蚀、变形或虚焊。 判断：异常则清洁、补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测 SIM 信号",
+          "instruction": "测 SIM 电源、复位、时钟和数据信号。 判断：电源异常查供电；复位/时钟/数据异常查连接器、周边小料和 CPU 侧链路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后插卡验证识别、注册网络和稳定性。 判断：识别和网络注册正常后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-KL4-DISPLAY-AUTO-001",
+      "source_sop_id": "SOP-KL4-DISPLAY-AUTO-001",
+      "title": "KL4 显示异常/无显示交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证屏模组",
+          "instruction": "先用 OK 屏模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测显示供电和复位",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查连接器",
+          "instruction": "检查屏 BTB/连接器、FPC、周边小料是否异常。 判断：异常则清洁、补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测显示供电和复位",
+          "instruction": "测显示相关电源、复位和 MIPI/DSI 信号。 判断：供电/复位异常查电源路径；高速信号异常查连接器、通路和主控侧。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证开机显示、亮度、触摸联动和稳定性。 判断：显示稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-KL4-TOUCH-AUTO-001",
+      "source_sop_id": "SOP-KL4-TOUCH-AUTO-001",
+      "title": "KL4 触摸异常交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证模组",
+          "instruction": "用 OK 触摸或屏模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测供电/复位/中断/通信",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查连接器",
+          "instruction": "检查 TP/CTP 连接器、FPC、异物、腐蚀和虚焊。 判断：异常则清洁、补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测供电/复位/中断/通信",
+          "instruction": "测 TP 供电、复位、中断和 I2C/SPI 通信。 判断：按异常信号定位供电、连接器或主控侧通路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证触摸全屏、边缘、长按和滑动稳定性。 判断：触摸稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-KL4-FRONT_CAMERA-AUTO-001",
+      "source_sop_id": "SOP-KL4-FRONT_CAMERA-AUTO-001",
+      "title": "KL4 前置摄像头无显示交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证摄像头模组",
+          "instruction": "使用 OK 前置摄像头模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查摄像头 BTB",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测摄像头供电和控制信号",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查摄像头 BTB",
+          "instruction": "检查摄像头连接器是否虚焊、腐蚀、变形或接触不良。 判断：异常则加焊或更换 BTB。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测摄像头供电和控制信号",
+          "instruction": "测模拟电源、数字电源、IO 电源、I2C/MIPI/复位等信号。 判断：供电异常查电源模块；通信异常查连接器、通路和主控侧。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证相机打开、预览、拍照和切换稳定性。 判断：前摄稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-KL4-REAR_CAMERA-AUTO-001",
+      "source_sop_id": "SOP-KL4-REAR_CAMERA-AUTO-001",
+      "title": "KL4 后置摄像头无显示交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证摄像头模组",
+          "instruction": "使用 OK 后置摄像头模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查摄像头连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测摄像头供电和控制信号",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查摄像头连接器",
+          "instruction": "检查后摄连接器是否虚焊、腐蚀、变形或接触不良。 判断：异常则加焊或更换 BTB。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测摄像头供电和控制信号",
+          "instruction": "测模拟电源、数字电源、IO 电源、I2C/MIPI/复位等信号。 判断：供电异常查电源模块；通信异常查连接器、通路和主控侧。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证相机打开、预览、拍照、录像和切换稳定性。 判断：后摄稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-KM4-NO_POWER-AUTO-001",
+      "source_sop_id": "SOP-KM4-NO_POWER-AUTO-001",
+      "title": "KM4 不开机交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "基础检查",
+          "instruction": "检查电池接口、主板外观、连接器、腐蚀、烧毁、断裂和明显短路痕迹。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "电流分型",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "无电流路径",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "小电流路径",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "电流分型",
+          "instruction": "外接维修电源并按开机键，记录无电流、小电流或大电流表现。 判断：无电流查 PWRKEY/VSYS；小电流查核心供电和时钟；大电流查 VBAT 或后级短路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "无电流路径",
+          "instruction": "测 PWRKEY 默认高电平、按下低电平；测 VSYS 是否建立。 判断：PWRKEY 异常查按键路径；VSYS 异常查充电 IC/PMU 输入输出。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "小电流路径",
+          "instruction": "测核心供电和 Memory 供电，必要时测 26MHz 时钟。 判断：供电异常查 PMU 输出；时钟异常查晶振；均正常则进入 CPU/Memory 周边检查。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_5"
+            }
+          ]
+        },
+        {
+          "step_id": "step_5",
+          "title": "大电流路径",
+          "instruction": "断电测 VBAT 对地阻值，必要时限流上电配合热像仪或松香法找发热点。 判断：定位短路器件后处理并回到电流分型复测。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-KM4-NO_CHARGE-AUTO-001",
+      "source_sop_id": "SOP-KM4-NO_CHARGE-AUTO-001",
+      "title": "KM4 不充电交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "确认外部条件",
+          "instruction": "使用 OK 充电器和 USB 线，区分无充电指示、有显示但不进电或快充/慢充异常。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查接口和连接",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测充电输入",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "判断电池和采样链路",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查接口和连接",
+          "instruction": "检查 USB 口、FPC、充电相关连接器是否虚焊、变形、腐蚀或扣合异常。 判断：异常则补焊/更换/重扣后复测；正常进入输入电压检查。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测充电输入",
+          "instruction": "插入充电器后测 VCHG/VBUS 是否到达板端。 判断：无输入沿 USB、副板、FPC、保护器件查断路；输入正常进入电池和采样检查。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "判断电池和采样链路",
+          "instruction": "测 VBAT、ISENSE、VBAT_SENSE/BATON 等采样相关信号。 判断：VBAT 不上升或充电电流异常时，查电池端口、采样电阻和充电控制链路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_5"
+            }
+          ]
+        },
+        {
+          "step_id": "step_5",
+          "title": "复测",
+          "instruction": "处理后重新记录充电识别、电流、VBAT 变化和接口晃动稳定性。 判断：充电识别、电压变化和稳定性均正常后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-KM4-USB-AUTO-001",
+      "source_sop_id": "SOP-KM4-USB-AUTO-001",
+      "title": "KM4 USB 不识别交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "确认外部条件",
+          "instruction": "使用 OK 电脑/充电器和 OK USB 线确认是否能识别。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查 USB 连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测输入和数据线",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查 USB 连接器",
+          "instruction": "检查 USB 插座焊接、变形、腐蚀和外围器件。 判断：异常则补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测输入和数据线",
+          "instruction": "测 VCHG/VBUS；必要时观察 USB_DM/USB_DP 是否有高速数字脉冲信号。 判断：无输入查供电路径；DM/DP 异常查副板、FPC、主板 USB 通路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证 USB 数据识别和充电输入。 判断：两者恢复后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-KM4-SIM-AUTO-001",
+      "source_sop_id": "SOP-KM4-SIM-AUTO-001",
+      "title": "KM4 SIM 卡不识别交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "确认 SIM 卡本体",
+          "instruction": "将 SIM 卡放到 OK 机器验证是否可识别。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查卡座",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测 SIM 信号",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查卡座",
+          "instruction": "检查 SIM 卡座是否有胶、异物、腐蚀、变形或虚焊。 判断：异常则清洁、补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测 SIM 信号",
+          "instruction": "测 SIM 电源、复位、时钟和数据信号。 判断：电源异常查供电；复位/时钟/数据异常查连接器、周边小料和 CPU 侧链路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后插卡验证识别、注册网络和稳定性。 判断：识别和网络注册正常后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-KM4-DISPLAY-AUTO-001",
+      "source_sop_id": "SOP-KM4-DISPLAY-AUTO-001",
+      "title": "KM4 显示异常/无显示交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证屏模组",
+          "instruction": "先用 OK 屏模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测显示供电和复位",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查连接器",
+          "instruction": "检查屏 BTB/连接器、FPC、周边小料是否异常。 判断：异常则清洁、补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测显示供电和复位",
+          "instruction": "测显示相关电源、复位和 MIPI/DSI 信号。 判断：供电/复位异常查电源路径；高速信号异常查连接器、通路和主控侧。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证开机显示、亮度、触摸联动和稳定性。 判断：显示稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-KM4-TOUCH-AUTO-001",
+      "source_sop_id": "SOP-KM4-TOUCH-AUTO-001",
+      "title": "KM4 触摸异常交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证模组",
+          "instruction": "用 OK 触摸或屏模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测供电/复位/中断/通信",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查连接器",
+          "instruction": "检查 TP/CTP 连接器、FPC、异物、腐蚀和虚焊。 判断：异常则清洁、补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测供电/复位/中断/通信",
+          "instruction": "测 TP 供电、复位、中断和 I2C/SPI 通信。 判断：按异常信号定位供电、连接器或主控侧通路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证触摸全屏、边缘、长按和滑动稳定性。 判断：触摸稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-KM4-FRONT_CAMERA-AUTO-001",
+      "source_sop_id": "SOP-KM4-FRONT_CAMERA-AUTO-001",
+      "title": "KM4 前置摄像头无显示交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证摄像头模组",
+          "instruction": "使用 OK 前置摄像头模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查摄像头 BTB",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测摄像头供电和控制信号",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查摄像头 BTB",
+          "instruction": "检查摄像头连接器是否虚焊、腐蚀、变形或接触不良。 判断：异常则加焊或更换 BTB。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测摄像头供电和控制信号",
+          "instruction": "测模拟电源、数字电源、IO 电源、I2C/MIPI/复位等信号。 判断：供电异常查电源模块；通信异常查连接器、通路和主控侧。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证相机打开、预览、拍照和切换稳定性。 判断：前摄稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-KM4-REAR_CAMERA-AUTO-001",
+      "source_sop_id": "SOP-KM4-REAR_CAMERA-AUTO-001",
+      "title": "KM4 后置摄像头无显示交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证摄像头模组",
+          "instruction": "使用 OK 后置摄像头模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查摄像头连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测摄像头供电和控制信号",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查摄像头连接器",
+          "instruction": "检查后摄连接器是否虚焊、腐蚀、变形或接触不良。 判断：异常则加焊或更换 BTB。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测摄像头供电和控制信号",
+          "instruction": "测模拟电源、数字电源、IO 电源、I2C/MIPI/复位等信号。 判断：供电异常查电源模块；通信异常查连接器、通路和主控侧。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证相机打开、预览、拍照、录像和切换稳定性。 判断：后摄稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-KM7K-NO_POWER-AUTO-001",
+      "source_sop_id": "SOP-KM7K-NO_POWER-AUTO-001",
+      "title": "KM7K 不开机交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "基础检查",
+          "instruction": "检查电池接口、主板外观、连接器、腐蚀、烧毁、断裂和明显短路痕迹。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "电流分型",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "无电流路径",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "小电流路径",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "电流分型",
+          "instruction": "外接维修电源并按开机键，记录无电流、小电流或大电流表现。 判断：无电流查 PWRKEY/VSYS；小电流查核心供电和时钟；大电流查 VBAT 或后级短路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "无电流路径",
+          "instruction": "测 PWRKEY 默认高电平、按下低电平；测 VSYS 是否建立。 判断：PWRKEY 异常查按键路径；VSYS 异常查充电 IC/PMU 输入输出。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "小电流路径",
+          "instruction": "测核心供电和 Memory 供电，必要时测 26MHz 时钟。 判断：供电异常查 PMU 输出；时钟异常查晶振；均正常则进入 CPU/Memory 周边检查。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_5"
+            }
+          ]
+        },
+        {
+          "step_id": "step_5",
+          "title": "大电流路径",
+          "instruction": "断电测 VBAT 对地阻值，必要时限流上电配合热像仪或松香法找发热点。 判断：定位短路器件后处理并回到电流分型复测。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-KM7K-NO_CHARGE-AUTO-001",
+      "source_sop_id": "SOP-KM7K-NO_CHARGE-AUTO-001",
+      "title": "KM7K 不充电交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "确认外部条件",
+          "instruction": "使用 OK 充电器和 USB 线，区分无充电指示、有显示但不进电或快充/慢充异常。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查接口和连接",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测充电输入",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "判断电池和采样链路",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查接口和连接",
+          "instruction": "检查 USB 口、FPC、充电相关连接器是否虚焊、变形、腐蚀或扣合异常。 判断：异常则补焊/更换/重扣后复测；正常进入输入电压检查。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测充电输入",
+          "instruction": "插入充电器后测 VCHG/VBUS 是否到达板端。 判断：无输入沿 USB、副板、FPC、保护器件查断路；输入正常进入电池和采样检查。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "判断电池和采样链路",
+          "instruction": "测 VBAT、ISENSE、VBAT_SENSE/BATON 等采样相关信号。 判断：VBAT 不上升或充电电流异常时，查电池端口、采样电阻和充电控制链路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_5"
+            }
+          ]
+        },
+        {
+          "step_id": "step_5",
+          "title": "复测",
+          "instruction": "处理后重新记录充电识别、电流、VBAT 变化和接口晃动稳定性。 判断：充电识别、电压变化和稳定性均正常后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-KM7K-USB-AUTO-001",
+      "source_sop_id": "SOP-KM7K-USB-AUTO-001",
+      "title": "KM7K USB 不识别交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "确认外部条件",
+          "instruction": "使用 OK 电脑/充电器和 OK USB 线确认是否能识别。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查 USB 连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测输入和数据线",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查 USB 连接器",
+          "instruction": "检查 USB 插座焊接、变形、腐蚀和外围器件。 判断：异常则补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测输入和数据线",
+          "instruction": "测 VCHG/VBUS；必要时观察 USB_DM/USB_DP 是否有高速数字脉冲信号。 判断：无输入查供电路径；DM/DP 异常查副板、FPC、主板 USB 通路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证 USB 数据识别和充电输入。 判断：两者恢复后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-KM7K-SIM-AUTO-001",
+      "source_sop_id": "SOP-KM7K-SIM-AUTO-001",
+      "title": "KM7K SIM 卡不识别交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "确认 SIM 卡本体",
+          "instruction": "将 SIM 卡放到 OK 机器验证是否可识别。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查卡座",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测 SIM 信号",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查卡座",
+          "instruction": "检查 SIM 卡座是否有胶、异物、腐蚀、变形或虚焊。 判断：异常则清洁、补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测 SIM 信号",
+          "instruction": "测 SIM 电源、复位、时钟和数据信号。 判断：电源异常查供电；复位/时钟/数据异常查连接器、周边小料和 CPU 侧链路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后插卡验证识别、注册网络和稳定性。 判断：识别和网络注册正常后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-KM7K-DISPLAY-AUTO-001",
+      "source_sop_id": "SOP-KM7K-DISPLAY-AUTO-001",
+      "title": "KM7K 显示异常/无显示交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证屏模组",
+          "instruction": "先用 OK 屏模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测显示供电和复位",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查连接器",
+          "instruction": "检查屏 BTB/连接器、FPC、周边小料是否异常。 判断：异常则清洁、补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测显示供电和复位",
+          "instruction": "测显示相关电源、复位和 MIPI/DSI 信号。 判断：供电/复位异常查电源路径；高速信号异常查连接器、通路和主控侧。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证开机显示、亮度、触摸联动和稳定性。 判断：显示稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-KM7K-TOUCH-AUTO-001",
+      "source_sop_id": "SOP-KM7K-TOUCH-AUTO-001",
+      "title": "KM7K 触摸异常交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证模组",
+          "instruction": "用 OK 触摸或屏模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测供电/复位/中断/通信",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查连接器",
+          "instruction": "检查 TP/CTP 连接器、FPC、异物、腐蚀和虚焊。 判断：异常则清洁、补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测供电/复位/中断/通信",
+          "instruction": "测 TP 供电、复位、中断和 I2C/SPI 通信。 判断：按异常信号定位供电、连接器或主控侧通路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证触摸全屏、边缘、长按和滑动稳定性。 判断：触摸稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-KM7K-FRONT_CAMERA-AUTO-001",
+      "source_sop_id": "SOP-KM7K-FRONT_CAMERA-AUTO-001",
+      "title": "KM7K 前置摄像头无显示交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证摄像头模组",
+          "instruction": "使用 OK 前置摄像头模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查摄像头 BTB",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测摄像头供电和控制信号",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查摄像头 BTB",
+          "instruction": "检查摄像头连接器是否虚焊、腐蚀、变形或接触不良。 判断：异常则加焊或更换 BTB。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测摄像头供电和控制信号",
+          "instruction": "测模拟电源、数字电源、IO 电源、I2C/MIPI/复位等信号。 判断：供电异常查电源模块；通信异常查连接器、通路和主控侧。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证相机打开、预览、拍照和切换稳定性。 判断：前摄稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-KM7K-REAR_CAMERA-AUTO-001",
+      "source_sop_id": "SOP-KM7K-REAR_CAMERA-AUTO-001",
+      "title": "KM7K 后置摄像头无显示交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证摄像头模组",
+          "instruction": "使用 OK 后置摄像头模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查摄像头连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测摄像头供电和控制信号",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查摄像头连接器",
+          "instruction": "检查后摄连接器是否虚焊、腐蚀、变形或接触不良。 判断：异常则加焊或更换 BTB。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测摄像头供电和控制信号",
+          "instruction": "测模拟电源、数字电源、IO 电源、I2C/MIPI/复位等信号。 判断：供电异常查电源模块；通信异常查连接器、通路和主控侧。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证相机打开、预览、拍照、录像和切换稳定性。 判断：后摄稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-X6880-NO_POWER-AUTO-001",
+      "source_sop_id": "SOP-X6880-NO_POWER-AUTO-001",
+      "title": "X6880 不开机交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "基础检查",
+          "instruction": "检查电池接口、主板外观、连接器、腐蚀、烧毁、断裂和明显短路痕迹。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "电流分型",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "无电流路径",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "小电流路径",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "电流分型",
+          "instruction": "外接维修电源并按开机键，记录无电流、小电流或大电流表现。 判断：无电流查 PWRKEY/VSYS；小电流查核心供电和时钟；大电流查 VBAT 或后级短路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "无电流路径",
+          "instruction": "测 PWRKEY 默认高电平、按下低电平；测 VSYS 是否建立。 判断：PWRKEY 异常查按键路径；VSYS 异常查充电 IC/PMU 输入输出。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "小电流路径",
+          "instruction": "测核心供电和 Memory 供电，必要时测 26MHz 时钟。 判断：供电异常查 PMU 输出；时钟异常查晶振；均正常则进入 CPU/Memory 周边检查。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_5"
+            }
+          ]
+        },
+        {
+          "step_id": "step_5",
+          "title": "大电流路径",
+          "instruction": "断电测 VBAT 对地阻值，必要时限流上电配合热像仪或松香法找发热点。 判断：定位短路器件后处理并回到电流分型复测。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-X6880-NO_CHARGE-AUTO-001",
+      "source_sop_id": "SOP-X6880-NO_CHARGE-AUTO-001",
+      "title": "X6880 不充电交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "确认外部条件",
+          "instruction": "使用 OK 充电器和 USB 线，区分无充电指示、有显示但不进电或快充/慢充异常。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查接口和连接",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测充电输入",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "判断电池和采样链路",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查接口和连接",
+          "instruction": "检查 USB 口、FPC、充电相关连接器是否虚焊、变形、腐蚀或扣合异常。 判断：异常则补焊/更换/重扣后复测；正常进入输入电压检查。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测充电输入",
+          "instruction": "插入充电器后测 VCHG/VBUS 是否到达板端。 判断：无输入沿 USB、副板、FPC、保护器件查断路；输入正常进入电池和采样检查。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "判断电池和采样链路",
+          "instruction": "测 VBAT、ISENSE、VBAT_SENSE/BATON 等采样相关信号。 判断：VBAT 不上升或充电电流异常时，查电池端口、采样电阻和充电控制链路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_5"
+            }
+          ]
+        },
+        {
+          "step_id": "step_5",
+          "title": "复测",
+          "instruction": "处理后重新记录充电识别、电流、VBAT 变化和接口晃动稳定性。 判断：充电识别、电压变化和稳定性均正常后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-X6880-USB-AUTO-001",
+      "source_sop_id": "SOP-X6880-USB-AUTO-001",
+      "title": "X6880 USB 不识别交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "确认外部条件",
+          "instruction": "使用 OK 电脑/充电器和 OK USB 线确认是否能识别。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查 USB 连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测输入和数据线",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查 USB 连接器",
+          "instruction": "检查 USB 插座焊接、变形、腐蚀和外围器件。 判断：异常则补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测输入和数据线",
+          "instruction": "测 VCHG/VBUS；必要时观察 USB_DM/USB_DP 是否有高速数字脉冲信号。 判断：无输入查供电路径；DM/DP 异常查副板、FPC、主板 USB 通路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证 USB 数据识别和充电输入。 判断：两者恢复后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-X6880-DISPLAY-AUTO-001",
+      "source_sop_id": "SOP-X6880-DISPLAY-AUTO-001",
+      "title": "X6880 显示异常/无显示交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证屏模组",
+          "instruction": "先用 OK 屏模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测显示供电和复位",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查连接器",
+          "instruction": "检查屏 BTB/连接器、FPC、周边小料是否异常。 判断：异常则清洁、补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测显示供电和复位",
+          "instruction": "测显示相关电源、复位和 MIPI/DSI 信号。 判断：供电/复位异常查电源路径；高速信号异常查连接器、通路和主控侧。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证开机显示、亮度、触摸联动和稳定性。 判断：显示稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-X6880-TOUCH-AUTO-001",
+      "source_sop_id": "SOP-X6880-TOUCH-AUTO-001",
+      "title": "X6880 触摸异常交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证模组",
+          "instruction": "用 OK 触摸或屏模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测供电/复位/中断/通信",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查连接器",
+          "instruction": "检查 TP/CTP 连接器、FPC、异物、腐蚀和虚焊。 判断：异常则清洁、补焊或更换。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测供电/复位/中断/通信",
+          "instruction": "测 TP 供电、复位、中断和 I2C/SPI 通信。 判断：按异常信号定位供电、连接器或主控侧通路。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证触摸全屏、边缘、长按和滑动稳定性。 判断：触摸稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-X6880-FRONT_CAMERA-AUTO-001",
+      "source_sop_id": "SOP-X6880-FRONT_CAMERA-AUTO-001",
+      "title": "X6880 前置摄像头无显示交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证摄像头模组",
+          "instruction": "使用 OK 前置摄像头模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查摄像头 BTB",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测摄像头供电和控制信号",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查摄像头 BTB",
+          "instruction": "检查摄像头连接器是否虚焊、腐蚀、变形或接触不良。 判断：异常则加焊或更换 BTB。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测摄像头供电和控制信号",
+          "instruction": "测模拟电源、数字电源、IO 电源、I2C/MIPI/复位等信号。 判断：供电异常查电源模块；通信异常查连接器、通路和主控侧。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证相机打开、预览、拍照和切换稳定性。 判断：前摄稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
+    },
+    {
+      "prototype_id": "ISOP-X6880-REAR_CAMERA-AUTO-001",
+      "source_sop_id": "SOP-X6880-REAR_CAMERA-AUTO-001",
+      "title": "X6880 后置摄像头无显示交互式 SOP",
+      "warning": "基于现有维修指导书、原理图和位号图自动生成，用于内部试点和复核。",
+      "target_role": [
+        "L4 技术员",
+        "中方技术人员",
+        "技术支持"
+      ],
+      "steps": [
+        {
+          "step_id": "start",
+          "title": "替换验证摄像头模组",
+          "instruction": "使用 OK 后置摄像头模组交叉验证。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "检查摄像头连接器",
+              "next_step_id": "step_2"
+            },
+            {
+              "label": "测摄像头供电和控制信号",
+              "next_step_id": "step_3"
+            },
+            {
+              "label": "复测",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_2",
+          "title": "检查摄像头连接器",
+          "instruction": "检查后摄连接器是否虚焊、腐蚀、变形或接触不良。 判断：异常则加焊或更换 BTB。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_3"
+            }
+          ]
+        },
+        {
+          "step_id": "step_3",
+          "title": "测摄像头供电和控制信号",
+          "instruction": "测模拟电源、数字电源、IO 电源、I2C/MIPI/复位等信号。 判断：供电异常查电源模块；通信异常查连接器、通路和主控侧。",
+          "input_type": "choice",
+          "options": [
+            {
+              "label": "继续下一步",
+              "next_step_id": "step_4"
+            }
+          ]
+        },
+        {
+          "step_id": "step_4",
+          "title": "复测",
+          "instruction": "处理后验证相机打开、预览、拍照、录像和切换稳定性。 判断：后摄稳定后关闭。",
+          "input_type": "terminal",
+          "options": []
+        }
+      ]
     }
   ]
 }

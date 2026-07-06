@@ -3384,7 +3384,7 @@
                         <span class="nav-card-code" aria-hidden="true">🧩</span>
                         <span>
                             <span class="nav-card-label">故障包</span>
-                            <span class="nav-card-meta">按高频故障组织 SOP、点位和边界</span>
+                            <span class="nav-card-meta">按高频故障组织 SOP、点位和验证</span>
                         </span>
                     </button>
                     <button class="tab-btn nav-card" data-tab="interactive-sop" onclick="switchTab('interactive-sop')">
@@ -3470,7 +3470,7 @@
                         </div>
                         <div class="roadmap-item">
                             <span class="roadmap-state building">阶段 1</span>
-                            <span><strong class="roadmap-title">知识与流程地基</strong><span class="roadmap-desc">机型 / 故障 / 器件 / 培训 / 案例结构化，明确资料来源、审核状态和维修边界。</span></span>
+                            <span><strong class="roadmap-title">知识与流程地基</strong><span class="roadmap-desc">机型 / 故障 / 器件 / 培训 / 案例结构化，明确资料来源、审核状态、步骤指导和修后验证。</span></span>
                         </div>
                         <div class="roadmap-item">
                             <span class="roadmap-state building">阶段 2</span>
@@ -3830,7 +3830,7 @@
             <div class="knowledge-shell">
                 <div class="knowledge-hero">
                     <h2>故障包</h2>
-                    <p class="subtitle">按高频故障组织资料建设：现象定义、诊断 SOP、测试点、主板图、案例、维修边界和工程确认。这里用来决定下一批资料和 SOP 怎么补。</p>
+                    <p class="subtitle">按高频故障组织资料建设：现象定义、诊断 SOP、测试点、主板图、步骤指导、修后验证和工程确认。这里用来决定下一批资料和 SOP 怎么补。</p>
                     <div class="knowledge-toolbar">
                         <input type="text" id="faultPackageSearchInput" placeholder="搜索故障包 / 模块 / 机型，例如 不开机、RF、BG6m" oninput="renderFaultPackages()">
                         <select id="faultPackagePriorityFilter" onchange="renderFaultPackages()">
@@ -3899,8 +3899,18 @@
             <div class="knowledge-shell">
                 <div class="knowledge-hero">
                     <h2>SOP 草案</h2>
-                    <p class="subtitle">这里仅展示草案和待确认流程，不作为正式维修指导。下一步要把制造中心手册和真实案例转译成可执行、可培训、可验证的 SOP。</p>
+                    <p class="subtitle">基于现有维修指导书、原理图和位号图生成的步骤指导。当前用于内部试点和复核，不作为正式维修指导。</p>
+                    <div class="knowledge-toolbar">
+                        <input type="text" id="sopDraftSearchInput" placeholder="搜索机型 / 故障 / 信号，例如 KM4、不开机、VBAT" oninput="renderSopDrafts()">
+                        <select id="sopDraftModelFilter" onchange="renderSopDrafts()">
+                            <option value="">全部机型</option>
+                        </select>
+                        <select id="sopDraftFaultFilter" onchange="renderSopDrafts()">
+                            <option value="">全部故障</option>
+                        </select>
+                    </div>
                 </div>
+                <div class="knowledge-stat-grid" id="sopDraftStats"></div>
                 <div class="knowledge-grid" id="sopDraftList">
                     <div class="knowledge-state">正在加载 SOP 草案...</div>
                 </div>
@@ -4813,6 +4823,22 @@
                 }).join('');
             }
 
+            const sopDraftModelFilter = document.getElementById('sopDraftModelFilter');
+            if (sopDraftModelFilter) {
+                const models = [...new Set((knowledgeBaseState.data.sopDrafts || []).flatMap(item => asArray(item.applicable_models)).filter(Boolean))].sort();
+                sopDraftModelFilter.innerHTML = '<option value="">全部机型</option>' + models.map(model => {
+                    return `<option value="${escapeHtml(model)}">${escapeHtml(model)}</option>`;
+                }).join('');
+            }
+
+            const sopDraftFaultFilter = document.getElementById('sopDraftFaultFilter');
+            if (sopDraftFaultFilter) {
+                const faults = [...new Set((knowledgeBaseState.data.sopDrafts || []).flatMap(item => asArray(item.applicable_faults)).filter(Boolean))].sort();
+                sopDraftFaultFilter.innerHTML = '<option value="">全部故障</option>' + faults.map(fault => {
+                    return `<option value="${escapeHtml(fault)}">${escapeHtml(fault)}</option>`;
+                }).join('');
+            }
+
             renderSignalModuleFilter();
         }
 
@@ -4873,7 +4899,7 @@
             groups.forEach(group => {
                 const material = model.required_materials?.[group.group_id];
                 const status = material?.status || 'missing';
-                if (['ready', 'confirmed', 'available'].includes(status)) {
+                if (['ready', 'confirmed', 'available', 'not_required_phase_1'].includes(status)) {
                     score += group.weight;
                     return;
                 }
@@ -4908,6 +4934,7 @@
                 partial: '部分',
                 available: '已登记',
                 draft_source_available: '已有资料源',
+                not_required_phase_1: '当前阶段不要求',
                 ready: '已具备',
                 confirmed: '已确认',
                 pending_confirmation: '待确认',
@@ -5057,7 +5084,7 @@
                         <p><strong>已登记文件：</strong>${escapeHtml(asArray(model.asset_inventory?.files).length)} 个</p>
                         ${renderModelFileList(model)}
                         <div class="material-checklist">${renderMaterialChecklist(model, library)}</div>
-                        <p><strong>维修边界：</strong>${escapeHtml(model.repair_boundary?.note || '待确认')}</p>
+                        <p><strong>当前阶段说明：</strong>${escapeHtml(model.repair_boundary?.note || '第一阶段优先补齐步骤指导、测试点参考和修后验证。')}</p>
                         <p><strong>工程确认：</strong>${escapeHtml(model.engineering_confirmation?.note || '待确认')}</p>
                     </div>
                 </article>
@@ -5071,7 +5098,7 @@
             groups.forEach(group => {
                 const material = pack.required_materials?.[group.group_id];
                 const status = material?.status || 'missing';
-                if (['ready', 'confirmed', 'available'].includes(status)) {
+                if (['ready', 'confirmed', 'available', 'not_required_phase_1'].includes(status)) {
                     score += group.weight;
                 } else if (['partial', 'draft_source_available'].includes(status)) {
                     score += Math.round(group.weight * 0.5);
@@ -5628,8 +5655,39 @@
             const container = document.getElementById('sopDraftList');
             if (!container) return;
             if (!knowledgeBaseState.loaded) return;
-            const drafts = knowledgeBaseState.data.sopDrafts || [];
+            const statsEl = document.getElementById('sopDraftStats');
+            const allDrafts = knowledgeBaseState.data.sopDrafts || [];
+            const keyword = document.getElementById('sopDraftSearchInput')?.value.trim().toLowerCase() || '';
+            const modelFilter = document.getElementById('sopDraftModelFilter')?.value || '';
+            const faultFilter = document.getElementById('sopDraftFaultFilter')?.value || '';
+            const drafts = allDrafts.filter(draft => {
+                const modelMatched = !modelFilter || asArray(draft.applicable_models).includes(modelFilter);
+                const faultMatched = !faultFilter || asArray(draft.applicable_faults).includes(faultFilter);
+                const haystack = [
+                    draft.sop_id,
+                    draft.title,
+                    draft.status,
+                    ...asArray(draft.applicable_models),
+                    ...asArray(draft.applicable_faults),
+                    ...asArray(draft.required_tools),
+                    ...asArray(draft.test_points_and_references).flatMap(item => [item.signal, item.reference, item.purpose]),
+                    ...asArray(draft.steps).flatMap(step => [step.action, step.operator_input, step.decision])
+                ].join(' ').toLowerCase();
+                return modelMatched && faultMatched && (!keyword || haystack.includes(keyword));
+            });
             const manuals = knowledgeBaseState.data.manuals || [];
+
+            if (statsEl) {
+                const generatedCount = allDrafts.filter(item => item.auto_generated_from_materials || item.derived_from_existing_materials).length;
+                const modelCount = new Set(allDrafts.flatMap(item => asArray(item.applicable_models))).size;
+                const visibleRefs = drafts.reduce((sum, item) => sum + asArray(item.test_points_and_references).length, 0);
+                statsEl.innerHTML = `
+                    <div class="knowledge-stat"><strong>${escapeHtml(allDrafts.length)}</strong><span>SOP 条目</span></div>
+                    <div class="knowledge-stat"><strong>${escapeHtml(generatedCount)}</strong><span>基于资料生成</span></div>
+                    <div class="knowledge-stat"><strong>${escapeHtml(modelCount)}</strong><span>覆盖机型/代号</span></div>
+                    <div class="knowledge-stat"><strong>${escapeHtml(visibleRefs)}</strong><span>当前参考信号</span></div>
+                `;
+            }
 
             const manualCards = manuals.map(manual => `
                 <article class="knowledge-card">
@@ -5681,7 +5739,7 @@
                 </article>
             `).join('');
 
-            container.innerHTML = (draftCards + manualCards) || '<div class="knowledge-state">暂无 SOP 草案。</div>';
+            container.innerHTML = (draftCards + (!keyword && !modelFilter && !faultFilter ? manualCards : '')) || '<div class="knowledge-state">暂无匹配的 SOP 草案。</div>';
         }
 
         // 快捷输入

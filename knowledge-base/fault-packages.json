@@ -47,7 +47,7 @@
       "package_id": "FP-NO-POWER",
       "title": "不开机故障包",
       "priority": "P0",
-      "status": "model_sample_sop_available",
+      "status": "model_guidance_available",
       "l4_evidence": [
         {
           "metric": "PWR01-No power on",
@@ -90,7 +90,17 @@
       ],
       "linked_fault_knowledge": [],
       "linked_sops": [
-        "SOP-KM4-NO-POWER-001"
+        "SOP-KM4-NO-POWER-001",
+        "SOP-BG6H-NO_POWER-AUTO-001",
+        "SOP-CK6N-NO_POWER-AUTO-001",
+        "SOP-CLA5-NO_POWER-AUTO-001",
+        "SOP-CM5-NO_POWER-AUTO-001",
+        "SOP-CM6-NO_POWER-AUTO-001",
+        "SOP-KJ5-NO_POWER-AUTO-001",
+        "SOP-KL4-NO_POWER-AUTO-001",
+        "SOP-KM4-NO_POWER-AUTO-001",
+        "SOP-KM7K-NO_POWER-AUTO-001",
+        "SOP-X6880-NO_POWER-AUTO-001"
       ],
       "required_materials": {
         "symptom_definition": {
@@ -102,13 +112,13 @@
         "diagnosis_sop": {
           "status": "partial",
           "missing_items": [
-            "其他机型的同类步骤指导"
+            "待工程复核和现场执行回流"
           ]
         },
         "test_points": {
           "status": "partial",
           "missing_items": [
-            "其他机型关键测试点坐标"
+            "需要把参考信号映射到具体点位坐标"
           ]
         },
         "board_assets": {
@@ -120,14 +130,13 @@
         "repair_cases": {
           "status": "partial",
           "missing_items": [
-            "由 SOP 执行后回流的验证记录"
+            "由步骤指导执行后回流的验证记录"
           ]
         },
         "repair_boundary": {
-          "status": "missing",
-          "missing_items": [
-            "CPU/Memory/PMU类故障维修边界"
-          ]
+          "status": "not_required_phase_1",
+          "missing_items": [],
+          "note": "当前阶段不强制设置维修边界。"
         },
         "engineering_confirmation": {
           "status": "missing",
@@ -136,13 +145,13 @@
           ]
         }
       },
-      "next_action": "以 KM4/F151 不开机步骤指导为样板，继续转译 KL4、CM6 等资料成熟机型。"
+      "next_action": "继续复核已生成的机型步骤指导，并把执行结果回流为验证记录。"
     },
     {
       "package_id": "FP-NO-SERVICE",
       "title": "无服务 / 无网络故障包",
       "priority": "P0",
-      "status": "planning",
+      "status": "model_guidance_available",
       "l4_evidence": [
         {
           "metric": "CLA01-No signal/No Service/No network",
@@ -176,7 +185,17 @@
         "WIFI"
       ],
       "linked_fault_knowledge": [],
-      "linked_sops": [],
+      "linked_sops": [
+        "SOP-BG6H-SIM-AUTO-001",
+        "SOP-CK6N-SIM-AUTO-001",
+        "SOP-CLA5-SIM-AUTO-001",
+        "SOP-CM5-SIM-AUTO-001",
+        "SOP-CM6-SIM-AUTO-001",
+        "SOP-KJ5-SIM-AUTO-001",
+        "SOP-KL4-SIM-AUTO-001",
+        "SOP-KM4-SIM-AUTO-001",
+        "SOP-KM7K-SIM-AUTO-001"
+      ],
       "required_materials": {
         "symptom_definition": {
           "status": "partial",
@@ -185,16 +204,15 @@
           ]
         },
         "diagnosis_sop": {
-          "status": "missing",
+          "status": "partial",
           "missing_items": [
-            "无服务标准诊断SOP"
+            "待工程复核和现场执行回流"
           ]
         },
         "test_points": {
-          "status": "missing",
+          "status": "partial",
           "missing_items": [
-            "RF/SIM关键测试点",
-            "校准Log判定标准"
+            "需要把参考信号映射到具体点位坐标"
           ]
         },
         "board_assets": {
@@ -205,16 +223,15 @@
           ]
         },
         "repair_cases": {
-          "status": "missing",
+          "status": "partial",
           "missing_items": [
-            "无服务已验证案例"
+            "由步骤指导执行后回流的验证记录"
           ]
         },
         "repair_boundary": {
-          "status": "missing",
-          "missing_items": [
-            "射频复杂维修边界"
-          ]
+          "status": "not_required_phase_1",
+          "missing_items": [],
+          "note": "当前阶段不强制设置维修边界。"
         },
         "engineering_confirmation": {
           "status": "missing",
@@ -223,7 +240,7 @@
           ]
         }
       },
-      "next_action": "向制造中心/技术支持索要无服务诊断路径、RF/SIM点位、校准Log样例和典型维修案例。"
+      "next_action": "继续复核已生成的机型步骤指导，并把执行结果回流为验证记录。"
     },
     {
       "package_id": "FP-RESTART-LOGO",
@@ -297,10 +314,9 @@
           ]
         },
         "repair_boundary": {
-          "status": "missing",
-          "missing_items": [
-            "软件/硬件分界和不可修边界"
-          ]
+          "status": "not_required_phase_1",
+          "missing_items": [],
+          "note": "当前阶段不强制设置维修边界。"
         },
         "engineering_confirmation": {
           "status": "missing",
@@ -315,7 +331,7 @@
       "package_id": "FP-NO-CHARGE",
       "title": "不充电故障包",
       "priority": "P1",
-      "status": "model_sample_sop_available",
+      "status": "model_guidance_available",
       "l4_evidence": [
         {
           "metric": "CHG01-Can not charging",
@@ -349,7 +365,27 @@
       ],
       "linked_fault_knowledge": [],
       "linked_sops": [
-        "SOP-KM4-NO-CHARGE-001"
+        "SOP-KM4-NO-CHARGE-001",
+        "SOP-BG6H-NO_CHARGE-AUTO-001",
+        "SOP-BG6H-USB-AUTO-001",
+        "SOP-CK6N-NO_CHARGE-AUTO-001",
+        "SOP-CK6N-USB-AUTO-001",
+        "SOP-CLA5-NO_CHARGE-AUTO-001",
+        "SOP-CLA5-USB-AUTO-001",
+        "SOP-CM5-NO_CHARGE-AUTO-001",
+        "SOP-CM5-USB-AUTO-001",
+        "SOP-CM6-NO_CHARGE-AUTO-001",
+        "SOP-CM6-USB-AUTO-001",
+        "SOP-KJ5-NO_CHARGE-AUTO-001",
+        "SOP-KJ5-USB-AUTO-001",
+        "SOP-KL4-NO_CHARGE-AUTO-001",
+        "SOP-KL4-USB-AUTO-001",
+        "SOP-KM4-NO_CHARGE-AUTO-001",
+        "SOP-KM4-USB-AUTO-001",
+        "SOP-KM7K-NO_CHARGE-AUTO-001",
+        "SOP-KM7K-USB-AUTO-001",
+        "SOP-X6880-NO_CHARGE-AUTO-001",
+        "SOP-X6880-USB-AUTO-001"
       ],
       "required_materials": {
         "symptom_definition": {
@@ -361,13 +397,13 @@
         "diagnosis_sop": {
           "status": "partial",
           "missing_items": [
-            "其他机型的同类步骤指导"
+            "待工程复核和现场执行回流"
           ]
         },
         "test_points": {
           "status": "partial",
           "missing_items": [
-            "其他机型充电 IC 周边测试点"
+            "需要把参考信号映射到具体点位坐标"
           ]
         },
         "board_assets": {
@@ -379,14 +415,13 @@
         "repair_cases": {
           "status": "partial",
           "missing_items": [
-            "由 SOP 执行后回流的验证记录"
+            "由步骤指导执行后回流的验证记录"
           ]
         },
         "repair_boundary": {
-          "status": "missing",
-          "missing_items": [
-            "USB/充电IC维修边界"
-          ]
+          "status": "not_required_phase_1",
+          "missing_items": [],
+          "note": "当前阶段不强制设置维修边界。"
         },
         "engineering_confirmation": {
           "status": "missing",
@@ -395,7 +430,7 @@
           ]
         }
       },
-      "next_action": "以 KM4/F151 不充电步骤指导为样板，继续转译 KL4、BG6m 等资料成熟机型。"
+      "next_action": "继续复核已生成的机型步骤指导，并把执行结果回流为验证记录。"
     },
     {
       "package_id": "FP-CURRENT-LEAKAGE",
@@ -468,10 +503,9 @@
           ]
         },
         "repair_boundary": {
-          "status": "missing",
-          "missing_items": [
-            "PMIC/CPU相关边界"
-          ]
+          "status": "not_required_phase_1",
+          "missing_items": [],
+          "note": "当前阶段不强制设置维修边界。"
         },
         "engineering_confirmation": {
           "status": "missing",
