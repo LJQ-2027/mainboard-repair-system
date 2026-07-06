@@ -32,7 +32,17 @@ The top stepper provides orientation but should not compete with the main task.
 
 ## Current Scope
 
-This iteration implements the main diagnostic flow page only. Secondary pages such as model library, repair steps, SN/Log tools, and records remain accessible but are not redesigned yet.
+This iteration implements the main diagnostic flow page only. All five flow stages must be usable, not only the default stage.
+
+Each stage owns a distinct right-side support panel:
+
+- Fault intake: recognized model, fault, and next step.
+- Basic exclusion: external checks before mainboard testing.
+- Test and locate: board/measurement position preview.
+- Repair or escalate: repair action choices and escalation.
+- Verify and record: required post-repair validation items.
+
+Secondary pages such as model library, repair steps, SN/Log tools, and records remain accessible but are not redesigned yet.
 
 ## Validation
 

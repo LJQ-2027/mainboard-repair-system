@@ -3443,6 +3443,165 @@
             box-shadow: 0 0 0 7px rgba(255, 122, 26, 0.14);
         }
 
+        .repair-board-label {
+            position: absolute;
+            left: 22px;
+            bottom: 22px;
+            display: grid;
+            gap: 6px;
+            z-index: 1;
+        }
+
+        .repair-board-label span {
+            width: fit-content;
+            padding: 7px 10px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.86);
+            color: #0f2a44;
+            font-size: 12px;
+            font-weight: 850;
+            box-shadow: 0 8px 18px rgba(15, 42, 68, 0.12);
+        }
+
+        .repair-assist-visual {
+            min-height: 290px;
+            margin: 16px;
+            border: 1px solid #d9e4ee;
+            border-radius: 22px;
+            background: #f8fbfd;
+            overflow: hidden;
+        }
+
+        .repair-intake-visual {
+            display: grid;
+            gap: 12px;
+            padding: 18px;
+        }
+
+        .repair-input-preview {
+            min-height: 54px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            border: 2px solid #0c6fd3;
+            border-radius: 16px;
+            background: #ffffff;
+            color: #6d8195;
+            font-weight: 760;
+        }
+
+        .repair-match-preview {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            align-items: center;
+            padding: 13px;
+            border: 1px solid #dfe8f1;
+            border-radius: 15px;
+            background: #ffffff;
+        }
+
+        .repair-match-preview strong {
+            display: block;
+            color: #10263d;
+            margin-bottom: 3px;
+        }
+
+        .repair-match-preview span {
+            color: #6d8195;
+            font-size: 13px;
+        }
+
+        .repair-match-preview b {
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: #e7f3ff;
+            color: #075ea8;
+            font-size: 12px;
+        }
+
+        .repair-exclusion-visual,
+        .repair-verification-visual {
+            display: grid;
+            gap: 12px;
+            padding: 18px;
+        }
+
+        .repair-exclusion-card,
+        .repair-verify-card {
+            display: grid;
+            grid-template-columns: 38px minmax(0, 1fr);
+            gap: 12px;
+            align-items: center;
+            min-height: 62px;
+            padding: 12px;
+            border: 1px solid #dfe8f1;
+            border-radius: 16px;
+            background: #ffffff;
+        }
+
+        .repair-exclusion-card i,
+        .repair-verify-card i {
+            width: 38px;
+            height: 38px;
+            display: grid;
+            place-items: center;
+            border-radius: 13px;
+            background: #e7f3ff;
+            color: #075ea8;
+            font-style: normal;
+            font-weight: 900;
+        }
+
+        .repair-exclusion-card strong,
+        .repair-verify-card strong {
+            display: block;
+            color: #10263d;
+            margin-bottom: 3px;
+        }
+
+        .repair-exclusion-card span,
+        .repair-verify-card span {
+            color: #6d8195;
+            font-size: 13px;
+        }
+
+        .repair-action-visual {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            padding: 18px;
+        }
+
+        .repair-action-choice {
+            min-height: 98px;
+            padding: 14px;
+            border: 1px solid #dfe8f1;
+            border-radius: 18px;
+            background: #ffffff;
+        }
+
+        .repair-action-choice strong {
+            display: block;
+            color: #10263d;
+            margin-bottom: 8px;
+        }
+
+        .repair-action-choice span {
+            color: #6d8195;
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        .repair-action-choice.escalate {
+            border-color: #f3c9a1;
+            background: #fff8ed;
+        }
+
+        .repair-action-choice.escalate strong {
+            color: #9a4d00;
+        }
+
         .repair-record-list {
             display: grid;
             gap: 11px;
@@ -4157,7 +4316,7 @@
                     <aside class="repair-assist-panel">
                         <div class="repair-location-card">
                             <div class="repair-assist-title"><strong id="repairLocationTitle">下一阶段测量位置</strong><span id="repairLocationMeta">预览</span></div>
-                            <div class="repair-board-preview"><div class="repair-board-target"></div></div>
+                            <div id="repairAssistVisual"></div>
                         </div>
                         <div class="repair-record-card">
                             <div class="repair-assist-title"><strong id="repairRecordTitle">检查结果</strong><span id="repairRecordMeta">本步骤填写</span></div>
@@ -5694,7 +5853,7 @@
             }).slice(0, 8);
         }
 
-        let activeRepairFlowStep = 2;
+        let activeRepairFlowStep = 1;
 
         const repairFlowSteps = [
             {
@@ -5717,7 +5876,8 @@
                     ['客户描述', '选填']
                 ],
                 locationTitle: '故障信息',
-                locationMeta: '录入'
+                locationMeta: '录入',
+                visualType: 'intake'
             },
             {
                 id: 2,
@@ -5739,7 +5899,8 @@
                     ['是否进入主板检测', '下一步']
                 ],
                 locationTitle: '下一阶段测量位置',
-                locationMeta: '预览'
+                locationMeta: '预览',
+                visualType: 'exclusion'
             },
             {
                 id: 3,
@@ -5761,7 +5922,8 @@
                     ['开机电流', '填写']
                 ],
                 locationTitle: '测量位置',
-                locationMeta: '当前步骤'
+                locationMeta: '当前步骤',
+                visualType: 'board'
             },
             {
                 id: 4,
@@ -5783,7 +5945,8 @@
                     ['是否升级', '选择']
                 ],
                 locationTitle: '处理位置',
-                locationMeta: '定位'
+                locationMeta: '定位',
+                visualType: 'repair'
             },
             {
                 id: 5,
@@ -5805,7 +5968,8 @@
                     ['维修结论', '记录']
                 ],
                 locationTitle: '验证项目',
-                locationMeta: '收尾'
+                locationMeta: '收尾',
+                visualType: 'verify'
             }
         ];
 
@@ -5815,8 +5979,7 @@
         }
 
         function getRepairStepForContext(query, model, pack) {
-            if (!query && !model && !pack) return 1;
-            return activeRepairFlowStep || 2;
+            return activeRepairFlowStep || 1;
         }
 
         function renderDiagnosticWorkbench() {
@@ -5829,6 +5992,7 @@
             const footerEl = document.getElementById('repairTaskFooter');
             const locationTitleEl = document.getElementById('repairLocationTitle');
             const locationMetaEl = document.getElementById('repairLocationMeta');
+            const assistVisualEl = document.getElementById('repairAssistVisual');
             const recordTitleEl = document.getElementById('repairRecordTitle');
             const recordMetaEl = document.getElementById('repairRecordMeta');
             const recordListEl = document.getElementById('repairRecordList');
@@ -5858,6 +6022,7 @@
             subtitleEl.textContent = step.subtitle;
             if (locationTitleEl) locationTitleEl.textContent = step.locationTitle;
             if (locationMetaEl) locationMetaEl.textContent = step.locationMeta;
+            if (assistVisualEl) assistVisualEl.innerHTML = renderRepairAssistVisual(step, query, model, pack);
             if (recordTitleEl) recordTitleEl.textContent = step.id === 3 ? '填写测量结果' : '检查结果';
             if (recordMetaEl) recordMetaEl.textContent = step.id === 5 ? '完成记录' : '本步骤填写';
 
@@ -5891,6 +6056,58 @@
                     <button type="button">${escapeHtml(action)}</button>
                 </div>
             `).join('');
+        }
+
+        function renderRepairAssistVisual(step, query, model, pack) {
+            if (step.visualType === 'intake') {
+                return `
+                    <div class="repair-assist-visual repair-intake-visual">
+                        <div class="repair-input-preview">${escapeHtml(query || '等待输入：机型 / SN / 故障现象')}</div>
+                        <div class="repair-match-preview"><div><strong>识别机型</strong><span>${escapeHtml(model?.model_name || '输入后自动匹配')}</span></div><b>${model ? '已识别' : '待识别'}</b></div>
+                        <div class="repair-match-preview"><div><strong>识别故障</strong><span>${escapeHtml(pack?.title || '输入后自动匹配')}</span></div><b>${pack ? '已识别' : '待识别'}</b></div>
+                        <div class="repair-match-preview"><div><strong>下一步</strong><span>信息足够后进入基础排除</span></div><b>步骤 2</b></div>
+                    </div>
+                `;
+            }
+            if (step.visualType === 'exclusion') {
+                return `
+                    <div class="repair-assist-visual repair-exclusion-visual">
+                        <div class="repair-exclusion-card"><i>1</i><div><strong>看外观</strong><span>进水、烧蚀、接口损坏、主板变形</span></div></div>
+                        <div class="repair-exclusion-card"><i>2</i><div><strong>换配件复测</strong><span>电池、充电器、线材、屏幕排线</span></div></div>
+                        <div class="repair-exclusion-card"><i>3</i><div><strong>确认仍复现</strong><span>非主板因素排除后再进入检测</span></div></div>
+                        <div class="repair-exclusion-card"><i>4</i><div><strong>准备测量</strong><span>下一步测 VBAT、主供电和开机电流</span></div></div>
+                    </div>
+                `;
+            }
+            if (step.visualType === 'repair') {
+                return `
+                    <div class="repair-assist-visual repair-action-visual">
+                        <div class="repair-action-choice"><strong>清洁</strong><span>腐蚀、异物、脏污、轻微进水痕迹。</span></div>
+                        <div class="repair-action-choice"><strong>补焊</strong><span>连接器、小料、明显虚焊或接触不良。</span></div>
+                        <div class="repair-action-choice"><strong>更换</strong><span>按检测结果更换明确异常器件。</span></div>
+                        <div class="repair-action-choice escalate"><strong>升级</strong><span>BGA、复杂短路、疑难板交给中方技术员。</span></div>
+                    </div>
+                `;
+            }
+            if (step.visualType === 'verify') {
+                return `
+                    <div class="repair-assist-visual repair-verification-visual">
+                        <div class="repair-verify-card"><i>✓</i><div><strong>开机验证</strong><span>能正常开机并进入系统。</span></div></div>
+                        <div class="repair-verify-card"><i>✓</i><div><strong>电流验证</strong><span>待机、充电、电流曲线无明显异常。</span></div></div>
+                        <div class="repair-verify-card"><i>✓</i><div><strong>功能验证</strong><span>按故障类型验证显示、触摸、充电或通信。</span></div></div>
+                        <div class="repair-verify-card"><i>✓</i><div><strong>记录保存</strong><span>保存测量值、维修动作和最终结果。</span></div></div>
+                    </div>
+                `;
+            }
+            return `
+                <div class="repair-board-preview">
+                    <div class="repair-board-target"></div>
+                    <div class="repair-board-label">
+                        <span>测量点：VBAT</span>
+                        <span>下一项：主供电阻值</span>
+                    </div>
+                </div>
+            `;
         }
 
         function getRecordHint(title, model, pack) {
