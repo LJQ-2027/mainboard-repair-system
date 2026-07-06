@@ -3640,6 +3640,217 @@
             cursor: pointer;
         }
 
+        .board-atlas-shell {
+            display: grid;
+            gap: 18px;
+        }
+
+        .board-atlas-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 360px;
+            gap: 18px;
+            align-items: start;
+        }
+
+        .board-atlas-stage,
+        .board-atlas-panel {
+            border: 1px solid #d8e3ee;
+            border-radius: 22px;
+            background: #ffffff;
+            box-shadow: 0 18px 45px rgba(9, 31, 53, 0.08);
+        }
+
+        .board-atlas-stage {
+            overflow: hidden;
+        }
+
+        .board-atlas-toolbar {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 14px;
+            align-items: center;
+            padding: 16px 18px;
+            border-bottom: 1px solid #e7eef5;
+        }
+
+        .board-atlas-toolbar h3,
+        .board-atlas-panel h3 {
+            margin: 0;
+            color: #071c33;
+            font-size: 18px;
+        }
+
+        .board-atlas-toolbar p,
+        .board-atlas-panel p {
+            margin: 4px 0 0;
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .board-atlas-side-switcher,
+        .board-atlas-faults {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .atlas-chip {
+            min-height: 38px;
+            padding: 8px 12px;
+            border: 1px solid #c9d7e6;
+            border-radius: 999px;
+            background: #ffffff;
+            color: #244056;
+            font-size: 13px;
+            font-weight: 850;
+            box-shadow: none;
+        }
+
+        .atlas-chip:hover,
+        .atlas-chip.active {
+            background: #083b76;
+            border-color: #083b76;
+            color: #ffffff;
+            transform: none;
+            box-shadow: 0 10px 24px rgba(8, 59, 118, 0.18);
+        }
+
+        .board-atlas-canvas {
+            position: relative;
+            min-height: 580px;
+            overflow: auto;
+            background:
+                linear-gradient(90deg, rgba(148, 163, 184, 0.13) 1px, transparent 1px),
+                linear-gradient(0deg, rgba(148, 163, 184, 0.13) 1px, transparent 1px),
+                #f8fbfd;
+            background-size: 24px 24px;
+        }
+
+        .board-atlas-viewport {
+            position: relative;
+            min-width: 980px;
+            width: 100%;
+            padding: 18px;
+        }
+
+        .board-atlas-image {
+            position: relative;
+            z-index: 1;
+            display: block;
+            width: 100%;
+            height: auto;
+            border: 1px solid #d4e0ec;
+            border-radius: 18px;
+            background: #ffffff;
+            pointer-events: none;
+        }
+
+        .board-atlas-overlay {
+            position: absolute;
+            inset: 18px;
+            z-index: 2;
+            width: calc(100% - 36px);
+            height: calc(100% - 36px);
+            pointer-events: none;
+        }
+
+        .atlas-module-polygon {
+            fill: rgba(8, 59, 118, 0.08);
+            stroke: rgba(8, 59, 118, 0.36);
+            stroke-width: 0.006;
+            cursor: pointer;
+            pointer-events: auto;
+            transition: fill 160ms var(--console-ease), stroke 160ms var(--console-ease);
+        }
+
+        .atlas-module-polygon.suspected {
+            fill: rgba(255, 177, 59, 0.20);
+            stroke: #a45400;
+        }
+
+        .atlas-module-polygon.selected {
+            fill: rgba(8, 122, 91, 0.22);
+            stroke: #087a5b;
+        }
+
+        .atlas-test-point {
+            fill: #b42318;
+            stroke: #ffffff;
+            stroke-width: 0.006;
+            cursor: pointer;
+            pointer-events: auto;
+        }
+
+        .atlas-test-point.selected {
+            fill: #087a5b;
+            stroke: #ffffff;
+        }
+
+        .atlas-module-label {
+            fill: #071c33;
+            font-size: 0.012px;
+            font-weight: 900;
+            pointer-events: none;
+            paint-order: stroke;
+            stroke: rgba(255, 255, 255, 0.92);
+            stroke-width: 0.003px;
+        }
+
+        .board-atlas-side-note {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            padding: 12px 18px 18px;
+        }
+
+        .board-atlas-panel {
+            display: grid;
+            gap: 14px;
+            padding: 18px;
+        }
+
+        .board-atlas-section {
+            display: grid;
+            gap: 10px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid #e7eef5;
+        }
+
+        .board-atlas-section:last-child {
+            border-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .atlas-detail-card {
+            padding: 13px;
+            border: 1px solid #dfe8f1;
+            border-radius: 16px;
+            background: #f8fbfd;
+        }
+
+        .atlas-detail-card strong {
+            display: block;
+            margin-bottom: 5px;
+            color: #10263d;
+        }
+
+        .atlas-detail-card span,
+        .atlas-detail-card p {
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.55;
+        }
+
+        .atlas-sop-step {
+            border-color: #f3c9a1;
+            background: #fff8ed;
+        }
+
+        .atlas-sop-step strong {
+            color: #8a4300;
+        }
+
         @media (max-width: 1280px) {
             .diagnostic-grid {
                 grid-template-columns: 1fr 1fr;
@@ -3650,6 +3861,10 @@
             }
 
             .repair-flow-work {
+                grid-template-columns: 1fr;
+            }
+
+            .board-atlas-layout {
                 grid-template-columns: 1fr;
             }
 
@@ -3704,8 +3919,17 @@
             .repair-flow-stepper,
             .repair-query-card,
             .repair-checklist,
+            .board-atlas-toolbar,
             .repair-assist-panel {
                 grid-template-columns: 1fr;
+            }
+
+            .board-atlas-canvas {
+                min-height: 430px;
+            }
+
+            .board-atlas-viewport {
+                min-width: 760px;
             }
 
             .repair-current-task {
@@ -3884,8 +4108,22 @@
         }
 
         @media (max-width: 980px) {
+            .container,
             .container.sidebar-collapsed {
                 grid-template-columns: 1fr;
+            }
+
+            .workbench-sidebar {
+                position: static;
+                height: auto;
+                max-height: none;
+                width: 100%;
+                border-right: 0;
+                border-bottom: 1px solid #dfe5ee;
+            }
+
+            .workbench-main {
+                min-width: 0;
             }
 
             .sidebar-toggle {
@@ -3944,6 +4182,13 @@
                         <span>
                             <span class="nav-card-label">机型资料</span>
                             <span class="nav-card-meta">承接 Top20 主板图、点位图和完整度</span>
+                        </span>
+                    </button>
+                    <button class="tab-btn nav-card" data-tab="board-atlas-guide" onclick="switchTab('board-atlas-guide')">
+                        <span class="nav-card-code" aria-hidden="true">MAP</span>
+                        <span>
+                            <span class="nav-card-label">主板图谱导诊</span>
+                            <span class="nav-card-meta">点击模块、测试点和故障路径完成检测</span>
                         </span>
                     </button>
                     <button class="tab-btn nav-card" data-tab="fault-packages" onclick="switchTab('fault-packages')">
@@ -4323,6 +4568,18 @@
                             <div class="repair-record-list" id="repairRecordList"></div>
                         </div>
                     </aside>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="board-atlas-guide-tab">
+            <div class="board-atlas-shell">
+                <div class="knowledge-hero">
+                    <h2>主板图谱导诊</h2>
+                    <p class="subtitle">用 KM4/F151 样板验证 2.5D 维修流程：先看板图，再按故障高亮模块，点击模块或测试点查看检测提示。当前为草案坐标，正式使用前需工程确认。</p>
+                </div>
+                <div id="boardAtlasGuideRoot">
+                    <div class="knowledge-state">正在加载主板图谱...</div>
                 </div>
             </div>
         </div>
@@ -5248,6 +5505,7 @@
                 trainingMaterials: [],
                 manuals: [],
                 modelAssets: null,
+                boardAtlas: null,
                 mtkSignals: null,
                 reportSummaries: [],
                 gapRequests: [],
@@ -5263,10 +5521,19 @@
             trainingMaterials: 'knowledge-base/training-materials.json',
             manuals: 'knowledge-base/platform-repair-manuals.json',
             modelAssets: 'knowledge-base/model-board-assets.json',
+            boardAtlas: 'knowledge-base/board-atlas-mvp.json',
             mtkSignals: 'knowledge-base/mtk-signal-reference.json',
             reportSummaries: 'knowledge-base/repair-report-summaries.json',
             gapRequests: 'knowledge-base/gap-requests.json',
             sopDrafts: 'knowledge-base/sop-drafts.json'
+        };
+
+        const boardAtlasUiState = {
+            boardId: '',
+            sideId: '',
+            faultId: '',
+            selectedModuleId: '',
+            selectedPointId: ''
         };
 
         function escapeHtml(value) {
@@ -5409,6 +5676,7 @@
             renderDiagnosticWorkbench();
             renderReadinessDashboard();
             renderModelLibrary();
+            renderBoardAtlasGuide();
             renderFaultPackages();
             renderCaseTemplate();
             renderInteractiveSop();
@@ -5652,6 +5920,185 @@
                     </div>
                 </article>
             `).join('');
+        }
+
+        function getActiveBoardAtlasBoard() {
+            const boards = knowledgeBaseState.data.boardAtlas?.boards || [];
+            if (boards.length === 0) return null;
+            if (!boardAtlasUiState.boardId) boardAtlasUiState.boardId = boards[0].board_id;
+            return boards.find(board => board.board_id === boardAtlasUiState.boardId) || boards[0];
+        }
+
+        function getActiveBoardAtlasSide(board) {
+            if (!board) return null;
+            if (!boardAtlasUiState.sideId) boardAtlasUiState.sideId = board.sides?.[0]?.side_id || '';
+            return board.sides.find(side => side.side_id === boardAtlasUiState.sideId) || board.sides[0];
+        }
+
+        function getActiveBoardAtlasFault(board) {
+            if (!board) return null;
+            if (!boardAtlasUiState.faultId) boardAtlasUiState.faultId = board.fault_paths?.[0]?.fault_id || '';
+            return board.fault_paths.find(fault => fault.fault_id === boardAtlasUiState.faultId) || board.fault_paths[0];
+        }
+
+        function getActiveBoardAtlasSop(board, fault) {
+            if (!board || !fault) return null;
+            return board.sop_steps.find(step => step.step_id === fault.first_sop_step) || board.sop_steps[0];
+        }
+
+        function setBoardAtlasSide(sideId) {
+            boardAtlasUiState.sideId = sideId;
+            boardAtlasUiState.selectedModuleId = '';
+            boardAtlasUiState.selectedPointId = '';
+            renderBoardAtlasGuide();
+        }
+
+        function setBoardAtlasFault(faultId) {
+            boardAtlasUiState.faultId = faultId;
+            boardAtlasUiState.selectedModuleId = '';
+            boardAtlasUiState.selectedPointId = '';
+            const board = getActiveBoardAtlasBoard();
+            const fault = getActiveBoardAtlasFault(board);
+            const firstModuleId = fault?.suspected_modules?.[0] || '';
+            const firstModule = board?.modules?.find(module => module.module_id === firstModuleId);
+            if (firstModule) boardAtlasUiState.sideId = firstModule.side_id;
+            renderBoardAtlasGuide();
+        }
+
+        function selectBoardAtlasModule(moduleId) {
+            boardAtlasUiState.selectedModuleId = moduleId;
+            boardAtlasUiState.selectedPointId = '';
+            renderBoardAtlasGuide();
+        }
+
+        function selectBoardAtlasTestPoint(pointId) {
+            boardAtlasUiState.selectedPointId = pointId;
+            const board = getActiveBoardAtlasBoard();
+            const point = board?.test_points?.find(item => item.point_id === pointId);
+            boardAtlasUiState.selectedModuleId = point?.related_modules?.[0] || boardAtlasUiState.selectedModuleId;
+            renderBoardAtlasGuide();
+        }
+
+        function polygonToSvgPoints(polygon) {
+            return asArray(polygon).map(point => `${Number(point[0]).toFixed(4)},${Number(point[1]).toFixed(4)}`).join(' ');
+        }
+
+        function polygonCenter(polygon) {
+            const points = asArray(polygon);
+            if (points.length === 0) return [0.5, 0.5];
+            const sum = points.reduce((acc, point) => [acc[0] + Number(point[0]), acc[1] + Number(point[1])], [0, 0]);
+            return [sum[0] / points.length, sum[1] / points.length];
+        }
+
+        function renderBoardAtlasGuide() {
+            const root = document.getElementById('boardAtlasGuideRoot');
+            if (!root) return;
+            if (!knowledgeBaseState.loaded) return;
+
+            const atlas = knowledgeBaseState.data.boardAtlas;
+            const board = getActiveBoardAtlasBoard();
+            if (!atlas || !board) {
+                root.innerHTML = '<div class="knowledge-state">暂无可用主板图谱数据。</div>';
+                return;
+            }
+
+            const side = getActiveBoardAtlasSide(board);
+            const fault = getActiveBoardAtlasFault(board);
+            const sopStep = getActiveBoardAtlasSop(board, fault);
+            const suspectedModuleIds = new Set(fault?.suspected_modules || []);
+            const sideModules = (board.modules || []).filter(module => module.side_id === side?.side_id);
+            const sidePoints = (board.test_points || []).filter(point => point.side_id === side?.side_id);
+            const selectedModule = (board.modules || []).find(module => module.module_id === boardAtlasUiState.selectedModuleId);
+            const selectedPoint = (board.test_points || []).find(point => point.point_id === boardAtlasUiState.selectedPointId);
+
+            root.innerHTML = `
+                <div class="board-atlas-layout">
+                    <section class="board-atlas-stage">
+                        <div class="board-atlas-toolbar">
+                            <div>
+                                <h3>${escapeHtml(board.model_name)} / ${escapeHtml(board.board_version)}</h3>
+                                <p>${escapeHtml(board.engineering_status === 'pending_review' ? '当前为工程待确认样板，模块坐标和测试点为草案。' : '主板图谱已登记。')}</p>
+                            </div>
+                            <div class="board-atlas-side-switcher">
+                                ${(board.sides || []).map(item => `
+                                    <button type="button" class="atlas-chip ${item.side_id === side?.side_id ? 'active' : ''}" onclick="setBoardAtlasSide('${escapeHtml(item.side_id)}')">${escapeHtml(item.label)}</button>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <div class="board-atlas-canvas">
+                            <div class="board-atlas-viewport">
+                                <img class="board-atlas-image" src="${escapeHtml(side?.image || '')}" alt="${escapeHtml(side?.label || '主板图谱')}">
+                                <svg class="board-atlas-overlay" viewBox="0 0 1 1" preserveAspectRatio="none" aria-label="主板模块与测试点覆盖层">
+                                    ${sideModules.map(module => {
+                                        const center = polygonCenter(module.polygon);
+                                        const state = [
+                                            suspectedModuleIds.has(module.module_id) ? 'suspected' : '',
+                                            boardAtlasUiState.selectedModuleId === module.module_id ? 'selected' : ''
+                                        ].join(' ');
+                                        return `
+                                            <polygon class="atlas-module-polygon ${state}" points="${polygonToSvgPoints(module.polygon)}" onclick="selectBoardAtlasModule('${escapeHtml(module.module_id)}')"></polygon>
+                                            <text class="atlas-module-label" x="${center[0].toFixed(4)}" y="${center[1].toFixed(4)}" text-anchor="middle">${escapeHtml(module.name)}</text>
+                                        `;
+                                    }).join('')}
+                                    ${sidePoints.map(point => `
+                                        <circle class="atlas-test-point ${boardAtlasUiState.selectedPointId === point.point_id ? 'selected' : ''}" cx="${Number(point.x).toFixed(4)}" cy="${Number(point.y).toFixed(4)}" r="0.018" onclick="selectBoardAtlasTestPoint('${escapeHtml(point.point_id)}')"></circle>
+                                    `).join('')}
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="board-atlas-side-note">
+                            <span class="knowledge-pill draft">${escapeHtml(side?.orientation_status || 'needs_confirmation')}</span>
+                            <span class="knowledge-pill medium">模块 ${sideModules.length} 个</span>
+                            <span class="knowledge-pill medium">测试点 ${sidePoints.length} 个</span>
+                        </div>
+                    </section>
+                    <aside class="board-atlas-panel">
+                        <div class="board-atlas-section">
+                            <h3>选择当前情况</h3>
+                            <p>维修员只有一个入口；如果不知道坏点，就先走初步主板排查。</p>
+                            <div class="board-atlas-faults">
+                                ${(board.fault_paths || []).map(item => `
+                                    <button type="button" class="atlas-chip ${item.fault_id === fault?.fault_id ? 'active' : ''}" data-fault-id="${escapeHtml(item.fault_id)}" onclick="setBoardAtlasFault('${escapeHtml(item.fault_id)}')">${escapeHtml(item.label)}</button>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <div class="board-atlas-section">
+                            <h3>当前 SOP 提示</h3>
+                            <div class="atlas-detail-card atlas-sop-step">
+                                <strong>${escapeHtml(sopStep?.title || '等待选择故障')}</strong>
+                                <p>${escapeHtml(sopStep?.instruction || '请选择故障路径或初步排查。')}</p>
+                                <span>预期结果：${escapeHtml(sopStep?.expected_result || '待工程确认')}</span>
+                            </div>
+                        </div>
+                        <div class="board-atlas-section">
+                            <h3>选中模块</h3>
+                            ${selectedModule ? `
+                                <div class="atlas-detail-card">
+                                    <strong>${escapeHtml(selectedModule.name)}</strong>
+                                    <span>关联故障：${escapeHtml(asArray(selectedModule.related_faults).join(' / ') || '待补充')}</span>
+                                    <p>状态：${escapeHtml(selectedModule.status || 'draft_overlay')}</p>
+                                </div>
+                            ` : '<div class="atlas-detail-card"><span>点击图上的高亮区域查看模块说明。</span></div>'}
+                        </div>
+                        <div class="board-atlas-section">
+                            <h3>选中测试点</h3>
+                            ${selectedPoint ? `
+                                <div class="atlas-detail-card">
+                                    <strong>${escapeHtml(selectedPoint.name)}</strong>
+                                    <span>预期结果：${escapeHtml(selectedPoint.expected_result || '待工程确认')}</span>
+                                    <p>状态：${escapeHtml(selectedPoint.status || 'placeholder_requires_engineering_confirmation')}</p>
+                                </div>
+                            ` : '<div class="atlas-detail-card"><span>点击红色测试点查看测量提示。当前点位为占位，需要工程确认。</span></div>'}
+                        </div>
+                        <div class="board-atlas-section">
+                            <h3>仍需材料</h3>
+                            <div class="knowledge-meta">
+                                ${renderPills(board.open_material_gaps || [], 'draft')}
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+            `;
         }
 
         function calculatePackageReadiness(pack, library) {
