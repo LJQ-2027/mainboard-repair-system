@@ -71,6 +71,22 @@ AI_MODEL=kimi-k2-thinking
 
 ## 生产环境部署
 
+### 数据库迁移
+
+项目已配置 Alembic。首次部署或更新模型后，请执行：
+
+```bash
+cd backend
+alembic upgrade head
+```
+
+创建新的模型迁移：
+
+```bash
+alembic revision --autogenerate -m "描述变更内容"
+alembic upgrade head
+```
+
 ### 后端（FastAPI）
 
 ```bash
