@@ -15,7 +15,12 @@ from app.models.diagnosis import DiagnosisRecord
 from app.models.session import ChatSession
 from app.models.user import User
 from app.schemas.chat import ChatRequest
+from app.schemas.diagnosis import StructuredDiagnosis
 from app.services.ai_proxy import chat_sync, stream_chat
+from app.services.diagnosis_parser import (
+    parse_diagnosis_result,
+    structured_to_json,
+)
 from app.utils.validators import sanitize_input, validate_symptom, validate_system_prompt
 
 # 当 system prompt 涉及维修但未要求引用时，自动追加引用提示
@@ -24,6 +29,23 @@ _CITATION_PROMPT = (
     "- 如果参考了知识库信息，用 [知识库: 标题] 标注\n"
     "- 如果参考了本地案例，用 [案例: 故障类型] 标注\n"
     "- 如果是基于专业经验，用 [经验] 标注"
+)
+
+# 结构化诊断输出提示
+_STRUCTURED_PROMPT = (
+    "\n\n## 结构化输出要求\n"
+    "请在回复末尾附加一段 JSON 格式的结构化诊断结果，使用如下格式：\n"
+    "```json\n"
+    '{\n'
+    '  "fault_type": "故障类型",\n'
+    '  "confidence": "high/medium/low",\n'
+    '  "summary": "一句话摘要",\n'
+    '  "recommended_tests": ["测试项1", "测试项2"],\n'
+    '  "repair_actions": ["维修动作1", "维修动作2"],\n'
+    '  "warnings": ["注意事项"],\n'
+    '  "references": ["参考来源"]\n'
+    '}\n'
+    "```"
 )
 
 
@@ -53,13 +75,20 @@ def build_mode_from_system(system: str) -> str:
 
 
 def validate_and_prepare_request(request: ChatRequest) -> ChatRequest:
-    """校验并准备请求：system prompt、引用提示、基本参数"""
+    """校验并准备请求：system prompt、引用提示、结构化输出、基本参数"""
     if request.system:
         ok, err = validate_system_prompt(request.system)
         if not ok:
             raise HTTPException(status_code=400, detail=err)
         if "引用" not in request.system and "维修" in request.system:
             request.system += _CITATION_PROMPT
+
+    if request.structured:
+        if "结构化输出" not in request.system:
+            request.system += _STRUCTURED_PROMPT
+        # 结构化输出暂不支持流式（需要在流结束后解析 JSON）
+        request.stream = False
+
     return request
 
 
@@ -125,14 +154,35 @@ def update_diagnosis_result(
     diagnosis: DiagnosisRecord,
     result: dict[str, Any],
 ) -> None:
-    """更新诊断结果"""
+    """更新诊断结果（含结构化解析）"""
     text = ""
     if isinstance(result, dict) and "content" in result:
         for block in result.get("content", []):
             if isinstance(block, dict) and block.get("type") == "text":
                 text += block.get("text", "")
-    diagnosis.result_text = text
+
+    display_text, structured = parse_diagnosis_result(text)
+    diagnosis.result_text = display_text
+    diagnosis.structured_result = structured_to_json(structured)
     db.commit()
+
+
+def _strip_structured_json_from_result(result: dict[str, Any]) -> dict[str, Any]:
+    """从 AI 结果中移除结构化 JSON 代码块，便于前端展示"""
+    if not isinstance(result, dict) or "content" not in result:
+        return result
+
+    new_result = dict(result)
+    new_content = []
+    for block in new_result.get("content", []):
+        if isinstance(block, dict) and block.get("type") == "text":
+            text = block.get("text", "")
+            cleaned, _ = parse_diagnosis_result(text)
+            new_content.append({**block, "text": cleaned})
+        else:
+            new_content.append(block)
+    new_result["content"] = new_content
+    return new_result
 
 
 def load_session_history(
@@ -245,6 +295,11 @@ async def execute_chat_sync(
 
     if diagnosis:
         update_diagnosis_result(db, diagnosis, result)
+
+    # 结构化输出请求：清理返回文本中的 JSON 代码块，避免前端展示原始 JSON
+    if request.structured:
+        result = _strip_structured_json_from_result(result)
+
     return result
 
 

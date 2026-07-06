@@ -6,7 +6,9 @@
 - 返回响应
 """
 
-from fastapi import APIRouter, Depends
+import json
+
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -14,6 +16,7 @@ from app.models.diagnosis import DiagnosisRecord
 from app.models.session import ChatSession
 from app.models.user import User
 from app.schemas.chat import ChatRequest
+from app.schemas.diagnosis import DiagnosisRecordResponse, StructuredDiagnosis
 from app.services.auth import get_current_active_user, get_optional_user
 from app.services.chat_service import execute_chat_stream, execute_chat_sync
 
@@ -75,10 +78,44 @@ def get_history(
             "id": r.id,
             "mode": r.mode,
             "symptom": r.symptom,
-            "result_text": r.result_text[:200],
+            "result_text": r.result_text[:200] if r.result_text else "",
             "ai_model": r.ai_model,
             "has_image": r.has_image,
             "created_at": r.created_at.isoformat(),
         }
         for r in records
     ]
+
+
+@router.get("/history/{record_id}", response_model=DiagnosisRecordResponse)
+def get_history_detail(
+    record_id: int,
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+):
+    """获取单条诊断记录详情（含结构化结果）"""
+    record = db.query(DiagnosisRecord).filter(
+        DiagnosisRecord.id == record_id,
+        DiagnosisRecord.user_id == current_user.id,
+    ).first()
+    if not record:
+        raise HTTPException(status_code=404, detail="诊断记录不存在")
+
+    structured = None
+    if record.structured_result:
+        try:
+            structured = StructuredDiagnosis(**json.loads(record.structured_result))
+        except (json.JSONDecodeError, TypeError):
+            structured = None
+
+    return DiagnosisRecordResponse(
+        id=record.id,
+        mode=record.mode,
+        symptom=record.symptom,
+        result_text=record.result_text,
+        structured_result=structured,
+        ai_model=record.ai_model,
+        has_image=record.has_image,
+        project_model=record.project_model,
+        created_at=record.created_at.isoformat(),
+    )

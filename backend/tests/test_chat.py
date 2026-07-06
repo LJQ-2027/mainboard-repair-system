@@ -72,3 +72,99 @@ def test_create_and_list_session(client, db_session):
     list_resp = client.get("/api/chat/sessions", headers={"Authorization": f"Bearer {token}"})
     assert list_resp.status_code == 200
     assert any(s["id"] == session_id for s in list_resp.json())
+
+
+def test_structured_chat_saves_parsed_result(client, db_session, monkeypatch):
+    """结构化诊断请求会解析并保存 JSON 结果"""
+    username = _unique("structured")
+    client.post("/auth/register", json={"username": username, "password": "SecurePass123!"})
+    login = client.post("/auth/login", json={"username": username, "password": "SecurePass123!"})
+    token = login.json()["access_token"]
+
+    async def fake_chat_sync(payload):
+        return {
+            "content": [{
+                "type": "text",
+                "text": (
+                    "建议更换电源IC。\n\n"
+                    "```json\n"
+                    '{"fault_type": "不开机", "confidence": "high", "summary": "电源IC损坏"}\n'
+                    "```"
+                ),
+            }]
+        }
+
+    monkeypatch.setattr("app.services.chat_service.chat_sync", fake_chat_sync)
+
+    resp = client.post(
+        "/api/chat",
+        headers={"Authorization": f"Bearer {token}"},
+        json={
+            "messages": [{"role": "user", "content": "手机不开机"}],
+            "stream": False,
+            "structured": True,
+        },
+    )
+    assert resp.status_code == 200
+    data = resp.json()
+    assert "电源IC" in data["content"][0]["text"]
+    assert "```json" not in data["content"][0]["text"]
+
+    # 查询历史详情验证结构化结果
+    history = client.get("/api/history", headers={"Authorization": f"Bearer {token}"})
+    record_id = history.json()[0]["id"]
+
+    detail = client.get(
+        f"/api/history/{record_id}",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert detail.status_code == 200
+    detail_data = detail.json()
+    assert detail_data["structured_result"]["fault_type"] == "不开机"
+    assert detail_data["structured_result"]["confidence"] == "high"
+
+
+def test_history_detail_not_found(client, db_session):
+    """查询不存在的诊断记录返回 404"""
+    username = _unique("histdetail")
+    client.post("/auth/register", json={"username": username, "password": "SecurePass123!"})
+    login = client.post("/auth/login", json={"username": username, "password": "SecurePass123!"})
+    token = login.json()["access_token"]
+
+    resp = client.get("/api/history/99999", headers={"Authorization": f"Bearer {token}"})
+    assert resp.status_code == 404
+
+
+def test_history_detail_forbidden(client, db_session):
+    """用户不能查看他人的诊断记录"""
+    user1 = _unique("user1")
+    user2 = _unique("user2")
+    client.post("/auth/register", json={"username": user1, "password": "SecurePass123!"})
+    client.post("/auth/register", json={"username": user2, "password": "SecurePass123!"})
+
+    login1 = client.post("/auth/login", json={"username": user1, "password": "SecurePass123!"})
+    token1 = login1.json()["access_token"]
+
+    login2 = client.post("/auth/login", json={"username": user2, "password": "SecurePass123!"})
+    token2 = login2.json()["access_token"]
+
+    # 用 user1 创建一条诊断记录
+    from app.models.diagnosis import DiagnosisRecord
+    from app.models.user import User
+    user = db_session.query(User).filter(User.username == user1).first()
+    record = DiagnosisRecord(
+        user_id=user.id,
+        mode="AI",
+        symptom="test",
+        project_model="X6878",
+    )
+    db_session.add(record)
+    db_session.commit()
+    record_id = record.id
+
+    # user2 访问应 404（不暴露存在性）
+    resp = client.get(
+        f"/api/history/{record_id}",
+        headers={"Authorization": f"Bearer {token2}"},
+    )
+    assert resp.status_code == 404

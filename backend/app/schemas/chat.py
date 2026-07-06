@@ -19,6 +19,7 @@ class ChatRequest(BaseModel):
     stream: bool = True
     session_id: int | None = None
     project: str = ""
+    structured: bool = Field(default=False, description="是否返回结构化诊断结果（非流式）")
 
     @field_validator("messages")
     @classmethod
