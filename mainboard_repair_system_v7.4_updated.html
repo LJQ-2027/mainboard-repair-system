@@ -3654,10 +3654,10 @@
 
         .board-atlas-stage,
         .board-atlas-panel {
-            border: 1px solid #d8e3ee;
-            border-radius: 22px;
+            border: 1px solid #cfdbe8;
+            border-radius: 12px;
             background: #ffffff;
-            box-shadow: 0 18px 45px rgba(9, 31, 53, 0.08);
+            box-shadow: 0 14px 34px rgba(9, 31, 53, 0.07);
         }
 
         .board-atlas-stage {
@@ -3732,6 +3732,7 @@
             min-width: 980px;
             width: 100%;
             padding: 18px;
+            perspective: 1200px;
         }
 
         .board-atlas-image {
@@ -3741,9 +3742,10 @@
             width: 100%;
             height: auto;
             border: 1px solid #d4e0ec;
-            border-radius: 18px;
+            border-radius: 10px;
             background: #ffffff;
             pointer-events: none;
+            box-shadow: 0 18px 34px rgba(15, 46, 70, 0.13);
         }
 
         .board-atlas-overlay {
@@ -3756,30 +3758,38 @@
         }
 
         .atlas-module-polygon {
-            fill: rgba(8, 59, 118, 0.08);
-            stroke: rgba(8, 59, 118, 0.36);
-            stroke-width: 0.006;
+            fill: rgba(8, 59, 118, 0.006);
+            stroke: rgba(0, 85, 155, 0.24);
+            stroke-width: 0.0022;
+            stroke-dasharray: 0.012 0.006;
+            stroke-linejoin: round;
             cursor: pointer;
             pointer-events: auto;
-            transition: fill 160ms var(--console-ease), stroke 160ms var(--console-ease);
+            filter: drop-shadow(0 0.006px 0 rgba(255, 255, 255, 0.95)) drop-shadow(0 0.012px 0.008px rgba(7, 28, 51, 0.18));
+            transition: fill 160ms var(--console-ease), stroke 160ms var(--console-ease), stroke-width 160ms var(--console-ease);
         }
 
         .atlas-module-polygon.suspected {
-            fill: rgba(255, 177, 59, 0.20);
-            stroke: #a45400;
+            fill: rgba(255, 177, 59, 0.055);
+            stroke: #c96d00;
+            stroke-width: 0.0038;
+            stroke-dasharray: none;
         }
 
         .atlas-module-polygon.selected {
-            fill: rgba(8, 122, 91, 0.22);
+            fill: rgba(8, 122, 91, 0.055);
             stroke: #087a5b;
+            stroke-width: 0.0042;
+            stroke-dasharray: none;
         }
 
         .atlas-test-point {
-            fill: #b42318;
+            fill: #f43f5e;
             stroke: #ffffff;
-            stroke-width: 0.006;
+            stroke-width: 0.004;
             cursor: pointer;
             pointer-events: auto;
+            filter: drop-shadow(0 0.01px 0.008px rgba(190, 18, 60, 0.7));
         }
 
         .atlas-test-point.selected {
@@ -3788,13 +3798,19 @@
         }
 
         .atlas-module-label {
-            fill: #071c33;
-            font-size: 0.012px;
+            fill: #00345f;
+            font-size: 0.008px;
             font-weight: 900;
+            opacity: 0;
             pointer-events: none;
             paint-order: stroke;
-            stroke: rgba(255, 255, 255, 0.92);
-            stroke-width: 0.003px;
+            stroke: rgba(255, 255, 255, 0.96);
+            stroke-width: 0.002px;
+        }
+
+        .atlas-module-polygon.suspected + .atlas-module-label,
+        .atlas-module-polygon.selected + .atlas-module-label {
+            opacity: 0.95;
         }
 
         .board-atlas-side-note {
@@ -4576,7 +4592,7 @@
             <div class="board-atlas-shell">
                 <div class="knowledge-hero">
                     <h2>主板图谱导诊</h2>
-                    <p class="subtitle">用 KM4/F151 样板验证 2.5D 维修流程：先看板图，再按故障高亮模块，点击模块或测试点查看检测提示。当前为草案坐标，正式使用前需工程确认。</p>
+                    <p class="subtitle">用 KM4/F151 内研资料生成维修图谱：先看板图，再按故障高亮模块，点击模块或测试点查看检测提示。</p>
                 </div>
                 <div id="boardAtlasGuideRoot">
                     <div class="knowledge-state">正在加载主板图谱...</div>
@@ -6017,7 +6033,7 @@
                         <div class="board-atlas-toolbar">
                             <div>
                                 <h3>${escapeHtml(board.model_name)} / ${escapeHtml(board.board_version)}</h3>
-                                <p>${escapeHtml(board.engineering_status === 'pending_review' ? '当前为工程待确认样板，模块坐标和测试点为草案。' : '主板图谱已登记。')}</p>
+                                <p>${escapeHtml(board.source_package_id || 'Top20 内研主板资料包')}</p>
                             </div>
                             <div class="board-atlas-side-switcher">
                                 ${(board.sides || []).map(item => `
@@ -6041,13 +6057,13 @@
                                         `;
                                     }).join('')}
                                     ${sidePoints.map(point => `
-                                        <circle class="atlas-test-point ${boardAtlasUiState.selectedPointId === point.point_id ? 'selected' : ''}" cx="${Number(point.x).toFixed(4)}" cy="${Number(point.y).toFixed(4)}" r="0.018" onclick="selectBoardAtlasTestPoint('${escapeHtml(point.point_id)}')"></circle>
+                                        <circle class="atlas-test-point ${boardAtlasUiState.selectedPointId === point.point_id ? 'selected' : ''}" cx="${Number(point.x).toFixed(4)}" cy="${Number(point.y).toFixed(4)}" r="0.010" onclick="selectBoardAtlasTestPoint('${escapeHtml(point.point_id)}')"></circle>
                                     `).join('')}
                                 </svg>
                             </div>
                         </div>
                         <div class="board-atlas-side-note">
-                            <span class="knowledge-pill draft">${escapeHtml(side?.orientation_status || 'needs_confirmation')}</span>
+                            <span class="knowledge-pill draft">资料页 ${escapeHtml(side?.source_pdf_page || '')}</span>
                             <span class="knowledge-pill medium">模块 ${sideModules.length} 个</span>
                             <span class="knowledge-pill medium">测试点 ${sidePoints.length} 个</span>
                         </div>
@@ -6067,7 +6083,7 @@
                             <div class="atlas-detail-card atlas-sop-step">
                                 <strong>${escapeHtml(sopStep?.title || '等待选择故障')}</strong>
                                 <p>${escapeHtml(sopStep?.instruction || '请选择故障路径或初步排查。')}</p>
-                                <span>预期结果：${escapeHtml(sopStep?.expected_result || '待工程确认')}</span>
+                                <span>记录要求：${escapeHtml(sopStep?.expected_result || '按维修资料记录结果')}</span>
                             </div>
                         </div>
                         <div class="board-atlas-section">
@@ -6075,8 +6091,8 @@
                             ${selectedModule ? `
                                 <div class="atlas-detail-card">
                                     <strong>${escapeHtml(selectedModule.name)}</strong>
-                                    <span>关联故障：${escapeHtml(asArray(selectedModule.related_faults).join(' / ') || '待补充')}</span>
-                                    <p>状态：${escapeHtml(selectedModule.status || 'draft_overlay')}</p>
+                                    <span>关联故障：${escapeHtml(asArray(selectedModule.related_faults).join(' / ') || '按现象继续排查')}</span>
+                                    <p>建议：先观察该区域器件外观，再按 SOP 测量关联点位。</p>
                                 </div>
                             ` : '<div class="atlas-detail-card"><span>点击图上的高亮区域查看模块说明。</span></div>'}
                         </div>
@@ -6085,15 +6101,15 @@
                             ${selectedPoint ? `
                                 <div class="atlas-detail-card">
                                     <strong>${escapeHtml(selectedPoint.name)}</strong>
-                                    <span>预期结果：${escapeHtml(selectedPoint.expected_result || '待工程确认')}</span>
-                                    <p>状态：${escapeHtml(selectedPoint.status || 'placeholder_requires_engineering_confirmation')}</p>
+                                    <span>记录要求：${escapeHtml(selectedPoint.expected_result || '按维修资料记录结果')}</span>
+                                    <p>建议：测量前确认表笔接地和供电状态，记录电压/阻值。</p>
                                 </div>
-                            ` : '<div class="atlas-detail-card"><span>点击红色测试点查看测量提示。当前点位为占位，需要工程确认。</span></div>'}
+                            ` : '<div class="atlas-detail-card"><span>点击红色测试点查看测量提示。</span></div>'}
                         </div>
                         <div class="board-atlas-section">
-                            <h3>仍需材料</h3>
+                            <h3>资料依据</h3>
                             <div class="knowledge-meta">
-                                ${renderPills(board.open_material_gaps || [], 'draft')}
+                                ${renderPills(board.source_evidence || [], 'draft')}
                             </div>
                         </div>
                     </aside>
