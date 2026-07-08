@@ -1,0 +1,198 @@
+{% extends "admin_base.html" %}
+{% block content %}
+
+<style>
+    .settings-card {
+        background: white;
+        border-radius: 8px;
+        padding: 24px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+    .settings-card h2 {
+        font-size: 18px;
+        margin-bottom: 16px;
+        color: #333;
+    }
+    .settings-card .hint {
+        font-size: 13px;
+        color: #999;
+        margin-bottom: 16px;
+    }
+    .field {
+        margin-bottom: 16px;
+    }
+    .field label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #555;
+        margin-bottom: 6px;
+    }
+    .field input, .field select {
+        width: 100%;
+        max-width: 500px;
+        padding: 10px 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 14px;
+        font-family: "SF Mono", "Consolas", monospace;
+    }
+    .field input:focus, .field select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
+    }
+    .alert {
+        padding: 12px 16px;
+        border-radius: 6px;
+        margin-bottom: 16px;
+        font-size: 14px;
+    }
+    .alert-success { background: #e8f5e9; color: #2e7d32; }
+    .alert-info { background: #e3f2fd; color: #1565c0; }
+    .btn-save {
+        padding: 10px 24px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+    }
+    .btn-save:hover { background: #5a6fd6; }
+    .btn-reset {
+        padding: 6px 12px;
+        background: none;
+        color: #f44336;
+        border: 1px solid #f44336;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        margin-left: 8px;
+        text-decoration: none;
+    }
+    .btn-reset:hover { background: #fff5f5; }
+    .priority-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        margin-right: 8px;
+    }
+    .badge-db { background: #e8f5e9; color: #2e7d32; }
+    .badge-env { background: #fff3e0; color: #e65100; }
+</style>
+
+<h2 style="margin-bottom: 20px;">系统设置</h2>
+
+{% if request.query_params.get('saved') %}
+<div class="alert alert-success">✅ 配置已保存并加密存储到数据库，立即生效</div>
+{% endif %}
+{% if request.query_params.get('deleted') %}
+<div class="alert alert-info">🗑️ 配置已删除，系统将恢复使用 .env 环境变量</div>
+{% endif %}
+
+<div class="alert alert-info" style="background:#f3e5f5;color:#7b1fa2;">
+    💡 <strong>配置说明：</strong>在下方设置 API Key 后，将<strong>优先使用此处的配置</strong>，不再读取 .env 文件。
+    如需恢复使用 .env，点击"恢复默认"删除对应配置即可。
+</div>
+
+<!-- AI API Key 配置 -->
+<div class="settings-card">
+    <h2>🤖 AI 平台配置</h2>
+    <p class="hint">设置后将覆盖 .env 中的对应配置。Key 会加密存储在数据库中。</p>
+
+    <form method="POST" action="/admin/api/settings">
+        <div class="field">
+            <label>API Key <span class="priority-badge badge-env">Fallback: .env</span></label>
+            <input type="password" name="value"
+                   placeholder="输入 API Key（如 sk-kimi-...），留空则使用 .env"
+                   autocomplete="off">
+            <input type="hidden" name="key" value="ai_api_key">
+            <div style="font-size:12px;color:#999;margin-top:4px;">
+                支持 Kimi Code / Anthropic Claude / DeepSeek / Kimi
+            </div>
+        </div>
+        <button type="submit" class="btn-save">💾 加密保存</button>
+        <a href="/admin/api/settings/ai_api_key/delete"
+           class="btn-reset"
+           onclick="return confirm('确认恢复使用 .env 中的 API Key？')">🔄 恢复默认</a>
+    </form>
+</div>
+
+<!-- AI Provider 配置 -->
+<div class="settings-card">
+    <h2>⚙️ AI 平台选择</h2>
+
+    <form method="POST" action="/admin/api/settings">
+        <div class="field">
+            <label>AI Provider</label>
+            <select name="value">
+                <option value="">使用 .env 默认值</option>
+                <option value="kimi-code">Kimi Code (订阅版)</option>
+                <option value="anthropic">Anthropic Claude</option>
+                <option value="deepseek">DeepSeek</option>
+                <option value="kimi">Kimi (Moonshot)</option>
+            </select>
+            <input type="hidden" name="key" value="ai_provider">
+        </div>
+        <button type="submit" class="btn-save">💾 保存</button>
+        <a href="/admin/api/settings/ai_provider/delete"
+           class="btn-reset"
+           onclick="return confirm('确认恢复默认？')">🔄 恢复默认</a>
+    </form>
+</div>
+
+<!-- AI Model 配置 -->
+<div class="settings-card">
+    <h2>🧠 AI 模型选择</h2>
+
+    <form method="POST" action="/admin/api/settings">
+        <div class="field">
+            <label>AI Model</label>
+            <select name="value">
+                <option value="">使用 .env 默认值</option>
+                <optgroup label="Kimi Code">
+                    <option value="kimi-for-coding">kimi-for-coding</option>
+                    <option value="kimi-k2-thinking">kimi-k2-thinking</option>
+                    <option value="kimi-k2-thinking-turbo">kimi-k2-thinking-turbo</option>
+                </optgroup>
+                <optgroup label="Kimi (Moonshot)">
+                    <option value="moonshot-v1-vision-preview">moonshot-v1-vision-preview</option>
+                    <option value="moonshot-v1-128k">moonshot-v1-128k</option>
+                </optgroup>
+                <optgroup label="Anthropic Claude">
+                    <option value="claude-sonnet-4-6">claude-sonnet-4-6</option>
+                    <option value="claude-opus-4-7">claude-opus-4-7</option>
+                </optgroup>
+                <optgroup label="DeepSeek">
+                    <option value="deepseek-chat">deepseek-chat</option>
+                    <option value="deepseek-reasoner">deepseek-reasoner</option>
+                </optgroup>
+            </select>
+            <input type="hidden" name="key" value="ai_model">
+        </div>
+        <button type="submit" class="btn-save">💾 保存</button>
+        <a href="/admin/api/settings/ai_model/delete"
+           class="btn-reset"
+           onclick="return confirm('确认恢复默认？')">🔄 恢复默认</a>
+    </form>
+</div>
+
+<div style="margin-top:32px;padding:16px;background:white;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+    <h3 style="font-size:14px;color:#666;margin-bottom:8px;">📋 当前读取优先级</h3>
+    <table style="width:100%;font-size:13px;border-collapse:collapse;">
+        <tr>
+            <td style="padding:8px;width:40px;color:#667eea;font-weight:bold;">1.</td>
+            <td style="padding:8px;"><span class="priority-badge badge-db">数据库</span> 上方页面设置的加密配置</td>
+        </tr>
+        <tr>
+            <td style="padding:8px;color:#999;font-weight:bold;">2.</td>
+            <td style="padding:8px;"><span class="priority-badge badge-env">.env 文件</span> 环境变量（兜底）</td>
+        </tr>
+    </table>
+</div>
+
+{% endblock %}

@@ -7,6 +7,9 @@ import httpx
 from fastapi import HTTPException
 
 from app.config import get_settings
+from app.middleware.metrics import record_ai_call
+
+import time
 
 # ========== 提供商配置 ==========
 # 注意：顺序很重要！特定前缀必须排在通用 sk- 前面
@@ -78,15 +81,28 @@ def detect_provider(api_key: str) -> Tuple[str, Dict[str, Any]]:
     )
 
 
-def _validate_and_detect_provider() -> Tuple[str, str, Dict[str, Any]]:
-    """校验 API Key 并检测 provider，返回 (api_key, provider_id, config)"""
-    settings = get_settings()
-    api_key = settings.anthropic_api_key
+def _validate_and_detect_provider(
+    api_key_override: str | None = None,
+    provider_override: str | None = None,
+) -> Tuple[str, str, Dict[str, Any]]:
+    """校验 API Key 并检测 provider，返回 (api_key, provider_id, config)
 
+    优先级: 参数覆盖 > 数据库配置 > .env / 环境变量
+    """
+    settings = get_settings()
+
+    # 1. API Key 来源
+    api_key = api_key_override or settings.anthropic_api_key
     if not api_key:
         raise HTTPException(status_code=500, detail="未配置 ANTHROPIC_API_KEY")
 
-    provider_id, config = detect_provider(api_key)
+    # 2. Provider 来源
+    if provider_override and provider_override in PROVIDERS:
+        provider_id = provider_override
+        config = PROVIDERS[provider_id]
+    else:
+        provider_id, config = detect_provider(api_key)
+
     return api_key, provider_id, config
 
 
@@ -267,15 +283,20 @@ def _handle_network_error(exc: Exception) -> None:
 
 async def stream_chat(
     payload: Dict[str, Any],
+    api_key_override: str | None = None,
+    provider_override: str | None = None,
 ) -> AsyncGenerator[str, None]:
     """流式聊天 API 调用"""
-    api_key, provider_id, config = _validate_and_detect_provider()
+    api_key, provider_id, config = _validate_and_detect_provider(
+        api_key_override, provider_override
+    )
     stream = payload.get("stream", True)
     api_payload, headers = _build_request(payload, api_key, provider_id, config, stream)
     api_format = config.get("api_format", "openai")
 
-    async with httpx.AsyncClient(timeout=180.0) as client:
-        try:
+    start = time.perf_counter()
+    try:
+        async with httpx.AsyncClient(timeout=180.0) as client:
             async with client.stream(
                 "POST",
                 config["url"],
@@ -313,16 +334,26 @@ async def stream_chat(
                     body = await response.aread()
                     yield body.decode("utf-8")
 
-        except (httpx.TimeoutException, httpx.ConnectError) as e:
-            _handle_network_error(e)
+        record_ai_call(provider_id, time.perf_counter() - start, success=True)
+
+    except (httpx.TimeoutException, httpx.ConnectError) as e:
+        record_ai_call(provider_id, time.perf_counter() - start, success=False)
+        _handle_network_error(e)
 
 
-async def chat_sync(payload: Dict[str, Any]) -> Dict[str, Any]:
+async def chat_sync(
+    payload: Dict[str, Any],
+    api_key_override: str | None = None,
+    provider_override: str | None = None,
+) -> Dict[str, Any]:
     """非流式聊天 API 调用"""
-    api_key, provider_id, config = _validate_and_detect_provider()
+    api_key, provider_id, config = _validate_and_detect_provider(
+        api_key_override, provider_override
+    )
     api_payload, headers = _build_request(payload, api_key, provider_id, config, stream=False)
     api_format = config.get("api_format", "openai")
 
+    start = time.perf_counter()
     async with httpx.AsyncClient(timeout=120.0) as client:
         try:
             response = await client.post(
@@ -343,11 +374,14 @@ async def chat_sync(payload: Dict[str, Any]) -> Dict[str, Any]:
                     "stop_reason": "end_turn",
                 }
 
+            record_ai_call(provider_id, time.perf_counter() - start, success=True)
             return result
         except httpx.HTTPStatusError as e:
+            record_ai_call(provider_id, time.perf_counter() - start, success=False)
             body = await e.response.aread()
             _handle_http_error(e.response.status_code, body)
         except (httpx.TimeoutException, httpx.ConnectError) as e:
+            record_ai_call(provider_id, time.perf_counter() - start, success=False)
             _handle_network_error(e)
 
 

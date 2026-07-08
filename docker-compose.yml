@@ -5,18 +5,32 @@ services:
     image: postgres:15-alpine
     container_name: mainboard-repair-db
     environment:
-      POSTGRES_USER: mainboard
-      POSTGRES_PASSWORD: mainboard_pass
-      POSTGRES_DB: mainboard_repair
+      POSTGRES_USER: ${POSTGRES_USER:-mainboard}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-mainboard_repair}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+    # 生产环境建议不暴露数据库端口到宿主机
+    # ports:
+    #   - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U mainboard -d mainboard_repair"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-mainboard} -d ${POSTGRES_DB:-mainboard_repair}"]
       interval: 5s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
+
+  # 数据库迁移初始化容器（运行完成后自动退出）
+  db-migrate:
+    build: .
+    container_name: mainboard-repair-migrate
+    command: sh -c "cd /app/backend && alembic upgrade head"
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-mainboard}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-mainboard_repair}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
 
   backend:
     build: .
@@ -24,17 +38,25 @@ services:
     ports:
       - "8899:8899"
     volumes:
-      - ./backend/app:/app/backend/app # 开发热重载（可选）
+      # 数据持久化（SQLite 模式下需要，PostgreSQL 模式可移除）
+      - app_data:/app/backend/data
+      # 上传文件持久化
+      - app_uploads:/app/uploads
     environment:
-      - DATABASE_URL=${DATABASE_URL:-postgresql://mainboard:mainboard_pass@db:5432/mainboard_repair}
+      - DATABASE_URL=${DATABASE_URL:-postgresql://${POSTGRES_USER:-mainboard}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-mainboard_repair}}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - AI_PROVIDER=${AI_PROVIDER:-kimi-code}
       - AI_MODEL=${AI_MODEL:-kimi-k2-thinking}
       - SECRET_KEY=${SECRET_KEY}
       - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000}
+      - LOG_FORMAT=${LOG_FORMAT:-json}
+      - ENABLE_HSTS=${ENABLE_HSTS:-false}
+      - RATE_LIMIT_ENABLED=${RATE_LIMIT_ENABLED:-true}
     depends_on:
       db:
         condition: service_healthy
+      db-migrate:
+        condition: service_completed_successfully
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8899/health')"]
@@ -44,3 +66,5 @@ services:
 
 volumes:
   postgres_data:
+  app_data:
+  app_uploads:

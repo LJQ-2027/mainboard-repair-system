@@ -15,4 +15,7 @@ class DiagnosisRecord(Base):
     ai_model = Column(String(50))
     has_image = Column(Boolean, default=False)
     project_model = Column(String(50))
+    sop_session_id = Column(
+        Integer, ForeignKey("diagnosis_sop_sessions.id"), nullable=True, index=True
+    )
     created_at = Column(DateTime, default=_now_utc)

@@ -14,6 +14,10 @@ def test_startup_handles_missing_api_key(monkeypatch):
         class FakeSettings:
             anthropic_api_key = ""
             port = 8899
+            log_level = "INFO"
+            log_format = "text"
+            enable_metrics = False
+            sentry_dsn = ""
 
         return FakeSettings()
 
@@ -40,6 +44,10 @@ def test_startup_handles_unrecognized_api_key(monkeypatch):
         class FakeSettings:
             anthropic_api_key = "invalid-key"
             port = 8899
+            log_level = "INFO"
+            log_format = "text"
+            enable_metrics = False
+            sentry_dsn = ""
 
         return FakeSettings()
 

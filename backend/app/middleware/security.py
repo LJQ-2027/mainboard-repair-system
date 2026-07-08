@@ -21,7 +21,8 @@ from app.config import get_settings
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     """为所有响应添加基础安全头部"""
 
-    # CSP：当前前端存在内联脚本/样式，因此允许 'unsafe-inline'，后续可收紧
+    # CSP：仅在必要时允许 unsafe-inline。
+    # 如果新版 Vite 前端不再需要内联脚本/样式，可进一步移除 unsafe-inline。
     _CSP = (
         "default-src 'self'; "
         "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
@@ -30,6 +31,8 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         "connect-src 'self'; "
         "font-src 'self'; "
         "frame-ancestors 'none';"
+        "base-uri 'self';"
+        "form-action 'self';"
     )
 
     _PERMISSIONS_POLICY = (

@@ -81,7 +81,7 @@ def test_structured_chat_saves_parsed_result(client, db_session, monkeypatch):
     login = client.post("/auth/login", json={"username": username, "password": "SecurePass123!"})
     token = login.json()["access_token"]
 
-    async def fake_chat_sync(payload):
+    async def fake_chat_sync(payload, api_key_override=None, provider_override=None):
         return {
             "content": [{
                 "type": "text",

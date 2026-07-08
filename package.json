@@ -6,7 +6,8 @@
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
-    "setup-internal": "node scripts/setup-internal.js"
+    "setup-internal": "node scripts/setup-internal.js",
+    "restore-public": "node scripts/restore-public.js"
   },
   "keywords": [
     "repair",

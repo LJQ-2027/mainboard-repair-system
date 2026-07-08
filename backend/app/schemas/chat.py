@@ -19,6 +19,9 @@ class ChatRequest(BaseModel):
     stream: bool = True
     session_id: int | None = None
     project: str = ""
+    sop_session_id: int | None = Field(
+        default=None, description="关联的 SOP 会话 ID，用于注入当前步骤上下文"
+    )
     structured: bool = Field(default=False, description="是否返回结构化诊断结果（非流式）")
 
     @field_validator("messages")

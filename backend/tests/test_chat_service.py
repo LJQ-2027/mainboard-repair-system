@@ -260,7 +260,7 @@ async def test_execute_chat_sync_updates_diagnosis(db_session: Session, monkeypa
         system="AI 智能诊断",
     )
 
-    async def fake_chat_sync(payload):
+    async def fake_chat_sync(payload, api_key_override=None, provider_override=None):
         return {"content": [{"type": "text", "text": "建议检查电源IC"}]}
 
     monkeypatch.setattr("app.services.chat_service.chat_sync", fake_chat_sync)
@@ -276,7 +276,7 @@ async def test_execute_chat_sync_updates_diagnosis(db_session: Session, monkeypa
 async def test_safe_stream_generator_handles_http_exception(monkeypatch):
     from app.services.chat_service import _safe_stream_generator
 
-    async def failing_stream(payload):
+    async def failing_stream(payload, api_key_override=None, provider_override=None):
         raise HTTPException(status_code=429, detail="请求过于频繁")
         yield ""
 

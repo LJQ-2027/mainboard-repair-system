@@ -13,10 +13,13 @@ from fastapi.staticfiles import StaticFiles
 from app.config import get_settings
 from app.database import init_db
 from app.middleware.logging import LoggingMiddleware
+from app.middleware.metrics import MetricsMiddleware, get_metrics, is_metrics_available
 from app.middleware.rate_limit import RateLimitKeyMiddleware, get_limiter
 from app.middleware.security import SecurityHeadersMiddleware
 from app.routers import admin, auth, chat, health
 from app.services.auth import get_current_user
+from app.services.logging_config import configure_logging
+from app.services.sentry import init_sentry
 from slowapi.errors import RateLimitExceeded
 from slowapi.extension import _rate_limit_exceeded_handler
 
@@ -24,11 +27,21 @@ from slowapi.extension import _rate_limit_exceeded_handler
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """应用生命周期管理"""
-    # 启动时初始化数据库并打印配置
+    settings = get_settings()
+
+    # 初始化结构化日志
+    configure_logging(settings)
+
+    # 初始化 Sentry（可选）
+    init_sentry(settings)
+
+    # 初始化数据库
     init_db()
 
-    settings = get_settings()
     from app.services.ai_proxy import detect_provider
+    from app.services.logging_config import get_logger
+
+    logger = get_logger("mainboard-repair")
 
     # 尝试识别 AI 平台；无 Key 或无法识别时不应阻塞启动
     config = None
@@ -36,7 +49,7 @@ async def lifespan(app: FastAPI):
         try:
             _, config = detect_provider(settings.anthropic_api_key)
         except Exception as exc:  # noqa: BLE001
-            print(f"  [WARNING] AI 平台识别失败: {exc}")
+            logger.warning("ai_provider_detect_failed", error=str(exc))
 
     print("=" * 60)
     print("  AI 代理服务器 - 智能主板维修系统 v9.0 (团队版)")
@@ -78,8 +91,9 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 settings = get_settings()
 _cors_origins = settings.get_cors_origins()
 if _cors_origins == ["*"] and settings.allow_credentials:
-    import logging
-    _cors_logger = logging.getLogger("mainboard-repair")
+    from app.services.logging_config import get_logger
+
+    _cors_logger = get_logger("mainboard-repair")
     _cors_logger.warning(
         "CORS allow_origins=['*'] 与 allow_credentials=True 同时启用，"
         "浏览器会拒绝携带 Cookie。生产环境请在 .env 中设置 CORS_ORIGINS。"
@@ -96,6 +110,10 @@ app.add_middleware(
 # 安全头部中间件
 app.add_middleware(SecurityHeadersMiddleware)
 
+# 指标收集中间件
+if settings.enable_metrics and is_metrics_available():
+    app.add_middleware(MetricsMiddleware)
+
 # 请求日志中间件
 app.add_middleware(LoggingMiddleware)
 
@@ -107,6 +125,14 @@ app.include_router(health.router)
 app.include_router(auth.router)
 app.include_router(admin.router)
 app.include_router(chat.router)
+
+
+@app.get("/metrics")
+async def metrics_endpoint():
+    """Prometheus 指标端点"""
+    data, content_type = get_metrics()
+    return Response(content=data, media_type=content_type)
+
 
 # 静态文件服务 - data/ 目录
 _data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "data")

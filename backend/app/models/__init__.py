@@ -4,6 +4,8 @@ from .component import ComponentMapEntry
 from .knowledge import KnowledgeBaseEntry
 from .session import ChatSession
 from .project import Project
+from .sop import DiagnosisSOP, SOPSession, SOPStep
+from .system_config import SystemConfig
 
 __all__ = [
     "User",
@@ -12,4 +14,8 @@ __all__ = [
     "KnowledgeBaseEntry",
     "ChatSession",
     "Project",
+    "DiagnosisSOP",
+    "SOPStep",
+    "SOPSession",
+    "SystemConfig",
 ]

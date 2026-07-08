@@ -1,34 +1,14 @@
-"""请求日志中间件 - 支持文件轮转"""
+"""请求日志中间件"""
 
-import logging
-import os
 import time
-from logging.handlers import RotatingFileHandler
 from typing import Callable
 
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 
-# ---- 日志配置 ----
-LOG_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "data")
-os.makedirs(LOG_DIR, exist_ok=True)
-LOG_FILE = os.path.join(LOG_DIR, "server.log")
+from app.services.logging_config import get_logger
 
-# 配置 logger
-logger = logging.getLogger("mainboard-repair")
-logger.setLevel(logging.INFO)
-
-# 仅在 logger 没有 handler 时注册，避免热重载/多 worker 重复追加
-if not logger.handlers:
-    # 控制台输出
-    console = logging.StreamHandler()
-    console.setFormatter(logging.Formatter("[%(asctime)s] %(levelname)s %(message)s", datefmt="%Y-%m-%d %H:%M:%S"))
-    logger.addHandler(console)
-
-    # 文件轮转：单文件最大 10MB，保留 5 个备份
-    file_handler = RotatingFileHandler(LOG_FILE, maxBytes=10 * 1024 * 1024, backupCount=5, encoding="utf-8")
-    file_handler.setFormatter(logging.Formatter("[%(asctime)s] %(levelname)s %(message)s", datefmt="%Y-%m-%d %H:%M:%S"))
-    logger.addHandler(file_handler)
+logger = get_logger("mainboard-repair")
 
 
 class LoggingMiddleware(BaseHTTPMiddleware):
@@ -45,13 +25,20 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         duration = (time.time() - start) * 1000
         status = response.status_code
 
-        msg = f"{method} {path} | {status} | {duration:.1f}ms | {client}"
+        log_data = {
+            "method": method,
+            "path": path,
+            "status": status,
+            "duration_ms": round(duration, 1),
+            "client": client,
+        }
 
+        # 同时兼容 structlog 与标准库 logging：使用 extra 传递结构化字段
         if status >= 500:
-            logger.error(msg)
+            logger.error("request", extra=log_data)
         elif status >= 400:
-            logger.warning(msg)
+            logger.warning("request", extra=log_data)
         else:
-            logger.info(msg)
+            logger.info("request", extra=log_data)
 
         return response

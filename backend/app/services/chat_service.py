@@ -17,6 +17,7 @@ from app.models.user import User
 from app.schemas.chat import ChatRequest
 from app.schemas.diagnosis import StructuredDiagnosis
 from app.services.ai_proxy import chat_sync, stream_chat
+from app.services.config_service import get_ai_api_key, get_ai_model, get_ai_provider
 from app.services.diagnosis_parser import (
     parse_diagnosis_result,
     structured_to_json,
@@ -259,12 +260,23 @@ def prepare_chat_context(
     return session, diagnosis, messages
 
 
+def _get_ai_config_overrides(db: Session | None) -> dict[str, str | None]:
+    """从数据库读取 AI 配置覆盖项（优先数据库，无则 None fallback 到 .env）"""
+    return {
+        "api_key_override": get_ai_api_key(db) if db else None,
+        "provider_override": get_ai_provider(db) if db else None,
+        "model_override": get_ai_model(db) if db else None,
+    }
+
+
 async def _safe_stream_generator(
-    payload: dict[str, Any]
+    payload: dict[str, Any],
+    api_key_override: str | None = None,
+    provider_override: str | None = None,
 ) -> AsyncGenerator[str, None]:
     """安全流式生成器：将上游异常转换为 SSE error 事件"""
     try:
-        async for chunk in stream_chat(payload):
+        async for chunk in stream_chat(payload, api_key_override, provider_override):
             yield chunk
     except HTTPException as exc:
         yield (
@@ -290,8 +302,19 @@ async def execute_chat_sync(
         db, user, request, messages, last_content
     )
 
+    # 数据库配置覆盖（优先级高于 .env）
+    overrides = _get_ai_config_overrides(db)
+
     payload = build_chat_payload(request, messages)
-    result = await chat_sync(payload)
+    # 如果数据库中有 model 配置，覆盖请求中的 model
+    if overrides["model_override"] and not request.model:
+        payload["model"] = overrides["model_override"]
+
+    result = await chat_sync(
+        payload,
+        api_key_override=overrides["api_key_override"],
+        provider_override=overrides["provider_override"],
+    )
 
     if diagnosis:
         update_diagnosis_result(db, diagnosis, result)
@@ -315,9 +338,19 @@ def execute_chat_stream(
     if db is not None and user is not None:
         prepare_chat_context(db, user, request, messages, last_content)
 
+    # 数据库配置覆盖（优先级高于 .env）
+    overrides = _get_ai_config_overrides(db)
+
     payload = build_chat_payload(request, messages)
+    if overrides["model_override"] and not request.model:
+        payload["model"] = overrides["model_override"]
+
     return StreamingResponse(
-        _safe_stream_generator(payload),
+        _safe_stream_generator(
+            payload,
+            api_key_override=overrides["api_key_override"],
+            provider_override=overrides["provider_override"],
+        ),
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "Connection": "keep-alive"},
     )

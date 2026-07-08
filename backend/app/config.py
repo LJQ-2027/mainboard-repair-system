@@ -53,6 +53,11 @@ class Settings(BaseSettings):
     # 速率限制
     rate_limit_enabled: bool = Field(default=True, alias="RATE_LIMIT_ENABLED")
 
+    # 日志与监控
+    log_format: Literal["text", "json"] = Field(default="text", alias="LOG_FORMAT")
+    enable_metrics: bool = Field(default=True, alias="ENABLE_METRICS")
+    sentry_dsn: str = Field(default="", alias="SENTRY_DSN")
+
     # 日志
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
 

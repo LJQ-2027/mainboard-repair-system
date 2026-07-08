@@ -21,10 +21,18 @@ from app.models.project import Project
 from app.models.user import User
 from app.schemas.project import ProjectCreate, ProjectResponse, ProjectUpdate, ProjectWithStats
 from app.services.auth import get_optional_user, get_current_user, require_admin
+from app.services.config_service import (
+    CONFIG_KEYS,
+    delete_config,
+    get_all_configs,
+    get_config,
+    set_config,
+)
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
-templates = Jinja2Templates(directory="app/templates")
+_templates_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "templates")
+templates = Jinja2Templates(directory=_templates_dir)
 
 
 def _project_to_dict(project: Project) -> dict:
@@ -528,3 +536,59 @@ def admin_cases(request: Request, user = Depends(get_optional_user)):
     return templates.TemplateResponse("cases.html", {
         "request": request, "user": user, "projects": projects
     })
+
+
+# ---------------------------------------------------------------------------
+# 系统设置 - API Key 配置
+# ---------------------------------------------------------------------------
+
+@router.get("/settings", response_class=HTMLResponse)
+def admin_settings(request: Request, user = Depends(get_optional_user)):
+    """系统设置页面"""
+    return templates.TemplateResponse("settings.html", {
+        "request": request,
+        "user": user,
+        "config_keys": CONFIG_KEYS,
+    })
+
+
+@router.get("/api/settings")
+def list_settings(
+    db: Session = Depends(get_db),
+    user: User = Depends(require_admin),
+):
+    """列出所有系统配置项（值脱敏）"""
+    return get_all_configs(db)
+
+
+@router.post("/api/settings")
+def save_setting(
+    key: str = Form(...),
+    value: str = Form(...),
+    db: Session = Depends(get_db),
+    user: User = Depends(require_admin),
+):
+    """保存系统配置"""
+    if key not in CONFIG_KEYS:
+        raise HTTPException(status_code=400, detail=f"不支持的配置项: {key}")
+    if not value or not value.strip():
+        raise HTTPException(status_code=400, detail="配置值不能为空")
+
+    description = CONFIG_KEYS.get(key, "")
+    set_config(db, key, value.strip(), description)
+
+    # 如果是 API Key，返回到设置页面时显示成功提示
+    return RedirectResponse("/admin/settings?saved=1", status_code=303)
+
+
+@router.get("/api/settings/{key}/delete")
+def remove_setting(
+    key: str,
+    db: Session = Depends(get_db),
+    user: User = Depends(require_admin),
+):
+    """删除系统配置（恢复使用 .env）"""
+    if key not in CONFIG_KEYS:
+        raise HTTPException(status_code=400, detail=f"不支持的配置项: {key}")
+    delete_config(db, key)
+    return RedirectResponse("/admin/settings?deleted=1", status_code=303)

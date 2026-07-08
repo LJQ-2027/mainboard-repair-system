@@ -125,6 +125,51 @@ docker-compose up -d
 
 注意：docker-compose.yml 中 backend 服务默认等待 db healthy 后启动，但首次仍需手动进入容器执行 `alembic upgrade head`。
 
+### 监控与日志
+
+#### 日志格式
+
+开发环境使用文本格式：
+
+```bash
+LOG_FORMAT=text
+```
+
+生产环境建议使用 JSON 格式，便于日志收集系统解析：
+
+```bash
+LOG_FORMAT=json
+```
+
+#### Prometheus 指标
+
+应用默认暴露 `/metrics` 端点，包含：
+
+- `http_requests_total`：HTTP 请求总数
+- `http_request_duration_seconds`：HTTP 请求耗时
+- `ai_calls_total`：AI 调用总数
+- `ai_call_duration_seconds`：AI 调用耗时
+
+在 `docker-compose.yml` 中可配置 Prometheus 抓取：
+
+```yaml
+services:
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+```
+
+#### Sentry 错误追踪（可选）
+
+配置 `SENTRY_DSN` 即可启用：
+
+```bash
+SENTRY_DSN=https://xxx@yyy.ingest.sentry.io/zzz
+```
+
 ### 后端（FastAPI）
 
 ```bash
