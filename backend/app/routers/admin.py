@@ -61,7 +61,7 @@ def _get_data_dir() -> str:
 # ---------------------------------------------------------------------------
 
 @router.get("/", response_class=HTMLResponse)
-def admin_dashboard(request: Request, user = Depends(get_optional_user), db: Session = Depends(get_db)):
+def admin_dashboard(request: Request, user: User = Depends(require_admin), db: Session = Depends(get_db)):
     """管理后台首页 - 数据统计看板"""
     # 总诊断次数
     total_diagnoses = db.query(DiagnosisRecord).count()
@@ -101,7 +101,7 @@ def admin_dashboard(request: Request, user = Depends(get_optional_user), db: Ses
 
 
 @router.get("/knowledge", response_class=HTMLResponse)
-def admin_knowledge(request: Request, user = Depends(get_optional_user), db: Session = Depends(get_db)):
+def admin_knowledge(request: Request, user: User = Depends(require_admin), db: Session = Depends(get_db)):
     """知识库管理"""
     entries = db.query(KnowledgeBaseEntry).order_by(KnowledgeBaseEntry.category, KnowledgeBaseEntry.title).all()
     categories = db.query(KnowledgeBaseEntry.category).distinct().all()
@@ -161,7 +161,7 @@ def toggle_knowledge(entry_id: int, user = Depends(require_admin), db: Session =
 # ---------------------------------------------------------------------------
 
 @router.get("/projects", response_class=HTMLResponse)
-def admin_projects(request: Request, user = Depends(get_optional_user), db: Session = Depends(get_db)):
+def admin_projects(request: Request, user: User = Depends(require_admin), db: Session = Depends(get_db)):
     """项目资料列表"""
     projects = db.query(Project).order_by(Project.code).all()
     projects_list = []
@@ -177,7 +177,7 @@ def admin_projects(request: Request, user = Depends(get_optional_user), db: Sess
 
 
 @router.get("/projects/{code}/edit", response_class=HTMLResponse)
-def admin_project_edit(code: str, request: Request, user = Depends(get_optional_user), db: Session = Depends(get_db)):
+def admin_project_edit(code: str, request: Request, user: User = Depends(require_admin), db: Session = Depends(get_db)):
     """项目编辑页"""
     project = db.query(Project).filter(Project.code == code).first()
     if not project:
@@ -504,7 +504,7 @@ def list_project_diagnoses(
 # ---------------------------------------------------------------------------
 
 @router.get("/cases", response_class=HTMLResponse)
-def admin_cases(request: Request, user = Depends(get_optional_user)):
+def admin_cases(request: Request, user: User = Depends(require_admin)):
     """查看各项目的案例数据"""
     import json5
     cases_file = os.path.join(_get_data_dir(), "project-cases.js")
@@ -543,7 +543,7 @@ def admin_cases(request: Request, user = Depends(get_optional_user)):
 # ---------------------------------------------------------------------------
 
 @router.get("/settings", response_class=HTMLResponse)
-def admin_settings(request: Request, user = Depends(get_optional_user)):
+def admin_settings(request: Request, user: User = Depends(require_admin)):
     """系统设置页面"""
     return templates.TemplateResponse("settings.html", {
         "request": request,
