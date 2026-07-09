@@ -4402,7 +4402,17 @@ async function handleLogin() {
             return;
         }
         if (password.length < 8) {
-            errDiv.textContent = '密码至少8位，需包含大写、小写、数字、特殊字符中的两类';
+            errDiv.textContent = '密码至少8位';
+            errDiv.style.display = 'block';
+            return;
+        }
+        // 密码复杂度：至少包含两类字符
+        const hasUpper = /[A-Z]/.test(password);
+        const hasLower = /[a-z]/.test(password);
+        const hasDigit = /\d/.test(password);
+        const hasSpecial = /[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(password);
+        if ([hasUpper, hasLower, hasDigit, hasSpecial].filter(Boolean).length < 2) {
+            errDiv.textContent = '密码需包含大写字母、小写字母、数字、特殊字符中的至少两类';
             errDiv.style.display = 'block';
             return;
         }
@@ -4417,7 +4427,15 @@ async function handleLogin() {
         });
         const data = await resp.json();
         if (!resp.ok) {
-            errDiv.textContent = data.detail || '操作失败';
+            // 支持多种错误格式：字符串、数组（Pydantic 验证错误）
+            let msg = '操作失败';
+            if (typeof data.detail === 'string') {
+                msg = data.detail;
+            } else if (Array.isArray(data.detail)) {
+                msg = data.detail.map(e => e.msg || '').filter(Boolean).join('；');
+            }
+            errDiv.textContent = msg;
+            errDiv.style.color = '#f44336';
             errDiv.style.display = 'block';
             return;
         }
