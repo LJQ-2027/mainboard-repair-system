@@ -3470,15 +3470,12 @@
 
         function getAISettings() {
             try {
-                const defaults = { apiUrl: '', model: 'deepseek-chat' };
+                const origin = window.location.origin;
+                const defaults = { apiUrl: origin, model: 'deepseek-chat' };
                 const saved = JSON.parse(localStorage.getItem(AI_SETTINGS_KEY) || '{}');
-                // 自动清理旧模型设置（deepseek-chat 在 Kimi Code 中不可用）
-                if (saved.model && saved.model.startsWith('deepseek')) {
-                    delete saved.model;
-                    localStorage.setItem(AI_SETTINGS_KEY, JSON.stringify(saved));
-                }
+                // 如果已保存 model 且与旧版注释冲突，直接使用已保存值
                 return { ...defaults, ...saved };
-            } catch (e) { return { apiUrl: 'http://localhost:8899', model: 'claude-sonnet-4-6' }; }
+            } catch (e) { return { apiUrl: 'http://localhost:8899', model: 'deepseek-chat' }; }
         }
 
         function saveAISettings() {
@@ -3499,10 +3496,10 @@
             try {
                 const resp = await fetch(`${settings.apiUrl}/health`, { method: 'GET', signal: AbortSignal.timeout(3000) });
                 const data = await resp.json();
-                aiSupportsVision = data.supports_vision || false;
-                if (data.status === 'ok' && data.api_configured) {
+                aiSupportsVision = data.ai?.supports_vision || false;
+                if (data.status === 'ok' && data.ai?.api_configured) {
                     if (dot) dot.className = 'ai-dot online';
-                    if (label) label.textContent = `${data.provider} · ${data.default_model}`;
+                    if (label) label.textContent = `${data.ai?.provider || 'AI'} · ${data.ai?.default_model || ''}`;
                 } else if (data.status === 'ok') {
                     if (dot) dot.className = 'ai-dot offline';
                     if (label) label.textContent = 'Key 未配置';
@@ -3538,10 +3535,11 @@
             try {
                 const resp = await fetch(`${settings.apiUrl}/health`, { method: 'GET' });
                 const data = await resp.json();
-                if (data.status === 'ok' && data.api_configured) {
+                const aiInfo = data.ai || {};
+                if (data.status === 'ok' && aiInfo.api_configured) {
                     dot.className = 'status-dot ok';
-                    const visionNote = data.supports_vision ? ' ✅支持原理图分析' : '';
-                    text.innerHTML = `连接成功 - ${data.provider || ''} (${data.default_model || ''})<br><span style="font-size:11px;color:#666;">图片分析: ${data.supports_vision ? '✅ 支持' : '⚠️ 不支持（需 Anthropic Key）'}</span>`;
+                    const visionNote = aiInfo.supports_vision ? ' ✅支持原理图分析' : '';
+                    text.innerHTML = `连接成功 - ${aiInfo.provider || ''} (${aiInfo.default_model || ''})<br><span style="font-size:11px;color:#666;">图片分析: ${aiInfo.supports_vision ? '✅ 支持' : '⚠️ 不支持（需 Anthropic Key）'}</span>`;
                 } else if (data.status === 'ok') {
                     dot.className = 'status-dot err';
                     text.textContent = '代理已启动但 API Key 未配置';
@@ -3888,8 +3886,10 @@
             try {
                 const healthResp = await fetch(`${settings.apiUrl}/health`, { method: 'GET', signal: AbortSignal.timeout(3000) });
                 const healthData = await healthResp.json();
-                if (!healthData.api_configured) {
-                    container.innerHTML = `<div class="ai-error"><strong>AI 代理未配置：</strong>API Key 未设置。<br>请编辑桌面上的 .env 文件，填入正确的 API Key，然后重新启动 AI 服务。</div>`;
+                // health 接口返回 { ai: { api_configured: ... } }
+                const apiConfigured = healthData.ai?.api_configured || healthData.api_configured;
+                if (!apiConfigured) {
+                    container.innerHTML = `<div class="ai-error"><strong>AI 代理未配置：</strong>API Key 未设置。<br>请前往 <a href="/admin/settings" style="color:#667eea;">管理后台 → 系统设置</a> 配置 API Key。</div>`;
                     return;
                 }
             } catch (e) {
