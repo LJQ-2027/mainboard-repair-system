@@ -1427,6 +1427,14 @@
             <div id="globalProjectIndicator" class="global-project-badge">当前项目：未选择</div>
             <div class="ai-status"><span class="ai-dot offline" id="aiDot"></span><span id="aiStatusLabel">检测中...</span></div>
             <div style="font-size:10px;margin-top:4px">DeepSeek · deepseek-chat</div>
+            <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.15)">
+                <a onclick="showLoginModal()" style="color:#fff;cursor:pointer;font-size:13px;text-decoration:none;display:flex;align-items:center;gap:6px" id="loginBtn">
+                    <span>👤</span> <span id="loginBtnText">登录/注册</span>
+                </a>
+                <div id="userInfoBar" style="display:none;font-size:12px;color:rgba(255,255,255,0.8);margin-top:4px">
+                    <span id="userInfoName"></span> · <a onclick="doLogout()" style="color:#ff6b6b;cursor:pointer;font-size:11px">退出</a>
+                </div>
+            </div>
         </div>
     </nav>
 
@@ -4308,5 +4316,176 @@ ${keyLogSnippet || '无关键行'}
             });
         });
     </script>
+
+<!-- 登录弹窗 -->
+<div class="settings-overlay" id="loginOverlay" style="display:none">
+    <div class="settings-panel" style="max-width:400px" onclick="event.stopPropagation()">
+        <h3 style="margin-bottom:16px" id="loginTitle">👤 登录</h3>
+        <div id="loginError" style="color:#f44336;font-size:13px;margin-bottom:8px;display:none"></div>
+        <div class="setting-row">
+            <label>用户名</label>
+            <input type="text" id="loginUsername" placeholder="输入用户名">
+        </div>
+        <div class="setting-row">
+            <label>密码</label>
+            <input type="password" id="loginPassword" placeholder="输入密码">
+        </div>
+        <div class="setting-row" id="confirmPwdRow" style="display:none">
+            <label>确认密码</label>
+            <input type="password" id="loginConfirmPassword" placeholder="再次输入密码">
+        </div>
+        <div class="setting-actions" style="margin-top:16px">
+            <button class="secondary-btn" onclick="closeLoginModal()">取消</button>
+            <button onclick="handleLogin()" id="loginSubmitBtn">登录</button>
+        </div>
+        <div style="margin-top:12px;text-align:center;font-size:13px;color:#666">
+            <span id="loginSwitchText">没有账号？</span>
+            <a onclick="toggleLoginMode()" style="color:#667eea;cursor:pointer" id="loginSwitchLink">去注册</a>
+        </div>
+    </div>
+</div>
+
+<script>
+// ========== 登录/注册 ==========
+let isLoginMode = true;
+const AUTH_TOKEN_KEY = 'authTokenV1';
+const AUTH_USER_KEY = 'authUserV1';
+
+function getAuthHeaders() {
+    const token = localStorage.getItem(AUTH_TOKEN_KEY);
+    return token ? { 'Authorization': `Bearer ${token}` } : {};
+}
+
+function showLoginModal() {
+    isLoginMode = true;
+    document.getElementById('loginTitle').textContent = '👤 登录';
+    document.getElementById('loginSubmitBtn').textContent = '登录';
+    document.getElementById('loginSwitchText').textContent = '没有账号？';
+    document.getElementById('loginSwitchLink').textContent = '去注册';
+    document.getElementById('confirmPwdRow').style.display = 'none';
+    document.getElementById('loginError').style.display = 'none';
+    document.getElementById('loginUsername').value = '';
+    document.getElementById('loginPassword').value = '';
+    document.getElementById('loginOverlay').style.display = 'flex';
+}
+
+function toggleLoginMode() {
+    isLoginMode = !isLoginMode;
+    document.getElementById('loginTitle').textContent = isLoginMode ? '👤 登录' : '📝 注册';
+    document.getElementById('loginSubmitBtn').textContent = isLoginMode ? '登录' : '注册';
+    document.getElementById('loginSwitchText').textContent = isLoginMode ? '没有账号？' : '已有账号？';
+    document.getElementById('loginSwitchLink').textContent = isLoginMode ? '去注册' : '去登录';
+    document.getElementById('confirmPwdRow').style.display = isLoginMode ? 'none' : 'block';
+    document.getElementById('loginError').style.display = 'none';
+}
+
+function closeLoginModal() {
+    document.getElementById('loginOverlay').style.display = 'none';
+}
+
+async function handleLogin() {
+    const username = document.getElementById('loginUsername').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const errDiv = document.getElementById('loginError');
+
+    if (!username || !password) {
+        errDiv.textContent = '请输入用户名和密码';
+        errDiv.style.display = 'block';
+        return;
+    }
+
+    if (!isLoginMode) {
+        const confirmPwd = document.getElementById('loginConfirmPassword').value;
+        if (password !== confirmPwd) {
+            errDiv.textContent = '两次密码不一致';
+            errDiv.style.display = 'block';
+            return;
+        }
+        if (password.length < 8) {
+            errDiv.textContent = '密码至少8位，需包含大写、小写、数字、特殊字符中的两类';
+            errDiv.style.display = 'block';
+            return;
+        }
+    }
+
+    const url = isLoginMode ? '/auth/login' : '/auth/register';
+    try {
+        const resp = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        const data = await resp.json();
+        if (!resp.ok) {
+            errDiv.textContent = data.detail || '操作失败';
+            errDiv.style.display = 'block';
+            return;
+        }
+        if (isLoginMode) {
+            localStorage.setItem(AUTH_TOKEN_KEY, data.access_token);
+            localStorage.setItem(AUTH_USER_KEY, JSON.stringify(data.user));
+            closeLoginModal();
+            updateUserUI();
+        } else {
+            // 注册成功后自动登录
+            localStorage.setItem(AUTH_USER_KEY, JSON.stringify(data));
+            isLoginMode = true;
+            toggleLoginMode();
+            errDiv.textContent = '注册成功！请登录';
+            errDiv.style.color = '#2e7d32';
+            errDiv.style.display = 'block';
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('loginUsername').value = data.username;
+        }
+    } catch (e) {
+        errDiv.textContent = '网络错误：' + e.message;
+        errDiv.style.display = 'block';
+    }
+}
+
+function doLogout() {
+    localStorage.removeItem(AUTH_TOKEN_KEY);
+    localStorage.removeItem(AUTH_USER_KEY);
+    updateUserUI();
+}
+
+function updateUserUI() {
+    const token = localStorage.getItem(AUTH_TOKEN_KEY);
+    const userStr = localStorage.getItem(AUTH_USER_KEY);
+    const loginBtn = document.getElementById('loginBtnText');
+    const userBar = document.getElementById('userInfoBar');
+    const userName = document.getElementById('userInfoName');
+
+    if (token && userStr) {
+        try {
+            const user = JSON.parse(userStr);
+            loginBtn.textContent = user.username;
+            userBar.style.display = 'block';
+            userName.textContent = user.username + (user.role === 'admin' ? ' 🔧' : '');
+        } catch(e) {
+            loginBtn.textContent = '登录/注册';
+            userBar.style.display = 'none';
+        }
+    } else {
+        loginBtn.textContent = '登录/注册';
+        userBar.style.display = 'none';
+    }
+}
+
+// 点击遮罩关闭
+document.getElementById('loginOverlay').addEventListener('click', closeLoginModal);
+
+// 回车提交
+document.getElementById('loginPassword').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') handleLogin();
+});
+document.getElementById('loginConfirmPassword').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') handleLogin();
+});
+
+// 初始化
+updateUserUI();
+</script>
+
 </body>
 </html>
