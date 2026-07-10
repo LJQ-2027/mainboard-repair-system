@@ -42,9 +42,15 @@ Service manuals do not replace placement drawings or schematics. Extracted claim
 
 ## Next Extraction Priority
 
-1. KM4, KL4, CLA5, KJ5, CM5, CM6, and X6880 overlap with existing structured models.
-2. Extract board-photo pages and model/board identifiers from those manuals first.
-3. Build reference-image candidates for the visual-recognition demo.
-4. Add newly covered models only after their model aliases and board versions are identified.
+Initial priority extraction is complete for KM4, KL4, CLA5, KJ5, CM5, CM6, and X6880:
+
+- 26 source pages extracted;
+- 96 embedded-image candidates retained with source-page traceability;
+- 21 images visually reviewed and approved as structure or installed-board references;
+- no manual supplied a clean isolated front/back main-board pair.
+
+The next priority is to add physical-board photos supplied from the field, then align them with the approved manual references and existing point maps.
 
 The complete per-file inventory, hashes, duplicate mappings, model tags, and parse checks are stored in `knowledge-base/service-manual-library-2026-07-10.json`.
+
+The extracted visual library is stored in `knowledge-base/vision-reference-gallery.json` and `assets/vision-reference-gallery/`.

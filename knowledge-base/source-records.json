@@ -547,6 +547,22 @@
       "source-records"
     ],
     "processing_status": "已完成项目本地原件复制、SHA-256 去重、完整性验证和第一版机型索引；待按优先机型深度抽取",
+    "extraction_progress": {
+      "priority_models_completed": [
+        "KM4",
+        "KL4",
+        "CLA5",
+        "KJ5",
+        "CM5",
+        "CM6",
+        "X6880"
+      ],
+      "source_pages_extracted": 26,
+      "embedded_image_candidates": 96,
+      "approved_reference_images": 21,
+      "standard_main_board_front_back_pairs": 0,
+      "gallery_manifest": "knowledge-base/vision-reference-gallery.json"
+    },
     "notes": "1.437 GB 二进制原件保存在项目本地 source-materials 目录并排除 Git 历史；Git 跟踪完整清单、哈希、重复映射和解析结果。Service Manual 可补充实物外观、拆装和模块上下文，但不替代 Placement 位号图或 SCH 原理图。"
   }
 ]
