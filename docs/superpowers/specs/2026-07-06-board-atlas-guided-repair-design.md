@@ -68,6 +68,26 @@ MVP flow:
 5. User clicks a highlighted module.
 6. Side panel shows measurement guidance, expected result, and next-step rule.
 
+## Iteration 2: 2.5D Inspection Baseline
+
+The first interactive pass proved the data path but still looked like a flat PDF with oversized annotation boxes. The second pass establishes the reusable visual baseline for later boards:
+
+- Crop rendered point-map pages to the actual board content so the board fills the working area.
+- Keep the point map and SVG coordinates in one transformable scene so zoom and focus never break alignment.
+- Separate the scene into four visible layers: board base, source modules, active fault path, and inspection focus.
+- Use compact numbered hotspots and precise outlines instead of large translucent rectangles.
+- Selecting a fault shows a ranked module rail; selecting a module smoothly focuses its local area and opens an inline inspection panel.
+- Provide fit, zoom in, zoom out, and reset controls suitable for repeated bench use.
+- Preserve a top-down inspection mode. Any depth treatment is shallow and must not distort test-point coordinates.
+
+Acceptance criteria:
+
+1. The board occupies most of the atlas canvas at the default desktop view.
+2. No overlay hides component labels in the source point map.
+3. Active modules remain distinguishable without relying on color alone.
+4. Clicking a suspected module focuses the correct local region and exposes its related test point or instruction.
+5. The desktop and mobile layouts have no horizontal page overflow; the board canvas may pan internally when zoomed.
+
 ## Data Model
 
 Add `knowledge-base/board-atlas-mvp.json` with these top-level sections:
@@ -103,28 +123,15 @@ This keeps overlays stable even if the rendered image resolution changes later.
 
 ## Materials Assessment
 
-Current Top20 in-house materials are sufficient for a point-map-driven 2.5D MVP.
+Current Top20 in-house materials are sufficient for the point-map-driven 2.5D atlas and its source-based repair guidance. The supplied point map, schematic, and repair guide are the accepted source for this product layer; the technician flow does not add engineering confirmation or manual calibration steps.
 
-They are not yet sufficient for:
-
-- Fully automatic real-photo alignment.
-- AI visual defect detection training.
-- Production technician repair decisions without engineering review.
-
-The missing material priority is:
-
-1. Real board front/back photos for the selected board version.
-2. Engineering confirmation of board version and model applicability.
-3. A small list of technician-approved modules and test points.
-4. One confirmed high-frequency SOP path.
-5. A few real repair examples with measurement values.
+Real board photos are useful later for photo-to-map matching and visual defect recognition, but they are not a blocker for this 2.5D atlas. Training a visual defect model will additionally require labeled good-board and bad-board image sets.
 
 ## Safety Boundaries
 
-- Do not present unconfirmed SOP drafts as final repair instruction.
 - Keep source engineering documents referenced by path; do not expose sensitive values in public-facing copy.
-- Label all MVP guidance as draft or engineering-pending until confirmed.
 - AI may summarize or guide navigation, but must not invent measurement values, repair boundaries, or replacement decisions.
+- Treat supplied in-house point maps, schematics, and repair guides as the atlas source of truth. When a value is absent, ask the technician to record the observed value rather than inventing a threshold.
 
 ## Verification
 
@@ -139,4 +146,3 @@ For the later frontend layer:
 - P3 desktop and mobile browser check.
 - Side switching, module click, fault selection, initial-check path, and SOP next-step interaction.
 - Visual check that overlays align with the board image and text remains readable.
-

@@ -7,7 +7,7 @@
   "material_audit": {
     "top20_inhouse_package_count": 11,
     "mvp_candidate": "KM4-F151",
-    "sufficiency": "Top20内研资料足够启动位号图驱动的2.5D MVP，但仍缺真实主板照片、版本确认、维修边界和已验证测量案例。",
+    "sufficiency": "Top20内研位号图、原理图和维修指导书足够建设来源驱动的2.5D维修图谱；真实主板照片仅是后续照片匹配和视觉缺陷识别所需。",
     "not_enough_for": [
       "fully_automatic_real_photo_alignment",
       "trained_visual_defect_detection",
@@ -40,7 +40,13 @@
           "source_pdf_page": 1,
           "image": "assets/board-atlas/km4-f151/main-point-map-page-1.png",
           "source_role": "point_map",
-          "orientation_status": "source_pdf_page_1"
+          "orientation_status": "source_pdf_page_1",
+          "source_crop": {
+            "x": 0.13349,
+            "y": 0.26528,
+            "width": 0.73302,
+            "height": 0.66085
+          }
         },
         {
           "side_id": "main_page_2",
@@ -48,20 +54,28 @@
           "source_pdf_page": 2,
           "image": "assets/board-atlas/km4-f151/main-point-map-page-2.png",
           "source_role": "point_map",
-          "orientation_status": "source_pdf_page_2"
+          "orientation_status": "source_pdf_page_2",
+          "source_crop": {
+            "x": 0.13444,
+            "y": 0.27065,
+            "width": 0.73159,
+            "height": 0.65749
+          }
         }
       ],
       "modules": [
         {
           "module_id": "power_pmu",
-          "name": "电源/PMU相关区域",
-          "side_id": "main_page_1",
+          "name": "电源管理 U2001",
+          "side_id": "main_page_2",
           "polygon": [
-            [0.68, 0.32],
-            [0.77, 0.32],
-            [0.77, 0.45],
-            [0.68, 0.45]
+            [0.497, 0.575],
+            [0.593, 0.575],
+            [0.593, 0.710],
+            [0.497, 0.710]
           ],
+          "designators": ["U2001"],
+          "source_basis": "位号图第2面 U2001；维修指导书第7-11页开机电源管理电路",
           "related_faults": [
             "no_power",
             "leakage_current",
@@ -71,14 +85,24 @@
         },
         {
           "module_id": "charging_usb",
-          "name": "充电/USB接口相关区域",
+          "name": "充电管理 U2702 / U2704",
           "side_id": "main_page_1",
-          "polygon": [
-            [0.40, 0.59],
-            [0.53, 0.59],
-            [0.53, 0.70],
-            [0.40, 0.70]
+          "regions": [
+            [
+              [0.235, 0.810],
+              [0.300, 0.810],
+              [0.300, 0.875],
+              [0.235, 0.875]
+            ],
+            [
+              [0.330, 0.815],
+              [0.390, 0.815],
+              [0.390, 0.880],
+              [0.330, 0.880]
+            ]
           ],
+          "designators": ["U2702", "U2704"],
+          "source_basis": "位号图第1面 U2702/U2704；维修指导书第12-14页充电管理电路",
           "related_faults": [
             "not_charging",
             "usb_no_response"
@@ -86,32 +110,89 @@
           "status": "source_overlay"
         },
         {
-          "module_id": "memory_cpu",
-          "name": "CPU/Memory相关区域",
-          "side_id": "main_page_2",
+          "module_id": "cpu_baseband",
+          "name": "CPU / 基带处理器 U1001",
+          "side_id": "main_page_1",
           "polygon": [
-            [0.36, 0.41],
-            [0.51, 0.41],
-            [0.51, 0.58],
-            [0.36, 0.58]
+            [0.548, 0.647],
+            [0.686, 0.647],
+            [0.686, 0.801],
+            [0.548, 0.801]
           ],
+          "designators": ["U1001"],
+          "source_basis": "位号图第1面 U1001；原理图 UMS9230",
           "related_faults": [
-            "memory_failure",
             "cpu_failure",
             "no_power"
           ],
           "status": "source_overlay"
         },
         {
-          "module_id": "rf_network",
-          "name": "射频/网络相关区域",
+          "module_id": "memory_ddr",
+          "name": "LPDDR4X U4001",
+          "side_id": "main_page_1",
+          "polygon": [
+            [0.680, 0.638],
+            [0.827, 0.638],
+            [0.827, 0.824],
+            [0.680, 0.824]
+          ],
+          "designators": ["U4001"],
+          "source_basis": "位号图第1面 U4001；原理图 LPDDR4X",
+          "related_faults": [
+            "memory_failure",
+            "no_power"
+          ],
+          "status": "source_overlay"
+        },
+        {
+          "module_id": "memory_emmc",
+          "name": "eMMC U4000",
           "side_id": "main_page_2",
           "polygon": [
-            [0.79, 0.33],
-            [0.91, 0.33],
-            [0.91, 0.51],
-            [0.79, 0.51]
+            [0.220, 0.635],
+            [0.355, 0.635],
+            [0.355, 0.840],
+            [0.220, 0.840]
           ],
+          "designators": ["U4000"],
+          "source_basis": "位号图第2面 U4000；原理图 eMMC",
+          "related_faults": [
+            "memory_failure",
+            "no_power"
+          ],
+          "status": "source_overlay"
+        },
+        {
+          "module_id": "clock_26m",
+          "name": "26MHz 时钟 X2100",
+          "side_id": "main_page_2",
+          "polygon": [
+            [0.548, 0.490],
+            [0.598, 0.490],
+            [0.598, 0.548],
+            [0.548, 0.548]
+          ],
+          "designators": ["X2100"],
+          "source_basis": "位号图第2面 X2100；维修指导书第10页和第15页",
+          "related_faults": [
+            "no_power",
+            "clock_failure"
+          ],
+          "status": "source_overlay"
+        },
+        {
+          "module_id": "rf_network",
+          "name": "射频基带 U0600",
+          "side_id": "main_page_2",
+          "polygon": [
+            [0.650, 0.540],
+            [0.750, 0.540],
+            [0.750, 0.680],
+            [0.650, 0.680]
+          ],
+          "designators": ["U0600"],
+          "source_basis": "位号图第2面 U0600；原理图 SR3595D",
           "related_faults": [
             "no_service",
             "weak_signal"
@@ -119,18 +200,20 @@
           "status": "source_overlay"
         },
         {
-          "module_id": "connectors_sim_display",
-          "name": "连接器/SIM/显示接口区域",
-          "side_id": "main_page_1",
+          "module_id": "usb_power_connector",
+          "name": "VBUS / 主板连接器 J6101",
+          "side_id": "main_page_2",
           "polygon": [
-            [0.30, 0.42],
-            [0.43, 0.42],
-            [0.43, 0.52],
-            [0.30, 0.52]
+            [0.548, 0.826],
+            [0.705, 0.826],
+            [0.705, 0.905],
+            [0.548, 0.905]
           ],
+          "designators": ["J6101", "VBUS1", "VBAT1"],
+          "source_basis": "位号图第2面 J6101/VBUS1/VBAT1；维修指导书第12-14页",
           "related_faults": [
-            "display_no_signal",
-            "sim_not_detected",
+            "not_charging",
+            "usb_no_response",
             "connector_damage"
           ],
           "status": "source_overlay"
@@ -139,26 +222,46 @@
       "test_points": [
         {
           "point_id": "tp_basic_vbat",
-          "name": "VBAT基础供电测试点",
-          "side_id": "main_page_1",
-          "x": 0.77,
-          "y": 0.52,
+          "name": "VBAT1 基础供电点",
+          "side_id": "main_page_2",
+          "x": 0.70758,
+          "y": 0.84525,
           "related_modules": [
-            "power_pmu"
+            "power_pmu",
+            "usb_power_connector"
           ],
-          "expected_result": "按维修指导书记录测量值",
+          "expected_result": "维修指导书参考：VBAT 3.4V-4.35V",
+          "source_label": "VBAT1",
+          "source_reference": "位号图第2面；维修指导书第11页",
           "status": "source_material_based"
         },
         {
           "point_id": "tp_basic_vbus",
-          "name": "VBUS/充电输入测试点",
-          "side_id": "main_page_1",
-          "x": 0.49,
-          "y": 0.62,
+          "name": "VBUS1 充电输入点",
+          "side_id": "main_page_2",
+          "x": 0.69321,
+          "y": 0.82425,
           "related_modules": [
+            "usb_power_connector",
             "charging_usb"
           ],
-          "expected_result": "按维修指导书记录插充电器前后表现",
+          "expected_result": "维修指导书参考：VCHG 充电电源输入 5V",
+          "source_label": "VBUS1",
+          "source_reference": "位号图第2面；维修指导书第14页",
+          "status": "source_material_based"
+        },
+        {
+          "point_id": "tp_x2100_26m",
+          "name": "X2100 26MHz 时钟",
+          "side_id": "main_page_2",
+          "x": 0.57240,
+          "y": 0.51841,
+          "related_modules": [
+            "clock_26m"
+          ],
+          "expected_result": "维修指导书参考：X2100 输出 26MHz",
+          "source_label": "X2100",
+          "source_reference": "位号图第2面；维修指导书第10页、第15页",
           "status": "source_material_based"
         }
       ],
@@ -170,7 +273,7 @@
           "suspected_modules": [
             "power_pmu",
             "charging_usb",
-            "connectors_sim_display"
+            "usb_power_connector"
           ],
           "first_sop_step": "km4_precheck_visual"
         },
@@ -180,7 +283,10 @@
           "entry_type": "known_fault",
           "suspected_modules": [
             "power_pmu",
-            "memory_cpu"
+            "clock_26m",
+            "cpu_baseband",
+            "memory_ddr",
+            "memory_emmc"
           ],
           "first_sop_step": "km4_no_power_vbat"
         },
@@ -189,8 +295,8 @@
           "label": "不充电",
           "entry_type": "known_fault",
           "suspected_modules": [
-            "charging_usb",
-            "power_pmu"
+            "usb_power_connector",
+            "charging_usb"
           ],
           "first_sop_step": "km4_not_charging_vbus"
         }
@@ -212,10 +318,32 @@
           "title": "检测基础供电",
           "target_type": "test_point",
           "target_id": "tp_basic_vbat",
-          "instruction": "按维修指导书测量基础供电点位，并记录电压/阻值。",
-          "expected_result": "按维修指导书记录测量值",
-          "next_if_normal": "continue_to_power_sequence_check",
+          "instruction": "在位号图第2面的 VBAT1 记录电压；若出现大电流，同时检查 VBAT 是否对地短路。",
+          "expected_result": "维修指导书参考：VBAT 3.4V-4.35V",
+          "next_if_normal": "km4_no_power_clock",
           "next_if_abnormal": "inspect_power_pmu_area",
+          "status": "source_material_based"
+        },
+        {
+          "step_id": "km4_no_power_clock",
+          "title": "检测 26MHz 时钟",
+          "target_type": "test_point",
+          "target_id": "tp_x2100_26m",
+          "instruction": "在位号图第2面定位 X2100，测量输出频率并记录波形。",
+          "expected_result": "维修指导书参考：X2100 输出 26MHz",
+          "next_if_normal": "km4_no_power_core_memory",
+          "next_if_abnormal": "inspect_x2100_area",
+          "status": "source_material_based"
+        },
+        {
+          "step_id": "km4_no_power_core_memory",
+          "title": "检查 CPU 与 Memory 供电",
+          "target_type": "module",
+          "target_id": "cpu_baseband",
+          "instruction": "按位号图依次定位 U1001、U4001、U4000，并记录 VDDCORE 与 VDDEMMCCORE。",
+          "expected_result": "维修指导书参考：VDDCORE 1.15V；VDDEMMCCORE 3.3V",
+          "next_if_normal": "continue_no_power_diagnosis",
+          "next_if_abnormal": "inspect_cpu_memory_power",
           "status": "source_material_based"
         },
         {
@@ -223,10 +351,21 @@
           "title": "检测充电输入",
           "target_type": "test_point",
           "target_id": "tp_basic_vbus",
-          "instruction": "按维修指导书测量VBUS/充电输入点位，并记录插充电器前后表现。",
-          "expected_result": "按维修指导书记录插充电器前后表现",
-          "next_if_normal": "inspect_charging_ic_area",
+          "instruction": "先检查接口与FPC连接，再在位号图第2面的 VBUS1 记录插入充电器后的电压。",
+          "expected_result": "维修指导书参考：VCHG 充电电源输入 5V",
+          "next_if_normal": "km4_not_charging_ic",
           "next_if_abnormal": "inspect_usb_connector_area",
+          "status": "source_material_based"
+        },
+        {
+          "step_id": "km4_not_charging_ic",
+          "title": "检查充电管理器件",
+          "target_type": "module",
+          "target_id": "charging_usb",
+          "instruction": "切换到位号图第1面，检查 U2702/U2704 及其周边器件外观和焊接状态。",
+          "expected_result": "器件无烧毁、缺件、虚焊或明显短路表现",
+          "next_if_normal": "continue_charging_path_check",
+          "next_if_abnormal": "repair_charging_component_area",
           "status": "source_material_based"
         }
       ],

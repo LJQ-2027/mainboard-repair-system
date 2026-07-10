@@ -27,9 +27,17 @@ def main() -> None:
         "function setBoardAtlasFault(",
         "function selectBoardAtlasModule(",
         "function selectBoardAtlasTestPoint(",
+        "function setBoardAtlasZoom(",
+        "function focusBoardAtlasOnPolygon(",
+        "function mapBoardAtlasPointToCrop(",
+        "function getBoardAtlasModuleRegions(",
         "class=\"board-atlas-shell\"",
         "class=\"board-atlas-canvas\"",
         "class=\"board-atlas-overlay\"",
+        "class=\"board-atlas-controls\"",
+        "class=\"board-atlas-module-rail\"",
+        "class=\"atlas-module-marker",
+        "aria-pressed=",
     ]
     for marker in required_markers:
         require_contains(html, marker)
@@ -37,9 +45,16 @@ def main() -> None:
     if not ATLAS_JSON.exists():
         raise AssertionError("Board atlas JSON is missing")
 
+    forbidden_markers = [
+        "min-width: 980px",
+        "min-width: 760px",
+    ]
+    for marker in forbidden_markers:
+        if marker in html:
+            raise AssertionError(f"Legacy oversized atlas marker still present: {marker}")
+
     print("Board atlas frontend markers found.")
 
 
 if __name__ == "__main__":
     main()
-

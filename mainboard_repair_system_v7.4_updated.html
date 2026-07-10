@@ -3642,22 +3642,22 @@
 
         .board-atlas-shell {
             display: grid;
-            gap: 18px;
+            gap: 12px;
         }
 
         .board-atlas-layout {
             display: grid;
-            grid-template-columns: minmax(0, 1fr) 360px;
-            gap: 18px;
+            grid-template-columns: minmax(0, 1fr) 340px;
+            gap: 12px;
             align-items: start;
         }
 
         .board-atlas-stage,
         .board-atlas-panel {
             border: 1px solid #cfdbe8;
-            border-radius: 12px;
-            background: #ffffff;
-            box-shadow: 0 14px 34px rgba(9, 31, 53, 0.07);
+            border-radius: 8px;
+            background: #fbfdfc;
+            box-shadow: 0 8px 22px rgba(9, 31, 53, 0.06);
         }
 
         .board-atlas-stage {
@@ -3666,10 +3666,10 @@
 
         .board-atlas-toolbar {
             display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 14px;
+            grid-template-columns: minmax(180px, 1fr) auto auto;
+            gap: 12px;
             align-items: center;
-            padding: 16px 18px;
+            padding: 12px 14px;
             border-bottom: 1px solid #e7eef5;
         }
 
@@ -3677,7 +3677,7 @@
         .board-atlas-panel h3 {
             margin: 0;
             color: #071c33;
-            font-size: 18px;
+            font-size: 16px;
         }
 
         .board-atlas-toolbar p,
@@ -3691,48 +3691,175 @@
         .board-atlas-side-switcher,
         .board-atlas-faults {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             flex-wrap: wrap;
         }
 
+        .board-atlas-side-switcher {
+            padding: 3px;
+            border: 1px solid #cbd8df;
+            border-radius: 7px;
+            background: #eef3f2;
+        }
+
         .atlas-chip {
-            min-height: 38px;
-            padding: 8px 12px;
+            min-height: 34px;
+            padding: 7px 10px;
             border: 1px solid #c9d7e6;
-            border-radius: 999px;
-            background: #ffffff;
+            border-radius: 6px;
+            background: #fbfdfc;
             color: #244056;
             font-size: 13px;
-            font-weight: 850;
+            font-weight: 750;
             box-shadow: none;
         }
 
-        .atlas-chip:hover,
-        .atlas-chip.active {
-            background: #083b76;
-            border-color: #083b76;
-            color: #ffffff;
+        .board-atlas-side-switcher .atlas-chip {
+            border-color: transparent;
+            background: transparent;
+        }
+
+        .atlas-chip:hover {
+            border-color: #91a7b4;
+            background: #eef3f2;
             transform: none;
-            box-shadow: 0 10px 24px rgba(8, 59, 118, 0.18);
+            box-shadow: none;
+        }
+
+        .atlas-chip.active {
+            background: #123f4b;
+            border-color: #123f4b;
+            color: #f7fbfa;
+            box-shadow: none;
+        }
+
+        .board-atlas-controls {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .atlas-icon-button {
+            display: inline-grid;
+            place-items: center;
+            width: 34px;
+            height: 34px;
+            padding: 0;
+            border: 1px solid #c6d3da;
+            border-radius: 6px;
+            background: #fbfdfc;
+            color: #173541;
+            font-size: 18px;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .atlas-icon-button:hover {
+            border-color: #7d949e;
+            background: #eef3f2;
+        }
+
+        .atlas-icon-button:disabled {
+            border-color: #dce4e6;
+            background: #f4f7f6;
+            color: #9aabad;
+            cursor: not-allowed;
+        }
+
+        .atlas-zoom-value {
+            min-width: 42px;
+            color: #536a74;
+            font-size: 12px;
+            font-variant-numeric: tabular-nums;
+            text-align: center;
+        }
+
+        .atlas-chip:focus-visible,
+        .atlas-icon-button:focus-visible,
+        .atlas-module-jump:focus-visible {
+            outline: 2px solid #087a5b;
+            outline-offset: 2px;
+        }
+
+        .board-atlas-module-rail {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 48px;
+            padding: 7px 12px;
+            overflow-x: auto;
+            border-bottom: 1px solid #dce6e7;
+            background: #f5f8f7;
+            scrollbar-width: thin;
+        }
+
+        .board-atlas-module-rail > span {
+            flex: 0 0 auto;
+            margin-right: 2px;
+            color: #6a7e86;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .atlas-module-jump {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            flex: 0 0 auto;
+            min-height: 34px;
+            padding: 5px 9px 5px 6px;
+            border: 1px solid #d0dadd;
+            border-radius: 6px;
+            background: #fbfdfc;
+            color: #29434d;
+            font-size: 12px;
+            font-weight: 750;
+            cursor: pointer;
+        }
+
+        .atlas-module-jump.active {
+            border-color: #087a5b;
+            background: #e9f4ef;
+            color: #075844;
+        }
+
+        .atlas-module-index {
+            display: inline-grid;
+            place-items: center;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #f2b84b;
+            color: #442b00;
+            font-size: 11px;
+            font-weight: 900;
         }
 
         .board-atlas-canvas {
             position: relative;
-            min-height: 580px;
+            height: clamp(520px, 65vh, 680px);
+            min-height: 520px;
             overflow: auto;
+            overscroll-behavior: contain;
+            scroll-behavior: smooth;
             background:
-                linear-gradient(90deg, rgba(148, 163, 184, 0.13) 1px, transparent 1px),
-                linear-gradient(0deg, rgba(148, 163, 184, 0.13) 1px, transparent 1px),
-                #f8fbfd;
-            background-size: 24px 24px;
+                linear-gradient(90deg, rgba(76, 96, 101, 0.08) 1px, transparent 1px),
+                linear-gradient(0deg, rgba(76, 96, 101, 0.08) 1px, transparent 1px),
+                #edf2f0;
+            background-size: 20px 20px;
         }
 
         .board-atlas-viewport {
             position: relative;
-            min-width: 980px;
+            width: var(--atlas-width, 100%);
+            min-width: 100%;
+            padding: clamp(20px, 3vw, 36px);
+            transition: width 240ms cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .board-atlas-board {
+            position: relative;
             width: 100%;
-            padding: 18px;
-            perspective: 1200px;
         }
 
         .board-atlas-image {
@@ -3741,95 +3868,147 @@
             display: block;
             width: 100%;
             height: auto;
-            border: 1px solid #d4e0ec;
-            border-radius: 10px;
-            background: #ffffff;
+            border: 0;
+            background: transparent;
             pointer-events: none;
-            box-shadow: 0 18px 34px rgba(15, 46, 70, 0.13);
+            filter:
+                drop-shadow(0 5px 0 #b9cbc6)
+                drop-shadow(0 18px 18px rgba(24, 48, 51, 0.20));
         }
 
         .board-atlas-overlay {
             position: absolute;
-            inset: 18px;
+            inset: 0;
             z-index: 2;
-            width: calc(100% - 36px);
-            height: calc(100% - 36px);
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .atlas-module-depth {
+            fill: rgba(8, 88, 69, 0.08);
+            stroke: none;
             pointer-events: none;
         }
 
         .atlas-module-polygon {
-            fill: rgba(8, 59, 118, 0.006);
-            stroke: rgba(0, 85, 155, 0.24);
-            stroke-width: 0.0022;
-            stroke-dasharray: 0.012 0.006;
+            fill: transparent;
+            stroke: transparent;
+            stroke-width: 1.5px;
             stroke-linejoin: round;
+            vector-effect: non-scaling-stroke;
             cursor: pointer;
             pointer-events: auto;
-            filter: drop-shadow(0 0.006px 0 rgba(255, 255, 255, 0.95)) drop-shadow(0 0.012px 0.008px rgba(7, 28, 51, 0.18));
-            transition: fill 160ms var(--console-ease), stroke 160ms var(--console-ease), stroke-width 160ms var(--console-ease);
+            transition: fill 140ms cubic-bezier(0.25, 1, 0.5, 1), stroke 140ms cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         .atlas-module-polygon.suspected {
-            fill: rgba(255, 177, 59, 0.055);
-            stroke: #c96d00;
-            stroke-width: 0.0038;
-            stroke-dasharray: none;
+            fill: rgba(239, 173, 47, 0.025);
+            stroke: #a35e00;
         }
 
         .atlas-module-polygon.selected {
-            fill: rgba(8, 122, 91, 0.055);
+            fill: rgba(8, 122, 91, 0.04);
             stroke: #087a5b;
-            stroke-width: 0.0042;
-            stroke-dasharray: none;
+            stroke-width: 2px;
+            filter: drop-shadow(0 3px 2px rgba(8, 88, 69, 0.28));
+        }
+
+        .board-atlas-hotspots {
+            position: absolute;
+            inset: 0;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .atlas-module-marker,
+        .atlas-test-point {
+            position: absolute;
+            display: inline-grid;
+            place-items: center;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            pointer-events: auto;
+        }
+
+        .atlas-module-marker {
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            border: 2px solid #6f4600;
+            border-radius: 50%;
+            background: #f2b84b;
+            color: #2d2107;
+            font-size: 12px;
+            font-weight: 900;
+            line-height: 1;
+            box-shadow: 0 3px 7px rgba(74, 48, 0, 0.28);
+        }
+
+        .atlas-module-marker:hover {
+            transform: translate(-50%, -50%) scale(1.08);
+        }
+
+        .atlas-module-marker::before {
+            content: '';
+            position: absolute;
+            inset: -8px;
+        }
+
+        .atlas-module-marker.selected {
+            border-color: #064c3a;
+            background: #087a5b;
+            color: #f7fbfa;
+            box-shadow: 0 4px 10px rgba(8, 88, 69, 0.34);
+        }
+
+        .atlas-module-marker:focus-visible,
+        .atlas-test-point:focus-visible {
+            outline: 3px solid #173541;
+            outline-offset: 3px;
         }
 
         .atlas-test-point {
-            fill: #f43f5e;
-            stroke: #ffffff;
-            stroke-width: 0.004;
-            cursor: pointer;
-            pointer-events: auto;
-            filter: drop-shadow(0 0.01px 0.008px rgba(190, 18, 60, 0.7));
+            width: 14px;
+            height: 14px;
+            padding: 0;
+            border: 2px solid #f9fbfa;
+            border-radius: 50%;
+            background: #bb2c44;
+            box-shadow: 0 2px 6px rgba(116, 20, 38, 0.42);
+        }
+
+        .atlas-test-point::before {
+            content: '';
+            position: absolute;
+            inset: -12px;
         }
 
         .atlas-test-point.selected {
-            fill: #087a5b;
-            stroke: #ffffff;
-        }
-
-        .atlas-module-label {
-            fill: #00345f;
-            font-size: 0.008px;
-            font-weight: 900;
-            opacity: 0;
-            pointer-events: none;
-            paint-order: stroke;
-            stroke: rgba(255, 255, 255, 0.96);
-            stroke-width: 0.002px;
-        }
-
-        .atlas-module-polygon.suspected + .atlas-module-label,
-        .atlas-module-polygon.selected + .atlas-module-label {
-            opacity: 0.95;
+            background: #087a5b;
+            box-shadow: 0 2px 7px rgba(8, 88, 69, 0.42);
         }
 
         .board-atlas-side-note {
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
-            padding: 12px 18px 18px;
+            padding: 9px 12px 11px;
+            border-top: 1px solid #e1e8e8;
         }
 
         .board-atlas-panel {
             display: grid;
-            gap: 14px;
-            padding: 18px;
+            gap: 12px;
+            padding: 14px;
+            position: sticky;
+            top: 14px;
         }
 
         .board-atlas-section {
             display: grid;
-            gap: 10px;
-            padding-bottom: 14px;
+            gap: 8px;
+            padding-bottom: 12px;
             border-bottom: 1px solid #e7eef5;
         }
 
@@ -3839,10 +4018,10 @@
         }
 
         .atlas-detail-card {
-            padding: 13px;
-            border: 1px solid #dfe8f1;
-            border-radius: 16px;
-            background: #f8fbfd;
+            padding: 11px;
+            border: 1px solid #d8e2e2;
+            border-radius: 6px;
+            background: #f5f8f7;
         }
 
         .atlas-detail-card strong {
@@ -3859,12 +4038,51 @@
         }
 
         .atlas-sop-step {
-            border-color: #f3c9a1;
-            background: #fff8ed;
+            border-color: #e4c483;
+            background: #fff8e8;
         }
 
         .atlas-sop-step strong {
-            color: #8a4300;
+            color: #714100;
+        }
+
+        .atlas-inspection-kicker {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+            color: #075844;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .atlas-inspection-kicker .atlas-module-index {
+            background: #087a5b;
+            color: #f7fbfa;
+        }
+
+        .atlas-source-list {
+            display: grid;
+            gap: 5px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .atlas-source-list li {
+            color: #60757d;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .board-atlas-viewport {
+                transition-duration: 0.01ms;
+            }
+
+            .board-atlas-canvas {
+                scroll-behavior: auto;
+            }
         }
 
         @media (max-width: 1280px) {
@@ -3882,6 +4100,10 @@
 
             .board-atlas-layout {
                 grid-template-columns: 1fr;
+            }
+
+            .board-atlas-panel {
+                position: static;
             }
 
             .repair-assist-panel {
@@ -3941,11 +4163,13 @@
             }
 
             .board-atlas-canvas {
-                min-height: 430px;
+                height: clamp(310px, 40vh, 430px);
+                min-height: 310px;
             }
 
             .board-atlas-viewport {
-                min-width: 760px;
+                min-width: 100%;
+                padding: 18px;
             }
 
             .repair-current-task {
@@ -4592,7 +4816,7 @@
             <div class="board-atlas-shell">
                 <div class="knowledge-hero">
                     <h2>主板图谱导诊</h2>
-                    <p class="subtitle">用 KM4/F151 内研资料生成维修图谱：先看板图，再按故障高亮模块，点击模块或测试点查看检测提示。</p>
+                    <p class="subtitle">选择故障，图谱显示优先检查区域；点击编号进入局部检测。</p>
                 </div>
                 <div id="boardAtlasGuideRoot">
                     <div class="knowledge-state">正在加载主板图谱...</div>
@@ -5549,7 +5773,8 @@
             sideId: '',
             faultId: '',
             selectedModuleId: '',
-            selectedPointId: ''
+            selectedPointId: '',
+            zoom: 1
         };
 
         function escapeHtml(value) {
@@ -5966,6 +6191,7 @@
             boardAtlasUiState.sideId = sideId;
             boardAtlasUiState.selectedModuleId = '';
             boardAtlasUiState.selectedPointId = '';
+            boardAtlasUiState.zoom = 1;
             renderBoardAtlasGuide();
         }
 
@@ -5973,6 +6199,7 @@
             boardAtlasUiState.faultId = faultId;
             boardAtlasUiState.selectedModuleId = '';
             boardAtlasUiState.selectedPointId = '';
+            boardAtlasUiState.zoom = 1;
             const board = getActiveBoardAtlasBoard();
             const fault = getActiveBoardAtlasFault(board);
             const firstModuleId = fault?.suspected_modules?.[0] || '';
@@ -5982,28 +6209,125 @@
         }
 
         function selectBoardAtlasModule(moduleId) {
+            const board = getActiveBoardAtlasBoard();
+            const module = board?.modules?.find(item => item.module_id === moduleId);
+            if (module) boardAtlasUiState.sideId = module.side_id;
             boardAtlasUiState.selectedModuleId = moduleId;
             boardAtlasUiState.selectedPointId = '';
+            boardAtlasUiState.zoom = 2;
             renderBoardAtlasGuide();
+            requestAnimationFrame(() => requestAnimationFrame(() => focusBoardAtlasOnPolygon(moduleId)));
+            setTimeout(() => focusBoardAtlasOnPolygon(moduleId), 280);
         }
 
         function selectBoardAtlasTestPoint(pointId) {
             boardAtlasUiState.selectedPointId = pointId;
             const board = getActiveBoardAtlasBoard();
             const point = board?.test_points?.find(item => item.point_id === pointId);
-            boardAtlasUiState.selectedModuleId = point?.related_modules?.[0] || boardAtlasUiState.selectedModuleId;
+            if (point) boardAtlasUiState.sideId = point.side_id;
+            const fault = getActiveBoardAtlasFault(board);
+            const pathModuleId = asArray(point?.related_modules).find(moduleId => asArray(fault?.suspected_modules).includes(moduleId));
+            boardAtlasUiState.selectedModuleId = pathModuleId || point?.related_modules?.[0] || boardAtlasUiState.selectedModuleId;
+            boardAtlasUiState.zoom = 2.2;
             renderBoardAtlasGuide();
+            requestAnimationFrame(() => requestAnimationFrame(() => focusBoardAtlasElement(`[data-test-point-id="${pointId}"]`)));
+            setTimeout(() => focusBoardAtlasElement(`[data-test-point-id="${pointId}"]`), 280);
         }
 
-        function polygonToSvgPoints(polygon) {
-            return asArray(polygon).map(point => `${Number(point[0]).toFixed(4)},${Number(point[1]).toFixed(4)}`).join(' ');
+        function getBoardAtlasCrop(side) {
+            const crop = side?.source_crop;
+            if (!crop) return { x: 0, y: 0, width: 1, height: 1 };
+            return {
+                x: Number(crop.x),
+                y: Number(crop.y),
+                width: Number(crop.width),
+                height: Number(crop.height)
+            };
         }
 
-        function polygonCenter(polygon) {
+        function mapBoardAtlasPointToCrop(point, sourceCrop) {
+            const crop = sourceCrop || { x: 0, y: 0, width: 1, height: 1 };
+            return [
+                (Number(point[0]) - crop.x) / crop.width,
+                (Number(point[1]) - crop.y) / crop.height
+            ];
+        }
+
+        function getBoardAtlasModuleRegions(module) {
+            if (Array.isArray(module?.regions) && module.regions.length) return module.regions;
+            return Array.isArray(module?.polygon) ? [module.polygon] : [];
+        }
+
+        function polygonToSvgPoints(polygon, sourceCrop) {
+            return asArray(polygon)
+                .map(point => mapBoardAtlasPointToCrop(point, sourceCrop))
+                .map(point => `${point[0].toFixed(4)},${point[1].toFixed(4)}`)
+                .join(' ');
+        }
+
+        function polygonCenter(polygon, sourceCrop) {
             const points = asArray(polygon);
             if (points.length === 0) return [0.5, 0.5];
             const sum = points.reduce((acc, point) => [acc[0] + Number(point[0]), acc[1] + Number(point[1])], [0, 0]);
-            return [sum[0] / points.length, sum[1] / points.length];
+            return mapBoardAtlasPointToCrop([sum[0] / points.length, sum[1] / points.length], sourceCrop);
+        }
+
+        function focusBoardAtlasElement(selector) {
+            const canvas = document.querySelector('.board-atlas-canvas');
+            const target = document.querySelector(selector);
+            if (!canvas || !target) return;
+            const canvasRect = canvas.getBoundingClientRect();
+            const targetRect = target.getBoundingClientRect();
+            const nextLeft = canvas.scrollLeft + targetRect.left + (targetRect.width / 2) - canvasRect.left - (canvas.clientWidth / 2);
+            const nextTop = canvas.scrollTop + targetRect.top + (targetRect.height / 2) - canvasRect.top - (canvas.clientHeight / 2);
+            canvas.style.scrollBehavior = 'auto';
+            canvas.scrollLeft = Math.max(0, nextLeft);
+            canvas.scrollTop = Math.max(0, nextTop);
+            requestAnimationFrame(() => canvas.style.removeProperty('scroll-behavior'));
+        }
+
+        function focusBoardAtlasOnPolygon(moduleId) {
+            focusBoardAtlasElement(`[data-module-marker="${moduleId}"]`);
+        }
+
+        function syncBoardAtlasZoomControls() {
+            const viewport = document.querySelector('.board-atlas-viewport');
+            const value = document.getElementById('boardAtlasZoomValue');
+            const zoomOut = document.getElementById('boardAtlasZoomOut');
+            const zoomIn = document.getElementById('boardAtlasZoomIn');
+            if (viewport) viewport.style.setProperty('--atlas-width', `${boardAtlasUiState.zoom * 100}%`);
+            if (value) value.textContent = `${Math.round(boardAtlasUiState.zoom * 100)}%`;
+            if (zoomOut) zoomOut.disabled = boardAtlasUiState.zoom <= 1;
+            if (zoomIn) zoomIn.disabled = boardAtlasUiState.zoom >= 3;
+        }
+
+        function setBoardAtlasZoom(nextZoom) {
+            const canvas = document.querySelector('.board-atlas-canvas');
+            const viewport = document.querySelector('.board-atlas-viewport');
+            const oldWidth = canvas?.scrollWidth || 1;
+            const oldHeight = canvas?.scrollHeight || 1;
+            const centerX = canvas ? (canvas.scrollLeft + canvas.clientWidth / 2) / oldWidth : 0.5;
+            const centerY = canvas ? (canvas.scrollTop + canvas.clientHeight / 2) / oldHeight : 0.5;
+            boardAtlasUiState.zoom = Math.min(3, Math.max(1, Math.round(Number(nextZoom) * 100) / 100));
+            if (viewport) viewport.style.setProperty('--atlas-width', `${boardAtlasUiState.zoom * 100}%`);
+            syncBoardAtlasZoomControls();
+            if (canvas) {
+                requestAnimationFrame(() => {
+                    canvas.scrollLeft = centerX * canvas.scrollWidth - canvas.clientWidth / 2;
+                    canvas.scrollTop = centerY * canvas.scrollHeight - canvas.clientHeight / 2;
+                });
+            }
+        }
+
+        function zoomBoardAtlasBy(delta) {
+            setBoardAtlasZoom(boardAtlasUiState.zoom + Number(delta));
+        }
+
+        function resetBoardAtlasView() {
+            boardAtlasUiState.zoom = 1;
+            syncBoardAtlasZoomControls();
+            const canvas = document.querySelector('.board-atlas-canvas');
+            if (canvas) canvas.scrollTo({ left: 0, top: 0, behavior: 'smooth' });
         }
 
         function renderBoardAtlasGuide() {
@@ -6018,14 +6342,38 @@
                 return;
             }
 
-            const side = getActiveBoardAtlasSide(board);
             const fault = getActiveBoardAtlasFault(board);
+            if (!boardAtlasUiState.sideId) {
+                const firstModuleId = fault?.suspected_modules?.[0];
+                const firstModule = (board.modules || []).find(module => module.module_id === firstModuleId);
+                if (firstModule) boardAtlasUiState.sideId = firstModule.side_id;
+            }
+            const side = getActiveBoardAtlasSide(board);
             const sopStep = getActiveBoardAtlasSop(board, fault);
+            const sourceCrop = getBoardAtlasCrop(side);
             const suspectedModuleIds = new Set(fault?.suspected_modules || []);
             const sideModules = (board.modules || []).filter(module => module.side_id === side?.side_id);
             const sidePoints = (board.test_points || []).filter(point => point.side_id === side?.side_id);
+            const suspectedModules = asArray(fault?.suspected_modules)
+                .map(moduleId => (board.modules || []).find(module => module.module_id === moduleId))
+                .filter(Boolean);
+            const moduleIndexById = new Map(suspectedModules.map((module, index) => [module.module_id, index + 1]));
+            const visibleModules = sideModules.filter(module =>
+                suspectedModuleIds.has(module.module_id) || boardAtlasUiState.selectedModuleId === module.module_id
+            );
+            const visibleModuleIds = new Set(visibleModules.map(module => module.module_id));
+            const visiblePoints = sidePoints.filter(point =>
+                asArray(point.related_modules).some(moduleId => visibleModuleIds.has(moduleId))
+            );
             const selectedModule = (board.modules || []).find(module => module.module_id === boardAtlasUiState.selectedModuleId);
             const selectedPoint = (board.test_points || []).find(point => point.point_id === boardAtlasUiState.selectedPointId);
+            const selectedModuleIndex = selectedModule
+                ? moduleIndexById.get(selectedModule.module_id) || (board.modules || []).findIndex(module => module.module_id === selectedModule.module_id) + 1
+                : null;
+            const selectedModulePoints = selectedModule
+                ? (board.test_points || []).filter(point => asArray(point.related_modules).includes(selectedModule.module_id))
+                : [];
+            const sideLabelById = new Map((board.sides || []).map(item => [item.side_id, `第${item.source_pdf_page}面`]));
 
             root.innerHTML = `
                 <div class="board-atlas-layout">
@@ -6033,53 +6381,84 @@
                         <div class="board-atlas-toolbar">
                             <div>
                                 <h3>${escapeHtml(board.model_name)} / ${escapeHtml(board.board_version)}</h3>
-                                <p>${escapeHtml(board.source_package_id || 'Top20 内研主板资料包')}</p>
+                                <p>${escapeHtml(side?.label || '')} · ${escapeHtml(board.source_package_id || 'Top20 内研主板资料包')}</p>
                             </div>
-                            <div class="board-atlas-side-switcher">
+                            <div class="board-atlas-side-switcher" role="group" aria-label="主板面切换">
                                 ${(board.sides || []).map(item => `
-                                    <button type="button" class="atlas-chip ${item.side_id === side?.side_id ? 'active' : ''}" onclick="setBoardAtlasSide('${escapeHtml(item.side_id)}')">${escapeHtml(item.label)}</button>
+                                    <button type="button" class="atlas-chip ${item.side_id === side?.side_id ? 'active' : ''}" aria-pressed="${item.side_id === side?.side_id}" onclick="setBoardAtlasSide('${escapeHtml(item.side_id)}')">第${escapeHtml(item.source_pdf_page)}面</button>
                                 `).join('')}
                             </div>
+                            <div class="board-atlas-controls" aria-label="图谱缩放">
+                                <button id="boardAtlasZoomOut" type="button" class="atlas-icon-button" aria-label="缩小主板图谱" title="缩小" onclick="zoomBoardAtlasBy(-0.25)" ${boardAtlasUiState.zoom <= 1 ? 'disabled' : ''}>−</button>
+                                <span class="atlas-zoom-value" id="boardAtlasZoomValue">${Math.round(boardAtlasUiState.zoom * 100)}%</span>
+                                <button id="boardAtlasZoomIn" type="button" class="atlas-icon-button" aria-label="放大主板图谱" title="放大" onclick="zoomBoardAtlasBy(0.25)" ${boardAtlasUiState.zoom >= 3 ? 'disabled' : ''}>+</button>
+                                <button type="button" class="atlas-icon-button" aria-label="适配整块主板" title="适配整板" onclick="resetBoardAtlasView()">↺</button>
+                            </div>
+                        </div>
+                        <div class="board-atlas-module-rail" aria-label="优先检查区域">
+                            <span>优先检查</span>
+                            ${suspectedModules.map((module, index) => `
+                                <button type="button" class="atlas-module-jump ${boardAtlasUiState.selectedModuleId === module.module_id ? 'active' : ''}" aria-pressed="${boardAtlasUiState.selectedModuleId === module.module_id}" onclick="selectBoardAtlasModule('${escapeHtml(module.module_id)}')">
+                                    <span class="atlas-module-index">${index + 1}</span>
+                                    ${escapeHtml(module.name)} · ${escapeHtml(sideLabelById.get(module.side_id) || '')}
+                                </button>
+                            `).join('')}
                         </div>
                         <div class="board-atlas-canvas">
-                            <div class="board-atlas-viewport">
-                                <img class="board-atlas-image" src="${escapeHtml(side?.image || '')}" alt="${escapeHtml(side?.label || '主板图谱')}">
-                                <svg class="board-atlas-overlay" viewBox="0 0 1 1" preserveAspectRatio="none" aria-label="主板模块与测试点覆盖层">
-                                    ${sideModules.map(module => {
-                                        const center = polygonCenter(module.polygon);
+                            <div class="board-atlas-viewport" style="--atlas-width: ${boardAtlasUiState.zoom * 100}%">
+                                <div class="board-atlas-board">
+                                    <img class="board-atlas-image" src="${escapeHtml(side?.image || '')}" alt="${escapeHtml(side?.label || '主板图谱')}">
+                                    <svg class="board-atlas-overlay" viewBox="0 0 1 1" preserveAspectRatio="none" aria-label="主板模块轮廓覆盖层">
+                                    ${visibleModules.map(module => {
+                                        const regions = getBoardAtlasModuleRegions(module);
+                                        const selected = boardAtlasUiState.selectedModuleId === module.module_id;
                                         const state = [
                                             suspectedModuleIds.has(module.module_id) ? 'suspected' : '',
-                                            boardAtlasUiState.selectedModuleId === module.module_id ? 'selected' : ''
+                                            selected ? 'selected' : ''
                                         ].join(' ');
-                                        return `
-                                            <polygon class="atlas-module-polygon ${state}" points="${polygonToSvgPoints(module.polygon)}" onclick="selectBoardAtlasModule('${escapeHtml(module.module_id)}')"></polygon>
-                                            <text class="atlas-module-label" x="${center[0].toFixed(4)}" y="${center[1].toFixed(4)}" text-anchor="middle">${escapeHtml(module.name)}</text>
-                                        `;
+                                        return regions.map((region, regionIndex) => `
+                                            ${selected ? `<polygon class="atlas-module-depth" points="${polygonToSvgPoints(region, sourceCrop)}" transform="translate(0 0.004)"></polygon>` : ''}
+                                            <polygon class="atlas-module-polygon ${state}" data-module-outline="${escapeHtml(module.module_id)}-${regionIndex}" points="${polygonToSvgPoints(region, sourceCrop)}" onclick="selectBoardAtlasModule('${escapeHtml(module.module_id)}')"></polygon>
+                                        `).join('');
                                     }).join('')}
-                                    ${sidePoints.map(point => `
-                                        <circle class="atlas-test-point ${boardAtlasUiState.selectedPointId === point.point_id ? 'selected' : ''}" cx="${Number(point.x).toFixed(4)}" cy="${Number(point.y).toFixed(4)}" r="0.010" onclick="selectBoardAtlasTestPoint('${escapeHtml(point.point_id)}')"></circle>
-                                    `).join('')}
-                                </svg>
+                                    </svg>
+                                    <div class="board-atlas-hotspots">
+                                        ${visibleModules.map(module => {
+                                            const center = polygonCenter(getBoardAtlasModuleRegions(module).flat(), sourceCrop);
+                                            const index = moduleIndexById.get(module.module_id) || (board.modules || []).findIndex(item => item.module_id === module.module_id) + 1;
+                                            const selected = boardAtlasUiState.selectedModuleId === module.module_id;
+                                            return `
+                                                <button type="button" class="atlas-module-marker ${selected ? 'selected' : ''}" data-module-marker="${escapeHtml(module.module_id)}" style="left:${(center[0] * 100).toFixed(3)}%;top:${(center[1] * 100).toFixed(3)}%" aria-label="区域 ${index}：${escapeHtml(module.name)}" aria-pressed="${selected}" title="${escapeHtml(module.name)}" onclick="selectBoardAtlasModule('${escapeHtml(module.module_id)}')">${index}</button>
+                                            `;
+                                        }).join('')}
+                                        ${visiblePoints.map(point => {
+                                            const mapped = mapBoardAtlasPointToCrop([point.x, point.y], sourceCrop);
+                                            const selected = boardAtlasUiState.selectedPointId === point.point_id;
+                                            return `
+                                                <button type="button" class="atlas-test-point ${selected ? 'selected' : ''}" data-test-point-id="${escapeHtml(point.point_id)}" style="left:${(mapped[0] * 100).toFixed(3)}%;top:${(mapped[1] * 100).toFixed(3)}%" aria-label="测试点：${escapeHtml(point.name)}" aria-pressed="${selected}" title="${escapeHtml(point.name)}" onclick="selectBoardAtlasTestPoint('${escapeHtml(point.point_id)}')"></button>
+                                            `;
+                                        }).join('')}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="board-atlas-side-note">
                             <span class="knowledge-pill draft">资料页 ${escapeHtml(side?.source_pdf_page || '')}</span>
-                            <span class="knowledge-pill medium">模块 ${sideModules.length} 个</span>
-                            <span class="knowledge-pill medium">测试点 ${sidePoints.length} 个</span>
+                            <span class="knowledge-pill medium">当前提示 ${visibleModules.length} 个区域</span>
+                            <span class="knowledge-pill medium">可测点 ${visiblePoints.length} 个</span>
                         </div>
                     </section>
                     <aside class="board-atlas-panel">
                         <div class="board-atlas-section">
-                            <h3>选择当前情况</h3>
-                            <p>维修员只有一个入口；如果不知道坏点，就先走初步主板排查。</p>
+                            <h3>故障现象</h3>
                             <div class="board-atlas-faults">
                                 ${(board.fault_paths || []).map(item => `
-                                    <button type="button" class="atlas-chip ${item.fault_id === fault?.fault_id ? 'active' : ''}" data-fault-id="${escapeHtml(item.fault_id)}" onclick="setBoardAtlasFault('${escapeHtml(item.fault_id)}')">${escapeHtml(item.label)}</button>
+                                    <button type="button" class="atlas-chip ${item.fault_id === fault?.fault_id ? 'active' : ''}" data-fault-id="${escapeHtml(item.fault_id)}" aria-pressed="${item.fault_id === fault?.fault_id}" onclick="setBoardAtlasFault('${escapeHtml(item.fault_id)}')">${escapeHtml(item.label)}</button>
                                 `).join('')}
                             </div>
                         </div>
                         <div class="board-atlas-section">
-                            <h3>当前 SOP 提示</h3>
+                            <h3>下一步</h3>
                             <div class="atlas-detail-card atlas-sop-step">
                                 <strong>${escapeHtml(sopStep?.title || '等待选择故障')}</strong>
                                 <p>${escapeHtml(sopStep?.instruction || '请选择故障路径或初步排查。')}</p>
@@ -6087,34 +6466,32 @@
                             </div>
                         </div>
                         <div class="board-atlas-section">
-                            <h3>选中模块</h3>
+                            <h3>当前检查位置</h3>
                             ${selectedModule ? `
                                 <div class="atlas-detail-card">
+                                    <div class="atlas-inspection-kicker"><span class="atlas-module-index">${selectedModuleIndex}</span> 已聚焦 ${escapeHtml(sideLabelById.get(selectedModule.side_id) || '')}</div>
                                     <strong>${escapeHtml(selectedModule.name)}</strong>
-                                    <span>关联故障：${escapeHtml(asArray(selectedModule.related_faults).join(' / ') || '按现象继续排查')}</span>
-                                    <p>建议：先观察该区域器件外观，再按 SOP 测量关联点位。</p>
+                                    <span>位号：${escapeHtml(asArray(selectedModule.designators).join(' / '))}</span>
+                                    <p>${escapeHtml(selectedModule.source_basis || '先观察该区域器件外观，再按当前步骤测量关联点位。')}</p>
+                                    ${selectedModulePoints.length ? `
+                                        <div class="board-atlas-faults">
+                                            ${selectedModulePoints.map(point => `<button type="button" class="atlas-chip ${selectedPoint?.point_id === point.point_id ? 'active' : ''}" aria-pressed="${selectedPoint?.point_id === point.point_id}" onclick="selectBoardAtlasTestPoint('${escapeHtml(point.point_id)}')">${escapeHtml(point.name)}</button>`).join('')}
+                                        </div>
+                                    ` : '<span>该区域当前按外观与资料步骤检查。</span>'}
                                 </div>
-                            ` : '<div class="atlas-detail-card"><span>点击图上的高亮区域查看模块说明。</span></div>'}
-                        </div>
-                        <div class="board-atlas-section">
-                            <h3>选中测试点</h3>
-                            ${selectedPoint ? `
-                                <div class="atlas-detail-card">
-                                    <strong>${escapeHtml(selectedPoint.name)}</strong>
-                                    <span>记录要求：${escapeHtml(selectedPoint.expected_result || '按维修资料记录结果')}</span>
-                                    <p>建议：测量前确认表笔接地和供电状态，记录电压/阻值。</p>
-                                </div>
-                            ` : '<div class="atlas-detail-card"><span>点击红色测试点查看测量提示。</span></div>'}
+                            ` : '<p>点击图中的编号区域，进入局部检查。</p>'}
+                            ${selectedPoint ? `<p><strong>${escapeHtml(selectedPoint.name)}</strong><br>记录要求：${escapeHtml(selectedPoint.expected_result || '按维修资料记录结果')}</p>` : ''}
                         </div>
                         <div class="board-atlas-section">
                             <h3>资料依据</h3>
-                            <div class="knowledge-meta">
-                                ${renderPills(board.source_evidence || [], 'draft')}
-                            </div>
+                            <ul class="atlas-source-list">
+                                ${asArray(board.source_evidence).map(item => `<li>${escapeHtml(item)}</li>`).join('')}
+                            </ul>
                         </div>
                     </aside>
                 </div>
             `;
+            requestAnimationFrame(syncBoardAtlasZoomControls);
         }
 
         function calculatePackageReadiness(pack, library) {
