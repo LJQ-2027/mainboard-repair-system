@@ -92,14 +92,45 @@ class VisionReferenceGalleryTests(unittest.TestCase):
 
     def test_gallery_html_uses_embedded_favicon_to_avoid_404(self):
         manifest = {
-            "statistics": {"embedded_image_count": 0, "approved_image_count": 0},
-            "models": [],
+            "statistics": {"embedded_image_count": 1, "approved_image_count": 1},
+            "models": [
+                {
+                    "model": "KM4",
+                    "board_versions": {"main": ["F151_MAIN_PCB_V1.2"], "sub": [], "other": []},
+                    "candidate_pages": [
+                        {
+                            "page_number": 3,
+                            "embedded_images": [
+                                {
+                                    "asset_path": "assets/a.jpg",
+                                    "review_status": "approved",
+                                    "width": 800,
+                                    "height": 600,
+                                    "board_side": "unknown",
+                                    "reference_role": "candidate",
+                                    "board_scope": "main",
+                                },
+                                {
+                                    "asset_path": "assets/b.jpg",
+                                    "review_status": "approved",
+                                    "width": 800,
+                                    "height": 600,
+                                    "board_side": "unknown",
+                                    "reference_role": "candidate",
+                                    "board_scope": "main",
+                                }
+                            ],
+                        }
+                    ],
+                }
+            ],
         }
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory) / "index.html"
             generate_gallery_html(manifest, output)
             document = output.read_text(encoding="utf-8")
         self.assertIn('rel="icon" href="data:,"', document)
+        self.assertFalse(any(line.endswith((" ", "\t")) for line in document.splitlines()))
 
     def test_board_version_label_follows_asset_scope(self):
         model = {

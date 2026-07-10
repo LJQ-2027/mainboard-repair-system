@@ -310,6 +310,7 @@ def generate_gallery_html(manifest: dict, destination: Path) -> None:
 </html>
 """
     destination.parent.mkdir(parents=True, exist_ok=True)
+    document = "\n".join(line.rstrip() for line in document.splitlines()) + "\n"
     destination.write_text(document, encoding="utf-8", newline="\n")
 
 
