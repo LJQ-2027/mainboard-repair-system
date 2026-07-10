@@ -1,0 +1,2838 @@
+{
+  "inventory_id": "SERVICE-MANUAL-LIBRARY-20260710",
+  "title": "Desktop service manual library intake",
+  "received_date": "2026-07-10",
+  "source_root": "C:\\Users\\Mercurluto\\Desktop\\manual",
+  "storage_root": "source-materials/service-manual-library/2026-07-10-desktop-manual/files",
+  "binary_policy": "project-local copy excluded from Git; manifest and intake record are Git-tracked",
+  "statistics": {
+    "source_file_count": 125,
+    "unique_file_count": 119,
+    "duplicate_group_count": 6,
+    "unique_size_bytes": 1543057242,
+    "extension_counts": {
+      ".doc": 3,
+      ".docx": 26,
+      ".jpg": 10,
+      ".pdf": 86
+    },
+    "parse_status_counts": {
+      "ok": 125
+    }
+  },
+  "project_overlap_models": [
+    "CLA5",
+    "CM5",
+    "CM6",
+    "KJ5",
+    "KL4",
+    "KM4",
+    "X6880"
+  ],
+  "model_counts": {
+    "7C": 1,
+    "7C_PRO": 1,
+    "8H": 1,
+    "AD10": 2,
+    "AD11": 1,
+    "AD9": 1,
+    "AE10": 1,
+    "AE11": 1,
+    "BF6": 1,
+    "CCFX692": 2,
+    "CCFX693": 2,
+    "CCFX695": 2,
+    "CK8N": 1,
+    "CLA5": 1,
+    "CM5": 1,
+    "CM6": 1,
+    "CM7": 1,
+    "CM8": 1,
+    "CN5": 1,
+    "CN5C": 1,
+    "CN6C": 1,
+    "CN7C": 2,
+    "G01RA": 1,
+    "GL613": 1,
+    "KI5M": 1,
+    "KI5Q": 1,
+    "KI7": 1,
+    "KI8": 1,
+    "KJ5": 1,
+    "KL4": 2,
+    "KL4H": 1,
+    "KL5N": 1,
+    "KL6": 1,
+    "KL7": 1,
+    "KL8": 1,
+    "KM4": 1,
+    "KM6": 1,
+    "KM7": 1,
+    "KM8": 1,
+    "KM9": 1,
+    "KN3": 1,
+    "KN8": 1,
+    "KO5": 2,
+    "LH8N": 1,
+    "LJ6": 1,
+    "LJ7": 1,
+    "LJ8": 1,
+    "LJ8K": 1,
+    "LJ9": 1,
+    "LK6": 2,
+    "LK7K": 1,
+    "S1": 1,
+    "S302": 1,
+    "T1": 1,
+    "T1001": 1,
+    "T1002": 2,
+    "T1101": 1,
+    "T1102": 1,
+    "T1103": 2,
+    "T1201": 1,
+    "T455": 1,
+    "T528NEW": 1,
+    "X1101": 1,
+    "X1301": 2,
+    "X6525": 1,
+    "X6531": 1,
+    "X6720": 1,
+    "X6837": 1,
+    "X6838": 1,
+    "X6851": 1,
+    "X6861": 1,
+    "X6873": 1,
+    "X6876": 1,
+    "X6877": 1,
+    "X6878": 1,
+    "X6879": 1,
+    "X6880": 2,
+    "X6881": 2,
+    "X6882": 2,
+    "X6885": 1,
+    "X6886": 3,
+    "X6887": 3,
+    "X6891": 3,
+    "X6895": 2,
+    "X6895B": 3,
+    "X6896": 1,
+    "X692": 4,
+    "X693": 4,
+    "X695": 4,
+    "X695C": 4,
+    "X695D": 4,
+    "X6962": 2,
+    "X697": 3,
+    "X698": 8,
+    "XL434": 1,
+    "YL513H": 1
+  },
+  "files": [
+    {
+      "source_relative_path": "593_TECNO KJ5 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/593_TECNO KJ5 Service Manual.pdf",
+      "file_name": "593_TECNO KJ5 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 2887689,
+      "sha256": "4dfe8918f5de8270f4bdb2eb21bc08277c460dd757a950c480b6a580985539f7",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "KJ5"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 14,
+        "sample_text_chars": 8266,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "596_TECNO AD11 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/596_TECNO AD11 Service Manual.pdf",
+      "file_name": "596_TECNO AD11 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 4018643,
+      "sha256": "35e9d1d1081d0e6ec2606b43ccdfcbd4ee0fd70d5c448d52021317557555efba",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "AD11"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 18,
+        "sample_text_chars": 8387,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "601_TECNO LH8n Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/601_TECNO LH8n Service Manual.pdf",
+      "file_name": "601_TECNO LH8n Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 3924067,
+      "sha256": "7487078c656ae75cdff16f0b6e2b38404652c8693e6482cdf9014acadecbaf40",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "LH8N"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 16,
+        "sample_text_chars": 7817,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "618_TECNO AD9 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/618_TECNO AD9 Service Manual.pdf",
+      "file_name": "618_TECNO AD9 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 3340185,
+      "sha256": "1c33b6af1d715755634ec4a4397ad7221f675f0ef59e3db798cdf42375ef54d9",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "AD9"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 15,
+        "sample_text_chars": 8388,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "620_TECNO BF6 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/620_TECNO BF6 Service Manual.pdf",
+      "file_name": "620_TECNO BF6 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 2614848,
+      "sha256": "57bea1c6db1c205711b1d081cac86bc0216136ed89c950545312d97dc8d6b355",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "BF6"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 13,
+        "sample_text_chars": 8158,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "623_TECNO KI5q Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/623_TECNO KI5q Service Manual.pdf",
+      "file_name": "623_TECNO KI5q Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 3145728,
+      "sha256": "5ea33bb2c9808b64e651ba8d5597f520d4479b402c4a94825c19c87640bd6f72",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "KI5Q"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 14,
+        "sample_text_chars": 8334,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "626_TECNO KI7 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/626_TECNO KI7 Service Manual.pdf",
+      "file_name": "626_TECNO KI7 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 3075733,
+      "sha256": "0e44e1e948fe3f2e6dbfa42b4e6734f51e7da7b6aa2f2acf0f4bbc97cb3f8a0a",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "KI7"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 15,
+        "sample_text_chars": 7979,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "631_TECNO KI5m Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/631_TECNO KI5m Service Manual.pdf",
+      "file_name": "631_TECNO KI5m Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 2827438,
+      "sha256": "a28fcf686edd873f2e3bff6062e97eecc2145d07f3ed4cb43ea9ece4a92e69f2",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "KI5M"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 13,
+        "sample_text_chars": 8198,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "633_TECNO KI8 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/633_TECNO KI8 Service Manual.pdf",
+      "file_name": "633_TECNO KI8 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 3422195,
+      "sha256": "d1abfd13be87de6b078eae0789ddeb80fadc181fbdeb7fbfaa2a2dfe5a4e66c3",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "KI8"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 15,
+        "sample_text_chars": 8358,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "637_TECNO CK8n Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/637_TECNO CK8n Service Manual.pdf",
+      "file_name": "637_TECNO CK8n Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 3490255,
+      "sha256": "98b966ef043d6276eff7023408fe269d5844fc7d862748d90d0f1c411f0f712a",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "CK8N"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 15,
+        "sample_text_chars": 8108,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "685_TECNO Megabook S1 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/685_TECNO Megabook S1 Service Manual.pdf",
+      "file_name": "685_TECNO Megabook S1 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 6353395,
+      "sha256": "8361b34d53b978e1d397dd4753cf67697a14ba4938c5588bd453a9e1ad95eaf6",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "S1"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 23,
+        "sample_text_chars": 6880,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "731_TECNO Megabook T1 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/731_TECNO Megabook T1 Service Manual.pdf",
+      "file_name": "731_TECNO Megabook T1 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 3670101,
+      "sha256": "e84cc7b7e69af9693e8439fb23444bab5ca9299a51c9b244bc798d11625de08f",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "T1"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 17,
+        "sample_text_chars": 7170,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "778_TECNO KL4 Service Manual (1).pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/778_TECNO KL4 Service Manual (1).pdf",
+      "file_name": "778_TECNO KL4 Service Manual (1).pdf",
+      "extension": ".pdf",
+      "size_bytes": 2808595,
+      "sha256": "bd5575d13a04074f5f15acada245d1bb82011dce5a0246f1b22ae059396ee293",
+      "is_exact_duplicate": true,
+      "duplicate_source_paths": [
+        "778_TECNO KL4 Service Manual.pdf"
+      ],
+      "models": [
+        "KL4"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 15,
+        "sample_text_chars": 8436,
+        "mainboard_terms": [
+          "mainboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "778_TECNO KL4 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/778_TECNO KL4 Service Manual (1).pdf",
+      "file_name": "778_TECNO KL4 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 2808595,
+      "sha256": "bd5575d13a04074f5f15acada245d1bb82011dce5a0246f1b22ae059396ee293",
+      "is_exact_duplicate": true,
+      "duplicate_source_paths": [
+        "778_TECNO KL4 Service Manual (1).pdf"
+      ],
+      "models": [
+        "KL4"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 15,
+        "sample_text_chars": 8436,
+        "mainboard_terms": [
+          "mainboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "820_TECNO T528New Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/820_TECNO T528New Service Manual.pdf",
+      "file_name": "820_TECNO T528New Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 1500025,
+      "sha256": "87f0fca67a89652991994658f4136b8ea2245522d998f7a22f661da658f3a1d6",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "T528NEW"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 10,
+        "sample_text_chars": 6752,
+        "mainboard_terms": [
+          "mainboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "831_TECNO T1001 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/831_TECNO T1001 Service Manual.pdf",
+      "file_name": "831_TECNO T1001 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 3092627,
+      "sha256": "122d6a3be532f0db5762efa73213c1d247c1bff946733da24bc423b5fb6c9f9b",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "T1001"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 15,
+        "sample_text_chars": 9441,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "883_TECNO KL5n Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/883_TECNO KL5n Service Manual.pdf",
+      "file_name": "883_TECNO KL5n Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 2635586,
+      "sha256": "bfb91f6c8eaddfcc82d7f0877c57feb1662ac5b6149bf0d25d57b54cb1f63dd2",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "KL5N"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 15,
+        "sample_text_chars": 8533,
+        "mainboard_terms": [
+          "main board",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "942_TECNO AE10 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/942_TECNO AE10 Service Manual.pdf",
+      "file_name": "942_TECNO AE10 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 4707131,
+      "sha256": "b254c5301884684dad4636754d1bce359ebc2f961def79284d2b66ddf0f3bd1f",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "AE10"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 22,
+        "sample_text_chars": 10655,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "944_TECNO AE11 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/944_TECNO AE11 Service Manual.pdf",
+      "file_name": "944_TECNO AE11 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 4395733,
+      "sha256": "b8f591f558d6ed469d7733e5075d48fa249df4ce758c285c5a892235ef166c54",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "AE11"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 21,
+        "sample_text_chars": 11368,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "948_TECNO KL8 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/948_TECNO KL8 Service Manual.pdf",
+      "file_name": "948_TECNO KL8 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 2299988,
+      "sha256": "f1793d1664d661e573ef5fc8a3faea3d19ec4524b84a245859b459f41e6d9783",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "KL8"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 15,
+        "sample_text_chars": 8743,
+        "mainboard_terms": [
+          "mainboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "975_TECNO CLA5 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/975_TECNO CLA5 Service Manual.pdf",
+      "file_name": "975_TECNO CLA5 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 2522613,
+      "sha256": "88945a0c12429b82016eff011bd2c3abbc011f4292b657e770aad92d4c51af54",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "CLA5"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 16,
+        "sample_text_chars": 9410,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "Infinix INBOOK GL613 Service Manual.docx",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/Infinix INBOOK GL613 Service Manual.docx",
+      "file_name": "Infinix INBOOK GL613 Service Manual.docx",
+      "extension": ".docx",
+      "size_bytes": 180461402,
+      "sha256": "668bcbd64cea5e4ab562f39c273dc0e04c99203178cab73fa8dfb7081d0571af",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "GL613"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "zip_bad_member": null,
+        "document_xml_bytes": 982211,
+        "mainboard_terms": [
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "Infinix X1101 Service Manual.docx",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/Infinix X1101 Service Manual.docx",
+      "file_name": "Infinix X1101 Service Manual.docx",
+      "extension": ".docx",
+      "size_bytes": 31678023,
+      "sha256": "51c1c20737983b6ef4cf6aa02f3bca58a6032e5fcbaf4ee48a14a1367742c08e",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X1101"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "zip_bad_member": null,
+        "document_xml_bytes": 821868,
+        "mainboard_terms": [
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "Infinix X6525 Service Manual  LA.docx",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/Infinix X6525 Service Manual  LA.docx",
+      "file_name": "Infinix X6525 Service Manual  LA.docx",
+      "extension": ".docx",
+      "size_bytes": 16735803,
+      "sha256": "4ae49fb808e38c6b4cad41f48a8b7b8de53d0372a21d9efb02679eaba9c3088e",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X6525"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "zip_bad_member": null,
+        "document_xml_bytes": 888210,
+        "mainboard_terms": [
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "Infinix X6531 Service Manual.docx",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/Infinix X6531 Service Manual.docx",
+      "file_name": "Infinix X6531 Service Manual.docx",
+      "extension": ".docx",
+      "size_bytes": 57661872,
+      "sha256": "24cf373d13a241e4b4acac54af942b6ec25764ef2ce589eb83c1efbaddba330c",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X6531"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "zip_bad_member": null,
+        "document_xml_bytes": 755738,
+        "mainboard_terms": [
+          "mainboard",
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "Infinix X6720 Service Manual.docx",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/Infinix X6720 Service Manual.docx",
+      "file_name": "Infinix X6720 Service Manual.docx",
+      "extension": ".docx",
+      "size_bytes": 26286351,
+      "sha256": "97266bb22533407d6e34ea22e5fbfabd25b87096099d09c59fbc7f88a73ef6ab",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X6720"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "zip_bad_member": null,
+        "document_xml_bytes": 760187,
+        "mainboard_terms": [
+          "mainboard",
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "Infinix X6837 Service Manual LA.docx",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/Infinix X6837 Service Manual LA.docx",
+      "file_name": "Infinix X6837 Service Manual LA.docx",
+      "extension": ".docx",
+      "size_bytes": 32919404,
+      "sha256": "7d86c98fb2124a5f477e7ab901975fbc385750a4154af13dbd6cf5f0b242165e",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X6837"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "zip_bad_member": null,
+        "document_xml_bytes": 853515,
+        "mainboard_terms": [
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "Infinix X6838 Service Manual.docx",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/Infinix X6838 Service Manual.docx",
+      "file_name": "Infinix X6838 Service Manual.docx",
+      "extension": ".docx",
+      "size_bytes": 28935752,
+      "sha256": "90d49ce9341aa82ce893da4c5ae7f3b209dbdb77e4a12954bc51c3e8d9f32882",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X6838"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "zip_bad_member": null,
+        "document_xml_bytes": 815419,
+        "mainboard_terms": [
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "Infinix X6851 Service Manual.docx",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/Infinix X6851 Service Manual.docx",
+      "file_name": "Infinix X6851 Service Manual.docx",
+      "extension": ".docx",
+      "size_bytes": 60055684,
+      "sha256": "ffc13a85a1f8e3eedf8125c8b6ce2ef8410c265913d1b415bea6cc09690265cd",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X6851"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "zip_bad_member": null,
+        "document_xml_bytes": 881229,
+        "mainboard_terms": [
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "Infinix X6861 Service Manual.docx",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/Infinix X6861 Service Manual.docx",
+      "file_name": "Infinix X6861 Service Manual.docx",
+      "extension": ".docx",
+      "size_bytes": 20102174,
+      "sha256": "6cb405c79179a8b976e77ab178e487ad9b32fd7cbd78007177254b737abcdf3a",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X6861"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "zip_bad_member": null,
+        "document_xml_bytes": 846744,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "Infinix X6873 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/Infinix X6873 Service Manual.pdf",
+      "file_name": "Infinix X6873 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 6422581,
+      "sha256": "a0329eea6c59cf43a7c15c00b90e0c7c56747ace75f9659dfaf551a9f0eb3c89",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X6873"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 15,
+        "sample_text_chars": 8380,
+        "mainboard_terms": [
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "Infinix X6876 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/Infinix X6876 Service Manual.pdf",
+      "file_name": "Infinix X6876 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 4987752,
+      "sha256": "f612b6270b0a1da502d8fbfa2c1bd4ec3249c0f55f8f495fa1b3ce6d9bf5c6cb",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X6876"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 16,
+        "sample_text_chars": 8327,
+        "mainboard_terms": [
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "Infinix X6877 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/Infinix X6877 Service Manual.pdf",
+      "file_name": "Infinix X6877 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 7844038,
+      "sha256": "858b5548a15258458f8afb7aa7d3cdb462c96f2b53d6bd617e4e1da7f85baacf",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X6877"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 19,
+        "sample_text_chars": 8890,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "Infinix X6878 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/Infinix X6878 Service Manual.pdf",
+      "file_name": "Infinix X6878 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 6605353,
+      "sha256": "3811d2ee7f3423d823ab13a9fbdc282ff7e082b93a2da470393d12c8e6c8ca38",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X6878"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 17,
+        "sample_text_chars": 8762,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "Infinix X6879 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/Infinix X6879 Service Manual.pdf",
+      "file_name": "Infinix X6879 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 5572268,
+      "sha256": "70eba2ce072defc9a0d068efab0336e2a05277502e901f4cc86aa61cc80f1ecc",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X6879"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 14,
+        "sample_text_chars": 8524,
+        "mainboard_terms": [
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "Infinix X6880 Service Manual.docx",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/Infinix X6880 Service Manual.docx",
+      "file_name": "Infinix X6880 Service Manual.docx",
+      "extension": ".docx",
+      "size_bytes": 39909736,
+      "sha256": "f68068df41bcfb6735283b99a8c857c330b04c6e2a1e49b0af2e247a104b4567",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X6880"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "zip_bad_member": null,
+        "document_xml_bytes": 795364,
+        "mainboard_terms": [
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "Infinix X6880 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/Infinix X6880 Service Manual.pdf",
+      "file_name": "Infinix X6880 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 4241581,
+      "sha256": "93cde79174286feed851e09af21b684bc7526561a2b5d646930b00990ae35a6f",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X6880"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 14,
+        "sample_text_chars": 7586,
+        "mainboard_terms": [
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "Infinix X6881 Service Manual.docx",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/Infinix X6881 Service Manual.docx",
+      "file_name": "Infinix X6881 Service Manual.docx",
+      "extension": ".docx",
+      "size_bytes": 26224109,
+      "sha256": "c15eadb3aa40fa3303b93429b5d01c8770f205f3232f284a9f88f2e7ea54532d",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X6881"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "zip_bad_member": null,
+        "document_xml_bytes": 768211,
+        "mainboard_terms": [
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "Infinix X6881 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/Infinix X6881 Service Manual.pdf",
+      "file_name": "Infinix X6881 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 3401419,
+      "sha256": "a04711b85032f1436e01c717a87b8bc5d50bc501ca8a4384b4afb637bdc78e0f",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X6881"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 13,
+        "sample_text_chars": 8297,
+        "mainboard_terms": [
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "Infinix X6882 Service Manual.docx",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/Infinix X6882 Service Manual.docx",
+      "file_name": "Infinix X6882 Service Manual.docx",
+      "extension": ".docx",
+      "size_bytes": 22413082,
+      "sha256": "fabf1e367d00ed51b3f33866f51efa288cdbbaa5c47d2e6438bb523387570d0b",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X6882"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "zip_bad_member": null,
+        "document_xml_bytes": 761400,
+        "mainboard_terms": [
+          "mainboard",
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "Infinix X6882 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/Infinix X6882 Service Manual.pdf",
+      "file_name": "Infinix X6882 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 3231423,
+      "sha256": "d7b36e56ad8eeb2e9caef581a79dff66b6cc1291b27b5ec035d53809b8327f4f",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X6882"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 13,
+        "sample_text_chars": 8287,
+        "mainboard_terms": [
+          "mainboard",
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "Infinix X6885 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/Infinix X6885 Service Manual.pdf",
+      "file_name": "Infinix X6885 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 4489838,
+      "sha256": "a41f8f0da8e1805a3bfd23b58d1831de075da972d68eff0ba3177112ee2893e0",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X6885"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 15,
+        "sample_text_chars": 8915,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "Infinix X6886 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/Infinix X6886 Service Manual.pdf",
+      "file_name": "Infinix X6886 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 4913005,
+      "sha256": "e98f8b19ccada96d27c920127732574b2c86cb10ab3bcce8455da5b032bc58e6",
+      "is_exact_duplicate": true,
+      "duplicate_source_paths": [
+        "infinix_X6886/Infinix X6886 Service Manual.pdf"
+      ],
+      "models": [
+        "X6886"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 15,
+        "sample_text_chars": 9488,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "Infinix X6887 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/Infinix X6887 Service Manual.pdf",
+      "file_name": "Infinix X6887 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 4923010,
+      "sha256": "3b5a1bfcd73f5df86e9d700b4875ae5f69e6267083aa32c3f291eab9fc4b3728",
+      "is_exact_duplicate": true,
+      "duplicate_source_paths": [
+        "infinix_X6887/Infinix X6887 Service Manual.pdf"
+      ],
+      "models": [
+        "X6887"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 14,
+        "sample_text_chars": 8534,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "Infinix X6891 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/Infinix X6891 Service Manual.pdf",
+      "file_name": "Infinix X6891 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 8413460,
+      "sha256": "2e8418fc76cf80af5495eed9f36a6f46709066f2ef08d304334a757a5fbb01df",
+      "is_exact_duplicate": true,
+      "duplicate_source_paths": [
+        "infinix_X6891/Infinix X6891 Service Manual.pdf"
+      ],
+      "models": [
+        "X6891"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 18,
+        "sample_text_chars": 8969,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "Infinix X6895B Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/Infinix X6895B Service Manual.pdf",
+      "file_name": "Infinix X6895B Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 4884316,
+      "sha256": "91f0a8de399197e72987c3f0566c2c8ca2678d84ea9643e029e272723d25454b",
+      "is_exact_duplicate": true,
+      "duplicate_source_paths": [
+        "infinix_X6895&X6895B/Infinix X6895B Service Manual.pdf"
+      ],
+      "models": [
+        "X6895B"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 13,
+        "sample_text_chars": 8150,
+        "mainboard_terms": [
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "Infinix X6962 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/Infinix X6962 Service Manual.pdf",
+      "file_name": "Infinix X6962 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 5256532,
+      "sha256": "3e38853dba818aa59464f42c0dd332ab07ed332870b5b0e138bf9128fd6d93cb",
+      "is_exact_duplicate": true,
+      "duplicate_source_paths": [
+        "infinix_X6962/Infinix X6962 Service Manual.pdf"
+      ],
+      "models": [
+        "X6962"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 20,
+        "sample_text_chars": 11154,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "Infinix XL434 Service Manual.docx",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/Infinix XL434 Service Manual.docx",
+      "file_name": "Infinix XL434 Service Manual.docx",
+      "extension": ".docx",
+      "size_bytes": 23178502,
+      "sha256": "94bdc38fe1d7b08b005ea4f7eceaf98b3fa63759da938e9f45a9aabfbb869ad0",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "XL434"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "zip_bad_member": null,
+        "document_xml_bytes": 645049,
+        "mainboard_terms": [
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "Infinix YL513H Service Manual.docx",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/Infinix YL513H Service Manual.docx",
+      "file_name": "Infinix YL513H Service Manual.docx",
+      "extension": ".docx",
+      "size_bytes": 22868311,
+      "sha256": "9738e82ebc6721d5325bde5b2fa5fbec13caddd59f042727880eaf6cfd2098ff",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "YL513H"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "zip_bad_member": null,
+        "document_xml_bytes": 661711,
+        "mainboard_terms": [
+          "main board",
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "infinix_X1301/Infinix X1301 Service Manual.docx",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/infinix_X1301/Infinix X1301 Service Manual.docx",
+      "file_name": "Infinix X1301 Service Manual.docx",
+      "extension": ".docx",
+      "size_bytes": 54202834,
+      "sha256": "733cd3af51d4b98873e089a5fbc4366cf8b94ede399d6b635a05b27e265d7649",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X1301"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "zip_bad_member": null,
+        "document_xml_bytes": 1032477,
+        "mainboard_terms": [
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "infinix_X1301/Infinix X1301 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/infinix_X1301/Infinix X1301 Service Manual.pdf",
+      "file_name": "Infinix X1301 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 5490586,
+      "sha256": "ce7f108409ef477290cd325f1a863b8bff308c35e864d80f443f1d62e0f94fe4",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X1301"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 18,
+        "sample_text_chars": 7156,
+        "mainboard_terms": [
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "infinix_X6886/Infinix X6886 Service Manual.docx",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/infinix_X6886/Infinix X6886 Service Manual.docx",
+      "file_name": "Infinix X6886 Service Manual.docx",
+      "extension": ".docx",
+      "size_bytes": 44497065,
+      "sha256": "e93747c0f84eb64c770cd8de70a9b0c8afd423c527f0d7c02480fbbc8592af85",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X6886"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "zip_bad_member": null,
+        "document_xml_bytes": 926638,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "infinix_X6886/Infinix X6886 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/Infinix X6886 Service Manual.pdf",
+      "file_name": "Infinix X6886 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 4913005,
+      "sha256": "e98f8b19ccada96d27c920127732574b2c86cb10ab3bcce8455da5b032bc58e6",
+      "is_exact_duplicate": true,
+      "duplicate_source_paths": [
+        "Infinix X6886 Service Manual.pdf"
+      ],
+      "models": [
+        "X6886"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 15,
+        "sample_text_chars": 9488,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "infinix_X6887/Infinix X6887 Service Manual.docx",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/infinix_X6887/Infinix X6887 Service Manual.docx",
+      "file_name": "Infinix X6887 Service Manual.docx",
+      "extension": ".docx",
+      "size_bytes": 42410192,
+      "sha256": "e49fb170527741822a7263fd470c1a20f554a02c174eb571a64a4d3bc5f403da",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X6887"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "zip_bad_member": null,
+        "document_xml_bytes": 859934,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "infinix_X6887/Infinix X6887 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/Infinix X6887 Service Manual.pdf",
+      "file_name": "Infinix X6887 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 4923010,
+      "sha256": "3b5a1bfcd73f5df86e9d700b4875ae5f69e6267083aa32c3f291eab9fc4b3728",
+      "is_exact_duplicate": true,
+      "duplicate_source_paths": [
+        "Infinix X6887 Service Manual.pdf"
+      ],
+      "models": [
+        "X6887"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 14,
+        "sample_text_chars": 8534,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "infinix_X6891/Infinix X6891 Service Manual.docx",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/infinix_X6891/Infinix X6891 Service Manual.docx",
+      "file_name": "Infinix X6891 Service Manual.docx",
+      "extension": ".docx",
+      "size_bytes": 74747661,
+      "sha256": "853255a3b6065240a7f9b45fad02c189f84463c52761d2819c9fecd107af5559",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X6891"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "zip_bad_member": null,
+        "document_xml_bytes": 958659,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "infinix_X6891/Infinix X6891 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/Infinix X6891 Service Manual.pdf",
+      "file_name": "Infinix X6891 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 8413460,
+      "sha256": "2e8418fc76cf80af5495eed9f36a6f46709066f2ef08d304334a757a5fbb01df",
+      "is_exact_duplicate": true,
+      "duplicate_source_paths": [
+        "Infinix X6891 Service Manual.pdf"
+      ],
+      "models": [
+        "X6891"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 18,
+        "sample_text_chars": 8969,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "infinix_X6895&X6895B/Infinix X6895B Service Manual.docx",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/infinix_X6895&X6895B/Infinix X6895B Service Manual.docx",
+      "file_name": "Infinix X6895B Service Manual.docx",
+      "extension": ".docx",
+      "size_bytes": 66482384,
+      "sha256": "ceda77d83b9ea6c558a6fd4cf67a6b284c2efb07f476e69bcc39183994d404cf",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X6895",
+        "X6895B"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "zip_bad_member": null,
+        "document_xml_bytes": 706542,
+        "mainboard_terms": [
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "infinix_X6895&X6895B/Infinix X6895B Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/Infinix X6895B Service Manual.pdf",
+      "file_name": "Infinix X6895B Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 4884316,
+      "sha256": "91f0a8de399197e72987c3f0566c2c8ca2678d84ea9643e029e272723d25454b",
+      "is_exact_duplicate": true,
+      "duplicate_source_paths": [
+        "Infinix X6895B Service Manual.pdf"
+      ],
+      "models": [
+        "X6895",
+        "X6895B"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 13,
+        "sample_text_chars": 8150,
+        "mainboard_terms": [
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "infinix_X6896/Infinix X6896 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/infinix_X6896/Infinix X6896 Service Manual.pdf",
+      "file_name": "Infinix X6896 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 4448423,
+      "sha256": "c59e3596ea1bcba31c14af410fb329e23b19e6a259a581049be57164e4fc5107",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X6896"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 14,
+        "sample_text_chars": 8341,
+        "mainboard_terms": [
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "infinix_X692/997d0ba3fee98fc4c2a0e2eadc44251f.jpg",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/infinix_X692/997d0ba3fee98fc4c2a0e2eadc44251f.jpg",
+      "file_name": "997d0ba3fee98fc4c2a0e2eadc44251f.jpg",
+      "extension": ".jpg",
+      "size_bytes": 622926,
+      "sha256": "b48233df276068fda7fa346b777f96e6a67844586e3d9b1c92bd90192f4112bd",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X692"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "width": 1920,
+        "height": 2560,
+        "format": "JPEG"
+      }
+    },
+    {
+      "source_relative_path": "infinix_X692/CCfX692 infinix_X692_Service Manual V1.0.doc",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/infinix_X692/CCfX692 infinix_X692_Service Manual V1.0.doc",
+      "file_name": "CCfX692 infinix_X692_Service Manual V1.0.doc",
+      "extension": ".doc",
+      "size_bytes": 67140721,
+      "sha256": "f87a1cd06cfbe23bffe1af9fd9b5864f8fa2c6db834b8134c07450fa10bffe0e",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X692",
+        "CCFX692"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "format": "ole_compound_document"
+      }
+    },
+    {
+      "source_relative_path": "infinix_X692/CCfX692 infinix_X692_Service Manual V1.0.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/infinix_X692/CCfX692 infinix_X692_Service Manual V1.0.pdf",
+      "file_name": "CCfX692 infinix_X692_Service Manual V1.0.pdf",
+      "extension": ".pdf",
+      "size_bytes": 5590615,
+      "sha256": "271e40840308ef48947922bf048ed3482083609faca8be1baaf14563fc09a9b7",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X692",
+        "CCFX692"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 27,
+        "sample_text_chars": 10465,
+        "mainboard_terms": [
+          "mainboard",
+          "main board",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "infinix_X692/ee4b0481af19019d6c4b866fbacb567e.jpg",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/infinix_X692/ee4b0481af19019d6c4b866fbacb567e.jpg",
+      "file_name": "ee4b0481af19019d6c4b866fbacb567e.jpg",
+      "extension": ".jpg",
+      "size_bytes": 644244,
+      "sha256": "85b71dd9d66c257f9d52983399b91bd633b53e2405f83b75372157b5608dc802",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X692"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "width": 1920,
+        "height": 2560,
+        "format": "JPEG"
+      }
+    },
+    {
+      "source_relative_path": "infinix_X693/CCfX693 infinix_X693_Service Manual V1.0.doc",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/infinix_X693/CCfX693 infinix_X693_Service Manual V1.0.doc",
+      "file_name": "CCfX693 infinix_X693_Service Manual V1.0.doc",
+      "extension": ".doc",
+      "size_bytes": 54834920,
+      "sha256": "5ac96b61fe279bc322c0d1cace4c6403206f7147a614dd082e6ac22138abd3c1",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X693",
+        "CCFX693"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "format": "ole_compound_document"
+      }
+    },
+    {
+      "source_relative_path": "infinix_X693/CCfX693 infinix_X693_Service Manual V1.0.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/infinix_X693/CCfX693 infinix_X693_Service Manual V1.0.pdf",
+      "file_name": "CCfX693 infinix_X693_Service Manual V1.0.pdf",
+      "extension": ".pdf",
+      "size_bytes": 3550443,
+      "sha256": "9d3991b59de85661f40e4492e614a05bb8eb3f5bc4161a94b1b1a32e9459bb71",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X693",
+        "CCFX693"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 25,
+        "sample_text_chars": 12759,
+        "mainboard_terms": [
+          "mainboard",
+          "main board",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "infinix_X693/IMG_20210317_121322.jpg",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/infinix_X693/IMG_20210317_121322.jpg",
+      "file_name": "IMG_20210317_121322.jpg",
+      "extension": ".jpg",
+      "size_bytes": 4456529,
+      "sha256": "c347466d994910d341303fda55406b80f885175a38fef7c8dc8cfbef0778d9a7",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X693"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "width": 4032,
+        "height": 3024,
+        "format": "JPEG"
+      }
+    },
+    {
+      "source_relative_path": "infinix_X693/IMG_20210317_121506.jpg",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/infinix_X693/IMG_20210317_121506.jpg",
+      "file_name": "IMG_20210317_121506.jpg",
+      "extension": ".jpg",
+      "size_bytes": 3154537,
+      "sha256": "5c4dc850990697df71c7a45246fd237cdaefefa53d2b9963b7738c783c41b17a",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X693"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "width": 4032,
+        "height": 3024,
+        "format": "JPEG"
+      }
+    },
+    {
+      "source_relative_path": "infinix_X695&X695C&X695D/CCfX695 infinix_X695_Service Manual V1.0.doc",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/infinix_X695&X695C&X695D/CCfX695 infinix_X695_Service Manual V1.0.doc",
+      "file_name": "CCfX695 infinix_X695_Service Manual V1.0.doc",
+      "extension": ".doc",
+      "size_bytes": 49701930,
+      "sha256": "d9721b13ab58e204abedbfeb5cf2f6791360b051dfe8fe855f7987a8cd51f061",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X695",
+        "X695C",
+        "X695D",
+        "CCFX695"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "format": "ole_compound_document"
+      }
+    },
+    {
+      "source_relative_path": "infinix_X695&X695C&X695D/CCfX695 infinix_X695_Service Manual V1.0.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/infinix_X695&X695C&X695D/CCfX695 infinix_X695_Service Manual V1.0.pdf",
+      "file_name": "CCfX695 infinix_X695_Service Manual V1.0.pdf",
+      "extension": ".pdf",
+      "size_bytes": 3585975,
+      "sha256": "39378e66d14a7d7397bf1a647d55a068ec7e7586f62729ea8c84ff103f1f01f2",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X695",
+        "X695C",
+        "X695D",
+        "CCFX695"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 26,
+        "sample_text_chars": 12931,
+        "mainboard_terms": [
+          "mainboard",
+          "main board",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "infinix_X695&X695C&X695D/IMG_20210325_165426.jpg",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/infinix_X695&X695C&X695D/IMG_20210325_165426.jpg",
+      "file_name": "IMG_20210325_165426.jpg",
+      "extension": ".jpg",
+      "size_bytes": 4226534,
+      "sha256": "f9c0f083280c6719b6914224c84f630dcd2551798307238228bb67a1f30824e8",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X695",
+        "X695C",
+        "X695D"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "width": 4032,
+        "height": 3024,
+        "format": "JPEG"
+      }
+    },
+    {
+      "source_relative_path": "infinix_X695&X695C&X695D/IMG_20210325_165459.jpg",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/infinix_X695&X695C&X695D/IMG_20210325_165459.jpg",
+      "file_name": "IMG_20210325_165459.jpg",
+      "extension": ".jpg",
+      "size_bytes": 4524004,
+      "sha256": "1052daa7c6aaa4dba3aa16231ef01513170dd4c41f7aafe1ea2bea8b45cb6bba",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X695",
+        "X695C",
+        "X695D"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "width": 4032,
+        "height": 3024,
+        "format": "JPEG"
+      }
+    },
+    {
+      "source_relative_path": "infinix_X6962/Infinix X6962 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/Infinix X6962 Service Manual.pdf",
+      "file_name": "Infinix X6962 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 5256532,
+      "sha256": "3e38853dba818aa59464f42c0dd332ab07ed332870b5b0e138bf9128fd6d93cb",
+      "is_exact_duplicate": true,
+      "duplicate_source_paths": [
+        "Infinix X6962 Service Manual.pdf"
+      ],
+      "models": [
+        "X6962"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 20,
+        "sample_text_chars": 11154,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "infinix_X697/infinix X697(NOTE 11 Pro)&X698(NOTE 11S) Service Manual V2.0.docx",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/infinix_X697/infinix X697(NOTE 11 Pro)&X698(NOTE 11S) Service Manual V2.0.docx",
+      "file_name": "infinix X697(NOTE 11 Pro)&X698(NOTE 11S) Service Manual V2.0.docx",
+      "extension": ".docx",
+      "size_bytes": 18469862,
+      "sha256": "6ddfa670b5453abe19c1a30186e3ce54e6d8b08acb6285e1691a772e8ef32e7a",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X697",
+        "X698"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "zip_bad_member": null,
+        "document_xml_bytes": 1509291,
+        "mainboard_terms": [
+          "mainboard",
+          "main board",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "infinix_X698/IMG_20211102_150823.jpg",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/infinix_X698/IMG_20211102_150823.jpg",
+      "file_name": "IMG_20211102_150823.jpg",
+      "extension": ".jpg",
+      "size_bytes": 2269577,
+      "sha256": "4cee4f356be944852fb83984975354f9eb0853ed8fbf394ae252fd52f1c1412e",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X698"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "width": 4096,
+        "height": 3072,
+        "format": "JPEG"
+      }
+    },
+    {
+      "source_relative_path": "infinix_X698/IMG_20211102_150833.jpg",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/infinix_X698/IMG_20211102_150833.jpg",
+      "file_name": "IMG_20211102_150833.jpg",
+      "extension": ".jpg",
+      "size_bytes": 2425994,
+      "sha256": "4b9867a3c0f8a06046637495a2f2c4aa1f350ee1e42987e07d5e982f40249d3e",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X698"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "width": 4096,
+        "height": 3072,
+        "format": "JPEG"
+      }
+    },
+    {
+      "source_relative_path": "infinix_X698/IMG_20211102_150843.jpg",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/infinix_X698/IMG_20211102_150843.jpg",
+      "file_name": "IMG_20211102_150843.jpg",
+      "extension": ".jpg",
+      "size_bytes": 2681077,
+      "sha256": "c62dcd435fb5efaf5db5346bd53dcdef3686096d7c990dac89ff078de3f434fc",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X698"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "width": 4096,
+        "height": 3072,
+        "format": "JPEG"
+      }
+    },
+    {
+      "source_relative_path": "infinix_X698/IMG_20211102_150848.jpg",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/infinix_X698/IMG_20211102_150848.jpg",
+      "file_name": "IMG_20211102_150848.jpg",
+      "extension": ".jpg",
+      "size_bytes": 2609854,
+      "sha256": "7f0af11cefa0ac66422eeec7394945ca290690a60ddcc27116a359d7339528f4",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X698"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "width": 4096,
+        "height": 3072,
+        "format": "JPEG"
+      }
+    },
+    {
+      "source_relative_path": "infinix_X698/infinix X697(NOTE 11 Pro)&X698(NOTE 11S)  新产品上市通知.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/infinix_X698/infinix X697(NOTE 11 Pro)&X698(NOTE 11S)  新产品上市通知.pdf",
+      "file_name": "infinix X697(NOTE 11 Pro)&X698(NOTE 11S)  新产品上市通知.pdf",
+      "extension": ".pdf",
+      "size_bytes": 478622,
+      "sha256": "4fea14b245ca99362460389d800f6a0b2214f91de4eb2e808a299217df2f4606",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X698",
+        "X697"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 2,
+        "sample_text_chars": 938,
+        "mainboard_terms": []
+      }
+    },
+    {
+      "source_relative_path": "infinix_X698/infinix X697(NOTE 11 Pro)&X698(NOTE 11S) Service Manual V2.0.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/infinix_X698/infinix X697(NOTE 11 Pro)&X698(NOTE 11S) Service Manual V2.0.pdf",
+      "file_name": "infinix X697(NOTE 11 Pro)&X698(NOTE 11S) Service Manual V2.0.pdf",
+      "extension": ".pdf",
+      "size_bytes": 2629330,
+      "sha256": "1211b0b05a64a73e43445bdf43e8d104d5bda0ba08cbb677f56c782188a7940b",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X698",
+        "X697"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 23,
+        "sample_text_chars": 12358,
+        "mainboard_terms": [
+          "mainboard",
+          "main board",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "infinix_X698/NOTE 11 Pro & 11S Training Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/infinix_X698/NOTE 11 Pro & 11S Training Manual.pdf",
+      "file_name": "NOTE 11 Pro & 11S Training Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 11430462,
+      "sha256": "3cdb3dc2f3ca634d10acf1e068532935b3c91a6ac803bc75308a221b7d082add",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "X698"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 74,
+        "sample_text_chars": 10568,
+        "mainboard_terms": []
+      }
+    },
+    {
+      "source_relative_path": "TECNO AD10 Service Manual.docx",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO AD10 Service Manual.docx",
+      "file_name": "TECNO AD10 Service Manual.docx",
+      "extension": ".docx",
+      "size_bytes": 43209126,
+      "sha256": "0f416d8f507290eb440a286784533a599be667d105eebef75d6eede4f933c047",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "AD10"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "zip_bad_member": null,
+        "document_xml_bytes": 1795056,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO AD10 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO AD10 Service Manual.pdf",
+      "file_name": "TECNO AD10 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 4787058,
+      "sha256": "d8aceb45e2f93bca24d8691a94e07098cd1f87649e104f5b89162dca28f7719d",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "AD10"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 22,
+        "sample_text_chars": 7717,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO CM5 Service Manual_1740044636762.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO CM5 Service Manual_1740044636762.pdf",
+      "file_name": "TECNO CM5 Service Manual_1740044636762.pdf",
+      "extension": ".pdf",
+      "size_bytes": 3720569,
+      "sha256": "198af84448bbe59decf568e4463d3f47c888a7a050c25cb01c3b21b909f20c97",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "CM5"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 18,
+        "sample_text_chars": 9833,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO CM6 Service Manual_1740044953319.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO CM6 Service Manual_1740044953319.pdf",
+      "file_name": "TECNO CM6 Service Manual_1740044953319.pdf",
+      "extension": ".pdf",
+      "size_bytes": 3149224,
+      "sha256": "ade820ea803bb407d593bc99818b854f7b6ff18ba45c89faf476eaf735d2b7c3",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "CM6"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 16,
+        "sample_text_chars": 9069,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO CM7 Service Manual_1744009154363.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO CM7 Service Manual_1744009154363.pdf",
+      "file_name": "TECNO CM7 Service Manual_1744009154363.pdf",
+      "extension": ".pdf",
+      "size_bytes": 3031125,
+      "sha256": "ce0ae917c05a9eee315c41db1480663ef13effc6e3b26d0d084f04e456333237",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "CM7"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 16,
+        "sample_text_chars": 9145,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO CM8 Service Manual_1744009535349.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO CM8 Service Manual_1744009535349.pdf",
+      "file_name": "TECNO CM8 Service Manual_1744009535349.pdf",
+      "extension": ".pdf",
+      "size_bytes": 2590004,
+      "sha256": "3a8b96482e905aab90f9cee70f931e6ad0bcfee62e844676d81e7f4bbc078e37",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "CM8"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 15,
+        "sample_text_chars": 9055,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO CN5 Service Manual_1766459133009.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO CN5 Service Manual_1766459133009.pdf",
+      "file_name": "TECNO CN5 Service Manual_1766459133009.pdf",
+      "extension": ".pdf",
+      "size_bytes": 5392059,
+      "sha256": "c23c26073677db5f00f5136d8bb294972991357dbdcba593a644f7337cccd684",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "CN5"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 15,
+        "sample_text_chars": 8915,
+        "mainboard_terms": [
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO CN5c  Service Manual_1766113703772.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO CN5c  Service Manual_1766113703772.pdf",
+      "file_name": "TECNO CN5c  Service Manual_1766113703772.pdf",
+      "extension": ".pdf",
+      "size_bytes": 4438473,
+      "sha256": "dc3e0d756d2af302ba33428245746f3483ad0135a606d30c3f9cc3b5f5ef1f0e",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "CN5C"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 15,
+        "sample_text_chars": 8908,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO CN6c Service Manual.docx",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO CN6c Service Manual.docx",
+      "file_name": "TECNO CN6c Service Manual.docx",
+      "extension": ".docx",
+      "size_bytes": 23131935,
+      "sha256": "1df5586e8718a82a737a362090b95ab1265f06cee7521ae7aa8d56bae8819072",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "CN6C"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "zip_bad_member": null,
+        "document_xml_bytes": 844505,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO CN7c Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO CN7c Service Manual.pdf",
+      "file_name": "TECNO CN7c Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 5835893,
+      "sha256": "fff2e158af12ad33ab9c2eb388b27205cc17ce0df35f4a0e2b1ad77142e3c27c",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "CN7C"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 15,
+        "sample_text_chars": 8945,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO CN7c Service Manual_1770348308637.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO CN7c Service Manual_1770348308637.pdf",
+      "file_name": "TECNO CN7c Service Manual_1770348308637.pdf",
+      "extension": ".pdf",
+      "size_bytes": 5835887,
+      "sha256": "ff0a580e5689a97e2fcee92542946500bf9129a1e8a772d1f66c4502ff03c45f",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "CN7C"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 15,
+        "sample_text_chars": 8943,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO G01RA Service Manual_1736408298469.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO G01RA Service Manual_1736408298469.pdf",
+      "file_name": "TECNO G01RA Service Manual_1736408298469.pdf",
+      "extension": ".pdf",
+      "size_bytes": 4132995,
+      "sha256": "cbe889c800d556673b2808c935ebbedbc546261b168a1b21878d72bebf791b2b",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "G01RA"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 18,
+        "sample_text_chars": 7490,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO KL4h Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO KL4h Service Manual.pdf",
+      "file_name": "TECNO KL4h Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 3191676,
+      "sha256": "79fb814d86e654cd529c1f0657893cf661a42f3f37b0ef5970e4daf19e45f000",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "KL4H"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 15,
+        "sample_text_chars": 8284,
+        "mainboard_terms": [
+          "mainboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO KL6 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO KL6 Service Manual.pdf",
+      "file_name": "TECNO KL6 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 2821813,
+      "sha256": "4798a9479889df7f7bf5911e101a92433f2d7576068ee8f5c21338cc61d377ce",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "KL6"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 15,
+        "sample_text_chars": 8838,
+        "mainboard_terms": [
+          "mainboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO KL7 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO KL7 Service Manual.pdf",
+      "file_name": "TECNO KL7 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 2829742,
+      "sha256": "aea0ff163fd3ad28959494ec7ebb5b1379eb7aacf5828fff4510a67fabbe608b",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "KL7"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 15,
+        "sample_text_chars": 8746,
+        "mainboard_terms": [
+          "mainboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO KM4 Service Manual_1753264377935.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO KM4 Service Manual_1753264377935.pdf",
+      "file_name": "TECNO KM4 Service Manual_1753264377935.pdf",
+      "extension": ".pdf",
+      "size_bytes": 2549498,
+      "sha256": "1f55c7a19f5727b239adf312fa06a450ea88dc9596ab8ddcf795a450d391db7b",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "KM4"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 16,
+        "sample_text_chars": 8174,
+        "mainboard_terms": [
+          "mainboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO KM6 Service Manual_1764574751511.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO KM6 Service Manual_1764574751511.pdf",
+      "file_name": "TECNO KM6 Service Manual_1764574751511.pdf",
+      "extension": ".pdf",
+      "size_bytes": 2542991,
+      "sha256": "1b3faf34e4b547dd67d9cbc5f6e60a2e563dbfd98287b433e84de8aae05f9ebd",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "KM6"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 16,
+        "sample_text_chars": 7807,
+        "mainboard_terms": [
+          "mainboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO KM7 Service Manual_1767758459431.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO KM7 Service Manual_1767758459431.pdf",
+      "file_name": "TECNO KM7 Service Manual_1767758459431.pdf",
+      "extension": ".pdf",
+      "size_bytes": 2394024,
+      "sha256": "b7b8a99fc8e47e3bbe61ba6df69a020fd0d29fee7878e7513ea35337a02135c0",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "KM7"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 14,
+        "sample_text_chars": 7519,
+        "mainboard_terms": [
+          "mainboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO KM8 Service Manual_1761896475213.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO KM8 Service Manual_1761896475213.pdf",
+      "file_name": "TECNO KM8 Service Manual_1761896475213.pdf",
+      "extension": ".pdf",
+      "size_bytes": 2564322,
+      "sha256": "17d4ee6612d91c280eb6f11112224abe9db7b663ffe06d0f7200c7609b6e942b",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "KM8"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 15,
+        "sample_text_chars": 7635,
+        "mainboard_terms": [
+          "mainboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO KM9 Service Manual_1765185957044.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO KM9 Service Manual_1765185957044.pdf",
+      "file_name": "TECNO KM9 Service Manual_1765185957044.pdf",
+      "extension": ".pdf",
+      "size_bytes": 2868616,
+      "sha256": "43e3149defb7c6636917aea9acfb4203f33438c9cdb531643c35e542cf1b07d9",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "KM9"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 16,
+        "sample_text_chars": 7442,
+        "mainboard_terms": [
+          "mainboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO KN3 Service Manual_1764915023276.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO KN3 Service Manual_1764915023276.pdf",
+      "file_name": "TECNO KN3 Service Manual_1764915023276.pdf",
+      "extension": ".pdf",
+      "size_bytes": 4066986,
+      "sha256": "278cc1f66628b0d052bfa6128f68aea69999085ee4fdd2017498b2346e3b094e",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "KN3"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 14,
+        "sample_text_chars": 8278,
+        "mainboard_terms": [
+          "pcb",
+          "circuit"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO KN8 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO KN8 Service Manual.pdf",
+      "file_name": "TECNO KN8 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 6906969,
+      "sha256": "6ffdfe19b83b298bebc3a107c8a763989694fbaaca4adb5cc853c1ba3f613116",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "KN8"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 15,
+        "sample_text_chars": 8022,
+        "mainboard_terms": [
+          "pcb",
+          "circuit"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO KO5 Service Manual.docx",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO KO5 Service Manual.docx",
+      "file_name": "TECNO KO5 Service Manual.docx",
+      "extension": ".docx",
+      "size_bytes": 19706149,
+      "sha256": "8ba94acda66b0e18ee0802fbade007550788335eb83a11289860fa82f3c55e7b",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "KO5"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "zip_bad_member": null,
+        "document_xml_bytes": 769517,
+        "mainboard_terms": [
+          "motherboard",
+          "pcb",
+          "circuit"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO KO5 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO KO5 Service Manual.pdf",
+      "file_name": "TECNO KO5 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 4832863,
+      "sha256": "c22446ab9b702c7ec314faa567717de4d14a41b5e70958a8db6a6bd721cfd234",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "KO5"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 15,
+        "sample_text_chars": 8626,
+        "mainboard_terms": [
+          "pcb",
+          "circuit"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO LJ6 Service Manual_1752456360640.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO LJ6 Service Manual_1752456360640.pdf",
+      "file_name": "TECNO LJ6 Service Manual_1752456360640.pdf",
+      "extension": ".pdf",
+      "size_bytes": 3019987,
+      "sha256": "1c5d23bb154be4c95a15eb4e061a39431cadfeb69385bf641eae64071b04d910",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "LJ6"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 13,
+        "sample_text_chars": 8179,
+        "mainboard_terms": [
+          "mainboard",
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO LJ7 Service Manual_1752456481699.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO LJ7 Service Manual_1752456481699.pdf",
+      "file_name": "TECNO LJ7 Service Manual_1752456481699.pdf",
+      "extension": ".pdf",
+      "size_bytes": 3627074,
+      "sha256": "9c98694dd85ae3e438e1a8123306d76352f9e193ea18a2b90cda449588c373b9",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "LJ7"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 13,
+        "sample_text_chars": 8356,
+        "mainboard_terms": [
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO LJ8 Service Manual_1754986642303.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO LJ8 Service Manual_1754986642303.pdf",
+      "file_name": "TECNO LJ8 Service Manual_1754986642303.pdf",
+      "extension": ".pdf",
+      "size_bytes": 3755412,
+      "sha256": "0bf4b9db0f3563f6c2cf50951fcc346233c284046e7d5285f5c2e260867543d9",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "LJ8"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 13,
+        "sample_text_chars": 8332,
+        "mainboard_terms": [
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO LJ8k Service Manual_1748911543580.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO LJ8k Service Manual_1748911543580.pdf",
+      "file_name": "TECNO LJ8k Service Manual_1748911543580.pdf",
+      "extension": ".pdf",
+      "size_bytes": 2788997,
+      "sha256": "35b35b8451258bff433cef33bf272befa32956bd3442f1f9384faa665e4faa54",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "LJ8K"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 16,
+        "sample_text_chars": 9076,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO LJ9 Service Manual_1753263935000.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO LJ9 Service Manual_1753263935000.pdf",
+      "file_name": "TECNO LJ9 Service Manual_1753263935000.pdf",
+      "extension": ".pdf",
+      "size_bytes": 4116368,
+      "sha256": "63c78222f9b2758bc7b454e30bb1b4c1876b7678a1788998b5c638bb7117d475",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "LJ9"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 14,
+        "sample_text_chars": 7765,
+        "mainboard_terms": [
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO LK6 Service Manual.docx",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO LK6 Service Manual.docx",
+      "file_name": "TECNO LK6 Service Manual.docx",
+      "extension": ".docx",
+      "size_bytes": 19830652,
+      "sha256": "7875af86fe3bdbaf166a7da7e365d4d7022e72b91cd7e1dd90a8688046a3526c",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "LK6"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "zip_bad_member": null,
+        "document_xml_bytes": 863504,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO LK6 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO LK6 Service Manual.pdf",
+      "file_name": "TECNO LK6 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 4826719,
+      "sha256": "9aaa55824a3da014afca82297177f4b1567cbc93e9124cf0b8268159bd25d348",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "LK6"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 16,
+        "sample_text_chars": 8789,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO LK7k Service Manual_1766627095430.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO LK7k Service Manual_1766627095430.pdf",
+      "file_name": "TECNO LK7k Service Manual_1766627095430.pdf",
+      "extension": ".pdf",
+      "size_bytes": 4596438,
+      "sha256": "1314afb0eb41ffce404cad68005380c208b9abbc544538fbde9756970be512be",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "LK7K"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 15,
+        "sample_text_chars": 9022,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO S302 Service Manual_1747379763838.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO S302 Service Manual_1747379763838.pdf",
+      "file_name": "TECNO S302 Service Manual_1747379763838.pdf",
+      "extension": ".pdf",
+      "size_bytes": 1725690,
+      "sha256": "5c3ca78477bf0d11fc18d66ddd6fda78e83432eac0a10f3d5131b09b02988838",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "S302"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 11,
+        "sample_text_chars": 7790,
+        "mainboard_terms": [
+          "mainboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO T1002 Service Manual.docx",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO T1002 Service Manual.docx",
+      "file_name": "TECNO T1002 Service Manual.docx",
+      "extension": ".docx",
+      "size_bytes": 16510695,
+      "sha256": "016e1d4ff3f11dc0de87b55a0de3450179e75855a72d286f999b2b2effd6ed12",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "T1002"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "zip_bad_member": null,
+        "document_xml_bytes": 836800,
+        "mainboard_terms": [
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO T1002 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO T1002 Service Manual.pdf",
+      "file_name": "TECNO T1002 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 3667891,
+      "sha256": "24c4d8d75f90d672cc26596762881d923102fb5265d15d1e4d5ece0a5cfe702b",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "T1002"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 14,
+        "sample_text_chars": 8969,
+        "mainboard_terms": [
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO T1101 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO T1101 Service Manual.pdf",
+      "file_name": "TECNO T1101 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 2908289,
+      "sha256": "772990ff58f620a42cbe91618d771edbe92516e8fc57d0be9dad30d7acdd668c",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "T1101"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 14,
+        "sample_text_chars": 9208,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO T1102 Service Manual_1764928293817.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO T1102 Service Manual_1764928293817.pdf",
+      "file_name": "TECNO T1102 Service Manual_1764928293817.pdf",
+      "extension": ".pdf",
+      "size_bytes": 4550694,
+      "sha256": "9d740118e678d4779df49e1a1477c2a53b7d751a415c1bff5e8edaad068b8591",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "T1102"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 15,
+        "sample_text_chars": 7590,
+        "mainboard_terms": [
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO T1103 Service Manual.docx",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO T1103 Service Manual.docx",
+      "file_name": "TECNO T1103 Service Manual.docx",
+      "extension": ".docx",
+      "size_bytes": 18940060,
+      "sha256": "7b1238fbfeb467c10619be6cdef734d35f001069be04c478941036a0f301dd7f",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "T1103"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "zip_bad_member": null,
+        "document_xml_bytes": 731676,
+        "mainboard_terms": [
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO T1103 Service Manual.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO T1103 Service Manual.pdf",
+      "file_name": "TECNO T1103 Service Manual.pdf",
+      "extension": ".pdf",
+      "size_bytes": 4558359,
+      "sha256": "cb868a7683dbced503b1e7ab9caab61d4fd89d48478f1a382eeaa25e80151c6d",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "T1103"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 13,
+        "sample_text_chars": 8007,
+        "mainboard_terms": [
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO T1201 Service Manual_1760167867831.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO T1201 Service Manual_1760167867831.pdf",
+      "file_name": "TECNO T1201 Service Manual_1760167867831.pdf",
+      "extension": ".pdf",
+      "size_bytes": 3891841,
+      "sha256": "94ff0941726cdbf1892aaedd2e0152f2e7938be33c6b9cb5ec61604411314827",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "T1201"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 16,
+        "sample_text_chars": 6754,
+        "mainboard_terms": [
+          "motherboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO T455 Service Manual_1747311033148.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO T455 Service Manual_1747311033148.pdf",
+      "file_name": "TECNO T455 Service Manual_1747311033148.pdf",
+      "extension": ".pdf",
+      "size_bytes": 1878023,
+      "sha256": "c526a38ad1399f936f445f0ecab4f0b95e1b7a5fd6a30a853574d5ce802b9a57",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "T455"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 13,
+        "sample_text_chars": 8399,
+        "mainboard_terms": [
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO_7C_PRO_Service Manual_v1.0.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO_7C_PRO_Service Manual_v1.0.pdf",
+      "file_name": "TECNO_7C_PRO_Service Manual_v1.0.pdf",
+      "extension": ".pdf",
+      "size_bytes": 1043506,
+      "sha256": "1ec1f9bb462aa8f75328e00267aac2e8892f76337cd08c43140f7b846e82037d",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "7C_PRO"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 12,
+        "sample_text_chars": 12123,
+        "mainboard_terms": [
+          "mainboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO_7C_Service Manual_v1.0.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO_7C_Service Manual_v1.0.pdf",
+      "file_name": "TECNO_7C_Service Manual_v1.0.pdf",
+      "extension": ".pdf",
+      "size_bytes": 702486,
+      "sha256": "8592e893c92f5af3614993a2728d760521e7a951edb5cda04a014bdecc6eb970",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "7C"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 13,
+        "sample_text_chars": 9908,
+        "mainboard_terms": [
+          "mainboard",
+          "pcb"
+        ]
+      }
+    },
+    {
+      "source_relative_path": "TECNO_8H_Service Manual_v2.0.pdf",
+      "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO_8H_Service Manual_v2.0.pdf",
+      "file_name": "TECNO_8H_Service Manual_v2.0.pdf",
+      "extension": ".pdf",
+      "size_bytes": 931407,
+      "sha256": "854b41c6ffccaa5924792d9b36ae51e79860648cbd95239af0e8b6cfe013182e",
+      "is_exact_duplicate": false,
+      "duplicate_source_paths": [],
+      "models": [
+        "8H"
+      ],
+      "inspection": {
+        "parse_status": "ok",
+        "page_count": 15,
+        "sample_text_chars": 9923,
+        "mainboard_terms": [
+          "mainboard",
+          "pcb"
+        ]
+      }
+    }
+  ]
+}

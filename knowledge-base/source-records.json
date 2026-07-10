@@ -496,5 +496,57 @@
     ],
     "processing_status": "已完成资料包解包和清单登记，待结构化抽取",
     "notes": "该资料包显著提升机型资料库完整度，但仍不能直接等同于海外可执行 SOP，需要继续做章节抽取、图纸映射和工程确认。"
+  },
+  {
+    "source_id": "SRC-20260710-001",
+    "file_name": "Desktop manual service-manual library",
+    "original_path": "C:/Users/Mercurluto/Desktop/manual",
+    "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files",
+    "file_type": "Folder (PDF, DOCX, DOC, JPG)",
+    "received_date": "2026-07-10",
+    "main_category": "机型维修手册库",
+    "secondary_categories": [
+      "主板视觉资料库",
+      "培训资料库",
+      "机型资料库",
+      "拆装与结构资料库"
+    ],
+    "related_models": [
+      "KM4",
+      "KL4",
+      "CLA5",
+      "KJ5",
+      "CM5",
+      "CM6",
+      "X6880"
+    ],
+    "related_model_count": 96,
+    "related_faults": [],
+    "related_components": [],
+    "related_tools": [],
+    "summary": "Milo 提供的大型 TECNO / Infinix Service Manual 资料库。共收到 125 个源文件，SHA-256 去重后保存 119 份唯一文件，约 1.437 GB；包含 86 份 PDF、26 份 DOCX、3 份 DOC 和 10 张 JPG。全部文件通过基础格式或解析检查，86 份 PDF 合计约 1404 页。前 12 页抽样检查中，110 条文件记录已检测到 PCB、main board、schematic、circuit 等主板相关词。",
+    "extractable_items": [
+      "机型级 Service Manual",
+      "手册内嵌主板和副板图片候选",
+      "拆机步骤和部件位置",
+      "主板模块和连接器上下文",
+      "机型别名和外观识别参考",
+      "视觉识别 Demo 的参考图片候选"
+    ],
+    "missing_fields": [
+      "逐手册主板版本和项目代号映射",
+      "主板实物图片所在页和正反面标签",
+      "手册图片与现有位号图的对应关系",
+      "视觉识别训练样本的授权和标注状态",
+      "每份手册可直接用于维修 SOP 的章节边界"
+    ],
+    "target_knowledge_base": [
+      "service-manual-library-2026-07-10",
+      "model-board-assets",
+      "training-materials",
+      "source-records"
+    ],
+    "processing_status": "已完成项目本地原件复制、SHA-256 去重、完整性验证和第一版机型索引；待按优先机型深度抽取",
+    "notes": "1.437 GB 二进制原件保存在项目本地 source-materials 目录并排除 Git 历史；Git 跟踪完整清单、哈希、重复映射和解析结果。Service Manual 可补充实物外观、拆装和模块上下文，但不替代 Placement 位号图或 SCH 原理图。"
   }
 ]

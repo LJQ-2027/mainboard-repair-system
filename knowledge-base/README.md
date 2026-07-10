@@ -7,6 +7,7 @@
 ## 文件说明
 
 - `source-records.json`：收到的原始资料登记表。
+- `service-manual-library-2026-07-10.json`：大型 Service Manual 资料库的逐文件清单、SHA-256、重复映射、机型标签和可解析性检查。
 - `training-materials.json`：培训资料条目。
 - `module-principles.json`：手机模块原理、关键链路和后续可转化为诊断说明的基础知识。
 - `platform-repair-manuals.json`：制造中心提供的平台级主板维修通用手册摘要。
