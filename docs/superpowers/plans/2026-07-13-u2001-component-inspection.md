@@ -31,5 +31,5 @@
 
 - [x] Run syntax checks, all Node tests, all Python tests, JSON validation, and standalone validation.
 - [x] Run headed Chromium desktop/mobile interaction and visual QA.
-- [ ] Update implementation evidence, Vault, and project ledger.
-- [ ] Commit the implementation and closeout state.
+- [x] Update implementation evidence, Vault, and project ledger.
+- [x] Commit the implementation and closeout state.
