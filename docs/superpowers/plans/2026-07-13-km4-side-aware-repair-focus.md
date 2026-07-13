@@ -79,12 +79,12 @@ assert.deepEqual(frame.center, { x: 0, y: 0 });
 - Create: `knowledge-base/km4-board-sides.json`
 - Modify: `tests/test_compile_km4_board.py`
 
-- [ ] Extract `compile_side(page, side_id, image_path, output_path, required_designators)` from the current page-2-only script.
-- [ ] Add tests proving each output retains its own `side_id`, source page, engineering texture, outline, confidence audit, and components.
-- [ ] Compile page 1 against `main-point-map-page-1.png` without requiring the page-2 reviewed designator set.
-- [ ] Preserve `km4-board-compiled.json` as the validated page-2 compatibility artifact.
-- [ ] Write a manifest with explicit source labels `第1面` and `第2面`, compiled-data paths, and texture paths.
-- [ ] Run all Python tests and both output validators; commit Checkpoint 2.
+- [x] Extract `compile_side(page, side_id, image_path, output_path, required_designators)` from the current page-2-only script.
+- [x] Add tests proving each output retains its own `side_id`, source page, engineering texture, outline, confidence audit, and components.
+- [x] Compile page 1 against `main-point-map-page-1.png` without requiring the page-2 reviewed designator set.
+- [x] Preserve `km4-board-compiled.json` as the validated page-2 compatibility artifact.
+- [x] Write a manifest with explicit source labels `第1面` and `第2面`, compiled-data paths, and texture paths.
+- [x] Run all Python tests and both output validators; commit Checkpoint 2.
 
 ### Task 5: Side-Aware Renderer And One-Board Flip
 

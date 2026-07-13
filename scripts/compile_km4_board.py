@@ -11,28 +11,45 @@ from scripts.board_compiler.outline import extract_board_outline
 from scripts.board_compiler.pdf_primitives import extract_form_primitives
 
 
+BOARD_ID = "BOARD-KM4-F151-MAIN-V1.2"
+SOURCE_PATH = "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/F151_MAIN_PCB_V1.2_位号图.pdf"
 REQUIRED_DESIGNATORS = {"U2001", "U4000", "X2100", "U0600", "J6101", "VBAT1", "VBUS1"}
+SIDE_CONFIGS = {
+    "main_page_1": {
+        "page": 1,
+        "label": "第1面",
+        "image": "assets/board-atlas/km4-f151/main-point-map-page-1.png",
+        "output": "knowledge-base/km4-board-compiled-page-1.json",
+        "required_designators": set(),
+    },
+    "main_page_2": {
+        "page": 2,
+        "label": "第2面",
+        "image": "assets/board-atlas/km4-f151/main-point-map-page-2.png",
+        "output": "knowledge-base/km4-board-compiled.json",
+        "required_designators": REQUIRED_DESIGNATORS,
+    },
+}
 
 
-def main():
-    root = ROOT
-    source = root / "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/F151_MAIN_PCB_V1.2_位号图.pdf"
-    output = root / "knowledge-base/km4-board-compiled.json"
-    point_map_image = root / "assets/board-atlas/km4-f151/main-point-map-page-2.png"
-    primitives = extract_form_primitives(source, 2)
+def compile_side(root, side_id, config):
+    source = root / SOURCE_PATH
+    point_map_image = root / config["image"]
+    primitives = extract_form_primitives(source, config["page"])
     outline = extract_board_outline(point_map_image)
     components = compile_designators(primitives["labels"], primitives["rectangles"], primitives["visible_bounds"])
-    recovered = {item["designator"] for item in components} & REQUIRED_DESIGNATORS
+    required = config["required_designators"]
+    recovered = {item["designator"] for item in components} & required
     footprint_count = sum("footprint" in item for item in components)
     confidence_counts = Counter(item["footprint"]["confidence"] for item in components if "footprint" in item)
-    payload = {
+    return {
         "compiler_id": "BOARD-COMPILER-PYPDF-V1",
-        "board_id": "BOARD-KM4-F151-MAIN-V1.2",
-        "side_id": "main_page_2",
+        "board_id": BOARD_ID,
+        "side_id": side_id,
         "coordinate_system": "normalized_form_xobject",
         "source": {
-            "path": str(source.relative_to(root)).replace("\\", "/"),
-            "page": 2,
+            "path": SOURCE_PATH,
+            "page": config["page"],
             "form_xobject": primitives["form_name"],
             "bounds": primitives["bounds"],
             "visible_bounds": primitives["visible_bounds"],
@@ -43,27 +60,58 @@ def main():
             "accepted_designators": len(components),
             "candidate_footprints": footprint_count,
             "footprint_confidence": dict(sorted(confidence_counts.items())),
-            "required_designators": sorted(REQUIRED_DESIGNATORS),
+            "required_designators": sorted(required),
             "recovered_required_designators": sorted(recovered),
-            "required_recovery_complete": recovered == REQUIRED_DESIGNATORS,
+            "required_recovery_complete": recovered == required,
             "outline_points": len(outline["outline"]),
             "outline_mask_area_ratio": outline["mask_area_ratio"],
         },
         "board_outline": outline["outline"],
         "board_outline_source": {
-            "image": str(point_map_image.relative_to(root)).replace("\\", "/"),
+            "image": config["image"],
             "method": "engineering-mark closing, largest component, hole fill, contour simplification",
             "image_size": outline["image_size"],
         },
         "accuracy_boundary": "Designators are decoded from the embedded PDF CMap. Footprints are provisional nearest-vector candidates until geometry pairing is reviewed.",
         "components": components,
     }
-    output.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    print(json.dumps(payload["audit"], indent=2, ensure_ascii=False))
-    if recovered != REQUIRED_DESIGNATORS:
-        print(f"Missing required designators: {sorted(REQUIRED_DESIGNATORS - recovered)}", file=sys.stderr)
-        return 1
-    return 0
+
+
+def build_side_manifest(root=ROOT):
+    del root
+    return {
+        "manifest_id": "KM4-F151-BOARD-SIDES-V1",
+        "board_id": BOARD_ID,
+        "default_side_id": "main_page_2",
+        "sides": [
+            {
+                "side_id": side_id,
+                "label": config["label"],
+                "source_pdf_page": config["page"],
+                "engineering_texture": config["image"],
+                "compiled_data": config["output"],
+            }
+            for side_id, config in SIDE_CONFIGS.items()
+        ],
+    }
+
+
+def write_json(path, payload):
+    path.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
+def main():
+    failed = False
+    for side_id, config in SIDE_CONFIGS.items():
+        payload = compile_side(ROOT, side_id, config)
+        write_json(ROOT / config["output"], payload)
+        print(json.dumps({"side_id": side_id, **payload["audit"]}, indent=2, ensure_ascii=False))
+        if not payload["audit"]["required_recovery_complete"]:
+            missing = set(config["required_designators"]) - set(payload["audit"]["recovered_required_designators"])
+            print(f"Missing required designators on {side_id}: {sorted(missing)}", file=sys.stderr)
+            failed = True
+    write_json(ROOT / "knowledge-base/km4-board-sides.json", build_side_manifest(ROOT))
+    return 1 if failed else 0
 
 
 if __name__ == "__main__":
