@@ -56,6 +56,9 @@
             <button class="side-flip" id="flipSide" type="button" title="翻转主板" aria-label="翻转主板">⇄</button>
             <span id="activeSideLabel" aria-live="polite">第2面</span>
           </div>
+          <div class="inspection-status" id="inspectionStatus" hidden aria-live="polite">
+            <strong id="inspectionDesignator">U2001</strong><span>单体检视</span>
+          </div>
           <div class="model-legend" aria-label="模型几何置信度">
             <span><i class="legend-body"></i>可信实体</span>
             <span><i class="legend-outline"></i>参考轮廓</span>
@@ -66,9 +69,20 @@
       <div class="source-note" id="sourceNote"></div>
     </section>
     <aside class="evidence">
-      <div class="entity-heading"><div><span id="entityCategory"></span><h2 id="entityDesignator">—</h2></div><span class="visibility" id="entityVisibility"></span></div>
+      <div class="entity-heading">
+        <div><span id="entityCategory"></span><h2 id="entityDesignator">—</h2></div>
+        <div class="entity-actions">
+          <span class="visibility" id="entityVisibility"></span>
+          <button class="inspect-component" id="inspectComponent" type="button" aria-pressed="false" disabled>单体查看</button>
+        </div>
+      </div>
       <p class="entity-name" id="entityName"></p>
       <dl class="facts"><div><dt>功能模块</dt><dd id="entityModule"></dd></div><div><dt>统一坐标</dt><dd id="entityCoordinate"></dd></div></dl>
+      <section class="component-guidance" id="componentGuidance" hidden>
+        <h3>常见故障</h3><div class="fault-list" id="commonFaults"></div>
+        <h3>检测方法</h3><article class="guidance-block" id="inspectionMethod"></article>
+        <h3>模型边界</h3><p class="model-boundary" id="modelBoundary"></p>
+      </section>
       <section><h3>原理图关系</h3><div id="schematicEvidence"></div></section>
       <section><h3>维修指导</h3><div id="repairEvidence"></div></section>
       <section class="entity-list-section"><h3 id="entityListHeading">第2面已关联实体</h3><div class="entity-list" id="entityList"></div></section>

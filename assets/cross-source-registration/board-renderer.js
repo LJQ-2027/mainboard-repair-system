@@ -12,6 +12,7 @@ import {
   shouldShowLabels,
 } from './anatomy-state.js';
 import { isPointInFocus } from './repair-focus-state.js';
+import { buildInspectionTransform, inspectionOpacity } from './component-inspection-state.js';
 
 const COLORS = {
   board: 0x17473e,
@@ -44,6 +45,31 @@ function box(width, depth, height, meshMaterial) {
   return mesh;
 }
 
+function roundedRectShape(width, height, radius) {
+  const x = -width / 2;
+  const y = -height / 2;
+  const shape = new THREE.Shape();
+  shape.moveTo(x + radius, y);
+  shape.lineTo(x + width - radius, y);
+  shape.quadraticCurveTo(x + width, y, x + width, y + radius);
+  shape.lineTo(x + width, y + height - radius);
+  shape.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  shape.lineTo(x + radius, y + height);
+  shape.quadraticCurveTo(x, y + height, x, y + height - radius);
+  shape.lineTo(x, y + radius);
+  shape.quadraticCurveTo(x, y, x + radius, y);
+  return shape;
+}
+
+function captureMaterialState(object) {
+  object.traverse((child) => {
+    if (!child.material) return;
+    child.userData.baseOpacity = child.material.opacity;
+    child.userData.baseTransparent = child.material.transparent;
+    child.userData.baseDepthWrite = child.material.depthWrite;
+  });
+}
+
 function addPassivePackage(group, descriptor) {
   const { x, y, z } = descriptor.dimensions;
   const terminalWidth = Math.max(x * 0.2, 0.004);
@@ -67,6 +93,64 @@ function addIcPackage(group, descriptor) {
   dot.rotation.x = Math.PI / 2;
   dot.position.set(-x * 0.3, y * 0.3, z + 0.001);
   group.add(dot);
+}
+
+function addInspectionPmicPackage(group, descriptor) {
+  const { x, y, z } = descriptor.dimensions;
+  const radius = Math.min(x, y) * 0.075;
+  const substrateMaterial = material('copper', { color: 0x4d5948, roughness: 0.52, metalness: 0.3 });
+  const substrate = new THREE.Mesh(
+    new THREE.ExtrudeGeometry(roundedRectShape(x, y, radius * 0.72), {
+      depth: z * 0.24,
+      bevelEnabled: true,
+      bevelSize: Math.min(radius * 0.24, 0.003),
+      bevelThickness: 0.0015,
+      bevelSegments: 2,
+    }),
+    substrateMaterial,
+  );
+  group.add(substrate);
+  const substrateEdge = new THREE.LineSegments(
+    new THREE.EdgesGeometry(substrate.geometry, 24),
+    new THREE.LineBasicMaterial({ color: 0x9b7742, transparent: true, opacity: 0.78 }),
+  );
+  group.add(substrateEdge);
+
+  const body = new THREE.Mesh(
+    new THREE.ExtrudeGeometry(roundedRectShape(x * 0.94, y * 0.94, radius), {
+      depth: z * 0.7,
+      bevelEnabled: true,
+      bevelSize: Math.min(radius * 0.55, 0.006),
+      bevelThickness: Math.min(z * 0.08, 0.003),
+      bevelSegments: 3,
+    }),
+    material('black', { color: 0x151a19, roughness: 0.38, metalness: 0.2 }),
+  );
+  body.position.z = z * 0.22;
+  group.add(body);
+
+  const top = new THREE.Mesh(
+    new THREE.ShapeGeometry(roundedRectShape(x * 0.76, y * 0.72, radius * 0.65)),
+    material('dark', { color: 0x29302e, roughness: 0.5, metalness: 0.12 }),
+  );
+  top.position.z = z * 0.94;
+  group.add(top);
+
+  const dotRadius = Math.max(Math.min(x, y) * 0.045, 0.003);
+  const dot = new THREE.Mesh(
+    new THREE.CircleGeometry(dotRadius, 24),
+    material('ceramic', { color: 0xa6ada8, roughness: 0.62 }),
+  );
+  dot.position.set(-x * 0.31, y * 0.31, z * 0.955);
+  group.add(dot);
+
+  const edge = new THREE.LineSegments(
+    new THREE.EdgesGeometry(body.geometry, 24),
+    new THREE.LineBasicMaterial({ color: 0x4f5955, transparent: true, opacity: 0.72 }),
+  );
+  edge.position.copy(body.position);
+  group.add(edge);
+  group.userData.inspectionProfileId = descriptor.inspectionProfile.profile_id;
 }
 
 function addConnectorPackage(group, descriptor) {
@@ -123,7 +207,8 @@ function addGenericPackage(group, descriptor) {
 
 function createPackageMesh(descriptor) {
   const group = new THREE.Group();
-  if (descriptor.family === 'passive') addPassivePackage(group, descriptor);
+  if (descriptor.inspectionProfile?.profile_id === 'u2001-pmic-v1') addInspectionPmicPackage(group, descriptor);
+  else if (descriptor.family === 'passive') addPassivePackage(group, descriptor);
   else if (descriptor.family === 'ic') addIcPackage(group, descriptor);
   else if (descriptor.family === 'connector') addConnectorPackage(group, descriptor);
   else if (descriptor.family === 'crystal') addCrystalPackage(group, descriptor);
@@ -265,11 +350,15 @@ export class BoardRenderer {
     this.shieldObjects = new Map();
     this.moduleObjects = new Map();
     this.labelSprites = new Map();
+    this.contextObjects = [];
     this.shieldMode = 'removed';
     this.activeModuleId = null;
     this.activeFocusRegion = null;
     this.selectedComponentId = null;
     this.cameraAnimation = null;
+    this.inspectionAnimation = null;
+    this.inspectionComponentId = null;
+    this.inspectionSnapshot = null;
     this.sideTransitioning = false;
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0xe7eae5);
@@ -333,6 +422,8 @@ export class BoardRenderer {
       new THREE.LineBasicMaterial({ color: COLORS.boardEdge, transparent: true, opacity: 0.8 }),
     );
     substrate.add(rim);
+    captureMaterialState(substrate);
+    this.contextObjects.push(substrate);
 
     const surfaceGeometry = new THREE.ShapeGeometry(shape);
     const positions = surfaceGeometry.attributes.position;
@@ -357,7 +448,9 @@ export class BoardRenderer {
     });
     const surface = new THREE.Mesh(surfaceGeometry, surfaceMaterial);
     surface.position.z = 0.001;
+    captureMaterialState(surface);
     this.group.add(surface);
+    this.contextObjects.push(surface);
     new THREE.TextureLoader().load(this.engineeringTextureUrl, (texture) => {
       texture.colorSpace = THREE.SRGBColorSpace;
       texture.anisotropy = Math.min(this.renderer.capabilities.getMaxAnisotropy(), 8);
@@ -378,16 +471,12 @@ export class BoardRenderer {
     object.userData.componentId = descriptor.componentId;
     object.traverse((child) => {
       child.userData.componentId = descriptor.componentId;
-      if (child.material) {
-        child.userData.baseOpacity = child.material.opacity;
-        child.userData.baseTransparent = child.material.transparent;
-        child.userData.baseDepthWrite = child.material.depthWrite;
-      }
       if (child.isMesh) {
         child.castShadow = descriptor.layer === 'body';
         child.receiveShadow = true;
       }
     });
+    captureMaterialState(object);
     this.group.add(object);
     this.descriptors.set(descriptor.componentId, descriptor);
     this.renderObjects.set(descriptor.componentId, object);
@@ -465,6 +554,7 @@ export class BoardRenderer {
   }
 
   replaceSideData(sideData, rotationY = 0) {
+    this.cancelInspectionAnimation();
     this.disposeGroup(this.group);
     this.assignSideData(sideData);
     this.meshes = new Map();
@@ -473,9 +563,12 @@ export class BoardRenderer {
     this.shieldObjects = new Map();
     this.moduleObjects = new Map();
     this.labelSprites = new Map();
+    this.contextObjects = [];
     this.activeModuleId = null;
     this.activeFocusRegion = null;
     this.selectionHalo = null;
+    this.inspectionComponentId = null;
+    this.inspectionSnapshot = null;
     this.group = new THREE.Group();
     this.group.rotation.set(TOP_VIEW_TILT, rotationY, 0);
     this.scene.add(this.group);
@@ -526,26 +619,38 @@ export class BoardRenderer {
     const canvas = this.renderer.domElement;
     canvas.addEventListener('pointerdown', (event) => {
       this.cancelCameraAnimation();
-      this.drag = { x: event.clientX, y: event.clientY, rx: this.group.rotation.x, rz: this.group.rotation.z };
+      const inspected = this.inspectionComponentId ? this.renderObjects.get(this.inspectionComponentId) : null;
+      this.drag = inspected
+        ? { mode: 'component', x: event.clientX, y: event.clientY, rx: inspected.rotation.x, ry: inspected.rotation.y }
+        : { mode: 'board', x: event.clientX, y: event.clientY, rx: this.group.rotation.x, rz: this.group.rotation.z };
       canvas.setPointerCapture(event.pointerId);
     });
     canvas.addEventListener('pointermove', (event) => {
       if (!this.drag) return;
-      this.group.rotation.z = this.drag.rz + (event.clientX - this.drag.x) * 0.006;
-      this.group.rotation.x = Math.max(-0.58, Math.min(0.08, this.drag.rx + (event.clientY - this.drag.y) * 0.004));
-      this.inspectionAngle = Math.abs(this.group.rotation.x) > 0.08;
+      if (this.drag.mode === 'component') {
+        const inspected = this.renderObjects.get(this.inspectionComponentId);
+        if (!inspected) return;
+        inspected.rotation.y = this.drag.ry + (event.clientX - this.drag.x) * 0.012;
+        inspected.rotation.x = Math.max(-1.15, Math.min(0.75, this.drag.rx + (event.clientY - this.drag.y) * 0.009));
+      } else {
+        this.group.rotation.z = this.drag.rz + (event.clientX - this.drag.x) * 0.006;
+        this.group.rotation.x = Math.max(-0.58, Math.min(0.08, this.drag.rx + (event.clientY - this.drag.y) * 0.004));
+        this.inspectionAngle = Math.abs(this.group.rotation.x) > 0.08;
+      }
       this.render();
     });
     canvas.addEventListener('pointerup', (event) => {
+      const dragMode = this.drag?.mode;
       const moved = this.drag && Math.hypot(event.clientX - this.drag.x, event.clientY - this.drag.y) > 5;
       this.drag = null;
-      if (!moved) this.pick(event);
+      if (!moved && dragMode !== 'component') this.pick(event);
     });
     canvas.addEventListener('pointercancel', () => { this.drag = null; });
     canvas.addEventListener('wheel', (event) => {
       event.preventDefault();
       this.cancelCameraAnimation();
-      this.camera.zoom = Math.max(0.72, Math.min(4.2, this.camera.zoom * (event.deltaY > 0 ? 0.9 : 1.1)));
+      const zoomBounds = this.inspectionComponentId ? [1.8, 6] : [0.72, 4.2];
+      this.camera.zoom = Math.max(zoomBounds[0], Math.min(zoomBounds[1], this.camera.zoom * (event.deltaY > 0 ? 0.9 : 1.1)));
       this.camera.updateProjectionMatrix();
       this.updateLabelVisibility(false);
       this.render();
@@ -575,6 +680,7 @@ export class BoardRenderer {
   }
 
   select(componentId) {
+    if (this.inspectionComponentId && this.inspectionComponentId !== componentId) void this.clearComponentInspection(false);
     this.clearSelectionStyle();
     this.selectedComponentId = componentId;
     const object = this.meshes.get(componentId);
@@ -638,6 +744,159 @@ export class BoardRenderer {
       const selected = componentId === this.selectedComponentId;
       this.setObjectEmphasis(object, inFocus || selected ? 1 : 0.52);
     });
+  }
+
+  cancelInspectionAnimation() {
+    if (this.inspectionAnimation !== null) cancelAnimationFrame(this.inspectionAnimation);
+    this.inspectionAnimation = null;
+  }
+
+  setInspectionContextOpacity(activeComponentId) {
+    this.contextObjects.forEach((object) => this.setObjectEmphasis(object, activeComponentId ? 0.16 : 1));
+    this.renderObjects.forEach((object, componentId) => {
+      this.setObjectEmphasis(object, inspectionOpacity(activeComponentId, componentId));
+      object.visible = true;
+    });
+    this.shieldObjects.forEach((object) => { object.visible = false; });
+    this.moduleObjects.forEach((object) => { object.visible = false; });
+    this.labelSprites.forEach((sprite) => { sprite.visible = false; });
+    if (this.selectionHalo) this.selectionHalo.visible = !activeComponentId;
+  }
+
+  setInspectionSelectionStyle(object, active) {
+    object.traverse((child) => {
+      if (!child.isMesh || !child.material?.emissive) return;
+      child.material.emissive.setHex(active ? 0x000000 : COLORS.selected);
+      child.material.emissiveIntensity = active ? 0 : 0.2;
+    });
+  }
+
+  restoreInspectionContext() {
+    this.contextObjects.forEach((object) => this.setObjectEmphasis(object, 1));
+    this.applyRepairEmphasis(this.activeFocusRegion);
+    this.setShieldMode(this.inspectionSnapshot?.shieldMode || this.shieldMode, false);
+    this.setModuleFocus(this.inspectionSnapshot?.moduleId || this.activeModuleId);
+    if (this.selectionHalo) this.selectionHalo.visible = true;
+    this.updateLabelVisibility(false);
+  }
+
+  animateInspectionObject(object, target, duration = 460) {
+    this.cancelInspectionAnimation();
+    const started = performance.now();
+    const from = {
+      scale: object.scale.x,
+      z: object.position.z,
+      rx: object.rotation.x,
+      ry: object.rotation.y,
+      cameraX: this.camera.position.x,
+      cameraY: this.camera.position.y,
+      zoom: this.camera.zoom,
+    };
+    return new Promise((resolve) => {
+      const tick = (now) => {
+        const progress = Math.min(1, (now - started) / duration);
+        const eased = 1 - (1 - progress) ** 3;
+        const scale = from.scale + (target.scale - from.scale) * eased;
+        object.scale.setScalar(scale);
+        object.position.z = from.z + (target.z - from.z) * eased;
+        object.rotation.x = from.rx + (target.rx - from.rx) * eased;
+        object.rotation.y = from.ry + (target.ry - from.ry) * eased;
+        const cameraX = from.cameraX + (target.cameraX - from.cameraX) * eased;
+        const cameraY = from.cameraY + (target.cameraY - from.cameraY) * eased;
+        this.camera.position.set(cameraX, cameraY, 4);
+        this.camera.lookAt(cameraX, cameraY, 0);
+        this.camera.zoom = from.zoom + (target.zoom - from.zoom) * eased;
+        this.camera.updateProjectionMatrix();
+        this.render();
+        if (progress < 1) this.inspectionAnimation = requestAnimationFrame(tick);
+        else {
+          this.inspectionAnimation = null;
+          resolve();
+        }
+      };
+      this.inspectionAnimation = requestAnimationFrame(tick);
+    });
+  }
+
+  async setComponentInspection(componentId, animate = true) {
+    const object = this.renderObjects.get(componentId);
+    const descriptor = this.descriptors.get(componentId);
+    if (!object || !descriptor?.inspectionProfile || this.inspectionComponentId === componentId) return false;
+    if (this.inspectionComponentId) await this.clearComponentInspection(false);
+    this.cancelCameraAnimation();
+    const narrow = this.container.clientWidth < 620;
+    const transform = buildInspectionTransform(descriptor.dimensions, narrow);
+    this.inspectionComponentId = componentId;
+    this.inspectionSnapshot = {
+      positionZ: object.position.z,
+      rotation: object.rotation.clone(),
+      scale: object.scale.x,
+      camera: { x: this.camera.position.x, y: this.camera.position.y, zoom: this.camera.zoom },
+      shieldMode: this.shieldMode,
+      moduleId: this.activeModuleId,
+    };
+    this.setInspectionContextOpacity(componentId);
+    this.setInspectionSelectionStyle(object, true);
+    object.traverse((child) => { child.renderOrder = 12; });
+    const target = {
+      scale: transform.scale,
+      z: this.inspectionSnapshot.positionZ + transform.lift,
+      rx: -0.42,
+      ry: 0.18,
+      cameraX: descriptor.center.x,
+      cameraY: descriptor.center.y,
+      zoom: transform.zoom,
+    };
+    if (animate) await this.animateInspectionObject(object, target);
+    else {
+      object.scale.setScalar(target.scale);
+      object.position.z = target.z;
+      object.rotation.set(target.rx, target.ry, 0);
+      this.camera.position.set(target.cameraX, target.cameraY, 4);
+      this.camera.lookAt(target.cameraX, target.cameraY, 0);
+      this.camera.zoom = target.zoom;
+      this.camera.updateProjectionMatrix();
+      this.render();
+    }
+    return true;
+  }
+
+  async clearComponentInspection(animate = true) {
+    if (!this.inspectionComponentId || !this.inspectionSnapshot) return false;
+    const object = this.renderObjects.get(this.inspectionComponentId);
+    const snapshot = this.inspectionSnapshot;
+    if (object) {
+      const target = {
+        scale: snapshot.scale,
+        z: snapshot.positionZ,
+        rx: snapshot.rotation.x,
+        ry: snapshot.rotation.y,
+        cameraX: snapshot.camera.x,
+        cameraY: snapshot.camera.y,
+        zoom: snapshot.camera.zoom,
+      };
+      if (animate) await this.animateInspectionObject(object, target);
+      else {
+        object.scale.setScalar(target.scale);
+        object.position.z = target.z;
+        object.rotation.copy(snapshot.rotation);
+        this.camera.position.set(target.cameraX, target.cameraY, 4);
+        this.camera.lookAt(target.cameraX, target.cameraY, 0);
+        this.camera.zoom = target.zoom;
+        this.camera.updateProjectionMatrix();
+      }
+      object.traverse((child) => { child.renderOrder = 0; });
+      this.setInspectionSelectionStyle(object, false);
+    }
+    this.restoreInspectionContext();
+    this.inspectionComponentId = null;
+    this.inspectionSnapshot = null;
+    this.render();
+    return true;
+  }
+
+  isComponentInspectionActive() {
+    return Boolean(this.inspectionComponentId);
   }
 
   cancelCameraAnimation() {
@@ -720,6 +979,7 @@ export class BoardRenderer {
   }
 
   setInspectionAngle(enabled) {
+    if (this.inspectionComponentId) return;
     this.inspectionAngle = enabled;
     this.group.rotation.x = enabled ? -0.46 : TOP_VIEW_TILT;
     this.render();
@@ -727,6 +987,7 @@ export class BoardRenderer {
 
   reset() {
     this.cancelCameraAnimation();
+    if (this.inspectionComponentId) void this.clearComponentInspection(false);
     this.group.rotation.set(TOP_VIEW_TILT, 0, 0);
     this.inspectionAngle = false;
     this.clearRepairFocus(true);
@@ -743,7 +1004,13 @@ export class BoardRenderer {
     this.camera.bottom = frame.bottom;
     this.camera.near = frame.near;
     this.camera.far = frame.far;
-    if (this.activeFocusRegion) {
+    if (this.inspectionComponentId) {
+      const descriptor = this.descriptors.get(this.inspectionComponentId);
+      const transform = descriptor ? buildInspectionTransform(descriptor.dimensions, width < 620) : null;
+      this.camera.position.set(descriptor?.center.x || 0, descriptor?.center.y || 0, frame.position.z);
+      this.camera.lookAt(descriptor?.center.x || 0, descriptor?.center.y || 0, 0);
+      this.camera.zoom = transform?.zoom || 2.55;
+    } else if (this.activeFocusRegion) {
       const focusFrame = buildFocusFrame(this.activeFocusRegion, width / height);
       this.camera.position.set(focusFrame.center.x, focusFrame.center.y, frame.position.z);
       this.camera.lookAt(focusFrame.center.x, focusFrame.center.y, 0);

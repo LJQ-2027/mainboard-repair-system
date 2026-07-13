@@ -5,6 +5,11 @@ import { PointMapViewport } from './point-map-viewport.js';
 import { mergeCompiledSchematicLinks } from './source-links.js';
 import { extractModuleRegions, extractShieldRegions } from './anatomy-state.js';
 import { buildEntityTarget, buildModuleTarget, nextSideId } from './repair-focus-state.js';
+import {
+  canInspectComponent,
+  enterComponentInspection,
+  exitComponentInspection,
+} from './component-inspection-state.js';
 
 const DATA_URL = '../../knowledge-base/km4-cross-source-registration.json';
 const GEOMETRY_URL = '../../knowledge-base/km4-board-compiled.json';
@@ -28,6 +33,69 @@ let sideDataById = new Map();
 let sideIds = [];
 let activeSideId = 'main_page_2';
 let sideTransitionLocked = false;
+let componentInspection = exitComponentInspection();
+let inspectionTransitionLocked = false;
+
+const FAULT_LABELS = {
+  no_power: '无法开机',
+  leakage_current: '漏电',
+  pmu_failure: '电源管理异常',
+  'No power': '无法开机',
+  'Leakage current': '漏电',
+};
+
+function updateInspectionUi() {
+  const entity = data?.entities.find((candidate) => candidate.component_id === selectedId);
+  const active = componentInspection.mode === 'isolated';
+  const available = canInspectComponent(entity)
+    && entity.side_id === activeSideId
+    && activeView === 'model'
+    && !sideTransitionLocked;
+  const button = document.querySelector('#inspectComponent');
+  button.disabled = inspectionTransitionLocked || (!active && !available);
+  button.textContent = active ? '返回主板' : '单体查看';
+  button.setAttribute('aria-pressed', String(active));
+  button.title = available || active ? '' : '当前单体样板仅支持 U2001 第2面';
+  document.querySelector('#inspectionStatus').hidden = !active;
+  document.querySelector('#inspectionDesignator').textContent = entity?.designator || '—';
+  document.querySelector('#modelView').classList.toggle('inspection-active', active);
+  document.querySelector('#toggleInspection').disabled = active;
+  document.querySelector('#moduleFocus').disabled = active;
+  document.querySelectorAll('[data-shield-mode]').forEach((control) => {
+    const sideHasShields = Boolean(sideDataById.get(activeSideId)?.anatomy.shields.length);
+    control.disabled = active || !sideHasShields;
+  });
+  if (active) document.querySelector('#sourceNote').textContent = `${entity.designator} 单体检视 · ${sideDataById.get(activeSideId)?.label}注册坐标 · 维修视觉封装`;
+}
+
+async function leaveComponentInspection(animate = true) {
+  if (componentInspection.mode !== 'isolated' || inspectionTransitionLocked) return false;
+  inspectionTransitionLocked = true;
+  updateInspectionUi();
+  await renderer.clearComponentInspection(animate);
+  componentInspection = exitComponentInspection(componentInspection);
+  inspectionTransitionLocked = false;
+  updateSideControls();
+  updateInspectionUi();
+  return true;
+}
+
+async function toggleComponentInspection() {
+  if (inspectionTransitionLocked) return;
+  if (componentInspection.mode === 'isolated') {
+    await leaveComponentInspection();
+    return;
+  }
+  const entity = data?.entities.find((candidate) => candidate.component_id === selectedId);
+  const next = enterComponentInspection(entity, activeSideId);
+  if (next.mode !== 'isolated') return;
+  inspectionTransitionLocked = true;
+  updateInspectionUi();
+  const entered = await renderer.setComponentInspection(next.componentId);
+  componentInspection = entered ? next : exitComponentInspection();
+  inspectionTransitionLocked = false;
+  updateInspectionUi();
+}
 
 function populateModuleMenu(modules) {
   const moduleMenu = document.querySelector('#moduleFocus');
@@ -78,6 +146,7 @@ function applyRepairTarget(animate = true) {
 
 async function switchModelSide(sideId, animate = true) {
   if (sideTransitionLocked || sideId === activeSideId || !sideDataById.has(sideId)) return activeSideId;
+  if (componentInspection.mode === 'isolated') await leaveComponentInspection(false);
   sideTransitionLocked = true;
   updateSideControls();
   await renderer.setSideData(sideDataById.get(sideId), animate);
@@ -93,6 +162,7 @@ async function switchModelSide(sideId, animate = true) {
   }
   sideTransitionLocked = false;
   updateSideControls();
+  updateInspectionUi();
   return activeSideId;
 }
 
@@ -133,9 +203,28 @@ function evidenceCard(link, type) {
   return `<article class="evidence-card">${details}${previews}<small>${link.source} · ${link.page}</small></article>`;
 }
 
-function selectEntity(componentId) {
+function renderComponentGuidance(entity) {
+  const section = document.querySelector('#componentGuidance');
+  section.hidden = !canInspectComponent(entity);
+  const faultList = document.querySelector('#commonFaults');
+  faultList.replaceChildren();
+  const faults = [...new Set(entity.repair_links.flatMap((link) => link.faults || []))];
+  faults.forEach((fault) => {
+    const item = document.createElement('span');
+    item.textContent = FAULT_LABELS[fault] || fault;
+    faultList.append(item);
+  });
+  document.querySelector('#inspectionMethod').textContent = entity.repair_links
+    .map((link) => link.instruction)
+    .filter(Boolean)
+    .join(' ');
+  document.querySelector('#modelBoundary').textContent = entity.inspection_profile?.visual_note || '';
+}
+
+async function selectEntity(componentId) {
   const entity = data.entities.find((item) => item.component_id === componentId);
   if (!entity) return;
+  if (componentInspection.mode === 'isolated') await leaveComponentInspection(false);
   selectedId = componentId;
   const state = buildSelectionState(entity, matrix);
   document.querySelectorAll('[data-component-id]').forEach((node) => node.classList.toggle('selected', node.dataset.componentId === componentId));
@@ -147,6 +236,7 @@ function selectEntity(componentId) {
   document.querySelector('#entityVisibility').textContent = entity.proxy_visibility === 'concealed_by_shield' ? '屏蔽罩下' : '代理图可见区域';
   document.querySelector('#schematicEvidence').innerHTML = entity.schematic_links.map((link) => evidenceCard(link, 'schematic')).join('');
   document.querySelector('#repairEvidence').innerHTML = entity.repair_links.map((link) => evidenceCard(link, 'repair')).join('');
+  renderComponentGuidance(entity);
   renderer.select(componentId);
   moduleFocusMode = 'auto';
   document.querySelector('#moduleFocus').value = 'auto';
@@ -155,9 +245,11 @@ function selectEntity(componentId) {
   updateSideControls();
   activateRepairTarget();
   if (activeView === 'pointmap' && pointMapViewport) pointMapViewport.focus(state.boardPoint);
+  updateInspectionUi();
 }
 
 function setView(name) {
+  if (name !== 'model' && componentInspection.mode === 'isolated') void leaveComponentInspection(false);
   activeView = name;
   document.querySelectorAll('[role=tab]').forEach((button) => button.setAttribute('aria-selected', String(button.dataset.view === name)));
   Object.entries(views).forEach(([key, view]) => view.classList.toggle('active', key === name));
@@ -175,6 +267,7 @@ function setView(name) {
   }
   if (name === 'pointmap') requestAnimationFrame(() => pointMapViewport?.reset());
   updateSideControls();
+  updateInspectionUi();
 }
 
 async function init() {
@@ -273,10 +366,13 @@ async function init() {
 }
 
 document.querySelectorAll('[role=tab]').forEach((button) => button.addEventListener('click', () => setView(button.dataset.view)));
-document.querySelector('#resetModel').addEventListener('click', () => {
+document.querySelector('#resetModel').addEventListener('click', async () => {
+  if (componentInspection.mode === 'isolated') await leaveComponentInspection(false);
   renderer?.reset();
   document.querySelector('#toggleInspection').setAttribute('aria-pressed', 'false');
+  updateInspectionUi();
 });
+document.querySelector('#inspectComponent').addEventListener('click', () => { void toggleComponentInspection(); });
 document.querySelector('#toggleInspection').addEventListener('click', (event) => {
   const enabled = event.currentTarget.getAttribute('aria-pressed') !== 'true';
   event.currentTarget.setAttribute('aria-pressed', String(enabled));

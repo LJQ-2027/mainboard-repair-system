@@ -86,3 +86,10 @@ test('selection radius stays restrained at both package-size extremes', () => {
   assert.equal(buildSelectionRadius({ x: 0.26, y: 0.22 }), 0.09);
   assert.equal(buildSelectionRadius({ x: 0.01, y: 0.008 }), 0.022);
 });
+
+test('reviewed inspection profile survives compilation into the render descriptor', () => {
+  const source = component('bga_ic', 'reviewed', { x: 0.096, y: 0.135 });
+  source.inspection_profile = { profile_id: 'u2001-pmic-v1', fidelity: 'repair_visual' };
+  const descriptor = buildRenderDescriptor(source, { reviewed: true });
+  assert.deepEqual(descriptor.inspectionProfile, source.inspection_profile);
+});

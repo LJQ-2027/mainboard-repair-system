@@ -35,7 +35,13 @@
       "geometry": {"center": {"x": 0.545, "y": 0.642}, "size": {"x": 0.096, "y": 0.135}, "rotation": 0},
       "schematic_links": [{"source": "F151_MAIN_PCB_1_维修原理图_V1.2_20250310.pdf", "page": "power-management sheets", "facts": ["Designator U2001"]}],
       "repair_links": [{"source": "TECNO-L6735-KM4-F151手机维修通用操作指导书V1.0_20250331.pdf", "page": "7-11", "faults": ["No power", "Leakage current"], "instruction": "Follow the power-on and PMU checks; confirm supply conditions before component action."}],
-      "visual_profile": {"shape": "square", "height": 0.055, "engineering_dimension": false}
+      "visual_profile": {"shape": "square", "height": 0.055, "engineering_dimension": false},
+      "inspection_profile": {
+        "profile_id": "u2001-pmic-v1",
+        "fidelity": "repair_visual",
+        "source_status": "category_based",
+        "visual_note": "外观、层高和封装细节为维修识别示意，不代表实测尺寸、焊球数量或工程封装。"
+      }
     },
     {
       "component_id": "KM4-MAIN-U4000", "designator": "U4000", "name": "eMMC", "category": "bga_ic", "module": "Storage", "proxy_visibility": "concealed_by_shield",

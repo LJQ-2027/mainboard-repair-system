@@ -55,6 +55,15 @@ The debug geometry view has been replaced by a layered repair model. Its reset s
 - Selecting a reviewed entity always makes it the current repair target. If its recommended side differs from the visible side, the model automatically flips there; the compact side control remains available for manual inspection.
 - When a selected entity is not represented on the visible side, its evidence panel remains visible and explicitly states the side containing the target instead of drawing a false locator.
 
+## U2001 Component Inspection Sample
+
+- U2001 is the first explicit `inspection_profile` vertical slice. The capability is data-enabled rather than inferred from a designator, so unfinished components do not expose a misleading control.
+- `单体查看` keeps the component at its registered board coordinate, raises and enlarges it, and turns the board and unrelated packages into a low-opacity context layer.
+- Pointer drag rotates U2001 around its own center; wheel input uses inspection-specific zoom bounds. The board remains still during component manipulation.
+- Return, full reset, entity change, side change, and view change all restore the original package transform, camera, opacity, shield state, module state, selected identity, and evidence context.
+- The refined procedural PMIC/BGA profile uses a layered dark package, muted substrate, metal edge, restrained bevel, and pin-one cue. It explicitly does not claim measured dimensions, exact ball count, or engineering CAD fidelity.
+- The evidence panel separates source-backed common faults and detection guidance from a visible model-fidelity boundary. No missing voltage, resistance, pin, or replacement values are invented.
+
 ## Evidence Boundary
 
 The available proxy photograph shows the board installed with shields. It supports board-context registration but does not expose most chip bodies. Markers for concealed entities therefore indicate the registered position below the shield, not visual component detection. Standardized physical front/back photographs are still required to validate field-photo registration and exposed-component correspondence.
@@ -103,3 +112,10 @@ Dual-side verification on 2026-07-13:
 - Headed Chromium passed at `1600x900` and `390x844`: distinct nonblank side frames, automatic U2001 return to 第2面, manual flip in both directions, transition control locking, target preservation, side-specific module menus, 第2面 shield/X-ray mode, 第1面 module focus, drag, wheel zoom, full-board reset, keyboard-visible focus, no panel overlap, no horizontal overflow, and zero console/page errors.
 - A regression path verifies that selecting U2001 still takes ownership of the repair target and flips to 第2面 after a manual 第1面 module selection.
 - Dual-side screenshots are kept under ignored local `output/playwright/km4-sides-*.png`.
+
+U2001 inspection verification on 2026-07-13:
+
+- 46 Node tests and 37 Python tests passed; JSON and JavaScript syntax checks passed, and the standalone validator passed for seven entities and four anchors.
+- Headed Chromium passed at `1600x900` and `390x844`: U2001 capability gating, enter/return animation, board ghosting, independent component drag, wheel zoom, source-backed fault/method copy, model-boundary copy, shield/module lockout, reset exit, entity-change exit, side-change exit, view-change exit, keyboard-visible focus, nonblank WebGL frames, no horizontal overflow, and zero console/page errors.
+- U4000 remains correctly disabled for single-component inspection until it receives its own explicit profile.
+- Inspection screenshots are kept under ignored local `output/playwright/u2001-inspection-*.png`.
