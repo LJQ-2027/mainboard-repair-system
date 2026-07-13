@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Board Visual Inspection</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="app-header">
+    <div>
+      <p class="eyebrow">Visual QC Lab</p>
+      <h1>Board visual inspection</h1>
+    </div>
+    <div class="header-status">
+      <span class="scope-badge">Internal reference demo</span>
+      <span id="libraryStatus" class="library-status">Loading references</span>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <aside class="sample-panel" aria-labelledby="sampleHeading">
+      <div class="panel-heading">
+        <h2 id="sampleHeading">Reference samples</h2>
+        <span id="sampleCount">0 / 7</span>
+      </div>
+      <div id="sampleList" class="sample-list" aria-live="polite"></div>
+    </aside>
+
+    <section class="inspection-panel" aria-labelledby="inspectionHeading">
+      <div class="inspection-toolbar">
+        <div>
+          <h2 id="inspectionHeading">Inspection image</h2>
+          <p id="imageMeta">No image selected</p>
+        </div>
+        <div class="toolbar-actions">
+          <label class="file-button" for="imageInput">Choose image</label>
+          <input id="imageInput" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+          <button id="clearButton" class="icon-button" type="button" title="Clear image" aria-label="Clear image" disabled>&times;</button>
+        </div>
+      </div>
+
+      <div id="dropZone" class="drop-zone" tabindex="0" role="button" aria-label="Choose or drop a board image">
+        <div id="emptyState" class="empty-state">
+          <span class="upload-mark" aria-hidden="true">+</span>
+          <strong>Drop a board image here</strong>
+          <span>JPEG, PNG or WebP</span>
+        </div>
+        <div id="loadingState" class="loading-state" hidden>
+          <span class="spinner" aria-hidden="true"></span>
+          <strong>Analyzing image</strong>
+        </div>
+        <canvas id="previewCanvas" aria-label="Selected board image preview" hidden></canvas>
+      </div>
+
+      <div id="captureNotice" class="capture-notice" hidden></div>
+    </section>
+
+    <aside class="results-panel" aria-labelledby="resultsHeading">
+      <div class="panel-heading">
+        <h2 id="resultsHeading">Inspection result</h2>
+        <span id="qualityBadge" class="quality-badge neutral">Waiting</span>
+      </div>
+
+      <section id="qualitySection" class="quality-section" hidden>
+        <div class="score-row">
+          <div>
+            <span>Capture quality</span>
+            <strong id="qualityScore">0</strong>
+          </div>
+          <div class="score-track" aria-hidden="true"><span id="scoreFill"></span></div>
+        </div>
+        <dl class="metrics-grid">
+          <div><dt>Resolution</dt><dd id="metricResolution">-</dd></div>
+          <div><dt>Brightness</dt><dd id="metricBrightness">-</dd></div>
+          <div><dt>Contrast</dt><dd id="metricContrast">-</dd></div>
+          <div><dt>Sharpness</dt><dd id="metricSharpness">-</dd></div>
+        </dl>
+        <ul id="guidanceList" class="guidance-list"></ul>
+      </section>
+
+      <section id="matchesSection" class="matches-section" hidden>
+        <div class="section-label">
+          <h3>Closest model references</h3>
+          <span>Top 3</span>
+        </div>
+        <div id="matchList" class="match-list"></div>
+      </section>
+
+      <div id="resultEmpty" class="result-empty">
+        <strong>Ready for an image</strong>
+        <p>Choose a reviewed sample or add a local photo.</p>
+      </div>
+
+      <p class="boundary-note">Similarity is measured against 21 reviewed Service Manual images. It is not a production model, fault diagnosis, or calibrated recognition probability.</p>
+    </aside>
+  </main>
+
+  <template id="sampleTemplate">
+    <button class="sample-item" type="button">
+      <img alt="">
+      <span><strong></strong><small></small></span>
+    </button>
+  </template>
+
+  <template id="matchTemplate">
+    <article class="match-item">
+      <div class="rank"></div>
+      <img alt="">
+      <div class="match-copy">
+        <div><strong></strong><span class="similarity"></span></div>
+        <p class="match-role"></p>
+        <code></code>
+      </div>
+    </article>
+  </template>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

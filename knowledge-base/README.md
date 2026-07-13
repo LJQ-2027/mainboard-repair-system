@@ -10,6 +10,8 @@
 - `service-manual-library-2026-07-10.json`：大型 Service Manual 资料库的逐文件清单、SHA-256、重复映射、机型标签和可解析性检查。
 - `vision-reference-gallery.json`：从优先机型 Service Manual 中提取的主板视觉候选页、嵌入图片、板号关联和人工复核结果。
 - `vision-reference-review.json`：视觉参考图的人工选片、用途分类、参考强度和标准正反面照片缺口。
+- `assets/vision-reference-gallery/`：七个重合机型、21 张已复核 Service Manual 参考图的本地浏览图库。
+- `assets/vision-recognition-demo/`：基于上述参考图运行的浏览器端图像质量检查与七机型相似度检索 Demo。
 - `training-materials.json`：培训资料条目。
 - `module-principles.json`：手机模块原理、关键链路和后续可转化为诊断说明的基础知识。
 - `platform-repair-manuals.json`：制造中心提供的平台级主板维修通用手册摘要。
