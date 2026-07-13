@@ -31,7 +31,7 @@ def render_pdf_pages(pdf_path: Path, output_dir: Path, output_stem: str) -> list
         find_pdftoppm(),
         "-png",
         "-r",
-        "180",
+        "720",
         str(pdf_path),
         str(output_dir / output_stem),
     ]

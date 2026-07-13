@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>KM4/F151 跨资料主板工作台</title>
   <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./point-map.css">
 </head>
 <body>
   <header class="topbar">
@@ -19,11 +20,16 @@
           <button role="tab" aria-selected="false" data-view="pointmap">点位图</button>
           <button role="tab" aria-selected="false" data-view="model">2.5D 模型</button>
         </div>
+        <div class="view-tools" id="pointMapTools" hidden>
+          <button class="icon-button" id="zoomOutPointMap" title="缩小点位图" aria-label="缩小点位图">−</button>
+          <button class="icon-button" id="zoomInPointMap" title="放大点位图" aria-label="放大点位图">+</button>
+          <button class="icon-button" id="resetPointMap" title="重置点位图" aria-label="重置点位图">↻</button>
+        </div>
         <button class="icon-button" id="resetModel" title="重置模型视角" aria-label="重置模型视角">↻</button>
       </div>
       <div class="stage">
         <div class="view active" id="photoView"><div class="image-layer"><img alt="KM4装机主板代理图"><div class="markers"></div></div></div>
-        <div class="view" id="pointmapView"><div class="image-layer point-map"><img alt="KM4 F151主板点位图"><div class="markers"></div></div></div>
+        <div class="view point-map-view" id="pointmapView"><div class="image-layer point-map"><img alt="KM4 F151主板点位图"><div class="markers"></div></div></div>
         <div class="view model-view" id="modelView"><div id="modelCanvas"></div><p class="model-hint">拖动旋转 · 滚轮缩放 · 点击器件</p></div>
       </div>
       <div class="source-note" id="sourceNote"></div>

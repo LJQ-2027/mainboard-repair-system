@@ -1,6 +1,7 @@
 import { solveHomography } from './registration-core.js';
 import { buildSelectionState } from './selection-state.js';
 import { BoardRenderer } from './board-renderer.js';
+import { PointMapViewport } from './point-map-viewport.js';
 
 const DATA_URL = '../../knowledge-base/km4-cross-source-registration.json';
 const GEOMETRY_URL = '../../knowledge-base/km4-board-compiled.json';
@@ -10,6 +11,8 @@ let matrix;
 let renderer;
 let geometryData;
 let selectedId;
+let pointMapViewport;
+let activeView = 'photo';
 
 function addMarkers(layer, positions, entities) {
   const fragment = document.createDocumentFragment();
@@ -50,12 +53,17 @@ function selectEntity(componentId) {
   document.querySelector('#schematicEvidence').innerHTML = entity.schematic_links.map((link) => evidenceCard(link, 'schematic')).join('');
   document.querySelector('#repairEvidence').innerHTML = entity.repair_links.map((link) => evidenceCard(link, 'repair')).join('');
   renderer.select(componentId);
+  if (activeView === 'pointmap' && pointMapViewport) pointMapViewport.focus(state.boardPoint);
 }
 
 function setView(name) {
+  activeView = name;
   document.querySelectorAll('[role=tab]').forEach((button) => button.setAttribute('aria-selected', String(button.dataset.view === name)));
   Object.entries(views).forEach(([key, view]) => view.classList.toggle('active', key === name));
+  document.querySelector('#pointMapTools').hidden = name !== 'pointmap';
+  document.querySelector('#resetModel').hidden = name !== 'model';
   if (name === 'model') renderer.resize();
+  if (name === 'pointmap') requestAnimationFrame(() => pointMapViewport?.reset());
 }
 
 async function init() {
@@ -85,6 +93,8 @@ async function init() {
   const pointMapImage = document.querySelector('#pointmapView img');
   photoImage.src = `../../${data.registration.proxy_image}`;
   pointMapImage.src = `../../${data.registration.point_map_image}`;
+  pointMapViewport = new PointMapViewport(document.querySelector('#pointmapView'), document.querySelector('#pointmapView .point-map'));
+  pointMapImage.addEventListener('load', () => pointMapViewport.reset(), { once: true });
   const boardPositions = new Map(data.entities.map((entity) => [entity.component_id, entity.geometry.center]));
   const photoPositions = new Map(data.entities.map((entity) => [entity.component_id, buildSelectionState(entity, matrix).photoPoint]));
   addMarkers(document.querySelector('#photoView .markers'), photoPositions, data.entities);
@@ -115,6 +125,10 @@ async function init() {
 
 document.querySelectorAll('[role=tab]').forEach((button) => button.addEventListener('click', () => setView(button.dataset.view)));
 document.querySelector('#resetModel').addEventListener('click', () => renderer?.reset());
+document.querySelector('#zoomOutPointMap').addEventListener('click', () => pointMapViewport?.zoomBy(0.8));
+document.querySelector('#zoomInPointMap').addEventListener('click', () => pointMapViewport?.zoomBy(1.25));
+document.querySelector('#resetPointMap').addEventListener('click', () => pointMapViewport?.reset());
+document.querySelector('#resetModel').hidden = true;
 init().catch((error) => {
   document.querySelector('.stage').innerHTML = `<p class="load-error">无法载入跨资料数据：${error.message}</p>`;
   console.error(error);
