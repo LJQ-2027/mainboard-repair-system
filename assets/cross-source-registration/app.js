@@ -67,8 +67,15 @@ function setView(name) {
   document.querySelectorAll('[role=tab]').forEach((button) => button.setAttribute('aria-selected', String(button.dataset.view === name)));
   Object.entries(views).forEach(([key, view]) => view.classList.toggle('active', key === name));
   document.querySelector('#pointMapTools').hidden = name !== 'pointmap';
-  document.querySelector('#resetModel').hidden = name !== 'model';
-  if (name === 'model') renderer.resize();
+  document.querySelector('#modelTools').hidden = name !== 'model';
+  if (name === 'model') {
+    renderer.setInspectionAngle(true);
+    document.querySelector('#toggleInspection').setAttribute('aria-pressed', 'false');
+    requestAnimationFrame(() => {
+      renderer.reset();
+      renderer.resize();
+    });
+  }
   if (name === 'pointmap') requestAnimationFrame(() => pointMapViewport?.reset());
 }
 
@@ -108,16 +115,14 @@ async function init() {
   addMarkers(document.querySelector('#photoView .markers'), photoPositions, data.entities);
   addMarkers(document.querySelector('#pointmapView .markers'), boardPositions, data.entities);
 
-  const linkedDesignators = new Set(data.entities.map((entity) => entity.designator));
-  const compiledGeometry = geometryData.components
-    .filter((component) => component.footprint && component.footprint.confidence !== 'low' && !linkedDesignators.has(component.designator))
-    .map((component) => ({
-      geometry_id: component.component_id,
-      category: component.category,
-      center: component.footprint.center,
-      size: component.footprint.size,
-    }));
-  renderer = new BoardRenderer(document.querySelector('#modelCanvas'), data.entities, geometryData.board_outline, compiledGeometry, selectEntity);
+  renderer = new BoardRenderer(
+    document.querySelector('#modelCanvas'),
+    data.entities,
+    geometryData.board_outline,
+    geometryData.components,
+    `../../${data.registration.point_map_image}`,
+    selectEntity,
+  );
   document.querySelector('#sourceNote').textContent = `${data.registration.proxy_label} · ${data.registration.proxy_limit}`;
   const list = document.querySelector('#entityList');
   data.entities.forEach((entity) => {
@@ -132,11 +137,19 @@ async function init() {
 }
 
 document.querySelectorAll('[role=tab]').forEach((button) => button.addEventListener('click', () => setView(button.dataset.view)));
-document.querySelector('#resetModel').addEventListener('click', () => renderer?.reset());
+document.querySelector('#resetModel').addEventListener('click', () => {
+  renderer?.reset();
+  document.querySelector('#toggleInspection').setAttribute('aria-pressed', 'false');
+});
+document.querySelector('#toggleInspection').addEventListener('click', (event) => {
+  const enabled = event.currentTarget.getAttribute('aria-pressed') !== 'true';
+  event.currentTarget.setAttribute('aria-pressed', String(enabled));
+  renderer?.setInspectionAngle(enabled);
+});
 document.querySelector('#zoomOutPointMap').addEventListener('click', () => pointMapViewport?.zoomBy(0.8));
 document.querySelector('#zoomInPointMap').addEventListener('click', () => pointMapViewport?.zoomBy(1.25));
 document.querySelector('#resetPointMap').addEventListener('click', () => pointMapViewport?.reset());
-document.querySelector('#resetModel').hidden = true;
+document.querySelector('#modelTools').hidden = true;
 const evidenceDialog = document.querySelector('#evidenceDialog');
 document.querySelector('#schematicEvidence').addEventListener('click', (event) => {
   const trigger = event.target.closest('[data-preview-src]');

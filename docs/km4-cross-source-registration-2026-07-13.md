@@ -13,6 +13,19 @@
 - A deterministic raster extractor now converts the point map's red engineering layer into 112 additional source-driven geometry regions. Large regions render as provisional shield structures and smaller regions provide board-density geometry; unresolved regions do not receive invented designators.
 - Selection is synchronized across view markers, the entity list, and 3D mesh picking.
 
+## Repair-Grade 2.5D V2
+
+The debug geometry view has been replaced by a layered repair model. Its reset state is a fitted orthographic top view, with a second constrained inspection angle for checking board thickness and package elevation.
+
+- The exact 104-point PCB silhouette remains the substrate boundary.
+- The high-resolution point map is UV-mapped and clipped to the board surface, retaining pads, labels, and engineering structure.
+- Only the 180 high-confidence footprint relationships become elevated package bodies.
+- The 630 medium-confidence relationships remain flat reference outlines, and the 10 low-confidence candidates remain excluded from the physical layer.
+- Reusable procedural profiles distinguish ICs, passive chips, inductors, crystals, connectors, test points, metal contacts, LEDs, diodes, and transistors.
+- Package dimensions and heights are capped by conservative visual profiles; they are not represented as measured dimensions.
+- Reviewed entities remain the primary click targets. Selection now uses a compact locator ring and restrained emissive feedback instead of replacing the component with an oversized solid block.
+- The package-profile contract is ready for later Blender-authored GLB assets without changing normalized board data or repair interactions.
+
 ## Current Entities
 
 `U2001`, `U4000`, `X2100`, `U0600`, `J6101`, `VBAT1`, and `VBUS1`.
@@ -37,3 +50,12 @@ The compiler now also derives the PCB silhouette from the rendered engineering-m
 - Three Python tests plus the standalone validator cover assets, anchors, normalized board outline and entity geometry, stable identities, and source links.
 - Desktop `1440x900` and mobile `390x844` browser paths cover all three views, seven markers, synchronized selection, nonblank WebGL pixels, responsive overflow, and runtime errors.
 - Screenshots: `output/playwright/km4-cross-source-photo.png`, `km4-cross-source-pointmap.png`, `km4-cross-source-desktop.png`, and `km4-cross-source-mobile.png`.
+
+V2 verification on 2026-07-13:
+
+- 23 Node tests passed, including five model-profile tests written before the implementation.
+- 33 Python compiler, outline, schematic, gallery, and registration tests passed.
+- The standalone cross-source validator passed for seven entities and four anchors.
+- Headed Chromium passed at `1600x900` and `390x844`: nonblank WebGL canvas, complete board framing, no horizontal overflow, inspection toggle, top-view reset, U4000 selection synchronization, and zero console/page errors.
+- V2 screenshots are kept under ignored local `output/playwright/km4-v2-*-top.png` and `km4-v2-*-inspection.png`.
+- Headless Chromium's first WebGL context can capture an empty initial compositing frame; this did not reproduce in headed Chromium and is retained as a test-runner limitation rather than a product defect.

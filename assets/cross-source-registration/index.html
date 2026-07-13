@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>KM4/F151 跨资料主板工作台</title>
+  <link rel="icon" href="data:,">
   <link rel="stylesheet" href="./styles.css">
   <link rel="stylesheet" href="./point-map.css">
   <link rel="stylesheet" href="./schematic-evidence.css">
@@ -11,7 +12,7 @@
 <body>
   <header class="topbar">
     <div><span class="eyebrow">KNOWN BOARD / SOURCE-LINKED</span><h1>KM4 · F151_MAIN_PCB_V1.2</h1></div>
-    <div class="status"><i></i>代理图配准基线</div>
+    <div class="status"><i></i>维修级 2.5D V2</div>
   </header>
   <main>
     <section class="workspace" aria-label="同步主板视图">
@@ -26,12 +27,22 @@
           <button class="icon-button" id="zoomInPointMap" title="放大点位图" aria-label="放大点位图">+</button>
           <button class="icon-button" id="resetPointMap" title="重置点位图" aria-label="重置点位图">↻</button>
         </div>
-        <button class="icon-button" id="resetModel" title="重置模型视角" aria-label="重置模型视角">↻</button>
+        <div class="view-tools" id="modelTools" hidden>
+          <button class="icon-button" id="toggleInspection" type="button" aria-pressed="false" title="切换检视角度" aria-label="切换检视角度">◩</button>
+          <button class="icon-button" id="resetModel" type="button" title="恢复俯视全板" aria-label="恢复俯视全板">⌖</button>
+        </div>
       </div>
       <div class="stage">
         <div class="view active" id="photoView"><div class="image-layer"><img alt="KM4装机主板代理图"><div class="markers"></div></div></div>
         <div class="view point-map-view" id="pointmapView"><div class="image-layer point-map"><img alt="KM4 F151主板点位图"><div class="markers"></div></div></div>
-        <div class="view model-view" id="modelView"><div id="modelCanvas"></div><p class="model-hint">拖动旋转 · 滚轮缩放 · 点击器件</p></div>
+        <div class="view model-view" id="modelView">
+          <div id="modelCanvas"></div>
+          <div class="model-legend" aria-label="模型几何置信度">
+            <span><i class="legend-body"></i>可信实体</span>
+            <span><i class="legend-outline"></i>参考轮廓</span>
+            <span><i class="legend-selected"></i>当前定位</span>
+          </div>
+        </div>
       </div>
       <div class="source-note" id="sourceNote"></div>
     </section>
