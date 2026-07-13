@@ -6,7 +6,7 @@ Add a source-honest anatomy layer to the accepted repair-grade 2.5D model. A tec
 
 ## Source Boundary
 
-The five shield candidates come from `km4-point-map-geometry.json` and are classified as `shield_region` by the point-map engineering-layer extractor. Their rectangles are useful repair landmarks but remain unresolved engineering geometry, not measured shield-can dimensions.
+The shield candidates come from `km4-point-map-geometry.json` and are classified as `shield_region` by the point-map engineering-layer extractor. Re-running the extractor against the current high-resolution point map yields two large closed regions. Their normalized polygons are useful repair landmarks but remain unresolved engineering geometry, not measured shield-can dimensions.
 
 Module polygons come from `board-atlas-mvp.json` and are restricted to `main_page_2` source overlays. No new module boundary or hidden component relationship is invented in the renderer.
 
@@ -38,4 +38,3 @@ Shield bodies use a restrained stamped-metal treatment with a thin rim and edge 
 - Reviewed designator labels appear only beyond the zoom threshold.
 - Existing rotation, inspection angle, zoom, reset, picking, and evidence synchronization continue working.
 - Desktop and mobile layouts remain stable with no overlap or horizontal overflow.
-

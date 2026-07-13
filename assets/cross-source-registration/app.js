@@ -3,10 +3,13 @@ import { buildSelectionState } from './selection-state.js';
 import { BoardRenderer } from './board-renderer.js';
 import { PointMapViewport } from './point-map-viewport.js';
 import { mergeCompiledSchematicLinks } from './source-links.js';
+import { extractModuleRegions, extractShieldRegions } from './anatomy-state.js';
 
 const DATA_URL = '../../knowledge-base/km4-cross-source-registration.json';
 const GEOMETRY_URL = '../../knowledge-base/km4-board-compiled.json';
 const SCHEMATIC_URL = '../../knowledge-base/km4-schematic-compiled.json';
+const SHIELD_URL = '../../knowledge-base/km4-point-map-geometry.json';
+const ATLAS_URL = '../../knowledge-base/board-atlas-mvp.json';
 const views = { photo: document.querySelector('#photoView'), pointmap: document.querySelector('#pointmapView'), model: document.querySelector('#modelView') };
 let data;
 let matrix;
@@ -15,6 +18,7 @@ let geometryData;
 let selectedId;
 let pointMapViewport;
 let activeView = 'photo';
+let moduleFocusMode = 'auto';
 
 function addMarkers(layer, positions, entities) {
   const fragment = document.createDocumentFragment();
@@ -59,6 +63,7 @@ function selectEntity(componentId) {
   document.querySelector('#schematicEvidence').innerHTML = entity.schematic_links.map((link) => evidenceCard(link, 'schematic')).join('');
   document.querySelector('#repairEvidence').innerHTML = entity.repair_links.map((link) => evidenceCard(link, 'repair')).join('');
   renderer.select(componentId);
+  if (moduleFocusMode === 'auto') renderer.focusModuleForDesignator(entity.designator);
   if (activeView === 'pointmap' && pointMapViewport) pointMapViewport.focus(state.boardPoint);
 }
 
@@ -80,11 +85,24 @@ function setView(name) {
 }
 
 async function init() {
-  const [response, geometryResponse, schematicResponse] = await Promise.all([fetch(DATA_URL), fetch(GEOMETRY_URL), fetch(SCHEMATIC_URL)]);
-  if (!response.ok || !geometryResponse.ok || !schematicResponse.ok) throw new Error(`Dataset failed to load: ${response.status}/${geometryResponse.status}/${schematicResponse.status}`);
+  const [response, geometryResponse, schematicResponse, shieldResponse, atlasResponse] = await Promise.all([
+    fetch(DATA_URL),
+    fetch(GEOMETRY_URL),
+    fetch(SCHEMATIC_URL),
+    fetch(SHIELD_URL),
+    fetch(ATLAS_URL),
+  ]);
+  const responses = [response, geometryResponse, schematicResponse, shieldResponse, atlasResponse];
+  if (responses.some((candidate) => !candidate.ok)) throw new Error(`Dataset failed to load: ${responses.map((candidate) => candidate.status).join('/')}`);
   data = await response.json();
   geometryData = await geometryResponse.json();
   const schematicData = await schematicResponse.json();
+  const shieldData = await shieldResponse.json();
+  const atlasData = await atlasResponse.json();
+  const anatomy = {
+    shields: extractShieldRegions(shieldData),
+    modules: extractModuleRegions(atlasData, 'main_page_2'),
+  };
   const compiledByDesignator = new Map(geometryData.components.map((component) => [component.designator, component]));
   data.entities = data.entities.map((originalEntity) => {
     const entity = mergeCompiledSchematicLinks(originalEntity, schematicData);
@@ -121,8 +139,16 @@ async function init() {
     geometryData.board_outline,
     geometryData.components,
     `../../${data.registration.point_map_image}`,
+    anatomy,
     selectEntity,
   );
+  const moduleMenu = document.querySelector('#moduleFocus');
+  anatomy.modules.forEach((module) => {
+    const option = document.createElement('option');
+    option.value = module.moduleId;
+    option.textContent = module.name;
+    moduleMenu.append(option);
+  });
   document.querySelector('#sourceNote').textContent = `${data.registration.proxy_label} · ${data.registration.proxy_limit}`;
   const list = document.querySelector('#entityList');
   data.entities.forEach((entity) => {
@@ -145,6 +171,19 @@ document.querySelector('#toggleInspection').addEventListener('click', (event) =>
   const enabled = event.currentTarget.getAttribute('aria-pressed') !== 'true';
   event.currentTarget.setAttribute('aria-pressed', String(enabled));
   renderer?.setInspectionAngle(enabled);
+});
+document.querySelectorAll('[data-shield-mode]').forEach((button) => button.addEventListener('click', () => {
+  document.querySelectorAll('[data-shield-mode]').forEach((candidate) => candidate.setAttribute('aria-pressed', String(candidate === button)));
+  renderer?.setShieldMode(button.dataset.shieldMode);
+}));
+document.querySelector('#moduleFocus').addEventListener('change', (event) => {
+  moduleFocusMode = event.currentTarget.value;
+  if (moduleFocusMode === 'auto') {
+    const entity = data?.entities.find((candidate) => candidate.component_id === selectedId);
+    renderer?.focusModuleForDesignator(entity?.designator || '');
+  } else {
+    renderer?.setModuleFocus(moduleFocusMode === 'none' ? null : moduleFocusMode);
+  }
 });
 document.querySelector('#zoomOutPointMap').addEventListener('click', () => pointMapViewport?.zoomBy(0.8));
 document.querySelector('#zoomInPointMap').addEventListener('click', () => pointMapViewport?.zoomBy(1.25));

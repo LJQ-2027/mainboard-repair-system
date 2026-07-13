@@ -4,6 +4,11 @@ import {
   buildCameraFrame,
   buildRenderDescriptor,
 } from './model-profiles.js';
+import {
+  getShieldPresentation,
+  isPointCovered,
+  shouldShowLabels,
+} from './anatomy-state.js';
 
 const COLORS = {
   board: 0x17473e,
@@ -146,16 +151,124 @@ function createMarker(descriptor) {
   return marker;
 }
 
+function normalizedToWorld(point) {
+  return {
+    x: point.x * BOARD_WORLD_SIZE.width - BOARD_WORLD_SIZE.width / 2,
+    y: (1 - point.y) * BOARD_WORLD_SIZE.height - BOARD_WORLD_SIZE.height / 2,
+  };
+}
+
+function createShieldMesh(region) {
+  const center = normalizedToWorld(region.center);
+  const polygon = region.polygon?.length >= 3
+    ? region.polygon.map(([x, y]) => normalizedToWorld({ x, y }))
+    : [
+      { x: center.x - region.size.x * BOARD_WORLD_SIZE.width / 2, y: center.y - region.size.y * BOARD_WORLD_SIZE.height / 2 },
+      { x: center.x + region.size.x * BOARD_WORLD_SIZE.width / 2, y: center.y - region.size.y * BOARD_WORLD_SIZE.height / 2 },
+      { x: center.x + region.size.x * BOARD_WORLD_SIZE.width / 2, y: center.y + region.size.y * BOARD_WORLD_SIZE.height / 2 },
+      { x: center.x - region.size.x * BOARD_WORLD_SIZE.width / 2, y: center.y + region.size.y * BOARD_WORLD_SIZE.height / 2 },
+    ];
+  const localPoints = polygon.map((point) => ({ x: point.x - center.x, y: point.y - center.y }));
+  const makeShape = (scale = 1) => {
+    const shape = new THREE.Shape();
+    localPoints.forEach((point, index) => {
+      const x = point.x * scale;
+      const y = point.y * scale;
+      if (index === 0) shape.moveTo(x, y); else shape.lineTo(x, y);
+    });
+    shape.closePath();
+    return shape;
+  };
+  const group = new THREE.Group();
+  const rimMaterial = material('metal', { color: 0x7f8a85, transparent: true });
+  const lidMaterial = material('metal', { color: 0xc3c9c5, roughness: 0.32, transparent: true });
+  const rim = new THREE.Mesh(
+    new THREE.ExtrudeGeometry(makeShape(), { depth: 0.012, bevelEnabled: true, bevelSize: 0.004, bevelThickness: 0.003, bevelSegments: 1 }),
+    rimMaterial,
+  );
+  const lid = new THREE.Mesh(new THREE.ShapeGeometry(makeShape(0.965)), lidMaterial);
+  lid.position.z = 0.016;
+  group.add(rim, lid);
+  const edgePoints = [...localPoints, localPoints[0]].map((point) => new THREE.Vector3(point.x, point.y, 0.019));
+  const edge = new THREE.Line(
+    new THREE.BufferGeometry().setFromPoints(edgePoints),
+    new THREE.LineBasicMaterial({ color: 0x4a5651, transparent: true, opacity: 0.86 }),
+  );
+  group.add(edge);
+  group.position.set(center.x, center.y, 0.047);
+  group.userData.shieldId = region.shieldId;
+  group.userData.materials = [rimMaterial, lidMaterial, edge.material];
+  return group;
+}
+
+function createModuleMesh(module) {
+  const points = module.polygon.map(([x, y]) => normalizedToWorld({ x, y }));
+  const shape = new THREE.Shape();
+  points.forEach((point, index) => {
+    if (index === 0) shape.moveTo(point.x, point.y); else shape.lineTo(point.x, point.y);
+  });
+  shape.closePath();
+  const fill = new THREE.Mesh(
+    new THREE.ShapeGeometry(shape),
+    new THREE.MeshBasicMaterial({ color: 0x1c8f75, transparent: true, opacity: 0.16, depthTest: false }),
+  );
+  fill.position.z = 0.102;
+  fill.renderOrder = 6;
+  const linePoints = [...points, points[0]].map((point) => new THREE.Vector3(point.x, point.y, 0.104));
+  const line = new THREE.Line(
+    new THREE.BufferGeometry().setFromPoints(linePoints),
+    new THREE.LineBasicMaterial({ color: 0xf5b544, transparent: true, opacity: 0.96, depthTest: false }),
+  );
+  line.renderOrder = 7;
+  const group = new THREE.Group();
+  group.add(fill, line);
+  group.visible = false;
+  group.userData.moduleId = module.moduleId;
+  return group;
+}
+
+function createLabelSprite(text) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 256;
+  canvas.height = 72;
+  const context = canvas.getContext('2d');
+  context.fillStyle = 'rgba(248,249,246,0.94)';
+  context.fillRect(2, 2, 252, 68);
+  context.strokeStyle = '#ef5b3f';
+  context.lineWidth = 4;
+  context.strokeRect(2, 2, 252, 68);
+  context.fillStyle = '#17221e';
+  context.font = '700 34px Segoe UI, Arial';
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  context.fillText(text, 128, 38);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false }));
+  sprite.scale.set(0.13, 0.037, 1);
+  sprite.renderOrder = 9;
+  sprite.visible = false;
+  return sprite;
+}
+
 export class BoardRenderer {
-  constructor(container, entities, boardOutline, compiledComponents, engineeringTextureUrl, onSelect) {
+  constructor(container, entities, boardOutline, compiledComponents, engineeringTextureUrl, anatomy, onSelect) {
     this.container = container;
     this.entities = entities;
     this.boardOutline = boardOutline;
     this.compiledComponents = compiledComponents;
     this.engineeringTextureUrl = engineeringTextureUrl;
+    this.shieldRegions = anatomy.shields;
+    this.modules = anatomy.modules;
     this.onSelect = onSelect;
     this.meshes = new Map();
+    this.renderObjects = new Map();
     this.descriptors = new Map();
+    this.shieldObjects = new Map();
+    this.moduleObjects = new Map();
+    this.labelSprites = new Map();
+    this.shieldMode = 'removed';
+    this.activeModuleId = null;
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0xe7eae5);
     this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 20);
@@ -259,7 +372,35 @@ export class BoardRenderer {
     });
     this.group.add(object);
     this.descriptors.set(descriptor.componentId, descriptor);
+    this.renderObjects.set(descriptor.componentId, object);
     if (descriptor.selectable) this.meshes.set(descriptor.componentId, object);
+  }
+
+  buildShields() {
+    this.shieldRegions.forEach((region) => {
+      const shield = createShieldMesh(region);
+      this.group.add(shield);
+      this.shieldObjects.set(region.shieldId, shield);
+    });
+  }
+
+  buildModules() {
+    this.modules.forEach((module) => {
+      const object = createModuleMesh(module);
+      this.group.add(object);
+      this.moduleObjects.set(module.moduleId, object);
+    });
+  }
+
+  buildLabels() {
+    this.entities.forEach((entity) => {
+      const descriptor = this.descriptors.get(entity.component_id);
+      if (!descriptor) return;
+      const sprite = createLabelSprite(entity.designator);
+      sprite.position.set(descriptor.center.x, descriptor.center.y + descriptor.dimensions.y * 0.72 + 0.025, 0.12);
+      this.group.add(sprite);
+      this.labelSprites.set(entity.component_id, sprite);
+    });
   }
 
   build() {
@@ -274,6 +415,11 @@ export class BoardRenderer {
       .map((entity) => buildRenderDescriptor(entity, { reviewed: true }))
       .filter(Boolean)
       .forEach((descriptor) => this.addDescriptor(descriptor));
+    this.buildModules();
+    this.buildShields();
+    this.buildLabels();
+    this.setShieldMode('removed', false);
+    this.updateLabelVisibility(false);
 
     this.scene.add(new THREE.HemisphereLight(0xffffff, 0x3a5148, 1.7));
     const key = new THREE.DirectionalLight(0xffffff, 2.5);
@@ -309,6 +455,7 @@ export class BoardRenderer {
       event.preventDefault();
       this.camera.zoom = Math.max(0.72, Math.min(4.2, this.camera.zoom * (event.deltaY > 0 ? 0.9 : 1.1)));
       this.camera.updateProjectionMatrix();
+      this.updateLabelVisibility(false);
       this.render();
     }, { passive: false });
   }
@@ -356,6 +503,43 @@ export class BoardRenderer {
     this.render();
   }
 
+  setShieldMode(mode, shouldRender = true) {
+    this.shieldMode = mode;
+    const presentation = getShieldPresentation(mode);
+    this.shieldObjects.forEach((shield) => {
+      shield.visible = presentation.visible;
+      shield.userData.materials.forEach((shieldMaterial) => {
+        shieldMaterial.opacity = presentation.opacity;
+        shieldMaterial.depthWrite = presentation.opacity >= 0.9;
+        shieldMaterial.needsUpdate = true;
+      });
+    });
+    this.renderObjects.forEach((object, componentId) => {
+      const descriptor = this.descriptors.get(componentId);
+      const covered = this.shieldRegions.some((region) => isPointCovered(descriptor.normalizedCenter, region));
+      object.visible = presentation.coveredBodiesVisible || !covered;
+    });
+    if (shouldRender) this.render();
+  }
+
+  setModuleFocus(moduleId) {
+    this.activeModuleId = moduleId || null;
+    this.moduleObjects.forEach((object, id) => { object.visible = id === this.activeModuleId; });
+    this.render();
+  }
+
+  focusModuleForDesignator(designator) {
+    const module = this.modules.find((candidate) => candidate.designators.includes(designator));
+    this.setModuleFocus(module?.moduleId || null);
+    return module?.moduleId || null;
+  }
+
+  updateLabelVisibility(shouldRender = true) {
+    const visible = shouldShowLabels(this.camera.zoom);
+    this.labelSprites.forEach((sprite) => { sprite.visible = visible; });
+    if (shouldRender) this.render();
+  }
+
   setInspectionAngle(enabled) {
     this.inspectionAngle = enabled;
     this.group.rotation.x = enabled ? -0.46 : TOP_VIEW_TILT;
@@ -368,6 +552,7 @@ export class BoardRenderer {
     this.camera.position.set(0, 0, 4);
     this.camera.lookAt(0, 0, 0);
     this.camera.updateProjectionMatrix();
+    this.updateLabelVisibility(false);
     this.inspectionAngle = false;
     this.render();
   }

@@ -10,7 +10,7 @@
 - A reviewed four-anchor homography projects board coordinates onto the Service Manual installed-mainboard proxy image.
 - Seven source-supported entities share stable identities across the proxy image, point map, schematic evidence, repair guidance, and Three.js 2.5D view.
 - The 2.5D substrate uses an outline derived from the point map. Component footprints use normalized point-map geometry; visual heights are generic and explicitly not engineering dimensions.
-- A deterministic raster extractor now converts the point map's red engineering layer into 112 additional source-driven geometry regions. Large regions render as provisional shield structures and smaller regions provide board-density geometry; unresolved regions do not receive invented designators.
+- A deterministic raster extractor now converts the current high-resolution point map's red engineering layer into 323 additional source-driven geometry regions. Two large closed regions provide provisional shield polygons; unresolved regions do not receive invented designators.
 - Selection is synchronized across view markers, the entity list, and 3D mesh picking.
 
 ## Repair-Grade 2.5D V2
@@ -26,6 +26,13 @@ The debug geometry view has been replaced by a layered repair model. Its reset s
 - Reviewed entities remain the primary click targets. Selection now uses a compact locator ring and restrained emissive feedback instead of replacing the component with an oversized solid block.
 - The package-profile contract is ready for later Blender-authored GLB assets without changing normalized board data or repair interactions.
 
+## Shield Anatomy Layer
+
+- Installed, X-ray, and Removed modes show shield context, translucent covered geometry, or the exposed repair surface without changing component identities.
+- Shield candidates use normalized convex polygons extracted from the current high-resolution engineering layer instead of coarse bounding boxes. They remain source-derived landmarks rather than measured mechanical dimensions.
+- Source-backed functional-module polygons can follow the selected reviewed entity or be chosen directly from a compact menu.
+- Reviewed designator labels appear only after the orthographic view reaches the repair zoom threshold.
+
 ## Current Entities
 
 `U2001`, `U4000`, `X2100`, `U0600`, `J6101`, `VBAT1`, and `VBUS1`.
@@ -34,7 +41,7 @@ The debug geometry view has been replaced by a layered repair model. Its reset s
 
 The available proxy photograph shows the board installed with shields. It supports board-context registration but does not expose most chip bodies. Markers for concealed entities therefore indicate the registered position below the shield, not visual component detection. Standardized physical front/back photographs are still required to validate field-photo registration and exposed-component correspondence.
 
-The first raster pass produced 112 anonymous regions because the normal page-text APIs did not expose designators. That pass is retained as historical fallback evidence but is no longer the primary geometry source.
+The first raster pass produced 112 anonymous regions because the normal page-text APIs did not expose designators. The current high-resolution rerun produces 323 anonymous regions, while the PDF compiler remains the primary component-identity and footprint source.
 
 ## Board Compiler Update
 
@@ -59,3 +66,9 @@ V2 verification on 2026-07-13:
 - Headed Chromium passed at `1600x900` and `390x844`: nonblank WebGL canvas, complete board framing, no horizontal overflow, inspection toggle, top-view reset, U4000 selection synchronization, and zero console/page errors.
 - V2 screenshots are kept under ignored local `output/playwright/km4-v2-*-top.png` and `km4-v2-*-inspection.png`.
 - Headless Chromium's first WebGL context can capture an empty initial compositing frame; this did not reproduce in headed Chromium and is retained as a test-runner limitation rather than a product defect.
+
+Shield anatomy verification on 2026-07-13:
+
+- 29 Node tests and 33 Python tests passed; the standalone validator passed for seven entities and four anchors.
+- Headed Chromium passed at `1600x900` and `390x844`: Installed/X-ray/Removed state changes, U2001 selection under anatomy controls, seven module-menu options, zoom-level labels, drag rotation, reset, visible keyboard focus, no horizontal overflow, and zero console/page errors.
+- Anatomy screenshots are kept under ignored local `output/playwright/km4-anatomy-*.png`.

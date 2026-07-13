@@ -9,74 +9,194 @@
       "geometry_id": "PM2-GEO-001",
       "category": "shield_region",
       "center": {
-        "x": 0.818182,
-        "y": 0.420838
+        "x": 0.761163,
+        "y": 0.724834
       },
       "size": {
-        "x": 0.276623,
-        "y": 0.435138
+        "x": 0.159117,
+        "y": 0.126214
       },
-      "source_pixels": 14144,
+      "source_pixels": 14064,
       "source": "point_map_red_engineering_layer",
-      "semantic_status": "unresolved_geometry"
+      "semantic_status": "unresolved_geometry",
+      "polygon": [
+        [
+          0.681604,
+          0.687276
+        ],
+        [
+          0.682091,
+          0.661727
+        ],
+        [
+          0.689073,
+          0.661727
+        ],
+        [
+          0.791362,
+          0.661983
+        ],
+        [
+          0.832116,
+          0.662238
+        ],
+        [
+          0.840396,
+          0.673224
+        ],
+        [
+          0.840559,
+          0.695708
+        ],
+        [
+          0.840559,
+          0.772867
+        ],
+        [
+          0.840234,
+          0.783853
+        ],
+        [
+          0.813444,
+          0.787685
+        ],
+        [
+          0.715701,
+          0.787685
+        ],
+        [
+          0.688261,
+          0.756004
+        ],
+        [
+          0.682903,
+          0.744762
+        ],
+        [
+          0.681929,
+          0.719469
+        ],
+        [
+          0.681604,
+          0.698263
+        ]
+      ]
     },
     {
       "geometry_id": "PM2-GEO-002",
       "category": "shield_region",
       "center": {
-        "x": 0.336688,
-        "y": 0.724719
+        "x": 0.220166,
+        "y": 0.15023
       },
       "size": {
-        "x": 0.42013,
-        "y": 0.423902
+        "x": 0.134113,
+        "y": 0.11395
       },
-      "source_pixels": 9145,
+      "source_pixels": 11570,
       "source": "point_map_red_engineering_layer",
-      "semantic_status": "unresolved_geometry"
+      "semantic_status": "unresolved_geometry",
+      "polygon": [
+        [
+          0.153109,
+          0.166326
+        ],
+        [
+          0.157331,
+          0.144865
+        ],
+        [
+          0.178438,
+          0.114205
+        ],
+        [
+          0.1937,
+          0.095299
+        ],
+        [
+          0.216269,
+          0.093255
+        ],
+        [
+          0.251015,
+          0.093255
+        ],
+        [
+          0.271797,
+          0.095299
+        ],
+        [
+          0.28706,
+          0.140777
+        ],
+        [
+          0.28706,
+          0.184466
+        ],
+        [
+          0.285923,
+          0.205416
+        ],
+        [
+          0.237376,
+          0.206949
+        ],
+        [
+          0.178438,
+          0.206949
+        ],
+        [
+          0.164962,
+          0.204905
+        ],
+        [
+          0.153109,
+          0.201584
+        ]
+      ]
     },
     {
       "geometry_id": "PM2-GEO-003",
-      "category": "shield_region",
+      "category": "source_geometry",
       "center": {
-        "x": 0.544805,
-        "y": 0.542901
+        "x": 0.178438,
+        "y": 0.900358
       },
       "size": {
-        "x": 0.219481,
-        "y": 0.405516
+        "x": 0.090599,
+        "y": 0.091978
       },
-      "source_pixels": 8337,
+      "source_pixels": 5640,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
     {
       "geometry_id": "PM2-GEO-004",
-      "category": "shield_region",
+      "category": "source_geometry",
       "center": {
-        "x": 0.760714,
-        "y": 0.734934
+        "x": 0.928722,
+        "y": 0.41326
       },
       "size": {
-        "x": 0.16039,
-        "y": 0.14811
+        "x": 0.045462,
+        "y": 0.105519
       },
-      "source_pixels": 3885,
+      "source_pixels": 4444,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
     {
       "geometry_id": "PM2-GEO-005",
-      "category": "shield_region",
+      "category": "source_geometry",
       "center": {
-        "x": 0.220455,
-        "y": 0.130746
+        "x": 0.078422,
+        "y": 0.847982
       },
       "size": {
-        "x": 0.134416,
-        "y": 0.153218
+        "x": 0.055528,
+        "y": 0.05161
       },
-      "source_pixels": 2560,
+      "source_pixels": 4068,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -84,14 +204,14 @@
       "geometry_id": "PM2-GEO-006",
       "category": "source_geometry",
       "center": {
-        "x": 0.901948,
-        "y": 0.676711
+        "x": 0.050008,
+        "y": 0.590317
       },
       "size": {
-        "x": 0.097403,
-        "y": 0.137896
+        "x": 0.037344,
+        "y": 0.004343
       },
-      "source_pixels": 1733,
+      "source_pixels": 3856,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -99,14 +219,14 @@
       "geometry_id": "PM2-GEO-007",
       "category": "source_geometry",
       "center": {
-        "x": 0.178571,
-        "y": 0.905516
+        "x": 0.800779,
+        "y": 0.242846
       },
       "size": {
-        "x": 0.090909,
-        "y": 0.103166
+        "x": 0.04124,
+        "y": 0.079458
       },
-      "source_pixels": 1317,
+      "source_pixels": 3779,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -114,14 +234,14 @@
       "geometry_id": "PM2-GEO-008",
       "category": "source_geometry",
       "center": {
-        "x": 0.091234,
-        "y": 0.86619
+        "x": 0.800617,
+        "y": 0.299438
       },
       "size": {
-        "x": 0.081169,
-        "y": 0.089888
+        "x": 0.044488,
+        "y": 0.07256
       },
-      "source_pixels": 949,
+      "source_pixels": 3570,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -129,14 +249,14 @@
       "geometry_id": "PM2-GEO-009",
       "category": "source_geometry",
       "center": {
-        "x": 0.928896,
-        "y": 0.413687
+        "x": 0.281214,
+        "y": 0.574987
       },
       "size": {
-        "x": 0.046104,
-        "y": 0.106231
+        "x": 0.023056,
+        "y": 0.036025
       },
-      "source_pixels": 938,
+      "source_pixels": 3473,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -144,14 +264,14 @@
       "geometry_id": "PM2-GEO-010",
       "category": "source_geometry",
       "center": {
-        "x": 0.398701,
-        "y": 0.3381
+        "x": 0.281214,
+        "y": 0.83048
       },
       "size": {
-        "x": 0.035065,
-        "y": 0.130746
+        "x": 0.023056,
+        "y": 0.036025
       },
-      "source_pixels": 879,
+      "source_pixels": 3473,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -159,14 +279,14 @@
       "geometry_id": "PM2-GEO-011",
       "category": "source_geometry",
       "center": {
-        "x": 0.66039,
-        "y": 0.807457
+        "x": 0.262786,
+        "y": 0.806464
       },
       "size": {
-        "x": 0.063636,
-        "y": 0.094995
+        "x": 0.022244,
+        "y": 0.036025
       },
-      "source_pixels": 834,
+      "source_pixels": 3409,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -174,14 +294,14 @@
       "geometry_id": "PM2-GEO-012",
       "category": "source_geometry",
       "center": {
-        "x": 0.668506,
-        "y": 0.906027
+        "x": 0.865644,
+        "y": 0.443025
       },
       "size": {
-        "x": 0.191558,
-        "y": 0.061287
+        "x": 0.051794,
+        "y": 0.075626
       },
-      "source_pixels": 706,
+      "source_pixels": 3379,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -189,14 +309,14 @@
       "geometry_id": "PM2-GEO-013",
       "category": "source_geometry",
       "center": {
-        "x": 0.340584,
-        "y": 0.356486
+        "x": 0.790956,
+        "y": 0.36906
       },
       "size": {
-        "x": 0.03961,
-        "y": 0.21859
+        "x": 0.041078,
+        "y": 0.05953
       },
-      "source_pixels": 628,
+      "source_pixels": 3030,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -204,14 +324,14 @@
       "geometry_id": "PM2-GEO-014",
       "category": "source_geometry",
       "center": {
-        "x": 0.406494,
-        "y": 0.240041
+        "x": 0.832522,
+        "y": 0.600153
       },
       "size": {
-        "x": 0.048052,
-        "y": 0.06333
+        "x": 0.047573,
+        "y": 0.053654
       },
-      "source_pixels": 542,
+      "source_pixels": 2683,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -219,14 +339,14 @@
       "geometry_id": "PM2-GEO-015",
       "category": "source_geometry",
       "center": {
-        "x": 0.827273,
-        "y": 0.122063
+        "x": 0.396899,
+        "y": 0.37072
       },
       "size": {
-        "x": 0.035065,
-        "y": 0.080695
+        "x": 0.031012,
+        "y": 0.064384
       },
-      "source_pixels": 537,
+      "source_pixels": 2604,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -234,14 +354,14 @@
       "geometry_id": "PM2-GEO-016",
       "category": "source_geometry",
       "center": {
-        "x": 0.880195,
-        "y": 0.1476
+        "x": 0.352979,
+        "y": 0.181272
       },
       "size": {
-        "x": 0.046104,
-        "y": 0.052094
+        "x": 0.0302,
+        "y": 0.038579
       },
-      "source_pixels": 492,
+      "source_pixels": 2487,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -249,14 +369,14 @@
       "geometry_id": "PM2-GEO-017",
       "category": "source_geometry",
       "center": {
-        "x": 0.472078,
-        "y": 0.572523
+        "x": 0.154733,
+        "y": 0.938937
       },
       "size": {
-        "x": 0.048052,
-        "y": 0.086823
+        "x": 0.043838,
+        "y": 0.037302
       },
-      "source_pixels": 453,
+      "source_pixels": 2469,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -264,14 +384,14 @@
       "geometry_id": "PM2-GEO-018",
       "category": "source_geometry",
       "center": {
-        "x": 0.859416,
-        "y": 0.834014
+        "x": 0.396899,
+        "y": 0.305187
       },
       "size": {
-        "x": 0.069481,
-        "y": 0.07048
+        "x": 0.031012,
+        "y": 0.064129
       },
-      "source_pixels": 447,
+      "source_pixels": 2437,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -279,14 +399,14 @@
       "geometry_id": "PM2-GEO-019",
       "category": "source_geometry",
       "center": {
-        "x": 0.875649,
-        "y": 0.25383
+        "x": 0.639633,
+        "y": 0.361267
       },
       "size": {
-        "x": 0.035714,
-        "y": 0.078652
+        "x": 0.02744,
+        "y": 0.044456
       },
-      "source_pixels": 433,
+      "source_pixels": 2432,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -294,14 +414,14 @@
       "geometry_id": "PM2-GEO-020",
       "category": "source_geometry",
       "center": {
-        "x": 0.825649,
-        "y": 0.918795
+        "x": 0.262949,
+        "y": 0.598748
       },
       "size": {
-        "x": 0.086364,
-        "y": 0.060266
+        "x": 0.021919,
+        "y": 0.035514
       },
-      "source_pixels": 416,
+      "source_pixels": 2364,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -309,14 +429,14 @@
       "geometry_id": "PM2-GEO-021",
       "category": "source_geometry",
       "center": {
-        "x": 0.921753,
-        "y": 0.782431
+        "x": 0.108216,
+        "y": 0.892437
       },
       "size": {
-        "x": 0.042208,
-        "y": 0.034729
+        "x": 0.039779,
+        "y": 0.038324
       },
-      "source_pixels": 409,
+      "source_pixels": 2300,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -324,14 +444,14 @@
       "geometry_id": "PM2-GEO-022",
       "category": "source_geometry",
       "center": {
-        "x": 0.087338,
-        "y": 0.743105
+        "x": 0.226741,
+        "y": 0.073199
       },
       "size": {
-        "x": 0.038312,
-        "y": 0.127681
+        "x": 0.030037,
+        "y": 0.038579
       },
-      "source_pixels": 383,
+      "source_pixels": 2211,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -339,14 +459,14 @@
       "geometry_id": "PM2-GEO-023",
       "category": "source_geometry",
       "center": {
-        "x": 0.266883,
-        "y": 0.910112
+        "x": 0.113005,
+        "y": 0.938937
       },
       "size": {
-        "x": 0.068831,
-        "y": 0.073544
+        "x": 0.0302,
+        "y": 0.037302
       },
-      "source_pixels": 372,
+      "source_pixels": 2206,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -354,14 +474,14 @@
       "geometry_id": "PM2-GEO-024",
       "category": "source_geometry",
       "center": {
-        "x": 0.116234,
-        "y": 0.173136
+        "x": 0.378065,
+        "y": 0.857946
       },
       "size": {
-        "x": 0.022078,
-        "y": 0.066394
+        "x": 0.018347,
+        "y": 0.00511
       },
-      "source_pixels": 367,
+      "source_pixels": 2196,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -369,14 +489,14 @@
       "geometry_id": "PM2-GEO-025",
       "category": "source_geometry",
       "center": {
-        "x": 0.853896,
-        "y": 0.09857
+        "x": 0.7912,
+        "y": 0.847854
       },
       "size": {
-        "x": 0.084416,
-        "y": 0.039837
+        "x": 0.030849,
+        "y": 0.039601
       },
-      "source_pixels": 359,
+      "source_pixels": 2169,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -384,14 +504,14 @@
       "geometry_id": "PM2-GEO-026",
       "category": "source_geometry",
       "center": {
-        "x": 0.339286,
-        "y": 0.143514
+        "x": 0.271473,
+        "y": 0.818472
       },
       "size": {
-        "x": 0.042208,
-        "y": 0.033708
+        "x": 0.013314,
+        "y": 0.025294
       },
-      "source_pixels": 354,
+      "source_pixels": 2142,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -399,14 +519,14 @@
       "geometry_id": "PM2-GEO-027",
       "category": "source_geometry",
       "center": {
-        "x": 0.722078,
-        "y": 0.843718
+        "x": 0.088326,
+        "y": 0.117144
       },
       "size": {
-        "x": 0.055844,
-        "y": 0.022472
+        "x": 0.037019,
+        "y": 0.052887
       },
-      "source_pixels": 345,
+      "source_pixels": 2116,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -414,14 +534,14 @@
       "geometry_id": "PM2-GEO-028",
       "category": "source_geometry",
       "center": {
-        "x": 0.639935,
-        "y": 0.361593
+        "x": 0.414678,
+        "y": 0.228155
       },
       "size": {
-        "x": 0.027922,
-        "y": 0.044944
+        "x": 0.0302,
+        "y": 0.038324
       },
-      "source_pixels": 344,
+      "source_pixels": 2097,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -429,14 +549,14 @@
       "geometry_id": "PM2-GEO-029",
       "category": "source_geometry",
       "center": {
-        "x": 0.63474,
-        "y": 0.722165
+        "x": 0.643367,
+        "y": 0.426162
       },
       "size": {
-        "x": 0.035714,
-        "y": 0.046987
+        "x": 0.021919,
+        "y": 0.076648
       },
-      "source_pixels": 319,
+      "source_pixels": 2087,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -444,14 +564,14 @@
       "geometry_id": "PM2-GEO-030",
       "category": "source_geometry",
       "center": {
-        "x": 0.921429,
-        "y": 0.841164
+        "x": 0.534502,
+        "y": 0.388861
       },
       "size": {
-        "x": 0.050649,
-        "y": 0.078652
+        "x": 0.044488,
+        "y": 0.041901
       },
-      "source_pixels": 306,
+      "source_pixels": 2067,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -459,14 +579,14 @@
       "geometry_id": "PM2-GEO-031",
       "category": "source_geometry",
       "center": {
-        "x": 0.05,
-        "y": 0.581205
+        "x": 0.882043,
+        "y": 0.822688
       },
       "size": {
-        "x": 0.049351,
-        "y": 0.07763
+        "x": 0.024517,
+        "y": 0.048033
       },
-      "source_pixels": 300,
+      "source_pixels": 2066,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -474,14 +594,14 @@
       "geometry_id": "PM2-GEO-032",
       "category": "source_geometry",
       "center": {
-        "x": 0.352273,
-        "y": 0.181307
+        "x": 0.142556,
+        "y": 0.086101
       },
       "size": {
-        "x": 0.031818,
-        "y": 0.039837
+        "x": 0.036694,
+        "y": 0.052121
       },
-      "source_pixels": 280,
+      "source_pixels": 2047,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -489,14 +609,14 @@
       "geometry_id": "PM2-GEO-033",
       "category": "source_geometry",
       "center": {
-        "x": 0.114935,
-        "y": 0.938202
+        "x": 0.832522,
+        "y": 0.231349
       },
       "size": {
-        "x": 0.033766,
-        "y": 0.037794
+        "x": 0.018997,
+        "y": 0.050843
       },
-      "source_pixels": 280,
+      "source_pixels": 2022,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -504,14 +624,14 @@
       "geometry_id": "PM2-GEO-034",
       "category": "source_geometry",
       "center": {
-        "x": 0.281169,
-        "y": 0.829928
+        "x": 0.883991,
+        "y": 0.14742
       },
       "size": {
-        "x": 0.023377,
-        "y": 0.035751
+        "x": 0.03848,
+        "y": 0.050077
       },
-      "source_pixels": 264,
+      "source_pixels": 2019,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -519,14 +639,14 @@
       "geometry_id": "PM2-GEO-035",
       "category": "source_geometry",
       "center": {
-        "x": 0.590909,
-        "y": 0.809499
+        "x": 0.824647,
+        "y": 0.102069
       },
       "size": {
-        "x": 0.031169,
-        "y": 0.009193
+        "x": 0.0302,
+        "y": 0.037046
       },
-      "source_pixels": 260,
+      "source_pixels": 1962,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -534,14 +654,14 @@
       "geometry_id": "PM2-GEO-036",
       "category": "source_geometry",
       "center": {
-        "x": 0.599026,
-        "y": 0.376915
+        "x": 0.694999,
+        "y": 0.778871
       },
       "size": {
-        "x": 0.043506,
-        "y": 0.057201
+        "x": 0.028089,
+        "y": 0.061063
       },
-      "source_pixels": 258,
+      "source_pixels": 1943,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -549,14 +669,14 @@
       "geometry_id": "PM2-GEO-037",
       "category": "source_geometry",
       "center": {
-        "x": 0.316234,
-        "y": 0.095506
+        "x": 0.116009,
+        "y": 0.173224
       },
       "size": {
-        "x": 0.033766,
-        "y": 0.037794
+        "x": 0.02127,
+        "y": 0.066428
       },
-      "source_pixels": 256,
+      "source_pixels": 1924,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -564,14 +684,14 @@
       "geometry_id": "PM2-GEO-038",
       "category": "source_geometry",
       "center": {
-        "x": 0.400649,
-        "y": 0.469867
+        "x": 0.875467,
+        "y": 0.253577
       },
       "size": {
-        "x": 0.032468,
-        "y": 0.030644
+        "x": 0.035395,
+        "y": 0.077414
       },
-      "source_pixels": 249,
+      "source_pixels": 1890,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -579,14 +699,14 @@
       "geometry_id": "PM2-GEO-039",
       "category": "source_geometry",
       "center": {
-        "x": 0.791558,
-        "y": 0.847293
+        "x": 0.33926,
+        "y": 0.143459
       },
       "size": {
-        "x": 0.031169,
-        "y": 0.039837
+        "x": 0.041728,
+        "y": 0.032448
       },
-      "source_pixels": 243,
+      "source_pixels": 1871,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -594,14 +714,14 @@
       "geometry_id": "PM2-GEO-040",
       "category": "source_geometry",
       "center": {
-        "x": 0.281169,
-        "y": 0.574566
+        "x": 0.591005,
+        "y": 0.809913
       },
       "size": {
-        "x": 0.023377,
-        "y": 0.035751
+        "x": 0.031174,
+        "y": 0.009709
       },
-      "source_pixels": 234,
+      "source_pixels": 1831,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -609,14 +729,14 @@
       "geometry_id": "PM2-GEO-041",
       "category": "source_geometry",
       "center": {
-        "x": 0.262987,
-        "y": 0.805924
+        "x": 0.314174,
+        "y": 0.09581
       },
       "size": {
-        "x": 0.022078,
-        "y": 0.036772
+        "x": 0.0302,
+        "y": 0.038324
       },
-      "source_pixels": 229,
+      "source_pixels": 1829,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -624,14 +744,14 @@
       "geometry_id": "PM2-GEO-042",
       "category": "source_geometry",
       "center": {
-        "x": 0.05,
-        "y": 0.589377
+        "x": 0.048628,
+        "y": 0.571921
       },
       "size": {
-        "x": 0.037662,
-        "y": 0.004086
+        "x": 0.018022,
+        "y": 0.004343
       },
-      "source_pixels": 228,
+      "source_pixels": 1827,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -639,14 +759,14 @@
       "geometry_id": "PM2-GEO-043",
       "category": "source_geometry",
       "center": {
-        "x": 0.595455,
-        "y": 0.276813
+        "x": 0.701818,
+        "y": 0.606285
       },
       "size": {
-        "x": 0.055844,
-        "y": 0.061287
+        "x": 0.033934,
+        "y": 0.061829
       },
-      "source_pixels": 224,
+      "source_pixels": 1811,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -654,14 +774,14 @@
       "geometry_id": "PM2-GEO-044",
       "category": "source_geometry",
       "center": {
-        "x": 0.954545,
-        "y": 0.786517
+        "x": 0.921741,
+        "y": 0.782448
       },
       "size": {
-        "x": 0.022078,
-        "y": 0.042901
+        "x": 0.04189,
+        "y": 0.033981
       },
-      "source_pixels": 210,
+      "source_pixels": 1798,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -669,14 +789,14 @@
       "geometry_id": "PM2-GEO-045",
       "category": "source_geometry",
       "center": {
-        "x": 0.361688,
-        "y": 0.096527
+        "x": 0.648238,
+        "y": 0.816811
       },
       "size": {
-        "x": 0.033766,
-        "y": 0.035751
+        "x": 0.038805,
+        "y": 0.074604
       },
-      "source_pixels": 207,
+      "source_pixels": 1788,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -684,14 +804,14 @@
       "geometry_id": "PM2-GEO-046",
       "category": "source_geometry",
       "center": {
-        "x": 0.409416,
-        "y": 0.553626
+        "x": 0.808492,
+        "y": 0.798799
       },
       "size": {
-        "x": 0.027922,
-        "y": 0.028601
+        "x": 0.056016,
+        "y": 0.021206
       },
-      "source_pixels": 207,
+      "source_pixels": 1662,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -699,14 +819,14 @@
       "geometry_id": "PM2-GEO-047",
       "category": "source_geometry",
       "center": {
-        "x": 0.875,
-        "y": 0.776813
+        "x": 0.722033,
+        "y": 0.843894
       },
       "size": {
-        "x": 0.029221,
-        "y": 0.02145
+        "x": 0.055853,
+        "y": 0.021461
       },
-      "source_pixels": 204,
+      "source_pixels": 1660,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -714,14 +834,14 @@
       "geometry_id": "PM2-GEO-048",
       "category": "source_geometry",
       "center": {
-        "x": 0.591883,
-        "y": 0.786006
+        "x": 0.860692,
+        "y": 0.585973
       },
       "size": {
-        "x": 0.043506,
-        "y": 0.035751
+        "x": 0.034096,
+        "y": 0.040623
       },
-      "source_pixels": 200,
+      "source_pixels": 1633,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -729,14 +849,14 @@
       "geometry_id": "PM2-GEO-049",
       "category": "source_geometry",
       "center": {
-        "x": 0.591883,
-        "y": 0.834014
+        "x": 0.036045,
+        "y": 0.268396
       },
       "size": {
-        "x": 0.043506,
-        "y": 0.035751
+        "x": 0.02403,
+        "y": 0.047266
       },
-      "source_pixels": 200,
+      "source_pixels": 1577,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -744,14 +864,14 @@
       "geometry_id": "PM2-GEO-050",
       "category": "source_geometry",
       "center": {
-        "x": 0.687013,
-        "y": 0.27477
+        "x": 0.35988,
+        "y": 0.096576
       },
       "size": {
-        "x": 0.055844,
-        "y": 0.065373
+        "x": 0.030037,
+        "y": 0.036791
       },
-      "source_pixels": 189,
+      "source_pixels": 1567,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -759,14 +879,14 @@
       "geometry_id": "PM2-GEO-051",
       "category": "source_geometry",
       "center": {
-        "x": 0.630844,
-        "y": 0.806946
+        "x": 0.896249,
+        "y": 0.307614
       },
       "size": {
-        "x": 0.033117,
-        "y": 0.032686
+        "x": 0.034421,
+        "y": 0.045478
       },
-      "source_pixels": 187,
+      "source_pixels": 1379,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -774,14 +894,14 @@
       "geometry_id": "PM2-GEO-052",
       "category": "source_geometry",
       "center": {
-        "x": 0.036364,
-        "y": 0.268131
+        "x": 0.472155,
+        "y": 0.594021
       },
       "size": {
-        "x": 0.023377,
-        "y": 0.048008
+        "x": 0.04741,
+        "y": 0.042923
       },
-      "source_pixels": 179,
+      "source_pixels": 1342,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -789,14 +909,14 @@
       "geometry_id": "PM2-GEO-053",
       "category": "source_geometry",
       "center": {
-        "x": 0.409416,
-        "y": 0.596016
+        "x": 0.588813,
+        "y": 0.764691
       },
       "size": {
-        "x": 0.027922,
-        "y": 0.027579
+        "x": 0.02679,
+        "y": 0.004088
       },
-      "source_pixels": 170,
+      "source_pixels": 1341,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -804,14 +924,14 @@
       "geometry_id": "PM2-GEO-054",
       "category": "source_geometry",
       "center": {
-        "x": 0.935714,
-        "y": 0.241062
+        "x": 0.634356,
+        "y": 0.721768
       },
       "size": {
-        "x": 0.014286,
-        "y": 0.044944
+        "x": 0.035395,
+        "y": 0.047522
       },
-      "source_pixels": 166,
+      "source_pixels": 1304,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -819,14 +939,14 @@
       "geometry_id": "PM2-GEO-055",
       "category": "source_geometry",
       "center": {
-        "x": 0.861688,
-        "y": 0.809499
+        "x": 0.139714,
+        "y": 0.83048
       },
       "size": {
-        "x": 0.014286,
-        "y": 0.033708
+        "x": 0.022893,
+        "y": 0.036025
       },
-      "source_pixels": 166,
+      "source_pixels": 1272,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -834,14 +954,14 @@
       "geometry_id": "PM2-GEO-056",
       "category": "source_geometry",
       "center": {
-        "x": 0.900325,
-        "y": 0.366701
+        "x": 0.158386,
+        "y": 0.806975
       },
       "size": {
-        "x": 0.017532,
-        "y": 0.044944
+        "x": 0.022893,
+        "y": 0.035003
       },
-      "source_pixels": 164,
+      "source_pixels": 1257,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -849,14 +969,14 @@
       "geometry_id": "PM2-GEO-057",
       "category": "source_geometry",
       "center": {
-        "x": 0.07987,
-        "y": 0.652196
+        "x": 0.798425,
+        "y": 0.603475
       },
       "size": {
-        "x": 0.022078,
-        "y": 0.02145
+        "x": 0.020296,
+        "y": 0.040879
       },
-      "source_pixels": 163,
+      "source_pixels": 1203,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -864,14 +984,14 @@
       "geometry_id": "PM2-GEO-058",
       "category": "source_geometry",
       "center": {
-        "x": 0.898052,
-        "y": 0.435649
+        "x": 0.630947,
+        "y": 0.806719
       },
       "size": {
-        "x": 0.01039,
-        "y": 0.048008
+        "x": 0.032798,
+        "y": 0.031937
       },
-      "source_pixels": 156,
+      "source_pixels": 1150,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -879,14 +999,14 @@
       "geometry_id": "PM2-GEO-059",
       "category": "source_geometry",
       "center": {
-        "x": 0.262987,
-        "y": 0.598059
+        "x": 0.302565,
+        "y": 0.759453
       },
       "size": {
-        "x": 0.022078,
-        "y": 0.035751
+        "x": 0.01445,
+        "y": 0.003321
       },
-      "source_pixels": 141,
+      "source_pixels": 1145,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -894,14 +1014,14 @@
       "geometry_id": "PM2-GEO-060",
       "category": "source_geometry",
       "center": {
-        "x": 0.035714,
-        "y": 0.396323
+        "x": 0.345917,
+        "y": 0.7965
       },
       "size": {
-        "x": 0.022078,
-        "y": 0.053115
+        "x": 0.002111,
+        "y": 0.022739
       },
-      "source_pixels": 139,
+      "source_pixels": 1145,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -909,14 +1029,14 @@
       "geometry_id": "PM2-GEO-061",
       "category": "source_geometry",
       "center": {
-        "x": 0.377922,
-        "y": 0.857508
+        "x": 0.415571,
+        "y": 0.840956
       },
       "size": {
-        "x": 0.018182,
-        "y": 0.005107
+        "x": 0.01445,
+        "y": 0.003321
       },
-      "source_pixels": 133,
+      "source_pixels": 1145,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -924,14 +1044,14 @@
       "geometry_id": "PM2-GEO-062",
       "category": "source_geometry",
       "center": {
-        "x": 0.094156,
-        "y": 0.593973
+        "x": 0.486524,
+        "y": 0.468063
       },
       "size": {
-        "x": 0.020779,
-        "y": 0.05618
+        "x": 0.002111,
+        "y": 0.022483
       },
-      "source_pixels": 132,
+      "source_pixels": 1136,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -939,14 +1059,14 @@
       "geometry_id": "PM2-GEO-063",
       "category": "source_geometry",
       "center": {
-        "x": 0.632792,
-        "y": 0.400919
+        "x": 0.309466,
+        "y": 0.602069
       },
       "size": {
-        "x": 0.014935,
-        "y": 0.023493
+        "x": 0.014288,
+        "y": 0.003321
       },
-      "source_pixels": 127,
+      "source_pixels": 1136,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -954,14 +1074,14 @@
       "geometry_id": "PM2-GEO-064",
       "category": "source_geometry",
       "center": {
-        "x": 0.099026,
-        "y": 0.652196
+        "x": 0.402663,
+        "y": 0.702989
       },
       "size": {
-        "x": 0.014935,
-        "y": 0.02145
+        "x": 0.014288,
+        "y": 0.003321
       },
-      "source_pixels": 122,
+      "source_pixels": 1136,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -969,14 +1089,14 @@
       "geometry_id": "PM2-GEO-065",
       "category": "source_geometry",
       "center": {
-        "x": 0.271429,
-        "y": 0.817671
+        "x": 0.415165,
+        "y": 0.750255
       },
       "size": {
-        "x": 0.012987,
-        "y": 0.025536
+        "x": 0.014288,
+        "y": 0.003321
       },
-      "source_pixels": 121,
+      "source_pixels": 1136,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -984,14 +1104,14 @@
       "geometry_id": "PM2-GEO-066",
       "category": "source_geometry",
       "center": {
-        "x": 0.588636,
-        "y": 0.764045
+        "x": 0.31937,
+        "y": 0.759453
       },
       "size": {
-        "x": 0.026623,
-        "y": 0.004086
+        "x": 0.014288,
+        "y": 0.003321
       },
-      "source_pixels": 120,
+      "source_pixels": 1136,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -999,14 +1119,14 @@
       "geometry_id": "PM2-GEO-067",
       "category": "source_geometry",
       "center": {
-        "x": 0.048701,
-        "y": 0.570991
+        "x": 0.398928,
+        "y": 0.840956
       },
       "size": {
-        "x": 0.018182,
-        "y": 0.004086
+        "x": 0.014288,
+        "y": 0.003321
       },
-      "source_pixels": 109,
+      "source_pixels": 1136,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1014,14 +1134,14 @@
       "geometry_id": "PM2-GEO-068",
       "category": "source_geometry",
       "center": {
-        "x": 0.13474,
-        "y": 0.185393
+        "x": 0.432213,
+        "y": 0.840956
       },
       "size": {
-        "x": 0.012338,
-        "y": 0.035751
+        "x": 0.014288,
+        "y": 0.003321
       },
-      "source_pixels": 104,
+      "source_pixels": 1136,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1029,14 +1149,14 @@
       "geometry_id": "PM2-GEO-069",
       "category": "source_geometry",
       "center": {
-        "x": 0.305519,
-        "y": 0.192543
+        "x": 0.82968,
+        "y": 0.298416
       },
       "size": {
-        "x": 0.012338,
-        "y": 0.035751
+        "x": 0.018834,
+        "y": 0.025549
       },
-      "source_pixels": 104,
+      "source_pixels": 1124,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1044,14 +1164,14 @@
       "geometry_id": "PM2-GEO-070",
       "category": "source_geometry",
       "center": {
-        "x": 0.489935,
-        "y": 0.646067
+        "x": 0.852736,
+        "y": 0.082652
       },
       "size": {
-        "x": 0.012338,
-        "y": 0.035751
+        "x": 0.084754,
+        "y": 0.007409
       },
-      "source_pixels": 104,
+      "source_pixels": 1119,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1059,14 +1179,14 @@
       "geometry_id": "PM2-GEO-071",
       "category": "source_geometry",
       "center": {
-        "x": 0.158117,
-        "y": 0.806946
+        "x": 0.736889,
+        "y": 0.798799
       },
       "size": {
-        "x": 0.022727,
-        "y": 0.034729
+        "x": 0.042052,
+        "y": 0.021206
       },
-      "source_pixels": 103,
+      "source_pixels": 1085,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1074,14 +1194,14 @@
       "geometry_id": "PM2-GEO-072",
       "category": "source_geometry",
       "center": {
-        "x": 0.094156,
-        "y": 0.129724
+        "x": 0.82692,
+        "y": 0.14001
       },
       "size": {
-        "x": 0.018182,
-        "y": 0.016343
+        "x": 0.021107,
+        "y": 0.043434
       },
-      "source_pixels": 91,
+      "source_pixels": 1077,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1089,14 +1209,14 @@
       "geometry_id": "PM2-GEO-073",
       "category": "source_geometry",
       "center": {
-        "x": 0.137013,
-        "y": 0.072523
+        "x": 0.305894,
+        "y": 0.643715
       },
       "size": {
-        "x": 0.018182,
-        "y": 0.016343
+        "x": 0.001948,
+        "y": 0.022739
       },
-      "source_pixels": 88,
+      "source_pixels": 1056,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1104,14 +1224,14 @@
       "geometry_id": "PM2-GEO-074",
       "category": "source_geometry",
       "center": {
-        "x": 0.305844,
-        "y": 0.643514
+        "x": 0.385858,
+        "y": 0.702862
       },
       "size": {
-        "x": 0.002597,
-        "y": 0.022472
+        "x": 0.01445,
+        "y": 0.003066
       },
-      "source_pixels": 88,
+      "source_pixels": 1056,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1119,14 +1239,14 @@
       "geometry_id": "PM2-GEO-075",
       "category": "source_geometry",
       "center": {
-        "x": 0.414935,
-        "y": 0.749745
+        "x": 0.398441,
+        "y": 0.750128
       },
       "size": {
-        "x": 0.014286,
-        "y": 0.004086
+        "x": 0.014288,
+        "y": 0.003066
       },
-      "source_pixels": 88,
+      "source_pixels": 1052,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1134,14 +1254,14 @@
       "geometry_id": "PM2-GEO-076",
       "category": "source_geometry",
       "center": {
-        "x": 0.9,
-        "y": 0.468846
+        "x": 0.832765,
+        "y": 0.269673
       },
       "size": {
-        "x": 0.014286,
-        "y": 0.016343
+        "x": 0.018834,
+        "y": 0.025294
       },
-      "source_pixels": 87,
+      "source_pixels": 1051,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1149,14 +1269,14 @@
       "geometry_id": "PM2-GEO-077",
       "category": "source_geometry",
       "center": {
-        "x": 0.355519,
-        "y": 0.210419
+        "x": 0.400308,
+        "y": 0.470235
       },
       "size": {
-        "x": 0.013636,
-        "y": 0.012257
+        "x": 0.031986,
+        "y": 0.029893
       },
-      "source_pixels": 81,
+      "source_pixels": 1032,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1164,14 +1284,14 @@
       "geometry_id": "PM2-GEO-078",
       "category": "source_geometry",
       "center": {
-        "x": 0.603247,
-        "y": 0.460674
+        "x": 0.90039,
+        "y": 0.366633
       },
       "size": {
-        "x": 0.007792,
-        "y": 0.022472
+        "x": 0.017373,
+        "y": 0.043945
       },
-      "source_pixels": 74,
+      "source_pixels": 994,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1179,14 +1299,14 @@
       "geometry_id": "PM2-GEO-079",
       "category": "source_geometry",
       "center": {
-        "x": 0.129221,
-        "y": 0.829418
+        "x": 0.465904,
+        "y": 0.550843
       },
       "size": {
-        "x": 0.002597,
-        "y": 0.034729
+        "x": 0.035558,
+        "y": 0.042923
       },
-      "source_pixels": 68,
+      "source_pixels": 987,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1194,14 +1314,14 @@
       "geometry_id": "PM2-GEO-080",
       "category": "source_geometry",
       "center": {
-        "x": 0.13961,
-        "y": 0.575587
+        "x": 0.791687,
+        "y": 0.565151
       },
       "size": {
-        "x": 0.022078,
-        "y": 0.033708
+        "x": 0.033772,
+        "y": 0.03117
       },
-      "source_pixels": 66,
+      "source_pixels": 986,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1209,14 +1329,14 @@
       "geometry_id": "PM2-GEO-081",
       "category": "source_geometry",
       "center": {
-        "x": 0.927273,
-        "y": 0.456588
+        "x": 0.359068,
+        "y": 0.644737
       },
       "size": {
-        "x": 0.007792,
-        "y": 0.022472
+        "x": 0.01445,
+        "y": 0.003321
       },
-      "source_pixels": 64,
+      "source_pixels": 972,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1224,14 +1344,14 @@
       "geometry_id": "PM2-GEO-082",
       "category": "source_geometry",
       "center": {
-        "x": 0.354545,
-        "y": 0.747702
+        "x": 0.571765,
+        "y": 0.464997
       },
       "size": {
-        "x": 0.007792,
-        "y": 0.022472
+        "x": 0.017048,
+        "y": 0.042412
       },
-      "source_pixels": 64,
+      "source_pixels": 933,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1239,14 +1359,14 @@
       "geometry_id": "PM2-GEO-083",
       "category": "source_geometry",
       "center": {
-        "x": 0.159091,
-        "y": 0.59857
+        "x": 0.954782,
+        "y": 0.782959
       },
       "size": {
-        "x": 0.020779,
-        "y": 0.032686
+        "x": 0.02127,
+        "y": 0.050332
       },
-      "source_pixels": 63,
+      "source_pixels": 932,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1254,14 +1374,14 @@
       "geometry_id": "PM2-GEO-084",
       "category": "source_geometry",
       "center": {
-        "x": 0.595455,
-        "y": 0.318182
+        "x": 0.781052,
+        "y": 0.6151
       },
       "size": {
-        "x": 0.032468,
-        "y": 0.00715
+        "x": 0.013476,
+        "y": 0.033981
       },
-      "source_pixels": 62,
+      "source_pixels": 914,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1269,14 +1389,14 @@
       "geometry_id": "PM2-GEO-085",
       "category": "source_geometry",
       "center": {
-        "x": 0.537338,
-        "y": 0.417773
+        "x": 0.3956,
+        "y": 0.259709
       },
       "size": {
-        "x": 0.013636,
-        "y": 0.012257
+        "x": 0.02679,
+        "y": 0.022228
       },
-      "source_pixels": 62,
+      "source_pixels": 909,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1284,14 +1404,14 @@
       "geometry_id": "PM2-GEO-086",
       "category": "source_geometry",
       "center": {
-        "x": 0.391234,
-        "y": 0.222165
+        "x": 0.139714,
+        "y": 0.576392
       },
       "size": {
-        "x": 0.007143,
-        "y": 0.02145
+        "x": 0.022244,
+        "y": 0.033214
       },
-      "source_pixels": 60,
+      "source_pixels": 908,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1299,14 +1419,14 @@
       "geometry_id": "PM2-GEO-087",
       "category": "source_geometry",
       "center": {
-        "x": 0.783766,
-        "y": 0.873851
+        "x": 0.844131,
+        "y": 0.391671
       },
       "size": {
-        "x": 0.014286,
-        "y": 0.023493
+        "x": 0.004221,
+        "y": 0.008687
       },
-      "source_pixels": 56,
+      "source_pixels": 852,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1314,14 +1434,14 @@
       "geometry_id": "PM2-GEO-088",
       "category": "source_geometry",
       "center": {
-        "x": 0.686688,
-        "y": 0.318182
+        "x": 0.035152,
+        "y": 0.39397
       },
       "size": {
-        "x": 0.031818,
-        "y": 0.00715
+        "x": 0.022244,
+        "y": 0.047522
       },
-      "source_pixels": 55,
+      "source_pixels": 777,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1329,14 +1449,14 @@
       "geometry_id": "PM2-GEO-089",
       "category": "source_geometry",
       "center": {
-        "x": 0.843831,
-        "y": 0.391216
+        "x": 0.159117,
+        "y": 0.599131
       },
       "size": {
-        "x": 0.004545,
-        "y": 0.008172
+        "x": 0.021432,
+        "y": 0.033214
       },
-      "source_pixels": 53,
+      "source_pixels": 762,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1344,14 +1464,14 @@
       "geometry_id": "PM2-GEO-090",
       "category": "source_geometry",
       "center": {
-        "x": 0.921104,
-        "y": 0.834525
+        "x": 0.677789,
+        "y": 0.843383
       },
       "size": {
-        "x": 0.007143,
-        "y": 0.006129
+        "x": 0.02744,
+        "y": 0.022483
       },
-      "source_pixels": 43,
+      "source_pixels": 752,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1359,14 +1479,14 @@
       "geometry_id": "PM2-GEO-091",
       "category": "source_geometry",
       "center": {
-        "x": 0.882143,
-        "y": 0.626149
+        "x": 0.523949,
+        "y": 0.795222
       },
       "size": {
-        "x": 0.00974,
-        "y": 0.016343
+        "x": 0.020458,
+        "y": 0.022228
       },
-      "source_pixels": 41,
+      "source_pixels": 746,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1374,14 +1494,14 @@
       "geometry_id": "PM2-GEO-092",
       "category": "source_geometry",
       "center": {
-        "x": 0.597727,
-        "y": 0.932074
+        "x": 0.898279,
+        "y": 0.436382
       },
       "size": {
-        "x": 0.005844,
-        "y": 0.005107
+        "x": 0.010878,
+        "y": 0.049055
       },
-      "source_pixels": 39,
+      "source_pixels": 739,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1389,14 +1509,14 @@
       "geometry_id": "PM2-GEO-093",
       "category": "source_geometry",
       "center": {
-        "x": 0.088636,
-        "y": 0.824821
+        "x": 0.025004,
+        "y": 0.390649
       },
       "size": {
-        "x": 0.014935,
-        "y": 0.009193
+        "x": 0.001948,
+        "y": 0.021972
       },
-      "source_pixels": 37,
+      "source_pixels": 737,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1404,14 +1524,14 @@
       "geometry_id": "PM2-GEO-094",
       "category": "source_geometry",
       "center": {
-        "x": 0.926623,
-        "y": 0.18999
+        "x": 0.409239,
+        "y": 0.553398
       },
       "size": {
-        "x": 0.005195,
-        "y": 0.008172
+        "x": 0.027115,
+        "y": 0.027593
       },
-      "source_pixels": 35,
+      "source_pixels": 711,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1419,14 +1539,14 @@
       "geometry_id": "PM2-GEO-095",
       "category": "source_geometry",
       "center": {
-        "x": 0.851299,
-        "y": 0.395301
+        "x": 0.409239,
+        "y": 0.596065
       },
       "size": {
-        "x": 0.003896,
-        "y": 0.008172
+        "x": 0.027115,
+        "y": 0.027593
       },
-      "source_pixels": 34,
+      "source_pixels": 711,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1434,14 +1554,14 @@
       "geometry_id": "PM2-GEO-096",
       "category": "source_geometry",
       "center": {
-        "x": 0.618182,
-        "y": 0.776302
+        "x": 0.921172,
+        "y": 0.834951
       },
       "size": {
-        "x": 0.007792,
-        "y": 0.006129
+        "x": 0.006982,
+        "y": 0.006643
       },
-      "source_pixels": 32,
+      "source_pixels": 688,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1449,14 +1569,14 @@
       "geometry_id": "PM2-GEO-097",
       "category": "source_geometry",
       "center": {
-        "x": 0.267857,
-        "y": 0.814096
+        "x": 0.64288,
+        "y": 0.774527
       },
       "size": {
-        "x": 0.004545,
-        "y": 0.006129
+        "x": 0.028414,
+        "y": 0.028871
       },
-      "source_pixels": 32,
+      "source_pixels": 686,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1464,14 +1584,14 @@
       "geometry_id": "PM2-GEO-098",
       "category": "source_geometry",
       "center": {
-        "x": 0.618182,
-        "y": 0.824311
+        "x": 0.818802,
+        "y": 0.499745
       },
       "size": {
-        "x": 0.007792,
-        "y": 0.006129
+        "x": 0.014288,
+        "y": 0.021461
       },
-      "source_pixels": 32,
+      "source_pixels": 672,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1479,14 +1599,14 @@
       "geometry_id": "PM2-GEO-099",
       "category": "source_geometry",
       "center": {
-        "x": 0.618182,
-        "y": 0.842697
+        "x": 0.871245,
+        "y": 0.776827
       },
       "size": {
-        "x": 0.007792,
-        "y": 0.006129
+        "x": 0.021107,
+        "y": 0.021206
       },
-      "source_pixels": 32,
+      "source_pixels": 665,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1494,14 +1614,14 @@
       "geometry_id": "PM2-GEO-100",
       "category": "source_geometry",
       "center": {
-        "x": 0.101299,
-        "y": 0.57712
+        "x": 0.861585,
+        "y": 0.809658
       },
       "size": {
-        "x": 0.006494,
-        "y": 0.022472
+        "x": 0.013476,
+        "y": 0.033214
       },
-      "source_pixels": 31,
+      "source_pixels": 665,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1509,14 +1629,14 @@
       "geometry_id": "PM2-GEO-101",
       "category": "source_geometry",
       "center": {
-        "x": 0.928896,
-        "y": 0.207354
+        "x": 0.597824,
+        "y": 0.932678
       },
       "size": {
-        "x": 0.004545,
-        "y": 0.006129
+        "x": 0.00617,
+        "y": 0.006387
       },
-      "source_pixels": 30,
+      "source_pixels": 659,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1524,14 +1644,14 @@
       "geometry_id": "PM2-GEO-102",
       "category": "source_geometry",
       "center": {
-        "x": 0.87013,
-        "y": 0.645557
+        "x": 0.882448,
+        "y": 0.084568
       },
       "size": {
-        "x": 0.003896,
-        "y": 0.006129
+        "x": 0.013314,
+        "y": 0.002044
       },
-      "source_pixels": 30,
+      "source_pixels": 621,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1539,14 +1659,14 @@
       "geometry_id": "PM2-GEO-103",
       "category": "source_geometry",
       "center": {
-        "x": 0.181818,
-        "y": 0.201226
+        "x": 0.880094,
+        "y": 0.100537
       },
       "size": {
-        "x": 0.003896,
-        "y": 0.006129
+        "x": 0.030037,
+        "y": 0.033981
       },
-      "source_pixels": 28,
+      "source_pixels": 620,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1554,14 +1674,14 @@
       "geometry_id": "PM2-GEO-104",
       "category": "source_geometry",
       "center": {
-        "x": 0.782468,
-        "y": 0.342186
+        "x": 0.926855,
+        "y": 0.189959
       },
       "size": {
-        "x": 0.01039,
-        "y": 0.006129
+        "x": 0.005358,
+        "y": 0.008431
       },
-      "source_pixels": 26,
+      "source_pixels": 602,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1569,14 +1689,14 @@
       "geometry_id": "PM2-GEO-105",
       "category": "source_geometry",
       "center": {
-        "x": 0.948701,
-        "y": 0.496936
+        "x": 0.632733,
+        "y": 0.40138
       },
       "size": {
-        "x": 0.003896,
-        "y": 0.005107
+        "x": 0.014288,
+        "y": 0.022483
       },
-      "source_pixels": 26,
+      "source_pixels": 586,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1584,14 +1704,14 @@
       "geometry_id": "PM2-GEO-106",
       "category": "source_geometry",
       "center": {
-        "x": 0.757143,
-        "y": 0.583759
+        "x": 0.94025,
+        "y": 0.455544
       },
       "size": {
-        "x": 0.003896,
-        "y": 0.005107
+        "x": 0.013963,
+        "y": 0.021461
       },
-      "source_pixels": 25,
+      "source_pixels": 584,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1599,14 +1719,14 @@
       "geometry_id": "PM2-GEO-107",
       "category": "source_geometry",
       "center": {
-        "x": 0.474026,
-        "y": 0.863636
+        "x": 0.7088,
+        "y": 0.770567
       },
       "size": {
-        "x": 0.003896,
-        "y": 0.005107
+        "x": 0.013476,
+        "y": 0.033214
       },
-      "source_pixels": 25,
+      "source_pixels": 584,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1614,14 +1734,14 @@
       "geometry_id": "PM2-GEO-108",
       "category": "source_geometry",
       "center": {
-        "x": 0.864286,
-        "y": 0.393769
+        "x": 0.768875,
+        "y": 0.798799
       },
       "size": {
-        "x": 0.003896,
-        "y": 0.015322
+        "x": 0.020945,
+        "y": 0.021206
       },
-      "source_pixels": 24,
+      "source_pixels": 582,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1629,14 +1749,14 @@
       "geometry_id": "PM2-GEO-109",
       "category": "source_geometry",
       "center": {
-        "x": 0.708766,
-        "y": 0.544944
+        "x": 0.86402,
+        "y": 0.14512
       },
       "size": {
-        "x": 0.003247,
-        "y": 0.005107
+        "x": 0.013476,
+        "y": 0.022483
       },
-      "source_pixels": 24,
+      "source_pixels": 581,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1644,14 +1764,14 @@
       "geometry_id": "PM2-GEO-110",
       "category": "source_geometry",
       "center": {
-        "x": 0.082143,
-        "y": 0.892748
+        "x": 0.851437,
+        "y": 0.395887
       },
       "size": {
-        "x": 0.008442,
-        "y": 0.006129
+        "x": 0.004221,
+        "y": 0.00792
       },
-      "source_pixels": 22,
+      "source_pixels": 572,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1659,14 +1779,14 @@
       "geometry_id": "PM2-GEO-111",
       "category": "source_geometry",
       "center": {
-        "x": 0.783766,
-        "y": 0.440756
+        "x": 0.948937,
+        "y": 0.497445
       },
       "size": {
-        "x": 0.003896,
-        "y": 0.005107
+        "x": 0.004059,
+        "y": 0.006132
       },
-      "source_pixels": 21,
+      "source_pixels": 566,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     },
@@ -1674,14 +1794,3179 @@
       "geometry_id": "PM2-GEO-112",
       "category": "source_geometry",
       "center": {
-        "x": 0.878247,
-        "y": 0.866701
+        "x": 0.305488,
+        "y": 0.192642
       },
       "size": {
-        "x": 0.00974,
-        "y": 0.00715
+        "x": 0.011853,
+        "y": 0.035769
+      },
+      "source_pixels": 564,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-113",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.870271,
+        "y": 0.559147
+      },
+      "size": {
+        "x": 0.008443,
+        "y": 0.00281
+      },
+      "source_pixels": 564,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-114",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.899984,
+        "y": 0.460526
+      },
+      "size": {
+        "x": 0.013963,
+        "y": 0.032959
+      },
+      "source_pixels": 558,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-115",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.935947,
+        "y": 0.235309
+      },
+      "size": {
+        "x": 0.013476,
+        "y": 0.032703
+      },
+      "source_pixels": 545,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-116",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.870109,
+        "y": 0.646014
+      },
+      "size": {
+        "x": 0.004221,
+        "y": 0.006387
+      },
+      "source_pixels": 526,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-117",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.636386,
+        "y": 0.730583
+      },
+      "size": {
+        "x": 0.004059,
+        "y": 0.006387
+      },
+      "source_pixels": 517,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-118",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.687287,
+        "y": 0.600281
+      },
+      "size": {
+        "x": 0.004221,
+        "y": 0.006387
+      },
+      "source_pixels": 514,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-119",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.18201,
+        "y": 0.201456
+      },
+      "size": {
+        "x": 0.004221,
+        "y": 0.006387
+      },
+      "source_pixels": 513,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-120",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.640039,
+        "y": 0.820772
+      },
+      "size": {
+        "x": 0.007793,
+        "y": 0.00281
+      },
+      "source_pixels": 510,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-121",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.267901,
+        "y": 0.815023
+      },
+      "size": {
+        "x": 0.004221,
+        "y": 0.006643
+      },
+      "source_pixels": 508,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-122",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.288034,
+        "y": 0.840956
+      },
+      "size": {
+        "x": 0.004221,
+        "y": 0.006387
+      },
+      "source_pixels": 506,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-123",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.928966,
+        "y": 0.207844
+      },
+      "size": {
+        "x": 0.004059,
+        "y": 0.006387
+      },
+      "source_pixels": 501,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-124",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.757347,
+        "y": 0.584185
+      },
+      "size": {
+        "x": 0.004059,
+        "y": 0.006387
+      },
+      "source_pixels": 501,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-125",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.618363,
+        "y": 0.776955
+      },
+      "size": {
+        "x": 0.007631,
+        "y": 0.006643
+      },
+      "source_pixels": 500,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-126",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.474103,
+        "y": 0.864461
+      },
+      "size": {
+        "x": 0.004221,
+        "y": 0.006387
+      },
+      "source_pixels": 500,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-127",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.927829,
+        "y": 0.707333
+      },
+      "size": {
+        "x": 0.014126,
+        "y": 0.031937
+      },
+      "source_pixels": 498,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-128",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.520133,
+        "y": 0.773122
+      },
+      "size": {
+        "x": 0.014126,
+        "y": 0.021461
+      },
+      "source_pixels": 498,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-129",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.134762,
+        "y": 0.18536
+      },
+      "size": {
+        "x": 0.012015,
+        "y": 0.035514
+      },
+      "source_pixels": 494,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-130",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.075418,
+        "y": 0.885156
+      },
+      "size": {
+        "x": 0.022244,
+        "y": 0.022228
+      },
+      "source_pixels": 488,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-131",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.618363,
+        "y": 0.824987
+      },
+      "size": {
+        "x": 0.007631,
+        "y": 0.006643
+      },
+      "source_pixels": 486,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-132",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.384478,
+        "y": 0.380301
+      },
+      "size": {
+        "x": 0.00552,
+        "y": 0.008942
+      },
+      "source_pixels": 476,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-133",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.35923,
+        "y": 0.66952
+      },
+      "size": {
+        "x": 0.002111,
+        "y": 0.009964
+      },
+      "source_pixels": 461,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-134",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.35923,
+        "y": 0.682039
+      },
+      "size": {
+        "x": 0.002111,
+        "y": 0.009964
+      },
+      "source_pixels": 455,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-135",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.384478,
+        "y": 0.314768
+      },
+      "size": {
+        "x": 0.00552,
+        "y": 0.008687
+      },
+      "source_pixels": 452,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-136",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.398766,
+        "y": 0.544711
+      },
+      "size": {
+        "x": 0.00552,
+        "y": 0.008687
+      },
+      "source_pixels": 452,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-137",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.398766,
+        "y": 0.587379
+      },
+      "size": {
+        "x": 0.00552,
+        "y": 0.008687
+      },
+      "source_pixels": 448,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-138",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.595551,
+        "y": 0.317961
+      },
+      "size": {
+        "x": 0.031823,
+        "y": 0.006898
+      },
+      "source_pixels": 442,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-139",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.618363,
+        "y": 0.84351
+      },
+      "size": {
+        "x": 0.007631,
+        "y": 0.006387
+      },
+      "source_pixels": 440,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-140",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.365969,
+        "y": 0.75
+      },
+      "size": {
+        "x": 0.012015,
+        "y": 0.035514
+      },
+      "source_pixels": 422,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-141",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.489852,
+        "y": 0.646398
+      },
+      "size": {
+        "x": 0.012015,
+        "y": 0.035258
+      },
+      "source_pixels": 420,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-142",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.083455,
+        "y": 0.652402
+      },
+      "size": {
+        "x": 0.013963,
+        "y": 0.021206
+      },
+      "source_pixels": 415,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-143",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.874655,
+        "y": 0.733904
+      },
+      "size": {
+        "x": 0.013963,
+        "y": 0.021206
+      },
+      "source_pixels": 415,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-144",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.941792,
+        "y": 0.398697
+      },
+      "size": {
+        "x": 0.013476,
+        "y": 0.011497
+      },
+      "source_pixels": 414,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-145",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.781052,
+        "y": 0.589039
+      },
+      "size": {
+        "x": 0.013476,
+        "y": 0.011497
+      },
+      "source_pixels": 414,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-146",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.783893,
+        "y": 0.441492
+      },
+      "size": {
+        "x": 0.004221,
+        "y": 0.006132
+      },
+      "source_pixels": 392,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-147",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.579558,
+        "y": 0.808891
+      },
+      "size": {
+        "x": 0.003734,
+        "y": 0.006132
+      },
+      "source_pixels": 347,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-148",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.093197,
+        "y": 0.829714
+      },
+      "size": {
+        "x": 0.02403,
+        "y": 0.017629
+      },
+      "source_pixels": 337,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-149",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.391135,
+        "y": 0.222024
+      },
+      "size": {
+        "x": 0.007144,
+        "y": 0.021461
+      },
+      "source_pixels": 336,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-150",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.926936,
+        "y": 0.456566
+      },
+      "size": {
+        "x": 0.007144,
+        "y": 0.021461
+      },
+      "source_pixels": 336,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-151",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.636305,
+        "y": 0.463209
+      },
+      "size": {
+        "x": 0.007144,
+        "y": 0.021461
+      },
+      "source_pixels": 336,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-152",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.508849,
+        "y": 0.472662
+      },
+      "size": {
+        "x": 0.007144,
+        "y": 0.021461
+      },
+      "source_pixels": 336,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-153",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.776506,
+        "y": 0.273633
+      },
+      "size": {
+        "x": 0.006982,
+        "y": 0.021461
+      },
+      "source_pixels": 332,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-154",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.86402,
+        "y": 0.167603
+      },
+      "size": {
+        "x": 0.013476,
+        "y": 0.011242
+      },
+      "source_pixels": 331,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-155",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.935947,
+        "y": 0.257537
+      },
+      "size": {
+        "x": 0.013476,
+        "y": 0.011242
+      },
+      "source_pixels": 331,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-156",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.537181,
+        "y": 0.417987
+      },
+      "size": {
+        "x": 0.013476,
+        "y": 0.011242
+      },
+      "source_pixels": 331,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-157",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.100747,
+        "y": 0.594021
+      },
+      "size": {
+        "x": 0.007306,
+        "y": 0.056208
+      },
+      "source_pixels": 307,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-158",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.277561,
+        "y": 0.877236
+      },
+      "size": {
+        "x": 0.004059,
+        "y": 0.004343
+      },
+      "source_pixels": 307,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-159",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.889836,
+        "y": 0.286025
+      },
+      "size": {
+        "x": 0.00276,
+        "y": 0.006387
+      },
+      "source_pixels": 305,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-160",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.889998,
+        "y": 0.326137
+      },
+      "size": {
+        "x": 0.004059,
+        "y": 0.004343
+      },
+      "source_pixels": 305,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-161",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.358013,
+        "y": 0.425268
+      },
+      "size": {
+        "x": 0.002923,
+        "y": 0.005876
+      },
+      "source_pixels": 300,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-162",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.891622,
+        "y": 0.318217
+      },
+      "size": {
+        "x": 0.003085,
+        "y": 0.004343
+      },
+      "source_pixels": 295,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-163",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.025004,
+        "y": 0.408022
+      },
+      "size": {
+        "x": 0.001948,
+        "y": 0.008687
+      },
+      "source_pixels": 271,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-164",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.841208,
+        "y": 0.150613
+      },
+      "size": {
+        "x": 0.007144,
+        "y": 0.021206
+      },
+      "source_pixels": 250,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-165",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.355496,
+        "y": 0.210782
+      },
+      "size": {
+        "x": 0.013476,
+        "y": 0.011242
+      },
+      "source_pixels": 250,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-166",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.862153,
+        "y": 0.225984
+      },
+      "size": {
+        "x": 0.007144,
+        "y": 0.021206
+      },
+      "source_pixels": 250,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-167",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.72187,
+        "y": 0.586995
+      },
+      "size": {
+        "x": 0.007144,
+        "y": 0.021206
+      },
+      "source_pixels": 250,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-168",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.102127,
+        "y": 0.652402
+      },
+      "size": {
+        "x": 0.007144,
+        "y": 0.021206
+      },
+      "source_pixels": 250,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-169",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.885533,
+        "y": 0.776827
+      },
+      "size": {
+        "x": 0.007144,
+        "y": 0.021206
+      },
+      "source_pixels": 250,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-170",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.660334,
+        "y": 0.844021
+      },
+      "size": {
+        "x": 0.007144,
+        "y": 0.021206
+      },
+      "source_pixels": 250,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-171",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.520539,
+        "y": 0.438171
+      },
+      "size": {
+        "x": 0.012664,
+        "y": 0.012264
+      },
+      "source_pixels": 248,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-172",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.603264,
+        "y": 0.461037
+      },
+      "size": {
+        "x": 0.006982,
+        "y": 0.021206
+      },
+      "source_pixels": 248,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-173",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.072333,
+        "y": 0.652402
+      },
+      "size": {
+        "x": 0.006982,
+        "y": 0.021206
+      },
+      "source_pixels": 248,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-174",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.094902,
+        "y": 0.652402
+      },
+      "size": {
+        "x": 0.006982,
+        "y": 0.021206
+      },
+      "source_pixels": 248,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-175",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.885777,
+        "y": 0.733904
+      },
+      "size": {
+        "x": 0.006982,
+        "y": 0.021206
+      },
+      "source_pixels": 248,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-176",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.354359,
+        "y": 0.747956
+      },
+      "size": {
+        "x": 0.006982,
+        "y": 0.021206
+      },
+      "source_pixels": 248,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-177",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.686719,
+        "y": 0.317961
+      },
+      "size": {
+        "x": 0.031661,
+        "y": 0.006898
+      },
+      "source_pixels": 247,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-178",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.583374,
+        "y": 0.808891
+      },
+      "size": {
+        "x": 0.003247,
+        "y": 0.006132
+      },
+      "source_pixels": 234,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-179",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.590843,
+        "y": 0.808891
+      },
+      "size": {
+        "x": 0.002923,
+        "y": 0.006132
+      },
+      "source_pixels": 234,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-180",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.214321,
+        "y": 0.856541
+      },
+      "size": {
+        "x": 0.004221,
+        "y": 0.002299
+      },
+      "source_pixels": 230,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-181",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.148807,
+        "y": 0.119188
+      },
+      "size": {
+        "x": 0.014126,
+        "y": 0.022228
+      },
+      "source_pixels": 228,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-182",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.783488,
+        "y": 0.87417
+      },
+      "size": {
+        "x": 0.014126,
+        "y": 0.022228
+      },
+      "source_pixels": 224,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-183",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.594009,
+        "y": 0.809785
+      },
+      "size": {
+        "x": 0.003085,
+        "y": 0.004343
+      },
+      "source_pixels": 222,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-184",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.597256,
+        "y": 0.809785
+      },
+      "size": {
+        "x": 0.003085,
+        "y": 0.004343
+      },
+      "source_pixels": 222,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-185",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.870758,
+        "y": 0.084568
+      },
+      "size": {
+        "x": 0.004871,
+        "y": 0.002044
+      },
+      "source_pixels": 207,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-186",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.022812,
+        "y": 0.402657
+      },
+      "size": {
+        "x": 0.002111,
+        "y": 0.007154
+      },
+      "source_pixels": 200,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-187",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.618363,
+        "y": 0.788452
+      },
+      "size": {
+        "x": 0.007631,
+        "y": 0.001022
+      },
+      "source_pixels": 186,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-188",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.618363,
+        "y": 0.836484
+      },
+      "size": {
+        "x": 0.007631,
+        "y": 0.001022
+      },
+      "source_pixels": 186,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-189",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.708151,
+        "y": 0.237353
+      },
+      "size": {
+        "x": 0.002111,
+        "y": 0.038324
+      },
+      "source_pixels": 181,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-190",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.637847,
+        "y": 0.692003
+      },
+      "size": {
+        "x": 0.010229,
+        "y": 0.011497
+      },
+      "source_pixels": 181,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-191",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.900714,
+        "y": 0.181017
+      },
+      "size": {
+        "x": 0.009904,
+        "y": 0.022739
+      },
+      "source_pixels": 178,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-192",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.924582,
+        "y": 0.218702
+      },
+      "size": {
+        "x": 0.01445,
+        "y": 0.01533
+      },
+      "source_pixels": 177,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-193",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.574038,
+        "y": 0.237736
+      },
+      "size": {
+        "x": 0.002111,
+        "y": 0.037046
+      },
+      "source_pixels": 177,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-194",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.94504,
+        "y": 0.186638
+      },
+      "size": {
+        "x": 0.009579,
+        "y": 0.022739
+      },
+      "source_pixels": 176,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-195",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.138334,
+        "y": 0.927951
+      },
+      "size": {
+        "x": 0.011041,
+        "y": 0.015841
+      },
+      "source_pixels": 172,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-196",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.19646,
+        "y": 0.874042
+      },
+      "size": {
+        "x": 0.017211,
+        "y": 0.011242
+      },
+      "source_pixels": 168,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-197",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.585647,
+        "y": 0.21372
+      },
+      "size": {
+        "x": 0.018185,
+        "y": 0.003832
+      },
+      "source_pixels": 152,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-198",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.696379,
+        "y": 0.213975
+      },
+      "size": {
+        "x": 0.01786,
+        "y": 0.003832
+      },
+      "source_pixels": 146,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-199",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.605374,
+        "y": 0.764691
+      },
+      "size": {
+        "x": 0.002435,
+        "y": 0.004088
+      },
+      "source_pixels": 146,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-200",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.359393,
+        "y": 0.675907
+      },
+      "size": {
+        "x": 0.001786,
+        "y": 0.003832
+      },
+      "source_pixels": 125,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-201",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.904774,
+        "y": 0.094532
+      },
+      "size": {
+        "x": 0.009904,
+        "y": 0.01533
+      },
+      "source_pixels": 120,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-202",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.587514,
+        "y": 0.808891
+      },
+      "size": {
+        "x": 0.001137,
+        "y": 0.006132
+      },
+      "source_pixels": 114,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-203",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.265952,
+        "y": 0.225217
+      },
+      "size": {
+        "x": 0.012664,
+        "y": 0.008431
+      },
+      "source_pixels": 110,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-204",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.194999,
+        "y": 0.893587
+      },
+      "size": {
+        "x": 0.01234,
+        "y": 0.004854
+      },
+      "source_pixels": 107,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-205",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.187287,
+        "y": 0.882984
+      },
+      "size": {
+        "x": 0.003085,
+        "y": 0.019417
+      },
+      "source_pixels": 106,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-206",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.102695,
+        "y": 0.101814
+      },
+      "size": {
+        "x": 0.00341,
+        "y": 0.004343
+      },
+      "source_pixels": 96,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-207",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.127862,
+        "y": 0.10092
+      },
+      "size": {
+        "x": 0.00341,
+        "y": 0.004088
+      },
+      "source_pixels": 92,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-208",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.841939,
+        "y": 0.096449
+      },
+      "size": {
+        "x": 0.003085,
+        "y": 0.00281
+      },
+      "source_pixels": 90,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-209",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.032879,
+        "y": 0.241058
+      },
+      "size": {
+        "x": 0.001786,
+        "y": 0.004854
+      },
+      "source_pixels": 90,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-210",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.0371,
+        "y": 0.42118
+      },
+      "size": {
+        "x": 0.001786,
+        "y": 0.004854
+      },
+      "source_pixels": 90,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-211",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.130297,
+        "y": 0.887711
+      },
+      "size": {
+        "x": 0.003085,
+        "y": 0.00281
+      },
+      "source_pixels": 90,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-212",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.178844,
+        "y": 0.887711
+      },
+      "size": {
+        "x": 0.003085,
+        "y": 0.00281
+      },
+      "source_pixels": 90,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-213",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.209368,
+        "y": 0.077925
+      },
+      "size": {
+        "x": 0.003085,
+        "y": 0.002555
+      },
+      "source_pixels": 88,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-214",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.331466,
+        "y": 0.090956
+      },
+      "size": {
+        "x": 0.003085,
+        "y": 0.002555
+      },
+      "source_pixels": 88,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-215",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.377253,
+        "y": 0.090956
+      },
+      "size": {
+        "x": 0.003085,
+        "y": 0.002555
+      },
+      "source_pixels": 88,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-216",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.862721,
+        "y": 0.102964
+      },
+      "size": {
+        "x": 0.003085,
+        "y": 0.002555
+      },
+      "source_pixels": 88,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-217",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.621448,
+        "y": 0.78513
+      },
+      "size": {
+        "x": 0.002111,
+        "y": 0.002044
+      },
+      "source_pixels": 88,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-218",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.879039,
+        "y": 0.795478
+      },
+      "size": {
+        "x": 0.001624,
+        "y": 0.004854
+      },
+      "source_pixels": 88,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-219",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.621448,
+        "y": 0.833163
+      },
+      "size": {
+        "x": 0.002111,
+        "y": 0.002044
+      },
+      "source_pixels": 88,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-220",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.335606,
+        "y": 0.185871
+      },
+      "size": {
+        "x": 0.002923,
+        "y": 0.00281
+      },
+      "source_pixels": 86,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-221",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.397305,
+        "y": 0.232882
+      },
+      "size": {
+        "x": 0.002923,
+        "y": 0.00281
+      },
+      "source_pixels": 86,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-222",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.414678,
+        "y": 0.352964
+      },
+      "size": {
+        "x": 0.002923,
+        "y": 0.00281
+      },
+      "source_pixels": 86,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-223",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.130297,
+        "y": 0.934722
+      },
+      "size": {
+        "x": 0.003085,
+        "y": 0.00281
+      },
+      "source_pixels": 86,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-224",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.597743,
+        "y": 0.227389
+      },
+      "size": {
+        "x": 0.002111,
+        "y": 0.016352
+      },
+      "source_pixels": 85,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-225",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.414678,
+        "y": 0.28743
+      },
+      "size": {
+        "x": 0.002923,
+        "y": 0.002555
+      },
+      "source_pixels": 84,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-226",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.678844,
+        "y": 0.236587
+      },
+      "size": {
+        "x": 0.010067,
+        "y": 0.003066
+      },
+      "source_pixels": 80,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-227",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.684689,
+        "y": 0.227261
+      },
+      "size": {
+        "x": 0.001624,
+        "y": 0.015585
+      },
+      "source_pixels": 79,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-228",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.323754,
+        "y": 0.152146
+      },
+      "size": {
+        "x": 0.007469,
+        "y": 0.003321
+      },
+      "source_pixels": 78,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-229",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.323754,
+        "y": 0.163388
+      },
+      "size": {
+        "x": 0.007469,
+        "y": 0.003321
+      },
+      "source_pixels": 78,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-230",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.321805,
+        "y": 0.177695
+      },
+      "size": {
+        "x": 0.007469,
+        "y": 0.003321
+      },
+      "source_pixels": 78,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-231",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.321805,
+        "y": 0.188937
+      },
+      "size": {
+        "x": 0.007469,
+        "y": 0.003321
+      },
+      "source_pixels": 78,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-232",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.465498,
+        "y": 0.405595
+      },
+      "size": {
+        "x": 0.007469,
+        "y": 0.003321
+      },
+      "source_pixels": 78,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-233",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.465498,
+        "y": 0.416837
+      },
+      "size": {
+        "x": 0.007469,
+        "y": 0.003321
+      },
+      "source_pixels": 78,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-234",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.646696,
+        "y": 0.699412
+      },
+      "size": {
+        "x": 0.007469,
+        "y": 0.003321
+      },
+      "source_pixels": 78,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-235",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.124939,
+        "y": 0.092105
+      },
+      "size": {
+        "x": 0.00276,
+        "y": 0.004343
+      },
+      "source_pixels": 75,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-236",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.603588,
+        "y": 0.236714
+      },
+      "size": {
+        "x": 0.009579,
+        "y": 0.002299
+      },
+      "source_pixels": 75,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-237",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.209368,
+        "y": 0.068089
+      },
+      "size": {
+        "x": 0.003085,
+        "y": 0.00281
+      },
+      "source_pixels": 74,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-238",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.862721,
+        "y": 0.093127
+      },
+      "size": {
+        "x": 0.003085,
+        "y": 0.00281
+      },
+      "source_pixels": 74,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-239",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.377253,
+        "y": 0.100792
+      },
+      "size": {
+        "x": 0.003085,
+        "y": 0.00281
+      },
+      "source_pixels": 74,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-240",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.88529,
+        "y": 0.795478
+      },
+      "size": {
+        "x": 0.001786,
+        "y": 0.004854
+      },
+      "source_pixels": 74,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-241",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.331466,
+        "y": 0.100792
+      },
+      "size": {
+        "x": 0.003085,
+        "y": 0.00281
+      },
+      "source_pixels": 72,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-242",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.030849,
+        "y": 0.42118
+      },
+      "size": {
+        "x": 0.001624,
+        "y": 0.004854
+      },
+      "source_pixels": 72,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-243",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.359068,
+        "y": 0.645631
+      },
+      "size": {
+        "x": 0.002435,
+        "y": 0.001533
+      },
+      "source_pixels": 71,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-244",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.841939,
+        "y": 0.106285
+      },
+      "size": {
+        "x": 0.003085,
+        "y": 0.002555
+      },
+      "source_pixels": 70,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-245",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.335606,
+        "y": 0.176162
+      },
+      "size": {
+        "x": 0.002923,
+        "y": 0.00281
+      },
+      "source_pixels": 70,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-246",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.03913,
+        "y": 0.241058
+      },
+      "size": {
+        "x": 0.001624,
+        "y": 0.004854
+      },
+      "source_pixels": 70,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-247",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.414678,
+        "y": 0.297266
+      },
+      "size": {
+        "x": 0.002923,
+        "y": 0.00281
+      },
+      "source_pixels": 70,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-248",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.414678,
+        "y": 0.362672
+      },
+      "size": {
+        "x": 0.002923,
+        "y": 0.00281
+      },
+      "source_pixels": 70,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-249",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.646858,
+        "y": 0.688043
+      },
+      "size": {
+        "x": 0.006819,
+        "y": 0.003066
+      },
+      "source_pixels": 70,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-250",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.130297,
+        "y": 0.897547
+      },
+      "size": {
+        "x": 0.003085,
+        "y": 0.002555
+      },
+      "source_pixels": 70,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-251",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.178844,
+        "y": 0.897547
+      },
+      "size": {
+        "x": 0.003085,
+        "y": 0.002555
+      },
+      "source_pixels": 70,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-252",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.130297,
+        "y": 0.944558
+      },
+      "size": {
+        "x": 0.003085,
+        "y": 0.002555
+      },
+      "source_pixels": 70,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-253",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.324322,
+        "y": 0.077287
+      },
+      "size": {
+        "x": 0.009904,
+        "y": 0.001277
+      },
+      "source_pixels": 69,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-254",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.105943,
+        "y": 0.110501
+      },
+      "size": {
+        "x": 0.00276,
+        "y": 0.004343
+      },
+      "source_pixels": 69,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-255",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.881068,
+        "y": 0.868549
+      },
+      "size": {
+        "x": 0.004384,
+        "y": 0.009964
+      },
+      "source_pixels": 69,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-256",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.397305,
+        "y": 0.223045
+      },
+      "size": {
+        "x": 0.002923,
+        "y": 0.002555
+      },
+      "source_pixels": 68,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-257",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.321887,
+        "y": 0.192131
+      },
+      "size": {
+        "x": 0.006007,
+        "y": 0.002044
+      },
+      "source_pixels": 58,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-258",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.321887,
+        "y": 0.20465
+      },
+      "size": {
+        "x": 0.006007,
+        "y": 0.002044
+      },
+      "source_pixels": 58,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-259",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.673567,
+        "y": 0.343894
+      },
+      "size": {
+        "x": 0.006007,
+        "y": 0.002044
+      },
+      "source_pixels": 58,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-260",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.669589,
+        "y": 0.337762
+      },
+      "size": {
+        "x": 0.001299,
+        "y": 0.009198
+      },
+      "source_pixels": 56,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-261",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.263842,
+        "y": 0.211293
+      },
+      "size": {
+        "x": 0.007144,
+        "y": 0.001533
+      },
+      "source_pixels": 54,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-262",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.620312,
+        "y": 0.269545
+      },
+      "size": {
+        "x": 0.004384,
+        "y": 0.007154
+      },
+      "source_pixels": 54,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-263",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.673811,
+        "y": 0.331375
+      },
+      "size": {
+        "x": 0.00552,
+        "y": 0.002044
+      },
+      "source_pixels": 52,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-264",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.778535,
+        "y": 0.866377
+      },
+      "size": {
+        "x": 0.004221,
+        "y": 0.006643
+      },
+      "source_pixels": 51,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-265",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.189154,
+        "y": 0.100281
+      },
+      "size": {
+        "x": 0.005845,
+        "y": 0.001788
+      },
+      "source_pixels": 50,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-266",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.189154,
+        "y": 0.1128
+      },
+      "size": {
+        "x": 0.005845,
+        "y": 0.001788
+      },
+      "source_pixels": 50,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-267",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.263842,
+        "y": 0.221513
+      },
+      "size": {
+        "x": 0.007144,
+        "y": 0.001022
+      },
+      "source_pixels": 50,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-268",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.673324,
+        "y": 0.351942
+      },
+      "size": {
+        "x": 0.005845,
+        "y": 0.001788
+      },
+      "source_pixels": 50,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-269",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.677302,
+        "y": 0.358201
+      },
+      "size": {
+        "x": 0.001137,
+        "y": 0.009198
+      },
+      "source_pixels": 50,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-270",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.673324,
+        "y": 0.364461
+      },
+      "size": {
+        "x": 0.005845,
+        "y": 0.001788
+      },
+      "source_pixels": 50,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-271",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.053905,
+        "y": 0.811318
+      },
+      "size": {
+        "x": 0.005845,
+        "y": 0.001788
+      },
+      "source_pixels": 50,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-272",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.053905,
+        "y": 0.823838
+      },
+      "size": {
+        "x": 0.005845,
+        "y": 0.001788
+      },
+      "source_pixels": 50,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-273",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.203117,
+        "y": 0.887966
+      },
+      "size": {
+        "x": 0.003897,
+        "y": 0.006387
+      },
+      "source_pixels": 49,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-274",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.590843,
+        "y": 0.763286
+      },
+      "size": {
+        "x": 0.002273,
+        "y": 0.001277
+      },
+      "source_pixels": 47,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-275",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.091005,
+        "y": 0.890266
+      },
+      "size": {
+        "x": 0.000812,
+        "y": 0.010986
+      },
+      "source_pixels": 47,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-276",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.126725,
+        "y": 0.09696
+      },
+      "size": {
+        "x": 0.00276,
+        "y": 0.002299
+      },
+      "source_pixels": 41,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-277",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.455512,
+        "y": 0.405084
+      },
+      "size": {
+        "x": 0.005033,
+        "y": 0.001277
+      },
+      "source_pixels": 41,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-278",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.677707,
+        "y": 0.33674
+      },
+      "size": {
+        "x": 0.000974,
+        "y": 0.006643
+      },
+      "source_pixels": 40,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-279",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.103994,
+        "y": 0.105646
+      },
+      "size": {
+        "x": 0.00276,
+        "y": 0.002299
+      },
+      "source_pixels": 39,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-280",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.585972,
+        "y": 0.808125
+      },
+      "size": {
+        "x": 0.001624,
+        "y": 0.001022
+      },
+      "source_pixels": 39,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-281",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.911755,
+        "y": 0.823327
+      },
+      "size": {
+        "x": 0.005033,
+        "y": 0.001277
+      },
+      "source_pixels": 39,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-282",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.576636,
+        "y": 0.258815
+      },
+      "size": {
+        "x": 0.003085,
+        "y": 0.00511
+      },
+      "source_pixels": 38,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-283",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.705553,
+        "y": 0.25907
+      },
+      "size": {
+        "x": 0.003085,
+        "y": 0.00511
+      },
+      "source_pixels": 38,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-284",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.319614,
+        "y": 0.157384
+      },
+      "size": {
+        "x": 0.000812,
+        "y": 0.007154
+      },
+      "source_pixels": 37,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-285",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.96363,
+        "y": 0.837506
+      },
+      "size": {
+        "x": 0.004546,
+        "y": 0.002555
+      },
+      "source_pixels": 37,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-286",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.783569,
+        "y": 0.444175
+      },
+      "size": {
+        "x": 0.001299,
+        "y": 0.001277
+      },
+      "source_pixels": 35,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-287",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.185176,
+        "y": 0.107946
+      },
+      "size": {
+        "x": 0.001137,
+        "y": 0.006387
+      },
+      "source_pixels": 34,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-288",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.79599,
+        "y": 0.558763
+      },
+      "size": {
+        "x": 0.002435,
+        "y": 0.002044
+      },
+      "source_pixels": 34,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-289",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.04189,
+        "y": 0.650102
+      },
+      "size": {
+        "x": 0.002923,
+        "y": 0.004343
+      },
+      "source_pixels": 34,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-290",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.592872,
+        "y": 0.785258
+      },
+      "size": {
+        "x": 0.001786,
+        "y": 0.002299
+      },
+      "source_pixels": 34,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-291",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.048872,
+        "y": 0.649974
+      },
+      "size": {
+        "x": 0.002923,
+        "y": 0.004088
+      },
+      "source_pixels": 33,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-292",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.880662,
+        "y": 0.373531
+      },
+      "size": {
+        "x": 0.000649,
+        "y": 0.002555
+      },
+      "source_pixels": 31,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-293",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.141663,
+        "y": 0.06745
+      },
+      "size": {
+        "x": 0.00341,
+        "y": 0.002555
+      },
+      "source_pixels": 30,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-294",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.325946,
+        "y": 0.184211
+      },
+      "size": {
+        "x": 0.000812,
+        "y": 0.006132
+      },
+      "source_pixels": 30,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-295",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.874817,
+        "y": 0.138477
+      },
+      "size": {
+        "x": 0.000649,
+        "y": 0.002555
+      },
+      "source_pixels": 29,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-296",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.327894,
+        "y": 0.158789
+      },
+      "size": {
+        "x": 0.000812,
+        "y": 0.005876
+      },
+      "source_pixels": 29,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-297",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.915895,
+        "y": 0.824604
+      },
+      "size": {
+        "x": 0.003247,
+        "y": 0.001277
+      },
+      "source_pixels": 28,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-298",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.976214,
+        "y": 0.874553
+      },
+      "size": {
+        "x": 0.001461,
+        "y": 0.003577
+      },
+      "source_pixels": 26,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-299",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.669346,
+        "y": 0.355902
+      },
+      "size": {
+        "x": 0.001137,
+        "y": 0.004599
+      },
+      "source_pixels": 25,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-300",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.949667,
+        "y": 0.173608
+      },
+      "size": {
+        "x": 0.001624,
+        "y": 0.003321
+      },
+      "source_pixels": 24,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-301",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.452103,
+        "y": 0.407511
+      },
+      "size": {
+        "x": 0.001786,
+        "y": 0.003577
+      },
+      "source_pixels": 24,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-302",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.452103,
+        "y": 0.415687
+      },
+      "size": {
+        "x": 0.001786,
+        "y": 0.003577
+      },
+      "source_pixels": 24,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-303",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.458922,
+        "y": 0.415687
+      },
+      "size": {
+        "x": 0.001786,
+        "y": 0.003577
+      },
+      "source_pixels": 24,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-304",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.458922,
+        "y": 0.407384
+      },
+      "size": {
+        "x": 0.001786,
+        "y": 0.003321
+      },
+      "source_pixels": 23,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-305",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.578747,
+        "y": 0.763286
+      },
+      "size": {
+        "x": 0.001137,
+        "y": 0.001277
+      },
+      "source_pixels": 23,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-306",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.58037,
+        "y": 0.763286
+      },
+      "size": {
+        "x": 0.001137,
+        "y": 0.001277
+      },
+      "source_pixels": 23,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-307",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.891703,
+        "y": 0.79535
+      },
+      "size": {
+        "x": 0.001948,
+        "y": 0.003066
+      },
+      "source_pixels": 23,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-308",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.950641,
+        "y": 0.79535
+      },
+      "size": {
+        "x": 0.001948,
+        "y": 0.003066
+      },
+      "source_pixels": 23,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-309",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.950641,
+        "y": 0.887583
+      },
+      "size": {
+        "x": 0.001948,
+        "y": 0.003066
+      },
+      "source_pixels": 23,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-310",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.926855,
+        "y": 0.188554
+      },
+      "size": {
+        "x": 0.001137,
+        "y": 0.001533
+      },
+      "source_pixels": 22,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-311",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.317909,
+        "y": 0.201201
+      },
+      "size": {
+        "x": 0.001299,
+        "y": 0.003832
+      },
+      "source_pixels": 22,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-312",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.706202,
+        "y": 0.216786
+      },
+      "size": {
+        "x": 0.001786,
+        "y": 0.00281
       },
       "source_pixels": 21,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-313",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.582156,
+        "y": 0.763286
+      },
+      "size": {
+        "x": 0.000812,
+        "y": 0.001277
+      },
+      "source_pixels": 21,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-314",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.584592,
+        "y": 0.763286
+      },
+      "size": {
+        "x": 0.000812,
+        "y": 0.001277
+      },
+      "source_pixels": 21,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-315",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.592872,
+        "y": 0.763286
+      },
+      "size": {
+        "x": 0.000812,
+        "y": 0.001277
+      },
+      "source_pixels": 21,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-316",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.596119,
+        "y": 0.763286
+      },
+      "size": {
+        "x": 0.000812,
+        "y": 0.001277
+      },
+      "source_pixels": 21,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-317",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.037263,
+        "y": 0.242974
+      },
+      "size": {
+        "x": 0.000812,
+        "y": 0.001022
+      },
+      "source_pixels": 20,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-318",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.783569,
+        "y": 0.442386
+      },
+      "size": {
+        "x": 0.000649,
+        "y": 0.001788
+      },
+      "source_pixels": 20,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-319",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.650836,
+        "y": 0.695835
+      },
+      "size": {
+        "x": 0.000812,
+        "y": 0.003832
+      },
+      "source_pixels": 20,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-320",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.587758,
+        "y": 0.763286
+      },
+      "size": {
+        "x": 0.000649,
+        "y": 0.001277
+      },
+      "source_pixels": 20,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-321",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.588732,
+        "y": 0.763286
+      },
+      "size": {
+        "x": 0.000649,
+        "y": 0.001277
+      },
+      "source_pixels": 20,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-322",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.588732,
+        "y": 0.811318
+      },
+      "size": {
+        "x": 0.000649,
+        "y": 0.001277
+      },
+      "source_pixels": 20,
+      "source": "point_map_red_engineering_layer",
+      "semantic_status": "unresolved_geometry"
+    },
+    {
+      "geometry_id": "PM2-GEO-323",
+      "category": "source_geometry",
+      "center": {
+        "x": 0.977513,
+        "y": 0.87072
+      },
+      "size": {
+        "x": 0.000812,
+        "y": 0.003066
+      },
+      "source_pixels": 20,
       "source": "point_map_red_engineering_layer",
       "semantic_status": "unresolved_geometry"
     }

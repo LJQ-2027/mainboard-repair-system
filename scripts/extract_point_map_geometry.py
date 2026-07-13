@@ -28,12 +28,34 @@ def connected_regions(mask, minimum_pixels=20):
         if len(xs) >= minimum_pixels:
             regions.append({
                 "pixels": len(xs),
+                "points": list(zip(xs, ys)),
                 "x": min(xs),
                 "y": min(ys),
                 "width": max(xs) - min(xs) + 1,
                 "height": max(ys) - min(ys) + 1,
             })
     return sorted(regions, key=lambda region: region["pixels"], reverse=True)
+
+
+def convex_hull(points):
+    unique = sorted(set(points))
+    if len(unique) <= 2:
+        return unique
+
+    def cross(origin, a, b):
+        return (a[0] - origin[0]) * (b[1] - origin[1]) - (a[1] - origin[1]) * (b[0] - origin[0])
+
+    lower = []
+    for point in unique:
+        while len(lower) >= 2 and cross(lower[-2], lower[-1], point) <= 0:
+            lower.pop()
+        lower.append(point)
+    upper = []
+    for point in reversed(unique):
+        while len(upper) >= 2 and cross(upper[-2], upper[-1], point) <= 0:
+            upper.pop()
+        upper.append(point)
+    return lower[:-1] + upper[:-1]
 
 
 def normalize_regions(regions, image_width, image_height):
@@ -47,7 +69,7 @@ def normalize_regions(regions, image_width, image_height):
         if region["width"] < 4 or region["height"] < 4 or area_ratio > 0.20 or aspect > 18 or occupancy < 0.025:
             continue
         category = "shield_region" if area_ratio > 0.015 else "source_geometry"
-        normalized.append({
+        normalized_region = {
             "geometry_id": f"PM2-GEO-{len(normalized) + 1:03d}",
             "category": category,
             "center": {
@@ -61,7 +83,19 @@ def normalize_regions(regions, image_width, image_height):
             "source_pixels": region["pixels"],
             "source": "point_map_red_engineering_layer",
             "semantic_status": "unresolved_geometry",
-        })
+        }
+        if category == "shield_region":
+            points = region.get("points") or [
+                (region["x"], region["y"]),
+                (region["x"] + region["width"] - 1, region["y"]),
+                (region["x"] + region["width"] - 1, region["y"] + region["height"] - 1),
+                (region["x"], region["y"] + region["height"] - 1),
+            ]
+            normalized_region["polygon"] = [
+                [round(x / image_width, 6), round(y / image_height, 6)]
+                for x, y in convex_hull(points)
+            ]
+        normalized.append(normalized_region)
     return normalized
 
 

@@ -37,6 +37,17 @@
         <div class="view point-map-view" id="pointmapView"><div class="image-layer point-map"><img alt="KM4 F151主板点位图"><div class="markers"></div></div></div>
         <div class="view model-view" id="modelView">
           <div id="modelCanvas"></div>
+          <div class="anatomy-panel" aria-label="模型解剖层控制">
+            <div class="anatomy-segments" role="group" aria-label="屏蔽罩状态">
+              <button type="button" data-shield-mode="installed" aria-pressed="false" title="显示安装状态的屏蔽罩">罩上</button>
+              <button type="button" data-shield-mode="xray" aria-pressed="false" title="半透明查看屏蔽罩下器件">透视</button>
+              <button type="button" data-shield-mode="removed" aria-pressed="true" title="移除屏蔽罩查看器件">拆罩</button>
+            </div>
+            <select id="moduleFocus" aria-label="选择功能模块">
+              <option value="auto">跟随选择</option>
+              <option value="none">不显示模块</option>
+            </select>
+          </div>
           <div class="model-legend" aria-label="模型几何置信度">
             <span><i class="legend-body"></i>可信实体</span>
             <span><i class="legend-outline"></i>参考轮廓</span>

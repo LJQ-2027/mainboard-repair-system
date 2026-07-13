@@ -16,10 +16,10 @@
 - Create: `assets/cross-source-registration/anatomy-state.js`
 - Create: `tests/anatomy-state.test.mjs`
 
-- [ ] Write failing tests for shield extraction, anatomy-mode presentation, point coverage, module filtering, and zoom-label visibility.
-- [ ] Run the targeted Node test and confirm the missing-module failure.
-- [ ] Implement the pure state helpers and pass the targeted test.
-- [ ] Run the complete Node test suite.
+- [x] Write failing tests for shield extraction, anatomy-mode presentation, point coverage, module filtering, and zoom-label visibility.
+- [x] Run the targeted Node test and confirm the missing-module failure.
+- [x] Implement the pure state helpers and pass the targeted test.
+- [x] Run the complete Node test suite.
 
 ### Task 2: Three.js Anatomy Layers
 
@@ -27,11 +27,11 @@
 - Modify: `assets/cross-source-registration/board-renderer.js`
 - Modify: `assets/cross-source-registration/app.js`
 
-- [ ] Load the existing shield geometry and board-atlas module datasets.
-- [ ] Build stamped-metal shield groups above the package layer.
-- [ ] Apply Installed, X-ray, and Removed presentation rules without changing component identities.
-- [ ] Build source-backed module polygons and synchronize them to reviewed-entity selection.
-- [ ] Build reviewed designator sprites and update their visibility from orthographic zoom.
+- [x] Load the existing shield geometry and board-atlas module datasets.
+- [x] Build stamped-metal shield groups above the package layer.
+- [x] Apply Installed, X-ray, and Removed presentation rules without changing component identities.
+- [x] Build source-backed module polygons and synchronize them to reviewed-entity selection.
+- [x] Build reviewed designator sprites and update their visibility from orthographic zoom.
 
 ### Task 3: Compact Controls
 
@@ -40,9 +40,9 @@
 - Modify: `assets/cross-source-registration/styles.css`
 - Modify: `assets/cross-source-registration/app.js`
 
-- [ ] Add a stable segmented anatomy control and module-focus menu.
-- [ ] Preserve keyboard focus, selected-state readability, and mobile layout.
-- [ ] Keep model controls hidden outside the model tab.
+- [x] Add a stable segmented anatomy control and module-focus menu.
+- [x] Preserve keyboard focus, selected-state readability, and mobile layout.
+- [x] Keep model controls hidden outside the model tab.
 
 ### Task 4: Verification And State Return
 
@@ -50,7 +50,6 @@
 - Modify: `docs/km4-cross-source-registration-2026-07-13.md`
 - Modify: project ledger and Vault cards after evidence exists.
 
-- [ ] Run JavaScript syntax checks, all Node tests, all Python tests, and standalone registration validation.
-- [ ] Verify desktop and mobile anatomy modes, module focus, labels, selection, zoom, drag, reset, focus states, overflow, and runtime logs in headed Chromium.
-- [ ] Record the source boundary, implementation commits, verification evidence, and remaining GLB/front-back work.
-
+- [x] Run JavaScript syntax checks, all Node tests, all Python tests, and standalone registration validation.
+- [x] Verify desktop and mobile anatomy modes, module focus, labels, selection, zoom, drag, reset, focus states, overflow, and runtime logs in headed Chromium.
+- [x] Record the source boundary, implementation commits, verification evidence, and remaining GLB/front-back work.

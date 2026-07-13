@@ -65,6 +65,7 @@ export function buildRenderDescriptor(component, options = {}) {
     confidence,
     layer,
     selectable: Boolean(options.reviewed),
+    normalizedCenter: { ...source.center },
     center: {
       x: source.center.x * BOARD_WIDTH - BOARD_WIDTH / 2,
       y: (1 - source.center.y) * BOARD_HEIGHT - BOARD_HEIGHT / 2,
