@@ -4,13 +4,15 @@ import { BoardRenderer } from './board-renderer.js';
 import { PointMapViewport } from './point-map-viewport.js';
 import { mergeCompiledSchematicLinks } from './source-links.js';
 import { extractModuleRegions, extractShieldRegions } from './anatomy-state.js';
-import { buildEntityTarget, buildModuleTarget } from './repair-focus-state.js';
+import { buildEntityTarget, buildModuleTarget, nextSideId } from './repair-focus-state.js';
 
 const DATA_URL = '../../knowledge-base/km4-cross-source-registration.json';
 const GEOMETRY_URL = '../../knowledge-base/km4-board-compiled.json';
 const SCHEMATIC_URL = '../../knowledge-base/km4-schematic-compiled.json';
 const SHIELD_URL = '../../knowledge-base/km4-point-map-geometry.json';
 const ATLAS_URL = '../../knowledge-base/board-atlas-mvp.json';
+const SIDE_MANIFEST_URL = '../../knowledge-base/km4-board-sides.json';
+const PAGE_ONE_GEOMETRY_URL = '../../knowledge-base/km4-board-compiled-page-1.json';
 const views = { photo: document.querySelector('#photoView'), pointmap: document.querySelector('#pointmapView'), model: document.querySelector('#modelView') };
 let data;
 let matrix;
@@ -22,10 +24,85 @@ let activeView = 'photo';
 let moduleFocusMode = 'auto';
 let anatomy;
 let currentRepairTarget;
+let sideDataById = new Map();
+let sideIds = [];
+let activeSideId = 'main_page_2';
+let sideTransitionLocked = false;
+
+function populateModuleMenu(modules) {
+  const moduleMenu = document.querySelector('#moduleFocus');
+  moduleMenu.replaceChildren();
+  [['auto', '跟随选择'], ['none', '不显示模块']].forEach(([value, label]) => {
+    const option = document.createElement('option');
+    option.value = value;
+    option.textContent = label;
+    moduleMenu.append(option);
+  });
+  modules.forEach((module) => {
+    const option = document.createElement('option');
+    option.value = module.moduleId;
+    option.textContent = module.name;
+    moduleMenu.append(option);
+  });
+  moduleFocusMode = 'auto';
+  moduleMenu.value = 'auto';
+}
+
+function updateSideControls() {
+  document.querySelectorAll('[data-side-id]').forEach((button) => {
+    button.setAttribute('aria-pressed', String(button.dataset.sideId === activeSideId));
+    button.disabled = sideTransitionLocked;
+  });
+  document.querySelector('#flipSide').disabled = sideTransitionLocked;
+  const sideData = sideDataById.get(activeSideId);
+  document.querySelector('#activeSideLabel').textContent = sideData?.label || activeSideId;
+  const shieldsAvailable = Boolean(sideData?.anatomy.shields.length);
+  document.querySelectorAll('[data-shield-mode]').forEach((button) => { button.disabled = !shieldsAvailable; });
+  const linkedSide = sideDataById.get(data?.side_id);
+  if (linkedSide) document.querySelector('#entityListHeading').textContent = `${linkedSide.label}已关联实体`;
+  const selectedEntity = data?.entities.find((entity) => entity.component_id === selectedId);
+  if (selectedEntity) {
+    document.querySelector('#entityVisibility').textContent = selectedEntity.side_id === activeSideId
+      ? (selectedEntity.proxy_visibility === 'concealed_by_shield' ? '屏蔽罩下' : '代理图可见区域')
+      : `目标位于${sideDataById.get(selectedEntity.side_id)?.label || selectedEntity.side_id}`;
+  }
+  if (activeView === 'model' && sideData) {
+    document.querySelector('#sourceNote').textContent = `${sideData.label}点位图 · ${sideData.audit.accepted_designators} 个已编译位号 · 几何按来源置信度分层`;
+  }
+}
 
 function applyRepairTarget(animate = true) {
-  if (!renderer || !currentRepairTarget) return;
+  if (!renderer || !currentRepairTarget || currentRepairTarget.sideId !== activeSideId) return;
   renderer.setRepairFocus(currentRepairTarget.moduleId, currentRepairTarget.focusRegion, animate);
+}
+
+async function switchModelSide(sideId, animate = true) {
+  if (sideTransitionLocked || sideId === activeSideId || !sideDataById.has(sideId)) return activeSideId;
+  sideTransitionLocked = true;
+  updateSideControls();
+  await renderer.setSideData(sideDataById.get(sideId), animate);
+  activeSideId = sideId;
+  anatomy = sideDataById.get(sideId).anatomy;
+  populateModuleMenu(anatomy.modules);
+  if (currentRepairTarget?.sideId === activeSideId) {
+    renderer.select(selectedId);
+    applyRepairTarget();
+  } else {
+    renderer.setModuleFocus(null);
+    renderer.clearRepairFocus(false);
+  }
+  sideTransitionLocked = false;
+  updateSideControls();
+  return activeSideId;
+}
+
+function activateRepairTarget() {
+  if (!currentRepairTarget || activeView !== 'model') return;
+  if (currentRepairTarget.recommendedSideId !== activeSideId) {
+    void switchModelSide(currentRepairTarget.recommendedSideId);
+  } else {
+    applyRepairTarget();
+  }
 }
 
 function addMarkers(layer, positions, entities) {
@@ -71,10 +148,12 @@ function selectEntity(componentId) {
   document.querySelector('#schematicEvidence').innerHTML = entity.schematic_links.map((link) => evidenceCard(link, 'schematic')).join('');
   document.querySelector('#repairEvidence').innerHTML = entity.repair_links.map((link) => evidenceCard(link, 'repair')).join('');
   renderer.select(componentId);
-  if (moduleFocusMode === 'auto') {
-    currentRepairTarget = buildEntityTarget(data.board_id, entity, anatomy.modules);
-    if (activeView === 'model') applyRepairTarget();
-  }
+  moduleFocusMode = 'auto';
+  document.querySelector('#moduleFocus').value = 'auto';
+  const targetModules = sideDataById.get(entity.side_id)?.anatomy.modules || [];
+  currentRepairTarget = buildEntityTarget(data.board_id, entity, targetModules);
+  updateSideControls();
+  activateRepairTarget();
   if (activeView === 'pointmap' && pointMapViewport) pointMapViewport.focus(state.boardPoint);
 }
 
@@ -84,37 +163,39 @@ function setView(name) {
   Object.entries(views).forEach(([key, view]) => view.classList.toggle('active', key === name));
   document.querySelector('#pointMapTools').hidden = name !== 'pointmap';
   document.querySelector('#modelTools').hidden = name !== 'model';
+  if (name !== 'model' && data) document.querySelector('#sourceNote').textContent = `${data.registration.proxy_label} · ${data.registration.proxy_limit}`;
   if (name === 'model') {
     renderer.setInspectionAngle(true);
     document.querySelector('#toggleInspection').setAttribute('aria-pressed', 'false');
     requestAnimationFrame(() => {
       renderer.reset();
       renderer.resize();
-      applyRepairTarget();
+      if (currentRepairTarget?.sideId === activeSideId) applyRepairTarget();
     });
   }
   if (name === 'pointmap') requestAnimationFrame(() => pointMapViewport?.reset());
+  updateSideControls();
 }
 
 async function init() {
-  const [response, geometryResponse, schematicResponse, shieldResponse, atlasResponse] = await Promise.all([
+  const [response, geometryResponse, schematicResponse, shieldResponse, atlasResponse, manifestResponse, pageOneResponse] = await Promise.all([
     fetch(DATA_URL),
     fetch(GEOMETRY_URL),
     fetch(SCHEMATIC_URL),
     fetch(SHIELD_URL),
     fetch(ATLAS_URL),
+    fetch(SIDE_MANIFEST_URL),
+    fetch(PAGE_ONE_GEOMETRY_URL),
   ]);
-  const responses = [response, geometryResponse, schematicResponse, shieldResponse, atlasResponse];
+  const responses = [response, geometryResponse, schematicResponse, shieldResponse, atlasResponse, manifestResponse, pageOneResponse];
   if (responses.some((candidate) => !candidate.ok)) throw new Error(`Dataset failed to load: ${responses.map((candidate) => candidate.status).join('/')}`);
   data = await response.json();
   geometryData = await geometryResponse.json();
   const schematicData = await schematicResponse.json();
   const shieldData = await shieldResponse.json();
   const atlasData = await atlasResponse.json();
-  anatomy = {
-    shields: extractShieldRegions(shieldData),
-    modules: extractModuleRegions(atlasData, 'main_page_2'),
-  };
+  const sideManifest = await manifestResponse.json();
+  const pageOneGeometry = await pageOneResponse.json();
   const compiledByDesignator = new Map(geometryData.components.map((component) => [component.designator, component]));
   data.entities = data.entities.map((originalEntity) => {
     const entity = {
@@ -133,6 +214,29 @@ async function init() {
       },
     };
   });
+  const geometryBySide = new Map([
+    ['main_page_1', pageOneGeometry],
+    ['main_page_2', geometryData],
+  ]);
+  sideIds = sideManifest.sides.map((side) => side.side_id);
+  sideDataById = new Map(sideManifest.sides.map((side) => {
+    const compiled = geometryBySide.get(side.side_id);
+    return [side.side_id, {
+      sideId: side.side_id,
+      label: side.label,
+      entities: side.side_id === data.side_id ? data.entities : [],
+      boardOutline: compiled.board_outline,
+      compiledComponents: compiled.components,
+      audit: compiled.audit,
+      engineeringTextureUrl: `../../${side.engineering_texture}`,
+      anatomy: {
+        shields: side.side_id === data.side_id ? extractShieldRegions(shieldData) : [],
+        modules: extractModuleRegions(atlasData, side.side_id),
+      },
+    }];
+  }));
+  activeSideId = sideManifest.default_side_id;
+  anatomy = sideDataById.get(activeSideId).anatomy;
   const source = data.registration.anchors.slice(0, 4).map((anchor) => anchor.board);
   const target = data.registration.anchors.slice(0, 4).map((anchor) => anchor.image);
   matrix = solveHomography(source, target);
@@ -150,20 +254,11 @@ async function init() {
 
   renderer = new BoardRenderer(
     document.querySelector('#modelCanvas'),
-    data.entities,
-    geometryData.board_outline,
-    geometryData.components,
-    `../../${data.registration.point_map_image}`,
-    anatomy,
+    sideDataById.get(activeSideId),
     selectEntity,
   );
-  const moduleMenu = document.querySelector('#moduleFocus');
-  anatomy.modules.forEach((module) => {
-    const option = document.createElement('option');
-    option.value = module.moduleId;
-    option.textContent = module.name;
-    moduleMenu.append(option);
-  });
+  populateModuleMenu(anatomy.modules);
+  updateSideControls();
   document.querySelector('#sourceNote').textContent = `${data.registration.proxy_label} · ${data.registration.proxy_limit}`;
   const list = document.querySelector('#entityList');
   data.entities.forEach((entity) => {
@@ -195,8 +290,9 @@ document.querySelector('#moduleFocus').addEventListener('change', (event) => {
   moduleFocusMode = event.currentTarget.value;
   if (moduleFocusMode === 'auto') {
     const entity = data?.entities.find((candidate) => candidate.component_id === selectedId);
-    currentRepairTarget = entity ? buildEntityTarget(data.board_id, entity, anatomy.modules) : null;
-    if (activeView === 'model') applyRepairTarget();
+    const targetModules = entity ? sideDataById.get(entity.side_id)?.anatomy.modules || [] : [];
+    currentRepairTarget = entity ? buildEntityTarget(data.board_id, entity, targetModules) : null;
+    activateRepairTarget();
   } else if (moduleFocusMode === 'none') {
     currentRepairTarget = null;
     renderer?.setModuleFocus(null);
@@ -206,6 +302,13 @@ document.querySelector('#moduleFocus').addEventListener('change', (event) => {
     currentRepairTarget = module ? buildModuleTarget(data.board_id, module) : null;
     if (activeView === 'model') applyRepairTarget();
   }
+});
+document.querySelectorAll('[data-side-id]').forEach((button) => button.addEventListener('click', () => {
+  void switchModelSide(button.dataset.sideId);
+}));
+document.querySelector('#flipSide').addEventListener('click', () => {
+  const targetSideId = nextSideId(sideIds, activeSideId);
+  if (targetSideId) void switchModelSide(targetSideId);
 });
 document.querySelector('#zoomOutPointMap').addEventListener('click', () => pointMapViewport?.zoomBy(0.8));
 document.querySelector('#zoomInPointMap').addEventListener('click', () => pointMapViewport?.zoomBy(1.25));

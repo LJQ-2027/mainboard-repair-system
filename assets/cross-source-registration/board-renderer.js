@@ -255,14 +255,9 @@ function createLabelSprite(text) {
 }
 
 export class BoardRenderer {
-  constructor(container, entities, boardOutline, compiledComponents, engineeringTextureUrl, anatomy, onSelect) {
+  constructor(container, sideData, onSelect) {
     this.container = container;
-    this.entities = entities;
-    this.boardOutline = boardOutline;
-    this.compiledComponents = compiledComponents;
-    this.engineeringTextureUrl = engineeringTextureUrl;
-    this.shieldRegions = anatomy.shields;
-    this.modules = anatomy.modules;
+    this.assignSideData(sideData);
     this.onSelect = onSelect;
     this.meshes = new Map();
     this.renderObjects = new Map();
@@ -275,6 +270,7 @@ export class BoardRenderer {
     this.activeFocusRegion = null;
     this.selectedComponentId = null;
     this.cameraAnimation = null;
+    this.sideTransitioning = false;
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0xe7eae5);
     this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 20);
@@ -294,11 +290,22 @@ export class BoardRenderer {
     this.inspectionAngle = false;
     this.selectionHalo = null;
     this.build();
+    this.buildLights();
     this.renderer.compile(this.scene, this.camera);
     this.bind();
     this.resize();
     this.observer = new ResizeObserver(() => this.resize());
     this.observer.observe(container);
+  }
+
+  assignSideData(sideData) {
+    this.sideId = sideData.sideId;
+    this.entities = sideData.entities;
+    this.boardOutline = sideData.boardOutline;
+    this.compiledComponents = sideData.compiledComponents;
+    this.engineeringTextureUrl = sideData.engineeringTextureUrl;
+    this.shieldRegions = sideData.anatomy.shields;
+    this.modules = sideData.anatomy.modules;
   }
 
   createBoardShape() {
@@ -429,9 +436,11 @@ export class BoardRenderer {
     this.buildModules();
     this.buildShields();
     this.buildLabels();
-    this.setShieldMode('removed', false);
+    this.setShieldMode(this.shieldMode, false);
     this.updateLabelVisibility(false);
+  }
 
+  buildLights() {
     this.scene.add(new THREE.HemisphereLight(0xffffff, 0x3a5148, 1.7));
     const key = new THREE.DirectionalLight(0xffffff, 2.5);
     key.position.set(-1.8, -2.4, 4.2);
@@ -441,6 +450,76 @@ export class BoardRenderer {
     const fill = new THREE.DirectionalLight(0xdce9e2, 0.8);
     fill.position.set(2.5, 1.2, 2.5);
     this.scene.add(fill);
+  }
+
+  disposeGroup(group) {
+    group.traverse((child) => {
+      child.geometry?.dispose();
+      const materials = Array.isArray(child.material) ? child.material : [child.material];
+      materials.filter(Boolean).forEach((item) => {
+        item.map?.dispose();
+        item.dispose();
+      });
+    });
+    group.removeFromParent();
+  }
+
+  replaceSideData(sideData, rotationY = 0) {
+    this.disposeGroup(this.group);
+    this.assignSideData(sideData);
+    this.meshes = new Map();
+    this.renderObjects = new Map();
+    this.descriptors = new Map();
+    this.shieldObjects = new Map();
+    this.moduleObjects = new Map();
+    this.labelSprites = new Map();
+    this.activeModuleId = null;
+    this.activeFocusRegion = null;
+    this.selectionHalo = null;
+    this.group = new THREE.Group();
+    this.group.rotation.set(TOP_VIEW_TILT, rotationY, 0);
+    this.scene.add(this.group);
+    this.build();
+    this.renderer.compile(this.scene, this.camera);
+    this.resize();
+  }
+
+  setSideData(sideData, animate = true) {
+    if (this.sideTransitioning || sideData.sideId === this.sideId) return Promise.resolve(this.sideId);
+    this.cancelCameraAnimation();
+    if (!animate) {
+      this.replaceSideData(sideData);
+      return Promise.resolve(this.sideId);
+    }
+    this.sideTransitioning = true;
+    const started = performance.now();
+    const duration = 520;
+    let swapped = false;
+    return new Promise((resolve) => {
+      const tick = (now) => {
+        const progress = Math.min(1, (now - started) / duration);
+        if (progress < 0.5) {
+          const local = 1 - (1 - progress * 2) ** 3;
+          this.group.rotation.y = local * Math.PI / 2;
+        } else {
+          if (!swapped) {
+            swapped = true;
+            this.replaceSideData(sideData, -Math.PI / 2);
+          }
+          const local = (progress - 0.5) * 2;
+          this.group.rotation.y = -Math.PI / 2 + (1 - (1 - local) ** 3) * Math.PI / 2;
+        }
+        this.render();
+        if (progress < 1) requestAnimationFrame(tick);
+        else {
+          this.group.rotation.y = 0;
+          this.sideTransitioning = false;
+          this.render();
+          resolve(this.sideId);
+        }
+      };
+      requestAnimationFrame(tick);
+    });
   }
 
   bind() {

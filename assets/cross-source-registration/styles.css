@@ -63,7 +63,8 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 .entity-list button:focus-visible,
 .icon-button:focus-visible,
 .anatomy-segments button:focus-visible,
-.anatomy-panel select:focus-visible { outline: 3px solid #65a9ff; outline-offset: 2px; }
+.anatomy-panel select:focus-visible,
+.side-panel button:focus-visible { outline: 3px solid #65a9ff; outline-offset: 2px; }
 .icon-button {
   width: 34px;
   height: 34px;
@@ -150,6 +151,35 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
   font: inherit;
   font-size: 10px;
 }
+.side-panel {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px;
+  border: 1px solid #bac3bd;
+  background: #f8f9f6f2;
+}
+.side-segments { display: grid; grid-template-columns: repeat(2, 48px); }
+.side-segments button,
+.side-flip {
+  height: 30px;
+  border: 1px solid #b9c2bc;
+  background: white;
+  color: #405049;
+  font: inherit;
+  font-size: 10px;
+  cursor: pointer;
+}
+.side-segments button { border-right: 0; }
+.side-segments button:last-child { border-right: 1px solid #b9c2bc; }
+.side-segments button[aria-pressed="true"] { background: #17221e; color: white; border-color: #17221e; }
+.side-flip { width: 30px; padding: 0; font-size: 17px; }
+.side-panel button:disabled,
+.anatomy-segments button:disabled { opacity: 0.42; cursor: not-allowed; }
+#activeSideLabel { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 .model-legend {
   position: absolute;
   left: 14px;
@@ -222,4 +252,5 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
   .anatomy-panel { top: 8px; left: 8px; gap: 4px; }
   .anatomy-segments { grid-template-columns: repeat(3, 42px); }
   .anatomy-panel select { width: 112px; }
+  .side-panel { top: 56px; left: 8px; right: auto; }
 }

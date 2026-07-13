@@ -17,7 +17,7 @@
 
 The debug geometry view has been replaced by a layered repair model. Its reset state is a fitted orthographic top view, with a second constrained inspection angle for checking board thickness and package elevation.
 
-- The exact 104-point PCB silhouette remains the substrate boundary.
+- The current 204-point page-2 PCB silhouette remains the substrate boundary.
 - The high-resolution point map is UV-mapped and clipped to the board surface, retaining pads, labels, and engineering structure.
 - Only the 180 high-confidence footprint relationships become elevated package bodies.
 - The 630 medium-confidence relationships remain flat reference outlines, and the 10 low-confidence candidates remain excluded from the physical layer.
@@ -46,6 +46,15 @@ The debug geometry view has been replaced by a layered repair model. Its reset s
 
 `U2001`, `U4000`, `X2100`, `U0600`, `J6101`, `VBAT1`, and `VBUS1`.
 
+## Dual-Side Model
+
+- `km4-board-sides.json` is the explicit side manifest. It uses source-reviewed labels `第1面` and `第2面`; it does not infer front/back naming that the available material does not prove.
+- 第1面 is compiled from PDF page 1 and its own engineering texture: 2,489 decoded text objects, 4,297 vector rectangles, 352 accepted designators, and a 161-point normalized outline.
+- 第2面 remains the reviewed cross-source side: 3,665 decoded text objects, 3,719 vector rectangles, 820 accepted designators, all seven reviewed entities, and a 204-point normalized outline.
+- The renderer replaces the active board scene at the edge-on midpoint of a single-board flip. Each destination scene uses its own outline, texture, components, module polygons, and available shield anatomy.
+- Selecting a reviewed entity always makes it the current repair target. If its recommended side differs from the visible side, the model automatically flips there; the compact side control remains available for manual inspection.
+- When a selected entity is not represented on the visible side, its evidence panel remains visible and explicitly states the side containing the target instead of drawing a false locator.
+
 ## Evidence Boundary
 
 The available proxy photograph shows the board installed with shields. It supports board-context registration but does not expose most chip bodies. Markers for concealed entities therefore indicate the registered position below the shield, not visual component detection. Standardized physical front/back photographs are still required to validate field-photo registration and exposed-component correspondence.
@@ -58,7 +67,7 @@ The PDF has now been parsed directly through its embedded Form XObject using the
 
 The first page-2 compile produced 3,665 decoded text objects, 3,719 vector rectangles, 820 accepted board designators, and recovered all seven reviewed entities. Candidate footprints now drive the 2.5D density layer instead of the earlier 112 anonymous raster regions. Every footprint remains explicitly provisional until the pairing confidence is reviewed.
 
-The compiler now also derives the PCB silhouette from the rendered engineering-mark occupancy layer. Morphological closing, largest-component selection, hole filling, and contour simplification produce a 104-point normalized outline that replaces the manually approximated substrate. Footprint matching is graded as 180 high-confidence, 630 medium-confidence, and 10 low-confidence candidates; low-confidence geometry is excluded from the 2.5D workbench.
+The compiler now also derives the PCB silhouette from the rendered engineering-mark occupancy layer. Morphological closing, largest-component selection, hole filling, and contour simplification currently produce a 204-point normalized page-2 outline that replaces the manually approximated substrate. Footprint matching is graded as 180 high-confidence, 630 medium-confidence, and 10 low-confidence candidates; low-confidence geometry is excluded from the 2.5D workbench.
 
 ## Verification
 
@@ -87,3 +96,10 @@ Repair-focus verification on 2026-07-13:
 - 39 Node tests and 33 Python tests passed; the standalone validator passed for seven entities and four anchors.
 - Headed Chromium passed at `1600x900` and `390x844`: U2001, U4000, and U0600 produced distinct nonblank focus frames; full-board reset retained U2001 selection; controls remained in auto-module mode; no horizontal overflow or console/page errors occurred.
 - Repair-focus screenshots are kept under ignored local `output/playwright/km4-repair-focus-*.png`.
+
+Dual-side verification on 2026-07-13:
+
+- 40 Node tests and 37 Python tests passed; both side artifacts and the manifest parsed successfully, and the standalone validator passed for seven entities and four anchors.
+- Headed Chromium passed at `1600x900` and `390x844`: distinct nonblank side frames, automatic U2001 return to 第2面, manual flip in both directions, transition control locking, target preservation, side-specific module menus, 第2面 shield/X-ray mode, 第1面 module focus, drag, wheel zoom, full-board reset, keyboard-visible focus, no panel overlap, no horizontal overflow, and zero console/page errors.
+- A regression path verifies that selecting U2001 still takes ownership of the repair target and flips to 第2面 after a manual 第1面 module selection.
+- Dual-side screenshots are kept under ignored local `output/playwright/km4-sides-*.png`.

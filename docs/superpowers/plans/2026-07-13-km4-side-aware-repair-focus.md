@@ -96,13 +96,13 @@ assert.deepEqual(frame.center, { x: 0, y: 0 });
 - Modify: `assets/cross-source-registration/repair-focus-state.js`
 - Test: `tests/repair-focus-state.test.mjs`
 
-- [ ] Load the side manifest and build one Three.js group per side from its own texture, outline, descriptors, modules, shields, and labels.
-- [ ] Add tests for current-side preservation, explicit recommended-side switching, and no-guess behavior when a target has no recommendation.
-- [ ] Add a two-option side control and flip icon using reviewed `第1面` / `第2面` labels.
-- [ ] Animate the board group to edge-on, swap visible groups once, finish the rotation, and lock side controls during the transition.
-- [ ] Preserve valid selected targets and anatomy state; retain the information panel without a locator when the destination side lacks target geometry.
-- [ ] Verify automatic U2001 side selection, manual flip in both directions, target preservation, drag, zoom, reset, focus states, and mobile layout.
-- [ ] Commit Checkpoint 3.
+- [x] Load the side manifest and build the active Three.js board group from that side's own texture, outline, descriptors, modules, shields, and labels.
+- [x] Add tests for current-side preservation, explicit recommended-side switching, no-guess behavior when a target has no recommendation, and registered-side cycling.
+- [x] Add a two-option side control and flip icon using reviewed `第1面` / `第2面` labels.
+- [x] Animate the board group to edge-on, replace its side-backed scene once, finish the rotation, and lock side controls during the transition.
+- [x] Preserve valid selected targets and anatomy state; retain the information panel without a locator when the destination side lacks target geometry.
+- [x] Verify automatic U2001 side selection, manual flip in both directions, target preservation, drag, zoom, reset, focus states, and mobile layout.
+- [x] Commit Checkpoint 3.
 
 ### Task 6: Full Verification And Project State Return
 

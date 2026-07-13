@@ -48,6 +48,14 @@
               <option value="none">不显示模块</option>
             </select>
           </div>
+          <div class="side-panel" aria-label="主板面切换">
+            <div class="side-segments" role="group" aria-label="选择主板面">
+              <button type="button" data-side-id="main_page_1" aria-pressed="false">第1面</button>
+              <button type="button" data-side-id="main_page_2" aria-pressed="true">第2面</button>
+            </div>
+            <button class="side-flip" id="flipSide" type="button" title="翻转主板" aria-label="翻转主板">⇄</button>
+            <span id="activeSideLabel" aria-live="polite">第2面</span>
+          </div>
           <div class="model-legend" aria-label="模型几何置信度">
             <span><i class="legend-body"></i>可信实体</span>
             <span><i class="legend-outline"></i>参考轮廓</span>
@@ -63,7 +71,7 @@
       <dl class="facts"><div><dt>功能模块</dt><dd id="entityModule"></dd></div><div><dt>统一坐标</dt><dd id="entityCoordinate"></dd></div></dl>
       <section><h3>原理图关系</h3><div id="schematicEvidence"></div></section>
       <section><h3>维修指导</h3><div id="repairEvidence"></div></section>
-      <section class="entity-list-section"><h3>本面已关联实体</h3><div class="entity-list" id="entityList"></div></section>
+      <section class="entity-list-section"><h3 id="entityListHeading">第2面已关联实体</h3><div class="entity-list" id="entityList"></div></section>
     </aside>
   </main>
   <dialog class="evidence-dialog" id="evidenceDialog" aria-label="原理图局部证据">

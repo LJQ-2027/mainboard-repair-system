@@ -60,6 +60,12 @@ export function isPointInFocus(point, region, padding = 0.015) {
     && Math.abs(point.y - region.center.y) <= region.size.y / 2 + padding;
 }
 
+export function nextSideId(sideIds, currentSideId) {
+  if (!sideIds.length) return null;
+  const currentIndex = sideIds.indexOf(currentSideId);
+  return sideIds[(currentIndex + 1) % sideIds.length];
+}
+
 export function resetFocusView(state) {
   return { ...state, focusRegion: null };
 }
