@@ -43,10 +43,23 @@ def _candidate_footprint(label, rectangles, bounds, category):
         scale = max(width, height)
         score = distance / scale - (2 if contains else 0)
         if contains or distance <= scale * 2.5:
-            plausible.append((score, rectangle))
+            plausible.append((score, rectangle, contains, distance / scale))
     if not plausible:
         return None
-    return min(plausible, key=lambda item: item[0])[1]
+    score, rectangle, contains, distance_ratio = min(plausible, key=lambda item: item[0])
+    if contains and distance_ratio <= 0.35:
+        confidence = "high"
+    elif contains or distance_ratio <= 0.75:
+        confidence = "medium"
+    else:
+        confidence = "low"
+    return {
+        "rectangle": rectangle,
+        "confidence": confidence,
+        "match_method": "label_inside_vector_rectangle" if contains else "nearest_vector_rectangle",
+        "distance_ratio": round(distance_ratio, 4),
+        "score": round(score, 4),
+    }
 
 
 def compile_designators(labels, rectangles, bounds):
@@ -58,7 +71,7 @@ def compile_designators(labels, rectangles, bounds):
         key = (label["text"].upper(), round(label["x"], 3), round(label["y"], 3))
         if key in compiled:
             continue
-        footprint = _candidate_footprint(label, rectangles, bounds, category)
+        footprint_match = _candidate_footprint(label, rectangles, bounds, category)
         item = {
             "component_id": f"KM4-F151-P2-{label['text'].upper()}",
             "designator": label["text"].upper(),
@@ -67,14 +80,17 @@ def compile_designators(labels, rectangles, bounds):
             "center": normalize_point(label, bounds),
             "source_status": "decoded_pdf_text",
         }
-        if footprint:
+        if footprint_match:
+            footprint = footprint_match["rectangle"]
             item["footprint"] = {
                 "center": normalize_point({"x": footprint["x"] + footprint["width"] / 2, "y": footprint["y"] + footprint["height"] / 2}, bounds),
                 "size": {
                     "x": round(footprint["width"] / (bounds[2] - bounds[0]), 6),
                     "y": round(footprint["height"] / (bounds[3] - bounds[1]), 6),
                 },
-                "confidence": "candidate_nearest_vector_rectangle",
+                "confidence": footprint_match["confidence"],
+                "match_method": footprint_match["match_method"],
+                "distance_ratio": footprint_match["distance_ratio"],
             }
         compiled[key] = item
     return sorted(compiled.values(), key=lambda item: (item["designator"], item["center"]["y"], item["center"]["x"]))

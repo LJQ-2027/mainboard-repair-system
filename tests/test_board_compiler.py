@@ -29,6 +29,13 @@ class BoardCompilerTests(unittest.TestCase):
         result = compile_designators(labels, rectangles, [0, 0, 1000, 500])
         self.assertNotIn("footprint", result[0])
 
+    def test_centered_containing_rectangle_has_high_confidence(self):
+        labels = [{"text": "U2001", "x": 500, "y": 250}]
+        rectangles = [{"x": 460, "y": 210, "width": 80, "height": 80}]
+        result = compile_designators(labels, rectangles, [0, 0, 1000, 500])
+        self.assertEqual(result[0]["footprint"]["confidence"], "high")
+        self.assertEqual(result[0]["footprint"]["match_method"], "label_inside_vector_rectangle")
+
 
 if __name__ == "__main__":
     unittest.main()

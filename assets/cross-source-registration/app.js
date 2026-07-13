@@ -92,14 +92,14 @@ async function init() {
 
   const linkedDesignators = new Set(data.entities.map((entity) => entity.designator));
   const compiledGeometry = geometryData.components
-    .filter((component) => component.footprint && !linkedDesignators.has(component.designator))
+    .filter((component) => component.footprint && component.footprint.confidence !== 'low' && !linkedDesignators.has(component.designator))
     .map((component) => ({
       geometry_id: component.component_id,
       category: component.category,
       center: component.footprint.center,
       size: component.footprint.size,
     }));
-  renderer = new BoardRenderer(document.querySelector('#modelCanvas'), data.entities, data.board_outline, compiledGeometry, selectEntity);
+  renderer = new BoardRenderer(document.querySelector('#modelCanvas'), data.entities, geometryData.board_outline, compiledGeometry, selectEntity);
   document.querySelector('#sourceNote').textContent = `${data.registration.proxy_label} · ${data.registration.proxy_limit}`;
   const list = document.querySelector('#entityList');
   data.entities.forEach((entity) => {

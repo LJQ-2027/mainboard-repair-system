@@ -11,6 +11,9 @@ class CompiledKm4BoardTests(unittest.TestCase):
         data = json.loads((ROOT / "knowledge-base/km4-board-compiled.json").read_text(encoding="utf-8"))
         self.assertTrue(data["audit"]["required_recovery_complete"])
         self.assertGreaterEqual(data["audit"]["accepted_designators"], 800)
+        self.assertGreater(data["audit"]["outline_points"], 20)
+        self.assertGreaterEqual(data["audit"]["footprint_confidence"]["high"], 100)
+        self.assertLess(data["audit"]["footprint_confidence"]["low"], 50)
         self.assertEqual(len(data["components"]), data["audit"]["accepted_designators"])
 
     def test_components_use_normalized_coordinates_and_source_evidence(self):
