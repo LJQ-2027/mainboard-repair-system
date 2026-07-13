@@ -3,10 +3,11 @@ import * as THREE from '../vendor/three/three.module.min.js';
 const COLORS = { board: 0x163c35, copper: 0xc78b45, component: 0x26342f, selected: 0xf2c94c, point: 0xef5b3f };
 
 export class BoardRenderer {
-  constructor(container, entities, boardOutline, onSelect) {
+  constructor(container, entities, boardOutline, sourceGeometry, onSelect) {
     this.container = container;
     this.entities = entities;
     this.boardOutline = boardOutline;
+    this.sourceGeometry = sourceGeometry;
     this.onSelect = onSelect;
     this.meshes = new Map();
     this.scene = new THREE.Scene();
@@ -50,6 +51,28 @@ export class BoardRenderer {
       new THREE.LineBasicMaterial({ color: COLORS.copper }),
     );
     board.add(rim);
+
+    this.sourceGeometry.forEach((region) => {
+      const isShield = region.category === 'shield_region';
+      const height = isShield ? 0.065 : 0.025;
+      const geometry = new THREE.BoxGeometry(
+        Math.max(region.size.x * 2, 0.018),
+        Math.max(region.size.y * 1.25, 0.018),
+        height,
+      );
+      const material = new THREE.MeshStandardMaterial({
+        color: isShield ? 0xb9b5aa : 0x334d43,
+        roughness: isShield ? 0.34 : 0.72,
+        metalness: isShield ? 0.72 : 0.12,
+      });
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.position.set(
+        region.center.x * 2 - 1,
+        (1 - region.center.y) * 1.25 - 0.625,
+        0.015 + height / 2,
+      );
+      this.group.add(mesh);
+    });
 
     this.entities.forEach((entity) => {
       const { center, size } = entity.geometry;

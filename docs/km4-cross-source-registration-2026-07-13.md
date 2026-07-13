@@ -10,6 +10,7 @@
 - A reviewed four-anchor homography projects board coordinates onto the Service Manual installed-mainboard proxy image.
 - Seven source-supported entities share stable identities across the proxy image, point map, schematic evidence, repair guidance, and Three.js 2.5D view.
 - The 2.5D substrate uses an outline derived from the point map. Component footprints use normalized point-map geometry; visual heights are generic and explicitly not engineering dimensions.
+- A deterministic raster extractor now converts the point map's red engineering layer into 112 additional source-driven geometry regions. Large regions render as provisional shield structures and smaller regions provide board-density geometry; unresolved regions do not receive invented designators.
 - Selection is synchronized across view markers, the entity list, and 3D mesh picking.
 
 ## Current Entities
@@ -19,6 +20,8 @@
 ## Evidence Boundary
 
 The available proxy photograph shows the board installed with shields. It supports board-context registration but does not expose most chip bodies. Markers for concealed entities therefore indicate the registered position below the shield, not visual component detection. Standardized physical front/back photographs are still required to validate field-photo registration and exposed-component correspondence.
+
+The point-map PDF stores designator text as vector outlines rather than extractable text. The current offline environment also lacks OCR and PDF-vector parsing dependencies. The 112 extracted regions therefore improve spatial fidelity but remain semantically unresolved until reviewed linkage or a stronger extractor is available.
 
 ## Verification
 

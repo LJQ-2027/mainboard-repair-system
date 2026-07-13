@@ -13,6 +13,7 @@
 - `assets/vision-reference-gallery/`：七个重合机型、21 张已复核 Service Manual 参考图的本地浏览图库。
 - `assets/vision-recognition-demo/`：基于上述参考图运行的浏览器端图像质量检查与七机型相似度检索 Demo。
 - `km4-cross-source-registration.json`：KM4/F151 首批实体的归一化几何、代理照片配准、SCH证据、维修指导和2.5D视觉参数。
+- `km4-point-map-geometry.json`：从KM4/F151第2面点位图红色工程层自动提取的匿名归一化结构区域，不伪造位号语义。
 - `assets/cross-source-registration/`：实体代理图、点位图和参数化2.5D模型共用 `component_id` 的跨资料联动工作台。
 - `training-materials.json`：培训资料条目。
 - `module-principles.json`：手机模块原理、关键链路和后续可转化为诊断说明的基础知识。

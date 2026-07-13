@@ -3,10 +3,12 @@ import { buildSelectionState } from './selection-state.js';
 import { BoardRenderer } from './board-renderer.js';
 
 const DATA_URL = '../../knowledge-base/km4-cross-source-registration.json';
+const GEOMETRY_URL = '../../knowledge-base/km4-point-map-geometry.json';
 const views = { photo: document.querySelector('#photoView'), pointmap: document.querySelector('#pointmapView'), model: document.querySelector('#modelView') };
 let data;
 let matrix;
 let renderer;
+let geometryData;
 let selectedId;
 
 function addMarkers(layer, positions, entities) {
@@ -57,9 +59,10 @@ function setView(name) {
 }
 
 async function init() {
-  const response = await fetch(DATA_URL);
-  if (!response.ok) throw new Error(`Dataset failed to load: ${response.status}`);
+  const [response, geometryResponse] = await Promise.all([fetch(DATA_URL), fetch(GEOMETRY_URL)]);
+  if (!response.ok || !geometryResponse.ok) throw new Error(`Dataset failed to load: ${response.status}/${geometryResponse.status}`);
   data = await response.json();
+  geometryData = await geometryResponse.json();
   const source = data.registration.anchors.slice(0, 4).map((anchor) => anchor.board);
   const target = data.registration.anchors.slice(0, 4).map((anchor) => anchor.image);
   matrix = solveHomography(source, target);
@@ -73,7 +76,7 @@ async function init() {
   addMarkers(document.querySelector('#photoView .markers'), photoPositions, data.entities);
   addMarkers(document.querySelector('#pointmapView .markers'), boardPositions, data.entities);
 
-  renderer = new BoardRenderer(document.querySelector('#modelCanvas'), data.entities, data.board_outline, selectEntity);
+  renderer = new BoardRenderer(document.querySelector('#modelCanvas'), data.entities, data.board_outline, geometryData.regions, selectEntity);
   document.querySelector('#sourceNote').textContent = `${data.registration.proxy_label} · ${data.registration.proxy_limit}`;
   const list = document.querySelector('#entityList');
   data.entities.forEach((entity) => {
