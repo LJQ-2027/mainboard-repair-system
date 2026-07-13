@@ -2,9 +2,11 @@ import { solveHomography } from './registration-core.js';
 import { buildSelectionState } from './selection-state.js';
 import { BoardRenderer } from './board-renderer.js';
 import { PointMapViewport } from './point-map-viewport.js';
+import { mergeCompiledSchematicLinks } from './source-links.js';
 
 const DATA_URL = '../../knowledge-base/km4-cross-source-registration.json';
 const GEOMETRY_URL = '../../knowledge-base/km4-board-compiled.json';
+const SCHEMATIC_URL = '../../knowledge-base/km4-schematic-compiled.json';
 const views = { photo: document.querySelector('#photoView'), pointmap: document.querySelector('#pointmapView'), model: document.querySelector('#modelView') };
 let data;
 let matrix;
@@ -67,12 +69,14 @@ function setView(name) {
 }
 
 async function init() {
-  const [response, geometryResponse] = await Promise.all([fetch(DATA_URL), fetch(GEOMETRY_URL)]);
-  if (!response.ok || !geometryResponse.ok) throw new Error(`Dataset failed to load: ${response.status}/${geometryResponse.status}`);
+  const [response, geometryResponse, schematicResponse] = await Promise.all([fetch(DATA_URL), fetch(GEOMETRY_URL), fetch(SCHEMATIC_URL)]);
+  if (!response.ok || !geometryResponse.ok || !schematicResponse.ok) throw new Error(`Dataset failed to load: ${response.status}/${geometryResponse.status}/${schematicResponse.status}`);
   data = await response.json();
   geometryData = await geometryResponse.json();
+  const schematicData = await schematicResponse.json();
   const compiledByDesignator = new Map(geometryData.components.map((component) => [component.designator, component]));
-  data.entities = data.entities.map((entity) => {
+  data.entities = data.entities.map((originalEntity) => {
+    const entity = mergeCompiledSchematicLinks(originalEntity, schematicData);
     const compiled = compiledByDesignator.get(entity.designator);
     if (!compiled?.footprint) return entity;
     return {
