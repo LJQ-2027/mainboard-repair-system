@@ -95,4 +95,25 @@ export function buildCameraFrame(aspect = 1) {
   };
 }
 
+export function buildFocusFrame(region, aspect = 1) {
+  const frame = buildCameraFrame(aspect);
+  const frameWidth = frame.right - frame.left;
+  const frameHeight = frame.top - frame.bottom;
+  const paddedWidth = (region.size.x * 2 + 0.22) * BOARD_WIDTH;
+  const paddedHeight = (region.size.y * 1.25 + 0.18) * BOARD_HEIGHT;
+  const maximumZoom = aspect >= 1.2 ? 1.9 : 2.2;
+  const zoom = clamp(Math.min(frameWidth / paddedWidth, frameHeight / paddedHeight) * 0.86, 1.35, maximumZoom);
+  return {
+    center: {
+      x: Math.round((region.center.x * BOARD_WIDTH - BOARD_WIDTH / 2) * 1_000_000) / 1_000_000,
+      y: Math.round(((1 - region.center.y) * BOARD_HEIGHT - BOARD_HEIGHT / 2) * 1_000_000) / 1_000_000,
+    },
+    zoom: Math.round(zoom * 1_000_000) / 1_000_000,
+  };
+}
+
+export function buildSelectionRadius(dimensions) {
+  return Math.round(clamp(Math.max(dimensions.x, dimensions.y) * 0.44 + 0.006, 0.022, 0.09) * 1_000_000) / 1_000_000;
+}
+
 export const BOARD_WORLD_SIZE = Object.freeze({ width: BOARD_WIDTH, height: BOARD_HEIGHT });

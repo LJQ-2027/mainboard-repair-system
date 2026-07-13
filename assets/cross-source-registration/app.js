@@ -4,6 +4,7 @@ import { BoardRenderer } from './board-renderer.js';
 import { PointMapViewport } from './point-map-viewport.js';
 import { mergeCompiledSchematicLinks } from './source-links.js';
 import { extractModuleRegions, extractShieldRegions } from './anatomy-state.js';
+import { buildEntityTarget, buildModuleTarget } from './repair-focus-state.js';
 
 const DATA_URL = '../../knowledge-base/km4-cross-source-registration.json';
 const GEOMETRY_URL = '../../knowledge-base/km4-board-compiled.json';
@@ -19,6 +20,13 @@ let selectedId;
 let pointMapViewport;
 let activeView = 'photo';
 let moduleFocusMode = 'auto';
+let anatomy;
+let currentRepairTarget;
+
+function applyRepairTarget(animate = true) {
+  if (!renderer || !currentRepairTarget) return;
+  renderer.setRepairFocus(currentRepairTarget.moduleId, currentRepairTarget.focusRegion, animate);
+}
 
 function addMarkers(layer, positions, entities) {
   const fragment = document.createDocumentFragment();
@@ -63,7 +71,10 @@ function selectEntity(componentId) {
   document.querySelector('#schematicEvidence').innerHTML = entity.schematic_links.map((link) => evidenceCard(link, 'schematic')).join('');
   document.querySelector('#repairEvidence').innerHTML = entity.repair_links.map((link) => evidenceCard(link, 'repair')).join('');
   renderer.select(componentId);
-  if (moduleFocusMode === 'auto') renderer.focusModuleForDesignator(entity.designator);
+  if (moduleFocusMode === 'auto') {
+    currentRepairTarget = buildEntityTarget(data.board_id, entity, anatomy.modules);
+    if (activeView === 'model') applyRepairTarget();
+  }
   if (activeView === 'pointmap' && pointMapViewport) pointMapViewport.focus(state.boardPoint);
 }
 
@@ -79,6 +90,7 @@ function setView(name) {
     requestAnimationFrame(() => {
       renderer.reset();
       renderer.resize();
+      applyRepairTarget();
     });
   }
   if (name === 'pointmap') requestAnimationFrame(() => pointMapViewport?.reset());
@@ -99,13 +111,16 @@ async function init() {
   const schematicData = await schematicResponse.json();
   const shieldData = await shieldResponse.json();
   const atlasData = await atlasResponse.json();
-  const anatomy = {
+  anatomy = {
     shields: extractShieldRegions(shieldData),
     modules: extractModuleRegions(atlasData, 'main_page_2'),
   };
   const compiledByDesignator = new Map(geometryData.components.map((component) => [component.designator, component]));
   data.entities = data.entities.map((originalEntity) => {
-    const entity = mergeCompiledSchematicLinks(originalEntity, schematicData);
+    const entity = {
+      ...mergeCompiledSchematicLinks(originalEntity, schematicData),
+      side_id: originalEntity.side_id || data.side_id,
+    };
     const compiled = compiledByDesignator.get(entity.designator);
     if (!compiled?.footprint) return entity;
     return {
@@ -180,9 +195,16 @@ document.querySelector('#moduleFocus').addEventListener('change', (event) => {
   moduleFocusMode = event.currentTarget.value;
   if (moduleFocusMode === 'auto') {
     const entity = data?.entities.find((candidate) => candidate.component_id === selectedId);
-    renderer?.focusModuleForDesignator(entity?.designator || '');
+    currentRepairTarget = entity ? buildEntityTarget(data.board_id, entity, anatomy.modules) : null;
+    if (activeView === 'model') applyRepairTarget();
+  } else if (moduleFocusMode === 'none') {
+    currentRepairTarget = null;
+    renderer?.setModuleFocus(null);
+    renderer?.clearRepairFocus();
   } else {
-    renderer?.setModuleFocus(moduleFocusMode === 'none' ? null : moduleFocusMode);
+    const module = anatomy.modules.find((candidate) => candidate.moduleId === moduleFocusMode);
+    currentRepairTarget = module ? buildModuleTarget(data.board_id, module) : null;
+    if (activeView === 'model') applyRepairTarget();
   }
 });
 document.querySelector('#zoomOutPointMap').addEventListener('click', () => pointMapViewport?.zoomBy(0.8));

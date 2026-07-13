@@ -44,6 +44,7 @@ export function extractModuleRegions(atlasData, sideId) {
     .map((module) => ({
       moduleId: module.module_id,
       name: module.name,
+      sideId: module.side_id,
       designators: [...(module.designators || [])],
       polygon: module.polygon.map(([x, y]) => [x, y]),
     }));

@@ -56,6 +56,7 @@ test('module extraction keeps only valid source-backed polygons for the requeste
   assert.deepEqual(extractModuleRegions(atlas, 'main_page_2'), [{
     moduleId: 'power',
     name: 'Power',
+    sideId: 'main_page_2',
     designators: ['U1'],
     polygon: [[0.1, 0.2], [0.3, 0.2], [0.3, 0.4], [0.1, 0.4]],
   }]);

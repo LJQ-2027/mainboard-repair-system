@@ -2,13 +2,16 @@ import * as THREE from '../vendor/three/three.module.min.js';
 import {
   BOARD_WORLD_SIZE,
   buildCameraFrame,
+  buildFocusFrame,
   buildRenderDescriptor,
+  buildSelectionRadius,
 } from './model-profiles.js';
 import {
   getShieldPresentation,
   isPointCovered,
   shouldShowLabels,
 } from './anatomy-state.js';
+import { isPointInFocus } from './repair-focus-state.js';
 
 const COLORS = {
   board: 0x17473e,
@@ -269,6 +272,9 @@ export class BoardRenderer {
     this.labelSprites = new Map();
     this.shieldMode = 'removed';
     this.activeModuleId = null;
+    this.activeFocusRegion = null;
+    this.selectedComponentId = null;
+    this.cameraAnimation = null;
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0xe7eae5);
     this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 20);
@@ -365,6 +371,11 @@ export class BoardRenderer {
     object.userData.componentId = descriptor.componentId;
     object.traverse((child) => {
       child.userData.componentId = descriptor.componentId;
+      if (child.material) {
+        child.userData.baseOpacity = child.material.opacity;
+        child.userData.baseTransparent = child.material.transparent;
+        child.userData.baseDepthWrite = child.material.depthWrite;
+      }
       if (child.isMesh) {
         child.castShadow = descriptor.layer === 'body';
         child.receiveShadow = true;
@@ -435,6 +446,7 @@ export class BoardRenderer {
   bind() {
     const canvas = this.renderer.domElement;
     canvas.addEventListener('pointerdown', (event) => {
+      this.cancelCameraAnimation();
       this.drag = { x: event.clientX, y: event.clientY, rx: this.group.rotation.x, rz: this.group.rotation.z };
       canvas.setPointerCapture(event.pointerId);
     });
@@ -453,6 +465,7 @@ export class BoardRenderer {
     canvas.addEventListener('pointercancel', () => { this.drag = null; });
     canvas.addEventListener('wheel', (event) => {
       event.preventDefault();
+      this.cancelCameraAnimation();
       this.camera.zoom = Math.max(0.72, Math.min(4.2, this.camera.zoom * (event.deltaY > 0 ? 0.9 : 1.1)));
       this.camera.updateProjectionMatrix();
       this.updateLabelVisibility(false);
@@ -484,6 +497,7 @@ export class BoardRenderer {
 
   select(componentId) {
     this.clearSelectionStyle();
+    this.selectedComponentId = componentId;
     const object = this.meshes.get(componentId);
     const descriptor = this.descriptors.get(componentId);
     if (!object || !descriptor) return this.render();
@@ -492,7 +506,7 @@ export class BoardRenderer {
       child.material.emissive.setHex(COLORS.selected);
       child.material.emissiveIntensity = 0.2;
     });
-    const radius = Math.max(descriptor.dimensions.x, descriptor.dimensions.y) * 0.58 + 0.008;
+    const radius = buildSelectionRadius(descriptor.dimensions);
     this.selectionHalo = new THREE.Mesh(
       new THREE.RingGeometry(radius * 0.82, radius, 40),
       new THREE.MeshBasicMaterial({ color: COLORS.selected, transparent: true, opacity: 0.92, side: THREE.DoubleSide, depthTest: false }),
@@ -528,6 +542,87 @@ export class BoardRenderer {
     this.render();
   }
 
+  setObjectEmphasis(object, factor) {
+    object.traverse((child) => {
+      if (!child.material || child.userData.baseOpacity === undefined) return;
+      child.material.opacity = child.userData.baseOpacity * factor;
+      child.material.transparent = factor < 1 || child.userData.baseTransparent;
+      child.material.depthWrite = factor >= 1 ? child.userData.baseDepthWrite : false;
+      child.material.needsUpdate = true;
+    });
+  }
+
+  applyRepairEmphasis(region) {
+    this.renderObjects.forEach((object, componentId) => {
+      const descriptor = this.descriptors.get(componentId);
+      const inFocus = !region || isPointCovered(descriptor.normalizedCenter, region, 0.015);
+      const selected = componentId === this.selectedComponentId;
+      this.setObjectEmphasis(object, inFocus || selected ? 1 : 0.52);
+    });
+  }
+
+  cancelCameraAnimation() {
+    if (this.cameraAnimation !== null) cancelAnimationFrame(this.cameraAnimation);
+    this.cameraAnimation = null;
+  }
+
+  animateCamera(center, zoom, duration = 420) {
+    this.cancelCameraAnimation();
+    const start = performance.now();
+    const from = { x: this.camera.position.x, y: this.camera.position.y, zoom: this.camera.zoom };
+    const tick = (now) => {
+      const progress = Math.min(1, (now - start) / duration);
+      const eased = 1 - (1 - progress) ** 3;
+      const x = from.x + (center.x - from.x) * eased;
+      const y = from.y + (center.y - from.y) * eased;
+      this.camera.position.set(x, y, 4);
+      this.camera.lookAt(x, y, 0);
+      this.camera.zoom = from.zoom + (zoom - from.zoom) * eased;
+      this.camera.updateProjectionMatrix();
+      this.updateLabelVisibility(false);
+      this.render();
+      if (progress < 1) this.cameraAnimation = requestAnimationFrame(tick);
+      else this.cameraAnimation = null;
+    };
+    this.cameraAnimation = requestAnimationFrame(tick);
+  }
+
+  focusRegion(region, animate = true) {
+    if (!region) return this.clearRepairFocus(animate);
+    this.activeFocusRegion = region;
+    const aspect = Math.max(this.container.clientWidth, 320) / Math.max(this.container.clientHeight, 320);
+    const frame = buildFocusFrame(region, aspect);
+    this.applyRepairEmphasis(region);
+    if (animate) this.animateCamera(frame.center, frame.zoom);
+    else {
+      this.camera.position.set(frame.center.x, frame.center.y, 4);
+      this.camera.lookAt(frame.center.x, frame.center.y, 0);
+      this.camera.zoom = frame.zoom;
+      this.camera.updateProjectionMatrix();
+      this.updateLabelVisibility(false);
+      this.render();
+    }
+  }
+
+  setRepairFocus(moduleId, region, animate = true) {
+    this.setModuleFocus(moduleId);
+    this.focusRegion(region, animate);
+  }
+
+  clearRepairFocus(animate = true) {
+    this.activeFocusRegion = null;
+    this.applyRepairEmphasis(null);
+    if (animate) this.animateCamera({ x: 0, y: 0 }, 1);
+    else {
+      this.camera.position.set(0, 0, 4);
+      this.camera.lookAt(0, 0, 0);
+      this.camera.zoom = 1;
+      this.camera.updateProjectionMatrix();
+      this.updateLabelVisibility(false);
+      this.render();
+    }
+  }
+
   focusModuleForDesignator(designator) {
     const module = this.modules.find((candidate) => candidate.designators.includes(designator));
     this.setModuleFocus(module?.moduleId || null);
@@ -536,7 +631,12 @@ export class BoardRenderer {
 
   updateLabelVisibility(shouldRender = true) {
     const visible = shouldShowLabels(this.camera.zoom);
-    this.labelSprites.forEach((sprite) => { sprite.visible = visible; });
+    this.labelSprites.forEach((sprite, componentId) => {
+      const descriptor = this.descriptors.get(componentId);
+      const locallyRelevant = componentId === this.selectedComponentId
+        || isPointInFocus(descriptor.normalizedCenter, this.activeFocusRegion);
+      sprite.visible = visible && locallyRelevant;
+    });
     if (shouldRender) this.render();
   }
 
@@ -547,14 +647,10 @@ export class BoardRenderer {
   }
 
   reset() {
+    this.cancelCameraAnimation();
     this.group.rotation.set(TOP_VIEW_TILT, 0, 0);
-    this.camera.zoom = 1;
-    this.camera.position.set(0, 0, 4);
-    this.camera.lookAt(0, 0, 0);
-    this.camera.updateProjectionMatrix();
-    this.updateLabelVisibility(false);
     this.inspectionAngle = false;
-    this.render();
+    this.clearRepairFocus(true);
   }
 
   resize() {
@@ -568,8 +664,16 @@ export class BoardRenderer {
     this.camera.bottom = frame.bottom;
     this.camera.near = frame.near;
     this.camera.far = frame.far;
-    this.camera.position.set(frame.position.x, frame.position.y, frame.position.z);
-    this.camera.lookAt(0, 0, 0);
+    if (this.activeFocusRegion) {
+      const focusFrame = buildFocusFrame(this.activeFocusRegion, width / height);
+      this.camera.position.set(focusFrame.center.x, focusFrame.center.y, frame.position.z);
+      this.camera.lookAt(focusFrame.center.x, focusFrame.center.y, 0);
+      this.camera.zoom = focusFrame.zoom;
+    } else {
+      this.camera.position.set(frame.position.x, frame.position.y, frame.position.z);
+      this.camera.lookAt(0, 0, 0);
+      this.camera.zoom = 1;
+    }
     this.camera.updateProjectionMatrix();
     this.render();
   }

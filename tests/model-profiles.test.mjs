@@ -3,7 +3,9 @@ import assert from 'node:assert/strict';
 
 import {
   buildCameraFrame,
+  buildFocusFrame,
   buildRenderDescriptor,
+  buildSelectionRadius,
   resolvePackageFamily,
 } from '../assets/cross-source-registration/model-profiles.js';
 
@@ -63,4 +65,24 @@ test('orthographic frame contains the whole board at wide and narrow aspect rati
   assert.ok(narrow.right - narrow.left >= 2.16);
   assert.ok(narrow.top - narrow.bottom > 1.36);
   assert.deepEqual(wide.position, { x: 0, y: 0, z: 4 });
+});
+
+test('repair focus frame converts a normalized region into a bounded world camera target', () => {
+  const frame = buildFocusFrame({ center: { x: 0.6, y: 0.4 }, size: { x: 0.24, y: 0.28 } }, 1.6);
+  assert.deepEqual(frame.center, { x: 0.2, y: 0.125 });
+  assert.equal(frame.zoom >= 1.35 && frame.zoom <= 2.2, true);
+});
+
+test('repair focus zoom remains contextual for huge and tiny regions', () => {
+  const huge = buildFocusFrame({ center: { x: 0.5, y: 0.5 }, size: { x: 0.9, y: 0.9 } }, 1.6);
+  const tinyWide = buildFocusFrame({ center: { x: 0.5, y: 0.5 }, size: { x: 0.01, y: 0.01 } }, 1.6);
+  const tinyNarrow = buildFocusFrame({ center: { x: 0.5, y: 0.5 }, size: { x: 0.01, y: 0.01 } }, 0.82);
+  assert.equal(huge.zoom, 1.35);
+  assert.equal(tinyWide.zoom, 1.9);
+  assert.equal(tinyNarrow.zoom, 2.2);
+});
+
+test('selection radius stays restrained at both package-size extremes', () => {
+  assert.equal(buildSelectionRadius({ x: 0.26, y: 0.22 }), 0.09);
+  assert.equal(buildSelectionRadius({ x: 0.01, y: 0.008 }), 0.022);
 });

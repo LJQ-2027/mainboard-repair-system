@@ -33,6 +33,15 @@ The debug geometry view has been replaced by a layered repair model. Its reset s
 - Source-backed functional-module polygons can follow the selected reviewed entity or be chosen directly from a compact menu.
 - Reviewed designator labels appear only after the orthographic view reaches the repair zoom threshold.
 
+## Repair Focus Checkpoint
+
+- Reviewed entity selection now produces one side-aware repair target containing the active side, module, and normalized focus region.
+- The orthographic camera animates to a bounded local view while retaining nearby board landmarks and the full engineering texture.
+- Wide screens cap repair zoom at `1.9`; narrow screens may reach `2.2` so mobile targets remain operable without making desktop views lose orientation.
+- Components outside the repair region remain visible at reduced emphasis. No black mask or destructive crop is used.
+- Zoom-level labels are restricted to the selected or locally relevant reviewed entities.
+- `显示全板` restores the fitted top view without clearing the selected component or evidence panel.
+
 ## Current Entities
 
 `U2001`, `U4000`, `X2100`, `U0600`, `J6101`, `VBAT1`, and `VBUS1`.
@@ -72,3 +81,9 @@ Shield anatomy verification on 2026-07-13:
 - 29 Node tests and 33 Python tests passed; the standalone validator passed for seven entities and four anchors.
 - Headed Chromium passed at `1600x900` and `390x844`: Installed/X-ray/Removed state changes, U2001 selection under anatomy controls, seven module-menu options, zoom-level labels, drag rotation, reset, visible keyboard focus, no horizontal overflow, and zero console/page errors.
 - Anatomy screenshots are kept under ignored local `output/playwright/km4-anatomy-*.png`.
+
+Repair-focus verification on 2026-07-13:
+
+- 39 Node tests and 33 Python tests passed; the standalone validator passed for seven entities and four anchors.
+- Headed Chromium passed at `1600x900` and `390x844`: U2001, U4000, and U0600 produced distinct nonblank focus frames; full-board reset retained U2001 selection; controls remained in auto-module mode; no horizontal overflow or console/page errors occurred.
+- Repair-focus screenshots are kept under ignored local `output/playwright/km4-repair-focus-*.png`.

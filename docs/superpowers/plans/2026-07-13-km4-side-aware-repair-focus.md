@@ -16,7 +16,7 @@
 - Create: `assets/cross-source-registration/repair-focus-state.js`
 - Create: `tests/repair-focus-state.test.mjs`
 
-- [ ] Write failing tests for entity/module target construction, polygon bounds, conservative point focus, side recommendation, and reset-preserved selection.
+- [x] Write failing tests for entity/module target construction, polygon bounds, conservative point focus, side recommendation, and reset-preserved selection.
 
 ```js
 assert.deepEqual(buildEntityTarget(entity, modules, 'main_page_2'), {
@@ -29,10 +29,10 @@ assert.deepEqual(buildEntityTarget(entity, modules, 'main_page_2'), {
 });
 ```
 
-- [ ] Run `node --test tests/repair-focus-state.test.mjs` and confirm failure because the module does not exist.
-- [ ] Implement `polygonBounds`, `buildEntityTarget`, `buildModuleTarget`, `resolveTargetSide`, and `resetFocusView` without DOM or Three.js dependencies.
-- [ ] Run the targeted test and then `node --test tests/*.test.mjs`; expect all tests to pass.
-- [ ] Commit the pure state contract.
+- [x] Run `node --test tests/repair-focus-state.test.mjs` and confirm failure because the module does not exist.
+- [x] Implement `polygonBounds`, `buildEntityTarget`, `buildModuleTarget`, `resolveTargetSide`, and `resetFocusView` without DOM or Three.js dependencies.
+- [x] Run the targeted test and then `node --test tests/*.test.mjs`; expect all tests to pass.
+- [x] Commit the pure state contract as part of the complete Checkpoint 1 commit.
 
 ### Task 2: Page-2 Context-Preserving Camera Focus
 
@@ -41,7 +41,7 @@ assert.deepEqual(buildEntityTarget(entity, modules, 'main_page_2'), {
 - Modify: `assets/cross-source-registration/model-profiles.js`
 - Test: `tests/model-profiles.test.mjs`
 
-- [ ] Add failing tests for a focus camera frame that keeps normalized regions within a bounded `1.35-2.8` zoom and computes a world-space camera center.
+- [x] Add failing tests for a focus camera frame that keeps normalized regions within a responsive bounded zoom and computes a world-space camera center.
 
 ```js
 const frame = buildFocusFrame({ center: { x: 0.5, y: 0.5 }, size: { x: 0.2, y: 0.16 } }, 1.6);
@@ -49,11 +49,11 @@ assert.equal(frame.zoom >= 1.35 && frame.zoom <= 2.8, true);
 assert.deepEqual(frame.center, { x: 0, y: 0 });
 ```
 
-- [ ] Run `node --test tests/model-profiles.test.mjs` and confirm the missing export failure.
-- [ ] Implement `buildFocusFrame(region, aspect)` using `BOARD_WORLD_SIZE`, region padding, and zoom clamps.
-- [ ] Add `focusRegion(region)`, `clearRepairFocus()`, and an animation that interpolates `camera.position.x/y` and `camera.zoom` while cancelling any prior animation frame.
-- [ ] Preserve the selected halo and current shield mode during focus and reset.
-- [ ] Run the targeted and complete Node suites.
+- [x] Run `node --test tests/model-profiles.test.mjs` and confirm the missing export failure.
+- [x] Implement `buildFocusFrame(region, aspect)` using `BOARD_WORLD_SIZE`, region padding, and responsive zoom clamps.
+- [x] Add `focusRegion(region)`, `clearRepairFocus()`, and an animation that interpolates `camera.position.x/y` and `camera.zoom` while cancelling any prior animation frame.
+- [x] Preserve the selected halo and current shield mode during focus and reset.
+- [x] Run the targeted and complete Node suites.
 
 ### Task 3: Page-2 Repair Emphasis And Controller Integration
 
@@ -63,13 +63,13 @@ assert.deepEqual(frame.center, { x: 0, y: 0 });
 - Modify: `assets/cross-source-registration/index.html`
 - Modify: `assets/cross-source-registration/styles.css`
 
-- [ ] On reviewed entity selection, build one repair target and pass its `focusRegion` to the renderer.
-- [ ] On module-menu selection, build a module target and focus its polygon bounds.
-- [ ] Add a compact full-board icon action whose accessible label is `显示全板` and which resets the camera without clearing selection.
-- [ ] Emphasize the active module with its existing outline/tint and reduce unrelated package material opacity only to `0.52`; do not add a screen mask or hide source texture.
-- [ ] Ensure manual wheel or drag cancels camera animation without clearing repair emphasis.
-- [ ] Verify U2001, U4000, and U0600 focus regions visually at desktop and mobile sizes.
-- [ ] Commit Checkpoint 1 as a complete runnable feature.
+- [x] On reviewed entity selection, build one repair target and pass its `focusRegion` to the renderer.
+- [x] On module-menu selection, build a module target and focus its polygon bounds.
+- [x] Add a compact full-board icon action whose accessible label is `显示全板` and which resets the camera without clearing selection.
+- [x] Emphasize the active module with its existing outline/tint and reduce unrelated package material opacity only to `0.52`; do not add a screen mask or hide source texture.
+- [x] Ensure manual wheel or drag cancels camera animation without clearing repair emphasis.
+- [x] Verify U2001, U4000, and U0600 focus regions visually at desktop and mobile sizes.
+- [x] Commit Checkpoint 1 as a complete runnable feature.
 
 ### Task 4: Compile And Validate Main Page 1
 
