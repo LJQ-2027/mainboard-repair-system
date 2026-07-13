@@ -111,7 +111,7 @@ assert.deepEqual(frame.center, { x: 0, y: 0 });
 - Modify: `G:/Programming/mainboard-repair-enablement/PROJECT_LEDGER.md`
 - Modify: Vault project `Overview.md`, `Task Index.md`, `Decisions.md`, and `Risks.md` only where current facts changed.
 
-- [ ] Run JavaScript syntax checks, all Node tests, all Python tests, JSON parsing, and standalone cross-source validation.
-- [ ] Run headed Chromium at `1600x900` and `390x844` through focus, reset, automatic side change, manual flip, anatomy modes, selection, drag, zoom, focus visibility, overflow, WebGL pixels, and runtime logs.
-- [ ] Record implementation commits, source boundaries, browser evidence, and remaining material-polish and physical-photo gaps.
-- [ ] Run the Project Closeout Check and commit the ledger update.
+- [x] Run JavaScript syntax checks, all Node tests, all Python tests, JSON parsing, and standalone cross-source validation.
+- [x] Run headed Chromium at `1600x900` and `390x844` through focus, reset, automatic side change, manual flip, anatomy modes, selection, drag, zoom, focus visibility, overflow, WebGL pixels, and runtime logs.
+- [x] Record implementation commits, source boundaries, browser evidence, and remaining material-polish and physical-photo gaps.
+- [x] Run the Project Closeout Check and commit the ledger update.
