@@ -16,9 +16,9 @@
 - Create: `scripts/board_compiler/pdf_primitives.py`
 - Create: `tests/test_board_compiler_pdf.py`
 
-- [ ] Test CMap decoding, graphics-state matrix concatenation, transformed rectangles, and text coordinates.
-- [ ] Confirm tests fail before implementation.
-- [ ] Implement the pure parser and make tests pass.
+- [x] Test CMap decoding, graphics-state matrix concatenation, transformed rectangles, and text coordinates.
+- [x] Confirm tests fail before implementation.
+- [x] Implement the pure parser and make tests pass.
 
 ### Task 2: Designator Compiler
 
@@ -26,9 +26,9 @@
 - Create: `scripts/board_compiler/compiler.py`
 - Create: `tests/test_board_compiler.py`
 
-- [ ] Test accepted board prefixes, BGA-grid rejection, normalized coordinates, and deterministic ordering.
-- [ ] Confirm tests fail before implementation.
-- [ ] Implement designator classification and candidate-footprint pairing.
+- [x] Test accepted board prefixes, BGA-grid rejection, normalized coordinates, and deterministic ordering.
+- [x] Confirm tests fail before implementation.
+- [x] Implement designator classification and candidate-footprint pairing.
 
 ### Task 3: KM4 Dataset And Audit
 
@@ -37,9 +37,9 @@
 - Create: `knowledge-base/km4-board-compiled.json`
 - Modify: `scripts/validate_cross_source_registration.py`
 
-- [ ] Compile point-map page 2 and verify the seven reviewed entities are recovered.
-- [ ] Record decoded-text, accepted-designator, footprint-pairing, and unresolved counts.
-- [ ] Validate normalized coordinates and source evidence.
+- [x] Compile point-map page 2 and verify the seven reviewed entities are recovered.
+- [x] Record decoded-text, accepted-designator, footprint-pairing, and unresolved counts.
+- [x] Validate normalized coordinates and source evidence.
 
 ### Task 4: Workbench Integration
 
@@ -47,6 +47,6 @@
 - Modify: `assets/cross-source-registration/app.js`
 - Modify: `assets/cross-source-registration/board-renderer.js`
 
-- [ ] Replace anonymous raster geometry with compiled source geometry where confidence is sufficient.
-- [ ] Keep the seven reviewed semantic entities and evidence links synchronized.
-- [ ] Run desktop/mobile browser QA and inspect the 2.5D output.
+- [x] Replace anonymous raster geometry with compiled source geometry where confidence is sufficient.
+- [x] Keep the seven reviewed semantic entities and evidence links synchronized.
+- [x] Run desktop/mobile browser QA and inspect the 2.5D output.

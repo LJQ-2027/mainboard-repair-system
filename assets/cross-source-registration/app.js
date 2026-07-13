@@ -3,7 +3,7 @@ import { buildSelectionState } from './selection-state.js';
 import { BoardRenderer } from './board-renderer.js';
 
 const DATA_URL = '../../knowledge-base/km4-cross-source-registration.json';
-const GEOMETRY_URL = '../../knowledge-base/km4-point-map-geometry.json';
+const GEOMETRY_URL = '../../knowledge-base/km4-board-compiled.json';
 const views = { photo: document.querySelector('#photoView'), pointmap: document.querySelector('#pointmapView'), model: document.querySelector('#modelView') };
 let data;
 let matrix;
@@ -63,6 +63,20 @@ async function init() {
   if (!response.ok || !geometryResponse.ok) throw new Error(`Dataset failed to load: ${response.status}/${geometryResponse.status}`);
   data = await response.json();
   geometryData = await geometryResponse.json();
+  const compiledByDesignator = new Map(geometryData.components.map((component) => [component.designator, component]));
+  data.entities = data.entities.map((entity) => {
+    const compiled = compiledByDesignator.get(entity.designator);
+    if (!compiled?.footprint) return entity;
+    return {
+      ...entity,
+      geometry: {
+        ...entity.geometry,
+        center: compiled.footprint.center,
+        size: compiled.footprint.size,
+        source_status: compiled.footprint.confidence,
+      },
+    };
+  });
   const source = data.registration.anchors.slice(0, 4).map((anchor) => anchor.board);
   const target = data.registration.anchors.slice(0, 4).map((anchor) => anchor.image);
   matrix = solveHomography(source, target);
@@ -76,7 +90,16 @@ async function init() {
   addMarkers(document.querySelector('#photoView .markers'), photoPositions, data.entities);
   addMarkers(document.querySelector('#pointmapView .markers'), boardPositions, data.entities);
 
-  renderer = new BoardRenderer(document.querySelector('#modelCanvas'), data.entities, data.board_outline, geometryData.regions, selectEntity);
+  const linkedDesignators = new Set(data.entities.map((entity) => entity.designator));
+  const compiledGeometry = geometryData.components
+    .filter((component) => component.footprint && !linkedDesignators.has(component.designator))
+    .map((component) => ({
+      geometry_id: component.component_id,
+      category: component.category,
+      center: component.footprint.center,
+      size: component.footprint.size,
+    }));
+  renderer = new BoardRenderer(document.querySelector('#modelCanvas'), data.entities, data.board_outline, compiledGeometry, selectEntity);
   document.querySelector('#sourceNote').textContent = `${data.registration.proxy_label} · ${data.registration.proxy_limit}`;
   const list = document.querySelector('#entityList');
   data.entities.forEach((entity) => {

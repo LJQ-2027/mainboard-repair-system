@@ -21,7 +21,13 @@
 
 The available proxy photograph shows the board installed with shields. It supports board-context registration but does not expose most chip bodies. Markers for concealed entities therefore indicate the registered position below the shield, not visual component detection. Standardized physical front/back photographs are still required to validate field-photo registration and exposed-component correspondence.
 
-The point-map PDF stores designator text as vector outlines rather than extractable text. The current offline environment also lacks OCR and PDF-vector parsing dependencies. The 112 extracted regions therefore improve spatial fidelity but remain semantically unresolved until reviewed linkage or a stronger extractor is available.
+The first raster pass produced 112 anonymous regions because the normal page-text APIs did not expose designators. That pass is retained as historical fallback evidence but is no longer the primary geometry source.
+
+## Board Compiler Update
+
+The PDF has now been parsed directly through its embedded Form XObject using the locally available `pypdf` content-stream API. The compiler decodes the embedded `/ToUnicode` font CMap, tracks PDF transformation matrices, extracts vector rectangles, and normalizes coordinates to the page's visible clipping bounds.
+
+The first page-2 compile produced 3,665 decoded text objects, 3,719 vector rectangles, 820 accepted board designators, and recovered all seven reviewed entities. Candidate footprints now drive the 2.5D density layer instead of the earlier 112 anonymous raster regions. Every footprint remains explicitly provisional until the pairing confidence is reviewed.
 
 ## Verification
 

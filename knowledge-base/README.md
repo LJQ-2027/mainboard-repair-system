@@ -14,6 +14,7 @@
 - `assets/vision-recognition-demo/`：基于上述参考图运行的浏览器端图像质量检查与七机型相似度检索 Demo。
 - `km4-cross-source-registration.json`：KM4/F151 首批实体的归一化几何、代理照片配准、SCH证据、维修指导和2.5D视觉参数。
 - `km4-point-map-geometry.json`：从KM4/F151第2面点位图红色工程层自动提取的匿名归一化结构区域，不伪造位号语义。
+- `km4-board-compiled.json`：主板编译器直接解析KM4/F151位号图PDF的Form XObject、字体CMap、文字坐标和矢量矩形后生成的820个带位号候选实体。
 - `assets/cross-source-registration/`：实体代理图、点位图和参数化2.5D模型共用 `component_id` 的跨资料联动工作台。
 - `training-materials.json`：培训资料条目。
 - `module-principles.json`：手机模块原理、关键链路和后续可转化为诊断说明的基础知识。

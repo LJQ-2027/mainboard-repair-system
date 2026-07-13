@@ -52,18 +52,26 @@ export class BoardRenderer {
     );
     board.add(rim);
 
+    const visualStyles = {
+      connector: { color: 0x8d9690, height: 0.06, metalness: 0.55 },
+      ic: { color: 0x202b27, height: 0.04, metalness: 0.16 },
+      crystal: { color: 0xb8b7ae, height: 0.035, metalness: 0.7 },
+      inductor: { color: 0x3b4540, height: 0.032, metalness: 0.22 },
+      test_point: { color: COLORS.copper, height: 0.012, metalness: 0.72 },
+      default: { color: 0x3b5047, height: 0.018, metalness: 0.12 },
+    };
     this.sourceGeometry.forEach((region) => {
-      const isShield = region.category === 'shield_region';
-      const height = isShield ? 0.065 : 0.025;
+      const style = visualStyles[region.category] || visualStyles.default;
+      const height = style.height;
       const geometry = new THREE.BoxGeometry(
         Math.max(region.size.x * 2, 0.018),
         Math.max(region.size.y * 1.25, 0.018),
         height,
       );
       const material = new THREE.MeshStandardMaterial({
-        color: isShield ? 0xb9b5aa : 0x334d43,
-        roughness: isShield ? 0.34 : 0.72,
-        metalness: isShield ? 0.72 : 0.12,
+        color: style.color,
+        roughness: region.category === 'connector' || region.category === 'crystal' ? 0.34 : 0.72,
+        metalness: style.metalness,
       });
       const mesh = new THREE.Mesh(geometry, material);
       mesh.position.set(
