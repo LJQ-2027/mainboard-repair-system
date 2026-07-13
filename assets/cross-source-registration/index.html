@@ -6,6 +6,7 @@
   <title>KM4/F151 跨资料主板工作台</title>
   <link rel="stylesheet" href="./styles.css">
   <link rel="stylesheet" href="./point-map.css">
+  <link rel="stylesheet" href="./schematic-evidence.css">
 </head>
 <body>
   <header class="topbar">
@@ -43,6 +44,11 @@
       <section class="entity-list-section"><h3>本面已关联实体</h3><div class="entity-list" id="entityList"></div></section>
     </aside>
   </main>
+  <dialog class="evidence-dialog" id="evidenceDialog" aria-label="原理图局部证据">
+    <button class="dialog-close" type="button" aria-label="关闭原理图预览">×</button>
+    <img alt="原理图局部证据">
+    <p></p>
+  </dialog>
   <script type="module" src="./app.js"></script>
 </body>
 </html>

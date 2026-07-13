@@ -2,7 +2,9 @@ import unittest
 import json
 from pathlib import Path
 
-from scripts.board_compiler.schematic import coalesce_text_fragments, index_component_pages
+from PIL import Image
+
+from scripts.board_compiler.schematic import coalesce_text_fragments, crop_box_from_origin, index_component_pages
 
 
 class SchematicCompilerTests(unittest.TestCase):
@@ -45,6 +47,10 @@ class SchematicCompilerTests(unittest.TestCase):
         result = index_component_pages(pages, {"R2715", "R2725", "C1026", "C1027"})
         self.assertTrue(all(not occurrences for occurrences in result.values()))
 
+    def test_preview_crop_stays_inside_page_at_edge_origins(self):
+        self.assertEqual(crop_box_from_origin({"x": 0.02, "y": 0.03}, 1000, 800), (0, 0, 240, 176))
+        self.assertEqual(crop_box_from_origin({"x": 0.98, "y": 0.97}, 1000, 800), (760, 624, 1000, 800))
+
     def test_compiled_km4_schematic_recovers_reviewed_entities(self):
         root = Path(__file__).resolve().parents[1]
         data = json.loads((root / "knowledge-base/km4-schematic-compiled.json").read_text(encoding="utf-8"))
@@ -56,6 +62,19 @@ class SchematicCompilerTests(unittest.TestCase):
         }
         for designator, pages in expected_pages.items():
             self.assertEqual([item["page"] for item in data["components"][designator]], pages)
+            self.assertTrue(all(item.get("preview_image") for item in data["components"][designator]))
+        preview_paths = [
+            root / item["preview_image"]
+            for designator in expected_pages
+            for item in data["components"][designator]
+        ]
+        self.assertEqual(len(preview_paths), 8)
+        self.assertEqual(len(set(preview_paths)), 8)
+        for preview_path in preview_paths:
+            self.assertTrue(preview_path.is_file())
+            with Image.open(preview_path) as image:
+                self.assertGreater(image.width, 1500)
+                self.assertGreater(image.height, 400)
         self.assertTrue(data["audit"]["quality_gate_complete"])
         for occurrences in data["components"].values():
             for occurrence in occurrences:

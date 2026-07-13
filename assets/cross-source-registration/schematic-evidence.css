@@ -1,0 +1,67 @@
+.schematic-preview {
+  display: block;
+  width: 100%;
+  margin: 9px 0 4px;
+  padding: 0;
+  border: 1px solid #bfc8c2;
+  background: #fff;
+  cursor: zoom-in;
+  overflow: hidden;
+}
+
+.schematic-preview img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1.54;
+  object-fit: cover;
+}
+
+.schematic-preview:hover {
+  border-color: #ef5b3f;
+}
+
+.schematic-preview:focus-visible,
+.dialog-close:focus-visible {
+  outline: 3px solid #65a9ff;
+  outline-offset: 2px;
+}
+
+.evidence-dialog {
+  width: min(1120px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  padding: 38px 12px 12px;
+  border: 1px solid #17221e;
+  background: #f8f9f6;
+}
+
+.evidence-dialog::backdrop {
+  background: #101814cc;
+}
+
+.evidence-dialog img {
+  display: block;
+  width: 100%;
+  max-height: calc(100vh - 110px);
+  object-fit: contain;
+  background: white;
+}
+
+.evidence-dialog p {
+  margin: 8px 0 0;
+  color: #56625c;
+  font-size: 11px;
+}
+
+.dialog-close {
+  position: absolute;
+  top: 6px;
+  right: 7px;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #cbd2cc;
+  background: white;
+  color: #17221e;
+  font-size: 21px;
+  line-height: 26px;
+  cursor: pointer;
+}

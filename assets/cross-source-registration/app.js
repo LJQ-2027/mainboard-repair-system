@@ -37,7 +37,11 @@ function addMarkers(layer, positions, entities) {
 
 function evidenceCard(link, type) {
   const details = type === 'schematic' ? (link.facts || []).join(' · ') : link.instruction;
-  return `<article class="evidence-card">${details}<small>${link.source} · ${link.page}</small></article>`;
+  const previews = (link.previews || []).map((preview) => `
+    <button class="schematic-preview" type="button" data-preview-src="../../${preview.source}" data-preview-label="第 ${preview.page} 页" aria-label="查看第 ${preview.page} 页原理图局部图">
+      <img src="../../${preview.source}" alt="第 ${preview.page} 页原理图局部图" loading="lazy">
+    </button>`).join('');
+  return `<article class="evidence-card">${details}${previews}<small>${link.source} · ${link.page}</small></article>`;
 }
 
 function selectEntity(componentId) {
@@ -133,6 +137,18 @@ document.querySelector('#zoomOutPointMap').addEventListener('click', () => point
 document.querySelector('#zoomInPointMap').addEventListener('click', () => pointMapViewport?.zoomBy(1.25));
 document.querySelector('#resetPointMap').addEventListener('click', () => pointMapViewport?.reset());
 document.querySelector('#resetModel').hidden = true;
+const evidenceDialog = document.querySelector('#evidenceDialog');
+document.querySelector('#schematicEvidence').addEventListener('click', (event) => {
+  const trigger = event.target.closest('[data-preview-src]');
+  if (!trigger) return;
+  evidenceDialog.querySelector('img').src = trigger.dataset.previewSrc;
+  evidenceDialog.querySelector('p').textContent = trigger.dataset.previewLabel;
+  evidenceDialog.showModal();
+});
+evidenceDialog.querySelector('.dialog-close').addEventListener('click', () => evidenceDialog.close());
+evidenceDialog.addEventListener('click', (event) => {
+  if (event.target === evidenceDialog) evidenceDialog.close();
+});
 init().catch((error) => {
   document.querySelector('.stage').innerHTML = `<p class="load-error">无法载入跨资料数据：${error.message}</p>`;
   console.error(error);

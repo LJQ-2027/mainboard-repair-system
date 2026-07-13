@@ -4125,7 +4125,8 @@
           "x": 0.262706,
           "y": 0.163626
         },
-        "source_status": "decoded_pdf_text_run"
+        "source_status": "decoded_pdf_text_run",
+        "preview_image": "assets/schematic-evidence/km4-f151/j6101-p16-1.png"
       }
     ],
     "J6202": [
@@ -8853,7 +8854,8 @@
           "x": 0.780732,
           "y": 0.310692
         },
-        "source_status": "decoded_pdf_text_run"
+        "source_status": "decoded_pdf_text_run",
+        "preview_image": "assets/schematic-evidence/km4-f151/u0600-p10-1.png"
       }
     ],
     "U0602": [
@@ -9161,7 +9163,8 @@
           "x": 0.315062,
           "y": 0.178446
         },
-        "source_status": "decoded_pdf_text_run"
+        "source_status": "decoded_pdf_text_run",
+        "preview_image": "assets/schematic-evidence/km4-f151/u2001-p6-1.png"
       },
       {
         "page": 7,
@@ -9173,7 +9176,8 @@
           "x": 0.238165,
           "y": 0.276619
         },
-        "source_status": "decoded_pdf_text_run"
+        "source_status": "decoded_pdf_text_run",
+        "preview_image": "assets/schematic-evidence/km4-f151/u2001-p7-2.png"
       }
     ],
     "U2605": [
@@ -9439,7 +9443,8 @@
           "x": 0.206292,
           "y": 0.295601
         },
-        "source_status": "decoded_pdf_text_run"
+        "source_status": "decoded_pdf_text_run",
+        "preview_image": "assets/schematic-evidence/km4-f151/u4000-p13-1.png"
       }
     ],
     "U6108": [
@@ -9481,7 +9486,8 @@
           "x": 0.243787,
           "y": 0.223454
         },
-        "source_status": "decoded_pdf_text_run"
+        "source_status": "decoded_pdf_text_run",
+        "preview_image": "assets/schematic-evidence/km4-f151/vbat1-p9-1.png"
       }
     ],
     "VBUS1": [
@@ -9495,7 +9501,8 @@
           "x": 0.249962,
           "y": 0.285922
         },
-        "source_status": "decoded_pdf_text_run"
+        "source_status": "decoded_pdf_text_run",
+        "preview_image": "assets/schematic-evidence/km4-f151/vbus1-p16-1.png"
       }
     ],
     "X2100": [
@@ -9509,7 +9516,8 @@
           "x": 0.7444,
           "y": 0.452777
         },
-        "source_status": "decoded_pdf_text_run"
+        "source_status": "decoded_pdf_text_run",
+        "preview_image": "assets/schematic-evidence/km4-f151/x2100-p7-1.png"
       }
     ]
   }

@@ -1,5 +1,8 @@
 import json
+import shutil
+import subprocess
 import sys
+import tempfile
 from collections import Counter
 from pathlib import Path
 
@@ -7,9 +10,56 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from scripts.board_compiler.schematic import extract_schematic_pages, index_component_pages
+from scripts.board_compiler.schematic import crop_box_from_origin
+
+from PIL import Image
 
 
 REVIEWED_DESIGNATORS = {"U2001", "U4000", "X2100", "U0600", "J6101", "VBAT1", "VBUS1"}
+POPPLER_PDFTOPPM = Path(
+    "C:/Users/Mercurluto/.cache/codex-runtimes/codex-primary-runtime/"
+    "dependencies/native/poppler/Library/bin/pdftoppm.exe"
+)
+
+
+def find_pdftoppm():
+    if POPPLER_PDFTOPPM.exists():
+        return str(POPPLER_PDFTOPPM)
+    discovered = shutil.which("pdftoppm")
+    if discovered:
+        return discovered
+    raise RuntimeError("pdftoppm is required to render schematic evidence previews.")
+
+
+def build_reviewed_previews(source, components):
+    output_dir = ROOT / "assets/schematic-evidence/km4-f151"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    for previous in output_dir.glob("*.png"):
+        previous.unlink()
+    pages = sorted({item["page"] for designator in REVIEWED_DESIGNATORS for item in components.get(designator, [])})
+    with tempfile.TemporaryDirectory(prefix="km4-schematic-pages-") as temporary:
+        render_dir = Path(temporary)
+        rendered_pages = {}
+        for page in pages:
+            stem = render_dir / f"page-{page}"
+            rendered = stem.with_suffix(".png")
+            subprocess.run([
+                find_pdftoppm(), "-f", str(page), "-l", str(page), "-png", "-singlefile", "-r", "180",
+                str(source), str(stem),
+            ], check=True)
+            rendered_pages[page] = rendered
+
+        for designator in sorted(REVIEWED_DESIGNATORS):
+            for index, occurrence in enumerate(components.get(designator, []), 1):
+                source_image = Image.open(rendered_pages[occurrence["page"]]).convert("RGB")
+                crop_options = {"height_ratio": 0.08, "y_offset_ratio": 0} if designator == "VBUS1" else {}
+                crop = source_image.crop(crop_box_from_origin(
+                    occurrence["text_origin"], source_image.width, source_image.height, **crop_options,
+                ))
+                filename = f"{designator.lower()}-p{occurrence['page']}-{index}.png"
+                target = output_dir / filename
+                crop.save(target, format="PNG", optimize=True)
+                occurrence["preview_image"] = target.relative_to(ROOT).as_posix()
 
 
 def main():
@@ -41,6 +91,7 @@ def main():
     page_counts = Counter(occurrence["page"] for occurrences in components.values() for occurrence in occurrences)
     recovered = set(components) & REVIEWED_DESIGNATORS
     quality_gate_complete = recovered == REVIEWED_DESIGNATORS and len(components) >= 650
+    build_reviewed_previews(source, components)
     payload = {
         "compiler_id": "SCHEMATIC-COMPILER-PYPDF-V1",
         "board_id": board["board_id"],

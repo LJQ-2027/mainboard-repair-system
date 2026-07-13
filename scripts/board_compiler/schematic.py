@@ -1,6 +1,16 @@
 from pypdf import PdfReader
 
 
+def crop_box_from_origin(origin, image_width, image_height, width_ratio=0.24, height_ratio=0.22, y_offset_ratio=0.08):
+    crop_width = round(image_width * width_ratio)
+    crop_height = round(image_height * height_ratio)
+    center_x = round(origin["x"] * image_width)
+    center_y = round((origin["y"] + y_offset_ratio) * image_height)
+    left = min(max(center_x - crop_width // 2, 0), image_width - crop_width)
+    top = min(max(center_y - crop_height // 2, 0), image_height - crop_height)
+    return left, top, left + crop_width, top + crop_height
+
+
 def _same_baseline(left, right):
     tolerance = max(left["font_size"], right["font_size"]) * 0.22
     return abs(left["y"] - right["y"]) <= tolerance
