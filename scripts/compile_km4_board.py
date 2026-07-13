@@ -1,5 +1,6 @@
 import json
 import sys
+import argparse
 from collections import Counter
 from pathlib import Path
 
@@ -37,7 +38,12 @@ def compile_side(root, side_id, config):
     point_map_image = root / config["image"]
     primitives = extract_form_primitives(source, config["page"])
     outline = extract_board_outline(point_map_image)
-    components = compile_designators(primitives["labels"], primitives["rectangles"], primitives["visible_bounds"])
+    components = compile_designators(
+        primitives["labels"],
+        primitives["rectangles"],
+        primitives["visible_bounds"],
+        component_prefix=f"KM4-F151-P{config['page']}",
+    )
     required = config["required_designators"]
     recovered = {item["designator"] for item in components} & required
     footprint_count = sum("footprint" in item for item in components)
@@ -100,9 +106,14 @@ def write_json(path, payload):
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
-def main():
+def main(argv=None):
+    parser = argparse.ArgumentParser(description="Compile KM4/F151 point-map sides")
+    parser.add_argument("--side", choices=SIDE_CONFIGS, help="Compile only one side while refreshing the side manifest")
+    args = parser.parse_args(argv)
     failed = False
-    for side_id, config in SIDE_CONFIGS.items():
+    selected_sides = [args.side] if args.side else list(SIDE_CONFIGS)
+    for side_id in selected_sides:
+        config = SIDE_CONFIGS[side_id]
         payload = compile_side(ROOT, side_id, config)
         write_json(ROOT / config["output"], payload)
         print(json.dumps({"side_id": side_id, **payload["audit"]}, indent=2, ensure_ascii=False))

@@ -693,7 +693,7 @@
   "accuracy_boundary": "Designators are decoded from the embedded PDF CMap. Footprints are provisional nearest-vector candidates until geometry pairing is reviewed.",
   "components": [
     {
-      "component_id": "KM4-F151-P2-ANT0705",
+      "component_id": "KM4-F151-P1-ANT0705",
       "designator": "ANT0705",
       "category": "antenna",
       "source_point": {
@@ -720,7 +720,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-ANT0706",
+      "component_id": "KM4-F151-P1-ANT0706",
       "designator": "ANT0706",
       "category": "antenna",
       "source_point": {
@@ -747,7 +747,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-ANT0707",
+      "component_id": "KM4-F151-P1-ANT0707",
       "designator": "ANT0707",
       "category": "antenna",
       "source_point": {
@@ -774,7 +774,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-ANT0708",
+      "component_id": "KM4-F151-P1-ANT0708",
       "designator": "ANT0708",
       "category": "antenna",
       "source_point": {
@@ -801,7 +801,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-ANT0709",
+      "component_id": "KM4-F151-P1-ANT0709",
       "designator": "ANT0709",
       "category": "antenna",
       "source_point": {
@@ -828,7 +828,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-ANT0710",
+      "component_id": "KM4-F151-P1-ANT0710",
       "designator": "ANT0710",
       "category": "antenna",
       "source_point": {
@@ -855,7 +855,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-ANT6501",
+      "component_id": "KM4-F151-P1-ANT6501",
       "designator": "ANT6501",
       "category": "antenna",
       "source_point": {
@@ -882,7 +882,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-ANT6502",
+      "component_id": "KM4-F151-P1-ANT6502",
       "designator": "ANT6502",
       "category": "antenna",
       "source_point": {
@@ -909,7 +909,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-ANT6503",
+      "component_id": "KM4-F151-P1-ANT6503",
       "designator": "ANT6503",
       "category": "antenna",
       "source_point": {
@@ -936,7 +936,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-ANT6504",
+      "component_id": "KM4-F151-P1-ANT6504",
       "designator": "ANT6504",
       "category": "antenna",
       "source_point": {
@@ -963,7 +963,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-ANT6506",
+      "component_id": "KM4-F151-P1-ANT6506",
       "designator": "ANT6506",
       "category": "antenna",
       "source_point": {
@@ -990,7 +990,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-ANT6508",
+      "component_id": "KM4-F151-P1-ANT6508",
       "designator": "ANT6508",
       "category": "antenna",
       "source_point": {
@@ -1017,7 +1017,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C0722",
+      "component_id": "KM4-F151-P1-C0722",
       "designator": "C0722",
       "category": "capacitor",
       "source_point": {
@@ -1044,7 +1044,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C0732",
+      "component_id": "KM4-F151-P1-C0732",
       "designator": "C0732",
       "category": "capacitor",
       "source_point": {
@@ -1071,7 +1071,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C0733",
+      "component_id": "KM4-F151-P1-C0733",
       "designator": "C0733",
       "category": "capacitor",
       "source_point": {
@@ -1098,7 +1098,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C1060",
+      "component_id": "KM4-F151-P1-C1060",
       "designator": "C1060",
       "category": "capacitor",
       "source_point": {
@@ -1125,7 +1125,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C1061",
+      "component_id": "KM4-F151-P1-C1061",
       "designator": "C1061",
       "category": "capacitor",
       "source_point": {
@@ -1152,7 +1152,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C1062",
+      "component_id": "KM4-F151-P1-C1062",
       "designator": "C1062",
       "category": "capacitor",
       "source_point": {
@@ -1179,7 +1179,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C1064",
+      "component_id": "KM4-F151-P1-C1064",
       "designator": "C1064",
       "category": "capacitor",
       "source_point": {
@@ -1206,7 +1206,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C1065",
+      "component_id": "KM4-F151-P1-C1065",
       "designator": "C1065",
       "category": "capacitor",
       "source_point": {
@@ -1233,7 +1233,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C1066",
+      "component_id": "KM4-F151-P1-C1066",
       "designator": "C1066",
       "category": "capacitor",
       "source_point": {
@@ -1260,7 +1260,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C1108",
+      "component_id": "KM4-F151-P1-C1108",
       "designator": "C1108",
       "category": "capacitor",
       "source_point": {
@@ -1287,7 +1287,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C1109",
+      "component_id": "KM4-F151-P1-C1109",
       "designator": "C1109",
       "category": "capacitor",
       "source_point": {
@@ -1314,7 +1314,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2601",
+      "component_id": "KM4-F151-P1-C2601",
       "designator": "C2601",
       "category": "capacitor",
       "source_point": {
@@ -1341,7 +1341,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2602",
+      "component_id": "KM4-F151-P1-C2602",
       "designator": "C2602",
       "category": "capacitor",
       "source_point": {
@@ -1368,7 +1368,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2635",
+      "component_id": "KM4-F151-P1-C2635",
       "designator": "C2635",
       "category": "capacitor",
       "source_point": {
@@ -1395,7 +1395,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2639",
+      "component_id": "KM4-F151-P1-C2639",
       "designator": "C2639",
       "category": "capacitor",
       "source_point": {
@@ -1422,7 +1422,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2641",
+      "component_id": "KM4-F151-P1-C2641",
       "designator": "C2641",
       "category": "capacitor",
       "source_point": {
@@ -1449,7 +1449,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2644",
+      "component_id": "KM4-F151-P1-C2644",
       "designator": "C2644",
       "category": "capacitor",
       "source_point": {
@@ -1476,7 +1476,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2645",
+      "component_id": "KM4-F151-P1-C2645",
       "designator": "C2645",
       "category": "capacitor",
       "source_point": {
@@ -1503,7 +1503,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2706",
+      "component_id": "KM4-F151-P1-C2706",
       "designator": "C2706",
       "category": "capacitor",
       "source_point": {
@@ -1530,7 +1530,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2708",
+      "component_id": "KM4-F151-P1-C2708",
       "designator": "C2708",
       "category": "capacitor",
       "source_point": {
@@ -1557,7 +1557,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2709",
+      "component_id": "KM4-F151-P1-C2709",
       "designator": "C2709",
       "category": "capacitor",
       "source_point": {
@@ -1584,7 +1584,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2714",
+      "component_id": "KM4-F151-P1-C2714",
       "designator": "C2714",
       "category": "capacitor",
       "source_point": {
@@ -1611,7 +1611,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2716",
+      "component_id": "KM4-F151-P1-C2716",
       "designator": "C2716",
       "category": "capacitor",
       "source_point": {
@@ -1638,7 +1638,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2717",
+      "component_id": "KM4-F151-P1-C2717",
       "designator": "C2717",
       "category": "capacitor",
       "source_point": {
@@ -1665,7 +1665,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2718",
+      "component_id": "KM4-F151-P1-C2718",
       "designator": "C2718",
       "category": "capacitor",
       "source_point": {
@@ -1692,7 +1692,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2719",
+      "component_id": "KM4-F151-P1-C2719",
       "designator": "C2719",
       "category": "capacitor",
       "source_point": {
@@ -1719,7 +1719,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2720",
+      "component_id": "KM4-F151-P1-C2720",
       "designator": "C2720",
       "category": "capacitor",
       "source_point": {
@@ -1746,7 +1746,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2721",
+      "component_id": "KM4-F151-P1-C2721",
       "designator": "C2721",
       "category": "capacitor",
       "source_point": {
@@ -1773,7 +1773,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2722",
+      "component_id": "KM4-F151-P1-C2722",
       "designator": "C2722",
       "category": "capacitor",
       "source_point": {
@@ -1800,7 +1800,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2723",
+      "component_id": "KM4-F151-P1-C2723",
       "designator": "C2723",
       "category": "capacitor",
       "source_point": {
@@ -1827,7 +1827,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2724",
+      "component_id": "KM4-F151-P1-C2724",
       "designator": "C2724",
       "category": "capacitor",
       "source_point": {
@@ -1854,7 +1854,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2727",
+      "component_id": "KM4-F151-P1-C2727",
       "designator": "C2727",
       "category": "capacitor",
       "source_point": {
@@ -1881,7 +1881,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2728",
+      "component_id": "KM4-F151-P1-C2728",
       "designator": "C2728",
       "category": "capacitor",
       "source_point": {
@@ -1908,7 +1908,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2729",
+      "component_id": "KM4-F151-P1-C2729",
       "designator": "C2729",
       "category": "capacitor",
       "source_point": {
@@ -1935,7 +1935,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2731",
+      "component_id": "KM4-F151-P1-C2731",
       "designator": "C2731",
       "category": "capacitor",
       "source_point": {
@@ -1962,7 +1962,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2732",
+      "component_id": "KM4-F151-P1-C2732",
       "designator": "C2732",
       "category": "capacitor",
       "source_point": {
@@ -1989,7 +1989,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2733",
+      "component_id": "KM4-F151-P1-C2733",
       "designator": "C2733",
       "category": "capacitor",
       "source_point": {
@@ -2016,7 +2016,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2736",
+      "component_id": "KM4-F151-P1-C2736",
       "designator": "C2736",
       "category": "capacitor",
       "source_point": {
@@ -2043,7 +2043,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2737",
+      "component_id": "KM4-F151-P1-C2737",
       "designator": "C2737",
       "category": "capacitor",
       "source_point": {
@@ -2070,7 +2070,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2738",
+      "component_id": "KM4-F151-P1-C2738",
       "designator": "C2738",
       "category": "capacitor",
       "source_point": {
@@ -2097,7 +2097,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2740",
+      "component_id": "KM4-F151-P1-C2740",
       "designator": "C2740",
       "category": "capacitor",
       "source_point": {
@@ -2124,7 +2124,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2741",
+      "component_id": "KM4-F151-P1-C2741",
       "designator": "C2741",
       "category": "capacitor",
       "source_point": {
@@ -2151,7 +2151,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2743",
+      "component_id": "KM4-F151-P1-C2743",
       "designator": "C2743",
       "category": "capacitor",
       "source_point": {
@@ -2178,7 +2178,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2745",
+      "component_id": "KM4-F151-P1-C2745",
       "designator": "C2745",
       "category": "capacitor",
       "source_point": {
@@ -2205,7 +2205,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2750",
+      "component_id": "KM4-F151-P1-C2750",
       "designator": "C2750",
       "category": "capacitor",
       "source_point": {
@@ -2232,7 +2232,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2754",
+      "component_id": "KM4-F151-P1-C2754",
       "designator": "C2754",
       "category": "capacitor",
       "source_point": {
@@ -2259,7 +2259,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2756",
+      "component_id": "KM4-F151-P1-C2756",
       "designator": "C2756",
       "category": "capacitor",
       "source_point": {
@@ -2286,7 +2286,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2758",
+      "component_id": "KM4-F151-P1-C2758",
       "designator": "C2758",
       "category": "capacitor",
       "source_point": {
@@ -2313,7 +2313,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2759",
+      "component_id": "KM4-F151-P1-C2759",
       "designator": "C2759",
       "category": "capacitor",
       "source_point": {
@@ -2340,7 +2340,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2760",
+      "component_id": "KM4-F151-P1-C2760",
       "designator": "C2760",
       "category": "capacitor",
       "source_point": {
@@ -2367,7 +2367,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2761",
+      "component_id": "KM4-F151-P1-C2761",
       "designator": "C2761",
       "category": "capacitor",
       "source_point": {
@@ -2394,7 +2394,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2780",
+      "component_id": "KM4-F151-P1-C2780",
       "designator": "C2780",
       "category": "capacitor",
       "source_point": {
@@ -2421,7 +2421,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C2782",
+      "component_id": "KM4-F151-P1-C2782",
       "designator": "C2782",
       "category": "capacitor",
       "source_point": {
@@ -2448,7 +2448,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C4017",
+      "component_id": "KM4-F151-P1-C4017",
       "designator": "C4017",
       "category": "capacitor",
       "source_point": {
@@ -2475,7 +2475,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C4018",
+      "component_id": "KM4-F151-P1-C4018",
       "designator": "C4018",
       "category": "capacitor",
       "source_point": {
@@ -2502,7 +2502,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C4019",
+      "component_id": "KM4-F151-P1-C4019",
       "designator": "C4019",
       "category": "capacitor",
       "source_point": {
@@ -2529,7 +2529,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C4020",
+      "component_id": "KM4-F151-P1-C4020",
       "designator": "C4020",
       "category": "capacitor",
       "source_point": {
@@ -2556,7 +2556,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C4021",
+      "component_id": "KM4-F151-P1-C4021",
       "designator": "C4021",
       "category": "capacitor",
       "source_point": {
@@ -2583,7 +2583,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C4023",
+      "component_id": "KM4-F151-P1-C4023",
       "designator": "C4023",
       "category": "capacitor",
       "source_point": {
@@ -2610,7 +2610,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C4025",
+      "component_id": "KM4-F151-P1-C4025",
       "designator": "C4025",
       "category": "capacitor",
       "source_point": {
@@ -2637,7 +2637,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C4026",
+      "component_id": "KM4-F151-P1-C4026",
       "designator": "C4026",
       "category": "capacitor",
       "source_point": {
@@ -2664,7 +2664,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C4027",
+      "component_id": "KM4-F151-P1-C4027",
       "designator": "C4027",
       "category": "capacitor",
       "source_point": {
@@ -2691,7 +2691,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C4028",
+      "component_id": "KM4-F151-P1-C4028",
       "designator": "C4028",
       "category": "capacitor",
       "source_point": {
@@ -2718,7 +2718,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C4029",
+      "component_id": "KM4-F151-P1-C4029",
       "designator": "C4029",
       "category": "capacitor",
       "source_point": {
@@ -2745,7 +2745,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C4030",
+      "component_id": "KM4-F151-P1-C4030",
       "designator": "C4030",
       "category": "capacitor",
       "source_point": {
@@ -2772,7 +2772,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C4031",
+      "component_id": "KM4-F151-P1-C4031",
       "designator": "C4031",
       "category": "capacitor",
       "source_point": {
@@ -2799,7 +2799,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C4032",
+      "component_id": "KM4-F151-P1-C4032",
       "designator": "C4032",
       "category": "capacitor",
       "source_point": {
@@ -2826,7 +2826,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C4033",
+      "component_id": "KM4-F151-P1-C4033",
       "designator": "C4033",
       "category": "capacitor",
       "source_point": {
@@ -2853,7 +2853,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C4034",
+      "component_id": "KM4-F151-P1-C4034",
       "designator": "C4034",
       "category": "capacitor",
       "source_point": {
@@ -2880,7 +2880,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C4035",
+      "component_id": "KM4-F151-P1-C4035",
       "designator": "C4035",
       "category": "capacitor",
       "source_point": {
@@ -2907,7 +2907,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C4037",
+      "component_id": "KM4-F151-P1-C4037",
       "designator": "C4037",
       "category": "capacitor",
       "source_point": {
@@ -2934,7 +2934,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C4038",
+      "component_id": "KM4-F151-P1-C4038",
       "designator": "C4038",
       "category": "capacitor",
       "source_point": {
@@ -2961,7 +2961,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C5003",
+      "component_id": "KM4-F151-P1-C5003",
       "designator": "C5003",
       "category": "capacitor",
       "source_point": {
@@ -2988,7 +2988,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C5005",
+      "component_id": "KM4-F151-P1-C5005",
       "designator": "C5005",
       "category": "capacitor",
       "source_point": {
@@ -3015,7 +3015,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C5006",
+      "component_id": "KM4-F151-P1-C5006",
       "designator": "C5006",
       "category": "capacitor",
       "source_point": {
@@ -3042,7 +3042,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C5007",
+      "component_id": "KM4-F151-P1-C5007",
       "designator": "C5007",
       "category": "capacitor",
       "source_point": {
@@ -3069,7 +3069,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C5008",
+      "component_id": "KM4-F151-P1-C5008",
       "designator": "C5008",
       "category": "capacitor",
       "source_point": {
@@ -3096,7 +3096,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C5009",
+      "component_id": "KM4-F151-P1-C5009",
       "designator": "C5009",
       "category": "capacitor",
       "source_point": {
@@ -3123,7 +3123,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C5010",
+      "component_id": "KM4-F151-P1-C5010",
       "designator": "C5010",
       "category": "capacitor",
       "source_point": {
@@ -3150,7 +3150,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C5011",
+      "component_id": "KM4-F151-P1-C5011",
       "designator": "C5011",
       "category": "capacitor",
       "source_point": {
@@ -3177,7 +3177,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C5015",
+      "component_id": "KM4-F151-P1-C5015",
       "designator": "C5015",
       "category": "capacitor",
       "source_point": {
@@ -3204,7 +3204,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C5016",
+      "component_id": "KM4-F151-P1-C5016",
       "designator": "C5016",
       "category": "capacitor",
       "source_point": {
@@ -3231,7 +3231,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C5017",
+      "component_id": "KM4-F151-P1-C5017",
       "designator": "C5017",
       "category": "capacitor",
       "source_point": {
@@ -3258,7 +3258,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C5018",
+      "component_id": "KM4-F151-P1-C5018",
       "designator": "C5018",
       "category": "capacitor",
       "source_point": {
@@ -3285,7 +3285,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C5019",
+      "component_id": "KM4-F151-P1-C5019",
       "designator": "C5019",
       "category": "capacitor",
       "source_point": {
@@ -3312,7 +3312,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C5020",
+      "component_id": "KM4-F151-P1-C5020",
       "designator": "C5020",
       "category": "capacitor",
       "source_point": {
@@ -3339,7 +3339,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C5021",
+      "component_id": "KM4-F151-P1-C5021",
       "designator": "C5021",
       "category": "capacitor",
       "source_point": {
@@ -3366,7 +3366,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C5022",
+      "component_id": "KM4-F151-P1-C5022",
       "designator": "C5022",
       "category": "capacitor",
       "source_point": {
@@ -3393,7 +3393,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C5023",
+      "component_id": "KM4-F151-P1-C5023",
       "designator": "C5023",
       "category": "capacitor",
       "source_point": {
@@ -3420,7 +3420,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C5024",
+      "component_id": "KM4-F151-P1-C5024",
       "designator": "C5024",
       "category": "capacitor",
       "source_point": {
@@ -3447,7 +3447,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C5025",
+      "component_id": "KM4-F151-P1-C5025",
       "designator": "C5025",
       "category": "capacitor",
       "source_point": {
@@ -3474,7 +3474,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C5026",
+      "component_id": "KM4-F151-P1-C5026",
       "designator": "C5026",
       "category": "capacitor",
       "source_point": {
@@ -3501,7 +3501,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C5027",
+      "component_id": "KM4-F151-P1-C5027",
       "designator": "C5027",
       "category": "capacitor",
       "source_point": {
@@ -3528,7 +3528,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C5028",
+      "component_id": "KM4-F151-P1-C5028",
       "designator": "C5028",
       "category": "capacitor",
       "source_point": {
@@ -3555,7 +3555,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C5031",
+      "component_id": "KM4-F151-P1-C5031",
       "designator": "C5031",
       "category": "capacitor",
       "source_point": {
@@ -3582,7 +3582,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C5032",
+      "component_id": "KM4-F151-P1-C5032",
       "designator": "C5032",
       "category": "capacitor",
       "source_point": {
@@ -3609,7 +3609,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C5033",
+      "component_id": "KM4-F151-P1-C5033",
       "designator": "C5033",
       "category": "capacitor",
       "source_point": {
@@ -3636,7 +3636,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C5040",
+      "component_id": "KM4-F151-P1-C5040",
       "designator": "C5040",
       "category": "capacitor",
       "source_point": {
@@ -3663,7 +3663,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C5063",
+      "component_id": "KM4-F151-P1-C5063",
       "designator": "C5063",
       "category": "capacitor",
       "source_point": {
@@ -3690,7 +3690,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6000",
+      "component_id": "KM4-F151-P1-C6000",
       "designator": "C6000",
       "category": "capacitor",
       "source_point": {
@@ -3717,7 +3717,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6003",
+      "component_id": "KM4-F151-P1-C6003",
       "designator": "C6003",
       "category": "capacitor",
       "source_point": {
@@ -3744,7 +3744,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6004",
+      "component_id": "KM4-F151-P1-C6004",
       "designator": "C6004",
       "category": "capacitor",
       "source_point": {
@@ -3771,7 +3771,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6012",
+      "component_id": "KM4-F151-P1-C6012",
       "designator": "C6012",
       "category": "capacitor",
       "source_point": {
@@ -3798,7 +3798,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6013",
+      "component_id": "KM4-F151-P1-C6013",
       "designator": "C6013",
       "category": "capacitor",
       "source_point": {
@@ -3825,7 +3825,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6014",
+      "component_id": "KM4-F151-P1-C6014",
       "designator": "C6014",
       "category": "capacitor",
       "source_point": {
@@ -3852,7 +3852,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6030",
+      "component_id": "KM4-F151-P1-C6030",
       "designator": "C6030",
       "category": "capacitor",
       "source_point": {
@@ -3879,7 +3879,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6032",
+      "component_id": "KM4-F151-P1-C6032",
       "designator": "C6032",
       "category": "capacitor",
       "source_point": {
@@ -3906,7 +3906,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6037",
+      "component_id": "KM4-F151-P1-C6037",
       "designator": "C6037",
       "category": "capacitor",
       "source_point": {
@@ -3933,7 +3933,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6060",
+      "component_id": "KM4-F151-P1-C6060",
       "designator": "C6060",
       "category": "capacitor",
       "source_point": {
@@ -3960,7 +3960,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6062",
+      "component_id": "KM4-F151-P1-C6062",
       "designator": "C6062",
       "category": "capacitor",
       "source_point": {
@@ -3987,7 +3987,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6101",
+      "component_id": "KM4-F151-P1-C6101",
       "designator": "C6101",
       "category": "capacitor",
       "source_point": {
@@ -4014,7 +4014,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6108",
+      "component_id": "KM4-F151-P1-C6108",
       "designator": "C6108",
       "category": "capacitor",
       "source_point": {
@@ -4041,7 +4041,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6109",
+      "component_id": "KM4-F151-P1-C6109",
       "designator": "C6109",
       "category": "capacitor",
       "source_point": {
@@ -4068,7 +4068,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6201",
+      "component_id": "KM4-F151-P1-C6201",
       "designator": "C6201",
       "category": "capacitor",
       "source_point": {
@@ -4095,7 +4095,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6204",
+      "component_id": "KM4-F151-P1-C6204",
       "designator": "C6204",
       "category": "capacitor",
       "source_point": {
@@ -4122,7 +4122,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6209",
+      "component_id": "KM4-F151-P1-C6209",
       "designator": "C6209",
       "category": "capacitor",
       "source_point": {
@@ -4149,7 +4149,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6211",
+      "component_id": "KM4-F151-P1-C6211",
       "designator": "C6211",
       "category": "capacitor",
       "source_point": {
@@ -4176,7 +4176,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6213",
+      "component_id": "KM4-F151-P1-C6213",
       "designator": "C6213",
       "category": "capacitor",
       "source_point": {
@@ -4203,7 +4203,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6223",
+      "component_id": "KM4-F151-P1-C6223",
       "designator": "C6223",
       "category": "capacitor",
       "source_point": {
@@ -4230,7 +4230,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6224",
+      "component_id": "KM4-F151-P1-C6224",
       "designator": "C6224",
       "category": "capacitor",
       "source_point": {
@@ -4257,7 +4257,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6250",
+      "component_id": "KM4-F151-P1-C6250",
       "designator": "C6250",
       "category": "capacitor",
       "source_point": {
@@ -4284,7 +4284,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6251",
+      "component_id": "KM4-F151-P1-C6251",
       "designator": "C6251",
       "category": "capacitor",
       "source_point": {
@@ -4311,7 +4311,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6254",
+      "component_id": "KM4-F151-P1-C6254",
       "designator": "C6254",
       "category": "capacitor",
       "source_point": {
@@ -4338,7 +4338,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6255",
+      "component_id": "KM4-F151-P1-C6255",
       "designator": "C6255",
       "category": "capacitor",
       "source_point": {
@@ -4365,7 +4365,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6302",
+      "component_id": "KM4-F151-P1-C6302",
       "designator": "C6302",
       "category": "capacitor",
       "source_point": {
@@ -4392,7 +4392,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6303",
+      "component_id": "KM4-F151-P1-C6303",
       "designator": "C6303",
       "category": "capacitor",
       "source_point": {
@@ -4419,7 +4419,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6304",
+      "component_id": "KM4-F151-P1-C6304",
       "designator": "C6304",
       "category": "capacitor",
       "source_point": {
@@ -4446,7 +4446,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6305",
+      "component_id": "KM4-F151-P1-C6305",
       "designator": "C6305",
       "category": "capacitor",
       "source_point": {
@@ -4473,7 +4473,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6307",
+      "component_id": "KM4-F151-P1-C6307",
       "designator": "C6307",
       "category": "capacitor",
       "source_point": {
@@ -4500,7 +4500,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6308",
+      "component_id": "KM4-F151-P1-C6308",
       "designator": "C6308",
       "category": "capacitor",
       "source_point": {
@@ -4527,7 +4527,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6309",
+      "component_id": "KM4-F151-P1-C6309",
       "designator": "C6309",
       "category": "capacitor",
       "source_point": {
@@ -4554,7 +4554,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6310",
+      "component_id": "KM4-F151-P1-C6310",
       "designator": "C6310",
       "category": "capacitor",
       "source_point": {
@@ -4581,7 +4581,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6312",
+      "component_id": "KM4-F151-P1-C6312",
       "designator": "C6312",
       "category": "capacitor",
       "source_point": {
@@ -4608,7 +4608,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6320",
+      "component_id": "KM4-F151-P1-C6320",
       "designator": "C6320",
       "category": "capacitor",
       "source_point": {
@@ -4635,7 +4635,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6321",
+      "component_id": "KM4-F151-P1-C6321",
       "designator": "C6321",
       "category": "capacitor",
       "source_point": {
@@ -4662,7 +4662,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6401",
+      "component_id": "KM4-F151-P1-C6401",
       "designator": "C6401",
       "category": "capacitor",
       "source_point": {
@@ -4689,7 +4689,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6501",
+      "component_id": "KM4-F151-P1-C6501",
       "designator": "C6501",
       "category": "capacitor",
       "source_point": {
@@ -4716,7 +4716,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6504",
+      "component_id": "KM4-F151-P1-C6504",
       "designator": "C6504",
       "category": "capacitor",
       "source_point": {
@@ -4743,7 +4743,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6505",
+      "component_id": "KM4-F151-P1-C6505",
       "designator": "C6505",
       "category": "capacitor",
       "source_point": {
@@ -4770,7 +4770,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-C6506",
+      "component_id": "KM4-F151-P1-C6506",
       "designator": "C6506",
       "category": "capacitor",
       "source_point": {
@@ -4797,7 +4797,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-D2702",
+      "component_id": "KM4-F151-P1-D2702",
       "designator": "D2702",
       "category": "diode",
       "source_point": {
@@ -4824,7 +4824,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-D2704",
+      "component_id": "KM4-F151-P1-D2704",
       "designator": "D2704",
       "category": "diode",
       "source_point": {
@@ -4851,7 +4851,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-D2706",
+      "component_id": "KM4-F151-P1-D2706",
       "designator": "D2706",
       "category": "diode",
       "source_point": {
@@ -4878,7 +4878,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-D2708",
+      "component_id": "KM4-F151-P1-D2708",
       "designator": "D2708",
       "category": "diode",
       "source_point": {
@@ -4905,7 +4905,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-D2709",
+      "component_id": "KM4-F151-P1-D2709",
       "designator": "D2709",
       "category": "diode",
       "source_point": {
@@ -4932,7 +4932,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-D2710",
+      "component_id": "KM4-F151-P1-D2710",
       "designator": "D2710",
       "category": "diode",
       "source_point": {
@@ -4959,7 +4959,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-D2725",
+      "component_id": "KM4-F151-P1-D2725",
       "designator": "D2725",
       "category": "diode",
       "source_point": {
@@ -4986,7 +4986,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-D6401",
+      "component_id": "KM4-F151-P1-D6401",
       "designator": "D6401",
       "category": "diode",
       "source_point": {
@@ -5013,7 +5013,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-F6101",
+      "component_id": "KM4-F151-P1-F6101",
       "designator": "F6101",
       "category": "fuse",
       "source_point": {
@@ -5040,7 +5040,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-F6103",
+      "component_id": "KM4-F151-P1-F6103",
       "designator": "F6103",
       "category": "fuse",
       "source_point": {
@@ -5067,7 +5067,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-F6105",
+      "component_id": "KM4-F151-P1-F6105",
       "designator": "F6105",
       "category": "fuse",
       "source_point": {
@@ -5094,7 +5094,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-F6107",
+      "component_id": "KM4-F151-P1-F6107",
       "designator": "F6107",
       "category": "fuse",
       "source_point": {
@@ -5121,7 +5121,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-F6109",
+      "component_id": "KM4-F151-P1-F6109",
       "designator": "F6109",
       "category": "fuse",
       "source_point": {
@@ -5148,7 +5148,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-J6210",
+      "component_id": "KM4-F151-P1-J6210",
       "designator": "J6210",
       "category": "connector",
       "source_point": {
@@ -5175,7 +5175,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-J6250",
+      "component_id": "KM4-F151-P1-J6250",
       "designator": "J6250",
       "category": "connector",
       "source_point": {
@@ -5202,7 +5202,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-J6501",
+      "component_id": "KM4-F151-P1-J6501",
       "designator": "J6501",
       "category": "connector",
       "source_point": {
@@ -5229,7 +5229,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-J6502",
+      "component_id": "KM4-F151-P1-J6502",
       "designator": "J6502",
       "category": "connector",
       "source_point": {
@@ -5256,7 +5256,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-J6503",
+      "component_id": "KM4-F151-P1-J6503",
       "designator": "J6503",
       "category": "connector",
       "source_point": {
@@ -5283,7 +5283,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-J6504",
+      "component_id": "KM4-F151-P1-J6504",
       "designator": "J6504",
       "category": "connector",
       "source_point": {
@@ -5310,7 +5310,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-L5002",
+      "component_id": "KM4-F151-P1-L5002",
       "designator": "L5002",
       "category": "inductor",
       "source_point": {
@@ -5337,7 +5337,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-L5003",
+      "component_id": "KM4-F151-P1-L5003",
       "designator": "L5003",
       "category": "inductor",
       "source_point": {
@@ -5364,7 +5364,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-L5004",
+      "component_id": "KM4-F151-P1-L5004",
       "designator": "L5004",
       "category": "inductor",
       "source_point": {
@@ -5391,7 +5391,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-L5005",
+      "component_id": "KM4-F151-P1-L5005",
       "designator": "L5005",
       "category": "inductor",
       "source_point": {
@@ -5418,7 +5418,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-L5006",
+      "component_id": "KM4-F151-P1-L5006",
       "designator": "L5006",
       "category": "inductor",
       "source_point": {
@@ -5445,7 +5445,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-L5007",
+      "component_id": "KM4-F151-P1-L5007",
       "designator": "L5007",
       "category": "inductor",
       "source_point": {
@@ -5472,7 +5472,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-L5008",
+      "component_id": "KM4-F151-P1-L5008",
       "designator": "L5008",
       "category": "inductor",
       "source_point": {
@@ -5499,7 +5499,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-L5009",
+      "component_id": "KM4-F151-P1-L5009",
       "designator": "L5009",
       "category": "inductor",
       "source_point": {
@@ -5526,7 +5526,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-L5010",
+      "component_id": "KM4-F151-P1-L5010",
       "designator": "L5010",
       "category": "inductor",
       "source_point": {
@@ -5553,7 +5553,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-L5011",
+      "component_id": "KM4-F151-P1-L5011",
       "designator": "L5011",
       "category": "inductor",
       "source_point": {
@@ -5580,7 +5580,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-L5013",
+      "component_id": "KM4-F151-P1-L5013",
       "designator": "L5013",
       "category": "inductor",
       "source_point": {
@@ -5607,7 +5607,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-L5014",
+      "component_id": "KM4-F151-P1-L5014",
       "designator": "L5014",
       "category": "inductor",
       "source_point": {
@@ -5634,7 +5634,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-L5017",
+      "component_id": "KM4-F151-P1-L5017",
       "designator": "L5017",
       "category": "inductor",
       "source_point": {
@@ -5661,7 +5661,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-LED2601",
+      "component_id": "KM4-F151-P1-LED2601",
       "designator": "LED2601",
       "category": "led",
       "source_point": {
@@ -5688,7 +5688,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-LED2602",
+      "component_id": "KM4-F151-P1-LED2602",
       "designator": "LED2602",
       "category": "led",
       "source_point": {
@@ -5715,7 +5715,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-LED2603",
+      "component_id": "KM4-F151-P1-LED2603",
       "designator": "LED2603",
       "category": "led",
       "source_point": {
@@ -5742,7 +5742,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-PL2607",
+      "component_id": "KM4-F151-P1-PL2607",
       "designator": "PL2607",
       "category": "inductor",
       "source_point": {
@@ -5769,7 +5769,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-PL2701",
+      "component_id": "KM4-F151-P1-PL2701",
       "designator": "PL2701",
       "category": "inductor",
       "source_point": {
@@ -5796,7 +5796,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-PL2702",
+      "component_id": "KM4-F151-P1-PL2702",
       "designator": "PL2702",
       "category": "inductor",
       "source_point": {
@@ -5823,7 +5823,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-Q2601",
+      "component_id": "KM4-F151-P1-Q2601",
       "designator": "Q2601",
       "category": "transistor",
       "source_point": {
@@ -5850,7 +5850,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-Q2602",
+      "component_id": "KM4-F151-P1-Q2602",
       "designator": "Q2602",
       "category": "transistor",
       "source_point": {
@@ -5877,7 +5877,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-Q2608",
+      "component_id": "KM4-F151-P1-Q2608",
       "designator": "Q2608",
       "category": "transistor",
       "source_point": {
@@ -5904,7 +5904,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-Q2609",
+      "component_id": "KM4-F151-P1-Q2609",
       "designator": "Q2609",
       "category": "transistor",
       "source_point": {
@@ -5931,7 +5931,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-Q2612",
+      "component_id": "KM4-F151-P1-Q2612",
       "designator": "Q2612",
       "category": "transistor",
       "source_point": {
@@ -5958,7 +5958,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-Q2702",
+      "component_id": "KM4-F151-P1-Q2702",
       "designator": "Q2702",
       "category": "transistor",
       "source_point": {
@@ -5985,7 +5985,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-Q2703",
+      "component_id": "KM4-F151-P1-Q2703",
       "designator": "Q2703",
       "category": "transistor",
       "source_point": {
@@ -6012,7 +6012,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-Q2704",
+      "component_id": "KM4-F151-P1-Q2704",
       "designator": "Q2704",
       "category": "transistor",
       "source_point": {
@@ -6039,7 +6039,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-Q2705",
+      "component_id": "KM4-F151-P1-Q2705",
       "designator": "Q2705",
       "category": "transistor",
       "source_point": {
@@ -6066,7 +6066,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-Q6402",
+      "component_id": "KM4-F151-P1-Q6402",
       "designator": "Q6402",
       "category": "transistor",
       "source_point": {
@@ -6093,7 +6093,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R1101",
+      "component_id": "KM4-F151-P1-R1101",
       "designator": "R1101",
       "category": "resistor",
       "source_point": {
@@ -6120,7 +6120,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R1103",
+      "component_id": "KM4-F151-P1-R1103",
       "designator": "R1103",
       "category": "resistor",
       "source_point": {
@@ -6147,7 +6147,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R1104",
+      "component_id": "KM4-F151-P1-R1104",
       "designator": "R1104",
       "category": "resistor",
       "source_point": {
@@ -6174,7 +6174,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R1105",
+      "component_id": "KM4-F151-P1-R1105",
       "designator": "R1105",
       "category": "resistor",
       "source_point": {
@@ -6201,7 +6201,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R1106",
+      "component_id": "KM4-F151-P1-R1106",
       "designator": "R1106",
       "category": "resistor",
       "source_point": {
@@ -6228,7 +6228,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R1107",
+      "component_id": "KM4-F151-P1-R1107",
       "designator": "R1107",
       "category": "resistor",
       "source_point": {
@@ -6255,7 +6255,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R1108",
+      "component_id": "KM4-F151-P1-R1108",
       "designator": "R1108",
       "category": "resistor",
       "source_point": {
@@ -6282,7 +6282,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R1109",
+      "component_id": "KM4-F151-P1-R1109",
       "designator": "R1109",
       "category": "resistor",
       "source_point": {
@@ -6309,7 +6309,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R1110",
+      "component_id": "KM4-F151-P1-R1110",
       "designator": "R1110",
       "category": "resistor",
       "source_point": {
@@ -6336,7 +6336,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R1115",
+      "component_id": "KM4-F151-P1-R1115",
       "designator": "R1115",
       "category": "resistor",
       "source_point": {
@@ -6363,7 +6363,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R1200",
+      "component_id": "KM4-F151-P1-R1200",
       "designator": "R1200",
       "category": "resistor",
       "source_point": {
@@ -6390,7 +6390,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R1201",
+      "component_id": "KM4-F151-P1-R1201",
       "designator": "R1201",
       "category": "resistor",
       "source_point": {
@@ -6417,7 +6417,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R1202",
+      "component_id": "KM4-F151-P1-R1202",
       "designator": "R1202",
       "category": "resistor",
       "source_point": {
@@ -6444,7 +6444,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2615",
+      "component_id": "KM4-F151-P1-R2615",
       "designator": "R2615",
       "category": "resistor",
       "source_point": {
@@ -6471,7 +6471,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2618",
+      "component_id": "KM4-F151-P1-R2618",
       "designator": "R2618",
       "category": "resistor",
       "source_point": {
@@ -6498,7 +6498,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2619",
+      "component_id": "KM4-F151-P1-R2619",
       "designator": "R2619",
       "category": "resistor",
       "source_point": {
@@ -6525,7 +6525,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2624",
+      "component_id": "KM4-F151-P1-R2624",
       "designator": "R2624",
       "category": "resistor",
       "source_point": {
@@ -6552,7 +6552,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2666",
+      "component_id": "KM4-F151-P1-R2666",
       "designator": "R2666",
       "category": "resistor",
       "source_point": {
@@ -6579,7 +6579,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2667",
+      "component_id": "KM4-F151-P1-R2667",
       "designator": "R2667",
       "category": "resistor",
       "source_point": {
@@ -6606,7 +6606,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2702",
+      "component_id": "KM4-F151-P1-R2702",
       "designator": "R2702",
       "category": "resistor",
       "source_point": {
@@ -6633,7 +6633,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2703",
+      "component_id": "KM4-F151-P1-R2703",
       "designator": "R2703",
       "category": "resistor",
       "source_point": {
@@ -6660,7 +6660,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2708",
+      "component_id": "KM4-F151-P1-R2708",
       "designator": "R2708",
       "category": "resistor",
       "source_point": {
@@ -6687,7 +6687,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2709",
+      "component_id": "KM4-F151-P1-R2709",
       "designator": "R2709",
       "category": "resistor",
       "source_point": {
@@ -6714,7 +6714,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2710",
+      "component_id": "KM4-F151-P1-R2710",
       "designator": "R2710",
       "category": "resistor",
       "source_point": {
@@ -6741,7 +6741,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2714",
+      "component_id": "KM4-F151-P1-R2714",
       "designator": "R2714",
       "category": "resistor",
       "source_point": {
@@ -6768,7 +6768,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2716",
+      "component_id": "KM4-F151-P1-R2716",
       "designator": "R2716",
       "category": "resistor",
       "source_point": {
@@ -6795,7 +6795,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2717",
+      "component_id": "KM4-F151-P1-R2717",
       "designator": "R2717",
       "category": "resistor",
       "source_point": {
@@ -6822,7 +6822,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2718",
+      "component_id": "KM4-F151-P1-R2718",
       "designator": "R2718",
       "category": "resistor",
       "source_point": {
@@ -6849,7 +6849,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2719",
+      "component_id": "KM4-F151-P1-R2719",
       "designator": "R2719",
       "category": "resistor",
       "source_point": {
@@ -6876,7 +6876,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2720",
+      "component_id": "KM4-F151-P1-R2720",
       "designator": "R2720",
       "category": "resistor",
       "source_point": {
@@ -6903,7 +6903,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2721",
+      "component_id": "KM4-F151-P1-R2721",
       "designator": "R2721",
       "category": "resistor",
       "source_point": {
@@ -6930,7 +6930,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2722",
+      "component_id": "KM4-F151-P1-R2722",
       "designator": "R2722",
       "category": "resistor",
       "source_point": {
@@ -6957,7 +6957,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2726",
+      "component_id": "KM4-F151-P1-R2726",
       "designator": "R2726",
       "category": "resistor",
       "source_point": {
@@ -6984,7 +6984,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2727",
+      "component_id": "KM4-F151-P1-R2727",
       "designator": "R2727",
       "category": "resistor",
       "source_point": {
@@ -7011,7 +7011,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2731",
+      "component_id": "KM4-F151-P1-R2731",
       "designator": "R2731",
       "category": "resistor",
       "source_point": {
@@ -7038,7 +7038,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2736",
+      "component_id": "KM4-F151-P1-R2736",
       "designator": "R2736",
       "category": "resistor",
       "source_point": {
@@ -7065,7 +7065,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2737",
+      "component_id": "KM4-F151-P1-R2737",
       "designator": "R2737",
       "category": "resistor",
       "source_point": {
@@ -7092,7 +7092,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2739",
+      "component_id": "KM4-F151-P1-R2739",
       "designator": "R2739",
       "category": "resistor",
       "source_point": {
@@ -7119,7 +7119,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2740",
+      "component_id": "KM4-F151-P1-R2740",
       "designator": "R2740",
       "category": "resistor",
       "source_point": {
@@ -7146,7 +7146,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2741",
+      "component_id": "KM4-F151-P1-R2741",
       "designator": "R2741",
       "category": "resistor",
       "source_point": {
@@ -7173,7 +7173,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2742",
+      "component_id": "KM4-F151-P1-R2742",
       "designator": "R2742",
       "category": "resistor",
       "source_point": {
@@ -7200,7 +7200,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2743",
+      "component_id": "KM4-F151-P1-R2743",
       "designator": "R2743",
       "category": "resistor",
       "source_point": {
@@ -7227,7 +7227,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2744",
+      "component_id": "KM4-F151-P1-R2744",
       "designator": "R2744",
       "category": "resistor",
       "source_point": {
@@ -7254,7 +7254,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2746",
+      "component_id": "KM4-F151-P1-R2746",
       "designator": "R2746",
       "category": "resistor",
       "source_point": {
@@ -7281,7 +7281,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2755",
+      "component_id": "KM4-F151-P1-R2755",
       "designator": "R2755",
       "category": "resistor",
       "source_point": {
@@ -7308,7 +7308,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2756",
+      "component_id": "KM4-F151-P1-R2756",
       "designator": "R2756",
       "category": "resistor",
       "source_point": {
@@ -7335,7 +7335,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2757",
+      "component_id": "KM4-F151-P1-R2757",
       "designator": "R2757",
       "category": "resistor",
       "source_point": {
@@ -7362,7 +7362,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2758",
+      "component_id": "KM4-F151-P1-R2758",
       "designator": "R2758",
       "category": "resistor",
       "source_point": {
@@ -7389,7 +7389,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2760",
+      "component_id": "KM4-F151-P1-R2760",
       "designator": "R2760",
       "category": "resistor",
       "source_point": {
@@ -7416,7 +7416,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2761",
+      "component_id": "KM4-F151-P1-R2761",
       "designator": "R2761",
       "category": "resistor",
       "source_point": {
@@ -7443,7 +7443,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2762",
+      "component_id": "KM4-F151-P1-R2762",
       "designator": "R2762",
       "category": "resistor",
       "source_point": {
@@ -7470,7 +7470,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2763",
+      "component_id": "KM4-F151-P1-R2763",
       "designator": "R2763",
       "category": "resistor",
       "source_point": {
@@ -7497,7 +7497,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2764",
+      "component_id": "KM4-F151-P1-R2764",
       "designator": "R2764",
       "category": "resistor",
       "source_point": {
@@ -7524,7 +7524,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2765",
+      "component_id": "KM4-F151-P1-R2765",
       "designator": "R2765",
       "category": "resistor",
       "source_point": {
@@ -7551,7 +7551,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2766",
+      "component_id": "KM4-F151-P1-R2766",
       "designator": "R2766",
       "category": "resistor",
       "source_point": {
@@ -7578,7 +7578,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2767",
+      "component_id": "KM4-F151-P1-R2767",
       "designator": "R2767",
       "category": "resistor",
       "source_point": {
@@ -7605,7 +7605,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2780",
+      "component_id": "KM4-F151-P1-R2780",
       "designator": "R2780",
       "category": "resistor",
       "source_point": {
@@ -7632,7 +7632,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2782",
+      "component_id": "KM4-F151-P1-R2782",
       "designator": "R2782",
       "category": "resistor",
       "source_point": {
@@ -7659,7 +7659,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2783",
+      "component_id": "KM4-F151-P1-R2783",
       "designator": "R2783",
       "category": "resistor",
       "source_point": {
@@ -7686,7 +7686,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2784",
+      "component_id": "KM4-F151-P1-R2784",
       "designator": "R2784",
       "category": "resistor",
       "source_point": {
@@ -7713,7 +7713,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2785",
+      "component_id": "KM4-F151-P1-R2785",
       "designator": "R2785",
       "category": "resistor",
       "source_point": {
@@ -7740,7 +7740,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R2786",
+      "component_id": "KM4-F151-P1-R2786",
       "designator": "R2786",
       "category": "resistor",
       "source_point": {
@@ -7767,7 +7767,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R4010",
+      "component_id": "KM4-F151-P1-R4010",
       "designator": "R4010",
       "category": "resistor",
       "source_point": {
@@ -7794,7 +7794,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R4012",
+      "component_id": "KM4-F151-P1-R4012",
       "designator": "R4012",
       "category": "resistor",
       "source_point": {
@@ -7821,7 +7821,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R4013",
+      "component_id": "KM4-F151-P1-R4013",
       "designator": "R4013",
       "category": "resistor",
       "source_point": {
@@ -7848,7 +7848,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R5003",
+      "component_id": "KM4-F151-P1-R5003",
       "designator": "R5003",
       "category": "resistor",
       "source_point": {
@@ -7875,7 +7875,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R5004",
+      "component_id": "KM4-F151-P1-R5004",
       "designator": "R5004",
       "category": "resistor",
       "source_point": {
@@ -7902,7 +7902,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R5005",
+      "component_id": "KM4-F151-P1-R5005",
       "designator": "R5005",
       "category": "resistor",
       "source_point": {
@@ -7929,7 +7929,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R5006",
+      "component_id": "KM4-F151-P1-R5006",
       "designator": "R5006",
       "category": "resistor",
       "source_point": {
@@ -7956,7 +7956,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R5007",
+      "component_id": "KM4-F151-P1-R5007",
       "designator": "R5007",
       "category": "resistor",
       "source_point": {
@@ -7983,7 +7983,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R5008",
+      "component_id": "KM4-F151-P1-R5008",
       "designator": "R5008",
       "category": "resistor",
       "source_point": {
@@ -8010,7 +8010,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R5016",
+      "component_id": "KM4-F151-P1-R5016",
       "designator": "R5016",
       "category": "resistor",
       "source_point": {
@@ -8037,7 +8037,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R5018",
+      "component_id": "KM4-F151-P1-R5018",
       "designator": "R5018",
       "category": "resistor",
       "source_point": {
@@ -8064,7 +8064,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R5039",
+      "component_id": "KM4-F151-P1-R5039",
       "designator": "R5039",
       "category": "resistor",
       "source_point": {
@@ -8091,7 +8091,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R5045",
+      "component_id": "KM4-F151-P1-R5045",
       "designator": "R5045",
       "category": "resistor",
       "source_point": {
@@ -8118,7 +8118,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R5046",
+      "component_id": "KM4-F151-P1-R5046",
       "designator": "R5046",
       "category": "resistor",
       "source_point": {
@@ -8145,7 +8145,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6002",
+      "component_id": "KM4-F151-P1-R6002",
       "designator": "R6002",
       "category": "resistor",
       "source_point": {
@@ -8172,7 +8172,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6088",
+      "component_id": "KM4-F151-P1-R6088",
       "designator": "R6088",
       "category": "resistor",
       "source_point": {
@@ -8199,7 +8199,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6111",
+      "component_id": "KM4-F151-P1-R6111",
       "designator": "R6111",
       "category": "resistor",
       "source_point": {
@@ -8226,7 +8226,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6112",
+      "component_id": "KM4-F151-P1-R6112",
       "designator": "R6112",
       "category": "resistor",
       "source_point": {
@@ -8253,7 +8253,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6113",
+      "component_id": "KM4-F151-P1-R6113",
       "designator": "R6113",
       "category": "resistor",
       "source_point": {
@@ -8280,7 +8280,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6114",
+      "component_id": "KM4-F151-P1-R6114",
       "designator": "R6114",
       "category": "resistor",
       "source_point": {
@@ -8307,7 +8307,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6115",
+      "component_id": "KM4-F151-P1-R6115",
       "designator": "R6115",
       "category": "resistor",
       "source_point": {
@@ -8334,7 +8334,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6116",
+      "component_id": "KM4-F151-P1-R6116",
       "designator": "R6116",
       "category": "resistor",
       "source_point": {
@@ -8361,7 +8361,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6117",
+      "component_id": "KM4-F151-P1-R6117",
       "designator": "R6117",
       "category": "resistor",
       "source_point": {
@@ -8388,7 +8388,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6118",
+      "component_id": "KM4-F151-P1-R6118",
       "designator": "R6118",
       "category": "resistor",
       "source_point": {
@@ -8415,7 +8415,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6130",
+      "component_id": "KM4-F151-P1-R6130",
       "designator": "R6130",
       "category": "resistor",
       "source_point": {
@@ -8442,7 +8442,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6131",
+      "component_id": "KM4-F151-P1-R6131",
       "designator": "R6131",
       "category": "resistor",
       "source_point": {
@@ -8469,7 +8469,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6202",
+      "component_id": "KM4-F151-P1-R6202",
       "designator": "R6202",
       "category": "resistor",
       "source_point": {
@@ -8496,7 +8496,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6250",
+      "component_id": "KM4-F151-P1-R6250",
       "designator": "R6250",
       "category": "resistor",
       "source_point": {
@@ -8523,7 +8523,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6270",
+      "component_id": "KM4-F151-P1-R6270",
       "designator": "R6270",
       "category": "resistor",
       "source_point": {
@@ -8550,7 +8550,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6301",
+      "component_id": "KM4-F151-P1-R6301",
       "designator": "R6301",
       "category": "resistor",
       "source_point": {
@@ -8577,7 +8577,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6305",
+      "component_id": "KM4-F151-P1-R6305",
       "designator": "R6305",
       "category": "resistor",
       "source_point": {
@@ -8604,7 +8604,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6306",
+      "component_id": "KM4-F151-P1-R6306",
       "designator": "R6306",
       "category": "resistor",
       "source_point": {
@@ -8631,7 +8631,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6307",
+      "component_id": "KM4-F151-P1-R6307",
       "designator": "R6307",
       "category": "resistor",
       "source_point": {
@@ -8658,7 +8658,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6308",
+      "component_id": "KM4-F151-P1-R6308",
       "designator": "R6308",
       "category": "resistor",
       "source_point": {
@@ -8685,7 +8685,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6309",
+      "component_id": "KM4-F151-P1-R6309",
       "designator": "R6309",
       "category": "resistor",
       "source_point": {
@@ -8712,7 +8712,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6310",
+      "component_id": "KM4-F151-P1-R6310",
       "designator": "R6310",
       "category": "resistor",
       "source_point": {
@@ -8739,7 +8739,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6311",
+      "component_id": "KM4-F151-P1-R6311",
       "designator": "R6311",
       "category": "resistor",
       "source_point": {
@@ -8766,7 +8766,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6320",
+      "component_id": "KM4-F151-P1-R6320",
       "designator": "R6320",
       "category": "resistor",
       "source_point": {
@@ -8793,7 +8793,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6330",
+      "component_id": "KM4-F151-P1-R6330",
       "designator": "R6330",
       "category": "resistor",
       "source_point": {
@@ -8820,7 +8820,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6335",
+      "component_id": "KM4-F151-P1-R6335",
       "designator": "R6335",
       "category": "resistor",
       "source_point": {
@@ -8847,7 +8847,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6336",
+      "component_id": "KM4-F151-P1-R6336",
       "designator": "R6336",
       "category": "resistor",
       "source_point": {
@@ -8874,7 +8874,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6337",
+      "component_id": "KM4-F151-P1-R6337",
       "designator": "R6337",
       "category": "resistor",
       "source_point": {
@@ -8901,7 +8901,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6409",
+      "component_id": "KM4-F151-P1-R6409",
       "designator": "R6409",
       "category": "resistor",
       "source_point": {
@@ -8928,7 +8928,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6411",
+      "component_id": "KM4-F151-P1-R6411",
       "designator": "R6411",
       "category": "resistor",
       "source_point": {
@@ -8955,7 +8955,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6455",
+      "component_id": "KM4-F151-P1-R6455",
       "designator": "R6455",
       "category": "resistor",
       "source_point": {
@@ -8982,7 +8982,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6501",
+      "component_id": "KM4-F151-P1-R6501",
       "designator": "R6501",
       "category": "resistor",
       "source_point": {
@@ -9009,7 +9009,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6502",
+      "component_id": "KM4-F151-P1-R6502",
       "designator": "R6502",
       "category": "resistor",
       "source_point": {
@@ -9036,7 +9036,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6503",
+      "component_id": "KM4-F151-P1-R6503",
       "designator": "R6503",
       "category": "resistor",
       "source_point": {
@@ -9063,7 +9063,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6504",
+      "component_id": "KM4-F151-P1-R6504",
       "designator": "R6504",
       "category": "resistor",
       "source_point": {
@@ -9090,7 +9090,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6505",
+      "component_id": "KM4-F151-P1-R6505",
       "designator": "R6505",
       "category": "resistor",
       "source_point": {
@@ -9117,7 +9117,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6506",
+      "component_id": "KM4-F151-P1-R6506",
       "designator": "R6506",
       "category": "resistor",
       "source_point": {
@@ -9144,7 +9144,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6507",
+      "component_id": "KM4-F151-P1-R6507",
       "designator": "R6507",
       "category": "resistor",
       "source_point": {
@@ -9171,7 +9171,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6509",
+      "component_id": "KM4-F151-P1-R6509",
       "designator": "R6509",
       "category": "resistor",
       "source_point": {
@@ -9198,7 +9198,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6510",
+      "component_id": "KM4-F151-P1-R6510",
       "designator": "R6510",
       "category": "resistor",
       "source_point": {
@@ -9225,7 +9225,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6511",
+      "component_id": "KM4-F151-P1-R6511",
       "designator": "R6511",
       "category": "resistor",
       "source_point": {
@@ -9252,7 +9252,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6513",
+      "component_id": "KM4-F151-P1-R6513",
       "designator": "R6513",
       "category": "resistor",
       "source_point": {
@@ -9279,7 +9279,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6514",
+      "component_id": "KM4-F151-P1-R6514",
       "designator": "R6514",
       "category": "resistor",
       "source_point": {
@@ -9306,7 +9306,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6515",
+      "component_id": "KM4-F151-P1-R6515",
       "designator": "R6515",
       "category": "resistor",
       "source_point": {
@@ -9333,7 +9333,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6516",
+      "component_id": "KM4-F151-P1-R6516",
       "designator": "R6516",
       "category": "resistor",
       "source_point": {
@@ -9360,7 +9360,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6517",
+      "component_id": "KM4-F151-P1-R6517",
       "designator": "R6517",
       "category": "resistor",
       "source_point": {
@@ -9387,7 +9387,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6518",
+      "component_id": "KM4-F151-P1-R6518",
       "designator": "R6518",
       "category": "resistor",
       "source_point": {
@@ -9414,7 +9414,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6520",
+      "component_id": "KM4-F151-P1-R6520",
       "designator": "R6520",
       "category": "resistor",
       "source_point": {
@@ -9441,7 +9441,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-R6521",
+      "component_id": "KM4-F151-P1-R6521",
       "designator": "R6521",
       "category": "resistor",
       "source_point": {
@@ -9468,7 +9468,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-TP2111",
+      "component_id": "KM4-F151-P1-TP2111",
       "designator": "TP2111",
       "category": "test_point",
       "source_point": {
@@ -9495,7 +9495,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-TP2112",
+      "component_id": "KM4-F151-P1-TP2112",
       "designator": "TP2112",
       "category": "test_point",
       "source_point": {
@@ -9522,7 +9522,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-TP2809",
+      "component_id": "KM4-F151-P1-TP2809",
       "designator": "TP2809",
       "category": "test_point",
       "source_point": {
@@ -9549,7 +9549,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-TP2810",
+      "component_id": "KM4-F151-P1-TP2810",
       "designator": "TP2810",
       "category": "test_point",
       "source_point": {
@@ -9576,7 +9576,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-TP6302",
+      "component_id": "KM4-F151-P1-TP6302",
       "designator": "TP6302",
       "category": "test_point",
       "source_point": {
@@ -9603,7 +9603,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-U1001",
+      "component_id": "KM4-F151-P1-U1001",
       "designator": "U1001",
       "category": "ic",
       "source_point": {
@@ -9630,7 +9630,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-U2606",
+      "component_id": "KM4-F151-P1-U2606",
       "designator": "U2606",
       "category": "ic",
       "source_point": {
@@ -9657,7 +9657,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-U2701",
+      "component_id": "KM4-F151-P1-U2701",
       "designator": "U2701",
       "category": "ic",
       "source_point": {
@@ -9684,7 +9684,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-U2702",
+      "component_id": "KM4-F151-P1-U2702",
       "designator": "U2702",
       "category": "ic",
       "source_point": {
@@ -9711,7 +9711,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-U2703",
+      "component_id": "KM4-F151-P1-U2703",
       "designator": "U2703",
       "category": "ic",
       "source_point": {
@@ -9738,7 +9738,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-U2704",
+      "component_id": "KM4-F151-P1-U2704",
       "designator": "U2704",
       "category": "ic",
       "source_point": {
@@ -9765,7 +9765,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-U2705",
+      "component_id": "KM4-F151-P1-U2705",
       "designator": "U2705",
       "category": "ic",
       "source_point": {
@@ -9792,7 +9792,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-U4001",
+      "component_id": "KM4-F151-P1-U4001",
       "designator": "U4001",
       "category": "ic",
       "source_point": {
@@ -9819,7 +9819,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-U5001",
+      "component_id": "KM4-F151-P1-U5001",
       "designator": "U5001",
       "category": "ic",
       "source_point": {
@@ -9846,7 +9846,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-U5002",
+      "component_id": "KM4-F151-P1-U5002",
       "designator": "U5002",
       "category": "ic",
       "source_point": {
@@ -9873,7 +9873,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-U5004",
+      "component_id": "KM4-F151-P1-U5004",
       "designator": "U5004",
       "category": "ic",
       "source_point": {
@@ -9900,7 +9900,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-U5005",
+      "component_id": "KM4-F151-P1-U5005",
       "designator": "U5005",
       "category": "ic",
       "source_point": {
@@ -9927,7 +9927,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-U5008",
+      "component_id": "KM4-F151-P1-U5008",
       "designator": "U5008",
       "category": "ic",
       "source_point": {
@@ -9954,7 +9954,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-U6002",
+      "component_id": "KM4-F151-P1-U6002",
       "designator": "U6002",
       "category": "ic",
       "source_point": {
@@ -9981,7 +9981,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-U6302",
+      "component_id": "KM4-F151-P1-U6302",
       "designator": "U6302",
       "category": "ic",
       "source_point": {
@@ -10008,7 +10008,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-U6304",
+      "component_id": "KM4-F151-P1-U6304",
       "designator": "U6304",
       "category": "ic",
       "source_point": {
@@ -10035,7 +10035,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-U6305",
+      "component_id": "KM4-F151-P1-U6305",
       "designator": "U6305",
       "category": "ic",
       "source_point": {
@@ -10062,7 +10062,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-U6306",
+      "component_id": "KM4-F151-P1-U6306",
       "designator": "U6306",
       "category": "ic",
       "source_point": {
@@ -10089,7 +10089,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-U6310",
+      "component_id": "KM4-F151-P1-U6310",
       "designator": "U6310",
       "category": "ic",
       "source_point": {
@@ -10116,7 +10116,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-U6602",
+      "component_id": "KM4-F151-P1-U6602",
       "designator": "U6602",
       "category": "ic",
       "source_point": {
@@ -10143,7 +10143,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-U6603",
+      "component_id": "KM4-F151-P1-U6603",
       "designator": "U6603",
       "category": "ic",
       "source_point": {
@@ -10170,7 +10170,7 @@
       }
     },
     {
-      "component_id": "KM4-F151-P2-U6604",
+      "component_id": "KM4-F151-P1-U6604",
       "designator": "U6604",
       "category": "ic",
       "source_point": {

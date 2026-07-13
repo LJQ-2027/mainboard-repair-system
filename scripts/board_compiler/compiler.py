@@ -62,7 +62,7 @@ def _candidate_footprint(label, rectangles, bounds, category):
     }
 
 
-def compile_designators(labels, rectangles, bounds):
+def compile_designators(labels, rectangles, bounds, component_prefix="KM4-F151-P2"):
     compiled = {}
     for label in labels:
         category = classify_designator(label["text"])
@@ -73,7 +73,7 @@ def compile_designators(labels, rectangles, bounds):
             continue
         footprint_match = _candidate_footprint(label, rectangles, bounds, category)
         item = {
-            "component_id": f"KM4-F151-P2-{label['text'].upper()}",
+            "component_id": f"{component_prefix}-{label['text'].upper()}",
             "designator": label["text"].upper(),
             "category": category,
             "source_point": {"x": round(label["x"], 3), "y": round(label["y"], 3)},

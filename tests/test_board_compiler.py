@@ -23,6 +23,11 @@ class BoardCompilerTests(unittest.TestCase):
         result = compile_designators(labels, [], [0, 0, 100, 50])
         self.assertEqual([item["designator"] for item in result], ["C1001", "U2001"])
 
+    def test_compilation_uses_the_requested_side_prefix(self):
+        labels = [{"text": "U2001", "x": 40, "y": 20}]
+        result = compile_designators(labels, [], [0, 0, 100, 50], component_prefix="KM4-F151-P1")
+        self.assertEqual(result[0]["component_id"], "KM4-F151-P1-U2001")
+
     def test_test_point_does_not_claim_a_large_connector_rectangle(self):
         labels = [{"text": "VBUS1", "x": 500, "y": 200}]
         rectangles = [{"x": 430, "y": 190, "width": 140, "height": 20}]
