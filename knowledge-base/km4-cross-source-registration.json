@@ -1,0 +1,83 @@
+{
+  "dataset_id": "KM4-F151-XREG-20260713",
+  "board_id": "BOARD-KM4-F151-MAIN-V1.2",
+  "model": "KM4",
+  "board_version": "F151_MAIN_PCB_V1.2",
+  "side_id": "main_page_2",
+  "coordinate_system": "normalized_board_plane",
+  "status": "proxy_registration_baseline",
+  "board_outline": [
+    {"x": 0.03, "y": 0.15}, {"x": 0.12, "y": 0.03}, {"x": 0.31, "y": 0.03},
+    {"x": 0.31, "y": 0.11}, {"x": 0.44, "y": 0.11}, {"x": 0.44, "y": 0.30},
+    {"x": 0.57, "y": 0.30}, {"x": 0.57, "y": 0.08}, {"x": 0.91, "y": 0.08},
+    {"x": 0.98, "y": 0.20}, {"x": 0.98, "y": 0.85}, {"x": 0.92, "y": 0.96},
+    {"x": 0.54, "y": 0.96}, {"x": 0.54, "y": 0.90}, {"x": 0.33, "y": 0.90},
+    {"x": 0.33, "y": 0.96}, {"x": 0.07, "y": 0.96}, {"x": 0.02, "y": 0.86}
+  ],
+  "registration": {
+    "proxy_image": "assets/vision-reference-gallery/km4/embedded/page-010-image-05.jpg",
+    "proxy_label": "Service Manual page 10 installed mainboard",
+    "proxy_limit": "Installed shield-side context; component bodies under shields are not directly visible.",
+    "point_map_image": "assets/board-atlas/km4-f151/main-point-map-page-2.png",
+    "point_map_source": "F151_MAIN_PCB_V1.2_位号图.pdf page 2",
+    "method": "reviewed_four_anchor_homography",
+    "confidence": "provisional_proxy",
+    "anchors": [
+      {"anchor_id": "board_top_left", "label": "PCB upper-left extent", "board": {"x": 0.02, "y": 0.03}, "image": {"x": 0.19, "y": 0.12}},
+      {"anchor_id": "board_top_right", "label": "PCB upper-right extent", "board": {"x": 0.96, "y": 0.05}, "image": {"x": 0.72, "y": 0.13}},
+      {"anchor_id": "board_bottom_right", "label": "PCB lower-right extent", "board": {"x": 0.94, "y": 0.96}, "image": {"x": 0.72, "y": 0.70}},
+      {"anchor_id": "board_bottom_left", "label": "PCB lower-left extent", "board": {"x": 0.03, "y": 0.93}, "image": {"x": 0.20, "y": 0.69}}
+    ]
+  },
+  "entities": [
+    {
+      "component_id": "KM4-MAIN-U2001", "designator": "U2001", "name": "Power management IC", "category": "bga_ic", "module": "Power management", "proxy_visibility": "concealed_by_shield",
+      "geometry": {"center": {"x": 0.545, "y": 0.642}, "size": {"x": 0.096, "y": 0.135}, "rotation": 0},
+      "schematic_links": [{"source": "F151_MAIN_PCB_1_维修原理图_V1.2_20250310.pdf", "page": "power-management sheets", "facts": ["Designator U2001"]}],
+      "repair_links": [{"source": "TECNO-L6735-KM4-F151手机维修通用操作指导书V1.0_20250331.pdf", "page": "7-11", "faults": ["No power", "Leakage current"], "instruction": "Follow the power-on and PMU checks; confirm supply conditions before component action."}],
+      "visual_profile": {"shape": "square", "height": 0.055, "engineering_dimension": false}
+    },
+    {
+      "component_id": "KM4-MAIN-U4000", "designator": "U4000", "name": "eMMC", "category": "bga_ic", "module": "Storage", "proxy_visibility": "concealed_by_shield",
+      "geometry": {"center": {"x": 0.288, "y": 0.738}, "size": {"x": 0.135, "y": 0.205}, "rotation": 0},
+      "schematic_links": [{"source": "F151_MAIN_PCB_1_维修原理图_V1.2_20250310.pdf", "page": "eMMC sheets", "facts": ["Designator U4000", "eMMC storage"]}],
+      "repair_links": [{"source": "TECNO-L6735-KM4-F151手机维修通用操作指导书V1.0_20250331.pdf", "page": "7-11", "faults": ["No power", "Storage failure"], "instruction": "Check the memory power path and record VDDEMMCCORE before escalation."}],
+      "visual_profile": {"shape": "rectangle", "height": 0.05, "engineering_dimension": false}
+    },
+    {
+      "component_id": "KM4-MAIN-X2100", "designator": "X2100", "name": "26 MHz crystal", "category": "crystal", "module": "Clock", "proxy_visibility": "concealed_by_shield",
+      "geometry": {"center": {"x": 0.573, "y": 0.519}, "size": {"x": 0.05, "y": 0.058}, "rotation": 0},
+      "schematic_links": [{"source": "F151_MAIN_PCB_1_维修原理图_V1.2_20250310.pdf", "page": "clock sheets", "facts": ["Designator X2100"]}],
+      "repair_links": [{"source": "TECNO-L6735-KM4-F151手机维修通用操作指导书V1.0_20250331.pdf", "page": "10, 15", "faults": ["No power", "Clock failure"], "instruction": "Measure and record the X2100 output waveform; reference frequency is 26 MHz."}],
+      "visual_profile": {"shape": "rectangle", "height": 0.035, "engineering_dimension": false}
+    },
+    {
+      "component_id": "KM4-MAIN-U0600", "designator": "U0600", "name": "RF/baseband device", "category": "bga_ic", "module": "RF network", "proxy_visibility": "concealed_by_shield",
+      "geometry": {"center": {"x": 0.70, "y": 0.61}, "size": {"x": 0.10, "y": 0.14}, "rotation": 0},
+      "schematic_links": [{"source": "F151_MAIN_PCB_1_维修原理图_V1.2_20250310.pdf", "page": "RF sheets", "facts": ["Designator U0600", "SR3595D reference"]}],
+      "repair_links": [{"source": "TECNO-L6735-KM4-F151手机维修通用操作指导书V1.0_20250331.pdf", "page": "source relationship only", "faults": ["No service", "Weak signal"], "instruction": "Use the schematic relationship for RF path inspection; no component replacement instruction is asserted."}],
+      "visual_profile": {"shape": "square", "height": 0.055, "engineering_dimension": false}
+    },
+    {
+      "component_id": "KM4-MAIN-J6101", "designator": "J6101", "name": "Mainboard connector", "category": "connector", "module": "USB and power interconnect", "proxy_visibility": "visible_context",
+      "geometry": {"center": {"x": 0.626, "y": 0.866}, "size": {"x": 0.157, "y": 0.079}, "rotation": 0},
+      "schematic_links": [{"source": "F151_MAIN_PCB_1_维修原理图_V1.2_20250310.pdf", "page": "connector sheets", "facts": ["Designator J6101", "VBUS1 and VBAT1 context"]}],
+      "repair_links": [{"source": "TECNO-L6735-KM4-F151手机维修通用操作指导书V1.0_20250331.pdf", "page": "12-14", "faults": ["Not charging", "USB no response"], "instruction": "Inspect connector and FPC condition before continuing along the charging path."}],
+      "visual_profile": {"shape": "connector", "height": 0.085, "engineering_dimension": false}
+    },
+    {
+      "component_id": "KM4-MAIN-VBAT1", "designator": "VBAT1", "name": "Battery supply test point", "category": "test_point", "module": "Basic power", "proxy_visibility": "visible_context",
+      "geometry": {"center": {"x": 0.708, "y": 0.845}, "size": {"x": 0.025, "y": 0.025}, "rotation": 0},
+      "schematic_links": [{"source": "F151_MAIN_PCB_1_维修原理图_V1.2_20250310.pdf", "page": "power entry", "facts": ["VBAT1 supply node"]}],
+      "repair_links": [{"source": "TECNO-L6735-KM4-F151手机维修通用操作指导书V1.0_20250331.pdf", "page": "11", "faults": ["No power"], "instruction": "Record VBAT1 voltage; manual reference range is 3.4 V to 4.35 V."}],
+      "visual_profile": {"shape": "point", "height": 0.018, "engineering_dimension": false}
+    },
+    {
+      "component_id": "KM4-MAIN-VBUS1", "designator": "VBUS1", "name": "Charging input test point", "category": "test_point", "module": "Charging input", "proxy_visibility": "visible_context",
+      "geometry": {"center": {"x": 0.693, "y": 0.824}, "size": {"x": 0.025, "y": 0.025}, "rotation": 0},
+      "schematic_links": [{"source": "F151_MAIN_PCB_1_维修原理图_V1.2_20250310.pdf", "page": "charging entry", "facts": ["VBUS1 charging-input node"]}],
+      "repair_links": [{"source": "TECNO-L6735-KM4-F151手机维修通用操作指导书V1.0_20250331.pdf", "page": "14", "faults": ["Not charging"], "instruction": "With a charger connected, record VBUS1; manual reference input is 5 V."}],
+      "visual_profile": {"shape": "point", "height": 0.018, "engineering_dimension": false}
+    }
+  ]
+}

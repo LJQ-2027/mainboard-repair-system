@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>KM4/F151 跨资料主板工作台</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div><span class="eyebrow">KNOWN BOARD / SOURCE-LINKED</span><h1>KM4 · F151_MAIN_PCB_V1.2</h1></div>
+    <div class="status"><i></i>代理图配准基线</div>
+  </header>
+  <main>
+    <section class="workspace" aria-label="同步主板视图">
+      <div class="view-head">
+        <div class="tabs" role="tablist">
+          <button role="tab" aria-selected="true" data-view="photo">实体代理图</button>
+          <button role="tab" aria-selected="false" data-view="pointmap">点位图</button>
+          <button role="tab" aria-selected="false" data-view="model">2.5D 模型</button>
+        </div>
+        <button class="icon-button" id="resetModel" title="重置模型视角" aria-label="重置模型视角">↻</button>
+      </div>
+      <div class="stage">
+        <div class="view active" id="photoView"><div class="image-layer"><img alt="KM4装机主板代理图"><div class="markers"></div></div></div>
+        <div class="view" id="pointmapView"><div class="image-layer point-map"><img alt="KM4 F151主板点位图"><div class="markers"></div></div></div>
+        <div class="view model-view" id="modelView"><div id="modelCanvas"></div><p class="model-hint">拖动旋转 · 滚轮缩放 · 点击器件</p></div>
+      </div>
+      <div class="source-note" id="sourceNote"></div>
+    </section>
+    <aside class="evidence">
+      <div class="entity-heading"><div><span id="entityCategory"></span><h2 id="entityDesignator">—</h2></div><span class="visibility" id="entityVisibility"></span></div>
+      <p class="entity-name" id="entityName"></p>
+      <dl class="facts"><div><dt>功能模块</dt><dd id="entityModule"></dd></div><div><dt>统一坐标</dt><dd id="entityCoordinate"></dd></div></dl>
+      <section><h3>原理图关系</h3><div id="schematicEvidence"></div></section>
+      <section><h3>维修指导</h3><div id="repairEvidence"></div></section>
+      <section class="entity-list-section"><h3>本面已关联实体</h3><div class="entity-list" id="entityList"></div></section>
+    </aside>
+  </main>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

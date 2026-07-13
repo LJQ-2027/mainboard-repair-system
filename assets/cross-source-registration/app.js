@@ -1,0 +1,95 @@
+import { solveHomography } from './registration-core.js';
+import { buildSelectionState } from './selection-state.js';
+import { BoardRenderer } from './board-renderer.js';
+
+const DATA_URL = '../../knowledge-base/km4-cross-source-registration.json';
+const views = { photo: document.querySelector('#photoView'), pointmap: document.querySelector('#pointmapView'), model: document.querySelector('#modelView') };
+let data;
+let matrix;
+let renderer;
+let selectedId;
+
+function addMarkers(layer, positions, entities) {
+  const fragment = document.createDocumentFragment();
+  entities.forEach((entity) => {
+    const point = positions.get(entity.component_id);
+    const button = document.createElement('button');
+    button.className = 'marker';
+    button.type = 'button';
+    button.dataset.componentId = entity.component_id;
+    button.style.left = `${point.x * 100}%`;
+    button.style.top = `${point.y * 100}%`;
+    button.textContent = entity.designator.replace(/[0-9]/g, '').slice(0, 2);
+    button.title = `${entity.designator} · ${entity.name}`;
+    button.setAttribute('aria-label', `选择 ${entity.designator} ${entity.name}`);
+    button.addEventListener('click', () => selectEntity(entity.component_id));
+    fragment.append(button);
+  });
+  layer.append(fragment);
+}
+
+function evidenceCard(link, type) {
+  const details = type === 'schematic' ? (link.facts || []).join(' · ') : link.instruction;
+  return `<article class="evidence-card">${details}<small>${link.source} · ${link.page}</small></article>`;
+}
+
+function selectEntity(componentId) {
+  const entity = data.entities.find((item) => item.component_id === componentId);
+  if (!entity) return;
+  selectedId = componentId;
+  const state = buildSelectionState(entity, matrix);
+  document.querySelectorAll('[data-component-id]').forEach((node) => node.classList.toggle('selected', node.dataset.componentId === componentId));
+  document.querySelector('#entityCategory').textContent = entity.category.replaceAll('_', ' ');
+  document.querySelector('#entityDesignator').textContent = entity.designator;
+  document.querySelector('#entityName').textContent = entity.name;
+  document.querySelector('#entityModule').textContent = entity.module;
+  document.querySelector('#entityCoordinate').textContent = `${state.boardPoint.x.toFixed(3)}, ${state.boardPoint.y.toFixed(3)}`;
+  document.querySelector('#entityVisibility').textContent = entity.proxy_visibility === 'concealed_by_shield' ? '屏蔽罩下' : '代理图可见区域';
+  document.querySelector('#schematicEvidence').innerHTML = entity.schematic_links.map((link) => evidenceCard(link, 'schematic')).join('');
+  document.querySelector('#repairEvidence').innerHTML = entity.repair_links.map((link) => evidenceCard(link, 'repair')).join('');
+  renderer.select(componentId);
+}
+
+function setView(name) {
+  document.querySelectorAll('[role=tab]').forEach((button) => button.setAttribute('aria-selected', String(button.dataset.view === name)));
+  Object.entries(views).forEach(([key, view]) => view.classList.toggle('active', key === name));
+  if (name === 'model') renderer.resize();
+}
+
+async function init() {
+  const response = await fetch(DATA_URL);
+  if (!response.ok) throw new Error(`Dataset failed to load: ${response.status}`);
+  data = await response.json();
+  const source = data.registration.anchors.slice(0, 4).map((anchor) => anchor.board);
+  const target = data.registration.anchors.slice(0, 4).map((anchor) => anchor.image);
+  matrix = solveHomography(source, target);
+
+  const photoImage = document.querySelector('#photoView img');
+  const pointMapImage = document.querySelector('#pointmapView img');
+  photoImage.src = `../../${data.registration.proxy_image}`;
+  pointMapImage.src = `../../${data.registration.point_map_image}`;
+  const boardPositions = new Map(data.entities.map((entity) => [entity.component_id, entity.geometry.center]));
+  const photoPositions = new Map(data.entities.map((entity) => [entity.component_id, buildSelectionState(entity, matrix).photoPoint]));
+  addMarkers(document.querySelector('#photoView .markers'), photoPositions, data.entities);
+  addMarkers(document.querySelector('#pointmapView .markers'), boardPositions, data.entities);
+
+  renderer = new BoardRenderer(document.querySelector('#modelCanvas'), data.entities, data.board_outline, selectEntity);
+  document.querySelector('#sourceNote').textContent = `${data.registration.proxy_label} · ${data.registration.proxy_limit}`;
+  const list = document.querySelector('#entityList');
+  data.entities.forEach((entity) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.dataset.componentId = entity.component_id;
+    button.innerHTML = `<strong>${entity.designator}</strong>${entity.module}`;
+    button.addEventListener('click', () => selectEntity(entity.component_id));
+    list.append(button);
+  });
+  selectEntity(data.entities[0].component_id);
+}
+
+document.querySelectorAll('[role=tab]').forEach((button) => button.addEventListener('click', () => setView(button.dataset.view)));
+document.querySelector('#resetModel').addEventListener('click', () => renderer?.reset());
+init().catch((error) => {
+  document.querySelector('.stage').innerHTML = `<p class="load-error">无法载入跨资料数据：${error.message}</p>`;
+  console.error(error);
+});

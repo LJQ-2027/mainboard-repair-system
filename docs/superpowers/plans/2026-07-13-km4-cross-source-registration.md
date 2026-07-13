@@ -16,10 +16,10 @@
 - Create: `assets/cross-source-registration/registration-core.js`
 - Create: `tests/registration-core.test.mjs`
 
-- [ ] Write failing tests for normalized coordinate validation, four-point homography projection, inverse projection, and polygon projection.
-- [ ] Run `node --test tests/registration-core.test.mjs` and confirm failure because the module does not exist.
-- [ ] Implement `validateNormalizedPoint`, `solveHomography`, `projectPoint`, `invertHomography`, and `projectPolygon` without DOM dependencies.
-- [ ] Run the targeted test and confirm all registration tests pass.
+- [x] Write failing tests for normalized coordinate validation, four-point homography projection, inverse projection, and polygon projection.
+- [x] Run `node --test tests/registration-core.test.mjs` and confirm failure because the module does not exist.
+- [x] Implement `validateNormalizedPoint`, `solveHomography`, `projectPoint`, `invertHomography`, and `projectPolygon` without DOM dependencies.
+- [x] Run the targeted test and confirm all registration tests pass.
 
 ### Task 2: Source-Linked KM4 Dataset
 
@@ -28,11 +28,11 @@
 - Create: `scripts/validate_cross_source_registration.py`
 - Create: `tests/test_validate_cross_source_registration.py`
 
-- [ ] Write failing validation tests for stable entity identities, normalized geometry, at least four registration anchors, valid schematic and repair links, and resolvable local assets.
-- [ ] Run `python -m unittest tests.test_validate_cross_source_registration -v` and confirm failure because the validator is absent.
-- [ ] Add one KM4/F151 mainboard-side record using the reviewed installed-mainboard image as proxy, point-map page 2 as canonical geometry, and source-supported entities `U2001`, `U4000`, `X2100`, `U0600`, `J6101`, `VBAT1`, and `VBUS1`.
-- [ ] Preserve page references and distinguish engineering facts from generic 2.5D visual profiles.
-- [ ] Run the targeted Python tests and validator and confirm they pass.
+- [x] Write failing validation tests for stable entity identities, normalized geometry, at least four registration anchors, valid schematic and repair links, and resolvable local assets.
+- [x] Run `python -m unittest tests.test_validate_cross_source_registration -v` and confirm failure because the validator is absent.
+- [x] Add one KM4/F151 mainboard-side record using the reviewed installed-mainboard image as proxy, point-map page 2 as canonical geometry, and source-supported entities `U2001`, `U4000`, `X2100`, `U0600`, `J6101`, `VBAT1`, and `VBUS1`.
+- [x] Preserve page references and distinguish engineering facts from generic 2.5D visual profiles.
+- [x] Run the targeted Python tests and validator and confirm they pass.
 
 ### Task 3: Synchronized Workbench
 
@@ -43,12 +43,12 @@
 - Create: `assets/cross-source-registration/board-renderer.js`
 - Create: `tests/selection-state.test.mjs`
 
-- [ ] Write failing tests for selecting one entity and deriving consistent photo marker, point-map marker, 2.5D entity, and evidence-panel state.
-- [ ] Run `node --test tests/selection-state.test.mjs` and confirm failure because selection helpers are absent.
-- [ ] Implement pure selection projection helpers, then make the tests pass.
-- [ ] Build compact synchronized tabs for proxy photo, point map, and 2.5D model; selecting markers or meshes updates the shared entity state and evidence panel.
-- [ ] Implement 2.5D tilt, rotation, zoom, reset, and mesh picking using stable Canvas dimensions and normalized geometry.
-- [ ] Show source evidence, unresolved fields, and the proxy-photo limitation without model recognition or quality-scoring controls.
+- [x] Write failing tests for selecting one entity and deriving consistent photo marker, point-map marker, 2.5D entity, and evidence-panel state.
+- [x] Run `node --test tests/selection-state.test.mjs` and confirm failure because selection helpers are absent.
+- [x] Implement pure selection projection helpers, then make the tests pass.
+- [x] Build compact synchronized tabs for proxy photo, point map, and 2.5D model; selecting markers or meshes updates the shared entity state and evidence panel.
+- [x] Implement 2.5D tilt, rotation, zoom, reset, and mesh picking using stable Canvas dimensions and normalized geometry.
+- [x] Show source evidence, unresolved fields, and the proxy-photo limitation without model recognition or quality-scoring controls.
 
 ### Task 4: Integration Validation And Documentation
 
@@ -56,9 +56,9 @@
 - Modify: `knowledge-base/README.md`
 - Create: `docs/km4-cross-source-registration-2026-07-13.md`
 
-- [ ] Run all Node and Python tests plus `git diff --check`.
-- [ ] Start the local server and open `/assets/cross-source-registration/index.html`.
-- [ ] Verify desktop and mobile layouts, all three views, marker selection, 2.5D picking, evidence updates, hover/focus/selected states, image loading, overflow, and console errors.
-- [ ] Record the implemented scope, source limitations, route, and validation evidence in project documentation.
-- [ ] Update the Vault task status only after browser QA succeeds.
-- [ ] Commit the implementation as `feat: add km4 cross-source registration baseline`.
+- [x] Run all Node and Python tests plus `git diff --check`.
+- [x] Start the local server and open `/assets/cross-source-registration/index.html`.
+- [x] Verify desktop and mobile layouts, all three views, marker selection, 2.5D picking, evidence updates, hover/focus/selected states, image loading, overflow, and console errors.
+- [x] Record the implemented scope, source limitations, route, and validation evidence in project documentation.
+- [x] Update the Vault task status only after browser QA succeeds.
+- [x] Commit the implementation as `feat: add km4 cross-source registration baseline`.
