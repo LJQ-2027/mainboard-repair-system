@@ -20,6 +20,7 @@ export function createRepairFlowState(profile) {
     terminal: null,
     actionExecution: null,
     postActionCheck: null,
+    closed: false,
     measurements: {},
   };
 }
@@ -30,6 +31,7 @@ export function currentRepairFlowStep(profile, state) {
 }
 
 export function answerRepairFlow(profile, state, choiceValue) {
+  if (state.closed) throw new Error('Repair flow is closed');
   if (state.terminal) throw new Error('Repair flow is already at a terminal action');
   const current = currentRepairFlowStep(profile, state);
   if (!current) throw new Error('Repair flow has no active step');
@@ -67,6 +69,7 @@ export function answerRepairFlow(profile, state, choiceValue) {
 }
 
 export function backRepairFlow(profile, state) {
+  if (state.closed) throw new Error('Repair flow is closed');
   if (!state.history.length) return state;
   const history = state.history.slice(0, -1);
   const previous = state.history.at(-1);
@@ -113,6 +116,7 @@ export function repairFlowTargetComponentId(profile, state) {
 }
 
 export function setRepairFlowActionExecuted(state, executed) {
+  if (state.closed) throw new Error('Repair flow is closed');
   if (state.terminal?.kind !== 'action') {
     throw new Error('Only a source action can record execution');
   }
@@ -125,11 +129,22 @@ export function setRepairFlowActionExecuted(state, executed) {
 
 export function recordRepairFlowPostActionCheck(state, result) {
   const allowed = new Set(['symptom_cleared', 'symptom_persists', 'uncertain']);
-  if (state.terminal?.kind !== 'action' || state.actionExecution !== 'executed') {
+  if (state.closed || state.terminal?.kind !== 'action' || state.actionExecution !== 'executed') {
     throw new Error('Post-action check requires an executed source action');
   }
   if (!allowed.has(result)) throw new RangeError(`Unknown post-action check: ${result}`);
   return { ...state, postActionCheck: result };
+}
+
+export function closeRepairFlow(state) {
+  if (!state.terminal) throw new Error('Repair flow must reach a terminal before closing');
+  if (state.terminal.kind === 'action') {
+    const rechecked = state.postActionCheck && state.postActionCheck !== 'pending';
+    if (state.actionExecution !== 'executed' || !rechecked) {
+      throw new Error('Source action requires execution and post-action check before closing');
+    }
+  }
+  return { ...state, closed: true };
 }
 
 export function repairFlowMeasurementsComplete(profile, state) {

@@ -4,6 +4,7 @@ import test from 'node:test';
 import {
   answerRepairFlow,
   backRepairFlow,
+  closeRepairFlow,
   createRepairFlowState,
   currentRepairFlowStep,
   recordRepairFlowPostActionCheck,
@@ -130,6 +131,32 @@ test('action execution is recordable without claiming a repair result', () => {
   const boundary = answerRepairFlow(boundaryProfile, createRepairFlowState(boundaryProfile), 'no');
   assert.throws(() => setRepairFlowActionExecuted(boundary, true));
   assert.throws(() => recordRepairFlowPostActionCheck(boundary, 'uncertain'));
+});
+
+test('a flow closes only after its terminal record is complete', () => {
+  const action = answerRepairFlow(profile, createRepairFlowState(profile), 'no');
+  assert.throws(() => closeRepairFlow(action));
+  const executed = setRepairFlowActionExecuted(action, true);
+  assert.throws(() => closeRepairFlow(executed));
+  const rechecked = recordRepairFlowPostActionCheck(executed, 'symptom_cleared');
+  const closed = closeRepairFlow(rechecked);
+  assert.equal(closed.closed, true);
+  assert.equal(closed.postActionCheck, 'symptom_cleared');
+  assert.throws(() => backRepairFlow(profile, closed));
+  assert.throws(() => setRepairFlowActionExecuted(closed, false));
+  assert.throws(() => recordRepairFlowPostActionCheck(closed, 'uncertain'));
+  assert.equal(resetRepairFlow(profile).closed, false);
+
+  const boundaryProfile = {
+    ...profile,
+    steps: [{
+      step_id: 'charger',
+      prompt: '资料是否明确？',
+      choices: [{ value: 'no', label: '否', outcome: { kind: 'boundary', label: '待资料复核' } }],
+    }],
+  };
+  const boundary = answerRepairFlow(boundaryProfile, createRepairFlowState(boundaryProfile), 'no');
+  assert.equal(closeRepairFlow(boundary).closed, true);
 });
 
 test('reset and invalid choices cannot escape the declared flow graph', () => {

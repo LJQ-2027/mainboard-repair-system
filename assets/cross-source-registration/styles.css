@@ -313,6 +313,7 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 .repair-step p { margin: 8px 0 0; font-size: 12px; line-height: 1.55; }
 .repair-step small { display: block; margin-top: 8px; color: var(--muted); font-size: 9px; line-height: 1.4; overflow-wrap: anywhere; }
 .repair-flow-control { margin-top: 12px; padding: 12px; border: 1px solid #9faea5; border-left: 3px solid #177d69; background: white; }
+.repair-flow-control[data-closed="true"] { border-left-color: #7d8b84; }
 .repair-flow-control[hidden] { display: none; }
 .repair-flow-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
 .repair-flow-heading > div:first-child > span { display: block; color: #177d69; font-size: 9px; font-weight: 700; text-transform: uppercase; }
@@ -377,6 +378,14 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 .repair-flow-recheck > p[data-result="symptom_cleared"] { border-left: 3px solid #55a590; color: #176b59; }
 .repair-flow-recheck > p[data-result="symptom_persists"] { border-left: 3px solid var(--accent); color: #8d3525; }
 .repair-flow-recheck > p[data-result="uncertain"] { border-left: 3px solid #d0a63b; color: #6c5718; }
+.repair-flow-completion { display: grid; gap: 6px; margin-top: 9px; padding-top: 9px; border-top: 1px solid #d0d7d2; }
+.repair-flow-completion[hidden] { display: none; }
+.repair-flow-completion button { min-height: 31px; border: 1px solid #8f9c94; background: white; color: var(--ink); font: inherit; font-size: 9px; cursor: pointer; }
+.repair-flow-completion button:disabled { color: #9aa49f; background: #edf0ec; cursor: not-allowed; }
+.repair-flow-completion[data-closed="true"] button { border-color: var(--ink); background: var(--ink); color: white; }
+.repair-flow-completion button:focus { outline: 3px solid #65a9ff; outline-offset: 2px; }
+.repair-flow-completion p { margin: 0; color: #52605a; font-size: 8px; line-height: 1.4; }
+.repair-flow-completion p:empty { display: none; }
 .repair-flow-log { margin-top: 10px; padding-top: 8px; border-top: 1px solid #d0d7d2; }
 .repair-flow-log[hidden] { display: none; }
 .repair-flow-log > span { color: #68746e; font-size: 8px; font-weight: 700; }
@@ -390,6 +399,7 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 .repair-flow-source-details summary:focus { outline: 3px solid #65a9ff; outline-offset: 2px; }
 .repair-flow-source-details small { display: block; margin-top: 4px; color: var(--muted); font-size: 8px; line-height: 1.35; overflow-wrap: anywhere; }
 .repair-flow-control footer div { display: flex; flex: none; }
+.repair-flow-control footer div[hidden] { display: none; }
 .repair-flow-control footer button { height: 28px; border: 1px solid #aeb9b2; border-right: 0; background: white; color: #435049; font: inherit; font-size: 9px; cursor: pointer; }
 .repair-flow-control footer button:last-child { border-right: 1px solid #aeb9b2; }
 .repair-flow-control footer button:disabled { color: #9aa49f; background: #edf0ec; cursor: not-allowed; }

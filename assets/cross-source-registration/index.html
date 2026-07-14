@@ -119,6 +119,10 @@
                 <p id="repairFlowRecheckStatus" data-result="pending" aria-live="polite"></p>
               </fieldset>
             </div>
+            <div class="repair-flow-completion" id="repairFlowCompletion" hidden>
+              <button id="closeRepairFlow" type="button">结束本次排查</button>
+              <p id="repairFlowCompletionStatus" aria-live="polite"></p>
+            </div>
           </div>
           <div class="repair-flow-log" id="repairFlowLog" hidden>
             <span>已记录结果</span>
@@ -126,7 +130,7 @@
           </div>
           <footer>
             <details class="repair-flow-source-details"><summary>资料依据</summary><small id="repairFlowSource"></small></details>
-            <div><button id="repairFlowBack" type="button">上一步</button><button id="repairFlowReset" type="button">重新开始</button></div>
+            <div id="repairFlowNavigation"><button id="repairFlowBack" type="button">上一步</button><button id="repairFlowReset" type="button">重新开始</button></div>
           </footer>
         </section>
         <article class="repair-step source-summary">
