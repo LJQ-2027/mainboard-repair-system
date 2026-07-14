@@ -272,3 +272,10 @@ Pointer-anchored model zoom on 2026-07-14:
 - Mobile pinch zoom preserves the initial board point beneath the live finger midpoint. Moving the midpoint while changing finger distance therefore combines zoom and pan without a separate gesture transition.
 - The anchor calculation is camera-frame based and remains inside the existing pan and zoom bounds. Tap suppression, component selection, single-finger pan, and full-board reset behavior are unchanged.
 - Headed Chromium at 390 px verified that X2100 remained under the same screen coordinate after zooming to 4.2x, with X2100 still selected, no page scroll, and no runtime errors. The full desktop, 390 px, and 320 px interaction matrix also passed.
+
+Readable component affordances on 2026-07-14:
+
+- The seven reviewed interactive entities retain fitted corner brackets and compact designator tags only. No module polygon, large circle, or broad translucent selection overlay is used for ordinary entity selection.
+- Fixed screen-space tags increased from 48 x 14 px to 68 x 20 px, with the hovered or selected identity at 76 x 22 px. The text is now readable in the whole-board desktop and 390 px views without enlarging component hit geometry.
+- The raster tag treatment now uses a complete restrained border and a small amber locator square instead of an orange side stripe. Hover tooltips likewise use a uniform border, automatically flip around canvas edges, and remain fully inside the model surface.
+- Wheel zoom recomputes hover against the anchored camera state, while touch input clears desktop-style hover feedback. Headed Chromium kept X2100 as the same hover target through wheel zoom, showed no touch tooltip residue, and passed the full desktop/390 px/320 px interaction matrix with no runtime errors.

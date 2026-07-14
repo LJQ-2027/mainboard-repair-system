@@ -25,6 +25,7 @@ import {
   buildHitArea,
   buildLabelPositions,
   buildScreenAwareHitScale,
+  placeHoverTooltip,
   resolveAffordancePresentation,
 } from './component-affordance-state.js';
 
@@ -337,22 +338,25 @@ function createModuleMesh(module) {
 
 function createLabelSprite(text) {
   const canvas = document.createElement('canvas');
-  canvas.width = 192;
-  canvas.height = 48;
+  canvas.width = 240;
+  canvas.height = 64;
   const context = canvas.getContext('2d');
-  context.fillStyle = 'rgba(19,29,25,0.9)';
-  context.fillRect(0, 0, 192, 48);
-  context.fillStyle = '#d0a63b';
-  context.fillRect(0, 0, 6, 48);
+  context.fillStyle = 'rgba(19,29,25,0.94)';
+  context.fillRect(0, 0, 240, 64);
+  context.strokeStyle = 'rgba(196,206,200,0.82)';
+  context.lineWidth = 2;
+  context.strokeRect(1, 1, 238, 62);
+  context.fillStyle = '#f2c94c';
+  context.fillRect(12, 28, 8, 8);
   context.fillStyle = '#ffffff';
-  context.font = '700 23px Segoe UI, Arial';
+  context.font = '700 29px Segoe UI, Arial';
   context.textAlign = 'left';
   context.textBaseline = 'middle';
-  context.fillText(text, 20, 25);
+  context.fillText(text, 32, 33);
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
   const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false }));
-  sprite.scale.set(0.092, 0.023, 1);
+  sprite.scale.set(0.1, 0.028, 1);
   sprite.renderOrder = 9;
   sprite.visible = true;
   return sprite;
@@ -849,7 +853,7 @@ export class BoardRenderer {
       this.camera.lookAt(this.manualPanCenter.x, this.manualPanCenter.y, 0);
       this.camera.updateProjectionMatrix();
       this.updateLabelVisibility(false);
-      this.render();
+      this.updateHover(event);
     }, { passive: false });
   }
 
@@ -896,6 +900,7 @@ export class BoardRenderer {
   }
 
   updateHover(event) {
+    if (event.pointerType === 'touch') return this.clearHover();
     if (this.inspectionComponentId) return this.clearHover();
     const componentId = this.componentAtPointer(event);
     if (componentId !== this.hoveredComponentId) {
@@ -914,9 +919,19 @@ export class BoardRenderer {
     const name = document.createElement('span');
     name.textContent = entity.name;
     this.hoverTooltip.replaceChildren(designator, name);
-    this.hoverTooltip.style.left = `${Math.min(event.clientX - rect.left + 14, rect.width - 176)}px`;
-    this.hoverTooltip.style.top = `${Math.max(event.clientY - rect.top - 54, 8)}px`;
     this.hoverTooltip.hidden = false;
+    const placement = placeHoverTooltip({
+      pointer: { x: event.clientX - rect.left, y: event.clientY - rect.top },
+      viewport: { width: rect.width, height: rect.height },
+      tooltip: {
+        width: this.hoverTooltip.offsetWidth,
+        height: this.hoverTooltip.offsetHeight,
+      },
+    });
+    this.hoverTooltip.style.left = `${placement.x}px`;
+    this.hoverTooltip.style.top = `${placement.y}px`;
+    this.hoverTooltip.dataset.horizontal = placement.horizontal;
+    this.hoverTooltip.dataset.vertical = placement.vertical;
     this.render();
   }
 
@@ -1339,8 +1354,16 @@ export class BoardRenderer {
     const worldPerPixelX = (this.camera.right - this.camera.left) / (width * this.camera.zoom);
     const worldPerPixelY = (this.camera.top - this.camera.bottom) / (height * this.camera.zoom);
     this.container.dataset.cameraZoom = this.camera.zoom.toFixed(3);
-    this.labelSprites.forEach((sprite) => {
-      sprite.scale.set(worldPerPixelX * 48, worldPerPixelY * 14, 1);
+    this.labelSprites.forEach((sprite, componentId) => {
+      const presentation = resolveAffordancePresentation({
+        selected: componentId === this.selectedComponentId,
+        hovered: componentId === this.hoveredComponentId,
+      });
+      sprite.scale.set(
+        worldPerPixelX * presentation.labelPixels.width,
+        worldPerPixelY * presentation.labelPixels.height,
+        1,
+      );
     });
     const minimumPickPixels = width < 620 ? 36 : 24;
     this.pickTargets.forEach((target) => {

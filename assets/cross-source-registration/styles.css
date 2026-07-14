@@ -103,18 +103,18 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 .model-hover-tooltip {
   position: absolute;
   z-index: 12;
-  width: 162px;
+  width: 156px;
   padding: 7px 9px 8px;
-  border-left: 3px solid #d0a63b;
-  background: #131d19ee;
+  border: 1px solid #7f8d86;
+  background: #131d19f2;
   color: white;
   pointer-events: none;
-  box-shadow: 0 5px 16px #10181538;
+  box-shadow: 0 5px 16px #1018152e;
 }
 .model-hover-tooltip[hidden] { display: none; }
 .model-hover-tooltip strong,
 .model-hover-tooltip span { display: block; }
-.model-hover-tooltip strong { font-size: 12px; }
+.model-hover-tooltip strong { color: #f2c94c; font-size: 12px; }
 .model-hover-tooltip span { margin-top: 2px; color: #cbd5cf; font-size: 10px; line-height: 1.3; }
 .view { display: none; position: absolute; inset: 0; padding: 18px; }
 .view.active { display: flex; align-items: center; justify-content: center; }

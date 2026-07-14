@@ -1,7 +1,25 @@
 const STATES = Object.freeze({
-  idle: { color: 0xd0a63b, opacity: 0.58, labelOpacity: 0.72, emissiveIntensity: 0 },
-  hovered: { color: 0xf3d77f, opacity: 0.96, labelOpacity: 1, emissiveIntensity: 0.025 },
-  selected: { color: 0xf2c94c, opacity: 1, labelOpacity: 1, emissiveIntensity: 0.06 },
+  idle: {
+    color: 0xd0a63b,
+    opacity: 0.58,
+    labelOpacity: 0.72,
+    labelPixels: { width: 68, height: 20 },
+    emissiveIntensity: 0,
+  },
+  hovered: {
+    color: 0xf3d77f,
+    opacity: 0.96,
+    labelOpacity: 1,
+    labelPixels: { width: 76, height: 22 },
+    emissiveIntensity: 0.025,
+  },
+  selected: {
+    color: 0xf2c94c,
+    opacity: 1,
+    labelOpacity: 1,
+    labelPixels: { width: 76, height: 22 },
+    emissiveIntensity: 0.06,
+  },
 });
 
 export function buildCornerSegments(dimensions, padding = 0.008) {
@@ -35,6 +53,23 @@ export function buildScreenAwareHitScale(hitArea, worldPerPixel, minimumPixels) 
   return {
     x: Math.max(1, (worldPerPixel.x * minimumPixels) / hitArea.x),
     y: Math.max(1, (worldPerPixel.y * minimumPixels) / hitArea.y),
+  };
+}
+
+export function placeHoverTooltip({ pointer, viewport, tooltip, gap = 12, margin = 8 }) {
+  const horizontal = pointer.x + gap + tooltip.width + margin <= viewport.width ? 'right' : 'left';
+  const vertical = pointer.y - gap - tooltip.height >= margin ? 'above' : 'below';
+  const preferredX = horizontal === 'right'
+    ? pointer.x + gap
+    : pointer.x - gap - tooltip.width;
+  const preferredY = vertical === 'above'
+    ? pointer.y - gap - tooltip.height
+    : pointer.y + gap;
+  return {
+    x: Math.max(margin, Math.min(preferredX, viewport.width - tooltip.width - margin)),
+    y: Math.max(margin, Math.min(preferredY, viewport.height - tooltip.height - margin)),
+    horizontal,
+    vertical,
   };
 }
 

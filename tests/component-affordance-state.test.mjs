@@ -6,6 +6,7 @@ import {
   buildHitArea,
   buildLabelPositions,
   buildScreenAwareHitScale,
+  placeHoverTooltip,
   resolveAffordancePresentation,
 } from '../assets/cross-source-registration/component-affordance-state.js';
 
@@ -55,6 +56,28 @@ test('affordance states reserve coral for faults instead of ordinary selection',
   assert.notEqual(selected.color, 0xef5b3f);
   assert.equal(selected.labelOpacity, 1);
   assert.equal(selected.emissiveIntensity <= 0.08, true);
+});
+
+test('reviewed component tags keep a readable fixed screen size', () => {
+  const idle = resolveAffordancePresentation({});
+  const selected = resolveAffordancePresentation({ selected: true });
+
+  assert.deepEqual(idle.labelPixels, { width: 68, height: 20 });
+  assert.deepEqual(selected.labelPixels, { width: 76, height: 22 });
+});
+
+test('hover tooltip flips away from canvas edges and stays fully visible', () => {
+  assert.deepEqual(placeHoverTooltip({
+    pointer: { x: 310, y: 12 },
+    viewport: { width: 320, height: 240 },
+    tooltip: { width: 156, height: 48 },
+  }), { x: 142, y: 24, horizontal: 'left', vertical: 'below' });
+
+  assert.deepEqual(placeHoverTooltip({
+    pointer: { x: 80, y: 120 },
+    viewport: { width: 320, height: 240 },
+    tooltip: { width: 156, height: 48 },
+  }), { x: 92, y: 60, horizontal: 'right', vertical: 'above' });
 });
 
 test('selection takes precedence over hover presentation', () => {
