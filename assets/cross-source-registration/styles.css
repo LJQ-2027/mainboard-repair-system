@@ -374,6 +374,7 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 .repair-flow-control footer button { height: 28px; border: 1px solid #aeb9b2; border-right: 0; background: white; color: #435049; font: inherit; font-size: 9px; cursor: pointer; }
 .repair-flow-control footer button:last-child { border-right: 1px solid #aeb9b2; }
 .repair-flow-control footer button:disabled { color: #9aa49f; background: #edf0ec; cursor: not-allowed; }
+.repair-flow-control footer button[data-armed="true"] { border-color: #b64a36; background: #fff0ec; color: #963623; }
 .measurement-control { margin-top: 12px; padding: 10px; border: 1px solid #b9c4bd; background: #f8faf7; }
 .measurement-control[hidden] { display: none; }
 .measurement-control header { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }

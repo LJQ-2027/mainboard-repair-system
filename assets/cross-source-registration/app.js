@@ -70,6 +70,7 @@ let modelInteraction = createModelInteractionState();
 let modelDragMode = 'pan';
 const repairGuidanceByComponent = new Map();
 const repairFlowById = new Map();
+const confirmationTimers = new WeakMap();
 let activeRepairFlowId = null;
 
 const FAULT_LABELS = {
@@ -142,6 +143,38 @@ function applyRepairFlowState(flow, next, entity) {
     return;
   }
   renderComponentGuidance(entity);
+}
+
+function configureResetConfirmation(button, disabled, onConfirm) {
+  const priorTimer = confirmationTimers.get(button);
+  if (priorTimer) window.clearTimeout(priorTimer);
+  const disarm = () => {
+    const timer = confirmationTimers.get(button);
+    if (timer) window.clearTimeout(timer);
+    confirmationTimers.delete(button);
+    button.dataset.armed = 'false';
+    button.textContent = '重新开始';
+    button.setAttribute('aria-label', '重新开始当前排查');
+  };
+  disarm();
+  button.disabled = disabled;
+  button.onclick = () => {
+    if (button.dataset.armed === 'true') {
+      disarm();
+      onConfirm();
+      return;
+    }
+    button.dataset.armed = 'true';
+    button.textContent = '确认重置';
+    button.setAttribute('aria-label', '再次点击确认清空当前排查记录');
+    confirmationTimers.set(button, window.setTimeout(disarm, 4000));
+  };
+  button.onkeydown = (event) => {
+    if (event.key === 'Escape' && button.dataset.armed === 'true') {
+      event.preventDefault();
+      disarm();
+    }
+  };
 }
 
 function renderActiveFlowReturn(entity, flowActive) {
@@ -301,13 +334,12 @@ function renderRepairFlow(entity, guidance) {
   const back = document.querySelector('#repairFlowBack');
   const reset = document.querySelector('#repairFlowReset');
   back.disabled = !state.history.length;
-  reset.disabled = !state.history.length;
   back.onclick = () => {
     applyRepairFlowState(flow, backRepairFlow(flow, repairFlowById.get(flow.flow_id)), entity);
   };
-  reset.onclick = () => {
+  configureResetConfirmation(reset, !state.history.length, () => {
     applyRepairFlowState(flow, resetRepairFlow(flow), entity);
-  };
+  });
   return true;
 }
 

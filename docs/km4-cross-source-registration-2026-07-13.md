@@ -221,3 +221,10 @@ Interrupted-flow recovery on 2026-07-14:
 - The return action restores the flow's documented fault, current target component, model focus, measurements, answer history, and active prompt instead of restarting the graph.
 - Flow target resolution is now part of the tested state module, so active-step targets, explicit terminal targets, model navigation, and the recovery strip share one rule.
 - Headed Chromium verifies U4000 -> X2100 progression, temporary U0600 inspection, return to X2100, same-component fault interruption, keyboard-visible focus, 390 px fit, and zero runtime errors.
+
+Destructive reset protection on 2026-07-14:
+
+- `重新开始` no longer clears measurements and answer history on one click. The first activation changes the same button to `确认重置`; only a second activation within four seconds resets the flow.
+- `Escape`, timeout, or any flow rerender cancels the armed state. The confirmation remains inline instead of opening a modal that would hide the model and current repair context.
+- The armed button uses a restrained warning treatment distinct from component selection, abnormal-result feedback, and yellow source-boundary states.
+- Headed Chromium covers armed-without-reset, Escape cancellation, confirmed reset for both reviewed flows, prompt/target preservation before confirmation, and the full desktop/mobile regression matrix.
