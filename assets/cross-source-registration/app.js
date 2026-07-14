@@ -223,7 +223,9 @@ function renderRepairFlow(entity, guidance) {
   document.querySelector('#guidanceProgress').textContent = `${progress.current} / ${progress.total}`;
   document.querySelector('#inspectionStepLabel').textContent = '来源摘要';
   document.querySelector('#repairFlowTitle').textContent = flow.title;
-  document.querySelector('#repairFlowStep').textContent = `步骤 ${progress.current} / ${progress.total}`;
+  document.querySelector('#repairFlowStep').textContent = state.closed
+    ? `已结束 · ${progress.current} / ${progress.total}`
+    : `步骤 ${progress.current} / ${progress.total}`;
   document.querySelector('#repairFlowSource').textContent = `${flow.source.source} · 第 ${flow.source.page} 页`;
   const targetId = repairFlowTargetComponentId(flow, state);
   const targetEntity = data.entities.find((candidate) => candidate.component_id === targetId);
@@ -328,7 +330,10 @@ function renderRepairFlow(entity, guidance) {
   const actionButton = document.querySelector('#recordRepairFlowAction');
   actionButton.setAttribute('aria-pressed', String(actionExecuted));
   actionButton.disabled = state.closed;
-  actionButton.textContent = actionExecuted ? '撤销执行记录' : '记录已执行';
+  actionButton.textContent = state.closed
+    ? '已记录执行'
+    : (actionExecuted ? '撤销执行记录' : '记录已执行');
+  actionButton.title = state.closed ? '本次排查已结束，执行记录为只读' : '';
   document.querySelector('#repairFlowActionStatus').textContent = actionExecuted
     ? '已记录来源处理已执行；维修结果仍需复检确认。'
     : '尚未记录来源处理是否已执行。';
@@ -341,6 +346,7 @@ function renderRepairFlow(entity, guidance) {
   recheck.querySelectorAll('[data-post-action-check]').forEach((button) => {
     button.setAttribute('aria-pressed', String(button.dataset.postActionCheck === state.postActionCheck));
     button.disabled = state.closed;
+    button.title = state.closed ? '本次排查已结束，复检记录为只读' : '';
     button.onclick = () => {
       const next = recordRepairFlowPostActionCheck(
         repairFlowById.get(flow.flow_id),

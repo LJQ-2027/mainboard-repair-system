@@ -314,6 +314,8 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 .repair-step small { display: block; margin-top: 8px; color: var(--muted); font-size: 9px; line-height: 1.4; overflow-wrap: anywhere; }
 .repair-flow-control { margin-top: 12px; padding: 12px; border: 1px solid #9faea5; border-left: 3px solid #177d69; background: white; }
 .repair-flow-control[data-closed="true"] { border-left-color: #7d8b84; }
+.repair-flow-control[data-closed="true"] .repair-flow-heading > div:first-child > span { color: #66736c; }
+.repair-flow-control[data-closed="true"] .repair-flow-position span { border-color: #aeb8b2; background: #e8ece9; color: #435049; }
 .repair-flow-control[hidden] { display: none; }
 .repair-flow-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
 .repair-flow-heading > div:first-child > span { display: block; color: #177d69; font-size: 9px; font-weight: 700; text-transform: uppercase; }
@@ -363,6 +365,7 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 .repair-flow-action-record[hidden] { display: none; }
 .repair-flow-action-record button { min-height: 31px; border: 1px solid #8f9c94; background: white; color: var(--ink); font: inherit; font-size: 9px; cursor: pointer; }
 .repair-flow-action-record button[aria-pressed="true"] { border-color: #55a590; background: #e2f2ec; color: #176b59; }
+.repair-flow-control[data-closed="true"] .repair-flow-action-record button { border-color: #c1c9c4; background: #eef1ef; color: #52605a; cursor: default; opacity: 1; }
 .repair-flow-action-record button:focus { outline: 3px solid #65a9ff; outline-offset: 2px; }
 .repair-flow-action-record p { margin: 0; color: #627069; font-size: 8px; line-height: 1.4; }
 .repair-flow-action-record[data-executed="true"] p { color: #176b59; }
@@ -374,6 +377,10 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 .repair-flow-recheck > div button:last-child { border-right: 1px solid #8f9c94; }
 .repair-flow-recheck > div button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: white; }
 .repair-flow-recheck > div button[data-post-action-check="symptom_persists"][aria-pressed="true"] { background: var(--accent); border-color: var(--accent); }
+.repair-flow-control[data-closed="true"] .repair-flow-recheck > div button { border-color: #d0d6d2; background: #f4f6f4; color: #929c96; cursor: default; opacity: 1; }
+.repair-flow-control[data-closed="true"] .repair-flow-recheck > div button[aria-pressed="true"] { border-color: #81aa9d; background: #e6f0ec; color: #176b59; }
+.repair-flow-control[data-closed="true"] .repair-flow-recheck > div button[data-post-action-check="symptom_persists"][aria-pressed="true"] { border-color: #d27a69; background: #fff0ec; color: #8d3525; }
+.repair-flow-control[data-closed="true"] .repair-flow-recheck > div button[data-post-action-check="uncertain"][aria-pressed="true"] { border-color: #d0a63b; background: #fff8dc; color: #6c5718; }
 .repair-flow-recheck > p { margin-top: 7px; padding: 6px 7px; border: 1px solid #d0d7d2; background: #f8faf7; }
 .repair-flow-recheck > p[data-result="symptom_cleared"] { border-left: 3px solid #55a590; color: #176b59; }
 .repair-flow-recheck > p[data-result="symptom_persists"] { border-left: 3px solid var(--accent); color: #8d3525; }
