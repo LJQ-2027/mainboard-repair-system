@@ -24,6 +24,12 @@ import {
   recordSelectionIntent,
 } from './model-interaction-state.js';
 import { resolveBoardInteractionMode } from './board-pan-state.js';
+import {
+  createRepairGuidance,
+  guidanceProgress,
+  recordGuidanceResult,
+  selectGuidanceFault,
+} from './repair-guidance-state.js';
 
 const DATA_URL = '../../knowledge-base/km4-cross-source-registration.json';
 const GEOMETRY_URL = '../../knowledge-base/km4-board-compiled.json';
@@ -49,6 +55,7 @@ let activeSideId = 'main_page_2';
 let componentInspection = exitComponentInspection();
 let modelInteraction = createModelInteractionState();
 let modelDragMode = 'pan';
+const repairGuidanceByComponent = new Map();
 
 const FAULT_LABELS = {
   no_power: '无法开机',
@@ -56,6 +63,19 @@ const FAULT_LABELS = {
   pmu_failure: '电源管理异常',
   'No power': '无法开机',
   'Leakage current': '漏电',
+  'Storage failure': '存储异常',
+  'Clock failure': '时钟异常',
+  'No service': '无服务',
+  'Weak signal': '信号弱',
+  'Not charging': '无法充电',
+  'USB no response': 'USB 无响应',
+};
+
+const GUIDANCE_RESULT_COPY = {
+  pending: '尚未返回检测结果。完成来源步骤后记录本次观察。',
+  normal: '已记录正常。继续结合下方原理图与维修指导排查其他路径。',
+  abnormal: '已记录异常。保留测量信息，并结合下方来源资料继续处理。',
+  uncertain: '已记录无法确认。复核检测条件后再次执行本步骤。',
 };
 
 function updateInspectionUi() {
@@ -264,20 +284,42 @@ function evidenceCard(link, type) {
 
 function renderComponentGuidance(entity) {
   const section = document.querySelector('#componentGuidance');
-  section.hidden = !canInspectComponent(entity);
+  let guidance = repairGuidanceByComponent.get(entity.component_id);
+  if (!guidance) {
+    guidance = createRepairGuidance(entity);
+    repairGuidanceByComponent.set(entity.component_id, guidance);
+  }
+  section.hidden = !guidance.steps.length;
+  if (!guidance.steps.length) return;
   const faultList = document.querySelector('#commonFaults');
   faultList.replaceChildren();
-  const faults = [...new Set(entity.repair_links.flatMap((link) => link.faults || []))];
-  faults.forEach((fault) => {
-    const item = document.createElement('span');
-    item.textContent = FAULT_LABELS[fault] || fault;
-    faultList.append(item);
+  guidance.faults.forEach((fault) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = FAULT_LABELS[fault] || fault;
+    button.setAttribute('aria-pressed', String(fault === guidance.selectedFault));
+    button.addEventListener('click', () => {
+      const next = selectGuidanceFault(repairGuidanceByComponent.get(entity.component_id), fault);
+      repairGuidanceByComponent.set(entity.component_id, next);
+      renderComponentGuidance(entity);
+    });
+    faultList.append(button);
   });
-  document.querySelector('#inspectionMethod').textContent = entity.repair_links
-    .map((link) => link.instruction)
-    .filter(Boolean)
-    .join(' ');
-  document.querySelector('#modelBoundary').textContent = entity.inspection_profile?.visual_note || '';
+  const step = guidance.steps[0];
+  const progress = guidanceProgress(guidance);
+  document.querySelector('#guidanceProgress').textContent = `${progress.completed} / ${progress.total}`;
+  document.querySelector('#inspectionStepLabel').textContent = `检测步骤 1 / ${progress.total}`;
+  document.querySelector('#inspectionMethod').textContent = step.instruction;
+  document.querySelector('#inspectionSource').textContent = `${step.source} · ${step.page}`;
+  document.querySelectorAll('[data-guidance-result]').forEach((button) => {
+    button.setAttribute('aria-pressed', String(button.dataset.guidanceResult === guidance.result));
+  });
+  const resultStatus = document.querySelector('#guidanceResultStatus');
+  resultStatus.dataset.result = guidance.result;
+  resultStatus.textContent = GUIDANCE_RESULT_COPY[guidance.result];
+  const boundary = entity.inspection_profile?.visual_note || '';
+  document.querySelector('#modelBoundaryDetails').hidden = !boundary;
+  document.querySelector('#modelBoundary').textContent = boundary;
 }
 
 async function selectEntity(componentId, options = {}) {
@@ -299,6 +341,7 @@ async function selectEntity(componentId, options = {}) {
   document.querySelector('#schematicEvidence').innerHTML = entity.schematic_links.map((link) => evidenceCard(link, 'schematic')).join('');
   document.querySelector('#repairEvidence').innerHTML = entity.repair_links.map((link) => evidenceCard(link, 'repair')).join('');
   renderComponentGuidance(entity);
+  if (options.explicit !== false) document.querySelector('.evidence').scrollTo({ top: 0, behavior: 'auto' });
   renderer.select(componentId);
   moduleFocusMode = 'auto';
   document.querySelector('#moduleFocus').value = 'auto';
@@ -443,6 +486,14 @@ document.querySelector('#resetModel').addEventListener('click', async () => {
   updateInspectionUi();
 });
 document.querySelector('#inspectComponent').addEventListener('click', () => { void toggleComponentInspection(); });
+document.querySelectorAll('[data-guidance-result]').forEach((button) => button.addEventListener('click', () => {
+  const entity = data?.entities.find((candidate) => candidate.component_id === selectedId);
+  if (!entity) return;
+  const current = repairGuidanceByComponent.get(entity.component_id) || createRepairGuidance(entity);
+  const next = recordGuidanceResult(current, button.dataset.guidanceResult);
+  repairGuidanceByComponent.set(entity.component_id, next);
+  renderComponentGuidance(entity);
+}));
 document.querySelector('#toggleInspection').addEventListener('click', (event) => {
   const enabled = event.currentTarget.getAttribute('aria-pressed') !== 'true';
   event.currentTarget.setAttribute('aria-pressed', String(enabled));

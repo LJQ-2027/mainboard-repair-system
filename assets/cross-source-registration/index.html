@@ -78,9 +78,31 @@
       <p class="entity-name" id="entityName"></p>
       <dl class="facts"><div><dt>功能模块</dt><dd id="entityModule"></dd></div><div><dt>统一坐标</dt><dd id="entityCoordinate"></dd></div></dl>
       <section class="component-guidance" id="componentGuidance" hidden>
-        <h3>常见故障</h3><div class="fault-list" id="commonFaults"></div>
-        <h3>检测方法</h3><article class="guidance-block" id="inspectionMethod"></article>
-        <h3>模型边界</h3><p class="model-boundary" id="modelBoundary"></p>
+        <header class="guidance-heading">
+          <div><span>当前维修路径</span><h3>故障排查</h3></div>
+          <strong id="guidanceProgress">0 / 1</strong>
+        </header>
+        <div class="guidance-group">
+          <h4>故障现象</h4>
+          <div class="fault-list" id="commonFaults" role="group" aria-label="选择故障现象"></div>
+        </div>
+        <article class="repair-step">
+          <header><span id="inspectionStepLabel">检测步骤 1</span><strong>来源检测指导</strong></header>
+          <p id="inspectionMethod"></p>
+          <small id="inspectionSource"></small>
+        </article>
+        <fieldset class="result-control">
+          <legend>返回检测结果</legend>
+          <div role="group" aria-label="选择本次检测结果">
+            <button type="button" data-guidance-result="normal" aria-pressed="false">正常</button>
+            <button type="button" data-guidance-result="abnormal" aria-pressed="false">异常</button>
+            <button type="button" data-guidance-result="uncertain" aria-pressed="false">无法确认</button>
+          </div>
+        </fieldset>
+        <p class="result-status" id="guidanceResultStatus" aria-live="polite"></p>
+        <details class="model-boundary-details" id="modelBoundaryDetails">
+          <summary>模型说明</summary><p id="modelBoundary"></p>
+        </details>
       </section>
       <section><h3>原理图关系</h3><div id="schematicEvidence"></div></section>
       <section><h3>维修指导</h3><div id="repairEvidence"></div></section>

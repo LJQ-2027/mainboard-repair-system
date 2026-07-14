@@ -164,3 +164,11 @@ Compact model-control verification on 2026-07-14:
 - Shield/module state and board-side state share one horizontal control band at 390 px and 320 px without overlap. The narrow-screen dimensions preserve the full `器件定位` label and remove the page-level horizontal scrollbar.
 - The redundant geometry legend was removed from the canvas. Source confidence remains available in the source note, while interactive-component discoverability is carried by the persistent fitted markers and tags.
 - Headed Chromium passed desktop, 390 px, and 320 px layout and interaction checks with zero horizontal overflow or runtime errors. All 58 Node tests, 37 Python tests, and standalone registration validation passed.
+
+Source-bounded repair-guidance interaction on 2026-07-14:
+
+- All seven reviewed entities now expose an executable repair card when their source record contains a repair instruction. This capability is independent from the U2001-only single-component visual sample.
+- The technician can select a documented fault symptom, read the exact source instruction and citation, and return `正常`, `异常`, or `无法确认`. Fault changes clear the prior observation; component changes keep session-local observations isolated and restore them when returning to the component.
+- The interaction records observations only. It contains no generated diagnosis or component-replacement action, and it does not yet persist measurement values or case history to a backend.
+- Explicit component changes reset the evidence panel to the new component's starting context. Sticky-header scroll margins prevent the repair card from being covered when it is brought into view.
+- 62 Node tests, 37 Python tests, standalone validation, and headed Chromium desktop/390 px/320 px matrices passed. Browser evidence covers abnormal and uncertain results, U2001/U4000 state isolation, restoration, source-card visibility, model-boundary gating, zero overflow, and zero console/page errors.
