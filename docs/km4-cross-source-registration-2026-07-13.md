@@ -157,3 +157,10 @@ Evidence-context verification on 2026-07-14:
 - The desktop evidence panel now keeps the selected component identity, visibility status, and single-component inspection action in a compact sticky header while schematic and repair evidence scroll below it.
 - The mobile layout retains normal document flow so the same header cannot cover content on narrow screens.
 - Headed Chromium confirmed 529 px of evidence scrolling with zero header drift, a visible inspection action, the correct U2001 identity, and no console/page errors. The full desktop/mobile interaction matrix, 58 Node tests, 37 Python tests, and standalone registration validation remain green.
+
+Compact model-control verification on 2026-07-14:
+
+- The mobile model toolbar now occupies a complete second navigation row, keeping pan, rotate, inspection-angle, and full-board reset actions visible instead of clipping the final action.
+- Shield/module state and board-side state share one horizontal control band at 390 px and 320 px without overlap. The narrow-screen dimensions preserve the full `器件定位` label and remove the page-level horizontal scrollbar.
+- The redundant geometry legend was removed from the canvas. Source confidence remains available in the source note, while interactive-component discoverability is carried by the persistent fitted markers and tags.
+- Headed Chromium passed desktop, 390 px, and 320 px layout and interaction checks with zero horizontal overflow or runtime errors. All 58 Node tests, 37 Python tests, and standalone registration validation passed.

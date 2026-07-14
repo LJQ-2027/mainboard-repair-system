@@ -12,7 +12,7 @@
 }
 
 * { box-sizing: border-box; }
-body { margin: 0; min-width: 320px; }
+body { margin: 0; min-width: 0; }
 
 .topbar {
   height: 76px;
@@ -234,25 +234,6 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 }
 .inspection-status[hidden] { display: none; }
 .inspection-status strong { font-size: 15px; }
-.model-legend {
-  position: absolute;
-  left: 14px;
-  bottom: 12px;
-  display: flex;
-  gap: 14px;
-  padding: 7px 9px;
-  border: 1px solid #bac3bd;
-  background: #f8f9f6e8;
-  color: #35413c;
-  font-size: 10px;
-  pointer-events: none;
-}
-.model-legend span { display: flex; align-items: center; gap: 5px; white-space: nowrap; }
-.model-legend i { display: block; width: 11px; height: 8px; }
-.legend-body { background: #202927; }
-.legend-outline { border: 1px solid #73827b; background: transparent; }
-.legend-selected { border: 2px solid #d0a63b; }
-
 .source-note {
   padding: 12px 17px;
   font-size: 11px;
@@ -337,15 +318,28 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 }
 
 @media (max-width: 480px) {
+  .workspace { height: 540px; grid-template-rows: auto minmax(0, 1fr) 42px; }
+  .view-head { flex-wrap: wrap; row-gap: 4px; padding: 5px 8px; }
   .tabs button { padding: 8px 9px; font-size: 11px; }
-  .workspace { height: 540px; }
+  #modelTools { flex: 0 0 100%; justify-content: flex-end; gap: 4px; }
+  #modelTools .icon-button { width: 32px; height: 32px; }
+  #modelTools .model-interaction-modes button { height: 32px; }
   .entity-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .facts { grid-template-columns: 1fr; }
   .source-note { font-size: 10px; }
-  .model-legend { gap: 8px; left: 8px; bottom: 8px; }
-  .anatomy-panel { top: 8px; left: 8px; gap: 4px; }
-  .anatomy-segments { grid-template-columns: repeat(3, 42px); }
-  .anatomy-panel select { width: 112px; }
-  .side-panel { top: 56px; left: 8px; right: auto; }
+  .anatomy-panel { top: 8px; left: 8px; gap: 4px; padding: 4px; }
+  .anatomy-segments { grid-template-columns: repeat(3, 36px); }
+  .anatomy-panel select { width: 94px; }
+  .side-panel { top: 8px; left: auto; right: 8px; padding: 4px; }
+  .side-segments { grid-template-columns: repeat(2, 42px); }
   .inspection-status { right: 8px; bottom: 8px; }
+}
+
+@media (max-width: 360px) {
+  .anatomy-panel { gap: 3px; }
+  .anatomy-segments { grid-template-columns: repeat(3, 30px); }
+  .anatomy-panel select { width: 82px; padding: 0 18px 0 4px; font-size: 9px; }
+  .side-panel { gap: 3px; }
+  .side-segments { grid-template-columns: repeat(2, 32px); }
+  .side-flip { width: 26px; }
 }
