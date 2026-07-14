@@ -100,8 +100,8 @@ def validate_dataset(data, root):
         has_boundary = False
         for step in steps:
             step_id = step.get("step_id")
-            if not step.get("prompt") or not step.get("choices"):
-                errors.append(f"{flow_id}/{step_id} flow step requires a prompt and choices")
+            if not step.get("label") or not step.get("prompt") or not step.get("choices"):
+                errors.append(f"{flow_id}/{step_id} flow step requires a label, prompt, and choices")
             if step.get("target_component_id") and step["target_component_id"] not in identities:
                 errors.append(f"{flow_id}/{step_id} flow component target is unresolved")
             measurements = step.get("measurements", [])

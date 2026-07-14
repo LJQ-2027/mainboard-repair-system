@@ -68,6 +68,18 @@ export function repairFlowProgress(profile, state) {
   return { current: index < 0 ? 0 : index + 1, total: profile.steps.length };
 }
 
+export function repairFlowTrail(profile, state) {
+  const completed = new Set(state.history.map((entry) => entry.stepId));
+  return profile.steps.map((step) => ({
+    stepId: step.step_id,
+    label: step.label || step.prompt,
+    targetComponentId: step.target_component_id || null,
+    status: step.step_id === state.currentStepId
+      ? 'current'
+      : completed.has(step.step_id) ? 'completed' : 'pending',
+  }));
+}
+
 export function repairFlowMeasurementsComplete(profile, state) {
   const step = currentRepairFlowStep(profile, state);
   if (!step) return true;

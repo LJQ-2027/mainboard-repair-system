@@ -87,6 +87,11 @@ class CrossSourceRegistrationTests(unittest.TestCase):
         flow["steps"][0]["measurements"][0]["reference"] = {"kind": "nominal"}
         self.assertTrue(any("flow measurement" in error for error in validate_dataset(data, ROOT)))
 
+    def test_rejects_repair_flow_step_without_a_short_label(self):
+        data = json.loads((ROOT / "knowledge-base/km4-cross-source-registration.json").read_text(encoding="utf-8"))
+        data["repair_flows"][0]["steps"][0].pop("label")
+        self.assertTrue(any("flow step" in error for error in validate_dataset(data, ROOT)))
+
 
 if __name__ == "__main__":
     unittest.main()

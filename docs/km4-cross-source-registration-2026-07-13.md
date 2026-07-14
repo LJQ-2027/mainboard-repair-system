@@ -200,3 +200,11 @@ Composite measurement and cross-component repair flow on 2026-07-14:
 - Editing a previously recorded value immediately makes the step incomplete again and locks its outcome choices until the technician records the revised values.
 - The model follows the source target across the graph: U4000 rail check, X2100 26 MHz check, U2001 power-management action, and X2100 crystal action. Back and reset move both the graph and selected model entity together.
 - 71 Node tests, 46 Python tests, and standalone dataset validation passed. Headed Chromium desktop and 390 px checks cover locked choices, dual measurement capture, dirty-value relocking, cross-entity advance, both abnormal terminals, back, reset, source copy, model focus, and zero horizontal overflow with no console/page errors.
+
+Repair-sidebar hierarchy refinement on 2026-07-14:
+
+- Active source flows now appear before the passive source summary, so the technician reaches the current action before supporting evidence.
+- Every reviewed flow step has a short source-owned label. The interface renders a persistent trail with completed, current, and pending states and identifies the component currently targeted by the graph.
+- Answer history remains visible as a secondary result log. Exact PDF citations remain available in a collapsed `资料依据` disclosure, reducing visual competition without removing traceability.
+- Ordinary progress uses ink and restrained green states; coral remains reserved for abnormal/fault feedback and yellow remains reserved for reviewed source boundaries.
+- Headed Chromium desktop and 390 px evidence verifies flow-before-source order, trail-state transitions, target/model agreement, collapsed source detail, responsive fit, and no console/page errors.

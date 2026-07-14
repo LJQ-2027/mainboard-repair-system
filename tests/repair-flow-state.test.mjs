@@ -9,6 +9,7 @@ import {
   recordRepairFlowMeasurement,
   repairFlowMeasurementsComplete,
   repairFlowProgress,
+  repairFlowTrail,
   resetRepairFlow,
 } from '../assets/cross-source-registration/repair-flow-state.js';
 
@@ -59,6 +60,16 @@ test('a next outcome advances and back restores the prior source question', () =
   const restored = backRepairFlow(profile, advanced);
   assert.equal(currentRepairFlowStep(profile, restored).step_id, 'charger');
   assert.deepEqual(restored.history, []);
+});
+
+test('flow trail exposes completed, current, and pending source steps', () => {
+  const initial = createRepairFlowState(profile);
+  assert.deepEqual(repairFlowTrail(profile, initial).map((item) => item.status), ['current', 'pending', 'pending']);
+  const advanced = answerRepairFlow(profile, initial, 'yes');
+  assert.deepEqual(repairFlowTrail(profile, advanced).map((item) => item.status), ['completed', 'current', 'pending']);
+  const terminal = answerRepairFlow(profile, advanced, 'yes');
+  assert.deepEqual(repairFlowTrail(profile, terminal).map((item) => item.status), ['completed', 'completed', 'pending']);
+  assert.deepEqual(repairFlowTrail(profile, backRepairFlow(profile, terminal)).map((item) => item.status), ['completed', 'current', 'pending']);
 });
 
 test('an action outcome terminates with the exact source action', () => {

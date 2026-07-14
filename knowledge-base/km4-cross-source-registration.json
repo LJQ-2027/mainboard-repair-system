@@ -42,6 +42,7 @@
       "steps": [
         {
           "step_id": "charger_check",
+          "label": "充电器",
           "prompt": "充电器是否正常工作？",
           "choices": [
             {"value": "yes", "label": "是", "outcome": {"kind": "next", "step_id": "usb_solder_check"}},
@@ -50,6 +51,7 @@
         },
         {
           "step_id": "usb_solder_check",
+          "label": "USB 接口",
           "prompt": "观察 USB 接口是否虚焊？",
           "target_component_id": "KM4-MAIN-J6101",
           "choices": [
@@ -59,6 +61,7 @@
         },
         {
           "step_id": "fpc_seat_check",
+          "label": "FPC 排线",
           "prompt": "检查 FPC 排线是否扣好？",
           "target_component_id": "KM4-MAIN-J6101",
           "choices": [
@@ -79,6 +82,7 @@
       "steps": [
         {
           "step_id": "rail_check",
+          "label": "核心供电",
           "prompt": "VDDCORE / VDDEMMCCORE 电压是否正常？",
           "target_component_id": "KM4-MAIN-U4000",
           "measurements": [
@@ -92,6 +96,7 @@
         },
         {
           "step_id": "clock_check",
+          "label": "26 MHz 晶振",
           "prompt": "X2100 输出频率是否 = 26 MHz？",
           "target_component_id": "KM4-MAIN-X2100",
           "measurements": [

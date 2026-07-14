@@ -284,7 +284,7 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 .facts dd { font-size: 12px; margin: 0; font-weight: 600; }
 .evidence section { margin-top: 20px; }
 .evidence h3 { font-size: 11px; text-transform: uppercase; color: #5d6963; margin: 0 0 8px; }
-.component-guidance { scroll-margin-top: 92px; padding: 14px; border: 1px solid #aeb9b2; background: #eef2ed; }
+.component-guidance { scroll-margin-top: 92px; padding: 14px; border: 1px solid #aeb9b2; background: #f1f4f0; }
 .guidance-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .guidance-heading span { display: block; margin-bottom: 3px; color: var(--muted); font-size: 9px; text-transform: uppercase; }
 .guidance-heading h3 { margin: 0; color: var(--ink); font-size: 15px; text-transform: none; }
@@ -297,17 +297,30 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 .fault-list button:focus-visible,
 .result-control button:focus-visible { outline: 3px solid #65a9ff; outline-offset: 2px; }
 .repair-step { margin-top: 12px; border-left: 3px solid #1c8f75; padding: 11px 12px; background: white; }
+.repair-step.source-summary { border-left-color: #9ca9a1; background: #f8faf7; }
 .repair-step header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .repair-step header span { color: #177d69; font-size: 10px; font-weight: 700; }
 .repair-step header strong { font-size: 10px; }
 .repair-step p { margin: 8px 0 0; font-size: 12px; line-height: 1.55; }
 .repair-step small { display: block; margin-top: 8px; color: var(--muted); font-size: 9px; line-height: 1.4; overflow-wrap: anywhere; }
-.repair-flow-control { margin-top: 12px; border-top: 1px solid #aeb9b2; padding-top: 12px; }
+.repair-flow-control { margin-top: 12px; padding: 12px; border: 1px solid #9faea5; border-left: 3px solid #177d69; background: white; }
 .repair-flow-control[hidden] { display: none; }
 .repair-flow-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
-.repair-flow-heading div > span { display: block; color: #177d69; font-size: 9px; font-weight: 700; text-transform: uppercase; }
+.repair-flow-heading > div:first-child > span { display: block; color: #177d69; font-size: 9px; font-weight: 700; text-transform: uppercase; }
 .repair-flow-heading strong { display: block; margin-top: 3px; font-size: 12px; }
-.repair-flow-heading > span { padding: 4px 6px; border: 1px solid #aeb9b2; background: white; font-size: 9px; }
+.repair-flow-position { display: grid; justify-items: end; gap: 3px; }
+.repair-flow-position strong { color: var(--ink); font-size: 10px; }
+.repair-flow-position span { padding: 3px 5px; border: 1px solid #b8c2bc; background: #f2f5f1; color: #56635d; font-size: 8px; }
+.repair-flow-trail { display: flex; margin: 12px 0 0; padding: 0; list-style: none; }
+.repair-flow-trail li { position: relative; display: grid; flex: 1; min-width: 0; justify-items: center; gap: 5px; color: #8a958f; text-align: center; }
+.repair-flow-trail li:not(:last-child)::after { content: ''; position: absolute; z-index: 0; top: 10px; left: calc(50% + 12px); width: calc(100% - 24px); height: 1px; background: #c9d0cc; }
+.repair-flow-trail li[data-status="completed"]:not(:last-child)::after { background: #55a590; }
+.repair-flow-trail li > span { position: relative; z-index: 1; display: grid; width: 21px; height: 21px; place-items: center; border: 1px solid #b7c0ba; border-radius: 50%; background: white; font-size: 8px; }
+.repair-flow-trail li > strong { max-width: 100%; overflow: hidden; font-size: 8px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.repair-flow-trail li[data-status="completed"] { color: #177d69; }
+.repair-flow-trail li[data-status="completed"] > span { border-color: #55a590; background: #e2f2ec; }
+.repair-flow-trail li[data-status="current"] { color: var(--ink); }
+.repair-flow-trail li[data-status="current"] > span { border-color: var(--ink); background: var(--ink); color: white; box-shadow: 0 0 0 3px #dce5df; }
 .repair-flow-prompt { margin: 12px 0 0; font-size: 13px; font-weight: 650; line-height: 1.45; }
 .repair-flow-measurements { margin-top: 10px; padding: 9px; border: 1px solid #b9c4bd; background: #f8faf7; }
 .repair-flow-measurements[hidden] { display: none; }
@@ -336,13 +349,18 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 .repair-flow-terminal > p { margin: 7px 0 0; color: #6c5718; font-size: 9px; line-height: 1.45; }
 .repair-flow-terminal[data-kind="boundary"] { border-left-color: #d0a63b; background: #fff9e5; }
 .repair-flow-terminal[data-kind="boundary"] > span { color: #755d13; }
-.repair-flow-history { display: grid; gap: 4px; margin: 10px 0 0; padding: 0; list-style: none; }
-.repair-flow-history:empty { display: none; }
+.repair-flow-log { margin-top: 10px; padding-top: 8px; border-top: 1px solid #d0d7d2; }
+.repair-flow-log[hidden] { display: none; }
+.repair-flow-log > span { color: #68746e; font-size: 8px; font-weight: 700; }
+.repair-flow-history { display: grid; gap: 4px; margin: 6px 0 0; padding: 0; list-style: none; }
 .repair-flow-history li { display: flex; justify-content: space-between; gap: 10px; border-top: 1px solid #cbd3cd; padding-top: 5px; color: #5c6962; font-size: 9px; }
 .repair-flow-history li span { min-width: 0; }
 .repair-flow-history li strong { white-space: nowrap; color: var(--ink); }
 .repair-flow-control footer { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; margin-top: 10px; }
-.repair-flow-control footer small { color: var(--muted); font-size: 8px; line-height: 1.35; overflow-wrap: anywhere; }
+.repair-flow-source-details { min-width: 0; color: var(--muted); font-size: 8px; }
+.repair-flow-source-details summary { cursor: pointer; font-weight: 700; }
+.repair-flow-source-details summary:focus { outline: 3px solid #65a9ff; outline-offset: 2px; }
+.repair-flow-source-details small { display: block; margin-top: 4px; color: var(--muted); font-size: 8px; line-height: 1.35; overflow-wrap: anywhere; }
 .repair-flow-control footer div { display: flex; flex: none; }
 .repair-flow-control footer button { height: 28px; border: 1px solid #aeb9b2; border-right: 0; background: white; color: #435049; font: inherit; font-size: 9px; cursor: pointer; }
 .repair-flow-control footer button:last-child { border-right: 1px solid #aeb9b2; }

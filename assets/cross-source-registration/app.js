@@ -39,6 +39,7 @@ import {
   recordRepairFlowMeasurement,
   repairFlowMeasurementsComplete,
   repairFlowProgress,
+  repairFlowTrail,
   resetRepairFlow,
 } from './repair-flow-state.js';
 
@@ -171,6 +172,25 @@ function renderRepairFlow(entity, guidance) {
   document.querySelector('#repairFlowTitle').textContent = flow.title;
   document.querySelector('#repairFlowStep').textContent = `步骤 ${progress.current} / ${progress.total}`;
   document.querySelector('#repairFlowSource').textContent = `${flow.source.source} · 第 ${flow.source.page} 页`;
+  const targetId = repairFlowTargetComponent(flow, state);
+  const targetEntity = data.entities.find((candidate) => candidate.component_id === targetId);
+  document.querySelector('#repairFlowTarget').textContent = targetEntity?.designator || '当前结果';
+
+  const trail = document.querySelector('#repairFlowTrail');
+  trail.replaceChildren();
+  repairFlowTrail(flow, state).forEach((item, index) => {
+    const node = document.createElement('li');
+    const marker = document.createElement('span');
+    const label = document.createElement('strong');
+    const sourceStep = flow.steps.find((candidate) => candidate.step_id === item.stepId);
+    node.dataset.status = item.status;
+    node.title = sourceStep?.prompt || item.label;
+    if (item.status === 'current') node.setAttribute('aria-current', 'step');
+    marker.textContent = String(index + 1);
+    label.textContent = item.label;
+    node.append(marker, label);
+    trail.append(node);
+  });
 
   const prompt = document.querySelector('#repairFlowPrompt');
   const choices = document.querySelector('#repairFlowChoices');
@@ -261,6 +281,7 @@ function renderRepairFlow(entity, guidance) {
     item.append(label, value);
     history.append(item);
   });
+  document.querySelector('#repairFlowLog').hidden = !state.history.length;
   const back = document.querySelector('#repairFlowBack');
   const reset = document.querySelector('#repairFlowReset');
   back.disabled = !state.history.length;

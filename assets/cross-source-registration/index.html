@@ -86,16 +86,12 @@
           <h4>故障现象</h4>
           <div class="fault-list" id="commonFaults" role="group" aria-label="选择故障现象"></div>
         </div>
-        <article class="repair-step">
-          <header><span id="inspectionStepLabel">检测步骤 1</span><strong>来源检测指导</strong></header>
-          <p id="inspectionMethod"></p>
-          <small id="inspectionSource"></small>
-        </article>
         <section class="repair-flow-control" id="repairFlowControl" hidden>
           <header class="repair-flow-heading">
             <div><span>来源分支</span><strong id="repairFlowTitle"></strong></div>
-            <span id="repairFlowStep"></span>
+            <div class="repair-flow-position"><strong id="repairFlowTarget"></strong><span id="repairFlowStep"></span></div>
           </header>
+          <ol class="repair-flow-trail" id="repairFlowTrail" aria-label="维修步骤"></ol>
           <p class="repair-flow-prompt" id="repairFlowPrompt"></p>
           <div class="repair-flow-measurements" id="repairFlowMeasurements" hidden>
             <div id="repairFlowMeasurementFields"></div>
@@ -107,12 +103,20 @@
             <span id="repairFlowTerminalType"></span><strong id="repairFlowTerminalLabel"></strong>
             <p id="repairFlowBoundary"></p>
           </div>
-          <ol class="repair-flow-history" id="repairFlowHistory"></ol>
+          <div class="repair-flow-log" id="repairFlowLog" hidden>
+            <span>已记录结果</span>
+            <ol class="repair-flow-history" id="repairFlowHistory"></ol>
+          </div>
           <footer>
-            <small id="repairFlowSource"></small>
+            <details class="repair-flow-source-details"><summary>资料依据</summary><small id="repairFlowSource"></small></details>
             <div><button id="repairFlowBack" type="button">上一步</button><button id="repairFlowReset" type="button">重新开始</button></div>
           </footer>
         </section>
+        <article class="repair-step source-summary">
+          <header><span id="inspectionStepLabel">检测步骤 1</span><strong>来源检测指导</strong></header>
+          <p id="inspectionMethod"></p>
+          <small id="inspectionSource"></small>
+        </article>
         <section class="measurement-control" id="measurementControl" hidden>
           <header><label for="guidanceMeasurementValue" id="measurementLabel">测量值</label><span id="measurementReference"></span></header>
           <div class="measurement-input-row">
