@@ -235,3 +235,10 @@ Terminal source-action execution record on 2026-07-14:
 - The interface explicitly says `维修结果仍需复检确认`; executing a source action is not represented as a successful repair or diagnosis.
 - A `kind: boundary` terminal never exposes the execution control because an ambiguous source edge is not an executable repair instruction.
 - Headed Chromium covers pending/executed action states, restored execution state, hidden boundary control, visible focus, mobile fit, and zero overflow/runtime errors.
+
+Post-action recheck observation on 2026-07-14:
+
+- After a source action is marked executed, the technician can record `现象消失`, `现象仍在`, or `无法确认`. The control is unavailable before execution and never appears at a source-boundary terminal.
+- Recheck is an observation only. `现象消失` still states that final quality confirmation is required; no option automatically marks the repair successful or releases the board.
+- Revoking execution, going back, or confirmed restart clears the recheck. Temporary component/fault interruption preserves it with the rest of the page-session flow state.
+- Headed Chromium covers hidden/pending/three-result states, persisted recheck after interruption, semantic feedback colors, 390 px three-segment fit, and zero overflow/runtime errors.

@@ -6,6 +6,7 @@ import {
   backRepairFlow,
   createRepairFlowState,
   currentRepairFlowStep,
+  recordRepairFlowPostActionCheck,
   recordRepairFlowMeasurement,
   repairFlowMeasurementsComplete,
   repairFlowProgress,
@@ -111,7 +112,13 @@ test('action execution is recordable without claiming a repair result', () => {
   assert.equal(terminal.actionExecution, 'pending');
   const executed = setRepairFlowActionExecuted(terminal, true);
   assert.equal(executed.actionExecution, 'executed');
-  assert.equal(setRepairFlowActionExecuted(executed, false).actionExecution, 'pending');
+  assert.equal(executed.postActionCheck, 'pending');
+  const rechecked = recordRepairFlowPostActionCheck(executed, 'symptom_persists');
+  assert.equal(rechecked.postActionCheck, 'symptom_persists');
+  assert.equal(setRepairFlowActionExecuted(rechecked, false).actionExecution, 'pending');
+  assert.equal(setRepairFlowActionExecuted(rechecked, false).postActionCheck, null);
+  assert.throws(() => recordRepairFlowPostActionCheck(terminal, 'symptom_cleared'));
+  assert.throws(() => recordRepairFlowPostActionCheck(executed, 'fixed'));
   const boundaryProfile = {
     ...profile,
     steps: [{
@@ -122,6 +129,7 @@ test('action execution is recordable without claiming a repair result', () => {
   };
   const boundary = answerRepairFlow(boundaryProfile, createRepairFlowState(boundaryProfile), 'no');
   assert.throws(() => setRepairFlowActionExecuted(boundary, true));
+  assert.throws(() => recordRepairFlowPostActionCheck(boundary, 'uncertain'));
 });
 
 test('reset and invalid choices cannot escape the declared flow graph', () => {

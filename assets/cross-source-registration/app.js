@@ -36,6 +36,7 @@ import {
   backRepairFlow,
   createRepairFlowState,
   currentRepairFlowStep,
+  recordRepairFlowPostActionCheck,
   recordRepairFlowMeasurement,
   repairFlowMeasurementsComplete,
   repairFlowProgress,
@@ -332,6 +333,26 @@ function renderRepairFlow(entity, guidance) {
     const next = setRepairFlowActionExecuted(repairFlowById.get(flow.flow_id), !actionExecuted);
     applyRepairFlowState(flow, next, entity);
   };
+  const recheck = document.querySelector('#repairFlowRecheck');
+  recheck.hidden = !actionExecuted;
+  recheck.querySelectorAll('[data-post-action-check]').forEach((button) => {
+    button.setAttribute('aria-pressed', String(button.dataset.postActionCheck === state.postActionCheck));
+    button.onclick = () => {
+      const next = recordRepairFlowPostActionCheck(
+        repairFlowById.get(flow.flow_id),
+        button.dataset.postActionCheck,
+      );
+      applyRepairFlowState(flow, next, entity);
+    };
+  });
+  const recheckStatus = document.querySelector('#repairFlowRecheckStatus');
+  recheckStatus.dataset.result = state.postActionCheck || 'pending';
+  recheckStatus.textContent = {
+    pending: '尚未记录执行后的故障现象。',
+    symptom_cleared: '已记录：故障现象消失；仍需完成最终质量确认。',
+    symptom_persists: '已记录：故障现象仍存在；继续依据资料排查。',
+    uncertain: '已记录：无法确认；请保留现场信息并复核。',
+  }[state.postActionCheck || 'pending'];
 
   const history = document.querySelector('#repairFlowHistory');
   history.replaceChildren();

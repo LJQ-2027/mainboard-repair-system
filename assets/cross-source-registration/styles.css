@@ -365,6 +365,18 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 .repair-flow-action-record button:focus { outline: 3px solid #65a9ff; outline-offset: 2px; }
 .repair-flow-action-record p { margin: 0; color: #627069; font-size: 8px; line-height: 1.4; }
 .repair-flow-action-record[data-executed="true"] p { color: #176b59; }
+.repair-flow-recheck { margin: 3px 0 0; padding: 8px 0 0; border: 0; border-top: 1px solid #d0d7d2; }
+.repair-flow-recheck[hidden] { display: none; }
+.repair-flow-recheck legend { padding: 0; color: var(--ink); font-size: 9px; font-weight: 700; }
+.repair-flow-recheck > div { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 7px; }
+.repair-flow-recheck > div button { min-width: 0; padding: 0 4px; border-right: 0; font-size: 8px; }
+.repair-flow-recheck > div button:last-child { border-right: 1px solid #8f9c94; }
+.repair-flow-recheck > div button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: white; }
+.repair-flow-recheck > div button[data-post-action-check="symptom_persists"][aria-pressed="true"] { background: var(--accent); border-color: var(--accent); }
+.repair-flow-recheck > p { margin-top: 7px; padding: 6px 7px; border: 1px solid #d0d7d2; background: #f8faf7; }
+.repair-flow-recheck > p[data-result="symptom_cleared"] { border-left: 3px solid #55a590; color: #176b59; }
+.repair-flow-recheck > p[data-result="symptom_persists"] { border-left: 3px solid var(--accent); color: #8d3525; }
+.repair-flow-recheck > p[data-result="uncertain"] { border-left: 3px solid #d0a63b; color: #6c5718; }
 .repair-flow-log { margin-top: 10px; padding-top: 8px; border-top: 1px solid #d0d7d2; }
 .repair-flow-log[hidden] { display: none; }
 .repair-flow-log > span { color: #68746e; font-size: 8px; font-weight: 700; }

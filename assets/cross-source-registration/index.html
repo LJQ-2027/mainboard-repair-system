@@ -109,6 +109,15 @@
             <div class="repair-flow-action-record" id="repairFlowActionRecord" hidden>
               <button id="recordRepairFlowAction" type="button" aria-pressed="false">记录已执行</button>
               <p id="repairFlowActionStatus" aria-live="polite"></p>
+              <fieldset class="repair-flow-recheck" id="repairFlowRecheck" hidden>
+                <legend>执行后复检</legend>
+                <div role="group" aria-label="记录执行后的故障现象">
+                  <button type="button" data-post-action-check="symptom_cleared" aria-pressed="false">现象消失</button>
+                  <button type="button" data-post-action-check="symptom_persists" aria-pressed="false">现象仍在</button>
+                  <button type="button" data-post-action-check="uncertain" aria-pressed="false">无法确认</button>
+                </div>
+                <p id="repairFlowRecheckStatus" data-result="pending" aria-live="polite"></p>
+              </fieldset>
             </div>
           </div>
           <div class="repair-flow-log" id="repairFlowLog" hidden>

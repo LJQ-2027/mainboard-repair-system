@@ -19,6 +19,7 @@ export function createRepairFlowState(profile) {
     history: [],
     terminal: null,
     actionExecution: null,
+    postActionCheck: null,
     measurements: {},
   };
 }
@@ -41,7 +42,14 @@ export function answerRepairFlow(profile, state, choiceValue) {
   const history = [...state.history, { stepId: current.step_id, choice: choice.value }];
   if (outcome.kind === 'next') {
     if (!stepMap(profile).has(outcome.step_id)) throw new Error(`Unknown repair flow destination: ${outcome.step_id}`);
-    return { ...state, currentStepId: outcome.step_id, history, terminal: null, actionExecution: null };
+    return {
+      ...state,
+      currentStepId: outcome.step_id,
+      history,
+      terminal: null,
+      actionExecution: null,
+      postActionCheck: null,
+    };
   }
   if ((outcome.kind === 'action' || outcome.kind === 'boundary') && outcome.label) {
     const terminal = { kind: outcome.kind, label: outcome.label };
@@ -52,6 +60,7 @@ export function answerRepairFlow(profile, state, choiceValue) {
       history,
       terminal,
       actionExecution: outcome.kind === 'action' ? 'pending' : null,
+      postActionCheck: null,
     };
   }
   throw new Error('Repair flow outcome must be a declared next step, action, or source boundary');
@@ -62,7 +71,14 @@ export function backRepairFlow(profile, state) {
   const history = state.history.slice(0, -1);
   const previous = state.history.at(-1);
   if (!stepMap(profile).has(previous.stepId)) throw new Error('Repair flow history points outside the graph');
-  return { ...state, currentStepId: previous.stepId, history, terminal: null, actionExecution: null };
+  return {
+    ...state,
+    currentStepId: previous.stepId,
+    history,
+    terminal: null,
+    actionExecution: null,
+    postActionCheck: null,
+  };
 }
 
 export function resetRepairFlow(profile) {
@@ -100,7 +116,20 @@ export function setRepairFlowActionExecuted(state, executed) {
   if (state.terminal?.kind !== 'action') {
     throw new Error('Only a source action can record execution');
   }
-  return { ...state, actionExecution: executed ? 'executed' : 'pending' };
+  return {
+    ...state,
+    actionExecution: executed ? 'executed' : 'pending',
+    postActionCheck: executed ? state.postActionCheck || 'pending' : null,
+  };
+}
+
+export function recordRepairFlowPostActionCheck(state, result) {
+  const allowed = new Set(['symptom_cleared', 'symptom_persists', 'uncertain']);
+  if (state.terminal?.kind !== 'action' || state.actionExecution !== 'executed') {
+    throw new Error('Post-action check requires an executed source action');
+  }
+  if (!allowed.has(result)) throw new RangeError(`Unknown post-action check: ${result}`);
+  return { ...state, postActionCheck: result };
 }
 
 export function repairFlowMeasurementsComplete(profile, state) {
