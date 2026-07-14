@@ -369,14 +369,30 @@ function renderRepairFlow(entity, guidance) {
     && state.postActionCheck
     && state.postActionCheck !== 'pending';
   const canClose = state.terminal?.kind === 'boundary' || actionReady;
+  const completionStatus = document.querySelector('#repairFlowCompletionStatus');
+  let readiness = 'blocked';
+  let readinessCopy = '';
+  if (state.closed) {
+    readiness = 'closed';
+    readinessCopy = '本次排查记录已结束；当前页面会话仍保留以上记录。';
+  } else if (state.terminal?.kind === 'boundary') {
+    readiness = 'ready';
+    readinessCopy = '资料路径已到边界，可结束并保留当前记录。';
+  } else if (state.terminal?.kind === 'action' && state.actionExecution !== 'executed') {
+    readinessCopy = '先记录来源处理是否已执行。';
+  } else if (state.terminal?.kind === 'action' && !actionReady) {
+    readinessCopy = '记录执行后的故障现象后即可结束。';
+  } else if (actionReady) {
+    readiness = 'ready';
+    readinessCopy = '执行与复检已记录，可结束本次排查。';
+  }
   completion.hidden = !state.terminal;
   completion.dataset.closed = String(state.closed);
+  completion.dataset.readiness = readiness;
   completionButton.disabled = !state.closed && !canClose;
   completionButton.textContent = state.closed ? '开始新一轮' : '结束本次排查';
   completionButton.title = !state.closed && !canClose ? '完成动作执行与复检记录后可结束本次排查' : '';
-  document.querySelector('#repairFlowCompletionStatus').textContent = state.closed
-    ? '本次排查记录已结束；当前页面会话仍保留以上记录。'
-    : '';
+  completionStatus.textContent = readinessCopy;
   completionButton.onclick = () => {
     const next = state.closed ? resetRepairFlow(flow) : closeRepairFlow(repairFlowById.get(flow.flow_id));
     applyRepairFlowState(flow, next, entity);

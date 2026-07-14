@@ -393,6 +393,9 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 .repair-flow-completion button:focus { outline: 3px solid #65a9ff; outline-offset: 2px; }
 .repair-flow-completion p { margin: 0; color: #52605a; font-size: 8px; line-height: 1.4; }
 .repair-flow-completion p:empty { display: none; }
+.repair-flow-completion[data-readiness="blocked"] p { color: #75612a; }
+.repair-flow-completion[data-readiness="ready"] p { color: #176b59; }
+.repair-flow-completion[data-readiness="closed"] p { color: #52605a; }
 .repair-flow-log { margin-top: 10px; padding-top: 8px; border-top: 1px solid #d0d7d2; }
 .repair-flow-log[hidden] { display: none; }
 .repair-flow-log > span { color: #68746e; font-size: 8px; font-weight: 700; }
