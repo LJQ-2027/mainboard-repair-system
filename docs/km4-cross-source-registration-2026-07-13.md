@@ -151,3 +151,9 @@ Entity/module visual-ownership verification on 2026-07-14:
 - The focus control now uses technician-facing `器件定位` and `全板视图` labels. Interactive hover switches the canvas cursor to a pointer, while drag retains the existing pan/rotate cursors.
 - Selected-package emissive intensity was reduced so component surface geometry remains readable instead of appearing covered by an amber layer.
 - 58 Node tests, 37 Python tests, standalone validation, and headed Chromium desktop/mobile interaction matrices passed. Browser evidence confirms empty entity overlay state, explicit module overlay state, deterministic restoration, pointer hover, and all existing rapid-transition paths.
+
+Evidence-context verification on 2026-07-14:
+
+- The desktop evidence panel now keeps the selected component identity, visibility status, and single-component inspection action in a compact sticky header while schematic and repair evidence scroll below it.
+- The mobile layout retains normal document flow so the same header cannot cover content on narrow screens.
+- Headed Chromium confirmed 529 px of evidence scrolling with zero header drift, a visible inspection action, the correct U2001 identity, and no console/page errors. The full desktop/mobile interaction matrix, 58 Node tests, 37 Python tests, and standalone registration validation remain green.
