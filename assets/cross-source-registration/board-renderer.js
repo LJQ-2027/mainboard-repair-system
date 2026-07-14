@@ -15,6 +15,7 @@ import { buildInspectionTransform, inspectionOpacity } from './component-inspect
 import { transformBoardCenter } from './model-interaction-state.js';
 import {
   clampPanCenter,
+  pinchZoom,
   resolveBoardInteractionMode,
   screenDeltaToPan,
 } from './board-pan-state.js';
@@ -429,6 +430,8 @@ export class BoardRenderer {
     this.raycaster = new THREE.Raycaster();
     this.pointer = new THREE.Vector2();
     this.drag = null;
+    this.activePointers = new Map();
+    this.suppressTouchTap = false;
     this.inspectionAngle = false;
     this.hoveredComponentId = null;
     this.build();
@@ -709,6 +712,21 @@ export class BoardRenderer {
       if (this.interactionLocked) return;
       this.cancelCameraAnimation();
       this.clearHover(false);
+      canvas.setPointerCapture(event.pointerId);
+      if (event.pointerType === 'touch') {
+        this.activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+        if (this.activePointers.size >= 2) {
+          const [first, second] = [...this.activePointers.values()];
+          this.drag = {
+            mode: 'pinch',
+            distance: Math.hypot(second.x - first.x, second.y - first.y),
+            zoom: this.camera.zoom,
+          };
+          this.suppressTouchTap = true;
+          this.container.classList.add('dragging');
+          return;
+        }
+      }
       const inspected = this.inspectionComponentId ? this.renderObjects.get(this.inspectionComponentId) : null;
       if (inspected) {
         this.drag = { mode: 'component', x: event.clientX, y: event.clientY, rx: inspected.rotation.x, ry: inspected.rotation.y };
@@ -718,15 +736,30 @@ export class BoardRenderer {
         this.drag = { mode: 'pan', x: event.clientX, y: event.clientY, cx: this.camera.position.x, cy: this.camera.position.y };
       }
       this.container.classList.add('dragging');
-      canvas.setPointerCapture(event.pointerId);
     });
     canvas.addEventListener('pointermove', (event) => {
       if (this.interactionLocked) return;
+      if (event.pointerType === 'touch' && this.activePointers.has(event.pointerId)) {
+        this.activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      }
       if (!this.drag) {
         this.updateHover(event);
         return;
       }
-      if (this.drag.mode === 'component') {
+      if (this.drag.mode === 'pinch') {
+        const [first, second] = [...this.activePointers.values()];
+        if (!first || !second) return;
+        const [minimum, maximum] = this.zoomBounds();
+        this.camera.zoom = pinchZoom({
+          startDistance: this.drag.distance,
+          currentDistance: Math.hypot(second.x - first.x, second.y - first.y),
+          startZoom: this.drag.zoom,
+          minimum,
+          maximum,
+        });
+        this.camera.updateProjectionMatrix();
+        this.updateLabelVisibility(false);
+      } else if (this.drag.mode === 'component') {
         const inspected = this.renderObjects.get(this.inspectionComponentId);
         if (!inspected) return;
         inspected.rotation.y = this.drag.ry + (event.clientX - this.drag.x) * 0.012;
@@ -753,14 +786,23 @@ export class BoardRenderer {
     });
     canvas.addEventListener('pointerup', (event) => {
       if (this.interactionLocked) return;
+      if (event.pointerType === 'touch') this.activePointers.delete(event.pointerId);
+      if (this.suppressTouchTap) {
+        this.drag = null;
+        this.container.classList.remove('dragging');
+        if (!this.activePointers.size) this.suppressTouchTap = false;
+        return;
+      }
       const dragMode = this.drag?.mode;
       const moved = this.drag && Math.hypot(event.clientX - this.drag.x, event.clientY - this.drag.y) > 5;
       this.drag = null;
       this.container.classList.remove('dragging');
       if (!moved && dragMode !== 'component') this.pick(event);
     });
-    canvas.addEventListener('pointercancel', () => {
+    canvas.addEventListener('pointercancel', (event) => {
+      if (event.pointerType === 'touch') this.activePointers.delete(event.pointerId);
       this.drag = null;
+      if (!this.activePointers.size) this.suppressTouchTap = false;
       this.container.classList.remove('dragging');
     });
     canvas.addEventListener('pointerleave', () => {
@@ -770,12 +812,16 @@ export class BoardRenderer {
       event.preventDefault();
       if (this.interactionLocked) return;
       this.cancelCameraAnimation();
-      const zoomBounds = this.inspectionComponentId ? [1.8, 6] : [0.72, 4.2];
+      const zoomBounds = this.zoomBounds();
       this.camera.zoom = Math.max(zoomBounds[0], Math.min(zoomBounds[1], this.camera.zoom * (event.deltaY > 0 ? 0.9 : 1.1)));
       this.camera.updateProjectionMatrix();
       this.updateLabelVisibility(false);
       this.render();
     }, { passive: false });
+  }
+
+  zoomBounds() {
+    return this.inspectionComponentId ? [1.8, 6] : [0.72, 4.2];
   }
 
   pick(event) {
@@ -1251,6 +1297,7 @@ export class BoardRenderer {
     const height = Math.max(this.container.clientHeight, 320);
     const worldPerPixelX = (this.camera.right - this.camera.left) / (width * this.camera.zoom);
     const worldPerPixelY = (this.camera.top - this.camera.bottom) / (height * this.camera.zoom);
+    this.container.dataset.cameraZoom = this.camera.zoom.toFixed(3);
     this.labelSprites.forEach((sprite) => {
       sprite.scale.set(worldPerPixelX * 48, worldPerPixelY * 14, 1);
     });

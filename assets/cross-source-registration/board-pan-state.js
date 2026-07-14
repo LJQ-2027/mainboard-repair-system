@@ -29,3 +29,9 @@ export function clampPanCenter(center) {
     y: round(clamp(center.y, -PAN_LIMITS.y, PAN_LIMITS.y)),
   };
 }
+
+export function pinchZoom({ startDistance, currentDistance, startZoom, minimum, maximum }) {
+  if (!Number.isFinite(startDistance) || startDistance <= 0) return startZoom;
+  const ratio = Math.max(currentDistance, 0) / startDistance;
+  return round(clamp(startZoom * ratio, minimum, maximum));
+}

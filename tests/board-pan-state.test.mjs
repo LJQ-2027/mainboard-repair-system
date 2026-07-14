@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 import {
   clampPanCenter,
+  pinchZoom,
   resolveBoardInteractionMode,
   screenDeltaToPan,
 } from '../assets/cross-source-registration/board-pan-state.js';
@@ -39,4 +40,11 @@ test('manual camera center remains inside board-relative pan bounds', () => {
   assert.deepEqual(clampPanCenter({ x: 3, y: -2 }), { x: 0.92, y: -0.62 });
   assert.deepEqual(clampPanCenter({ x: -3, y: 2 }), { x: -0.92, y: 0.62 });
   assert.deepEqual(clampPanCenter({ x: 0.2, y: -0.1 }), { x: 0.2, y: -0.1 });
+});
+
+test('pinch distance produces bounded model zoom', () => {
+  assert.equal(pinchZoom({ startDistance: 80, currentDistance: 160, startZoom: 1, minimum: 0.72, maximum: 4.2 }), 2);
+  assert.equal(pinchZoom({ startDistance: 100, currentDistance: 50, startZoom: 2, minimum: 0.72, maximum: 4.2 }), 1);
+  assert.equal(pinchZoom({ startDistance: 10, currentDistance: 500, startZoom: 2, minimum: 0.72, maximum: 4.2 }), 4.2);
+  assert.equal(pinchZoom({ startDistance: 0, currentDistance: 100, startZoom: 2, minimum: 0.72, maximum: 4.2 }), 2);
 });

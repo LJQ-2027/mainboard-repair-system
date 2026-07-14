@@ -137,6 +137,8 @@ Bounded board-pan verification on 2026-07-14:
 - 53 Node tests, 37 Python tests, standalone registration validation, and headed Chromium desktop/mobile matrices passed. Canvas comparisons confirm pan movement and pixel-identical reset; component selection remains stable and the rotated-focus regression remains green.
 - The WebGL canvas now declares touch-gesture ownership. A real vertical touch drag previously moved the model and scrolled the page by 105 px at the same time; it now changes the model frame with zero page movement. A gesture starting outside the canvas still scrolls the mobile document normally.
 - Real touch regression covers canvas pan, outside-page scroll, tap-to-select, unchanged U2001 identity during pan, and pixel-identical full-board reset.
+- Two-touch pinch now maps finger-distance change to the same bounded camera zoom used by desktop wheel navigation. Pinch owns both pointers, suppresses terminal taps, and releases cleanly back to single-finger pan.
+- Real 390 px multi-touch evidence increased model zoom from 1.000 to 2.200 with zero page movement or selection change; single-finger pan worked immediately afterward, and full-board reset restored zoom 1.000 plus the original pixel frame.
 
 Reviewed-component affordance verification on 2026-07-14:
 
