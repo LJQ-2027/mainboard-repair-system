@@ -6,6 +6,8 @@ import {
   backRepairFlow,
   createRepairFlowState,
   currentRepairFlowStep,
+  recordRepairFlowMeasurement,
+  repairFlowMeasurementsComplete,
   repairFlowProgress,
   resetRepairFlow,
 } from '../assets/cross-source-registration/repair-flow-state.js';
@@ -87,4 +89,31 @@ test('an ambiguous source branch stops at an explicit boundary terminal', () => 
   };
   const terminal = answerRepairFlow(boundedProfile, createRepairFlowState(boundedProfile), 'no');
   assert.deepEqual(terminal.terminal, { kind: 'boundary', label: '后续 Y/N 标注待复核' });
+});
+
+test('a measured step cannot advance until every required source value is recorded', () => {
+  const measuredProfile = {
+    flow_id: 'small-current',
+    entry_step_id: 'rails',
+    steps: [{
+      step_id: 'rails',
+      prompt: '电压是否正常？',
+      measurements: [
+        { measurement_id: 'vddcore', label: 'VDDCORE', unit: 'V', input_step: 0.01, required: true, reference: { kind: 'nominal', value: 1.15 } },
+        { measurement_id: 'vddemmccore', label: 'VDDEMMCCORE', unit: 'V', input_step: 0.01, required: true, reference: { kind: 'nominal', value: 3.3 } },
+      ],
+      choices: [{ value: 'normal', label: '正常', outcome: { kind: 'action', label: '下一来源动作' } }],
+    }],
+  };
+  const initial = createRepairFlowState(measuredProfile);
+  assert.equal(repairFlowMeasurementsComplete(measuredProfile, initial), false);
+  assert.throws(() => answerRepairFlow(measuredProfile, initial, 'normal'));
+  const first = recordRepairFlowMeasurement(measuredProfile, initial, 'vddcore', '1.14');
+  assert.equal(repairFlowMeasurementsComplete(measuredProfile, first), false);
+  const complete = recordRepairFlowMeasurement(measuredProfile, first, 'vddemmccore', 3.28);
+  assert.equal(repairFlowMeasurementsComplete(measuredProfile, complete), true);
+  assert.deepEqual(complete.measurements.rails, { vddcore: 1.14, vddemmccore: 3.28 });
+  assert.equal(answerRepairFlow(measuredProfile, complete, 'normal').terminal.label, '下一来源动作');
+  assert.throws(() => recordRepairFlowMeasurement(measuredProfile, initial, 'unknown', 1));
+  assert.throws(() => recordRepairFlowMeasurement(measuredProfile, initial, 'vddcore', 'bad'));
 });

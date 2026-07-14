@@ -104,6 +104,27 @@ def validate_dataset(data, root):
                 errors.append(f"{flow_id}/{step_id} flow step requires a prompt and choices")
             if step.get("target_component_id") and step["target_component_id"] not in identities:
                 errors.append(f"{flow_id}/{step_id} flow component target is unresolved")
+            measurements = step.get("measurements", [])
+            measurement_ids = [measurement.get("measurement_id") for measurement in measurements]
+            if any(not measurement_id for measurement_id in measurement_ids) or len(measurement_ids) != len(set(measurement_ids)):
+                errors.append(f"{flow_id}/{step_id} flow measurement identities must be unique")
+            for measurement in measurements:
+                if not measurement.get("label") or not measurement.get("unit"):
+                    errors.append(f"{flow_id}/{step_id} flow measurement requires a label and unit")
+                if not _number(measurement.get("input_step")) or measurement["input_step"] <= 0:
+                    errors.append(f"{flow_id}/{step_id} flow measurement input step must be positive")
+                reference = measurement.get("reference", {})
+                reference_kind = reference.get("kind")
+                if reference_kind == "range":
+                    minimum = reference.get("min")
+                    maximum = reference.get("max")
+                    if not _number(minimum) or not _number(maximum) or minimum > maximum:
+                        errors.append(f"{flow_id}/{step_id} flow measurement range requires ordered numeric bounds")
+                elif reference_kind == "nominal":
+                    if not _number(reference.get("value")):
+                        errors.append(f"{flow_id}/{step_id} flow measurement nominal reference requires a numeric value")
+                elif reference_kind != "record_only":
+                    errors.append(f"{flow_id}/{step_id} flow measurement reference kind is unsupported")
             choice_values = [choice.get("value") for choice in step.get("choices", [])]
             if any(not value for value in choice_values) or len(choice_values) != len(set(choice_values)):
                 errors.append(f"{flow_id}/{step_id} flow choices require unique values")

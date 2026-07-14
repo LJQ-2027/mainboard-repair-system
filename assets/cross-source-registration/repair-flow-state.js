@@ -18,6 +18,7 @@ export function createRepairFlowState(profile) {
     currentStepId: profile.entry_step_id,
     history: [],
     terminal: null,
+    measurements: {},
   };
 }
 
@@ -30,6 +31,9 @@ export function answerRepairFlow(profile, state, choiceValue) {
   if (state.terminal) throw new Error('Repair flow is already at a terminal action');
   const current = currentRepairFlowStep(profile, state);
   if (!current) throw new Error('Repair flow has no active step');
+  if (!repairFlowMeasurementsComplete(profile, state)) {
+    throw new Error('Required repair flow measurements are incomplete');
+  }
   const choice = current.choices?.find((candidate) => candidate.value === choiceValue);
   if (!choice) throw new RangeError(`Unknown repair flow choice: ${choiceValue}`);
   const outcome = choice.outcome || {};
@@ -62,4 +66,31 @@ export function repairFlowProgress(profile, state) {
   const activeId = state.currentStepId || state.history.at(-1)?.stepId;
   const index = profile.steps.findIndex((step) => step.step_id === activeId);
   return { current: index < 0 ? 0 : index + 1, total: profile.steps.length };
+}
+
+export function repairFlowMeasurementsComplete(profile, state) {
+  const step = currentRepairFlowStep(profile, state);
+  if (!step) return true;
+  const required = (step.measurements || []).filter((measurement) => measurement.required !== false);
+  const values = state.measurements?.[step.step_id] || {};
+  return required.every((measurement) => Number.isFinite(values[measurement.measurement_id]));
+}
+
+export function recordRepairFlowMeasurement(profile, state, measurementId, rawValue) {
+  const step = currentRepairFlowStep(profile, state);
+  if (!step) throw new Error('Repair flow has no active measurement step');
+  const measurement = step.measurements?.find((candidate) => candidate.measurement_id === measurementId);
+  if (!measurement) throw new RangeError(`Unknown repair flow measurement: ${measurementId}`);
+  const value = typeof rawValue === 'number' ? rawValue : Number(String(rawValue).trim());
+  if (!Number.isFinite(value)) throw new TypeError('Repair flow measurement must be finite');
+  return {
+    ...state,
+    measurements: {
+      ...state.measurements,
+      [step.step_id]: {
+        ...(state.measurements?.[step.step_id] || {}),
+        [measurementId]: value,
+      },
+    },
+  };
 }

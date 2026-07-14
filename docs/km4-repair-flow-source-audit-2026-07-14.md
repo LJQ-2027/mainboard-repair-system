@@ -31,7 +31,16 @@ The chart proves this order for current below 100 mA:
 4. An abnormal X2100 result routes to crystal rework or replacement.
 5. A normal X2100 result routes to CPU/DDR rework or replacement.
 
-Deferred: step 1 is a composite check. The runtime currently captures `VDDEMMCCORE` but not a second `VDDCORE` value, so implementing this branch now would present only half of the source condition.
+Implemented: step 1 is preserved as one composite decision with two required measurements. The runtime records both `VDDCORE` (1.15 V nominal) and `VDDEMMCCORE` (3.3 V nominal) before enabling the normal/abnormal choice. Because the source supplies no tolerance, neither value is auto-classified.
+
+The reviewed runtime path is:
+
+1. Focus U4000 and require both rail measurements.
+2. A normal technician judgment advances to X2100 and requires a 26 MHz measurement.
+3. An abnormal rail judgment focuses U2001 and presents the source action to rework or replace the power-management IC.
+4. At X2100, an abnormal judgment presents crystal rework or replacement; a normal judgment presents CPU/DDR rework or replacement.
+
+Model focus follows the current step or terminal target. Back and reset restore the corresponding component target as well as the graph state.
 
 ## Page 11: Large-Current No-Power
 

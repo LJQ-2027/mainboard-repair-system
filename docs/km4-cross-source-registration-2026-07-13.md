@@ -191,3 +191,12 @@ First source-reviewed multi-step branch on 2026-07-14:
 - U4000 `VDDEMMCCORE` was corrected from record-only to a 3.3 V nominal reference without tolerance based on the page-11 signal table.
 - Repair-flow validation rejects graph edges outside declared steps, unresolved component targets, duplicate identities, unsupported outcomes, and boundary terminals without reviewed-partial status plus a note.
 - Headed Chromium desktop/mobile matrices passed the three-step path, boundary terminal, back, reset, source action, alternate-fault restoration, history, and zero-overflow checks with no console/page errors.
+
+Composite measurement and cross-component repair flow on 2026-07-14:
+
+- The page-10 small-current no-power path is now structured as a second source-reviewed repair flow. Its first decision cannot advance until both `VDDCORE` and `VDDEMMCCORE` have been recorded in the same step.
+- Nominal references remain technician-reviewed because pages 10-11 provide values but no tolerance. Recording a value never silently decides normal or abnormal.
+- Flow state owns step-scoped measurement records. Required-field completeness is enforced in the state module and in the interface, so future composite checks can reuse the same data contract.
+- Editing a previously recorded value immediately makes the step incomplete again and locks its outcome choices until the technician records the revised values.
+- The model follows the source target across the graph: U4000 rail check, X2100 26 MHz check, U2001 power-management action, and X2100 crystal action. Back and reset move both the graph and selected model entity together.
+- 71 Node tests, 46 Python tests, and standalone dataset validation passed. Headed Chromium desktop and 390 px checks cover locked choices, dual measurement capture, dirty-value relocking, cross-entity advance, both abnormal terminals, back, reset, source copy, model focus, and zero horizontal overflow with no console/page errors.

@@ -26,6 +26,14 @@ class CrossSourceRegistrationTests(unittest.TestCase):
         self.assertEqual(profiles["VBAT1"]["reference"], {"kind": "range", "min": 3.4, "max": 4.35})
         self.assertEqual(profiles["VBUS1"]["reference"], {"kind": "nominal", "value": 5})
 
+    def test_committed_repair_flows_preserve_reviewed_entries(self):
+        data = json.loads((ROOT / "knowledge-base/km4-cross-source-registration.json").read_text(encoding="utf-8"))
+        flows = {flow["flow_id"]: flow for flow in data["repair_flows"]}
+        self.assertEqual(set(flows), {"not-charging-page-14-reviewed", "no-power-small-current-page-10"})
+        small_current = flows["no-power-small-current-page-10"]
+        self.assertEqual(small_current["entry_component_id"], "KM4-MAIN-U4000")
+        self.assertEqual([item["reference"]["value"] for item in small_current["steps"][0]["measurements"]], [1.15, 3.3])
+
     def test_rejects_out_of_range_geometry(self):
         data = json.loads((ROOT / "knowledge-base/km4-cross-source-registration.json").read_text(encoding="utf-8"))
         data["entities"][0]["geometry"]["center"]["x"] = 1.2
@@ -72,6 +80,12 @@ class CrossSourceRegistrationTests(unittest.TestCase):
         flow = data["repair_flows"][0]
         flow["boundary_note"] = ""
         self.assertTrue(any("flow boundary" in error for error in validate_dataset(data, ROOT)))
+
+    def test_rejects_invalid_flow_measurement_reference(self):
+        data = json.loads((ROOT / "knowledge-base/km4-cross-source-registration.json").read_text(encoding="utf-8"))
+        flow = data["repair_flows"][1]
+        flow["steps"][0]["measurements"][0]["reference"] = {"kind": "nominal"}
+        self.assertTrue(any("flow measurement" in error for error in validate_dataset(data, ROOT)))
 
 
 if __name__ == "__main__":

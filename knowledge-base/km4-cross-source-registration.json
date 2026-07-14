@@ -67,6 +67,42 @@
           ]
         }
       ]
+    },
+    {
+      "flow_id": "no-power-small-current-page-10",
+      "title": "小电流不开机排查",
+      "fault": "No power",
+      "entry_component_id": "KM4-MAIN-U4000",
+      "entry_step_id": "rail_check",
+      "source": {"source": "TECNO-L6735-KM4-F151手机维修通用操作指导书V1.0_20250331.pdf", "page": "10-11"},
+      "source_status": "reviewed",
+      "steps": [
+        {
+          "step_id": "rail_check",
+          "prompt": "VDDCORE / VDDEMMCCORE 电压是否正常？",
+          "target_component_id": "KM4-MAIN-U4000",
+          "measurements": [
+            {"measurement_id": "vddcore-voltage", "label": "VDDCORE 电压", "unit": "V", "input_step": 0.01, "required": true, "reference": {"kind": "nominal", "value": 1.15}},
+            {"measurement_id": "vddemmccore-voltage", "label": "VDDEMMCCORE 电压", "unit": "V", "input_step": 0.01, "required": true, "reference": {"kind": "nominal", "value": 3.3}}
+          ],
+          "choices": [
+            {"value": "normal", "label": "正常", "outcome": {"kind": "next", "step_id": "clock_check"}},
+            {"value": "abnormal", "label": "异常", "outcome": {"kind": "action", "label": "重焊或更换电源管理 IC", "target_component_id": "KM4-MAIN-U2001"}}
+          ]
+        },
+        {
+          "step_id": "clock_check",
+          "prompt": "X2100 输出频率是否 = 26 MHz？",
+          "target_component_id": "KM4-MAIN-X2100",
+          "measurements": [
+            {"measurement_id": "x2100-frequency", "label": "X2100 输出频率", "unit": "MHz", "input_step": 0.1, "required": true, "reference": {"kind": "nominal", "value": 26}}
+          ],
+          "choices": [
+            {"value": "normal", "label": "正常", "outcome": {"kind": "action", "label": "重焊或更换 CPU/DDR"}},
+            {"value": "abnormal", "label": "异常", "outcome": {"kind": "action", "label": "重焊或更换晶振", "target_component_id": "KM4-MAIN-X2100"}}
+          ]
+        }
+      ]
     }
   ],
   "entities": [

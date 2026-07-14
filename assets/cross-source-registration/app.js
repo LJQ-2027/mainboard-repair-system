@@ -36,6 +36,8 @@ import {
   backRepairFlow,
   createRepairFlowState,
   currentRepairFlowStep,
+  recordRepairFlowMeasurement,
+  repairFlowMeasurementsComplete,
   repairFlowProgress,
   resetRepairFlow,
 } from './repair-flow-state.js';
@@ -66,6 +68,7 @@ let modelInteraction = createModelInteractionState();
 let modelDragMode = 'pan';
 const repairGuidanceByComponent = new Map();
 const repairFlowById = new Map();
+let activeRepairFlowId = null;
 
 const FAULT_LABELS = {
   no_power: '无法开机',
@@ -115,9 +118,37 @@ function guidanceResultCopy(guidance) {
 }
 
 function matchingRepairFlow(entity, guidance) {
-  return data?.repair_flows?.find((flow) => (
+  const active = data?.repair_flows?.find((flow) => flow.flow_id === activeRepairFlowId);
+  if (active && active.fault === guidance.selectedFault) {
+    const state = repairFlowById.get(active.flow_id) || createRepairFlowState(active);
+    const target = repairFlowTargetComponent(active, state);
+    if (target === entity.component_id) return active;
+  }
+  const entry = data?.repair_flows?.find((flow) => (
     flow.entry_component_id === entity.component_id && flow.fault === guidance.selectedFault
   )) || null;
+  if (entry) activeRepairFlowId = entry.flow_id;
+  return entry;
+}
+
+function repairFlowTargetComponent(flow, state) {
+  const step = currentRepairFlowStep(flow, state);
+  if (step?.target_component_id) return step.target_component_id;
+  if (state.terminal?.target_component_id) return state.terminal.target_component_id;
+  const previousStepId = state.history.at(-1)?.stepId;
+  const previousStep = flow.steps.find((candidate) => candidate.step_id === previousStepId);
+  return previousStep?.target_component_id || flow.entry_component_id;
+}
+
+function applyRepairFlowState(flow, next, entity) {
+  repairFlowById.set(flow.flow_id, next);
+  activeRepairFlowId = flow.flow_id;
+  const target = repairFlowTargetComponent(flow, next);
+  if (target && target !== entity.component_id) {
+    void selectEntity(target);
+    return;
+  }
+  renderComponentGuidance(entity);
 }
 
 function renderRepairFlow(entity, guidance) {
@@ -144,20 +175,66 @@ function renderRepairFlow(entity, guidance) {
   const prompt = document.querySelector('#repairFlowPrompt');
   const choices = document.querySelector('#repairFlowChoices');
   const terminal = document.querySelector('#repairFlowTerminal');
+  const measurementControl = document.querySelector('#repairFlowMeasurements');
+  const measurementFields = document.querySelector('#repairFlowMeasurementFields');
   choices.replaceChildren();
+  measurementFields.replaceChildren();
   prompt.hidden = !step;
   choices.hidden = !step;
   terminal.hidden = !state.terminal;
+  measurementControl.hidden = !step?.measurements?.length;
   if (step) {
     prompt.textContent = step.prompt;
+    const existingMeasurements = state.measurements?.[step.step_id] || {};
+    (step.measurements || []).forEach((measurement) => {
+      const row = document.createElement('div');
+      row.className = 'repair-flow-measurement';
+      const label = document.createElement('label');
+      const reference = document.createElement('small');
+      const input = document.createElement('input');
+      const unit = document.createElement('span');
+      input.type = 'number';
+      input.inputMode = 'decimal';
+      input.required = measurement.required !== false;
+      input.step = String(measurement.input_step || 'any');
+      input.dataset.flowMeasurement = measurement.measurement_id;
+      input.id = `flow-measurement-${measurement.measurement_id}`;
+      input.value = existingMeasurements[measurement.measurement_id] ?? '';
+      label.htmlFor = input.id;
+      label.append(document.createTextNode(measurement.label), reference);
+      reference.textContent = measurementReferenceCopy(measurement);
+      unit.textContent = measurement.unit;
+      input.addEventListener('input', () => {
+        measurementStatus.dataset.complete = 'false';
+        measurementStatus.textContent = '输入已修改，请重新记录本步测量后再选择结果。';
+        choices.querySelectorAll('button').forEach((button) => { button.disabled = true; });
+      });
+      row.append(label, input, unit);
+      measurementFields.append(row);
+    });
+    const measurementsComplete = repairFlowMeasurementsComplete(flow, state);
+    const measurementStatus = document.querySelector('#repairFlowMeasurementStatus');
+    measurementStatus.dataset.complete = String(measurementsComplete);
+    measurementStatus.textContent = measurementsComplete
+      ? '本步测量已记录。资料未提供容差，请依据来源判断正常或异常。'
+      : `需记录本步 ${step.measurements?.filter((measurement) => measurement.required !== false).length || 0} 项测量后再选择结果。`;
+    document.querySelector('#repairFlowRecordMeasurements').onclick = () => {
+      let next = repairFlowById.get(flow.flow_id);
+      const inputs = [...measurementFields.querySelectorAll('[data-flow-measurement]')];
+      if (inputs.some((input) => !input.reportValidity())) return;
+      inputs.forEach((input) => {
+        next = recordRepairFlowMeasurement(flow, next, input.dataset.flowMeasurement, input.value);
+      });
+      applyRepairFlowState(flow, next, entity);
+    };
     step.choices.forEach((choice) => {
       const button = document.createElement('button');
       button.type = 'button';
       button.textContent = choice.label;
+      button.disabled = !measurementsComplete;
       button.addEventListener('click', () => {
         const next = answerRepairFlow(flow, repairFlowById.get(flow.flow_id), choice.value);
-        repairFlowById.set(flow.flow_id, next);
-        renderComponentGuidance(entity);
+        applyRepairFlowState(flow, next, entity);
       });
       choices.append(button);
     });
@@ -189,12 +266,10 @@ function renderRepairFlow(entity, guidance) {
   back.disabled = !state.history.length;
   reset.disabled = !state.history.length;
   back.onclick = () => {
-    repairFlowById.set(flow.flow_id, backRepairFlow(flow, repairFlowById.get(flow.flow_id)));
-    renderComponentGuidance(entity);
+    applyRepairFlowState(flow, backRepairFlow(flow, repairFlowById.get(flow.flow_id)), entity);
   };
   reset.onclick = () => {
-    repairFlowById.set(flow.flow_id, resetRepairFlow(flow));
-    renderComponentGuidance(entity);
+    applyRepairFlowState(flow, resetRepairFlow(flow), entity);
   };
   return true;
 }
@@ -432,10 +507,10 @@ function renderComponentGuidance(entity) {
   document.querySelector('#inspectionStepLabel').textContent = `检测步骤 1 / ${progress.total}`;
   document.querySelector('#inspectionMethod').textContent = step.instruction;
   document.querySelector('#inspectionSource').textContent = `${step.source} · ${step.page}`;
-  renderRepairFlow(entity, guidance);
+  const repairFlowActive = renderRepairFlow(entity, guidance);
   const measurementControl = document.querySelector('#measurementControl');
   const profile = guidance.measurementProfile;
-  measurementControl.hidden = !profile;
+  measurementControl.hidden = repairFlowActive || !profile;
   if (profile) {
     document.querySelector('#measurementLabel').textContent = profile.label;
     document.querySelector('#measurementReference').textContent = measurementReferenceCopy(profile);
