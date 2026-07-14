@@ -4,15 +4,12 @@ import {
   buildCameraFrame,
   buildFocusFrame,
   buildRenderDescriptor,
-  buildSelectionHalo,
   buildSelectionRadius,
 } from './model-profiles.js';
 import {
   getShieldPresentation,
   isPointCovered,
-  shouldShowLabels,
 } from './anatomy-state.js';
-import { isPointInFocus } from './repair-focus-state.js';
 import { buildInspectionTransform, inspectionOpacity } from './component-inspection-state.js';
 import { transformBoardCenter } from './model-interaction-state.js';
 import {
@@ -20,6 +17,12 @@ import {
   resolveBoardInteractionMode,
   screenDeltaToPan,
 } from './board-pan-state.js';
+import {
+  buildCornerSegments,
+  buildHitArea,
+  buildLabelPositions,
+  resolveAffordancePresentation,
+} from './component-affordance-state.js';
 
 const COLORS = {
   board: 0x17473e,
@@ -29,7 +32,7 @@ const COLORS = {
   ink: 0x111816,
   metal: 0xaeb6b1,
   outline: 0x73827b,
-  selected: 0xff5a3d,
+  selected: 0xf2c94c,
 };
 const TOP_VIEW_TILT = -0.012;
 
@@ -324,26 +327,54 @@ function createModuleMesh(module) {
 
 function createLabelSprite(text) {
   const canvas = document.createElement('canvas');
-  canvas.width = 256;
-  canvas.height = 72;
+  canvas.width = 192;
+  canvas.height = 48;
   const context = canvas.getContext('2d');
-  context.fillStyle = 'rgba(248,249,246,0.94)';
-  context.fillRect(2, 2, 252, 68);
-  context.strokeStyle = '#ef5b3f';
-  context.lineWidth = 4;
-  context.strokeRect(2, 2, 252, 68);
-  context.fillStyle = '#17221e';
-  context.font = '700 34px Segoe UI, Arial';
-  context.textAlign = 'center';
+  context.fillStyle = 'rgba(19,29,25,0.9)';
+  context.fillRect(0, 0, 192, 48);
+  context.fillStyle = '#d0a63b';
+  context.fillRect(0, 0, 6, 48);
+  context.fillStyle = '#ffffff';
+  context.font = '700 23px Segoe UI, Arial';
+  context.textAlign = 'left';
   context.textBaseline = 'middle';
-  context.fillText(text, 128, 38);
+  context.fillText(text, 20, 25);
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
   const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false }));
-  sprite.scale.set(0.13, 0.037, 1);
+  sprite.scale.set(0.092, 0.023, 1);
   sprite.renderOrder = 9;
-  sprite.visible = false;
+  sprite.visible = true;
   return sprite;
+}
+
+function createAffordanceFrame(descriptor) {
+  const points = buildCornerSegments(descriptor.dimensions)
+    .flatMap((segment) => segment.map((point) => new THREE.Vector3(point.x, point.y, 0)));
+  const presentation = resolveAffordancePresentation();
+  const frame = new THREE.LineSegments(
+    new THREE.BufferGeometry().setFromPoints(points),
+    new THREE.LineBasicMaterial({
+      color: presentation.color,
+      transparent: true,
+      opacity: presentation.opacity,
+      depthTest: false,
+    }),
+  );
+  frame.position.set(descriptor.center.x, descriptor.center.y, 0.108);
+  frame.renderOrder = 8;
+  return frame;
+}
+
+function createPickTarget(descriptor) {
+  const size = buildHitArea(descriptor.dimensions);
+  const target = new THREE.Mesh(
+    new THREE.PlaneGeometry(size.x, size.y),
+    new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide }),
+  );
+  target.position.set(descriptor.center.x, descriptor.center.y, 0.116);
+  target.userData.componentId = descriptor.componentId;
+  return target;
 }
 
 export class BoardRenderer {
@@ -357,6 +388,8 @@ export class BoardRenderer {
     this.shieldObjects = new Map();
     this.moduleObjects = new Map();
     this.labelSprites = new Map();
+    this.affordanceObjects = new Map();
+    this.pickTargets = new Map();
     this.contextObjects = [];
     this.shieldMode = 'removed';
     this.activeModuleId = null;
@@ -388,10 +421,15 @@ export class BoardRenderer {
     this.pointer = new THREE.Vector2();
     this.drag = null;
     this.inspectionAngle = false;
-    this.selectionHalo = null;
+    this.hoveredComponentId = null;
     this.build();
     this.buildLights();
     this.renderer.compile(this.scene, this.camera);
+    this.hoverTooltip = document.createElement('div');
+    this.hoverTooltip.className = 'model-hover-tooltip';
+    this.hoverTooltip.setAttribute('role', 'tooltip');
+    this.hoverTooltip.hidden = true;
+    container.append(this.hoverTooltip);
     this.bind();
     this.setInteractionMode(this.interactionMode);
     this.resize();
@@ -512,14 +550,39 @@ export class BoardRenderer {
   }
 
   buildLabels() {
+    const labelPositions = new Map(buildLabelPositions(this.entities
+      .map((entity) => ({ entity, descriptor: this.descriptors.get(entity.component_id) }))
+      .filter(({ descriptor }) => Boolean(descriptor))
+      .map(({ entity, descriptor }) => ({
+        id: entity.component_id,
+        center: descriptor.center,
+        dimensions: descriptor.dimensions,
+      })))
+      .map((position) => [position.id, position]));
     this.entities.forEach((entity) => {
       const descriptor = this.descriptors.get(entity.component_id);
       if (!descriptor) return;
       const sprite = createLabelSprite(entity.designator);
-      sprite.position.set(descriptor.center.x, descriptor.center.y + descriptor.dimensions.y * 0.72 + 0.025, 0.12);
+      const labelPosition = labelPositions.get(entity.component_id);
+      sprite.position.set(labelPosition.x, labelPosition.y, 0.12);
       this.group.add(sprite);
       this.labelSprites.set(entity.component_id, sprite);
     });
+  }
+
+  buildAffordances() {
+    this.entities.forEach((entity) => {
+      const descriptor = this.descriptors.get(entity.component_id);
+      if (!descriptor) return;
+      const frame = createAffordanceFrame(descriptor);
+      const pickTarget = createPickTarget(descriptor);
+      this.group.add(frame);
+      this.group.add(pickTarget);
+      this.affordanceObjects.set(entity.component_id, frame);
+      this.pickTargets.set(entity.component_id, pickTarget);
+    });
+    this.container.dataset.interactiveCount = String(this.affordanceObjects.size);
+    this.updateAffordanceStyles(false);
   }
 
   build() {
@@ -537,6 +600,7 @@ export class BoardRenderer {
     this.buildModules();
     this.buildShields();
     this.buildLabels();
+    this.buildAffordances();
     this.setShieldMode(this.shieldMode, false);
     this.updateLabelVisibility(false);
   }
@@ -575,10 +639,12 @@ export class BoardRenderer {
     this.shieldObjects = new Map();
     this.moduleObjects = new Map();
     this.labelSprites = new Map();
+    this.affordanceObjects = new Map();
+    this.pickTargets = new Map();
     this.contextObjects = [];
     this.activeModuleId = null;
     this.activeFocusRegion = null;
-    this.selectionHalo = null;
+    this.hoveredComponentId = null;
     this.inspectionComponentId = null;
     this.inspectionSnapshot = null;
     this.manualPanCenter = null;
@@ -633,6 +699,7 @@ export class BoardRenderer {
     canvas.addEventListener('pointerdown', (event) => {
       if (this.interactionLocked) return;
       this.cancelCameraAnimation();
+      this.clearHover(false);
       const inspected = this.inspectionComponentId ? this.renderObjects.get(this.inspectionComponentId) : null;
       if (inspected) {
         this.drag = { mode: 'component', x: event.clientX, y: event.clientY, rx: inspected.rotation.x, ry: inspected.rotation.y };
@@ -645,7 +712,11 @@ export class BoardRenderer {
       canvas.setPointerCapture(event.pointerId);
     });
     canvas.addEventListener('pointermove', (event) => {
-      if (this.interactionLocked || !this.drag) return;
+      if (this.interactionLocked) return;
+      if (!this.drag) {
+        this.updateHover(event);
+        return;
+      }
       if (this.drag.mode === 'component') {
         const inspected = this.renderObjects.get(this.inspectionComponentId);
         if (!inspected) return;
@@ -683,6 +754,9 @@ export class BoardRenderer {
       this.drag = null;
       this.container.classList.remove('dragging');
     });
+    canvas.addEventListener('pointerleave', () => {
+      if (!this.drag) this.clearHover();
+    });
     canvas.addEventListener('wheel', (event) => {
       event.preventDefault();
       if (this.interactionLocked) return;
@@ -697,11 +771,72 @@ export class BoardRenderer {
 
   pick(event) {
     if (this.interactionLocked) return;
+    const componentId = this.componentAtPointer(event);
+    if (componentId) this.onSelect(componentId);
+  }
+
+  componentAtPointer(event) {
     const rect = this.renderer.domElement.getBoundingClientRect();
     this.pointer.set(((event.clientX - rect.left) / rect.width) * 2 - 1, -((event.clientY - rect.top) / rect.height) * 2 + 1);
     this.raycaster.setFromCamera(this.pointer, this.camera);
-    const hit = this.raycaster.intersectObjects([...this.meshes.values()], true)[0];
-    if (hit?.object.userData.componentId) this.onSelect(hit.object.userData.componentId);
+    const hit = this.raycaster.intersectObjects([...this.pickTargets.values()], false)[0];
+    return hit?.object.userData.componentId || null;
+  }
+
+  updateHover(event) {
+    if (this.inspectionComponentId) return this.clearHover();
+    const componentId = this.componentAtPointer(event);
+    if (componentId !== this.hoveredComponentId) {
+      this.hoveredComponentId = componentId;
+      this.updateAffordanceStyles(false);
+    }
+    if (!componentId) {
+      this.hoverTooltip.hidden = true;
+      return this.render();
+    }
+    const entity = this.entities.find((candidate) => candidate.component_id === componentId);
+    const rect = this.container.getBoundingClientRect();
+    const designator = document.createElement('strong');
+    designator.textContent = entity.designator;
+    const name = document.createElement('span');
+    name.textContent = entity.name;
+    this.hoverTooltip.replaceChildren(designator, name);
+    this.hoverTooltip.style.left = `${Math.min(event.clientX - rect.left + 14, rect.width - 176)}px`;
+    this.hoverTooltip.style.top = `${Math.max(event.clientY - rect.top - 54, 8)}px`;
+    this.hoverTooltip.hidden = false;
+    this.render();
+  }
+
+  clearHover(shouldRender = true) {
+    if (!this.hoveredComponentId && this.hoverTooltip.hidden) return;
+    this.hoveredComponentId = null;
+    this.hoverTooltip.hidden = true;
+    this.updateAffordanceStyles(false);
+    if (shouldRender) this.render();
+  }
+
+  updateAffordanceStyles(shouldRender = true) {
+    this.affordanceObjects.forEach((frame, componentId) => {
+      const presentation = resolveAffordancePresentation({
+        selected: componentId === this.selectedComponentId,
+        hovered: componentId === this.hoveredComponentId,
+      });
+      frame.material.color.setHex(presentation.color);
+      frame.material.opacity = presentation.opacity;
+      frame.visible = !this.inspectionComponentId;
+      const label = this.labelSprites.get(componentId);
+      if (label) {
+        label.material.opacity = presentation.labelOpacity;
+        label.visible = !this.inspectionComponentId;
+      }
+      const object = this.meshes.get(componentId);
+      object?.traverse((child) => {
+        if (!child.isMesh || !child.material?.emissive) return;
+        child.material.emissive.setHex(presentation.color);
+        child.material.emissiveIntensity = presentation.emissiveIntensity;
+      });
+    });
+    if (shouldRender) this.render();
   }
 
   clearSelectionStyle() {
@@ -710,12 +845,6 @@ export class BoardRenderer {
       child.material.emissive.setHex(0x000000);
       child.material.emissiveIntensity = 0;
     }));
-    if (this.selectionHalo) {
-      this.selectionHalo.removeFromParent();
-      this.selectionHalo.geometry.dispose();
-      this.selectionHalo.material.dispose();
-      this.selectionHalo = null;
-    }
   }
 
   select(componentId) {
@@ -725,19 +854,7 @@ export class BoardRenderer {
     const object = this.meshes.get(componentId);
     const descriptor = this.descriptors.get(componentId);
     if (!object || !descriptor) return this.render();
-    object.traverse((child) => {
-      if (!child.isMesh || !child.material?.emissive) return;
-      child.material.emissive.setHex(COLORS.selected);
-      child.material.emissiveIntensity = 0.2;
-    });
-    const halo = buildSelectionHalo(descriptor.dimensions);
-    this.selectionHalo = new THREE.Mesh(
-      new THREE.RingGeometry(halo.innerRadius, halo.outerRadius, 48),
-      new THREE.MeshBasicMaterial({ color: COLORS.selected, transparent: true, opacity: 0.88, side: THREE.DoubleSide, depthTest: false }),
-    );
-    this.selectionHalo.position.set(descriptor.center.x, descriptor.center.y, 0.07);
-    this.selectionHalo.renderOrder = 8;
-    this.group.add(this.selectionHalo);
+    this.updateAffordanceStyles(false);
     this.render();
   }
 
@@ -793,6 +910,7 @@ export class BoardRenderer {
   }
 
   setInspectionContextOpacity(activeComponentId) {
+    this.clearHover(false);
     this.contextObjects.forEach((object) => this.setObjectEmphasis(object, activeComponentId ? 0.16 : 1));
     this.renderObjects.forEach((object, componentId) => {
       this.setObjectEmphasis(object, inspectionOpacity(activeComponentId, componentId));
@@ -801,7 +919,7 @@ export class BoardRenderer {
     this.shieldObjects.forEach((object) => { object.visible = false; });
     this.moduleObjects.forEach((object) => { object.visible = false; });
     this.labelSprites.forEach((sprite) => { sprite.visible = false; });
-    if (this.selectionHalo) this.selectionHalo.visible = !activeComponentId;
+    this.affordanceObjects.forEach((frame) => { frame.visible = false; });
   }
 
   setInspectionSelectionStyle(object, active) {
@@ -817,7 +935,7 @@ export class BoardRenderer {
     this.applyRepairEmphasis(this.activeFocusRegion);
     this.setShieldMode(this.inspectionSnapshot?.shieldMode || this.shieldMode, false);
     this.setModuleFocus(this.inspectionSnapshot?.moduleId || this.activeModuleId);
-    if (this.selectionHalo) this.selectionHalo.visible = true;
+    this.updateAffordanceStyles(false);
     this.updateLabelVisibility(false);
   }
 
@@ -932,8 +1050,8 @@ export class BoardRenderer {
       object.traverse((child) => { child.renderOrder = 0; });
       this.setInspectionSelectionStyle(object, false);
     }
-    this.restoreInspectionContext();
     this.inspectionComponentId = null;
+    this.restoreInspectionContext();
     this.inspectionSnapshot = null;
     this.render();
     return true;
@@ -1015,12 +1133,13 @@ export class BoardRenderer {
   }
 
   updateLabelVisibility(shouldRender = true) {
-    const visible = shouldShowLabels(this.camera.zoom);
     this.labelSprites.forEach((sprite, componentId) => {
-      const descriptor = this.descriptors.get(componentId);
-      const locallyRelevant = componentId === this.selectedComponentId
-        || isPointInFocus(descriptor.normalizedCenter, this.activeFocusRegion);
-      sprite.visible = visible && locallyRelevant;
+      const presentation = resolveAffordancePresentation({
+        selected: componentId === this.selectedComponentId,
+        hovered: componentId === this.hoveredComponentId,
+      });
+      sprite.visible = !this.inspectionComponentId;
+      sprite.material.opacity = presentation.labelOpacity;
     });
     if (shouldRender) this.render();
   }
@@ -1035,6 +1154,7 @@ export class BoardRenderer {
   setInteractionLocked(locked) {
     this.interactionLocked = Boolean(locked);
     if (this.interactionLocked) {
+      this.clearHover(false);
       this.drag = null;
       this.container.classList.remove('dragging');
     }
@@ -1099,6 +1219,13 @@ export class BoardRenderer {
   }
 
   render() {
+    const width = Math.max(this.container.clientWidth, 320);
+    const height = Math.max(this.container.clientHeight, 320);
+    const worldPerPixelX = (this.camera.right - this.camera.left) / (width * this.camera.zoom);
+    const worldPerPixelY = (this.camera.top - this.camera.bottom) / (height * this.camera.zoom);
+    this.labelSprites.forEach((sprite) => {
+      sprite.scale.set(worldPerPixelX * 48, worldPerPixelY * 14, 1);
+    });
     this.group.updateMatrixWorld(true);
     this.renderer.render(this.scene, this.camera);
   }
