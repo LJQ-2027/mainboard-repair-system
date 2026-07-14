@@ -358,6 +358,13 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 .repair-flow-terminal > p { margin: 7px 0 0; color: #6c5718; font-size: 9px; line-height: 1.45; }
 .repair-flow-terminal[data-kind="boundary"] { border-left-color: #d0a63b; background: #fff9e5; }
 .repair-flow-terminal[data-kind="boundary"] > span { color: #755d13; }
+.repair-flow-action-record { display: grid; gap: 6px; margin-top: 9px; padding-top: 9px; border-top: 1px solid #d0d7d2; }
+.repair-flow-action-record[hidden] { display: none; }
+.repair-flow-action-record button { min-height: 31px; border: 1px solid #8f9c94; background: white; color: var(--ink); font: inherit; font-size: 9px; cursor: pointer; }
+.repair-flow-action-record button[aria-pressed="true"] { border-color: #55a590; background: #e2f2ec; color: #176b59; }
+.repair-flow-action-record button:focus { outline: 3px solid #65a9ff; outline-offset: 2px; }
+.repair-flow-action-record p { margin: 0; color: #627069; font-size: 8px; line-height: 1.4; }
+.repair-flow-action-record[data-executed="true"] p { color: #176b59; }
 .repair-flow-log { margin-top: 10px; padding-top: 8px; border-top: 1px solid #d0d7d2; }
 .repair-flow-log[hidden] { display: none; }
 .repair-flow-log > span { color: #68746e; font-size: 8px; font-weight: 700; }

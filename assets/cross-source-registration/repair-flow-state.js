@@ -18,6 +18,7 @@ export function createRepairFlowState(profile) {
     currentStepId: profile.entry_step_id,
     history: [],
     terminal: null,
+    actionExecution: null,
     measurements: {},
   };
 }
@@ -40,12 +41,18 @@ export function answerRepairFlow(profile, state, choiceValue) {
   const history = [...state.history, { stepId: current.step_id, choice: choice.value }];
   if (outcome.kind === 'next') {
     if (!stepMap(profile).has(outcome.step_id)) throw new Error(`Unknown repair flow destination: ${outcome.step_id}`);
-    return { ...state, currentStepId: outcome.step_id, history, terminal: null };
+    return { ...state, currentStepId: outcome.step_id, history, terminal: null, actionExecution: null };
   }
   if ((outcome.kind === 'action' || outcome.kind === 'boundary') && outcome.label) {
     const terminal = { kind: outcome.kind, label: outcome.label };
     if (outcome.target_component_id) terminal.target_component_id = outcome.target_component_id;
-    return { ...state, currentStepId: null, history, terminal };
+    return {
+      ...state,
+      currentStepId: null,
+      history,
+      terminal,
+      actionExecution: outcome.kind === 'action' ? 'pending' : null,
+    };
   }
   throw new Error('Repair flow outcome must be a declared next step, action, or source boundary');
 }
@@ -55,7 +62,7 @@ export function backRepairFlow(profile, state) {
   const history = state.history.slice(0, -1);
   const previous = state.history.at(-1);
   if (!stepMap(profile).has(previous.stepId)) throw new Error('Repair flow history points outside the graph');
-  return { ...state, currentStepId: previous.stepId, history, terminal: null };
+  return { ...state, currentStepId: previous.stepId, history, terminal: null, actionExecution: null };
 }
 
 export function resetRepairFlow(profile) {
@@ -87,6 +94,13 @@ export function repairFlowTargetComponentId(profile, state) {
   const previousStepId = state.history.at(-1)?.stepId;
   const previousStep = profile.steps.find((candidate) => candidate.step_id === previousStepId);
   return previousStep?.target_component_id || profile.entry_component_id || null;
+}
+
+export function setRepairFlowActionExecuted(state, executed) {
+  if (state.terminal?.kind !== 'action') {
+    throw new Error('Only a source action can record execution');
+  }
+  return { ...state, actionExecution: executed ? 'executed' : 'pending' };
 }
 
 export function repairFlowMeasurementsComplete(profile, state) {

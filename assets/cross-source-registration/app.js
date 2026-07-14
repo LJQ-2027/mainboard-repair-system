@@ -42,6 +42,7 @@ import {
   repairFlowTargetComponentId,
   repairFlowTrail,
   resetRepairFlow,
+  setRepairFlowActionExecuted,
 } from './repair-flow-state.js';
 
 const DATA_URL = '../../knowledge-base/km4-cross-source-registration.json';
@@ -316,6 +317,21 @@ function renderRepairFlow(entity, guidance) {
     boundary.hidden = state.terminal.kind !== 'boundary';
     boundary.textContent = state.terminal.kind === 'boundary' ? flow.boundary_note : '';
   }
+  const actionRecord = document.querySelector('#repairFlowActionRecord');
+  const actionRecordVisible = state.terminal?.kind === 'action';
+  const actionExecuted = state.actionExecution === 'executed';
+  actionRecord.hidden = !actionRecordVisible;
+  actionRecord.dataset.executed = String(actionExecuted);
+  const actionButton = document.querySelector('#recordRepairFlowAction');
+  actionButton.setAttribute('aria-pressed', String(actionExecuted));
+  actionButton.textContent = actionExecuted ? '撤销执行记录' : '记录已执行';
+  document.querySelector('#repairFlowActionStatus').textContent = actionExecuted
+    ? '已记录来源处理已执行；维修结果仍需复检确认。'
+    : '尚未记录来源处理是否已执行。';
+  actionButton.onclick = () => {
+    const next = setRepairFlowActionExecuted(repairFlowById.get(flow.flow_id), !actionExecuted);
+    applyRepairFlowState(flow, next, entity);
+  };
 
   const history = document.querySelector('#repairFlowHistory');
   history.replaceChildren();

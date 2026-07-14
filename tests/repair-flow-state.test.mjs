@@ -12,6 +12,7 @@ import {
   repairFlowTargetComponentId,
   repairFlowTrail,
   resetRepairFlow,
+  setRepairFlowActionExecuted,
 } from '../assets/cross-source-registration/repair-flow-state.js';
 
 const profile = {
@@ -102,6 +103,25 @@ test('an action outcome terminates with the exact source action', () => {
   const reopened = backRepairFlow(profile, terminal);
   assert.equal(currentRepairFlowStep(profile, reopened).step_id, 'charger');
   assert.equal(reopened.terminal, null);
+  assert.equal(reopened.actionExecution, null);
+});
+
+test('action execution is recordable without claiming a repair result', () => {
+  const terminal = answerRepairFlow(profile, createRepairFlowState(profile), 'no');
+  assert.equal(terminal.actionExecution, 'pending');
+  const executed = setRepairFlowActionExecuted(terminal, true);
+  assert.equal(executed.actionExecution, 'executed');
+  assert.equal(setRepairFlowActionExecuted(executed, false).actionExecution, 'pending');
+  const boundaryProfile = {
+    ...profile,
+    steps: [{
+      step_id: 'charger',
+      prompt: '资料是否明确？',
+      choices: [{ value: 'no', label: '否', outcome: { kind: 'boundary', label: '待资料复核' } }],
+    }],
+  };
+  const boundary = answerRepairFlow(boundaryProfile, createRepairFlowState(boundaryProfile), 'no');
+  assert.throws(() => setRepairFlowActionExecuted(boundary, true));
 });
 
 test('reset and invalid choices cannot escape the declared flow graph', () => {

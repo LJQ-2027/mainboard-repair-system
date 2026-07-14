@@ -228,3 +228,10 @@ Destructive reset protection on 2026-07-14:
 - `Escape`, timeout, or any flow rerender cancels the armed state. The confirmation remains inline instead of opening a modal that would hide the model and current repair context.
 - The armed button uses a restrained warning treatment distinct from component selection, abnormal-result feedback, and yellow source-boundary states.
 - Headed Chromium covers armed-without-reset, Escape cancellation, confirmed reset for both reviewed flows, prompt/target preservation before confirmation, and the full desktop/mobile regression matrix.
+
+Terminal source-action execution record on 2026-07-14:
+
+- A terminal with `kind: action` now accepts a reversible session-local `已执行` record. The state is preserved through temporary component/fault interruptions and cleared by back or confirmed restart.
+- The interface explicitly says `维修结果仍需复检确认`; executing a source action is not represented as a successful repair or diagnosis.
+- A `kind: boundary` terminal never exposes the execution control because an ambiguous source edge is not an executable repair instruction.
+- Headed Chromium covers pending/executed action states, restored execution state, hidden boundary control, visible focus, mobile fit, and zero overflow/runtime errors.
