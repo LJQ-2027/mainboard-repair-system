@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+  anchorZoomCenter,
   clampPanCenter,
   pinchZoom,
   resolveBoardInteractionMode,
@@ -47,4 +48,24 @@ test('pinch distance produces bounded model zoom', () => {
   assert.equal(pinchZoom({ startDistance: 100, currentDistance: 50, startZoom: 2, minimum: 0.72, maximum: 4.2 }), 1);
   assert.equal(pinchZoom({ startDistance: 10, currentDistance: 500, startZoom: 2, minimum: 0.72, maximum: 4.2 }), 4.2);
   assert.equal(pinchZoom({ startDistance: 0, currentDistance: 100, startZoom: 2, minimum: 0.72, maximum: 4.2 }), 2);
+});
+
+test('zoom anchoring keeps the board point beneath the pointer or pinch midpoint', () => {
+  assert.deepEqual(anchorZoomCenter({
+    camera: { x: 0, y: 0 },
+    startNdc: { x: 0.5, y: 0 },
+    currentNdc: { x: 0.5, y: 0 },
+    frame: { width: 2, height: 1 },
+    startZoom: 1,
+    currentZoom: 2,
+  }), { x: 0.25, y: 0 });
+
+  assert.deepEqual(anchorZoomCenter({
+    camera: { x: 0, y: 0 },
+    startNdc: { x: 0.5, y: 0.5 },
+    currentNdc: { x: 0.25, y: 0.25 },
+    frame: { width: 2, height: 1 },
+    startZoom: 1,
+    currentZoom: 2,
+  }), { x: 0.375, y: 0.1875 });
 });

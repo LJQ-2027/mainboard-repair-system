@@ -14,6 +14,7 @@ import {
 import { buildInspectionTransform, inspectionOpacity } from './component-inspection-state.js';
 import { transformBoardCenter } from './model-interaction-state.js';
 import {
+  anchorZoomCenter,
   clampPanCenter,
   pinchZoom,
   resolveBoardInteractionMode,
@@ -721,6 +722,12 @@ export class BoardRenderer {
             mode: 'pinch',
             distance: Math.hypot(second.x - first.x, second.y - first.y),
             zoom: this.camera.zoom,
+            centerNdc: this.clientPointToNdc((first.x + second.x) / 2, (first.y + second.y) / 2),
+            camera: { x: this.camera.position.x, y: this.camera.position.y },
+            frame: {
+              width: this.camera.right - this.camera.left,
+              height: this.camera.top - this.camera.bottom,
+            },
           };
           this.suppressTouchTap = true;
           this.container.classList.add('dragging');
@@ -757,6 +764,17 @@ export class BoardRenderer {
           minimum,
           maximum,
         });
+        const currentNdc = this.clientPointToNdc((first.x + second.x) / 2, (first.y + second.y) / 2);
+        this.manualPanCenter = clampPanCenter(anchorZoomCenter({
+          camera: this.drag.camera,
+          startNdc: this.drag.centerNdc,
+          currentNdc,
+          frame: this.drag.frame,
+          startZoom: this.drag.zoom,
+          currentZoom: this.camera.zoom,
+        }));
+        this.camera.position.set(this.manualPanCenter.x, this.manualPanCenter.y, 4);
+        this.camera.lookAt(this.manualPanCenter.x, this.manualPanCenter.y, 0);
         this.camera.updateProjectionMatrix();
         this.updateLabelVisibility(false);
       } else if (this.drag.mode === 'component') {
@@ -813,7 +831,22 @@ export class BoardRenderer {
       if (this.interactionLocked) return;
       this.cancelCameraAnimation();
       const zoomBounds = this.zoomBounds();
-      this.camera.zoom = Math.max(zoomBounds[0], Math.min(zoomBounds[1], this.camera.zoom * (event.deltaY > 0 ? 0.9 : 1.1)));
+      const startZoom = this.camera.zoom;
+      const currentNdc = this.clientPointToNdc(event.clientX, event.clientY);
+      this.camera.zoom = Math.max(zoomBounds[0], Math.min(zoomBounds[1], startZoom * (event.deltaY > 0 ? 0.9 : 1.1)));
+      this.manualPanCenter = clampPanCenter(anchorZoomCenter({
+        camera: { x: this.camera.position.x, y: this.camera.position.y },
+        startNdc: currentNdc,
+        currentNdc,
+        frame: {
+          width: this.camera.right - this.camera.left,
+          height: this.camera.top - this.camera.bottom,
+        },
+        startZoom,
+        currentZoom: this.camera.zoom,
+      }));
+      this.camera.position.set(this.manualPanCenter.x, this.manualPanCenter.y, 4);
+      this.camera.lookAt(this.manualPanCenter.x, this.manualPanCenter.y, 0);
       this.camera.updateProjectionMatrix();
       this.updateLabelVisibility(false);
       this.render();
@@ -824,6 +857,14 @@ export class BoardRenderer {
     return this.inspectionComponentId ? [1.8, 6] : [0.72, 4.2];
   }
 
+  clientPointToNdc(clientX, clientY) {
+    const rect = this.renderer.domElement.getBoundingClientRect();
+    return {
+      x: ((clientX - rect.left) / rect.width) * 2 - 1,
+      y: -((clientY - rect.top) / rect.height) * 2 + 1,
+    };
+  }
+
   pick(event) {
     if (this.interactionLocked) return;
     const componentId = this.componentAtPointer(event);
@@ -831,8 +872,8 @@ export class BoardRenderer {
   }
 
   componentAtPointer(event) {
-    const rect = this.renderer.domElement.getBoundingClientRect();
-    this.pointer.set(((event.clientX - rect.left) / rect.width) * 2 - 1, -((event.clientY - rect.top) / rect.height) * 2 + 1);
+    const pointer = this.clientPointToNdc(event.clientX, event.clientY);
+    this.pointer.set(pointer.x, pointer.y);
     this.raycaster.setFromCamera(this.pointer, this.camera);
     const hits = this.raycaster.intersectObjects([...this.pickTargets.values()], false);
     if (!hits.length) return null;

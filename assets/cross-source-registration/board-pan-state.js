@@ -35,3 +35,16 @@ export function pinchZoom({ startDistance, currentDistance, startZoom, minimum, 
   const ratio = Math.max(currentDistance, 0) / startDistance;
   return round(clamp(startZoom * ratio, minimum, maximum));
 }
+
+export function anchorZoomCenter({ camera, startNdc, currentNdc, frame, startZoom, currentZoom }) {
+  const safeStartZoom = Math.max(startZoom, 0.01);
+  const safeCurrentZoom = Math.max(currentZoom, 0.01);
+  const anchor = {
+    x: camera.x + (startNdc.x * frame.width) / (2 * safeStartZoom),
+    y: camera.y + (startNdc.y * frame.height) / (2 * safeStartZoom),
+  };
+  return {
+    x: round(anchor.x - (currentNdc.x * frame.width) / (2 * safeCurrentZoom)),
+    y: round(anchor.y - (currentNdc.y * frame.height) / (2 * safeCurrentZoom)),
+  };
+}

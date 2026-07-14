@@ -265,3 +265,10 @@ Repair-flow lifecycle closure on 2026-07-14:
 - Ending an investigation never represents repair success. The existing recheck wording and the completion status keep repair outcome and final quality confirmation outside this page-session lifecycle.
 - A completed flow no longer appears as `进行中的排查` when the technician inspects another component. Returning to its component shows the read-only record; starting a new round explicitly clears it and restores the source entry step.
 - State tests cover close prerequisites, read-only mutation guards, source-boundary closure, and reset semantics. Headed Chromium covers desktop and 390 px closure, disabled controls, hidden navigation, cross-component return behavior, new-round reset, zero overflow, and zero runtime errors.
+
+Pointer-anchored model zoom on 2026-07-14:
+
+- Desktop wheel zoom now preserves the board point beneath the mouse pointer instead of pulling the model toward the canvas center.
+- Mobile pinch zoom preserves the initial board point beneath the live finger midpoint. Moving the midpoint while changing finger distance therefore combines zoom and pan without a separate gesture transition.
+- The anchor calculation is camera-frame based and remains inside the existing pan and zoom bounds. Tap suppression, component selection, single-finger pan, and full-board reset behavior are unchanged.
+- Headed Chromium at 390 px verified that X2100 remained under the same screen coordinate after zooming to 4.2x, with X2100 still selected, no page scroll, and no runtime errors. The full desktop, 390 px, and 320 px interaction matrix also passed.
