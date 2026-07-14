@@ -1,7 +1,7 @@
 const STATES = Object.freeze({
   idle: { color: 0xd0a63b, opacity: 0.58, labelOpacity: 0.72, emissiveIntensity: 0 },
-  hovered: { color: 0xf3d77f, opacity: 0.96, labelOpacity: 1, emissiveIntensity: 0.08 },
-  selected: { color: 0xf2c94c, opacity: 1, labelOpacity: 1, emissiveIntensity: 0.14 },
+  hovered: { color: 0xf3d77f, opacity: 0.96, labelOpacity: 1, emissiveIntensity: 0.025 },
+  selected: { color: 0xf2c94c, opacity: 1, labelOpacity: 1, emissiveIntensity: 0.06 },
 });
 
 export function buildCornerSegments(dimensions, padding = 0.008) {

@@ -39,6 +39,7 @@ test('affordance states reserve coral for faults instead of ordinary selection',
   assert.equal(selected.opacity, 1);
   assert.notEqual(selected.color, 0xef5b3f);
   assert.equal(selected.labelOpacity, 1);
+  assert.equal(selected.emissiveIntensity <= 0.08, true);
 });
 
 test('selection takes precedence over hover presentation', () => {

@@ -49,6 +49,10 @@ export function buildModuleTarget(boardId, module) {
   };
 }
 
+export function moduleOverlayId(target) {
+  return target?.targetType === 'module' ? target.moduleId || null : null;
+}
+
 export function resolveTargetSide(target, currentSideId) {
   if (target.availableSideIds?.includes(currentSideId)) return currentSideId;
   return target.recommendedSideId || currentSideId;

@@ -790,6 +790,7 @@ export class BoardRenderer {
       this.hoveredComponentId = componentId;
       this.updateAffordanceStyles(false);
     }
+    this.container.classList.toggle('component-hover', Boolean(componentId));
     if (!componentId) {
       this.hoverTooltip.hidden = true;
       return this.render();
@@ -810,6 +811,7 @@ export class BoardRenderer {
   clearHover(shouldRender = true) {
     if (!this.hoveredComponentId && this.hoverTooltip.hidden) return;
     this.hoveredComponentId = null;
+    this.container.classList.remove('component-hover');
     this.hoverTooltip.hidden = true;
     this.updateAffordanceStyles(false);
     if (shouldRender) this.render();
@@ -879,6 +881,7 @@ export class BoardRenderer {
 
   setModuleFocus(moduleId) {
     this.activeModuleId = moduleId || null;
+    this.container.dataset.activeModule = this.activeModuleId || '';
     this.moduleObjects.forEach((object, id) => { object.visible = id === this.activeModuleId; });
     this.render();
   }

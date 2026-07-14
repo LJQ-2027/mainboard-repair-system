@@ -5,6 +5,7 @@ import {
   buildEntityTarget,
   buildModuleTarget,
   isPointInFocus,
+  moduleOverlayId,
   nextSideId,
   polygonBounds,
   resetFocusView,
@@ -30,6 +31,14 @@ test('polygon bounds preserve the normalized center and size', () => {
     center: { x: 0.54, y: 0.62 },
     size: { x: 0.24, y: 0.28 },
   });
+});
+
+test('only explicit module targets request a module overlay', () => {
+  const entityTarget = buildEntityTarget(boardId, entity, [powerModule]);
+  const moduleTarget = buildModuleTarget(boardId, powerModule);
+  assert.equal(moduleOverlayId(entityTarget), null);
+  assert.equal(moduleOverlayId(moduleTarget), 'power_pmu');
+  assert.equal(moduleOverlayId(null), null);
 });
 
 test('entity target uses its source-backed module as the repair focus region', () => {

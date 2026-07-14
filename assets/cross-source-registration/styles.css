@@ -98,6 +98,7 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 #modelCanvas[data-drag-mode="pan"] canvas { cursor: grab; }
 #modelCanvas[data-drag-mode="rotate"] canvas { cursor: crosshair; }
 #modelCanvas.dragging canvas { cursor: grabbing; }
+#modelCanvas.component-hover canvas { cursor: pointer; }
 #modelCanvas { position: relative; }
 .model-hover-tooltip {
   position: absolute;

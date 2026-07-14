@@ -4,7 +4,12 @@ import { BoardRenderer } from './board-renderer.js';
 import { PointMapViewport } from './point-map-viewport.js';
 import { mergeCompiledSchematicLinks } from './source-links.js';
 import { extractModuleRegions, extractShieldRegions } from './anatomy-state.js';
-import { buildEntityTarget, buildModuleTarget, nextSideId } from './repair-focus-state.js';
+import {
+  buildEntityTarget,
+  buildModuleTarget,
+  moduleOverlayId,
+  nextSideId,
+} from './repair-focus-state.js';
 import {
   canInspectComponent,
   enterComponentInspection,
@@ -147,7 +152,7 @@ async function toggleComponentInspection() {
 function populateModuleMenu(modules) {
   const moduleMenu = document.querySelector('#moduleFocus');
   moduleMenu.replaceChildren();
-  [['auto', '跟随选择'], ['none', '不显示模块']].forEach(([value, label]) => {
+  [['auto', '器件定位'], ['none', '全板视图']].forEach(([value, label]) => {
     const option = document.createElement('option');
     option.value = value;
     option.textContent = label;
@@ -191,7 +196,7 @@ function updateSideControls() {
 
 function applyRepairTarget(animate = true) {
   if (!renderer || !currentRepairTarget || currentRepairTarget.sideId !== activeSideId) return;
-  renderer.setRepairFocus(currentRepairTarget.moduleId, currentRepairTarget.focusRegion, animate);
+  renderer.setRepairFocus(moduleOverlayId(currentRepairTarget), currentRepairTarget.focusRegion, animate);
 }
 
 async function switchModelSide(sideId, animate = true) {
