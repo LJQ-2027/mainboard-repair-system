@@ -4,6 +4,7 @@ import test from 'node:test';
 import {
   createRepairGuidance,
   guidanceProgress,
+  recordGuidanceMeasurement,
   recordGuidanceResult,
   selectGuidanceFault,
 } from '../assets/cross-source-registration/repair-guidance-state.js';
@@ -56,4 +57,77 @@ test('entities without source instructions do not expose an executable path', ()
   assert.deepEqual(state.faults, []);
   assert.deepEqual(state.steps, []);
   assert.equal(state.selectedFault, null);
+});
+
+test('a source range can classify a recorded value without generating a diagnosis', () => {
+  const state = createRepairGuidance({
+    ...entity,
+    measurement_profile: {
+      measurement_id: 'vbat1-voltage',
+      label: 'VBAT1 voltage',
+      quantity: 'voltage',
+      unit: 'V',
+      input_step: 0.01,
+      reference: { kind: 'range', min: 3.4, max: 4.35 },
+      source_link_index: 0,
+    },
+  });
+  const within = recordGuidanceMeasurement(state, '3.85');
+  assert.deepEqual(within.measurement, { value: 3.85, evaluation: 'within_range' });
+  assert.equal(within.result, 'normal');
+  assert.equal(within.resultSource, 'source_range');
+  const below = recordGuidanceMeasurement(state, 3.2);
+  assert.deepEqual(below.measurement, { value: 3.2, evaluation: 'below_range' });
+  assert.equal(below.result, 'abnormal');
+  assert.equal('diagnosis' in below, false);
+});
+
+test('nominal and record-only references never infer tolerance', () => {
+  const nominal = createRepairGuidance({
+    ...entity,
+    measurement_profile: {
+      measurement_id: 'x2100-frequency',
+      label: 'X2100 frequency',
+      quantity: 'frequency',
+      unit: 'MHz',
+      reference: { kind: 'nominal', value: 26 },
+      source_link_index: 0,
+    },
+  });
+  const recordedNominal = recordGuidanceMeasurement(nominal, 25.9);
+  assert.deepEqual(recordedNominal.measurement, { value: 25.9, evaluation: 'recorded' });
+  assert.equal(recordedNominal.result, 'pending');
+  assert.equal(recordedNominal.resultSource, null);
+
+  const recordOnly = createRepairGuidance({
+    ...entity,
+    measurement_profile: {
+      measurement_id: 'vddemmccore-voltage',
+      label: 'VDDEMMCCORE voltage',
+      quantity: 'voltage',
+      unit: 'V',
+      reference: { kind: 'record_only' },
+      source_link_index: 0,
+    },
+  });
+  assert.equal(recordGuidanceMeasurement(recordOnly, 1.8).measurement.evaluation, 'recorded');
+  assert.throws(() => recordGuidanceMeasurement(recordOnly, 'not-a-number'));
+});
+
+test('changing the fault clears observations from the previous path', () => {
+  const initial = createRepairGuidance({
+    ...entity,
+    measurement_profile: {
+      measurement_id: 'vbat1-voltage',
+      label: 'VBAT1 voltage',
+      quantity: 'voltage',
+      unit: 'V',
+      reference: { kind: 'range', min: 3.4, max: 4.35 },
+      source_link_index: 0,
+    },
+  });
+  const recorded = recordGuidanceMeasurement(initial, 3.9);
+  const switched = selectGuidanceFault(recorded, 'Leakage current');
+  assert.deepEqual(switched.measurement, { value: null, evaluation: 'unrecorded' });
+  assert.equal(switched.result, 'pending');
 });

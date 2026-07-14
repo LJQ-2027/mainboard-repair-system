@@ -91,6 +91,15 @@
           <p id="inspectionMethod"></p>
           <small id="inspectionSource"></small>
         </article>
+        <section class="measurement-control" id="measurementControl" hidden>
+          <header><label for="guidanceMeasurementValue" id="measurementLabel">测量值</label><span id="measurementReference"></span></header>
+          <div class="measurement-input-row">
+            <input id="guidanceMeasurementValue" type="number" inputmode="decimal" required>
+            <span id="measurementUnit"></span>
+            <button id="recordMeasurement" type="button">记录</button>
+          </div>
+          <p id="measurementFeedback" data-evaluation="unrecorded"></p>
+        </section>
         <fieldset class="result-control">
           <legend>返回检测结果</legend>
           <div role="group" aria-label="选择本次检测结果">

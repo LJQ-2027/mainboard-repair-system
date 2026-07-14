@@ -13,6 +13,19 @@ class CrossSourceRegistrationTests(unittest.TestCase):
         data = json.loads((ROOT / "knowledge-base/km4-cross-source-registration.json").read_text(encoding="utf-8"))
         self.assertEqual(validate_dataset(data, ROOT), [])
 
+    def test_committed_measurement_profiles_preserve_source_boundaries(self):
+        data = json.loads((ROOT / "knowledge-base/km4-cross-source-registration.json").read_text(encoding="utf-8"))
+        profiles = {
+            entity["designator"]: entity["measurement_profile"]
+            for entity in data["entities"]
+            if "measurement_profile" in entity
+        }
+        self.assertEqual(set(profiles), {"U4000", "X2100", "VBAT1", "VBUS1"})
+        self.assertEqual(profiles["U4000"]["reference"], {"kind": "record_only"})
+        self.assertEqual(profiles["X2100"]["reference"], {"kind": "nominal", "value": 26})
+        self.assertEqual(profiles["VBAT1"]["reference"], {"kind": "range", "min": 3.4, "max": 4.35})
+        self.assertEqual(profiles["VBUS1"]["reference"], {"kind": "nominal", "value": 5})
+
     def test_rejects_out_of_range_geometry(self):
         data = json.loads((ROOT / "knowledge-base/km4-cross-source-registration.json").read_text(encoding="utf-8"))
         data["entities"][0]["geometry"]["center"]["x"] = 1.2
@@ -23,6 +36,24 @@ class CrossSourceRegistrationTests(unittest.TestCase):
         data["entities"][0]["schematic_links"] = []
         data["entities"][0]["repair_links"] = []
         self.assertTrue(any("source link" in error for error in validate_dataset(data, ROOT)))
+
+    def test_rejects_measurement_without_a_valid_repair_source(self):
+        data = json.loads((ROOT / "knowledge-base/km4-cross-source-registration.json").read_text(encoding="utf-8"))
+        profile = data["entities"][1]["measurement_profile"]
+        profile["source_link_index"] = 99
+        self.assertTrue(any("measurement source" in error for error in validate_dataset(data, ROOT)))
+
+    def test_rejects_invalid_measurement_reference_bounds(self):
+        data = json.loads((ROOT / "knowledge-base/km4-cross-source-registration.json").read_text(encoding="utf-8"))
+        profile = data["entities"][5]["measurement_profile"]
+        profile["reference"] = {"kind": "range", "min": 4.35, "max": 3.4}
+        self.assertTrue(any("measurement range" in error for error in validate_dataset(data, ROOT)))
+
+    def test_rejects_nominal_reference_without_a_value(self):
+        data = json.loads((ROOT / "knowledge-base/km4-cross-source-registration.json").read_text(encoding="utf-8"))
+        profile = data["entities"][2]["measurement_profile"]
+        profile["reference"] = {"kind": "nominal"}
+        self.assertTrue(any("nominal measurement" in error for error in validate_dataset(data, ROOT)))
 
 
 if __name__ == "__main__":

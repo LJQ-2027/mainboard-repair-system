@@ -172,3 +172,12 @@ Source-bounded repair-guidance interaction on 2026-07-14:
 - The interaction records observations only. It contains no generated diagnosis or component-replacement action, and it does not yet persist measurement values or case history to a backend.
 - Explicit component changes reset the evidence panel to the new component's starting context. Sticky-header scroll margins prevent the repair card from being covered when it is brought into view.
 - 62 Node tests, 37 Python tests, standalone validation, and headed Chromium desktop/390 px/320 px matrices passed. Browser evidence covers abnormal and uncertain results, U2001/U4000 state isolation, restoration, source-card visibility, model-boundary gating, zero overflow, and zero console/page errors.
+
+Source-defined measurement capture on 2026-07-14:
+
+- Four reviewed measurement profiles are now structured in the cross-source dataset and tied to exact repair-link indices: U4000 `VDDEMMCCORE` voltage (record only), X2100 output frequency (26 MHz nominal without tolerance), VBAT1 voltage (3.4 V to 4.35 V range), and VBUS1 voltage (5 V nominal without tolerance).
+- The repair card exposes a numeric input, source unit, source reference, record action, and measurement feedback only for those four entities. U2001 and other entities do not receive invented measurement controls.
+- VBAT1 is the only profile that automatically maps a value to normal/abnormal because it is the only source with complete lower and upper bounds. Nominal and record-only profiles remain unclassified and explicitly state that no tolerance was supplied.
+- Dataset validation rejects missing/duplicate measurement identities, missing units, invalid source indices, nonpositive input steps, inverted ranges, nominal references without values, and unsupported reference kinds.
+- 65 Node tests, 41 Python tests, standalone validation, and headed Chromium desktop/390 px/320 px interaction matrices passed. Browser evidence covers within-range, below-range, nominal-only, hidden-control, and mobile measurement states with zero overflow and zero runtime errors.
+- Measurement records remain page-session state. Backend persistence, case linkage, and source-backed next-step branching are still open.

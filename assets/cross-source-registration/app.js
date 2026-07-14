@@ -27,6 +27,7 @@ import { resolveBoardInteractionMode } from './board-pan-state.js';
 import {
   createRepairGuidance,
   guidanceProgress,
+  recordGuidanceMeasurement,
   recordGuidanceResult,
   selectGuidanceFault,
 } from './repair-guidance-state.js';
@@ -77,6 +78,32 @@ const GUIDANCE_RESULT_COPY = {
   abnormal: '已记录异常。保留测量信息，并结合下方来源资料继续处理。',
   uncertain: '已记录无法确认。复核检测条件后再次执行本步骤。',
 };
+
+function measurementReferenceCopy(profile) {
+  const { reference, unit } = profile;
+  if (reference.kind === 'range') return `资料范围 ${reference.min}–${reference.max} ${unit}`;
+  if (reference.kind === 'nominal') return `资料参考 ${reference.value} ${unit} · 未提供容差`;
+  return '资料要求记录 · 未提供参考范围';
+}
+
+function measurementFeedbackCopy(guidance) {
+  const { measurement, measurementProfile: profile } = guidance;
+  if (!profile || measurement.evaluation === 'unrecorded') return '尚未记录测量值。';
+  const value = `${measurement.value} ${profile.unit}`;
+  if (measurement.evaluation === 'within_range') return `${value} · 位于资料范围内。`;
+  if (measurement.evaluation === 'below_range') return `${value} · 低于资料范围。`;
+  if (measurement.evaluation === 'above_range') return `${value} · 高于资料范围。`;
+  return `${value} · 已记录；资料未提供容差，未自动判定。`;
+}
+
+function guidanceResultCopy(guidance) {
+  if (guidance.resultSource === 'source_range') {
+    return guidance.result === 'normal'
+      ? '资料范围判断：本次测量值位于范围内；这不是器件诊断。'
+      : '资料范围判断：本次测量值位于范围外；保留测量信息并继续来源步骤。';
+  }
+  return GUIDANCE_RESULT_COPY[guidance.result];
+}
 
 function updateInspectionUi() {
   const entity = data?.entities.find((candidate) => candidate.component_id === selectedId);
@@ -311,12 +338,26 @@ function renderComponentGuidance(entity) {
   document.querySelector('#inspectionStepLabel').textContent = `检测步骤 1 / ${progress.total}`;
   document.querySelector('#inspectionMethod').textContent = step.instruction;
   document.querySelector('#inspectionSource').textContent = `${step.source} · ${step.page}`;
+  const measurementControl = document.querySelector('#measurementControl');
+  const profile = guidance.measurementProfile;
+  measurementControl.hidden = !profile;
+  if (profile) {
+    document.querySelector('#measurementLabel').textContent = profile.label;
+    document.querySelector('#measurementReference').textContent = measurementReferenceCopy(profile);
+    document.querySelector('#measurementUnit').textContent = profile.unit;
+    const measurementInput = document.querySelector('#guidanceMeasurementValue');
+    measurementInput.step = String(profile.input_step || 'any');
+    measurementInput.value = guidance.measurement.value ?? '';
+    const measurementFeedback = document.querySelector('#measurementFeedback');
+    measurementFeedback.dataset.evaluation = guidance.measurement.evaluation;
+    measurementFeedback.textContent = measurementFeedbackCopy(guidance);
+  }
   document.querySelectorAll('[data-guidance-result]').forEach((button) => {
     button.setAttribute('aria-pressed', String(button.dataset.guidanceResult === guidance.result));
   });
   const resultStatus = document.querySelector('#guidanceResultStatus');
   resultStatus.dataset.result = guidance.result;
-  resultStatus.textContent = GUIDANCE_RESULT_COPY[guidance.result];
+  resultStatus.textContent = guidanceResultCopy(guidance);
   const boundary = entity.inspection_profile?.visual_note || '';
   document.querySelector('#modelBoundaryDetails').hidden = !boundary;
   document.querySelector('#modelBoundary').textContent = boundary;
@@ -494,6 +535,15 @@ document.querySelectorAll('[data-guidance-result]').forEach((button) => button.a
   repairGuidanceByComponent.set(entity.component_id, next);
   renderComponentGuidance(entity);
 }));
+document.querySelector('#recordMeasurement').addEventListener('click', () => {
+  const entity = data?.entities.find((candidate) => candidate.component_id === selectedId);
+  const input = document.querySelector('#guidanceMeasurementValue');
+  if (!entity || !input.reportValidity()) return;
+  const current = repairGuidanceByComponent.get(entity.component_id) || createRepairGuidance(entity);
+  const next = recordGuidanceMeasurement(current, input.value);
+  repairGuidanceByComponent.set(entity.component_id, next);
+  renderComponentGuidance(entity);
+});
 document.querySelector('#toggleInspection').addEventListener('click', (event) => {
   const enabled = event.currentTarget.getAttribute('aria-pressed') !== 'true';
   event.currentTarget.setAttribute('aria-pressed', String(enabled));

@@ -302,6 +302,22 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 .repair-step header strong { font-size: 10px; }
 .repair-step p { margin: 8px 0 0; font-size: 12px; line-height: 1.55; }
 .repair-step small { display: block; margin-top: 8px; color: var(--muted); font-size: 9px; line-height: 1.4; overflow-wrap: anywhere; }
+.measurement-control { margin-top: 12px; padding: 10px; border: 1px solid #b9c4bd; background: #f8faf7; }
+.measurement-control[hidden] { display: none; }
+.measurement-control header { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.measurement-control label { color: var(--ink); font-size: 10px; font-weight: 700; }
+.measurement-control header span { color: var(--muted); font-size: 9px; text-align: right; }
+.measurement-input-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: stretch; margin-top: 8px; }
+.measurement-input-row input { min-width: 0; height: 34px; border: 1px solid #aeb9b2; background: white; padding: 0 8px; color: var(--ink); font: inherit; font-size: 13px; }
+.measurement-input-row > span { display: flex; min-width: 42px; align-items: center; justify-content: center; border-block: 1px solid #aeb9b2; background: #edf1ed; color: #4c5a53; font-size: 10px; }
+.measurement-input-row button { min-width: 54px; border: 1px solid var(--ink); background: var(--ink); color: white; font: inherit; font-size: 10px; cursor: pointer; }
+.measurement-input-row button:hover { border-color: var(--accent); }
+.measurement-input-row input:focus-visible,
+.measurement-input-row button:focus-visible { outline: 3px solid #65a9ff; outline-offset: 2px; }
+.measurement-control > p { min-height: 15px; margin: 7px 0 0; color: var(--muted); font-size: 9px; line-height: 1.4; }
+.measurement-control > p[data-evaluation="within_range"] { color: #177d69; }
+.measurement-control > p[data-evaluation="below_range"],
+.measurement-control > p[data-evaluation="above_range"] { color: #a43d2b; }
 .result-control { margin: 12px 0 0; padding: 0; border: 0; }
 .result-control legend { margin-bottom: 7px; padding: 0; color: #56635d; font-size: 10px; font-weight: 600; }
 .result-control > div { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
