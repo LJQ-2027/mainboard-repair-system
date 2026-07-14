@@ -117,4 +117,15 @@ export function buildSelectionRadius(dimensions) {
   return Math.round(clamp(Math.max(dimensions.x, dimensions.y) * 0.44 + 0.006, 0.022, 0.09) * 1_000_000) / 1_000_000;
 }
 
+export function buildSelectionHalo(dimensions) {
+  const packageRadius = Math.hypot(dimensions.x, dimensions.y) / 2;
+  const clearance = clamp(Math.max(dimensions.x, dimensions.y) * 0.08, 0.004, 0.009);
+  const innerRadius = packageRadius + clearance;
+  const stroke = clamp(innerRadius * 0.035, 0.0025, 0.005);
+  return {
+    innerRadius: Math.round(innerRadius * 1_000_000) / 1_000_000,
+    outerRadius: Math.round((innerRadius + stroke) * 1_000_000) / 1_000_000,
+  };
+}
+
 export const BOARD_WORLD_SIZE = Object.freeze({ width: BOARD_WIDTH, height: BOARD_HEIGHT });

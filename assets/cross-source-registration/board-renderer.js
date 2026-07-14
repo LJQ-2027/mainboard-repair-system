@@ -4,6 +4,7 @@ import {
   buildCameraFrame,
   buildFocusFrame,
   buildRenderDescriptor,
+  buildSelectionHalo,
   buildSelectionRadius,
 } from './model-profiles.js';
 import {
@@ -13,6 +14,7 @@ import {
 } from './anatomy-state.js';
 import { isPointInFocus } from './repair-focus-state.js';
 import { buildInspectionTransform, inspectionOpacity } from './component-inspection-state.js';
+import { transformBoardCenter } from './model-interaction-state.js';
 
 const COLORS = {
   board: 0x17473e,
@@ -357,9 +359,11 @@ export class BoardRenderer {
     this.selectedComponentId = null;
     this.cameraAnimation = null;
     this.inspectionAnimation = null;
+    this.inspectionAnimationResolve = null;
     this.inspectionComponentId = null;
     this.inspectionSnapshot = null;
     this.sideTransitioning = false;
+    this.interactionLocked = false;
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0xe7eae5);
     this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 20);
@@ -618,6 +622,7 @@ export class BoardRenderer {
   bind() {
     const canvas = this.renderer.domElement;
     canvas.addEventListener('pointerdown', (event) => {
+      if (this.interactionLocked) return;
       this.cancelCameraAnimation();
       const inspected = this.inspectionComponentId ? this.renderObjects.get(this.inspectionComponentId) : null;
       this.drag = inspected
@@ -626,7 +631,7 @@ export class BoardRenderer {
       canvas.setPointerCapture(event.pointerId);
     });
     canvas.addEventListener('pointermove', (event) => {
-      if (!this.drag) return;
+      if (this.interactionLocked || !this.drag) return;
       if (this.drag.mode === 'component') {
         const inspected = this.renderObjects.get(this.inspectionComponentId);
         if (!inspected) return;
@@ -640,6 +645,7 @@ export class BoardRenderer {
       this.render();
     });
     canvas.addEventListener('pointerup', (event) => {
+      if (this.interactionLocked) return;
       const dragMode = this.drag?.mode;
       const moved = this.drag && Math.hypot(event.clientX - this.drag.x, event.clientY - this.drag.y) > 5;
       this.drag = null;
@@ -648,6 +654,7 @@ export class BoardRenderer {
     canvas.addEventListener('pointercancel', () => { this.drag = null; });
     canvas.addEventListener('wheel', (event) => {
       event.preventDefault();
+      if (this.interactionLocked) return;
       this.cancelCameraAnimation();
       const zoomBounds = this.inspectionComponentId ? [1.8, 6] : [0.72, 4.2];
       this.camera.zoom = Math.max(zoomBounds[0], Math.min(zoomBounds[1], this.camera.zoom * (event.deltaY > 0 ? 0.9 : 1.1)));
@@ -658,6 +665,7 @@ export class BoardRenderer {
   }
 
   pick(event) {
+    if (this.interactionLocked) return;
     const rect = this.renderer.domElement.getBoundingClientRect();
     this.pointer.set(((event.clientX - rect.left) / rect.width) * 2 - 1, -((event.clientY - rect.top) / rect.height) * 2 + 1);
     this.raycaster.setFromCamera(this.pointer, this.camera);
@@ -691,10 +699,10 @@ export class BoardRenderer {
       child.material.emissive.setHex(COLORS.selected);
       child.material.emissiveIntensity = 0.2;
     });
-    const radius = buildSelectionRadius(descriptor.dimensions);
+    const halo = buildSelectionHalo(descriptor.dimensions);
     this.selectionHalo = new THREE.Mesh(
-      new THREE.RingGeometry(radius * 0.82, radius, 40),
-      new THREE.MeshBasicMaterial({ color: COLORS.selected, transparent: true, opacity: 0.92, side: THREE.DoubleSide, depthTest: false }),
+      new THREE.RingGeometry(halo.innerRadius, halo.outerRadius, 48),
+      new THREE.MeshBasicMaterial({ color: COLORS.selected, transparent: true, opacity: 0.88, side: THREE.DoubleSide, depthTest: false }),
     );
     this.selectionHalo.position.set(descriptor.center.x, descriptor.center.y, 0.07);
     this.selectionHalo.renderOrder = 8;
@@ -749,6 +757,8 @@ export class BoardRenderer {
   cancelInspectionAnimation() {
     if (this.inspectionAnimation !== null) cancelAnimationFrame(this.inspectionAnimation);
     this.inspectionAnimation = null;
+    if (this.inspectionAnimationResolve) this.inspectionAnimationResolve(false);
+    this.inspectionAnimationResolve = null;
   }
 
   setInspectionContextOpacity(activeComponentId) {
@@ -793,6 +803,7 @@ export class BoardRenderer {
       zoom: this.camera.zoom,
     };
     return new Promise((resolve) => {
+      this.inspectionAnimationResolve = resolve;
       const tick = (now) => {
         const progress = Math.min(1, (now - started) / duration);
         const eased = 1 - (1 - progress) ** 3;
@@ -811,7 +822,8 @@ export class BoardRenderer {
         if (progress < 1) this.inspectionAnimation = requestAnimationFrame(tick);
         else {
           this.inspectionAnimation = null;
-          resolve();
+          this.inspectionAnimationResolve = null;
+          resolve(true);
         }
       };
       this.inspectionAnimation = requestAnimationFrame(tick);
@@ -838,13 +850,14 @@ export class BoardRenderer {
     this.setInspectionContextOpacity(componentId);
     this.setInspectionSelectionStyle(object, true);
     object.traverse((child) => { child.renderOrder = 12; });
+    const focusCenter = this.focusCenterFor(descriptor.center);
     const target = {
       scale: transform.scale,
       z: this.inspectionSnapshot.positionZ + transform.lift,
       rx: -0.42,
       ry: 0.18,
-      cameraX: descriptor.center.x,
-      cameraY: descriptor.center.y,
+      cameraX: focusCenter.x,
+      cameraY: focusCenter.y,
       zoom: transform.zoom,
     };
     if (animate) await this.animateInspectionObject(object, target);
@@ -930,11 +943,12 @@ export class BoardRenderer {
     this.activeFocusRegion = region;
     const aspect = Math.max(this.container.clientWidth, 320) / Math.max(this.container.clientHeight, 320);
     const frame = buildFocusFrame(region, aspect);
+    const focusCenter = this.focusCenterFor(frame.center);
     this.applyRepairEmphasis(region);
-    if (animate) this.animateCamera(frame.center, frame.zoom);
+    if (animate) this.animateCamera(focusCenter, frame.zoom);
     else {
-      this.camera.position.set(frame.center.x, frame.center.y, 4);
-      this.camera.lookAt(frame.center.x, frame.center.y, 0);
+      this.camera.position.set(focusCenter.x, focusCenter.y, 4);
+      this.camera.lookAt(focusCenter.x, focusCenter.y, 0);
       this.camera.zoom = frame.zoom;
       this.camera.updateProjectionMatrix();
       this.updateLabelVisibility(false);
@@ -985,6 +999,18 @@ export class BoardRenderer {
     this.render();
   }
 
+  setInteractionLocked(locked) {
+    this.interactionLocked = Boolean(locked);
+    if (this.interactionLocked) this.drag = null;
+  }
+
+  focusCenterFor(center) {
+    return transformBoardCenter(center, {
+      x: this.group.rotation.x,
+      z: this.group.rotation.z,
+    });
+  }
+
   reset() {
     this.cancelCameraAnimation();
     if (this.inspectionComponentId) void this.clearComponentInspection(false);
@@ -1007,13 +1033,15 @@ export class BoardRenderer {
     if (this.inspectionComponentId) {
       const descriptor = this.descriptors.get(this.inspectionComponentId);
       const transform = descriptor ? buildInspectionTransform(descriptor.dimensions, width < 620) : null;
-      this.camera.position.set(descriptor?.center.x || 0, descriptor?.center.y || 0, frame.position.z);
-      this.camera.lookAt(descriptor?.center.x || 0, descriptor?.center.y || 0, 0);
+      const focusCenter = this.focusCenterFor(descriptor?.center || { x: 0, y: 0 });
+      this.camera.position.set(focusCenter.x, focusCenter.y, frame.position.z);
+      this.camera.lookAt(focusCenter.x, focusCenter.y, 0);
       this.camera.zoom = transform?.zoom || 2.55;
     } else if (this.activeFocusRegion) {
       const focusFrame = buildFocusFrame(this.activeFocusRegion, width / height);
-      this.camera.position.set(focusFrame.center.x, focusFrame.center.y, frame.position.z);
-      this.camera.lookAt(focusFrame.center.x, focusFrame.center.y, 0);
+      const focusCenter = this.focusCenterFor(focusFrame.center);
+      this.camera.position.set(focusCenter.x, focusCenter.y, frame.position.z);
+      this.camera.lookAt(focusCenter.x, focusCenter.y, 0);
       this.camera.zoom = focusFrame.zoom;
     } else {
       this.camera.position.set(frame.position.x, frame.position.y, frame.position.z);

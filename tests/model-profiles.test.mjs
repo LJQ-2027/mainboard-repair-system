@@ -5,6 +5,7 @@ import {
   buildCameraFrame,
   buildFocusFrame,
   buildRenderDescriptor,
+  buildSelectionHalo,
   buildSelectionRadius,
   resolvePackageFamily,
 } from '../assets/cross-source-registration/model-profiles.js';
@@ -85,6 +86,12 @@ test('repair focus zoom remains contextual for huge and tiny regions', () => {
 test('selection radius stays restrained at both package-size extremes', () => {
   assert.equal(buildSelectionRadius({ x: 0.26, y: 0.22 }), 0.09);
   assert.equal(buildSelectionRadius({ x: 0.01, y: 0.008 }), 0.022);
+});
+
+test('selection halo stays outside the component with a restrained stroke', () => {
+  const halo = buildSelectionHalo({ x: 0.1, y: 0.06 });
+  assert.equal(halo.innerRadius > Math.hypot(0.1, 0.06) / 2, true);
+  assert.equal(halo.outerRadius - halo.innerRadius <= 0.006, true);
 });
 
 test('reviewed inspection profile survives compilation into the render descriptor', () => {
