@@ -128,3 +128,10 @@ Interaction-stability verification on 2026-07-14:
 - Selection feedback is a thin halo outside the package footprint, so the highlighted component remains visible.
 - 50 Node tests, 37 Python tests, the standalone registration validator, and headed Chromium desktop/mobile interaction matrices passed. Rapid entity selection, rapid side switching, rotated-board focus, and mobile inspection enter/exit produced no console or page errors.
 - QA screenshots are kept under ignored local `output/playwright/model-interaction-audit/`.
+
+Bounded board-pan verification on 2026-07-14:
+
+- Commit `9e74b29` adds an explicit `平移` / `旋转` drag mode. Pan is the default; rotation remains available without sharing the same pointer gesture.
+- Orthographic pointer deltas are converted into zoom-aware world movement and clamped so the board cannot be lost completely outside the canvas.
+- Manual panning preserves repair emphasis, component selection, wheel zoom, and resize state. Full-board reset restores the original frame and default pan mode.
+- 53 Node tests, 37 Python tests, standalone registration validation, and headed Chromium desktop/mobile matrices passed. Canvas comparisons confirm pan movement and pixel-identical reset; component selection remains stable and the rotated-focus regression remains green.
