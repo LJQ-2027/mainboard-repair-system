@@ -135,3 +135,11 @@ Bounded board-pan verification on 2026-07-14:
 - Orthographic pointer deltas are converted into zoom-aware world movement and clamped so the board cannot be lost completely outside the canvas.
 - Manual panning preserves repair emphasis, component selection, wheel zoom, and resize state. Full-board reset restores the original frame and default pan mode.
 - 53 Node tests, 37 Python tests, standalone registration validation, and headed Chromium desktop/mobile matrices passed. Canvas comparisons confirm pan movement and pixel-identical reset; component selection remains stable and the rotated-focus regression remains green.
+
+Reviewed-component affordance verification on 2026-07-14:
+
+- Commit `a1c2783` replaces the oversized coral selection ring and white/red callout with persistent amber corner brackets, compact constant-screen-size designator tags, subtle package emphasis, and a pointer-adjacent function tooltip.
+- Only the seven source-reviewed entities receive these affordances. Nearby labels use reusable vertical lanes, and mobile does not depend on hover for discoverability.
+- Each reviewed entity now owns a bounded transparent pick surface. This fixes the prior complex U2001 mesh bounds intercepting hover or click tests elsewhere on the board.
+- Component inspection hides board-level affordances and restores them on exit; pan, rotate, repair focus, side switching, and reset retain their existing contracts.
+- 57 Node tests, 37 Python tests, standalone validation, and headed Chromium desktop/mobile interaction matrices passed with seven affordances, correct tooltip identity, no runtime errors, and the existing rapid-transition regressions green.
