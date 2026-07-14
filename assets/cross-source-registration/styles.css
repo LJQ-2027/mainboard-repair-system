@@ -282,6 +282,14 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 .facts div { padding: 11px 0; }
 .facts dt { font-size: 10px; color: var(--muted); margin-bottom: 4px; }
 .facts dd { font-size: 12px; margin: 0; font-weight: 600; }
+.active-flow-return { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; padding: 9px 10px; border: 1px solid #9faea5; border-left: 3px solid #177d69; background: #edf5f0; }
+.active-flow-return[hidden] { display: none; }
+.active-flow-return div { min-width: 0; }
+.active-flow-return span { display: block; color: #177d69; font-size: 8px; font-weight: 700; }
+.active-flow-return strong { display: block; margin-top: 2px; overflow: hidden; color: var(--ink); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.active-flow-return small { display: block; margin-top: 2px; color: #5c6962; font-size: 8px; }
+.active-flow-return button { flex: none; min-height: 30px; padding: 0 9px; border: 1px solid var(--ink); background: var(--ink); color: white; font: inherit; font-size: 9px; cursor: pointer; }
+.active-flow-return button:focus { outline: 3px solid #65a9ff; outline-offset: 2px; }
 .evidence section { margin-top: 20px; }
 .evidence h3 { font-size: 11px; text-transform: uppercase; color: #5d6963; margin: 0 0 8px; }
 .component-guidance { scroll-margin-top: 92px; padding: 14px; border: 1px solid #aeb9b2; background: #f1f4f0; }

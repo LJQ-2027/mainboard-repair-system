@@ -214,3 +214,10 @@ Repair-flow continuity cleanup on 2026-07-14:
 - The outer generic progress counter is hidden while a structured repair flow is active. The flow trail and its own step counter are now the single progress source, removing the prior duplicated `1 / 2` state.
 - Mobile cross-component advancement was exercised from U4000 rail checks to X2100 frequency inspection. The selected entity, source summary, trail, and prompt update together while the new question remains fully inside the existing viewport.
 - No forced page scroll was added: the current layout already preserves task continuity, and an automatic jump would unnecessarily disturb the technician's reading position.
+
+Interrupted-flow recovery on 2026-07-14:
+
+- A started repair flow remains visible as a compact `进行中的排查` return strip when the technician temporarily selects another component or switches to a different fault on the same component.
+- The return action restores the flow's documented fault, current target component, model focus, measurements, answer history, and active prompt instead of restarting the graph.
+- Flow target resolution is now part of the tested state module, so active-step targets, explicit terminal targets, model navigation, and the recovery strip share one rule.
+- Headed Chromium verifies U4000 -> X2100 progression, temporary U0600 inspection, return to X2100, same-component fault interruption, keyboard-visible focus, 390 px fit, and zero runtime errors.

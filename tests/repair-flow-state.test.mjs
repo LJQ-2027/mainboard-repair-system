@@ -9,6 +9,7 @@ import {
   recordRepairFlowMeasurement,
   repairFlowMeasurementsComplete,
   repairFlowProgress,
+  repairFlowTargetComponentId,
   repairFlowTrail,
   resetRepairFlow,
 } from '../assets/cross-source-registration/repair-flow-state.js';
@@ -70,6 +71,27 @@ test('flow trail exposes completed, current, and pending source steps', () => {
   const terminal = answerRepairFlow(profile, advanced, 'yes');
   assert.deepEqual(repairFlowTrail(profile, terminal).map((item) => item.status), ['completed', 'completed', 'pending']);
   assert.deepEqual(repairFlowTrail(profile, backRepairFlow(profile, terminal)).map((item) => item.status), ['completed', 'current', 'pending']);
+});
+
+test('flow target follows the current step and explicit terminal action', () => {
+  const targeted = {
+    ...profile,
+    entry_component_id: 'U4000',
+    steps: profile.steps.map((step, index) => ({
+      ...step,
+      target_component_id: index === 0 ? 'U4000' : 'X2100',
+      choices: index === 0
+        ? [
+          { value: 'yes', label: '是', outcome: { kind: 'next', step_id: 'usb' } },
+          { value: 'no', label: '否', outcome: { kind: 'action', label: '处理电源', target_component_id: 'U2001' } },
+        ]
+        : step.choices,
+    })),
+  };
+  const initial = createRepairFlowState(targeted);
+  assert.equal(repairFlowTargetComponentId(targeted, initial), 'U4000');
+  assert.equal(repairFlowTargetComponentId(targeted, answerRepairFlow(targeted, initial, 'yes')), 'X2100');
+  assert.equal(repairFlowTargetComponentId(targeted, answerRepairFlow(targeted, initial, 'no')), 'U2001');
 });
 
 test('an action outcome terminates with the exact source action', () => {

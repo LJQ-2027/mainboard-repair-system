@@ -80,6 +80,15 @@ export function repairFlowTrail(profile, state) {
   }));
 }
 
+export function repairFlowTargetComponentId(profile, state) {
+  const step = currentRepairFlowStep(profile, state);
+  if (step?.target_component_id) return step.target_component_id;
+  if (state.terminal?.target_component_id) return state.terminal.target_component_id;
+  const previousStepId = state.history.at(-1)?.stepId;
+  const previousStep = profile.steps.find((candidate) => candidate.step_id === previousStepId);
+  return previousStep?.target_component_id || profile.entry_component_id || null;
+}
+
 export function repairFlowMeasurementsComplete(profile, state) {
   const step = currentRepairFlowStep(profile, state);
   if (!step) return true;

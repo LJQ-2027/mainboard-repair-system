@@ -39,6 +39,7 @@ import {
   recordRepairFlowMeasurement,
   repairFlowMeasurementsComplete,
   repairFlowProgress,
+  repairFlowTargetComponentId,
   repairFlowTrail,
   resetRepairFlow,
 } from './repair-flow-state.js';
@@ -122,7 +123,7 @@ function matchingRepairFlow(entity, guidance) {
   const active = data?.repair_flows?.find((flow) => flow.flow_id === activeRepairFlowId);
   if (active && active.fault === guidance.selectedFault) {
     const state = repairFlowById.get(active.flow_id) || createRepairFlowState(active);
-    const target = repairFlowTargetComponent(active, state);
+    const target = repairFlowTargetComponentId(active, state);
     if (target === entity.component_id) return active;
   }
   const entry = data?.repair_flows?.find((flow) => (
@@ -132,24 +133,38 @@ function matchingRepairFlow(entity, guidance) {
   return entry;
 }
 
-function repairFlowTargetComponent(flow, state) {
-  const step = currentRepairFlowStep(flow, state);
-  if (step?.target_component_id) return step.target_component_id;
-  if (state.terminal?.target_component_id) return state.terminal.target_component_id;
-  const previousStepId = state.history.at(-1)?.stepId;
-  const previousStep = flow.steps.find((candidate) => candidate.step_id === previousStepId);
-  return previousStep?.target_component_id || flow.entry_component_id;
-}
-
 function applyRepairFlowState(flow, next, entity) {
   repairFlowById.set(flow.flow_id, next);
   activeRepairFlowId = flow.flow_id;
-  const target = repairFlowTargetComponent(flow, next);
+  const target = repairFlowTargetComponentId(flow, next);
   if (target && target !== entity.component_id) {
     void selectEntity(target);
     return;
   }
   renderComponentGuidance(entity);
+}
+
+function renderActiveFlowReturn(entity, flowActive) {
+  const control = document.querySelector('#activeFlowReturn');
+  const flow = data?.repair_flows?.find((candidate) => candidate.flow_id === activeRepairFlowId);
+  const state = flow && repairFlowById.get(flow.flow_id);
+  const targetId = state && repairFlowTargetComponentId(flow, state);
+  const targetEntity = data?.entities.find((candidate) => candidate.component_id === targetId);
+  const visible = Boolean(flow && state && targetEntity && !flowActive);
+  control.hidden = !visible;
+  if (!visible) return;
+  document.querySelector('#activeFlowReturnTitle').textContent = flow.title;
+  document.querySelector('#activeFlowReturnTarget').textContent = `返回 ${targetEntity.designator} · 保留当前进度`;
+  document.querySelector('#resumeActiveFlow').onclick = () => {
+    let targetGuidance = repairGuidanceByComponent.get(targetEntity.component_id);
+    if (!targetGuidance) targetGuidance = createRepairGuidance(targetEntity);
+    if (targetGuidance.faults.includes(flow.fault) && targetGuidance.selectedFault !== flow.fault) {
+      targetGuidance = selectGuidanceFault(targetGuidance, flow.fault);
+    }
+    repairGuidanceByComponent.set(targetEntity.component_id, targetGuidance);
+    if (targetEntity.component_id === entity.component_id) renderComponentGuidance(entity);
+    else void selectEntity(targetEntity.component_id);
+  };
 }
 
 function renderRepairFlow(entity, guidance) {
@@ -173,7 +188,7 @@ function renderRepairFlow(entity, guidance) {
   document.querySelector('#repairFlowTitle').textContent = flow.title;
   document.querySelector('#repairFlowStep').textContent = `步骤 ${progress.current} / ${progress.total}`;
   document.querySelector('#repairFlowSource').textContent = `${flow.source.source} · 第 ${flow.source.page} 页`;
-  const targetId = repairFlowTargetComponent(flow, state);
+  const targetId = repairFlowTargetComponentId(flow, state);
   const targetEntity = data.entities.find((candidate) => candidate.component_id === targetId);
   document.querySelector('#repairFlowTarget').textContent = targetEntity?.designator || '当前结果';
 
@@ -508,7 +523,10 @@ function renderComponentGuidance(entity) {
     repairGuidanceByComponent.set(entity.component_id, guidance);
   }
   section.hidden = !guidance.steps.length;
-  if (!guidance.steps.length) return;
+  if (!guidance.steps.length) {
+    renderActiveFlowReturn(entity, false);
+    return;
+  }
   const faultList = document.querySelector('#commonFaults');
   faultList.replaceChildren();
   guidance.faults.forEach((fault) => {
@@ -530,6 +548,7 @@ function renderComponentGuidance(entity) {
   document.querySelector('#inspectionMethod').textContent = step.instruction;
   document.querySelector('#inspectionSource').textContent = `${step.source} · ${step.page}`;
   const repairFlowActive = renderRepairFlow(entity, guidance);
+  renderActiveFlowReturn(entity, repairFlowActive);
   const measurementControl = document.querySelector('#measurementControl');
   const profile = guidance.measurementProfile;
   measurementControl.hidden = repairFlowActive || !profile;
