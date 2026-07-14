@@ -119,3 +119,12 @@ U2001 inspection verification on 2026-07-13:
 - Headed Chromium passed at `1600x900` and `390x844`: U2001 capability gating, enter/return animation, board ghosting, independent component drag, wheel zoom, source-backed fault/method copy, model-boundary copy, shield/module lockout, reset exit, entity-change exit, side-change exit, view-change exit, keyboard-visible focus, nonblank WebGL frames, no horizontal overflow, and zero console/page errors.
 - U4000 remains correctly disabled for single-component inspection until it receives its own explicit profile.
 - Inspection screenshots are kept under ignored local `output/playwright/u2001-inspection-*.png`.
+
+Interaction-stability verification on 2026-07-14:
+
+- Commit `65c45f4` replaces separate side/inspection locks with one model interaction state and blocks tabs, entity selection, side controls, model tools, and canvas input while a transition owns the scene.
+- Initial data selection now updates the evidence panel without forcing an automatic camera focus; entering the model and full-board reset therefore produce the same settled frame.
+- Repair focus and single-component inspection camera targets now follow the board's current tilt and rotation instead of using unrotated local coordinates.
+- Selection feedback is a thin halo outside the package footprint, so the highlighted component remains visible.
+- 50 Node tests, 37 Python tests, the standalone registration validator, and headed Chromium desktop/mobile interaction matrices passed. Rapid entity selection, rapid side switching, rotated-board focus, and mobile inspection enter/exit produced no console or page errors.
+- QA screenshots are kept under ignored local `output/playwright/model-interaction-audit/`.
