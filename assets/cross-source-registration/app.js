@@ -155,6 +155,7 @@ function applyRepairFlowState(flow, next, entity) {
 function renderRepairFlow(entity, guidance) {
   const control = document.querySelector('#repairFlowControl');
   const flow = matchingRepairFlow(entity, guidance);
+  document.querySelector('#guidanceProgress').hidden = Boolean(flow);
   control.hidden = !flow;
   document.querySelector('#resultControl').hidden = Boolean(flow);
   document.querySelector('#guidanceResultStatus').hidden = Boolean(flow);

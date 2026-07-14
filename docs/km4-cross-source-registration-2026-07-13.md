@@ -208,3 +208,9 @@ Repair-sidebar hierarchy refinement on 2026-07-14:
 - Answer history remains visible as a secondary result log. Exact PDF citations remain available in a collapsed `资料依据` disclosure, reducing visual competition without removing traceability.
 - Ordinary progress uses ink and restrained green states; coral remains reserved for abnormal/fault feedback and yellow remains reserved for reviewed source boundaries.
 - Headed Chromium desktop and 390 px evidence verifies flow-before-source order, trail-state transitions, target/model agreement, collapsed source detail, responsive fit, and no console/page errors.
+
+Repair-flow continuity cleanup on 2026-07-14:
+
+- The outer generic progress counter is hidden while a structured repair flow is active. The flow trail and its own step counter are now the single progress source, removing the prior duplicated `1 / 2` state.
+- Mobile cross-component advancement was exercised from U4000 rail checks to X2100 frequency inspection. The selected entity, source summary, trail, and prompt update together while the new question remains fully inside the existing viewport.
+- No forced page scroll was added: the current layout already preserves task continuity, and an automatic jump would unnecessarily disturb the technician's reading position.

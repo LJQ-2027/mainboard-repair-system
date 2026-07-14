@@ -289,6 +289,7 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 .guidance-heading span { display: block; margin-bottom: 3px; color: var(--muted); font-size: 9px; text-transform: uppercase; }
 .guidance-heading h3 { margin: 0; color: var(--ink); font-size: 15px; text-transform: none; }
 .guidance-heading > strong { min-width: 40px; padding: 5px 6px; border: 1px solid #aeb9b2; background: white; font-size: 10px; text-align: center; }
+.guidance-heading > strong[hidden] { display: none; }
 .guidance-group { margin-top: 14px; }
 .guidance-group h4 { margin: 0 0 7px; color: #56635d; font-size: 10px; font-weight: 600; }
 .fault-list { display: flex; flex-wrap: wrap; gap: 5px; }
