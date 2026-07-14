@@ -21,7 +21,7 @@ class CrossSourceRegistrationTests(unittest.TestCase):
             if "measurement_profile" in entity
         }
         self.assertEqual(set(profiles), {"U4000", "X2100", "VBAT1", "VBUS1"})
-        self.assertEqual(profiles["U4000"]["reference"], {"kind": "record_only"})
+        self.assertEqual(profiles["U4000"]["reference"], {"kind": "nominal", "value": 3.3})
         self.assertEqual(profiles["X2100"]["reference"], {"kind": "nominal", "value": 26})
         self.assertEqual(profiles["VBAT1"]["reference"], {"kind": "range", "min": 3.4, "max": 4.35})
         self.assertEqual(profiles["VBUS1"]["reference"], {"kind": "nominal", "value": 5})
@@ -54,6 +54,24 @@ class CrossSourceRegistrationTests(unittest.TestCase):
         profile = data["entities"][2]["measurement_profile"]
         profile["reference"] = {"kind": "nominal"}
         self.assertTrue(any("nominal measurement" in error for error in validate_dataset(data, ROOT)))
+
+    def test_rejects_repair_flow_edges_outside_the_declared_graph(self):
+        data = json.loads((ROOT / "knowledge-base/km4-cross-source-registration.json").read_text(encoding="utf-8"))
+        flow = data["repair_flows"][0]
+        flow["steps"][0]["choices"][0]["outcome"]["step_id"] = "missing"
+        self.assertTrue(any("flow destination" in error for error in validate_dataset(data, ROOT)))
+
+    def test_rejects_repair_flow_targets_outside_reviewed_entities(self):
+        data = json.loads((ROOT / "knowledge-base/km4-cross-source-registration.json").read_text(encoding="utf-8"))
+        flow = data["repair_flows"][0]
+        flow["entry_component_id"] = "KM4-MAIN-MISSING"
+        self.assertTrue(any("flow component" in error for error in validate_dataset(data, ROOT)))
+
+    def test_boundary_outcomes_require_an_explicit_source_note(self):
+        data = json.loads((ROOT / "knowledge-base/km4-cross-source-registration.json").read_text(encoding="utf-8"))
+        flow = data["repair_flows"][0]
+        flow["boundary_note"] = ""
+        self.assertTrue(any("flow boundary" in error for error in validate_dataset(data, ROOT)))
 
 
 if __name__ == "__main__":

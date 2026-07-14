@@ -302,6 +302,37 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 .repair-step header strong { font-size: 10px; }
 .repair-step p { margin: 8px 0 0; font-size: 12px; line-height: 1.55; }
 .repair-step small { display: block; margin-top: 8px; color: var(--muted); font-size: 9px; line-height: 1.4; overflow-wrap: anywhere; }
+.repair-flow-control { margin-top: 12px; border-top: 1px solid #aeb9b2; padding-top: 12px; }
+.repair-flow-control[hidden] { display: none; }
+.repair-flow-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.repair-flow-heading div > span { display: block; color: #177d69; font-size: 9px; font-weight: 700; text-transform: uppercase; }
+.repair-flow-heading strong { display: block; margin-top: 3px; font-size: 12px; }
+.repair-flow-heading > span { padding: 4px 6px; border: 1px solid #aeb9b2; background: white; font-size: 9px; }
+.repair-flow-prompt { margin: 12px 0 0; font-size: 13px; font-weight: 650; line-height: 1.45; }
+.repair-flow-choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 10px; }
+.repair-flow-choices button { min-height: 34px; border: 1px solid #9faaa3; border-right: 0; background: white; color: var(--ink); font: inherit; font-size: 11px; cursor: pointer; }
+.repair-flow-choices button:last-child { border-right: 1px solid #9faaa3; }
+.repair-flow-choices button:hover { background: var(--ink); color: white; }
+.repair-flow-choices button:focus-visible,
+.repair-flow-control footer button:focus-visible { outline: 3px solid #65a9ff; outline-offset: 2px; }
+.repair-flow-terminal { margin-top: 10px; border-left: 3px solid #1c8f75; padding: 9px 10px; background: white; }
+.repair-flow-terminal[hidden] { display: none; }
+.repair-flow-terminal > span { display: block; color: #177d69; font-size: 9px; font-weight: 700; }
+.repair-flow-terminal > strong { display: block; margin-top: 4px; font-size: 12px; line-height: 1.45; }
+.repair-flow-terminal > p { margin: 7px 0 0; color: #6c5718; font-size: 9px; line-height: 1.45; }
+.repair-flow-terminal[data-kind="boundary"] { border-left-color: #d0a63b; background: #fff9e5; }
+.repair-flow-terminal[data-kind="boundary"] > span { color: #755d13; }
+.repair-flow-history { display: grid; gap: 4px; margin: 10px 0 0; padding: 0; list-style: none; }
+.repair-flow-history:empty { display: none; }
+.repair-flow-history li { display: flex; justify-content: space-between; gap: 10px; border-top: 1px solid #cbd3cd; padding-top: 5px; color: #5c6962; font-size: 9px; }
+.repair-flow-history li span { min-width: 0; }
+.repair-flow-history li strong { white-space: nowrap; color: var(--ink); }
+.repair-flow-control footer { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; margin-top: 10px; }
+.repair-flow-control footer small { color: var(--muted); font-size: 8px; line-height: 1.35; overflow-wrap: anywhere; }
+.repair-flow-control footer div { display: flex; flex: none; }
+.repair-flow-control footer button { height: 28px; border: 1px solid #aeb9b2; border-right: 0; background: white; color: #435049; font: inherit; font-size: 9px; cursor: pointer; }
+.repair-flow-control footer button:last-child { border-right: 1px solid #aeb9b2; }
+.repair-flow-control footer button:disabled { color: #9aa49f; background: #edf0ec; cursor: not-allowed; }
 .measurement-control { margin-top: 12px; padding: 10px; border: 1px solid #b9c4bd; background: #f8faf7; }
 .measurement-control[hidden] { display: none; }
 .measurement-control header { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
@@ -319,6 +350,7 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 .measurement-control > p[data-evaluation="below_range"],
 .measurement-control > p[data-evaluation="above_range"] { color: #a43d2b; }
 .result-control { margin: 12px 0 0; padding: 0; border: 0; }
+.result-control[hidden], .result-status[hidden] { display: none; }
 .result-control legend { margin-bottom: 7px; padding: 0; color: #56635d; font-size: 10px; font-weight: 600; }
 .result-control > div { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .result-control button { min-height: 32px; border: 1px solid #aeb9b2; border-right: 0; background: white; color: #425049; font: inherit; font-size: 10px; cursor: pointer; }

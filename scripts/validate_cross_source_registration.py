@@ -32,12 +32,14 @@ def validate_dataset(data, root):
             errors.append(f"anchor {anchor.get('anchor_id', 'unknown')} must use normalized coordinates")
 
     identities = set()
+    entities_by_id = {}
     measurement_ids = set()
     for entity in data.get("entities", []):
         entity_id = entity.get("component_id")
         if not entity_id or entity_id in identities:
             errors.append(f"duplicate or missing component identity: {entity_id}")
         identities.add(entity_id)
+        entities_by_id[entity_id] = entity
         geometry = entity.get("geometry", {})
         if not _normalized(geometry.get("center")):
             errors.append(f"{entity_id} center must use normalized coordinates")
@@ -76,6 +78,53 @@ def validate_dataset(data, root):
                     errors.append(f"{entity_id} nominal measurement requires a numeric value")
             elif reference_kind != "record_only":
                 errors.append(f"{entity_id} measurement reference kind is unsupported")
+    flow_ids = set()
+    for flow in data.get("repair_flows", []):
+        flow_id = flow.get("flow_id")
+        if not flow_id or flow_id in flow_ids:
+            errors.append(f"duplicate or missing repair flow identity: {flow_id}")
+        flow_ids.add(flow_id)
+        entry_component_id = flow.get("entry_component_id")
+        if entry_component_id not in identities:
+            errors.append(f"{flow_id} flow component must resolve to a reviewed entity")
+        source = flow.get("source", {})
+        if not source.get("source") or not source.get("page"):
+            errors.append(f"{flow_id} flow source must include a document and page")
+        steps = flow.get("steps", [])
+        step_ids = [step.get("step_id") for step in steps]
+        if not steps or any(not step_id for step_id in step_ids) or len(step_ids) != len(set(step_ids)):
+            errors.append(f"{flow_id} flow steps require unique identities")
+        step_id_set = set(step_ids)
+        if flow.get("entry_step_id") not in step_id_set:
+            errors.append(f"{flow_id} flow entry step must resolve inside the graph")
+        has_boundary = False
+        for step in steps:
+            step_id = step.get("step_id")
+            if not step.get("prompt") or not step.get("choices"):
+                errors.append(f"{flow_id}/{step_id} flow step requires a prompt and choices")
+            if step.get("target_component_id") and step["target_component_id"] not in identities:
+                errors.append(f"{flow_id}/{step_id} flow component target is unresolved")
+            choice_values = [choice.get("value") for choice in step.get("choices", [])]
+            if any(not value for value in choice_values) or len(choice_values) != len(set(choice_values)):
+                errors.append(f"{flow_id}/{step_id} flow choices require unique values")
+            for choice in step.get("choices", []):
+                outcome = choice.get("outcome", {})
+                kind = outcome.get("kind")
+                if kind == "next":
+                    if outcome.get("step_id") not in step_id_set:
+                        errors.append(f"{flow_id}/{step_id} flow destination is outside the graph")
+                elif kind in ("action", "boundary"):
+                    if not outcome.get("label"):
+                        errors.append(f"{flow_id}/{step_id} flow terminal requires a label")
+                    if kind == "boundary":
+                        has_boundary = True
+                    target = outcome.get("target_component_id")
+                    if target and target not in identities:
+                        errors.append(f"{flow_id}/{step_id} flow component target is unresolved")
+                else:
+                    errors.append(f"{flow_id}/{step_id} flow outcome kind is unsupported")
+        if has_boundary and (flow.get("source_status") != "reviewed_partial" or not flow.get("boundary_note")):
+            errors.append(f"{flow_id} flow boundary requires reviewed-partial status and a note")
     if not data.get("entities"):
         errors.append("dataset requires entities")
     return errors

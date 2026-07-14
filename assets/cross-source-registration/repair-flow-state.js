@@ -1,0 +1,65 @@
+function stepMap(profile) {
+  const steps = Array.isArray(profile?.steps) ? profile.steps : [];
+  const byId = new Map();
+  steps.forEach((step) => {
+    if (!step?.step_id || byId.has(step.step_id)) throw new Error('Repair flow steps require unique identities');
+    byId.set(step.step_id, step);
+  });
+  return byId;
+}
+
+export function createRepairFlowState(profile) {
+  const byId = stepMap(profile);
+  if (!profile?.flow_id || !byId.has(profile.entry_step_id)) {
+    throw new Error('Repair flow requires a valid identity and entry step');
+  }
+  return {
+    flowId: profile.flow_id,
+    currentStepId: profile.entry_step_id,
+    history: [],
+    terminal: null,
+  };
+}
+
+export function currentRepairFlowStep(profile, state) {
+  if (!state?.currentStepId) return null;
+  return stepMap(profile).get(state.currentStepId) || null;
+}
+
+export function answerRepairFlow(profile, state, choiceValue) {
+  if (state.terminal) throw new Error('Repair flow is already at a terminal action');
+  const current = currentRepairFlowStep(profile, state);
+  if (!current) throw new Error('Repair flow has no active step');
+  const choice = current.choices?.find((candidate) => candidate.value === choiceValue);
+  if (!choice) throw new RangeError(`Unknown repair flow choice: ${choiceValue}`);
+  const outcome = choice.outcome || {};
+  const history = [...state.history, { stepId: current.step_id, choice: choice.value }];
+  if (outcome.kind === 'next') {
+    if (!stepMap(profile).has(outcome.step_id)) throw new Error(`Unknown repair flow destination: ${outcome.step_id}`);
+    return { ...state, currentStepId: outcome.step_id, history, terminal: null };
+  }
+  if ((outcome.kind === 'action' || outcome.kind === 'boundary') && outcome.label) {
+    const terminal = { kind: outcome.kind, label: outcome.label };
+    if (outcome.target_component_id) terminal.target_component_id = outcome.target_component_id;
+    return { ...state, currentStepId: null, history, terminal };
+  }
+  throw new Error('Repair flow outcome must be a declared next step, action, or source boundary');
+}
+
+export function backRepairFlow(profile, state) {
+  if (!state.history.length) return state;
+  const history = state.history.slice(0, -1);
+  const previous = state.history.at(-1);
+  if (!stepMap(profile).has(previous.stepId)) throw new Error('Repair flow history points outside the graph');
+  return { ...state, currentStepId: previous.stepId, history, terminal: null };
+}
+
+export function resetRepairFlow(profile) {
+  return createRepairFlowState(profile);
+}
+
+export function repairFlowProgress(profile, state) {
+  const activeId = state.currentStepId || state.history.at(-1)?.stepId;
+  const index = profile.steps.findIndex((step) => step.step_id === activeId);
+  return { current: index < 0 ? 0 : index + 1, total: profile.steps.length };
+}

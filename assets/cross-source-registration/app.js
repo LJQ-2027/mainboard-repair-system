@@ -31,6 +31,14 @@ import {
   recordGuidanceResult,
   selectGuidanceFault,
 } from './repair-guidance-state.js';
+import {
+  answerRepairFlow,
+  backRepairFlow,
+  createRepairFlowState,
+  currentRepairFlowStep,
+  repairFlowProgress,
+  resetRepairFlow,
+} from './repair-flow-state.js';
 
 const DATA_URL = '../../knowledge-base/km4-cross-source-registration.json';
 const GEOMETRY_URL = '../../knowledge-base/km4-board-compiled.json';
@@ -57,6 +65,7 @@ let componentInspection = exitComponentInspection();
 let modelInteraction = createModelInteractionState();
 let modelDragMode = 'pan';
 const repairGuidanceByComponent = new Map();
+const repairFlowById = new Map();
 
 const FAULT_LABELS = {
   no_power: '无法开机',
@@ -103,6 +112,91 @@ function guidanceResultCopy(guidance) {
       : '资料范围判断：本次测量值位于范围外；保留测量信息并继续来源步骤。';
   }
   return GUIDANCE_RESULT_COPY[guidance.result];
+}
+
+function matchingRepairFlow(entity, guidance) {
+  return data?.repair_flows?.find((flow) => (
+    flow.entry_component_id === entity.component_id && flow.fault === guidance.selectedFault
+  )) || null;
+}
+
+function renderRepairFlow(entity, guidance) {
+  const control = document.querySelector('#repairFlowControl');
+  const flow = matchingRepairFlow(entity, guidance);
+  control.hidden = !flow;
+  document.querySelector('#resultControl').hidden = Boolean(flow);
+  document.querySelector('#guidanceResultStatus').hidden = Boolean(flow);
+  if (!flow) return false;
+
+  let state = repairFlowById.get(flow.flow_id);
+  if (!state) {
+    state = createRepairFlowState(flow);
+    repairFlowById.set(flow.flow_id, state);
+  }
+  const step = currentRepairFlowStep(flow, state);
+  const progress = repairFlowProgress(flow, state);
+  document.querySelector('#guidanceProgress').textContent = `${progress.current} / ${progress.total}`;
+  document.querySelector('#inspectionStepLabel').textContent = '来源摘要';
+  document.querySelector('#repairFlowTitle').textContent = flow.title;
+  document.querySelector('#repairFlowStep').textContent = `步骤 ${progress.current} / ${progress.total}`;
+  document.querySelector('#repairFlowSource').textContent = `${flow.source.source} · 第 ${flow.source.page} 页`;
+
+  const prompt = document.querySelector('#repairFlowPrompt');
+  const choices = document.querySelector('#repairFlowChoices');
+  const terminal = document.querySelector('#repairFlowTerminal');
+  choices.replaceChildren();
+  prompt.hidden = !step;
+  choices.hidden = !step;
+  terminal.hidden = !state.terminal;
+  if (step) {
+    prompt.textContent = step.prompt;
+    step.choices.forEach((choice) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.textContent = choice.label;
+      button.addEventListener('click', () => {
+        const next = answerRepairFlow(flow, repairFlowById.get(flow.flow_id), choice.value);
+        repairFlowById.set(flow.flow_id, next);
+        renderComponentGuidance(entity);
+      });
+      choices.append(button);
+    });
+  }
+  if (state.terminal) {
+    terminal.dataset.kind = state.terminal.kind;
+    document.querySelector('#repairFlowTerminalType').textContent = state.terminal.kind === 'boundary' ? '资料边界' : '来源处理';
+    document.querySelector('#repairFlowTerminalLabel').textContent = state.terminal.label;
+    const boundary = document.querySelector('#repairFlowBoundary');
+    boundary.hidden = state.terminal.kind !== 'boundary';
+    boundary.textContent = state.terminal.kind === 'boundary' ? flow.boundary_note : '';
+  }
+
+  const history = document.querySelector('#repairFlowHistory');
+  history.replaceChildren();
+  state.history.forEach((entry) => {
+    const historyStep = flow.steps.find((candidate) => candidate.step_id === entry.stepId);
+    const historyChoice = historyStep?.choices.find((candidate) => candidate.value === entry.choice);
+    const item = document.createElement('li');
+    const label = document.createElement('span');
+    const value = document.createElement('strong');
+    label.textContent = historyStep?.prompt || entry.stepId;
+    value.textContent = historyChoice?.label || entry.choice;
+    item.append(label, value);
+    history.append(item);
+  });
+  const back = document.querySelector('#repairFlowBack');
+  const reset = document.querySelector('#repairFlowReset');
+  back.disabled = !state.history.length;
+  reset.disabled = !state.history.length;
+  back.onclick = () => {
+    repairFlowById.set(flow.flow_id, backRepairFlow(flow, repairFlowById.get(flow.flow_id)));
+    renderComponentGuidance(entity);
+  };
+  reset.onclick = () => {
+    repairFlowById.set(flow.flow_id, resetRepairFlow(flow));
+    renderComponentGuidance(entity);
+  };
+  return true;
 }
 
 function updateInspectionUi() {
@@ -338,6 +432,7 @@ function renderComponentGuidance(entity) {
   document.querySelector('#inspectionStepLabel').textContent = `检测步骤 1 / ${progress.total}`;
   document.querySelector('#inspectionMethod').textContent = step.instruction;
   document.querySelector('#inspectionSource').textContent = `${step.source} · ${step.page}`;
+  renderRepairFlow(entity, guidance);
   const measurementControl = document.querySelector('#measurementControl');
   const profile = guidance.measurementProfile;
   measurementControl.hidden = !profile;

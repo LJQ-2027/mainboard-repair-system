@@ -181,3 +181,13 @@ Source-defined measurement capture on 2026-07-14:
 - Dataset validation rejects missing/duplicate measurement identities, missing units, invalid source indices, nonpositive input steps, inverted ranges, nominal references without values, and unsupported reference kinds.
 - 65 Node tests, 41 Python tests, standalone validation, and headed Chromium desktop/390 px/320 px interaction matrices passed. Browser evidence covers within-range, below-range, nominal-only, hidden-control, and mobile measurement states with zero overflow and zero runtime errors.
 - Measurement records remain page-session state. Backend persistence, case linkage, and source-backed next-step branching are still open.
+
+First source-reviewed multi-step branch on 2026-07-14:
+
+- A visual/text audit of repair-guide pages 9, 10, 11, 14, and 15 is recorded in `docs/km4-repair-flow-source-audit-2026-07-14.md`.
+- J6101 `无法充电` now exposes the unambiguous page-14 sequence: charger condition, USB solder condition, and FPC seating condition. Each answer follows an explicit source arrow and can produce the exact source action, advance, go back, or reset.
+- The later FPC-defect Y/N labels conflict with their displayed actions. The runtime deliberately stops at a yellow source-boundary terminal and shows the reviewed ambiguity note instead of guessing the next edge.
+- Generic normal/abnormal/uncertain controls are hidden only while this exact fault/flow pair is active. Selecting `USB 无响应` restores the generic source-guidance interaction.
+- U4000 `VDDEMMCCORE` was corrected from record-only to a 3.3 V nominal reference without tolerance based on the page-11 signal table.
+- Repair-flow validation rejects graph edges outside declared steps, unresolved component targets, duplicate identities, unsupported outcomes, and boundary terminals without reviewed-partial status plus a note.
+- Headed Chromium desktop/mobile matrices passed the three-step path, boundary terminal, back, reset, source action, alternate-fault restoration, history, and zero-overflow checks with no console/page errors.

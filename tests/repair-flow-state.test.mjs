@@ -1,0 +1,90 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+
+import {
+  answerRepairFlow,
+  backRepairFlow,
+  createRepairFlowState,
+  currentRepairFlowStep,
+  repairFlowProgress,
+  resetRepairFlow,
+} from '../assets/cross-source-registration/repair-flow-state.js';
+
+const profile = {
+  flow_id: 'charging-page-14',
+  entry_step_id: 'charger',
+  steps: [
+    {
+      step_id: 'charger',
+      prompt: '充电器是否正常工作？',
+      choices: [
+        { value: 'yes', label: '是', outcome: { kind: 'next', step_id: 'usb' } },
+        { value: 'no', label: '否', outcome: { kind: 'action', label: '更换充电器' } },
+      ],
+    },
+    {
+      step_id: 'usb',
+      prompt: 'USB 接口是否虚焊？',
+      choices: [
+        { value: 'yes', label: '是', outcome: { kind: 'action', label: '补焊 USB 接口' } },
+        { value: 'no', label: '否', outcome: { kind: 'next', step_id: 'fpc' } },
+      ],
+    },
+    {
+      step_id: 'fpc',
+      prompt: 'FPC 排线是否扣好？',
+      choices: [
+        { value: 'yes', label: '是', outcome: { kind: 'action', label: '继续下一来源检查' } },
+        { value: 'no', label: '否', outcome: { kind: 'action', label: '重扣 FPC 排线' } },
+      ],
+    },
+  ],
+};
+
+test('flow starts at its explicit source entry step', () => {
+  const state = createRepairFlowState(profile);
+  assert.equal(currentRepairFlowStep(profile, state).step_id, 'charger');
+  assert.deepEqual(repairFlowProgress(profile, state), { current: 1, total: 3 });
+  assert.deepEqual(state.history, []);
+  assert.equal(state.terminal, null);
+});
+
+test('a next outcome advances and back restores the prior source question', () => {
+  const initial = createRepairFlowState(profile);
+  const advanced = answerRepairFlow(profile, initial, 'yes');
+  assert.equal(currentRepairFlowStep(profile, advanced).step_id, 'usb');
+  assert.deepEqual(repairFlowProgress(profile, advanced), { current: 2, total: 3 });
+  const restored = backRepairFlow(profile, advanced);
+  assert.equal(currentRepairFlowStep(profile, restored).step_id, 'charger');
+  assert.deepEqual(restored.history, []);
+});
+
+test('an action outcome terminates with the exact source action', () => {
+  const terminal = answerRepairFlow(profile, createRepairFlowState(profile), 'no');
+  assert.equal(currentRepairFlowStep(profile, terminal), null);
+  assert.deepEqual(terminal.terminal, { kind: 'action', label: '更换充电器' });
+  assert.equal(repairFlowProgress(profile, terminal).current, 1);
+  const reopened = backRepairFlow(profile, terminal);
+  assert.equal(currentRepairFlowStep(profile, reopened).step_id, 'charger');
+  assert.equal(reopened.terminal, null);
+});
+
+test('reset and invalid choices cannot escape the declared flow graph', () => {
+  const advanced = answerRepairFlow(profile, createRepairFlowState(profile), 'yes');
+  assert.deepEqual(resetRepairFlow(profile), createRepairFlowState(profile));
+  assert.throws(() => answerRepairFlow(profile, advanced, 'maybe'));
+  assert.throws(() => createRepairFlowState({ ...profile, entry_step_id: 'missing' }));
+});
+
+test('an ambiguous source branch stops at an explicit boundary terminal', () => {
+  const boundedProfile = {
+    ...profile,
+    steps: [{
+      step_id: 'charger',
+      prompt: '资料是否明确？',
+      choices: [{ value: 'no', label: '否', outcome: { kind: 'boundary', label: '后续 Y/N 标注待复核' } }],
+    }],
+  };
+  const terminal = answerRepairFlow(boundedProfile, createRepairFlowState(boundedProfile), 'no');
+  assert.deepEqual(terminal.terminal, { kind: 'boundary', label: '后续 Y/N 标注待复核' });
+});

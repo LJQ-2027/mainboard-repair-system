@@ -91,6 +91,23 @@
           <p id="inspectionMethod"></p>
           <small id="inspectionSource"></small>
         </article>
+        <section class="repair-flow-control" id="repairFlowControl" hidden>
+          <header class="repair-flow-heading">
+            <div><span>来源分支</span><strong id="repairFlowTitle"></strong></div>
+            <span id="repairFlowStep"></span>
+          </header>
+          <p class="repair-flow-prompt" id="repairFlowPrompt"></p>
+          <div class="repair-flow-choices" id="repairFlowChoices" role="group" aria-label="选择检查结果"></div>
+          <div class="repair-flow-terminal" id="repairFlowTerminal" hidden>
+            <span id="repairFlowTerminalType"></span><strong id="repairFlowTerminalLabel"></strong>
+            <p id="repairFlowBoundary"></p>
+          </div>
+          <ol class="repair-flow-history" id="repairFlowHistory"></ol>
+          <footer>
+            <small id="repairFlowSource"></small>
+            <div><button id="repairFlowBack" type="button">上一步</button><button id="repairFlowReset" type="button">重新开始</button></div>
+          </footer>
+        </section>
         <section class="measurement-control" id="measurementControl" hidden>
           <header><label for="guidanceMeasurementValue" id="measurementLabel">测量值</label><span id="measurementReference"></span></header>
           <div class="measurement-input-row">
@@ -100,7 +117,7 @@
           </div>
           <p id="measurementFeedback" data-evaluation="unrecorded"></p>
         </section>
-        <fieldset class="result-control">
+        <fieldset class="result-control" id="resultControl">
           <legend>返回检测结果</legend>
           <div role="group" aria-label="选择本次检测结果">
             <button type="button" data-guidance-result="normal" aria-pressed="false">正常</button>

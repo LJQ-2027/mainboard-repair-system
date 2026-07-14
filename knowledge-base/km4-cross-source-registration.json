@@ -29,6 +29,46 @@
       {"anchor_id": "board_bottom_left", "label": "PCB lower-left extent", "board": {"x": 0.03, "y": 0.93}, "image": {"x": 0.20, "y": 0.69}}
     ]
   },
+  "repair_flows": [
+    {
+      "flow_id": "not-charging-page-14-reviewed",
+      "title": "不充电分步排查",
+      "fault": "Not charging",
+      "entry_component_id": "KM4-MAIN-J6101",
+      "entry_step_id": "charger_check",
+      "source": {"source": "TECNO-L6735-KM4-F151手机维修通用操作指导书V1.0_20250331.pdf", "page": "14"},
+      "source_status": "reviewed_partial",
+      "boundary_note": "第14页在“FPC排线是否不良”之后的Y/N标注与处理动作语义存在歧义；本流程停在进入该节点前，不自动推断后续方向。",
+      "steps": [
+        {
+          "step_id": "charger_check",
+          "prompt": "充电器是否正常工作？",
+          "choices": [
+            {"value": "yes", "label": "是", "outcome": {"kind": "next", "step_id": "usb_solder_check"}},
+            {"value": "no", "label": "否", "outcome": {"kind": "action", "label": "更换充电器"}}
+          ]
+        },
+        {
+          "step_id": "usb_solder_check",
+          "prompt": "观察 USB 接口是否虚焊？",
+          "target_component_id": "KM4-MAIN-J6101",
+          "choices": [
+            {"value": "yes", "label": "是", "outcome": {"kind": "action", "label": "补焊 USB 接口", "target_component_id": "KM4-MAIN-J6101"}},
+            {"value": "no", "label": "否", "outcome": {"kind": "next", "step_id": "fpc_seat_check"}}
+          ]
+        },
+        {
+          "step_id": "fpc_seat_check",
+          "prompt": "检查 FPC 排线是否扣好？",
+          "target_component_id": "KM4-MAIN-J6101",
+          "choices": [
+            {"value": "yes", "label": "是", "outcome": {"kind": "boundary", "label": "进入 FPC 排线不良检查；后续 Y/N 标注待资料复核"}},
+            {"value": "no", "label": "否", "outcome": {"kind": "action", "label": "重扣 FPC 排线", "target_component_id": "KM4-MAIN-J6101"}}
+          ]
+        }
+      ]
+    }
+  ],
   "entities": [
     {
       "component_id": "KM4-MAIN-U2001", "designator": "U2001", "name": "Power management IC", "category": "bga_ic", "module": "Power management", "proxy_visibility": "concealed_by_shield",
@@ -48,7 +88,7 @@
       "geometry": {"center": {"x": 0.288, "y": 0.738}, "size": {"x": 0.135, "y": 0.205}, "rotation": 0},
       "schematic_links": [{"source": "F151_MAIN_PCB_1_维修原理图_V1.2_20250310.pdf", "page": "eMMC sheets", "facts": ["Designator U4000", "eMMC storage"]}],
       "repair_links": [{"source": "TECNO-L6735-KM4-F151手机维修通用操作指导书V1.0_20250331.pdf", "page": "7-11", "faults": ["No power", "Storage failure"], "instruction": "Check the memory power path and record VDDEMMCCORE before escalation."}],
-      "measurement_profile": {"measurement_id": "vddemmccore-voltage", "label": "VDDEMMCCORE 电压", "quantity": "voltage", "unit": "V", "input_step": 0.01, "reference": {"kind": "record_only"}, "source_link_index": 0},
+      "measurement_profile": {"measurement_id": "vddemmccore-voltage", "label": "VDDEMMCCORE 电压", "quantity": "voltage", "unit": "V", "input_step": 0.01, "reference": {"kind": "nominal", "value": 3.3}, "source_link_index": 0},
       "visual_profile": {"shape": "rectangle", "height": 0.05, "engineering_dimension": false}
     },
     {
