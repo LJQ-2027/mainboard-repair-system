@@ -6,6 +6,7 @@ import {
   buildFocusFrame,
   buildRenderDescriptor,
   buildSelectionRadius,
+  buildUnresolvedMarkerPresentation,
   resolvePackageFamily,
 } from '../assets/cross-source-registration/model-profiles.js';
 
@@ -47,6 +48,13 @@ test('reviewed low-confidence test points remain selectable markers without fake
   assert.equal(descriptor.layer, 'marker');
   assert.equal(descriptor.selectable, true);
   assert.equal(descriptor.dimensions.z, 0);
+});
+
+test('unresolved geometry markers do not reuse selection or fault colors', () => {
+  const presentation = buildUnresolvedMarkerPresentation();
+  assert.notEqual(presentation.color, 0xf2c94c);
+  assert.notEqual(presentation.color, 0xef5b3f);
+  assert.equal(presentation.opacity < 0.75, true);
 });
 
 test('visual profiles cap implausible source dimensions and heights', () => {

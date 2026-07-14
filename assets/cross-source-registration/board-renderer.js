@@ -5,6 +5,7 @@ import {
   buildFocusFrame,
   buildRenderDescriptor,
   buildSelectionRadius,
+  buildUnresolvedMarkerPresentation,
 } from './model-profiles.js';
 import {
   getShieldPresentation,
@@ -241,9 +242,15 @@ function createOutline(descriptor) {
 
 function createMarker(descriptor) {
   const radius = Math.max(descriptor.dimensions.x, descriptor.dimensions.y) * 0.72;
+  const presentation = buildUnresolvedMarkerPresentation();
   const marker = new THREE.Mesh(
     new THREE.RingGeometry(radius * 0.68, radius, 32),
-    new THREE.MeshBasicMaterial({ color: COLORS.selected, transparent: true, opacity: 0.9, side: THREE.DoubleSide }),
+    new THREE.MeshBasicMaterial({
+      color: presentation.color,
+      transparent: true,
+      opacity: presentation.opacity,
+      side: THREE.DoubleSide,
+    }),
   );
   marker.position.z = 0.012;
   return marker;

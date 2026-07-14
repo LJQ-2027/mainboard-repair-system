@@ -152,6 +152,12 @@ Entity/module visual-ownership verification on 2026-07-14:
 - Selected-package emissive intensity was reduced so component surface geometry remains readable instead of appearing covered by an amber layer.
 - 58 Node tests, 37 Python tests, standalone validation, and headed Chromium desktop/mobile interaction matrices passed. Browser evidence confirms empty entity overlay state, explicit module overlay state, deterministic restoration, pointer hover, and all existing rapid-transition paths.
 
+Unresolved-geometry marker refinement on 2026-07-14:
+
+- Reviewed entities whose source geometry is too weak for a package body retain a thin location ring, but the ring now uses a neutral low-opacity technical color instead of the same amber used by selection.
+- The marker continues to communicate an unresolved source position without fabricating component height. Persistent corner brackets, label emphasis, and restrained material response are now the only selected-component language.
+- A model-profile test prevents unresolved markers from reusing selection amber or fault coral. Headed Chromium confirms all seven reviewed entities remain discoverable and selectable through pan, rotation, side changes, and component inspection paths.
+
 Evidence-context verification on 2026-07-14:
 
 - The desktop evidence panel now keeps the selected component identity, visibility status, and single-component inspection action in a compact sticky header while schematic and repair evidence scroll below it.

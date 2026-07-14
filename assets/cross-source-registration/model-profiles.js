@@ -117,4 +117,8 @@ export function buildSelectionRadius(dimensions) {
   return Math.round(clamp(Math.max(dimensions.x, dimensions.y) * 0.44 + 0.006, 0.022, 0.09) * 1_000_000) / 1_000_000;
 }
 
+export function buildUnresolvedMarkerPresentation() {
+  return { color: 0x73827b, opacity: 0.56 };
+}
+
 export const BOARD_WORLD_SIZE = Object.freeze({ width: BOARD_WIDTH, height: BOARD_HEIGHT });
