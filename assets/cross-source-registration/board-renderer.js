@@ -15,6 +15,11 @@ import {
 import { isPointInFocus } from './repair-focus-state.js';
 import { buildInspectionTransform, inspectionOpacity } from './component-inspection-state.js';
 import { transformBoardCenter } from './model-interaction-state.js';
+import {
+  clampPanCenter,
+  resolveBoardInteractionMode,
+  screenDeltaToPan,
+} from './board-pan-state.js';
 
 const COLORS = {
   board: 0x17473e,
@@ -364,6 +369,8 @@ export class BoardRenderer {
     this.inspectionSnapshot = null;
     this.sideTransitioning = false;
     this.interactionLocked = false;
+    this.interactionMode = 'pan';
+    this.manualPanCenter = null;
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0xe7eae5);
     this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 20);
@@ -386,6 +393,7 @@ export class BoardRenderer {
     this.buildLights();
     this.renderer.compile(this.scene, this.camera);
     this.bind();
+    this.setInteractionMode(this.interactionMode);
     this.resize();
     this.observer = new ResizeObserver(() => this.resize());
     this.observer.observe(container);
@@ -573,6 +581,7 @@ export class BoardRenderer {
     this.selectionHalo = null;
     this.inspectionComponentId = null;
     this.inspectionSnapshot = null;
+    this.manualPanCenter = null;
     this.group = new THREE.Group();
     this.group.rotation.set(TOP_VIEW_TILT, rotationY, 0);
     this.scene.add(this.group);
@@ -625,9 +634,14 @@ export class BoardRenderer {
       if (this.interactionLocked) return;
       this.cancelCameraAnimation();
       const inspected = this.inspectionComponentId ? this.renderObjects.get(this.inspectionComponentId) : null;
-      this.drag = inspected
-        ? { mode: 'component', x: event.clientX, y: event.clientY, rx: inspected.rotation.x, ry: inspected.rotation.y }
-        : { mode: 'board', x: event.clientX, y: event.clientY, rx: this.group.rotation.x, rz: this.group.rotation.z };
+      if (inspected) {
+        this.drag = { mode: 'component', x: event.clientX, y: event.clientY, rx: inspected.rotation.x, ry: inspected.rotation.y };
+      } else if (this.interactionMode === 'rotate') {
+        this.drag = { mode: 'board', x: event.clientX, y: event.clientY, rx: this.group.rotation.x, rz: this.group.rotation.z };
+      } else {
+        this.drag = { mode: 'pan', x: event.clientX, y: event.clientY, cx: this.camera.position.x, cy: this.camera.position.y };
+      }
+      this.container.classList.add('dragging');
       canvas.setPointerCapture(event.pointerId);
     });
     canvas.addEventListener('pointermove', (event) => {
@@ -637,10 +651,23 @@ export class BoardRenderer {
         if (!inspected) return;
         inspected.rotation.y = this.drag.ry + (event.clientX - this.drag.x) * 0.012;
         inspected.rotation.x = Math.max(-1.15, Math.min(0.75, this.drag.rx + (event.clientY - this.drag.y) * 0.009));
-      } else {
+      } else if (this.drag.mode === 'board') {
         this.group.rotation.z = this.drag.rz + (event.clientX - this.drag.x) * 0.006;
         this.group.rotation.x = Math.max(-0.58, Math.min(0.08, this.drag.rx + (event.clientY - this.drag.y) * 0.004));
         this.inspectionAngle = Math.abs(this.group.rotation.x) > 0.08;
+      } else {
+        const delta = screenDeltaToPan({
+          dx: event.clientX - this.drag.x,
+          dy: event.clientY - this.drag.y,
+          width: this.container.clientWidth,
+          height: this.container.clientHeight,
+          frameWidth: this.camera.right - this.camera.left,
+          frameHeight: this.camera.top - this.camera.bottom,
+          zoom: this.camera.zoom,
+        });
+        this.manualPanCenter = clampPanCenter({ x: this.drag.cx + delta.x, y: this.drag.cy + delta.y });
+        this.camera.position.set(this.manualPanCenter.x, this.manualPanCenter.y, 4);
+        this.camera.lookAt(this.manualPanCenter.x, this.manualPanCenter.y, 0);
       }
       this.render();
     });
@@ -649,9 +676,13 @@ export class BoardRenderer {
       const dragMode = this.drag?.mode;
       const moved = this.drag && Math.hypot(event.clientX - this.drag.x, event.clientY - this.drag.y) > 5;
       this.drag = null;
+      this.container.classList.remove('dragging');
       if (!moved && dragMode !== 'component') this.pick(event);
     });
-    canvas.addEventListener('pointercancel', () => { this.drag = null; });
+    canvas.addEventListener('pointercancel', () => {
+      this.drag = null;
+      this.container.classList.remove('dragging');
+    });
     canvas.addEventListener('wheel', (event) => {
       event.preventDefault();
       if (this.interactionLocked) return;
@@ -944,6 +975,7 @@ export class BoardRenderer {
     const aspect = Math.max(this.container.clientWidth, 320) / Math.max(this.container.clientHeight, 320);
     const frame = buildFocusFrame(region, aspect);
     const focusCenter = this.focusCenterFor(frame.center);
+    this.manualPanCenter = null;
     this.applyRepairEmphasis(region);
     if (animate) this.animateCamera(focusCenter, frame.zoom);
     else {
@@ -963,6 +995,7 @@ export class BoardRenderer {
 
   clearRepairFocus(animate = true) {
     this.activeFocusRegion = null;
+    this.manualPanCenter = null;
     this.applyRepairEmphasis(null);
     if (animate) this.animateCamera({ x: 0, y: 0 }, 1);
     else {
@@ -1001,7 +1034,16 @@ export class BoardRenderer {
 
   setInteractionLocked(locked) {
     this.interactionLocked = Boolean(locked);
-    if (this.interactionLocked) this.drag = null;
+    if (this.interactionLocked) {
+      this.drag = null;
+      this.container.classList.remove('dragging');
+    }
+  }
+
+  setInteractionMode(mode) {
+    this.interactionMode = resolveBoardInteractionMode(mode);
+    this.container.dataset.dragMode = this.interactionMode;
+    return this.interactionMode;
   }
 
   focusCenterFor(center) {
@@ -1011,11 +1053,12 @@ export class BoardRenderer {
     });
   }
 
-  reset() {
+  reset(resetInteractionMode = true) {
     this.cancelCameraAnimation();
     if (this.inspectionComponentId) void this.clearComponentInspection(false);
     this.group.rotation.set(TOP_VIEW_TILT, 0, 0);
     this.inspectionAngle = false;
+    if (resetInteractionMode) this.setInteractionMode('pan');
     this.clearRepairFocus(true);
   }
 
@@ -1037,6 +1080,9 @@ export class BoardRenderer {
       this.camera.position.set(focusCenter.x, focusCenter.y, frame.position.z);
       this.camera.lookAt(focusCenter.x, focusCenter.y, 0);
       this.camera.zoom = transform?.zoom || 2.55;
+    } else if (this.manualPanCenter) {
+      this.camera.position.set(this.manualPanCenter.x, this.manualPanCenter.y, frame.position.z);
+      this.camera.lookAt(this.manualPanCenter.x, this.manualPanCenter.y, 0);
     } else if (this.activeFocusRegion) {
       const focusFrame = buildFocusFrame(this.activeFocusRegion, width / height);
       const focusCenter = this.focusCenterFor(focusFrame.center);

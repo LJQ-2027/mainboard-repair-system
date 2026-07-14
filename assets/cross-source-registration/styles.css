@@ -62,6 +62,7 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 .tabs button:focus-visible,
 .entity-list button:focus-visible,
 .icon-button:focus-visible,
+.model-interaction-modes button:focus-visible,
 .anatomy-segments button:focus-visible,
 .anatomy-panel select:focus-visible,
 .side-panel button:focus-visible { outline: 3px solid #65a9ff; outline-offset: 2px; }
@@ -77,8 +78,26 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 }
 .icon-button:hover { border-color: var(--accent); }
 .icon-button[aria-pressed="true"] { background: #17221e; color: white; border-color: #17221e; }
+.model-interaction-modes { display: flex; }
+.model-interaction-modes button {
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-right: 0;
+  background: white;
+  color: #46534d;
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+.model-interaction-modes button:last-child { border-right: 1px solid var(--line); }
+.model-interaction-modes button[aria-pressed="true"] { background: #17221e; border-color: #17221e; color: white; }
+.model-interaction-modes button:disabled { opacity: 0.42; cursor: not-allowed; }
 
 .stage { position: relative; min-height: 0; overflow: hidden; }
+#modelCanvas[data-drag-mode="pan"] canvas { cursor: grab; }
+#modelCanvas[data-drag-mode="rotate"] canvas { cursor: crosshair; }
+#modelCanvas.dragging canvas { cursor: grabbing; }
 .view { display: none; position: absolute; inset: 0; padding: 18px; }
 .view.active { display: flex; align-items: center; justify-content: center; }
 .image-layer {

@@ -18,6 +18,7 @@ import {
   createModelInteractionState,
   recordSelectionIntent,
 } from './model-interaction-state.js';
+import { resolveBoardInteractionMode } from './board-pan-state.js';
 
 const DATA_URL = '../../knowledge-base/km4-cross-source-registration.json';
 const GEOMETRY_URL = '../../knowledge-base/km4-board-compiled.json';
@@ -42,6 +43,7 @@ let sideIds = [];
 let activeSideId = 'main_page_2';
 let componentInspection = exitComponentInspection();
 let modelInteraction = createModelInteractionState();
+let modelDragMode = 'pan';
 
 const FAULT_LABELS = {
   no_power: '无法开机',
@@ -67,11 +69,24 @@ function updateInspectionUi() {
   document.querySelector('#modelView').classList.toggle('inspection-active', active);
   document.querySelector('#toggleInspection').disabled = active || !canAcceptModelInteraction(modelInteraction);
   document.querySelector('#moduleFocus').disabled = active || !canAcceptModelInteraction(modelInteraction);
+  document.querySelectorAll('[data-model-drag-mode]').forEach((control) => {
+    control.disabled = active || !canAcceptModelInteraction(modelInteraction);
+  });
   document.querySelectorAll('[data-shield-mode]').forEach((control) => {
     const sideHasShields = Boolean(sideDataById.get(activeSideId)?.anatomy.shields.length);
     control.disabled = active || !sideHasShields || !canAcceptModelInteraction(modelInteraction);
   });
   if (active) document.querySelector('#sourceNote').textContent = `${entity.designator} 单体检视 · ${sideDataById.get(activeSideId)?.label}注册坐标 · 维修视觉封装`;
+}
+
+function setModelDragMode(mode) {
+  if (!canAcceptModelInteraction(modelInteraction) || componentInspection.mode === 'isolated') return modelDragMode;
+  modelDragMode = resolveBoardInteractionMode(mode);
+  renderer?.setInteractionMode(modelDragMode);
+  document.querySelectorAll('[data-model-drag-mode]').forEach((control) => {
+    control.setAttribute('aria-pressed', String(control.dataset.modelDragMode === modelDragMode));
+  });
+  return modelDragMode;
 }
 
 function updateModelControlState() {
@@ -304,7 +319,7 @@ async function setView(name) {
     renderer.setInspectionAngle(true);
     document.querySelector('#toggleInspection').setAttribute('aria-pressed', 'false');
     requestAnimationFrame(() => {
-      renderer.reset();
+      renderer.reset(false);
       renderer.resize();
       if (modelInteraction.pendingFocus && currentRepairTarget?.sideId === activeSideId) {
         applyRepairTarget();
@@ -417,6 +432,7 @@ document.querySelector('#resetModel').addEventListener('click', async () => {
   if (!canAcceptModelInteraction(modelInteraction)) return;
   if (componentInspection.mode === 'isolated') await leaveComponentInspection(false);
   modelInteraction = consumePendingFocus(modelInteraction);
+  setModelDragMode('pan');
   renderer?.reset();
   document.querySelector('#toggleInspection').setAttribute('aria-pressed', 'false');
   updateInspectionUi();
@@ -427,6 +443,9 @@ document.querySelector('#toggleInspection').addEventListener('click', (event) =>
   event.currentTarget.setAttribute('aria-pressed', String(enabled));
   renderer?.setInspectionAngle(enabled);
 });
+document.querySelectorAll('[data-model-drag-mode]').forEach((button) => button.addEventListener('click', () => {
+  setModelDragMode(button.dataset.modelDragMode);
+}));
 document.querySelectorAll('[data-shield-mode]').forEach((button) => button.addEventListener('click', () => {
   document.querySelectorAll('[data-shield-mode]').forEach((candidate) => candidate.setAttribute('aria-pressed', String(candidate === button)));
   renderer?.setShieldMode(button.dataset.shieldMode);
