@@ -143,3 +143,11 @@ Reviewed-component affordance verification on 2026-07-14:
 - Each reviewed entity now owns a bounded transparent pick surface. This fixes the prior complex U2001 mesh bounds intercepting hover or click tests elsewhere on the board.
 - Component inspection hides board-level affordances and restores them on exit; pan, rotate, repair focus, side switching, and reset retain their existing contracts.
 - 57 Node tests, 37 Python tests, standalone validation, and headed Chromium desktop/mobile interaction matrices passed with seven affordances, correct tooltip identity, no runtime errors, and the existing rapid-transition regressions green.
+
+Entity/module visual-ownership verification on 2026-07-14:
+
+- Commit `3d8af66` stops entity targets from automatically rendering the source module polygon. Component selection now uses only its fitted corner markers, compact tag, and restrained material response.
+- Source module membership remains attached to the entity target for evidence and camera context. A module polygon appears only after the technician explicitly selects a module from the focus control.
+- The focus control now uses technician-facing `器件定位` and `全板视图` labels. Interactive hover switches the canvas cursor to a pointer, while drag retains the existing pan/rotate cursors.
+- Selected-package emissive intensity was reduced so component surface geometry remains readable instead of appearing covered by an amber layer.
+- 58 Node tests, 37 Python tests, standalone validation, and headed Chromium desktop/mobile interaction matrices passed. Browser evidence confirms empty entity overlay state, explicit module overlay state, deterministic restoration, pointer hover, and all existing rapid-transition paths.
