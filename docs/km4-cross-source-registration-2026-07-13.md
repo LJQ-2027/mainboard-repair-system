@@ -143,6 +143,8 @@ Reviewed-component affordance verification on 2026-07-14:
 - Each reviewed entity now owns a bounded transparent pick surface. This fixes the prior complex U2001 mesh bounds intercepting hover or click tests elsewhere on the board.
 - Component inspection hides board-level affordances and restores them on exit; pan, rotate, repair focus, side switching, and reset retain their existing contracts.
 - 57 Node tests, 37 Python tests, standalone validation, and headed Chromium desktop/mobile interaction matrices passed with seven affordances, correct tooltip identity, no runtime errors, and the existing rapid-transition regressions green.
+- Touch hit areas now maintain a screen-space minimum: 24 px on desktop and 36 px below 620 px, independent of model zoom. Overlapping transparent targets resolve to the component whose projected center is closest to the pointer, while visible corner markers retain their fitted size.
+- A real 390 px touch-context tap selected X2100 directly from the canvas and synchronized camera focus, selected affordance, evidence identity, and module context with zero overflow. Pan still wins after the existing movement threshold.
 
 Entity/module visual-ownership verification on 2026-07-14:
 

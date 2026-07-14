@@ -31,6 +31,13 @@ export function buildHitArea(dimensions, minimum = 0.035, padding = 0.012) {
   };
 }
 
+export function buildScreenAwareHitScale(hitArea, worldPerPixel, minimumPixels) {
+  return {
+    x: Math.max(1, (worldPerPixel.x * minimumPixels) / hitArea.x),
+    y: Math.max(1, (worldPerPixel.y * minimumPixels) / hitArea.y),
+  };
+}
+
 export function buildLabelPositions(items, labelWidth = 0.13, laneHeight = 0.034) {
   const placed = [];
   return items.map((item) => {

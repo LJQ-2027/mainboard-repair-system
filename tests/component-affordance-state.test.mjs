@@ -5,6 +5,7 @@ import {
   buildCornerSegments,
   buildHitArea,
   buildLabelPositions,
+  buildScreenAwareHitScale,
   resolveAffordancePresentation,
 } from '../assets/cross-source-registration/component-affordance-state.js';
 
@@ -28,6 +29,20 @@ test('nearby component labels are assigned separate vertical lanes', () => {
 test('reviewed components receive bounded hit areas without inheriting complex mesh bounds', () => {
   assert.deepEqual(buildHitArea({ x: 0.1, y: 0.06 }), { x: 0.112, y: 0.072 });
   assert.deepEqual(buildHitArea({ x: 0.008, y: 0.006 }), { x: 0.047, y: 0.047 });
+});
+
+test('small hit areas keep a screen-space minimum without enlarging visible markers', () => {
+  const mobile = buildScreenAwareHitScale(
+    { x: 0.047, y: 0.047 },
+    { x: 2.16 / 320, y: 1.38 / 500 },
+    36,
+  );
+  assert.equal(Math.round(0.047 * mobile.x / (2.16 / 320)), 36);
+  assert.equal(Math.round(0.047 * mobile.y / (1.38 / 500)), 36);
+  assert.deepEqual(
+    buildScreenAwareHitScale({ x: 0.2, y: 0.2 }, { x: 0.001, y: 0.001 }, 24),
+    { x: 1, y: 1 },
+  );
 });
 
 test('affordance states reserve coral for faults instead of ordinary selection', () => {

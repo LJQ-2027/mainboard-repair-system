@@ -22,6 +22,7 @@ import {
   buildCornerSegments,
   buildHitArea,
   buildLabelPositions,
+  buildScreenAwareHitScale,
   resolveAffordancePresentation,
 } from './component-affordance-state.js';
 
@@ -380,6 +381,7 @@ function createPickTarget(descriptor) {
     new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide }),
   );
   target.position.set(descriptor.center.x, descriptor.center.y, 0.116);
+  target.userData.hitArea = size;
   target.userData.componentId = descriptor.componentId;
   return target;
 }
@@ -786,8 +788,24 @@ export class BoardRenderer {
     const rect = this.renderer.domElement.getBoundingClientRect();
     this.pointer.set(((event.clientX - rect.left) / rect.width) * 2 - 1, -((event.clientY - rect.top) / rect.height) * 2 + 1);
     this.raycaster.setFromCamera(this.pointer, this.camera);
-    const hit = this.raycaster.intersectObjects([...this.pickTargets.values()], false)[0];
-    return hit?.object.userData.componentId || null;
+    const hits = this.raycaster.intersectObjects([...this.pickTargets.values()], false);
+    if (!hits.length) return null;
+    let nearestComponentId = null;
+    let nearestDistance = Number.POSITIVE_INFINITY;
+    const position = new THREE.Vector3();
+    const seen = new Set();
+    hits.forEach((hit) => {
+      const componentId = hit.object.userData.componentId;
+      if (seen.has(componentId)) return;
+      seen.add(componentId);
+      hit.object.getWorldPosition(position).project(this.camera);
+      const distance = (position.x - this.pointer.x) ** 2 + (position.y - this.pointer.y) ** 2;
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestComponentId = componentId;
+      }
+    });
+    return nearestComponentId;
   }
 
   updateHover(event) {
@@ -1235,6 +1253,15 @@ export class BoardRenderer {
     const worldPerPixelY = (this.camera.top - this.camera.bottom) / (height * this.camera.zoom);
     this.labelSprites.forEach((sprite) => {
       sprite.scale.set(worldPerPixelX * 48, worldPerPixelY * 14, 1);
+    });
+    const minimumPickPixels = width < 620 ? 36 : 24;
+    this.pickTargets.forEach((target) => {
+      const scale = buildScreenAwareHitScale(
+        target.userData.hitArea,
+        { x: worldPerPixelX, y: worldPerPixelY },
+        minimumPickPixels,
+      );
+      target.scale.set(scale.x, scale.y, 1);
     });
     this.group.updateMatrixWorld(true);
     this.renderer.render(this.scene, this.camera);
