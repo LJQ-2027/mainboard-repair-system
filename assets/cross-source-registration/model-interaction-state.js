@@ -1,4 +1,4 @@
-const TRANSITION_PHASES = new Set(['inspection', 'side']);
+const TRANSITION_PHASES = new Set(['inspection', 'side', 'angle']);
 
 export function createModelInteractionState() {
   return { phase: 'ready', transitionId: 0, pendingFocus: false };

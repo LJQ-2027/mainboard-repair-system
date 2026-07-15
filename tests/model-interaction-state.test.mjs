@@ -24,6 +24,13 @@ test('one transition owns the complete model interaction surface', () => {
   assert.equal(completeModelTransition(inspection, inspection.transitionId).phase, 'ready');
 });
 
+test('view-angle animation uses the same exclusive model transition contract', () => {
+  const angle = beginModelTransition(createModelInteractionState(), 'angle');
+  assert.equal(angle.phase, 'angle');
+  assert.equal(canAcceptModelInteraction(angle), false);
+  assert.deepEqual(beginModelTransition(angle, 'side'), angle);
+});
+
 test('initial data selection does not become an automatic camera request', () => {
   const initial = recordSelectionIntent(createModelInteractionState(), false);
   assert.equal(initial.pendingFocus, false);

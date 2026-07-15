@@ -36,6 +36,17 @@ test('model view controls use explicit repair-facing labels and synchronized ang
   assert.match(appSource, /function syncInspectionAngleControl\(enabled\)/);
   assert.match(appSource, /button\.setAttribute\('aria-pressed', String\(enabled\)\)/);
   assert.match(appSource, /enabled \? '恢复俯视' : '切换为斜视'/);
+  assert.match(appSource, /new BoardRenderer\([\s\S]*selectEntity,[\s\S]*syncInspectionAngleControl/);
+});
+
+test('button and drag angle changes share renderer-owned state and cancellable animation', () => {
+  assert.match(rendererSource, /this\.onInspectionAngleChange = onInspectionAngleChange/);
+  assert.match(rendererSource, /setInspectionAngleState\(enabled/);
+  assert.match(rendererSource, /this\.setInspectionAngleState\(isBoardAngled\(this\.group\.rotation\.x\)\)/);
+  assert.match(rendererSource, /cancelAngleAnimation\(\)/);
+  assert.match(rendererSource, /prefers-reduced-motion: reduce/);
+  assert.match(appSource, /startModelTransition\('angle'\)/);
+  assert.match(appSource, /await renderer\?\.setInspectionAngle\(enabled\)/);
 });
 
 test('model reset preserves active component inspection and resets its view', () => {
@@ -104,8 +115,9 @@ test('cross-view inspection serializes model view, target side, isolation, and r
 test('responsive board orientation survives reset and side replacement', () => {
   assert.match(rendererSource, /this\.defaultBoardRotationZ = buildDefaultBoardRotation\(width \/ height\)/);
   assert.match(rendererSource, /this\.group\.rotation\.set\(TOP_VIEW_TILT, 0, this\.defaultBoardRotationZ\)/);
-  assert.match(rendererSource, /replaceSideData\(sideData, -Math\.PI \/ 2, rotationZ\)/);
   assert.match(rendererSource, /buildFocusFrame\(region, aspect, this\.group\.rotation\.z\)/);
+  assert.match(rendererSource, /const rotationX = this\.group\.rotation\.x/);
+  assert.match(rendererSource, /replaceSideData\(sideData, -Math\.PI \/ 2, rotationZ, rotationX\)/);
 });
 
 test('board reset recomputes label slots only after the camera settles', () => {

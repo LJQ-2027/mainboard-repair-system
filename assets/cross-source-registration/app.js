@@ -801,7 +801,6 @@ async function setView(name) {
   document.querySelector('#pointMapTools').hidden = name !== 'pointmap';
   document.querySelector('#modelTools').hidden = name !== 'model';
   if (name === 'model') {
-    renderer.setInspectionAngle(true);
     syncInspectionAngleControl(false);
     await new Promise((resolve) => {
       requestAnimationFrame(() => {
@@ -899,6 +898,7 @@ async function init() {
     document.querySelector('#modelCanvas'),
     sideDataById.get(activeSideId),
     selectEntity,
+    syncInspectionAngleControl,
   );
   updateSideControls();
   updateSourceNote();
@@ -955,10 +955,16 @@ document.querySelector('#recordMeasurement').addEventListener('click', () => {
   repairGuidanceByComponent.set(entity.component_id, next);
   renderComponentGuidance(entity);
 });
-document.querySelector('#toggleInspection').addEventListener('click', (event) => {
+document.querySelector('#toggleInspection').addEventListener('click', async (event) => {
+  if (!canAcceptModelInteraction(modelInteraction)) return;
   const enabled = event.currentTarget.getAttribute('aria-pressed') !== 'true';
-  syncInspectionAngleControl(enabled);
-  renderer?.setInspectionAngle(enabled);
+  const transitionId = startModelTransition('angle');
+  if (transitionId === null) return;
+  try {
+    await renderer?.setInspectionAngle(enabled);
+  } finally {
+    finishModelTransition(transitionId);
+  }
 });
 document.querySelectorAll('[data-model-drag-mode]').forEach((button) => button.addEventListener('click', () => {
   setModelDragMode(button.dataset.modelDragMode);

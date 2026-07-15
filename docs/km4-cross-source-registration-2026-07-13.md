@@ -430,3 +430,11 @@ Repair-facing model toolbar clarity on 2026-07-15:
 - Full-board reset now uses the same familiar `↻` symbol as the point-map reset family instead of the crosshair-like `⌖`. Reset continues to restore pan mode, top view, board framing, and deterministic label placement.
 - The toolbar retains stable button dimensions and remains one row at desktop, 390 px, and 320 px. No explanatory legend, overlay, or canvas obstruction was added.
 - Headed Chromium verifies explicit labels, pressed state, reset state, canvas containment, complete button text, zero horizontal overflow, and zero runtime errors at all three widths. The strict full interaction matrix, 114 Node tests, 50 Python tests, source validation, syntax checks, diff checks, and HTTP checks passed.
+
+Unified board-angle interaction on 2026-07-15:
+
+- Button-driven and drag-driven board tilt now share renderer-owned angle state. Crossing the repair-view tilt threshold during a rotation gesture immediately synchronizes the `斜视` pressed state and accessible action instead of leaving stale toolbar feedback.
+- The `斜视` action uses a cancellable 280 ms cubic ease and participates in the same exclusive interaction transition as inspection and side switching. Repeated controls, canvas gestures, and view changes cannot race the in-flight angle transition.
+- Side replacement preserves the current X tilt together with Z orientation. Full-board reset remains the explicit path back to top view and pan mode.
+- Browsers requesting reduced motion receive the exact terminal angle without animation. Renderer diagnostics expose the current board tilt and angled state for interaction verification.
+- Headed Chromium sampled 22 monotonic animation frames, verified animation locking, manual-drag toolbar synchronization, side-preserved tilt, deterministic reset, reduced-motion behavior, and zero runtime errors. The strict full interaction matrix, 116 Node tests, 50 Python tests, source validation, syntax checks, diff checks, and HTTP checks passed.

@@ -46,6 +46,11 @@ const COLORS = {
   selected: 0xf2c94c,
 };
 const TOP_VIEW_TILT = -0.012;
+const INSPECTION_VIEW_TILT = -0.46;
+
+function isBoardAngled(rotationX) {
+  return Math.abs(rotationX - TOP_VIEW_TILT) > 0.08;
+}
 
 const MATERIALS = {
   dark: { color: COLORS.dark, roughness: 0.62, metalness: 0.12 },
@@ -454,10 +459,11 @@ function createPickTarget(descriptor) {
 }
 
 export class BoardRenderer {
-  constructor(container, sideData, onSelect) {
+  constructor(container, sideData, onSelect, onInspectionAngleChange = () => {}) {
     this.container = container;
     this.assignSideData(sideData);
     this.onSelect = onSelect;
+    this.onInspectionAngleChange = onInspectionAngleChange;
     this.meshes = new Map();
     this.renderObjects = new Map();
     this.descriptors = new Map();
@@ -474,6 +480,8 @@ export class BoardRenderer {
     this.activeFocusRegion = null;
     this.selectedComponentId = null;
     this.cameraAnimation = null;
+    this.angleAnimation = null;
+    this.angleAnimationResolve = null;
     this.inspectionAnimation = null;
     this.inspectionAnimationResolve = null;
     this.inspectionComponentId = null;
@@ -707,8 +715,14 @@ export class BoardRenderer {
     group.removeFromParent();
   }
 
-  replaceSideData(sideData, rotationY = 0, rotationZ = this.group.rotation.z) {
+  replaceSideData(
+    sideData,
+    rotationY = 0,
+    rotationZ = this.group.rotation.z,
+    rotationX = this.group.rotation.x,
+  ) {
     this.cancelInspectionAnimation();
+    this.cancelAngleAnimation();
     this.disposeGroup(this.group);
     this.assignSideData(sideData);
     this.meshes = new Map();
@@ -730,7 +744,7 @@ export class BoardRenderer {
     this.inspectionTarget = null;
     this.manualPanCenter = null;
     this.group = new THREE.Group();
-    this.group.rotation.set(TOP_VIEW_TILT, rotationY, rotationZ);
+    this.group.rotation.set(rotationX, rotationY, rotationZ);
     this.scene.add(this.group);
     this.build();
     this.renderer.compile(this.scene, this.camera);
@@ -746,6 +760,7 @@ export class BoardRenderer {
     }
     this.sideTransitioning = true;
     const rotationZ = this.group.rotation.z;
+    const rotationX = this.group.rotation.x;
     const started = performance.now();
     const duration = 520;
     let swapped = false;
@@ -758,7 +773,7 @@ export class BoardRenderer {
         } else {
           if (!swapped) {
             swapped = true;
-            this.replaceSideData(sideData, -Math.PI / 2, rotationZ);
+            this.replaceSideData(sideData, -Math.PI / 2, rotationZ, rotationX);
           }
           const local = (progress - 0.5) * 2;
           this.group.rotation.y = -Math.PI / 2 + (1 - (1 - local) ** 3) * Math.PI / 2;
@@ -781,6 +796,7 @@ export class BoardRenderer {
     canvas.addEventListener('pointerdown', (event) => {
       if (this.interactionLocked) return;
       this.cancelCameraAnimation();
+      this.cancelAngleAnimation();
       this.clearHover(false);
       canvas.setPointerCapture(event.pointerId);
       if (event.pointerType === 'touch') {
@@ -883,7 +899,7 @@ export class BoardRenderer {
         this.group.rotation.z = this.drag.rz + (event.clientX - this.drag.x) * 0.006;
         this.group.rotation.x = Math.max(-0.58, Math.min(0.08, this.drag.rx + (event.clientY - this.drag.y) * 0.004));
         if (this.drag.moved) this.boardOrientationDirty = true;
-        this.inspectionAngle = Math.abs(this.group.rotation.x) > 0.08;
+        this.setInspectionAngleState(isBoardAngled(this.group.rotation.x));
       } else {
         const delta = screenDeltaToPan({
           dx: event.clientX - this.drag.x,
@@ -1360,6 +1376,13 @@ export class BoardRenderer {
     this.cameraAnimation = null;
   }
 
+  cancelAngleAnimation() {
+    if (this.angleAnimation !== null) cancelAnimationFrame(this.angleAnimation);
+    this.angleAnimation = null;
+    if (this.angleAnimationResolve) this.angleAnimationResolve(false);
+    this.angleAnimationResolve = null;
+  }
+
   animateCamera(center, zoom, duration = 420, onComplete = null) {
     this.cancelCameraAnimation();
     const start = performance.now();
@@ -1447,11 +1470,48 @@ export class BoardRenderer {
     if (shouldRender) this.render();
   }
 
-  setInspectionAngle(enabled) {
-    if (this.inspectionComponentId) return;
-    this.inspectionAngle = enabled;
-    this.group.rotation.x = enabled ? -0.46 : TOP_VIEW_TILT;
-    this.render();
+  setInspectionAngleState(enabled, notify = true) {
+    const next = Boolean(enabled);
+    if (next === this.inspectionAngle) return next;
+    this.inspectionAngle = next;
+    if (notify) this.onInspectionAngleChange(next);
+    return next;
+  }
+
+  setInspectionAngle(enabled, animate = true) {
+    if (this.inspectionComponentId) return Promise.resolve(false);
+    this.cancelAngleAnimation();
+    const target = enabled ? INSPECTION_VIEW_TILT : TOP_VIEW_TILT;
+    const from = this.group.rotation.x;
+    this.setInspectionAngleState(enabled);
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!animate || reducedMotion || Math.abs(target - from) < 0.001) {
+      this.group.rotation.x = target;
+      this.updateLabelVisibility(false);
+      this.render();
+      return Promise.resolve(true);
+    }
+    const started = performance.now();
+    const duration = 280;
+    return new Promise((resolve) => {
+      this.angleAnimationResolve = resolve;
+      const tick = (now) => {
+        const progress = Math.min(1, (now - started) / duration);
+        const eased = 1 - (1 - progress) ** 3;
+        this.group.rotation.x = from + (target - from) * eased;
+        this.updateLabelVisibility(false);
+        this.render();
+        if (progress < 1) this.angleAnimation = requestAnimationFrame(tick);
+        else {
+          this.group.rotation.x = target;
+          this.angleAnimation = null;
+          this.angleAnimationResolve = null;
+          this.render();
+          resolve(true);
+        }
+      };
+      this.angleAnimation = requestAnimationFrame(tick);
+    });
   }
 
   setInteractionLocked(locked) {
@@ -1482,10 +1542,11 @@ export class BoardRenderer {
 
   reset(resetInteractionMode = true) {
     this.cancelCameraAnimation();
+    this.cancelAngleAnimation();
     if (this.inspectionComponentId) void this.clearComponentInspection(false);
     this.boardOrientationDirty = false;
     this.group.rotation.set(TOP_VIEW_TILT, 0, this.defaultBoardRotationZ);
-    this.inspectionAngle = false;
+    this.setInspectionAngleState(false);
     if (resetInteractionMode) this.setInteractionMode('pan');
     this.clearRepairFocus(true, true);
   }
@@ -1547,6 +1608,8 @@ export class BoardRenderer {
     const worldPerPixelX = (this.camera.right - this.camera.left) / (width * this.camera.zoom);
     const worldPerPixelY = (this.camera.top - this.camera.bottom) / (height * this.camera.zoom);
     this.container.dataset.cameraZoom = this.camera.zoom.toFixed(3);
+    this.container.dataset.boardTilt = this.group.rotation.x.toFixed(4);
+    this.container.dataset.boardAngled = String(this.inspectionAngle);
     this.group.updateMatrixWorld(true);
     const boardScreenCorners = [
       [-BOARD_WORLD_SIZE.width / 2, -BOARD_WORLD_SIZE.height / 2],
