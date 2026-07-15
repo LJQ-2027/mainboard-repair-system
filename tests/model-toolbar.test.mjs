@@ -12,6 +12,14 @@ test('model toolbar keeps source-driven focus without a manual module overlay se
   assert.match(appSource, /moduleOverlayId\(currentRepairTarget\)/);
 });
 
+test('ordinary selection keeps native component materials and uses precise affordances only', () => {
+  assert.doesNotMatch(rendererSource, /presentation\.emissiveIntensity/);
+  assert.doesNotMatch(rendererSource, /clearSelectionStyle\(\)/);
+  assert.doesNotMatch(rendererSource, /setInspectionSelectionStyle\(/);
+  assert.match(rendererSource, /createAffordanceFrame/);
+  assert.match(rendererSource, /labelVariant/);
+});
+
 test('model interaction tools belong to the model canvas instead of the global view header', () => {
   const viewHead = toolbarMarkup.slice(
     toolbarMarkup.indexOf('<div class="view-head">'),

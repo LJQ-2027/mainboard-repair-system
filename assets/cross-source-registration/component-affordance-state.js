@@ -5,7 +5,6 @@ const STATES = Object.freeze({
     labelOpacity: 0.72,
     labelPixels: { width: 68, height: 20 },
     labelVariant: 'idle',
-    emissiveIntensity: 0,
   },
   hovered: {
     color: 0xf3d77f,
@@ -13,7 +12,6 @@ const STATES = Object.freeze({
     labelOpacity: 1,
     labelPixels: { width: 76, height: 22 },
     labelVariant: 'hovered',
-    emissiveIntensity: 0.025,
   },
   selected: {
     color: 0xf2c94c,
@@ -21,7 +19,6 @@ const STATES = Object.freeze({
     labelOpacity: 1,
     labelPixels: { width: 76, height: 22 },
     labelVariant: 'selected',
-    emissiveIntensity: 0.06,
   },
 });
 

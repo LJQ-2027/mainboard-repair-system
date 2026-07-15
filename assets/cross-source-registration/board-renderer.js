@@ -1113,27 +1113,12 @@ export class BoardRenderer {
         leader.material.opacity = presentation.opacity * 0.44;
         if (this.inspectionComponentId) leader.visible = false;
       }
-      const object = this.meshes.get(componentId);
-      object?.traverse((child) => {
-        if (!child.isMesh || !child.material?.emissive) return;
-        child.material.emissive.setHex(presentation.color);
-        child.material.emissiveIntensity = presentation.emissiveIntensity;
-      });
     });
     if (shouldRender) this.render();
   }
 
-  clearSelectionStyle() {
-    this.meshes.forEach((object) => object.traverse((child) => {
-      if (!child.isMesh || !child.material?.emissive) return;
-      child.material.emissive.setHex(0x000000);
-      child.material.emissiveIntensity = 0;
-    }));
-  }
-
   select(componentId) {
     if (this.inspectionComponentId && this.inspectionComponentId !== componentId) void this.clearComponentInspection(false);
-    this.clearSelectionStyle();
     this.selectedComponentId = componentId;
     if (this.hoveredComponentId === componentId) this.updateHoverTooltipContent(componentId);
     const object = this.meshes.get(componentId);
@@ -1209,14 +1194,6 @@ export class BoardRenderer {
     this.affordanceObjects.forEach((frame) => { frame.visible = false; });
   }
 
-  setInspectionSelectionStyle(object, active) {
-    object.traverse((child) => {
-      if (!child.isMesh || !child.material?.emissive) return;
-      child.material.emissive.setHex(active ? 0x000000 : COLORS.selected);
-      child.material.emissiveIntensity = active ? 0 : 0.2;
-    });
-  }
-
   restoreInspectionContext() {
     this.contextObjects.forEach((object) => this.setObjectEmphasis(object, 1));
     this.applyRepairEmphasis(this.activeFocusRegion);
@@ -1285,7 +1262,6 @@ export class BoardRenderer {
       moduleId: this.activeModuleId,
     };
     this.setInspectionContextOpacity(componentId);
-    this.setInspectionSelectionStyle(object, true);
     object.traverse((child) => { child.renderOrder = 12; });
     const focusCenter = this.focusCenterFor(descriptor.center);
     const target = {
@@ -1366,7 +1342,6 @@ export class BoardRenderer {
         this.camera.updateProjectionMatrix();
       }
       object.traverse((child) => { child.renderOrder = 0; });
-      this.setInspectionSelectionStyle(object, false);
     }
     this.manualPanCenter = snapshot.manualPanCenter ? { ...snapshot.manualPanCenter } : null;
     this.inspectionComponentId = null;

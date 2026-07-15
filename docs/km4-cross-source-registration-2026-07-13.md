@@ -454,3 +454,10 @@ Free-browse versus guided-focus selection on 2026-07-16:
 - Entity-list, cross-source, and repair-flow selections retain the existing guided-focus path. They may change side, move the camera, zoom to the source-backed repair region, and apply local emphasis because those actions explicitly request navigation.
 - The stable free-browse frame lets desktop and touch users activate the same selected package again at the same screen coordinate to enter inspection. No timer, double-click dependency, or hidden coordinate cache was added.
 - Headed Chromium verifies pixel-coordinate-stable board bounds and unchanged `1.000` zoom for canvas selection at desktop and mobile, same-coordinate drill-down, and retained guided focus from `1.000` to `1.900`. The strict full interaction matrix, 119 Node tests, 50 Python tests, source validation, syntax checks, diff checks, and HTTP checks passed.
+
+Native-material component selection on 2026-07-16:
+
+- Ordinary idle, hover, and selected affordances no longer modify package emissive color or intensity. The package body keeps its native category material while eight fitted corner segments and the compact designator tag communicate interactivity and selection.
+- Entering and leaving single-component inspection no longer applies or restores an amber material tint. Isolation continues to use context opacity, camera framing, render order, and the existing return contract; abnormal repair observations retain their dedicated fault-color semantics.
+- A fixed-camera browser comparison sampled 2,200 pixels inside U4000 before selection, after selection, and after an inspection round trip. All package-interior pixels remained identical while the external selected affordance stayed visible and the camera remained at `1.000` zoom with unchanged board bounds.
+- The strict headed desktop/390 px/320 px interaction matrix, 120 Node tests, 50 Python tests, source validation, syntax checks, diff checks, and HTTP checks passed without runtime errors.
