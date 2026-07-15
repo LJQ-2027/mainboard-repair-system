@@ -631,7 +631,14 @@ function addMarkers(layer, positions, entities) {
     button.dataset.componentId = entity.component_id;
     button.style.left = `${point.x * 100}%`;
     button.style.top = `${point.y * 100}%`;
-    button.textContent = entity.designator.replace(/[0-9]/g, '').slice(0, 2);
+    const dot = document.createElement('span');
+    dot.className = 'marker-dot';
+    dot.setAttribute('aria-hidden', 'true');
+    const label = document.createElement('span');
+    label.className = 'marker-label';
+    label.textContent = entity.designator;
+    label.setAttribute('aria-hidden', 'true');
+    button.append(dot, label);
     button.title = `${entity.designator} · ${entity.name}`;
     button.setAttribute('aria-label', `选择 ${entity.designator} ${entity.name}`);
     button.addEventListener('click', () => selectEntity(entity.component_id));

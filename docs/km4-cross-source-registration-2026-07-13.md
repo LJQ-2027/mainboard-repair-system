@@ -401,3 +401,10 @@ View-aware source notes on 2026-07-15:
 - Reviewed `proxy_note` and `point_map_note` strings are stored in registration data and required by dataset validation. Model and inspection notes continue to derive the active board side, accepted designator count, and selected package identity from structured state.
 - At 480 px and below, the source row uses its existing 11 px text size, wraps completely, and grows only when needed instead of hiding content behind an ellipsis. The fixed workspace height remains unchanged and the model/image stage owns the remaining space.
 - Headed Chromium verifies the exact four source-note states at desktop, 390 px, and 320 px. Every note fits within both axes, each source row remains 42 px for the current reviewed copy, page overflow is zero, and there are no runtime errors. The strict full interaction matrix, 100 Node tests, and 50 Python tests passed.
+
+Compact cross-view markers on 2026-07-15:
+
+- Entity-proxy and engineering-point-map markers no longer use large coral circles or ambiguous designator prefixes. Ordinary navigation now uses a 12 px neutral locator, hover uses light amber, and selection uses strong amber; coral remains reserved for abnormal repair observations.
+- A transparent 36 px button preserves mouse and touch acquisition without enlarging the visible mark. The complete designator appears only for hover, keyboard focus, or selection, and the selected identity remains synchronized across both image views and the evidence panel.
+- Keyboard navigation exposes the same complete identity and adds a blue focus ring around the compact locator. The focus treatment does not resize the target or shift the registered coordinate.
+- Headed Chromium verifies target/locator dimensions, final-state colors, complete U2001/U4000/X2100 labels, hover, Tab focus, synchronized photo/point-map selection, label containment, zero overflow, and zero runtime errors at desktop, 390 px, and 320 px. The strict full interaction matrix, 104 Node tests, and 50 Python tests passed.

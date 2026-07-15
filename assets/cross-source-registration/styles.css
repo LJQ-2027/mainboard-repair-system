@@ -145,22 +145,58 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 .marker {
   position: absolute;
   transform: translate(-50%, -50%);
-  min-width: 27px;
-  height: 27px;
+  display: grid;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  z-index: 1;
+}
+.marker-dot {
+  display: block;
+  width: 12px;
+  height: 12px;
   border: 2px solid white;
   border-radius: 50%;
-  background: var(--accent);
-  color: white;
-  font-size: 9px;
-  font-weight: 700;
-  line-height: 23px;
-  text-align: center;
-  box-shadow: 0 1px 5px #0008;
-  cursor: pointer;
-  padding: 0 4px;
+  background: #2d3b35;
+  box-shadow: 0 1px 4px #0008;
+  transition: background 120ms ease, box-shadow 120ms ease, transform 120ms ease;
 }
-.marker:hover { scale: 1.13; }
-.marker.selected { background: var(--selected); color: #17221e; border-color: #17221e; z-index: 2; }
+.marker-label {
+  position: absolute;
+  left: 50%;
+  bottom: calc(50% + 9px);
+  min-width: max-content;
+  height: 22px;
+  padding: 0 6px;
+  transform: translateX(-50%) translateY(2px);
+  border: 1px solid #aeb9b2;
+  background: #17221e;
+  box-shadow: 0 2px 7px #0005;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease, transform 120ms ease;
+}
+.marker:is(:hover, :focus-visible, .selected) .marker-label { opacity: 1; transform: translateX(-50%) translateY(0); }
+.marker:hover:not(.selected) .marker-dot { background: #f6dc83; box-shadow: 0 0 0 2px #17221e, 0 2px 5px #0006; transform: scale(1.08); }
+.marker:focus-visible { outline: none; }
+.marker.selected { z-index: 3; }
+.marker.selected .marker-dot {
+  background: var(--selected);
+  box-shadow: 0 0 0 2px #17221e, 0 2px 5px #0006;
+}
+.marker.selected .marker-label {
+  border-color: var(--selected);
+  color: #fff3bd;
+}
+.marker:focus-visible .marker-dot { box-shadow: 0 0 0 3px #65a9ff, 0 2px 5px #0006; }
 
 .model-view { padding: 0; }
 .model-view.active { display: block; }
