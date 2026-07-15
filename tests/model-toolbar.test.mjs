@@ -22,3 +22,13 @@ test('model interaction tools belong to the model canvas instead of the global v
   assert.doesNotMatch(viewHead, /id="modelTools"/);
   assert.ok(modelToolsIndex > modelViewIndex);
 });
+
+test('model reset preserves active component inspection and resets its view', () => {
+  const resetHandler = appSource.slice(
+    appSource.indexOf("document.querySelector('#resetModel').addEventListener"),
+    appSource.indexOf("document.querySelector('#inspectComponent').addEventListener"),
+  );
+
+  assert.match(resetHandler, /resetComponentInspectionView/);
+  assert.doesNotMatch(resetHandler, /leaveComponentInspection/);
+});

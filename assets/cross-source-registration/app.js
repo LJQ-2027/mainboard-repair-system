@@ -10,6 +10,7 @@ import {
   nextSideId,
 } from './repair-focus-state.js';
 import {
+  buildInspectionToolbarState,
   canInspectComponent,
   enterComponentInspection,
   exitComponentInspection,
@@ -438,9 +439,19 @@ function updateInspectionUi() {
   document.querySelector('#inspectionDesignator').textContent = entity?.designator || '—';
   document.querySelector('#modelView').classList.toggle('inspection-active', active);
   document.querySelector('#toggleInspection').disabled = active || !canAcceptModelInteraction(modelInteraction);
-  document.querySelectorAll('[data-model-drag-mode]').forEach((control) => {
-    control.disabled = active || !canAcceptModelInteraction(modelInteraction);
+  const toolbar = buildInspectionToolbarState({
+    active,
+    ready: canAcceptModelInteraction(modelInteraction),
+    boardMode: modelDragMode,
   });
+  document.querySelectorAll('[data-model-drag-mode]').forEach((control) => {
+    const pan = control.dataset.modelDragMode === 'pan';
+    control.disabled = pan ? toolbar.panDisabled : toolbar.rotateDisabled;
+    control.setAttribute('aria-pressed', String(pan ? toolbar.panPressed : toolbar.rotatePressed));
+  });
+  const reset = document.querySelector('#resetModel');
+  reset.title = toolbar.resetLabel;
+  reset.setAttribute('aria-label', toolbar.resetLabel);
   document.querySelectorAll('[data-shield-mode]').forEach((control) => {
     const sideHasShields = Boolean(sideDataById.get(activeSideId)?.anatomy.shields.length);
     control.disabled = active || !sideHasShields || !canAcceptModelInteraction(modelInteraction);
@@ -449,7 +460,11 @@ function updateInspectionUi() {
 }
 
 function setModelDragMode(mode) {
-  if (!canAcceptModelInteraction(modelInteraction) || componentInspection.mode === 'isolated') return modelDragMode;
+  if (!canAcceptModelInteraction(modelInteraction)) return modelDragMode;
+  if (componentInspection.mode === 'isolated') {
+    if (mode === 'rotate') renderer?.focusInteractionSurface();
+    return modelDragMode;
+  }
   modelDragMode = resolveBoardInteractionMode(mode);
   renderer?.setInteractionMode(modelDragMode);
   document.querySelectorAll('[data-model-drag-mode]').forEach((control) => {
@@ -816,7 +831,16 @@ async function init() {
 document.querySelectorAll('[role=tab]').forEach((button) => button.addEventListener('click', () => { void setView(button.dataset.view); }));
 document.querySelector('#resetModel').addEventListener('click', async () => {
   if (!canAcceptModelInteraction(modelInteraction)) return;
-  if (componentInspection.mode === 'isolated') await leaveComponentInspection(false);
+  if (componentInspection.mode === 'isolated') {
+    const transitionId = startModelTransition('inspection');
+    if (transitionId === null) return;
+    try {
+      await renderer?.resetComponentInspectionView();
+    } finally {
+      finishModelTransition(transitionId);
+    }
+    return;
+  }
   modelInteraction = consumePendingFocus(modelInteraction);
   setModelDragMode('pan');
   renderer?.reset();

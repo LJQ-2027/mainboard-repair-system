@@ -11,7 +11,11 @@ import {
   getShieldPresentation,
   isPointCovered,
 } from './anatomy-state.js';
-import { buildInspectionTransform, inspectionOpacity } from './component-inspection-state.js';
+import {
+  buildInspectionTransform,
+  inspectionOpacity,
+  resolveInspectionKeyAction,
+} from './component-inspection-state.js';
 import { recordDragTravel, transformBoardCenter } from './model-interaction-state.js';
 import {
   anchorZoomCenter,
@@ -473,6 +477,7 @@ export class BoardRenderer {
     this.inspectionAnimationResolve = null;
     this.inspectionComponentId = null;
     this.inspectionSnapshot = null;
+    this.inspectionTarget = null;
     this.sideTransitioning = false;
     this.interactionLocked = false;
     this.interactionMode = 'pan';
@@ -487,6 +492,8 @@ export class BoardRenderer {
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.renderer.domElement.tabIndex = 0;
+    this.renderer.domElement.setAttribute('aria-label', '可交互 2.5D 主板模型');
     container.append(this.renderer.domElement);
     this.group = new THREE.Group();
     this.scene.add(this.group);
@@ -717,6 +724,7 @@ export class BoardRenderer {
     this.hoveredComponentId = null;
     this.inspectionComponentId = null;
     this.inspectionSnapshot = null;
+    this.inspectionTarget = null;
     this.manualPanCenter = null;
     this.group = new THREE.Group();
     this.group.rotation.set(TOP_VIEW_TILT, rotationY, 0);
@@ -936,6 +944,28 @@ export class BoardRenderer {
       this.updateLabelVisibility(false);
       this.updateHover(event);
     }, { passive: false });
+    canvas.addEventListener('keydown', (event) => {
+      if (this.interactionLocked || !this.inspectionComponentId) return;
+      const action = resolveInspectionKeyAction(event.key);
+      if (!action) return;
+      event.preventDefault();
+      const inspected = this.renderObjects.get(this.inspectionComponentId);
+      if (!inspected) return;
+      if (action.reset) {
+        void this.resetComponentInspectionView(false);
+        return;
+      }
+      if (action.rotationX) {
+        inspected.rotation.x = Math.max(-1.15, Math.min(0.75, inspected.rotation.x + action.rotationX));
+      }
+      if (action.rotationY) inspected.rotation.y += action.rotationY;
+      if (action.zoomFactor) {
+        const [minimum, maximum] = this.zoomBounds();
+        this.camera.zoom = Math.max(minimum, Math.min(maximum, this.camera.zoom * action.zoomFactor));
+        this.camera.updateProjectionMatrix();
+      }
+      this.render();
+    });
   }
 
   zoomBounds() {
@@ -1217,6 +1247,7 @@ export class BoardRenderer {
       rotation: object.rotation.clone(),
       scale: object.scale.x,
       camera: { x: this.camera.position.x, y: this.camera.position.y, zoom: this.camera.zoom },
+      manualPanCenter: this.manualPanCenter ? { ...this.manualPanCenter } : null,
       shieldMode: this.shieldMode,
       moduleId: this.activeModuleId,
     };
@@ -1233,6 +1264,13 @@ export class BoardRenderer {
       cameraY: focusCenter.y,
       zoom: transform.zoom,
     };
+    this.inspectionTarget = target;
+    this.container.dataset.dragMode = 'component';
+    const designator = descriptor.designator || componentId;
+    this.renderer.domElement.setAttribute(
+      'aria-label',
+      `${designator} 单体模型。方向键旋转，加减键缩放，Home 键复位。`,
+    );
     if (animate) await this.animateInspectionObject(object, target);
     else {
       object.scale.setScalar(target.scale);
@@ -1244,6 +1282,29 @@ export class BoardRenderer {
       this.camera.updateProjectionMatrix();
       this.render();
     }
+    const settledTarget = this.inspectionTarget || target;
+    this.manualPanCenter = { x: settledTarget.cameraX, y: settledTarget.cameraY };
+    return true;
+  }
+
+  async resetComponentInspectionView(animate = true) {
+    if (!this.inspectionComponentId || !this.inspectionTarget) return false;
+    const object = this.renderObjects.get(this.inspectionComponentId);
+    if (!object) return false;
+    const target = this.inspectionTarget;
+    if (animate) await this.animateInspectionObject(object, target, 320);
+    else {
+      object.scale.setScalar(target.scale);
+      object.position.z = target.z;
+      object.rotation.set(target.rx, target.ry, 0);
+      this.camera.position.set(target.cameraX, target.cameraY, 4);
+      this.camera.lookAt(target.cameraX, target.cameraY, 0);
+      this.camera.zoom = target.zoom;
+      this.camera.updateProjectionMatrix();
+      this.render();
+    }
+    const settledTarget = this.inspectionTarget || target;
+    this.manualPanCenter = { x: settledTarget.cameraX, y: settledTarget.cameraY };
     return true;
   }
 
@@ -1274,9 +1335,13 @@ export class BoardRenderer {
       object.traverse((child) => { child.renderOrder = 0; });
       this.setInspectionSelectionStyle(object, false);
     }
+    this.manualPanCenter = snapshot.manualPanCenter ? { ...snapshot.manualPanCenter } : null;
     this.inspectionComponentId = null;
     this.restoreInspectionContext();
     this.inspectionSnapshot = null;
+    this.inspectionTarget = null;
+    this.setInteractionMode(this.interactionMode);
+    this.renderer.domElement.setAttribute('aria-label', '可交互 2.5D 主板模型');
     this.render();
     return true;
   }
@@ -1390,6 +1455,10 @@ export class BoardRenderer {
     return this.interactionMode;
   }
 
+  focusInteractionSurface() {
+    this.renderer.domElement.focus({ preventScroll: true });
+  }
+
   focusCenterFor(center) {
     return transformBoardCenter(center, {
       x: this.group.rotation.x,
@@ -1425,6 +1494,13 @@ export class BoardRenderer {
       this.camera.position.set(focusCenter.x, focusCenter.y, frame.position.z);
       this.camera.lookAt(focusCenter.x, focusCenter.y, 0);
       this.camera.zoom = transform?.zoom || 2.55;
+      if (this.inspectionTarget) {
+        Object.assign(this.inspectionTarget, {
+          cameraX: focusCenter.x,
+          cameraY: focusCenter.y,
+          zoom: this.camera.zoom,
+        });
+      }
     } else if (this.manualPanCenter) {
       this.camera.position.set(this.manualPanCenter.x, this.manualPanCenter.y, frame.position.z);
       this.camera.lookAt(this.manualPanCenter.x, this.manualPanCenter.y, 0);

@@ -109,6 +109,7 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 .stage { position: relative; min-height: 0; overflow: hidden; }
 #modelCanvas[data-drag-mode="pan"] canvas { cursor: grab; }
 #modelCanvas[data-drag-mode="rotate"] canvas { cursor: crosshair; }
+#modelCanvas[data-drag-mode="component"] canvas { cursor: grab; }
 #modelCanvas.dragging canvas { cursor: grabbing; }
 #modelCanvas.component-hover canvas { cursor: pointer; }
 #modelCanvas { position: relative; }

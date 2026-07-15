@@ -3,10 +3,12 @@ import assert from 'node:assert/strict';
 
 import {
   buildInspectionTransform,
+  buildInspectionToolbarState,
   canInspectComponent,
   enterComponentInspection,
   exitComponentInspection,
   inspectionOpacity,
+  resolveInspectionKeyAction,
 } from '../assets/cross-source-registration/component-inspection-state.js';
 
 const u2001 = {
@@ -54,4 +56,39 @@ test('inspection transform is bounded across package and viewport sizes', () => 
   assert.equal(desktop.lift > 0, true);
   assert.equal(mobile.zoom < desktop.zoom, true);
   assert.equal(desktop.zoom <= 2.4, true);
+});
+
+test('inspection toolbar exposes component rotation and repurposes reset', () => {
+  assert.deepEqual(buildInspectionToolbarState({
+    active: true,
+    ready: true,
+    boardMode: 'pan',
+  }), {
+    panDisabled: true,
+    panPressed: false,
+    rotateDisabled: false,
+    rotatePressed: true,
+    resetLabel: '恢复单体初始视角',
+  });
+
+  assert.deepEqual(buildInspectionToolbarState({
+    active: false,
+    ready: true,
+    boardMode: 'pan',
+  }), {
+    panDisabled: false,
+    panPressed: true,
+    rotateDisabled: false,
+    rotatePressed: false,
+    resetLabel: '显示全板并恢复俯视',
+  });
+});
+
+test('inspection keyboard controls map only deliberate model commands', () => {
+  assert.deepEqual(resolveInspectionKeyAction('ArrowLeft'), { rotationY: -0.12 });
+  assert.deepEqual(resolveInspectionKeyAction('ArrowUp'), { rotationX: -0.09 });
+  assert.deepEqual(resolveInspectionKeyAction('+'), { zoomFactor: 1.1 });
+  assert.deepEqual(resolveInspectionKeyAction('-'), { zoomFactor: 0.9 });
+  assert.deepEqual(resolveInspectionKeyAction('Home'), { reset: true });
+  assert.equal(resolveInspectionKeyAction('Tab'), null);
 });

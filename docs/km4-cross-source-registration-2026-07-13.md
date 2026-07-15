@@ -55,12 +55,13 @@ The debug geometry view has been replaced by a layered repair model. Its reset s
 - Selecting a reviewed entity always makes it the current repair target. If its recommended side differs from the visible side, the model automatically flips there; the compact side control remains available for manual inspection.
 - When a selected entity is not represented on the visible side, its evidence panel remains visible and explicitly states the side containing the target instead of drawing a false locator.
 
-## U2001 Component Inspection Sample
+## Component Inspection Contract
 
-- U2001 is the first explicit `inspection_profile` vertical slice. The capability is data-enabled rather than inferred from a designator, so unfinished components do not expose a misleading control.
-- `单体查看` keeps the component at its registered board coordinate, raises and enlarges it, and turns the board and unrelated packages into a low-opacity context layer.
-- Pointer drag rotates U2001 around its own center; wheel input uses inspection-specific zoom bounds. The board remains still during component manipulation.
-- Return, full reset, entity change, side change, and view change all restore the original package transform, camera, opacity, shield state, module state, selected identity, and evidence context.
+- U2001, U4000, X2100, U0600, and J6101 have explicit `inspection_profile` records. The capability is data-enabled rather than inferred from a designator, so test points and unfinished components do not expose a misleading control.
+- `单体查看` keeps the selected package at its registered board coordinate, raises and enlarges it, and turns the board and unrelated packages into a low-opacity context layer.
+- Pointer or single-touch drag rotates the package around its own center. Wheel and two-touch pinch input use inspection-specific zoom bounds while the board remains still.
+- The canvas toolbar exposes component rotation as the active direct-manipulation mode. Its reset action restores the package angle, zoom, and center without leaving inspection.
+- Return, entity change, side change, and view change restore the original package transform, camera, opacity, shield state, module state, selected identity, evidence context, and prior board drag mode.
 - The refined procedural PMIC/BGA profile uses a layered dark package, muted substrate, metal edge, restrained bevel, and pin-one cue. It explicitly does not claim measured dimensions, exact ball count, or engineering CAD fidelity.
 - The evidence panel separates source-backed common faults and detection guidance from a visible model-fidelity boundary. No missing voltage, resistance, pin, or replacement values are invented.
 
@@ -364,3 +365,11 @@ Reviewed multi-component inspection on 2026-07-15:
 - The same isolation state, camera transform, low-opacity board context, component rotation, status frame, and return action are reused across all five package entities. No parallel inspection implementation or model-specific UI branch was added.
 - VBAT1 and VBUS1 remain test-point locations rather than component bodies. They retain measurement and repair guidance, do not receive inspection profiles, and no longer show an unavailable `单体查看` action.
 - Dataset validation rejects an inspection profile attached to a test point. Headed Chromium enters and exits all five package entities, verifies zero label leaders in isolation, checks U4000 and J6101 visually, confirms X2100 mobile containment, and passes the strict full interaction matrix without runtime errors.
+
+Direct component manipulation on 2026-07-15:
+
+- Single-component inspection now presents `旋转` as the active drag mode instead of disabling both board interaction controls. `平移` remains unavailable because the drag gesture owns package rotation, not board movement.
+- Mouse drag and one-finger touch rotate the isolated package. Wheel and two-finger pinch retain the inspection zoom bounds and do not change the selected identity or move the page.
+- The focused WebGL surface also supports arrow-key rotation, plus/minus zoom, and Home-key reset. The active rotation mode button moves keyboard focus to that surface instead of acting as a no-op.
+- The reset icon is repurposed in inspection to restore the initial package angle, camera center, and zoom without returning to the board. `返回主板` remains the sole explicit exit action and restores the prior board drag mode and camera center.
+- Headed Chromium produced pixel-different rotation and pinch frames, pixel-identical reset frames on desktop and mobile, a responsive-threshold reset race matching the stable target, and a clean pan-mode restoration after return. The strict full interaction matrix, 90 Node tests, 49 Python tests, source validation, and inline-script compilation passed without runtime errors.
