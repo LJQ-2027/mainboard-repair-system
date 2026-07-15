@@ -79,10 +79,25 @@ export function buildRenderDescriptor(component, options = {}) {
   };
 }
 
-export function buildCameraFrame(aspect = 1) {
+function rotatedBounds(width, height, rotationZ = 0) {
+  const cosine = Math.abs(Math.cos(rotationZ));
+  const sine = Math.abs(Math.sin(rotationZ));
+  return {
+    width: width * cosine + height * sine,
+    height: width * sine + height * cosine,
+  };
+}
+
+export function buildDefaultBoardRotation(aspect = 1) {
+  return aspect < 0.9 ? Math.PI / 2 : 0;
+}
+
+export function buildCameraFrame(aspect = 1, rotationZ = 0) {
   const safeAspect = Math.max(aspect, 0.25);
-  const minimumWidth = 2.16;
-  const minimumHeight = 1.38;
+  const bounds = rotatedBounds(BOARD_WIDTH, BOARD_HEIGHT, rotationZ);
+  const portraitBoard = Math.abs(Math.sin(rotationZ)) > 0.7;
+  const minimumWidth = bounds.width + 0.2;
+  const minimumHeight = bounds.height + (portraitBoard ? 0.58 : 0.15);
   const height = Math.max(minimumHeight, minimumWidth / safeAspect);
   const width = height * safeAspect;
   return {
@@ -96,14 +111,15 @@ export function buildCameraFrame(aspect = 1) {
   };
 }
 
-export function buildFocusFrame(region, aspect = 1) {
-  const frame = buildCameraFrame(aspect);
+export function buildFocusFrame(region, aspect = 1, rotationZ = 0) {
+  const frame = buildCameraFrame(aspect, rotationZ);
   const frameWidth = frame.right - frame.left;
   const frameHeight = frame.top - frame.bottom;
   const paddedWidth = (region.size.x * 2 + 0.22) * BOARD_WIDTH;
   const paddedHeight = (region.size.y * 1.25 + 0.18) * BOARD_HEIGHT;
+  const paddedBounds = rotatedBounds(paddedWidth, paddedHeight, rotationZ);
   const maximumZoom = aspect >= 1.2 ? 1.9 : 2.2;
-  const zoom = clamp(Math.min(frameWidth / paddedWidth, frameHeight / paddedHeight) * 0.86, 1.35, maximumZoom);
+  const zoom = clamp(Math.min(frameWidth / paddedBounds.width, frameHeight / paddedBounds.height) * 0.86, 1.35, maximumZoom);
   return {
     center: {
       x: Math.round((region.center.x * BOARD_WIDTH - BOARD_WIDTH / 2) * 1_000_000) / 1_000_000,

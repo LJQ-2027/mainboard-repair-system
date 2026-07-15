@@ -415,3 +415,11 @@ Cross-view component inspection on 2026-07-15:
 - On mobile, this explicit action also aligns the model workspace to the viewport. Desktop pages do not scroll, shared selection state does not own page movement, and non-package test points still expose no inspection action.
 - Point-map markers now receive pointer input before the pan surface. In dense marker groups, the target nearest the physical pointer position wins even when a neighboring 36 px acquisition area is visually above it; keyboard activation remains tied to the focused marker.
 - Headed Chromium verifies photo and point-map entry, automatic side correction, package return, test-point exclusion, zero horizontal overflow, and zero runtime errors at desktop, 390 px, and 320 px. The strict full interaction matrix, 109 Node tests, 50 Python tests, source validation, syntax checks, and UTF-8 validation passed.
+
+Adaptive narrow-screen board composition on 2026-07-15:
+
+- At narrow portrait canvas ratios, the wide KM4 board now defaults to a 90-degree screen composition. The source coordinate system, package orientation relative to the board, picking, repair focus, and side identity remain unchanged.
+- The orthographic frame is calculated from the rotated board bounds and reserves explicit top and bottom control-safe bands. At 390 px and 320 px the complete board occupies more than 70% of the model-canvas height while its conservative screen bounds remain disjoint from shield, side, and model-tool controls.
+- Manual board rotation remains authoritative until reset. Reset restores the current viewport's default composition; side replacement preserves it, and responsive transitions between narrow portrait and wider layouts select portrait or landscape framing without reload.
+- Reset label slots are now cleared only after the camera reaches its exact terminal frame. This removes animation-path-dependent slot assignment and restores pixel-identical pan and pinch reset frames.
+- Headed Chromium verifies desktop, 390 px, and 320 px composition, both board sides, manual rotation/reset, 390-to-700-to-390 responsive transitions, inspection entry/return, zero control overlap, zero label overlap or clipping, and zero runtime errors. The strict full interaction matrix, 113 Node tests, 50 Python tests, source validation, syntax checks, diff checks, UTF-8 checks, and HTTP checks passed.

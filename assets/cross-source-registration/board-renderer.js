@@ -2,6 +2,7 @@ import * as THREE from '../vendor/three/three.module.min.js';
 import {
   BOARD_WORLD_SIZE,
   buildCameraFrame,
+  buildDefaultBoardRotation,
   buildFocusFrame,
   buildRenderDescriptor,
   buildSelectionRadius,
@@ -482,6 +483,8 @@ export class BoardRenderer {
     this.interactionLocked = false;
     this.interactionMode = 'pan';
     this.manualPanCenter = null;
+    this.defaultBoardRotationZ = 0;
+    this.boardOrientationDirty = false;
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0xe7eae5);
     this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 20);
@@ -704,7 +707,7 @@ export class BoardRenderer {
     group.removeFromParent();
   }
 
-  replaceSideData(sideData, rotationY = 0) {
+  replaceSideData(sideData, rotationY = 0, rotationZ = this.group.rotation.z) {
     this.cancelInspectionAnimation();
     this.disposeGroup(this.group);
     this.assignSideData(sideData);
@@ -727,7 +730,7 @@ export class BoardRenderer {
     this.inspectionTarget = null;
     this.manualPanCenter = null;
     this.group = new THREE.Group();
-    this.group.rotation.set(TOP_VIEW_TILT, rotationY, 0);
+    this.group.rotation.set(TOP_VIEW_TILT, rotationY, rotationZ);
     this.scene.add(this.group);
     this.build();
     this.renderer.compile(this.scene, this.camera);
@@ -742,6 +745,7 @@ export class BoardRenderer {
       return Promise.resolve(this.sideId);
     }
     this.sideTransitioning = true;
+    const rotationZ = this.group.rotation.z;
     const started = performance.now();
     const duration = 520;
     let swapped = false;
@@ -754,7 +758,7 @@ export class BoardRenderer {
         } else {
           if (!swapped) {
             swapped = true;
-            this.replaceSideData(sideData, -Math.PI / 2);
+            this.replaceSideData(sideData, -Math.PI / 2, rotationZ);
           }
           const local = (progress - 0.5) * 2;
           this.group.rotation.y = -Math.PI / 2 + (1 - (1 - local) ** 3) * Math.PI / 2;
@@ -878,6 +882,7 @@ export class BoardRenderer {
       } else if (this.drag.mode === 'board') {
         this.group.rotation.z = this.drag.rz + (event.clientX - this.drag.x) * 0.006;
         this.group.rotation.x = Math.max(-0.58, Math.min(0.08, this.drag.rx + (event.clientY - this.drag.y) * 0.004));
+        if (this.drag.moved) this.boardOrientationDirty = true;
         this.inspectionAngle = Math.abs(this.group.rotation.x) > 0.08;
       } else {
         const delta = screenDeltaToPan({
@@ -1355,7 +1360,7 @@ export class BoardRenderer {
     this.cameraAnimation = null;
   }
 
-  animateCamera(center, zoom, duration = 420) {
+  animateCamera(center, zoom, duration = 420, onComplete = null) {
     this.cancelCameraAnimation();
     const start = performance.now();
     const from = { x: this.camera.position.x, y: this.camera.position.y, zoom: this.camera.zoom };
@@ -1371,7 +1376,10 @@ export class BoardRenderer {
       this.updateLabelVisibility(false);
       this.render();
       if (progress < 1) this.cameraAnimation = requestAnimationFrame(tick);
-      else this.cameraAnimation = null;
+      else {
+        this.cameraAnimation = null;
+        onComplete?.();
+      }
     };
     this.cameraAnimation = requestAnimationFrame(tick);
   }
@@ -1380,7 +1388,7 @@ export class BoardRenderer {
     if (!region) return this.clearRepairFocus(animate);
     this.activeFocusRegion = region;
     const aspect = Math.max(this.container.clientWidth, 320) / Math.max(this.container.clientHeight, 320);
-    const frame = buildFocusFrame(region, aspect);
+    const frame = buildFocusFrame(region, aspect, this.group.rotation.z);
     const focusCenter = this.focusCenterFor(frame.center);
     this.manualPanCenter = null;
     this.applyRepairEmphasis(region);
@@ -1400,16 +1408,22 @@ export class BoardRenderer {
     this.focusRegion(region, animate);
   }
 
-  clearRepairFocus(animate = true) {
+  clearRepairFocus(animate = true, resetLabelPlacement = false) {
     this.activeFocusRegion = null;
     this.manualPanCenter = null;
     this.applyRepairEmphasis(null);
-    if (animate) this.animateCamera({ x: 0, y: 0 }, 1);
+    const settleLabels = () => {
+      if (!resetLabelPlacement) return;
+      this.labelPlacementSlots = new Map();
+      this.render();
+    };
+    if (animate) this.animateCamera({ x: 0, y: 0 }, 1, 420, settleLabels);
     else {
       this.camera.position.set(0, 0, 4);
       this.camera.lookAt(0, 0, 0);
       this.camera.zoom = 1;
       this.camera.updateProjectionMatrix();
+      if (resetLabelPlacement) this.labelPlacementSlots = new Map();
       this.updateLabelVisibility(false);
       this.render();
     }
@@ -1469,18 +1483,26 @@ export class BoardRenderer {
   reset(resetInteractionMode = true) {
     this.cancelCameraAnimation();
     if (this.inspectionComponentId) void this.clearComponentInspection(false);
-    this.labelPlacementSlots = new Map();
-    this.group.rotation.set(TOP_VIEW_TILT, 0, 0);
+    this.boardOrientationDirty = false;
+    this.group.rotation.set(TOP_VIEW_TILT, 0, this.defaultBoardRotationZ);
     this.inspectionAngle = false;
     if (resetInteractionMode) this.setInteractionMode('pan');
-    this.clearRepairFocus(true);
+    this.clearRepairFocus(true, true);
   }
 
   resize() {
     const width = Math.max(this.container.clientWidth, 320);
     const height = Math.max(this.container.clientHeight, 320);
     this.renderer.setSize(width, height, false);
-    const frame = buildCameraFrame(width / height);
+    this.defaultBoardRotationZ = buildDefaultBoardRotation(width / height);
+    const previousRotationZ = this.group.rotation.z;
+    if (!this.boardOrientationDirty && !this.inspectionComponentId) {
+      this.group.rotation.z = this.defaultBoardRotationZ;
+    }
+    if (Math.abs(previousRotationZ - this.group.rotation.z) > 0.001) {
+      this.labelPlacementSlots = new Map();
+    }
+    const frame = buildCameraFrame(width / height, this.group.rotation.z);
     this.camera.left = frame.left;
     this.camera.right = frame.right;
     this.camera.top = frame.top;
@@ -1505,7 +1527,7 @@ export class BoardRenderer {
       this.camera.position.set(this.manualPanCenter.x, this.manualPanCenter.y, frame.position.z);
       this.camera.lookAt(this.manualPanCenter.x, this.manualPanCenter.y, 0);
     } else if (this.activeFocusRegion) {
-      const focusFrame = buildFocusFrame(this.activeFocusRegion, width / height);
+      const focusFrame = buildFocusFrame(this.activeFocusRegion, width / height, this.group.rotation.z);
       const focusCenter = this.focusCenterFor(focusFrame.center);
       this.camera.position.set(focusCenter.x, focusCenter.y, frame.position.z);
       this.camera.lookAt(focusCenter.x, focusCenter.y, 0);
@@ -1526,6 +1548,25 @@ export class BoardRenderer {
     const worldPerPixelY = (this.camera.top - this.camera.bottom) / (height * this.camera.zoom);
     this.container.dataset.cameraZoom = this.camera.zoom.toFixed(3);
     this.group.updateMatrixWorld(true);
+    const boardScreenCorners = [
+      [-BOARD_WORLD_SIZE.width / 2, -BOARD_WORLD_SIZE.height / 2],
+      [BOARD_WORLD_SIZE.width / 2, -BOARD_WORLD_SIZE.height / 2],
+      [BOARD_WORLD_SIZE.width / 2, BOARD_WORLD_SIZE.height / 2],
+      [-BOARD_WORLD_SIZE.width / 2, BOARD_WORLD_SIZE.height / 2],
+    ].map(([x, y]) => {
+      const point = new THREE.Vector3(x, y, 0).applyMatrix4(this.group.matrixWorld).project(this.camera);
+      return { x: (point.x + 1) * width / 2, y: (1 - point.y) * height / 2 };
+    });
+    const boardBounds = {
+      left: Math.min(...boardScreenCorners.map((point) => point.x)),
+      top: Math.min(...boardScreenCorners.map((point) => point.y)),
+      right: Math.max(...boardScreenCorners.map((point) => point.x)),
+      bottom: Math.max(...boardScreenCorners.map((point) => point.y)),
+    };
+    this.container.dataset.boardScreenBounds = JSON.stringify(boardBounds);
+    this.container.dataset.boardOrientation = this.boardOrientationDirty
+      ? 'manual'
+      : (Math.abs(Math.sin(this.group.rotation.z)) > 0.7 ? 'portrait' : 'landscape');
     const labelDepths = new Map();
     const labelAnchors = new Map();
     const anchor = new THREE.Vector3();

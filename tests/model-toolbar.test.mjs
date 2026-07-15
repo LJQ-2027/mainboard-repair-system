@@ -4,6 +4,7 @@ import test from 'node:test';
 
 const toolbarMarkup = await readFile(new URL('../assets/cross-source-registration/index.html', import.meta.url), 'utf8');
 const appSource = await readFile(new URL('../assets/cross-source-registration/app.js', import.meta.url), 'utf8');
+const rendererSource = await readFile(new URL('../assets/cross-source-registration/board-renderer.js', import.meta.url), 'utf8');
 
 test('model toolbar keeps source-driven focus without a manual module overlay selector', () => {
   assert.doesNotMatch(toolbarMarkup, /id="moduleFocus"/);
@@ -84,4 +85,22 @@ test('cross-view inspection serializes model view, target side, isolation, and r
   assert.match(entrySource, /revealModelWorkspace\(\)/);
   assert.ok(entrySource.indexOf("await setView('model')") < entrySource.indexOf('await switchModelSide(intent.sideId)'));
   assert.ok(entrySource.indexOf('await switchModelSide(intent.sideId)') < entrySource.indexOf('await enterCurrentComponentInspection(entity)'));
+});
+
+test('responsive board orientation survives reset and side replacement', () => {
+  assert.match(rendererSource, /this\.defaultBoardRotationZ = buildDefaultBoardRotation\(width \/ height\)/);
+  assert.match(rendererSource, /this\.group\.rotation\.set\(TOP_VIEW_TILT, 0, this\.defaultBoardRotationZ\)/);
+  assert.match(rendererSource, /replaceSideData\(sideData, -Math\.PI \/ 2, rotationZ\)/);
+  assert.match(rendererSource, /buildFocusFrame\(region, aspect, this\.group\.rotation\.z\)/);
+});
+
+test('board reset recomputes label slots only after the camera settles', () => {
+  const resetStart = rendererSource.indexOf('reset(resetInteractionMode = true)');
+  const resetSource = rendererSource.slice(
+    resetStart,
+    rendererSource.indexOf('\n  resize()', resetStart),
+  );
+  assert.match(rendererSource, /animateCamera\(center, zoom, duration = 420, onComplete = null\)/);
+  assert.match(resetSource, /clearRepairFocus\(true, true\)/);
+  assert.doesNotMatch(resetSource, /this\.labelPlacementSlots = new Map\(\)/);
 });

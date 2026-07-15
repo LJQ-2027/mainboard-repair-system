@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 import {
   buildCameraFrame,
+  buildDefaultBoardRotation,
   buildFocusFrame,
   buildRenderDescriptor,
   buildSelectionRadius,
@@ -73,6 +74,30 @@ test('orthographic frame contains the whole board at wide and narrow aspect rati
   assert.ok(narrow.right - narrow.left >= 2.16);
   assert.ok(narrow.top - narrow.bottom > 1.36);
   assert.deepEqual(wide.position, { x: 0, y: 0, z: 4 });
+});
+
+test('portrait workspaces rotate the wide board and fit its rotated bounds', () => {
+  const aspect = 320 / 454;
+  const rotation = buildDefaultBoardRotation(aspect);
+  const frame = buildCameraFrame(aspect, rotation);
+  const width = frame.right - frame.left;
+  const height = frame.top - frame.bottom;
+
+  assert.equal(rotation, Math.PI / 2);
+  assert.equal(buildDefaultBoardRotation(16 / 9), 0);
+  assert.equal(buildDefaultBoardRotation(390 / 454), Math.PI / 2);
+  assert.ok(width >= 1.8 && width < 1.9);
+  assert.ok(height >= 2.55 && height < 2.7);
+  assert.ok((1.25 / width) > 0.65);
+  assert.ok((2 / height) > 0.75);
+});
+
+test('repair focus swaps its padded bounds with the portrait board orientation', () => {
+  const region = { center: { x: 0.6, y: 0.4 }, size: { x: 0.2, y: 0.1 } };
+  const landscape = buildFocusFrame(region, 320 / 454, 0);
+  const portrait = buildFocusFrame(region, 320 / 454, Math.PI / 2);
+  assert.notEqual(portrait.zoom, landscape.zoom);
+  assert.deepEqual(portrait.center, landscape.center);
 });
 
 test('repair focus frame converts a normalized region into a bounded world camera target', () => {
