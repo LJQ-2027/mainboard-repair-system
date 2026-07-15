@@ -328,3 +328,11 @@ Screen-space component-label layout on 2026-07-15:
 - The layout keeps all seven reviewed labels visible. It selects nearby positions above, below, left, or right of each anchor, then uses a bounded fallback grid only when every local candidate is occupied.
 - Collision and containment use the actual WebGL canvas size rather than the nominal browser viewport. At a 320 px browser width the drawable canvas is 304 px, so right-edge labels such as `VBAT1` and `VBUS1` now remain fully visible instead of being clipped.
 - The renderer exposes measured overlap and outside counts for browser QA. Headed Chromium verifies both counts remain zero at desktop, 390 px, 320 px, and after anchored wheel zoom while selection, touch gestures, rotation, and inspection remain intact.
+
+Selective component-label leaders on 2026-07-15:
+
+- A reviewed designator tag receives a short leader only when collision avoidance moves its center at least 48 px from the projected component anchor. Nearby tags remain unconnected, preventing the whole-board view from becoming a line network.
+- Each leader starts eight screen pixels away from the component anchor and ends at the nearest edge of the tag. It inherits the restrained amber component-affordance color and stays subordinate to hover and selection feedback.
+- Leaders are hidden in single-component inspection because the isolated body already establishes identity. No module polygon, broad translucent overlay, or fault-coral treatment is used.
+- Label layout now defers during the initial pre-layout frame when the canvas is too small to contain one tag. This prevents invalid Three.js geometry before the real ResizeObserver dimensions arrive.
+- Headed Chromium verifies a selective leader count between one and six at 390 px and 320 px, zero leaders during inspection, zero label overlap or clipping, and the full desktop/mobile interaction matrix with no runtime errors.

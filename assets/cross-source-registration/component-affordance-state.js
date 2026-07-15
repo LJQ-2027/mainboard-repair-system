@@ -81,6 +81,9 @@ export function buildScreenLabelPositions(items, {
 } = {}) {
   const halfWidth = labelPixels.width / 2;
   const halfHeight = labelPixels.height / 2;
+  if (!viewport
+    || viewport.width < labelPixels.width + margin * 2
+    || viewport.height < labelPixels.height + margin * 2) return [];
   const horizontalStep = labelPixels.width + gap;
   const verticalStep = labelPixels.height + gap;
   const clamp = (position) => ({
@@ -133,6 +136,37 @@ export function buildScreenLabelPositions(items, {
     placed.push(position);
     return position;
   });
+}
+
+export function buildLabelLeaderSegment({
+  anchor,
+  label,
+  labelPixels = { width: 76, height: 22 },
+  minimumDistance = 48,
+  anchorPadding = 8,
+} = {}) {
+  const dx = label.x - anchor.x;
+  const dy = label.y - anchor.y;
+  const distance = Math.hypot(dx, dy);
+  if (distance < minimumDistance) return null;
+  const unit = { x: dx / distance, y: dy / distance };
+  const halfWidth = labelPixels.width / 2;
+  const halfHeight = labelPixels.height / 2;
+  const edgeDistance = Math.min(
+    Math.abs(unit.x) > Number.EPSILON ? halfWidth / Math.abs(unit.x) : Number.POSITIVE_INFINITY,
+    Math.abs(unit.y) > Number.EPSILON ? halfHeight / Math.abs(unit.y) : Number.POSITIVE_INFINITY,
+  );
+  const round = (value) => Math.round(value * 1_000_000) / 1_000_000;
+  return {
+    start: {
+      x: round(anchor.x + unit.x * anchorPadding),
+      y: round(anchor.y + unit.y * anchorPadding),
+    },
+    end: {
+      x: round(label.x - unit.x * edgeDistance),
+      y: round(label.y - unit.y * edgeDistance),
+    },
+  };
 }
 
 export function resolveAffordancePresentation({ selected = false, hovered = false } = {}) {

@@ -23,6 +23,7 @@ import {
 import {
   buildCornerSegments,
   buildHitArea,
+  buildLabelLeaderSegment,
   buildScreenLabelPositions,
   buildScreenAwareHitScale,
   placeHoverTooltip,
@@ -362,6 +363,22 @@ function createLabelSprite(text) {
   return sprite;
 }
 
+function createLabelLeaderLine() {
+  const geometry = new THREE.BufferGeometry();
+  const positions = new THREE.BufferAttribute(new Float32Array(6), 3);
+  positions.setUsage(THREE.DynamicDrawUsage);
+  geometry.setAttribute('position', positions);
+  const line = new THREE.Line(geometry, new THREE.LineBasicMaterial({
+    color: 0xd0a63b,
+    transparent: true,
+    opacity: 0.34,
+    depthTest: false,
+  }));
+  line.renderOrder = 8;
+  line.visible = false;
+  return line;
+}
+
 function createAffordanceFrame(descriptor) {
   const points = buildCornerSegments(descriptor.dimensions)
     .flatMap((segment) => segment.map((point) => new THREE.Vector3(point.x, point.y, 0)));
@@ -403,6 +420,7 @@ export class BoardRenderer {
     this.shieldObjects = new Map();
     this.moduleObjects = new Map();
     this.labelSprites = new Map();
+    this.labelLeaderLines = new Map();
     this.affordanceObjects = new Map();
     this.pickTargets = new Map();
     this.contextObjects = [];
@@ -571,9 +589,11 @@ export class BoardRenderer {
       const descriptor = this.descriptors.get(entity.component_id);
       if (!descriptor) return;
       const sprite = createLabelSprite(entity.designator);
+      const leader = createLabelLeaderLine();
       sprite.position.set(descriptor.center.x, descriptor.center.y, 0.12);
-      this.group.add(sprite);
+      this.group.add(leader, sprite);
       this.labelSprites.set(entity.component_id, sprite);
+      this.labelLeaderLines.set(entity.component_id, leader);
     });
   }
 
@@ -646,6 +666,7 @@ export class BoardRenderer {
     this.shieldObjects = new Map();
     this.moduleObjects = new Map();
     this.labelSprites = new Map();
+    this.labelLeaderLines = new Map();
     this.affordanceObjects = new Map();
     this.pickTargets = new Map();
     this.contextObjects = [];
@@ -948,6 +969,12 @@ export class BoardRenderer {
         label.material.opacity = presentation.labelOpacity;
         label.visible = !this.inspectionComponentId;
       }
+      const leader = this.labelLeaderLines.get(componentId);
+      if (leader) {
+        leader.material.color.setHex(presentation.color);
+        leader.material.opacity = presentation.opacity * 0.44;
+        if (this.inspectionComponentId) leader.visible = false;
+      }
       const object = this.meshes.get(componentId);
       object?.traverse((child) => {
         if (!child.isMesh || !child.material?.emissive) return;
@@ -1039,6 +1066,7 @@ export class BoardRenderer {
     this.shieldObjects.forEach((object) => { object.visible = false; });
     this.moduleObjects.forEach((object) => { object.visible = false; });
     this.labelSprites.forEach((sprite) => { sprite.visible = false; });
+    this.labelLeaderLines.forEach((leader) => { leader.visible = false; });
     this.affordanceObjects.forEach((frame) => { frame.visible = false; });
   }
 
@@ -1346,6 +1374,7 @@ export class BoardRenderer {
     this.container.dataset.cameraZoom = this.camera.zoom.toFixed(3);
     this.group.updateMatrixWorld(true);
     const labelDepths = new Map();
+    const labelAnchors = new Map();
     const anchor = new THREE.Vector3();
     const labelPositions = new Map(buildScreenLabelPositions(this.entities
       .map((entity) => ({ entity, descriptor: this.descriptors.get(entity.component_id) }))
@@ -1355,12 +1384,14 @@ export class BoardRenderer {
           .applyMatrix4(this.group.matrixWorld)
           .project(this.camera);
         labelDepths.set(entity.component_id, anchor.z);
+        const screenAnchor = {
+          x: ((anchor.x + 1) / 2) * width,
+          y: ((1 - anchor.y) / 2) * height,
+        };
+        labelAnchors.set(entity.component_id, screenAnchor);
         return {
           id: entity.component_id,
-          anchor: {
-            x: ((anchor.x + 1) / 2) * width,
-            y: ((1 - anchor.y) / 2) * height,
-          },
+          anchor: screenAnchor,
         };
       }), {
       viewport: { width, height },
@@ -1371,6 +1402,7 @@ export class BoardRenderer {
         hovered: componentId === this.hoveredComponentId,
       });
       const position = labelPositions.get(componentId);
+      sprite.visible = Boolean(position) && !this.inspectionComponentId;
       if (position) {
         const worldPosition = new THREE.Vector3(
           (position.x / width) * 2 - 1,
@@ -1379,6 +1411,26 @@ export class BoardRenderer {
         ).unproject(this.camera);
         sprite.position.copy(this.group.worldToLocal(worldPosition));
       }
+      const leader = this.labelLeaderLines.get(componentId);
+      const segment = position && buildLabelLeaderSegment({
+        anchor: labelAnchors.get(componentId),
+        label: position,
+      });
+      if (leader && segment && !this.inspectionComponentId) {
+        const depth = labelDepths.get(componentId);
+        const screenToLocal = (point) => this.group.worldToLocal(new THREE.Vector3(
+          (point.x / width) * 2 - 1,
+          1 - (point.y / height) * 2,
+          depth,
+        ).unproject(this.camera));
+        const start = screenToLocal(segment.start);
+        const end = screenToLocal(segment.end);
+        const attribute = leader.geometry.getAttribute('position');
+        attribute.setXYZ(0, start.x, start.y, start.z);
+        attribute.setXYZ(1, end.x, end.y, end.z);
+        attribute.needsUpdate = true;
+        leader.visible = true;
+      } else if (leader) leader.visible = false;
       sprite.scale.set(
         worldPerPixelX * presentation.labelPixels.width,
         worldPerPixelY * presentation.labelPixels.height,
@@ -1426,6 +1478,8 @@ export class BoardRenderer {
       || label.left + label.width > width
       || label.top + label.height > height
     )).length);
+    this.container.dataset.labelLeaderCount = String([...this.labelLeaderLines.values()]
+      .filter((leader) => leader.visible).length);
     this.renderer.render(this.scene, this.camera);
   }
 }

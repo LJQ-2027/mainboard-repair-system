@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import {
   buildCornerSegments,
   buildHitArea,
+  buildLabelLeaderSegment,
   buildScreenLabelPositions,
   buildScreenAwareHitScale,
   placeHoverTooltip,
@@ -44,6 +45,29 @@ test('screen-space label layout stays inside a narrow canvas without collisions'
   });
   positions.forEach((position, index) => {
     assert.ok(Math.hypot(position.x - items[index].anchor.x, position.y - items[index].anchor.y) < 150);
+  });
+});
+
+test('screen-space label layout defers when the canvas cannot fit one tag', () => {
+  assert.deepEqual(buildScreenLabelPositions([
+    { id: 'U2001', anchor: { x: 0, y: 0 } },
+  ], {
+    viewport: { width: 1, height: 1 },
+  }), []);
+});
+
+test('only displaced labels receive a leader ending at the label edge', () => {
+  assert.equal(buildLabelLeaderSegment({
+    anchor: { x: 100, y: 100 },
+    label: { x: 120, y: 100 },
+  }), null);
+
+  assert.deepEqual(buildLabelLeaderSegment({
+    anchor: { x: 20, y: 100 },
+    label: { x: 120, y: 100 },
+  }), {
+    start: { x: 28, y: 100 },
+    end: { x: 82, y: 100 },
   });
 });
 
