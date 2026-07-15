@@ -23,6 +23,9 @@ def validate_dataset(data, root):
         path = registration.get(key)
         if not path or not (root / path).is_file():
             errors.append(f"registration {key} does not resolve")
+    for key in ("proxy_note", "point_map_note"):
+        if not isinstance(registration.get(key), str) or not registration[key].strip():
+            errors.append(f"registration {key} is required")
 
     anchors = registration.get("anchors", [])
     if len(anchors) < 4:

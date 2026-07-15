@@ -394,3 +394,10 @@ Mobile entity-list model reveal on 2026-07-15:
 - The scroll is deliberately owned by the entity-list event path rather than shared `selectEntity()` state. Canvas picks, image/point-map markers, repair-flow target changes, initial selection, desktop layouts, and non-model tabs do not move the page.
 - The reveal uses smooth scrolling by default and an immediate scroll when the browser requests reduced motion. It aligns the workspace to the viewport start without changing the model camera or selected identity.
 - Headed Chromium verifies desktop non-scrolling, mobile 390 px and 320 px model reveal, photo-view non-scrolling, reduced-motion behavior, 454 px of visible model canvas, zero horizontal overflow, and zero runtime errors. The strict full interaction matrix, 95 Node tests, and 49 Python tests passed.
+
+View-aware source notes on 2026-07-15:
+
+- Entity proxy, engineering point map, board model, and isolated package views now receive their source note through one tested state helper. The point-map tab no longer repeats the Service Manual proxy-image boundary.
+- Reviewed `proxy_note` and `point_map_note` strings are stored in registration data and required by dataset validation. Model and inspection notes continue to derive the active board side, accepted designator count, and selected package identity from structured state.
+- At 480 px and below, the source row uses its existing 11 px text size, wraps completely, and grows only when needed instead of hiding content behind an ellipsis. The fixed workspace height remains unchanged and the model/image stage owns the remaining space.
+- Headed Chromium verifies the exact four source-note states at desktop, 390 px, and 320 px. Every note fits within both axes, each source row remains 42 px for the current reviewed copy, page overflow is zero, and there are no runtime errors. The strict full interaction matrix, 100 Node tests, and 50 Python tests passed.

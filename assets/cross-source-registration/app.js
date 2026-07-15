@@ -2,6 +2,7 @@ import { solveHomography } from './registration-core.js';
 import { buildSelectionState, entityListModelRevealOptions } from './selection-state.js';
 import { BoardRenderer } from './board-renderer.js';
 import { PointMapViewport } from './point-map-viewport.js';
+import { buildSourceNote } from './source-note-state.js';
 import { mergeCompiledSchematicLinks } from './source-links.js';
 import { extractModuleRegions, extractShieldRegions } from './anatomy-state.js';
 import {
@@ -95,6 +96,18 @@ function revealModelAfterEntityListSelection() {
     reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
   });
   if (options) document.querySelector('.workspace').scrollIntoView(options);
+}
+
+function updateSourceNote(inspectionEntity = null) {
+  if (!data) return;
+  const side = sideDataById.get(activeSideId);
+  if (!side) return;
+  document.querySelector('#sourceNote').textContent = buildSourceNote({
+    view: activeView,
+    registration: data.registration,
+    side,
+    inspectionEntity,
+  });
 }
 
 const GUIDANCE_RESULT_COPY = {
@@ -472,7 +485,7 @@ function updateInspectionUi() {
     const sideHasShields = Boolean(sideDataById.get(activeSideId)?.anatomy.shields.length);
     control.disabled = active || !sideHasShields || !canAcceptModelInteraction(modelInteraction);
   });
-  if (active) document.querySelector('#sourceNote').textContent = `${entity.designator} 单体检视 · ${sideDataById.get(activeSideId)?.label}注册坐标 · 维修视觉封装`;
+  if (active) updateSourceNote(entity);
 }
 
 function setModelDragMode(mode) {
@@ -566,7 +579,7 @@ function updateSideControls() {
       : `目标位于${sideDataById.get(selectedEntity.side_id)?.label || selectedEntity.side_id}`;
   }
   if (activeView === 'model' && sideData) {
-    document.querySelector('#sourceNote').textContent = `${sideData.label}点位图 · ${sideData.audit.accepted_designators} 个已编译位号 · 几何按来源置信度分层`;
+    updateSourceNote();
   }
 }
 
@@ -733,7 +746,6 @@ async function setView(name) {
   Object.entries(views).forEach(([key, view]) => view.classList.toggle('active', key === name));
   document.querySelector('#pointMapTools').hidden = name !== 'pointmap';
   document.querySelector('#modelTools').hidden = name !== 'model';
-  if (name !== 'model' && data) document.querySelector('#sourceNote').textContent = `${data.registration.proxy_label} · ${data.registration.proxy_limit}`;
   if (name === 'model') {
     renderer.setInspectionAngle(true);
     document.querySelector('#toggleInspection').setAttribute('aria-pressed', 'false');
@@ -748,6 +760,7 @@ async function setView(name) {
   }
   if (name === 'pointmap') requestAnimationFrame(() => pointMapViewport?.reset());
   updateSideControls();
+  updateSourceNote();
   updateInspectionUi();
 }
 
@@ -831,7 +844,7 @@ async function init() {
     selectEntity,
   );
   updateSideControls();
-  document.querySelector('#sourceNote').textContent = `${data.registration.proxy_label} · ${data.registration.proxy_limit}`;
+  updateSourceNote();
   const list = document.querySelector('#entityList');
   data.entities.forEach((entity) => {
     const button = document.createElement('button');

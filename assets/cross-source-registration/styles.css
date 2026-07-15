@@ -489,7 +489,7 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 }
 
 @media (max-width: 480px) {
-  .workspace { height: 540px; grid-template-rows: auto minmax(0, 1fr) 42px; }
+  .workspace { height: 540px; grid-template-rows: auto minmax(0, 1fr) auto; }
   .view-head { flex-wrap: wrap; row-gap: 4px; padding: 5px 8px; }
   .tabs button { padding: 8px 9px; font-size: 12px; }
   #modelTools { left: 8px; bottom: 8px; gap: 4px; padding: 4px; }
@@ -497,7 +497,15 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
   #modelTools .model-interaction-modes button { height: 32px; }
   .entity-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .facts { grid-template-columns: 1fr; }
-  .source-note { font-size: 11px; }
+  .source-note {
+    min-height: 42px;
+    padding: 5px 12px;
+    overflow: visible;
+    font-size: 11px;
+    line-height: 1.35;
+    text-overflow: clip;
+    white-space: normal;
+  }
   .anatomy-panel { top: 8px; left: 8px; gap: 4px; padding: 4px; }
   .anatomy-segments { grid-template-columns: repeat(3, 36px); }
   .side-panel { top: 8px; left: auto; right: 8px; padding: 4px; }

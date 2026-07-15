@@ -13,6 +13,15 @@ class CrossSourceRegistrationTests(unittest.TestCase):
         data = json.loads((ROOT / "knowledge-base/km4-cross-source-registration.json").read_text(encoding="utf-8"))
         self.assertEqual(validate_dataset(data, ROOT), [])
 
+    def test_registration_requires_view_specific_source_notes(self):
+        data = json.loads((ROOT / "knowledge-base/km4-cross-source-registration.json").read_text(encoding="utf-8"))
+        data["registration"].pop("point_map_note", None)
+
+        self.assertTrue(any(
+            "registration point_map_note" in error
+            for error in validate_dataset(data, ROOT)
+        ))
+
     def test_repair_visual_inspection_is_explicitly_limited_to_package_entities(self):
         data = json.loads((ROOT / "knowledge-base/km4-cross-source-registration.json").read_text(encoding="utf-8"))
         inspectable = {

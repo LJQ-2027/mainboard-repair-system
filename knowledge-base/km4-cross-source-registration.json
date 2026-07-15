@@ -18,8 +18,10 @@
     "proxy_image": "assets/vision-reference-gallery/km4/embedded/page-010-image-05.jpg",
     "proxy_label": "Service Manual page 10 installed mainboard",
     "proxy_limit": "Installed shield-side context; component bodies under shields are not directly visible.",
+    "proxy_note": "实体代理图 · 维修手册第10页 · 装机屏蔽罩面 · 罩下器件不可见",
     "point_map_image": "assets/board-atlas/km4-f151/main-point-map-page-2.png",
     "point_map_source": "F151_MAIN_PCB_V1.2_位号图.pdf page 2",
+    "point_map_note": "工程点位图 · F151_MAIN_PCB_V1.2 · 第2页",
     "method": "reviewed_four_anchor_homography",
     "confidence": "provisional_proxy",
     "anchors": [
