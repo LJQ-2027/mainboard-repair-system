@@ -1044,13 +1044,8 @@ export class BoardRenderer {
       this.hoverTooltip.hidden = true;
       return this.render();
     }
-    const entity = this.entities.find((candidate) => candidate.component_id === componentId);
     const rect = this.container.getBoundingClientRect();
-    const designator = document.createElement('strong');
-    designator.textContent = entity.designator;
-    const name = document.createElement('span');
-    name.textContent = entity.name;
-    this.hoverTooltip.replaceChildren(designator, name);
+    this.updateHoverTooltipContent(componentId);
     this.hoverTooltip.hidden = false;
     const placement = placeHoverTooltip({
       pointer: { x: event.clientX - rect.left, y: event.clientY - rect.top },
@@ -1065,6 +1060,22 @@ export class BoardRenderer {
     this.hoverTooltip.dataset.horizontal = placement.horizontal;
     this.hoverTooltip.dataset.vertical = placement.vertical;
     this.render();
+  }
+
+  updateHoverTooltipContent(componentId) {
+    const entity = this.entities.find((candidate) => candidate.component_id === componentId);
+    if (!entity) return;
+    const designator = document.createElement('strong');
+    designator.textContent = entity.designator;
+    const name = document.createElement('span');
+    name.textContent = entity.name;
+    const children = [designator, name];
+    if (componentId === this.selectedComponentId && entity.inspection_profile?.profile_id) {
+      const action = document.createElement('em');
+      action.textContent = '单体查看';
+      children.push(action);
+    }
+    this.hoverTooltip.replaceChildren(...children);
   }
 
   clearHover(shouldRender = true) {
@@ -1124,6 +1135,7 @@ export class BoardRenderer {
     if (this.inspectionComponentId && this.inspectionComponentId !== componentId) void this.clearComponentInspection(false);
     this.clearSelectionStyle();
     this.selectedComponentId = componentId;
+    if (this.hoveredComponentId === componentId) this.updateHoverTooltipContent(componentId);
     const object = this.meshes.get(componentId);
     const descriptor = this.descriptors.get(componentId);
     if (!object || !descriptor) return this.render();

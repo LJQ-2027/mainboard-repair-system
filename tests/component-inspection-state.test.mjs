@@ -7,11 +7,23 @@ import {
   buildInspectionTransform,
   buildInspectionToolbarState,
   canInspectComponent,
+  resolveModelComponentActivation,
   enterComponentInspection,
   exitComponentInspection,
   inspectionOpacity,
   resolveInspectionKeyAction,
 } from '../assets/cross-source-registration/component-inspection-state.js';
+
+test('model component activation selects first and drills into an already-selected package', () => {
+  const packageEntity = { component_id: 'cmp-u2001', inspection_profile: { profile_id: 'u2001-pmic-v1' } };
+  const testPoint = { component_id: 'cmp-vbat1', inspection_profile: null };
+
+  assert.equal(resolveModelComponentActivation(packageEntity, 'cmp-u4000', true), 'select');
+  assert.equal(resolveModelComponentActivation(packageEntity, 'cmp-u2001', true), 'inspect');
+  assert.equal(resolveModelComponentActivation(testPoint, 'cmp-vbat1', true), 'select');
+  assert.equal(resolveModelComponentActivation(packageEntity, 'cmp-u2001', false), 'ignore');
+  assert.equal(resolveModelComponentActivation(null, 'cmp-u2001', true), 'ignore');
+});
 
 const u2001 = {
   component_id: 'KM4-MAIN-U2001',

@@ -17,6 +17,7 @@ import {
   canInspectComponent,
   enterComponentInspection,
   exitComponentInspection,
+  resolveModelComponentActivation,
 } from './component-inspection-state.js';
 import {
   beginModelTransition,
@@ -792,6 +793,20 @@ async function selectEntity(componentId, options = {}) {
   updateInspectionUi();
 }
 
+async function handleModelComponentActivation(componentId) {
+  const entity = data?.entities.find((candidate) => candidate.component_id === componentId);
+  const action = resolveModelComponentActivation(
+    entity,
+    selectedId,
+    canAcceptModelInteraction(modelInteraction),
+  );
+  if (action === 'inspect') {
+    await enterSelectedComponentInspection();
+    return;
+  }
+  if (action === 'select') await selectEntity(componentId);
+}
+
 async function setView(name) {
   if (!canAcceptModelInteraction(modelInteraction)) return;
   if (name !== 'model' && componentInspection.mode === 'isolated') await leaveComponentInspection(false);
@@ -897,7 +912,7 @@ async function init() {
   renderer = new BoardRenderer(
     document.querySelector('#modelCanvas'),
     sideDataById.get(activeSideId),
-    selectEntity,
+    handleModelComponentActivation,
     syncInspectionAngleControl,
   );
   updateSideControls();

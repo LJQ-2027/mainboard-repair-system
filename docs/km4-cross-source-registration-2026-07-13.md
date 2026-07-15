@@ -438,3 +438,11 @@ Unified board-angle interaction on 2026-07-15:
 - Side replacement preserves the current X tilt together with Z orientation. Full-board reset remains the explicit path back to top view and pan mode.
 - Browsers requesting reduced motion receive the exact terminal angle without animation. Renderer diagnostics expose the current board tilt and angled state for interaction verification.
 - Headed Chromium sampled 22 monotonic animation frames, verified animation locking, manual-drag toolbar synchronization, side-preserved tilt, deterministic reset, reduced-motion behavior, and zero runtime errors. The strict full interaction matrix, 116 Node tests, 50 Python tests, source validation, syntax checks, diff checks, and HTTP checks passed.
+
+Direct selected-component drill-down on 2026-07-16:
+
+- Model activation now follows a deliberate two-stage contract. The first click or tap selects a component and updates repair context; activating the same selected package again enters its existing single-component inspection path directly from the model.
+- Direct drill-down is capability-gated by the reviewed inspection profile. VBAT1 and VBUS1 remain measurement locations even when repeatedly activated and never become synthetic package inspections.
+- A selected inspectable package adds a compact `单体查看` action row to its existing hover card. No permanent instruction, new overlay, broad highlight, or duplicate inspection runtime was added.
+- Drag-return gestures retain accumulated-travel suppression and cannot become direct drill-down activations. Desktop and touch use the same activation state helper and the same inspection transition.
+- Headed Chromium verifies select-then-inspect behavior, immediate default-selection drill-down, test-point exclusion, drag-return suppression, mobile two-tap entry, zero horizontal overflow, and zero runtime errors. The strict full interaction matrix, 118 Node tests, 50 Python tests, source validation, syntax checks, diff checks, and HTTP checks passed.

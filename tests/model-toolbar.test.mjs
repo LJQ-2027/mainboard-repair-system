@@ -36,7 +36,7 @@ test('model view controls use explicit repair-facing labels and synchronized ang
   assert.match(appSource, /function syncInspectionAngleControl\(enabled\)/);
   assert.match(appSource, /button\.setAttribute\('aria-pressed', String\(enabled\)\)/);
   assert.match(appSource, /enabled \? '恢复俯视' : '切换为斜视'/);
-  assert.match(appSource, /new BoardRenderer\([\s\S]*selectEntity,[\s\S]*syncInspectionAngleControl/);
+  assert.match(appSource, /new BoardRenderer\([\s\S]*handleModelComponentActivation,[\s\S]*syncInspectionAngleControl/);
 });
 
 test('button and drag angle changes share renderer-owned state and cancellable animation', () => {
@@ -110,6 +110,20 @@ test('cross-view inspection serializes model view, target side, isolation, and r
   assert.match(entrySource, /revealModelWorkspace\(\)/);
   assert.ok(entrySource.indexOf("await setView('model')") < entrySource.indexOf('await switchModelSide(intent.sideId)'));
   assert.ok(entrySource.indexOf('await switchModelSide(intent.sideId)') < entrySource.indexOf('await enterCurrentComponentInspection(entity)'));
+});
+
+test('model activation uses selection first and direct inspection only for the selected package', () => {
+  const activationSource = appSource.slice(
+    appSource.indexOf('async function handleModelComponentActivation'),
+    appSource.indexOf('async function setView'),
+  );
+
+  assert.match(activationSource, /resolveModelComponentActivation\([\s\S]*entity,[\s\S]*selectedId/);
+  assert.match(activationSource, /action === 'inspect'/);
+  assert.match(activationSource, /await enterSelectedComponentInspection\(\)/);
+  assert.match(activationSource, /await selectEntity\(componentId\)/);
+  assert.match(appSource, /new BoardRenderer\([\s\S]*handleModelComponentActivation/);
+  assert.match(rendererSource, /action\.textContent = '单体查看'/);
 });
 
 test('responsive board orientation survives reset and side replacement', () => {

@@ -13,6 +13,12 @@ export function canInspectComponent(entity) {
   return Boolean(entity?.inspection_profile?.profile_id);
 }
 
+export function resolveModelComponentActivation(entity, selectedComponentId, ready) {
+  if (!ready || !entity) return 'ignore';
+  if (entity.component_id === selectedComponentId && canInspectComponent(entity)) return 'inspect';
+  return 'select';
+}
+
 export function buildInspectionActionState({ active, inspectable, ready }) {
   if (active) {
     return { hidden: false, disabled: !ready, label: '返回主板', title: '' };
