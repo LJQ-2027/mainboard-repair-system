@@ -93,6 +93,18 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 .model-interaction-modes button:last-child { border-right: 1px solid var(--line); }
 .model-interaction-modes button[aria-pressed="true"] { background: #17221e; border-color: #17221e; color: white; }
 .model-interaction-modes button:disabled { opacity: 0.42; cursor: not-allowed; }
+#modelTools {
+  position: absolute;
+  z-index: 10;
+  left: 14px;
+  bottom: 12px;
+  gap: 6px;
+  margin-left: 0;
+  padding: 5px;
+  border: 1px solid #bac3bd;
+  background: #f8f9f6f2;
+}
+#modelTools[hidden] { display: none; }
 
 .stage { position: relative; min-height: 0; overflow: hidden; }
 #modelCanvas[data-drag-mode="pan"] canvas { cursor: grab; }
@@ -472,7 +484,7 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
   .workspace { height: 540px; grid-template-rows: auto minmax(0, 1fr) 42px; }
   .view-head { flex-wrap: wrap; row-gap: 4px; padding: 5px 8px; }
   .tabs button { padding: 8px 9px; font-size: 12px; }
-  #modelTools { flex: 0 0 100%; justify-content: flex-end; gap: 4px; }
+  #modelTools { left: 8px; bottom: 8px; gap: 4px; padding: 4px; }
   #modelTools .icon-button { width: 32px; height: 32px; }
   #modelTools .model-interaction-modes button { height: 32px; }
   .entity-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }

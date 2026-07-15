@@ -314,3 +314,10 @@ Manual module-overlay control removal on 2026-07-15:
 - Source-driven repair targets remain intact. A documented repair step can still request a module target through the existing repair-focus contract, while ordinary component selection continues to produce no active module overlay.
 - The anatomy tool now contains only the three shield states. This reduces the desktop group from roughly 280 px to 150 px and leaves a materially wider gap between the anatomy and side controls at 390 px and 320 px.
 - A regression test prevents the manual selector and its independent application state from returning. Headed Chromium verifies no selector, no ordinary-selection module overlay, three retained shield controls, compact desktop/mobile layout, and the full interaction matrix with zero runtime errors.
+
+Canvas-owned model controls on 2026-07-15:
+
+- Pan, rotate, inspection-angle, and full-board reset now belong to the model canvas instead of the global view header. View tabs switch sources; model controls operate only on the model surface.
+- The control group uses a compact bottom-left instrument panel. It remains separate from top-left shield anatomy, top-right side switching, and the bottom-right single-component status.
+- On 390 px and 320 px screens, the view header returns from two rows to one and the model canvas gains about 39 px of height. The larger stage produces a visibly larger whole-board frame without reducing the established 12 px/11 px control readability.
+- A structural test prevents `modelTools` from returning to the global header. Headed Chromium verifies canvas containment, no overlap with top controls or inspection status, compact view-head height, at least 440 px of mobile canvas height, and the full interaction matrix with zero runtime errors.

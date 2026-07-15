@@ -10,3 +10,15 @@ test('model toolbar keeps source-driven focus without a manual module overlay se
   assert.doesNotMatch(appSource, /moduleFocusMode|populateModuleMenu|#moduleFocus/);
   assert.match(appSource, /moduleOverlayId\(currentRepairTarget\)/);
 });
+
+test('model interaction tools belong to the model canvas instead of the global view header', () => {
+  const viewHead = toolbarMarkup.slice(
+    toolbarMarkup.indexOf('<div class="view-head">'),
+    toolbarMarkup.indexOf('<div class="stage">'),
+  );
+  const modelViewIndex = toolbarMarkup.indexOf('id="modelView"');
+  const modelToolsIndex = toolbarMarkup.indexOf('id="modelTools"');
+
+  assert.doesNotMatch(viewHead, /id="modelTools"/);
+  assert.ok(modelToolsIndex > modelViewIndex);
+});
