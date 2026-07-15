@@ -62,6 +62,7 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 .tabs button:focus-visible,
 .entity-list button:focus-visible,
 .icon-button:focus-visible,
+.model-angle-button:focus-visible,
 .model-interaction-modes button:focus-visible,
 .anatomy-segments button:focus-visible,
 .side-panel button:focus-visible { outline: 3px solid #65a9ff; outline-offset: 2px; }
@@ -77,6 +78,20 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 }
 .icon-button:hover { border-color: var(--accent); }
 .icon-button[aria-pressed="true"] { background: #17221e; color: white; border-color: #17221e; }
+.model-angle-button {
+  width: 46px;
+  height: 34px;
+  border: 1px solid var(--line);
+  background: white;
+  color: #46534d;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.model-angle-button:hover { border-color: var(--accent); }
+.model-angle-button[aria-pressed="true"] { background: #17221e; border-color: #17221e; color: white; }
+.model-angle-button:disabled { opacity: 0.42; cursor: not-allowed; }
 .model-interaction-modes { display: flex; }
 .model-interaction-modes button {
   height: 34px;
@@ -530,6 +545,7 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
   .tabs button { padding: 8px 9px; font-size: 12px; }
   #modelTools { left: 8px; bottom: 8px; gap: 4px; padding: 4px; }
   #modelTools .icon-button { width: 32px; height: 32px; }
+  #modelTools .model-angle-button { width: 42px; height: 32px; }
   #modelTools .model-interaction-modes button { height: 32px; }
   .entity-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .facts { grid-template-columns: 1fr; }

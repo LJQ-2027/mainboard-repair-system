@@ -423,3 +423,10 @@ Adaptive narrow-screen board composition on 2026-07-15:
 - Manual board rotation remains authoritative until reset. Reset restores the current viewport's default composition; side replacement preserves it, and responsive transitions between narrow portrait and wider layouts select portrait or landscape framing without reload.
 - Reset label slots are now cleared only after the camera reaches its exact terminal frame. This removes animation-path-dependent slot assignment and restores pixel-identical pan and pinch reset frames.
 - Headed Chromium verifies desktop, 390 px, and 320 px composition, both board sides, manual rotation/reset, 390-to-700-to-390 responsive transitions, inspection entry/return, zero control overlap, zero label overlap or clipping, and zero runtime errors. The strict full interaction matrix, 113 Node tests, 50 Python tests, source validation, syntax checks, diff checks, UTF-8 checks, and HTTP checks passed.
+
+Repair-facing model toolbar clarity on 2026-07-15:
+
+- The board-angle control now uses the explicit `斜视` label and a persistent pressed state instead of the ambiguous `◩` glyph. Its accessible action changes between `切换为斜视` and `恢复俯视` as the camera state changes.
+- Full-board reset now uses the same familiar `↻` symbol as the point-map reset family instead of the crosshair-like `⌖`. Reset continues to restore pan mode, top view, board framing, and deterministic label placement.
+- The toolbar retains stable button dimensions and remains one row at desktop, 390 px, and 320 px. No explanatory legend, overlay, or canvas obstruction was added.
+- Headed Chromium verifies explicit labels, pressed state, reset state, canvas containment, complete button text, zero horizontal overflow, and zero runtime errors at all three widths. The strict full interaction matrix, 114 Node tests, 50 Python tests, source validation, syntax checks, diff checks, and HTTP checks passed.

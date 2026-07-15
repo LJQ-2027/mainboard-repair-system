@@ -496,6 +496,14 @@ function updateInspectionUi() {
   if (active) updateSourceNote(entity);
 }
 
+function syncInspectionAngleControl(enabled) {
+  const button = document.querySelector('#toggleInspection');
+  const label = enabled ? '恢复俯视' : '切换为斜视';
+  button.setAttribute('aria-pressed', String(enabled));
+  button.setAttribute('aria-label', label);
+  button.title = label;
+}
+
 function setModelDragMode(mode) {
   if (!canAcceptModelInteraction(modelInteraction)) return modelDragMode;
   if (componentInspection.mode === 'isolated') {
@@ -794,7 +802,7 @@ async function setView(name) {
   document.querySelector('#modelTools').hidden = name !== 'model';
   if (name === 'model') {
     renderer.setInspectionAngle(true);
-    document.querySelector('#toggleInspection').setAttribute('aria-pressed', 'false');
+    syncInspectionAngleControl(false);
     await new Promise((resolve) => {
       requestAnimationFrame(() => {
         renderer.reset(false);
@@ -925,7 +933,7 @@ document.querySelector('#resetModel').addEventListener('click', async () => {
   modelInteraction = consumePendingFocus(modelInteraction);
   setModelDragMode('pan');
   renderer?.reset();
-  document.querySelector('#toggleInspection').setAttribute('aria-pressed', 'false');
+  syncInspectionAngleControl(false);
   updateInspectionUi();
 });
 document.querySelector('#inspectComponent').addEventListener('click', () => { void toggleComponentInspection(); });
@@ -949,7 +957,7 @@ document.querySelector('#recordMeasurement').addEventListener('click', () => {
 });
 document.querySelector('#toggleInspection').addEventListener('click', (event) => {
   const enabled = event.currentTarget.getAttribute('aria-pressed') !== 'true';
-  event.currentTarget.setAttribute('aria-pressed', String(enabled));
+  syncInspectionAngleControl(enabled);
   renderer?.setInspectionAngle(enabled);
 });
 document.querySelectorAll('[data-model-drag-mode]').forEach((button) => button.addEventListener('click', () => {

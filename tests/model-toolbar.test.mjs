@@ -24,6 +24,20 @@ test('model interaction tools belong to the model canvas instead of the global v
   assert.ok(modelToolsIndex > modelViewIndex);
 });
 
+test('model view controls use explicit repair-facing labels and synchronized angle feedback', () => {
+  const modelTools = toolbarMarkup.slice(
+    toolbarMarkup.indexOf('id="modelTools"'),
+    toolbarMarkup.indexOf('class="anatomy-panel"'),
+  );
+
+  assert.match(modelTools, /id="toggleInspection"[^>]*>斜视<\/button>/);
+  assert.match(modelTools, /id="resetModel"[^>]*>↻<\/button>/);
+  assert.doesNotMatch(modelTools, />◩<|>⌖</);
+  assert.match(appSource, /function syncInspectionAngleControl\(enabled\)/);
+  assert.match(appSource, /button\.setAttribute\('aria-pressed', String\(enabled\)\)/);
+  assert.match(appSource, /enabled \? '恢复俯视' : '切换为斜视'/);
+});
+
 test('model reset preserves active component inspection and resets its view', () => {
   const resetHandler = appSource.slice(
     appSource.indexOf("document.querySelector('#resetModel').addEventListener"),
