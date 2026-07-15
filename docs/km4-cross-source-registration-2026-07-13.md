@@ -300,3 +300,10 @@ Neutral source-evidence cards on 2026-07-15:
 - Source headings, two schematic images, repair instructions, filenames, and page references remain unchanged. The calmer container treatment preserves scan order while allowing actual abnormal observations to keep the coral semantic role.
 - Headed Chromium on desktop and 390 px verifies two visible evidence cards, equal nonzero border widths, border colors distinct from the fault accent, card containment inside the evidence panel, retained schematic images and repair text, and zero horizontal overflow.
 - The full interaction matrix passed with repair abnormal states, measurement classification, structured flows, single-component inspection, and mobile gestures intact and no runtime errors.
+
+Semantic repair-result states on 2026-07-15:
+
+- Generic measurement results and post-action recheck observations now share one three-state visual grammar: green for normal or symptom cleared, coral for abnormal or symptom persists, and yellow for uncertain.
+- Result messages no longer use a colored left stripe. Each state uses a complete semantic border with a light matching background, so the status reads as a bounded outcome instead of another locator or source-card accent.
+- Coral remains reserved for genuine abnormal feedback. Normal navigation, static evidence, and component inspection continue to use their neutral or engineering-green treatments.
+- Headed Chromium verifies all six result states with equal border widths on every side, distinct semantic backgrounds, retained repair wording, desktop/mobile containment, and zero runtime errors. The full interaction matrix passed without regressions to model navigation, repair flows, or touch gestures.

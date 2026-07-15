@@ -386,9 +386,9 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 .repair-flow-control[data-closed="true"] .repair-flow-recheck > div button[data-post-action-check="symptom_persists"][aria-pressed="true"] { border-color: #d27a69; background: #fff0ec; color: #8d3525; }
 .repair-flow-control[data-closed="true"] .repair-flow-recheck > div button[data-post-action-check="uncertain"][aria-pressed="true"] { border-color: #d0a63b; background: #fff8dc; color: #6c5718; }
 .repair-flow-recheck > p { margin-top: 7px; padding: 6px 7px; border: 1px solid #d0d7d2; background: #f8faf7; }
-.repair-flow-recheck > p[data-result="symptom_cleared"] { border-left: 3px solid #55a590; color: #176b59; }
-.repair-flow-recheck > p[data-result="symptom_persists"] { border-left: 3px solid var(--accent); color: #8d3525; }
-.repair-flow-recheck > p[data-result="uncertain"] { border-left: 3px solid #d0a63b; color: #6c5718; }
+.repair-flow-recheck > p[data-result="symptom_cleared"] { border-color: #55a590; background: #edf7f2; color: #176b59; }
+.repair-flow-recheck > p[data-result="symptom_persists"] { border-color: var(--accent); background: #fff0ec; color: #8d3525; }
+.repair-flow-recheck > p[data-result="uncertain"] { border-color: #d0a63b; background: #fff8dc; color: #6c5718; }
 .repair-flow-completion { display: grid; gap: 6px; margin-top: 9px; padding-top: 9px; border-top: 1px solid #d0d7d2; }
 .repair-flow-completion[hidden] { display: none; }
 .repair-flow-completion button { min-height: 31px; border: 1px solid #8f9c94; background: white; color: var(--ink); font: inherit; font-size: 9px; cursor: pointer; }
@@ -443,9 +443,9 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 .result-control button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: white; }
 .result-control button[data-guidance-result="abnormal"][aria-pressed="true"] { background: var(--accent); border-color: var(--accent); }
 .result-status { min-height: 32px; margin: 9px 0 0; padding: 8px 9px; border: 1px solid #c8d0ca; background: #f8faf7; color: #52605a; font-size: 10px; line-height: 1.45; }
-.result-status[data-result="normal"] { border-left: 3px solid #1c8f75; color: #225f51; }
-.result-status[data-result="abnormal"] { border-left: 3px solid var(--accent); color: #8d3525; }
-.result-status[data-result="uncertain"] { border-left: 3px solid #d0a63b; color: #6c5718; }
+.result-status[data-result="normal"] { border-color: #1c8f75; background: #edf7f2; color: #225f51; }
+.result-status[data-result="abnormal"] { border-color: var(--accent); background: #fff0ec; color: #8d3525; }
+.result-status[data-result="uncertain"] { border-color: #d0a63b; background: #fff8dc; color: #6c5718; }
 .model-boundary-details { margin-top: 10px; border-top: 1px solid #cbd3cd; padding-top: 9px; }
 .model-boundary-details[hidden] { display: none; }
 .model-boundary-details summary { color: #59665f; font-size: 10px; cursor: pointer; }
