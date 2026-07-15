@@ -19,3 +19,15 @@ export function findEntityAtPoint(entities, point) {
     .sort((left, right) => (left.geometry.size.x * left.geometry.size.y)
       - (right.geometry.size.x * right.geometry.size.y))[0] || null;
 }
+
+export function entityListModelRevealOptions({
+  activeView,
+  viewportWidth,
+  reducedMotion = false,
+}) {
+  if (activeView !== 'model' || viewportWidth > 820) return null;
+  return {
+    behavior: reducedMotion ? 'auto' : 'smooth',
+    block: 'start',
+  };
+}

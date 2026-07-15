@@ -387,3 +387,10 @@ Contextual inspection controls on 2026-07-15:
 - Returning to the board restores every board-level control, its prior interaction state, and side-switch availability without reloading or clearing the selected component.
 - This removes four groups of disabled visual noise from the inspection canvas without adding an overlay, menu, or parallel interaction mode.
 - Headed Chromium verifies the reduced control set and complete restoration at desktop, 390 px, and 320 px, with zero toolbar/return overlap and zero horizontal overflow. The strict full interaction matrix, 92 Node tests, 49 Python tests, source validation, and inline-script compilation passed without runtime errors.
+
+Mobile entity-list model reveal on 2026-07-15:
+
+- Selecting a component from the bottom `已关联实体` list now returns the 2.5D workspace to view on screens at or below 820 px, so the technician immediately sees the focused package instead of remaining at the list position.
+- The scroll is deliberately owned by the entity-list event path rather than shared `selectEntity()` state. Canvas picks, image/point-map markers, repair-flow target changes, initial selection, desktop layouts, and non-model tabs do not move the page.
+- The reveal uses smooth scrolling by default and an immediate scroll when the browser requests reduced motion. It aligns the workspace to the viewport start without changing the model camera or selected identity.
+- Headed Chromium verifies desktop non-scrolling, mobile 390 px and 320 px model reveal, photo-view non-scrolling, reduced-motion behavior, 454 px of visible model canvas, zero horizontal overflow, and zero runtime errors. The strict full interaction matrix, 95 Node tests, and 49 Python tests passed.

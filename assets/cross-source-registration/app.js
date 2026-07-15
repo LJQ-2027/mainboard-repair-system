@@ -1,5 +1,5 @@
 import { solveHomography } from './registration-core.js';
-import { buildSelectionState } from './selection-state.js';
+import { buildSelectionState, entityListModelRevealOptions } from './selection-state.js';
 import { BoardRenderer } from './board-renderer.js';
 import { PointMapViewport } from './point-map-viewport.js';
 import { mergeCompiledSchematicLinks } from './source-links.js';
@@ -87,6 +87,15 @@ const FAULT_LABELS = {
   'Not charging': '无法充电',
   'USB no response': 'USB 无响应',
 };
+
+function revealModelAfterEntityListSelection() {
+  const options = entityListModelRevealOptions({
+    activeView,
+    viewportWidth: window.innerWidth,
+    reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+  });
+  if (options) document.querySelector('.workspace').scrollIntoView(options);
+}
 
 const GUIDANCE_RESULT_COPY = {
   pending: '尚未返回检测结果。完成来源步骤后记录本次观察。',
@@ -829,7 +838,10 @@ async function init() {
     button.type = 'button';
     button.dataset.componentId = entity.component_id;
     button.innerHTML = `<strong>${entity.designator}</strong>${entity.module}`;
-    button.addEventListener('click', () => selectEntity(entity.component_id));
+    button.addEventListener('click', async () => {
+      await selectEntity(entity.component_id);
+      revealModelAfterEntityListSelection();
+    });
     list.append(button);
   });
   selectEntity(data.entities[0].component_id, { explicit: false });

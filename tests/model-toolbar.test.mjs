@@ -50,3 +50,24 @@ test('inspection mode hides board-only controls and keeps direct manipulation to
   assert.match(appSource, /querySelector\('\[data-model-drag-mode="pan"\]'\)\.hidden = toolbar\.panHidden/);
   assert.match(appSource, /querySelector\('#toggleInspection'\)\.hidden = toolbar\.inspectionAngleHidden/);
 });
+
+test('mobile model reveal belongs only to explicit entity list selection', () => {
+  const selectEntitySource = appSource.slice(
+    appSource.indexOf('async function selectEntity'),
+    appSource.indexOf('async function setView'),
+  );
+  const markerSource = appSource.slice(
+    appSource.indexOf('function addMarkers'),
+    appSource.indexOf('function evidenceCard'),
+  );
+  const entityListSource = appSource.slice(
+    appSource.indexOf("const list = document.querySelector('#entityList')"),
+    appSource.indexOf("selectEntity(data.entities[0].component_id"),
+  );
+  const revealCalls = appSource.match(/revealModelAfterEntityListSelection\(\)/g) || [];
+
+  assert.equal(revealCalls.length, 2, 'one helper definition and one entity-list call are expected');
+  assert.doesNotMatch(selectEntitySource, /revealModelAfterEntityListSelection/);
+  assert.doesNotMatch(markerSource, /revealModelAfterEntityListSelection/);
+  assert.match(entityListSource, /await selectEntity\(entity\.component_id\);\s*revealModelAfterEntityListSelection\(\);/);
+});

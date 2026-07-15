@@ -1,6 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildSelectionState, findEntityAtPoint } from '../assets/cross-source-registration/selection-state.js';
+import {
+  buildSelectionState,
+  entityListModelRevealOptions,
+  findEntityAtPoint,
+} from '../assets/cross-source-registration/selection-state.js';
 
 const entity = {
   component_id: 'KM4-MAIN-U2001',
@@ -24,4 +28,30 @@ test('point picking returns the smallest entity containing the point', () => {
   const small = { ...entity, component_id: 'small', geometry: { center: { x: 0.5, y: 0.5 }, size: { x: 0.1, y: 0.1 } } };
   assert.equal(findEntityAtPoint([large, small], { x: 0.52, y: 0.52 }).component_id, 'small');
   assert.equal(findEntityAtPoint([large, small], { x: 0.9, y: 0.9 }), null);
+});
+
+test('entity list selection reveals the model workspace only on narrow model viewports', () => {
+  assert.deepEqual(entityListModelRevealOptions({
+    activeView: 'model',
+    viewportWidth: 390,
+    reducedMotion: false,
+  }), { behavior: 'smooth', block: 'start' });
+  assert.equal(entityListModelRevealOptions({
+    activeView: 'photo',
+    viewportWidth: 390,
+    reducedMotion: false,
+  }), null);
+  assert.equal(entityListModelRevealOptions({
+    activeView: 'model',
+    viewportWidth: 821,
+    reducedMotion: false,
+  }), null);
+});
+
+test('entity list model reveal respects reduced motion and includes the mobile breakpoint', () => {
+  assert.deepEqual(entityListModelRevealOptions({
+    activeView: 'model',
+    viewportWidth: 820,
+    reducedMotion: true,
+  }), { behavior: 'auto', block: 'start' });
 });
