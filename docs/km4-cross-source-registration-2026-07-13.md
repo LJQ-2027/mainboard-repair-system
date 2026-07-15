@@ -343,3 +343,10 @@ Stable component-label placement on 2026-07-15:
 - A remembered slot is reused only while it remains inside the canvas and free of collisions. Real conflicts still trigger the existing bounded fallback search, preserving all seven visible identities without overlap.
 - Full-board reset clears the slot memory together with camera and focus state. The reset frame is therefore deterministic rather than retaining a label arrangement created by an earlier edge collision.
 - A headed Chromium rotation audit sampled 26 consecutive frames with zero slot transitions, zero label overlaps, zero clipping, and zero runtime errors. The strict full matrix also verifies pixel-identical desktop and 390 px pan/reset recovery.
+
+Drag-path click suppression on 2026-07-15:
+
+- Board interaction now records whether the pointer has exceeded the five-pixel drag threshold at any time during a gesture. Returning the pointer to its original coordinate no longer converts a completed pan or rotation into a component click.
+- Pointer down continues to clear hover feedback, dragging keeps the tooltip hidden, and mouse hover returns only after the next pointer movement. Touch gestures never leave desktop hover residue.
+- The same accumulated-travel rule applies to mouse and single-touch board gestures. Component inspection rotation remains non-selecting, while a genuine stationary tap still follows the existing component-pick path.
+- Headed Chromium reproduces a drag from X2100 outward and back to X2100 with both mouse and touch: U2001 remains selected, dragging state clears, hover recovers correctly for mouse, and no runtime errors occur. The full desktop/mobile interaction matrix also passes.

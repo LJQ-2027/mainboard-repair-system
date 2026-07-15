@@ -8,6 +8,7 @@ import {
   consumePendingFocus,
   createModelInteractionState,
   recordSelectionIntent,
+  recordDragTravel,
   transformBoardCenter,
 } from '../assets/cross-source-registration/model-interaction-state.js';
 
@@ -40,4 +41,12 @@ test('focus center follows the board rotation used by the renderer', () => {
   const tilted = transformBoardCenter({ x: 0.2, y: 0.125 }, { x: -0.46, z: 0 });
   assert.equal(tilted.x, 0.2);
   assert.equal(tilted.y < 0.125, true);
+});
+
+test('drag travel stays exceeded after the pointer returns to its origin', () => {
+  const origin = { x: 100, y: 100 };
+  const exceeded = recordDragTravel(false, origin, { x: 124, y: 100 });
+  assert.equal(exceeded, true);
+  assert.equal(recordDragTravel(exceeded, origin, { x: 101, y: 101 }), true);
+  assert.equal(recordDragTravel(false, origin, { x: 103, y: 104 }), false);
 });

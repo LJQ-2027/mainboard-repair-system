@@ -12,7 +12,7 @@ import {
   isPointCovered,
 } from './anatomy-state.js';
 import { buildInspectionTransform, inspectionOpacity } from './component-inspection-state.js';
-import { transformBoardCenter } from './model-interaction-state.js';
+import { recordDragTravel, transformBoardCenter } from './model-interaction-state.js';
 import {
   anchorZoomCenter,
   clampPanCenter,
@@ -753,11 +753,32 @@ export class BoardRenderer {
       }
       const inspected = this.inspectionComponentId ? this.renderObjects.get(this.inspectionComponentId) : null;
       if (inspected) {
-        this.drag = { mode: 'component', x: event.clientX, y: event.clientY, rx: inspected.rotation.x, ry: inspected.rotation.y };
+        this.drag = {
+          mode: 'component',
+          x: event.clientX,
+          y: event.clientY,
+          rx: inspected.rotation.x,
+          ry: inspected.rotation.y,
+          moved: false,
+        };
       } else if (this.interactionMode === 'rotate') {
-        this.drag = { mode: 'board', x: event.clientX, y: event.clientY, rx: this.group.rotation.x, rz: this.group.rotation.z };
+        this.drag = {
+          mode: 'board',
+          x: event.clientX,
+          y: event.clientY,
+          rx: this.group.rotation.x,
+          rz: this.group.rotation.z,
+          moved: false,
+        };
       } else {
-        this.drag = { mode: 'pan', x: event.clientX, y: event.clientY, cx: this.camera.position.x, cy: this.camera.position.y };
+        this.drag = {
+          mode: 'pan',
+          x: event.clientX,
+          y: event.clientY,
+          cx: this.camera.position.x,
+          cy: this.camera.position.y,
+          moved: false,
+        };
       }
       this.container.classList.add('dragging');
     });
@@ -769,6 +790,13 @@ export class BoardRenderer {
       if (!this.drag) {
         this.updateHover(event);
         return;
+      }
+      if (Number.isFinite(this.drag.x) && Number.isFinite(this.drag.y)) {
+        this.drag.moved = recordDragTravel(
+          this.drag.moved,
+          { x: this.drag.x, y: this.drag.y },
+          { x: event.clientX, y: event.clientY },
+        );
       }
       if (this.drag.mode === 'pinch') {
         const [first, second] = [...this.activePointers.values()];
@@ -829,7 +857,7 @@ export class BoardRenderer {
         return;
       }
       const dragMode = this.drag?.mode;
-      const moved = this.drag && Math.hypot(event.clientX - this.drag.x, event.clientY - this.drag.y) > 5;
+      const moved = Boolean(this.drag?.moved);
       this.drag = null;
       this.container.classList.remove('dragging');
       if (!moved && dragMode !== 'component') this.pick(event);

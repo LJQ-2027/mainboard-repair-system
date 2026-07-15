@@ -26,6 +26,11 @@ export function consumePendingFocus(state) {
   return { ...state, pendingFocus: false };
 }
 
+export function recordDragTravel(exceeded, origin, point, threshold = 5) {
+  return Boolean(exceeded)
+    || Math.hypot(point.x - origin.x, point.y - origin.y) > threshold;
+}
+
 export function transformBoardCenter(center, rotation) {
   const cosZ = Math.cos(rotation.z || 0);
   const sinZ = Math.sin(rotation.z || 0);
