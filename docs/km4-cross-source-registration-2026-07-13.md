@@ -373,3 +373,10 @@ Direct component manipulation on 2026-07-15:
 - The focused WebGL surface also supports arrow-key rotation, plus/minus zoom, and Home-key reset. The active rotation mode button moves keyboard focus to that surface instead of acting as a no-op.
 - The reset icon is repurposed in inspection to restore the initial package angle, camera center, and zoom without returning to the board. `返回主板` remains the sole explicit exit action and restores the prior board drag mode and camera center.
 - Headed Chromium produced pixel-different rotation and pinch frames, pixel-identical reset frames on desktop and mobile, a responsive-threshold reset race matching the stable target, and a clean pan-mode restoration after return. The strict full interaction matrix, 90 Node tests, 49 Python tests, source validation, and inline-script compilation passed without runtime errors.
+
+Canvas-local inspection return on 2026-07-15:
+
+- The existing bottom-right inspection identity is now a native return button instead of a non-interactive status block. It keeps the designator visible and routes through the same inspection state machine as the evidence-panel `返回主板` action.
+- Desktop click, keyboard Enter, and real mobile touch all leave isolation while preserving the selected component and restoring board context.
+- At 390 px the button retains `← U4000 单体检视`. At 320 px it keeps the 40 px touch height and source identity while hiding only the redundant `单体检视` suffix, preventing overlap with the canvas toolbar.
+- Headed Chromium verifies canvas containment, zero overlap with model/anatomy/side controls, zero horizontal overflow, and successful return at desktop, 390 px, and the actual 304 px drawable canvas inside a 320 px viewport. The strict full interaction matrix, 91 Node tests, 49 Python tests, source validation, and inline-script compilation passed without runtime errors.

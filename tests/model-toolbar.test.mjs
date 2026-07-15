@@ -32,3 +32,14 @@ test('model reset preserves active component inspection and resets its view', ()
   assert.match(resetHandler, /resetComponentInspectionView/);
   assert.doesNotMatch(resetHandler, /leaveComponentInspection/);
 });
+
+test('inspection status is a canvas-local return action using the shared exit path', () => {
+  const statusMarkup = toolbarMarkup.slice(
+    toolbarMarkup.indexOf('class="inspection-status"'),
+    toolbarMarkup.indexOf('</main>'),
+  );
+
+  assert.match(statusMarkup, /^class="inspection-status" id="inspectionStatus" type="button"/);
+  assert.match(statusMarkup, /inspection-return-icon/);
+  assert.match(appSource, /#inspectionStatus'\)\.addEventListener\('click', \(\) => \{ void toggleComponentInspection\(\); \}\)/);
+});

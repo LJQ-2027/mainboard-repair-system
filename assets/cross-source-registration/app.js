@@ -435,7 +435,10 @@ function updateInspectionUi() {
   button.textContent = active ? '返回主板' : '单体查看';
   button.setAttribute('aria-pressed', String(active));
   button.title = available || active ? '' : '该点位没有可单独检视的器件包体';
-  document.querySelector('#inspectionStatus').hidden = !active;
+  const status = document.querySelector('#inspectionStatus');
+  status.hidden = !active;
+  status.disabled = !active || !canAcceptModelInteraction(modelInteraction);
+  status.setAttribute('aria-label', `返回主板：${entity?.designator || '当前器件'}`);
   document.querySelector('#inspectionDesignator').textContent = entity?.designator || '—';
   document.querySelector('#modelView').classList.toggle('inspection-active', active);
   document.querySelector('#toggleInspection').disabled = active || !canAcceptModelInteraction(modelInteraction);
@@ -848,6 +851,7 @@ document.querySelector('#resetModel').addEventListener('click', async () => {
   updateInspectionUi();
 });
 document.querySelector('#inspectComponent').addEventListener('click', () => { void toggleComponentInspection(); });
+document.querySelector('#inspectionStatus').addEventListener('click', () => { void toggleComponentInspection(); });
 document.querySelectorAll('[data-guidance-result]').forEach((button) => button.addEventListener('click', () => {
   const entity = data?.entities.find((candidate) => candidate.component_id === selectedId);
   if (!entity) return;
