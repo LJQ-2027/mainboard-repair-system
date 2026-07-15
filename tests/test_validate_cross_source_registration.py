@@ -13,6 +13,36 @@ class CrossSourceRegistrationTests(unittest.TestCase):
         data = json.loads((ROOT / "knowledge-base/km4-cross-source-registration.json").read_text(encoding="utf-8"))
         self.assertEqual(validate_dataset(data, ROOT), [])
 
+    def test_repair_visual_inspection_is_explicitly_limited_to_package_entities(self):
+        data = json.loads((ROOT / "knowledge-base/km4-cross-source-registration.json").read_text(encoding="utf-8"))
+        inspectable = {
+            entity["designator"]
+            for entity in data["entities"]
+            if entity.get("inspection_profile", {}).get("fidelity") == "repair_visual"
+        }
+
+        self.assertEqual(inspectable, {"U2001", "U4000", "X2100", "U0600", "J6101"})
+        self.assertTrue(all(
+            "inspection_profile" not in entity
+            for entity in data["entities"]
+            if entity["category"] == "test_point"
+        ))
+
+    def test_rejects_component_inspection_profile_on_a_test_point(self):
+        data = json.loads((ROOT / "knowledge-base/km4-cross-source-registration.json").read_text(encoding="utf-8"))
+        test_point = next(entity for entity in data["entities"] if entity["category"] == "test_point")
+        test_point["inspection_profile"] = {
+            "profile_id": "invalid-test-point-v1",
+            "fidelity": "repair_visual",
+            "source_status": "category_based",
+            "visual_note": "invalid",
+        }
+
+        self.assertTrue(any(
+            "test point cannot expose component inspection" in error
+            for error in validate_dataset(data, ROOT)
+        ))
+
     def test_committed_measurement_profiles_preserve_source_boundaries(self):
         data = json.loads((ROOT / "knowledge-base/km4-cross-source-registration.json").read_text(encoding="utf-8"))
         profiles = {

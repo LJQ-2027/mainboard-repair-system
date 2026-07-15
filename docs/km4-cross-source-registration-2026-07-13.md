@@ -357,3 +357,10 @@ Three-state component-tag hierarchy on 2026-07-15:
 - Tag dimensions and dark background area remain unchanged. The hierarchy does not introduce a side stripe, broad fill, module polygon, selection circle, or fault-coral treatment.
 - Selection remains authoritative when the same entity is hovered. Moving selection from U2001 to X2100 transfers the selected texture with the shared identity state, while touch interaction clears the desktop hover variant.
 - All three textures are owned by the sprite and disposed when a board side is replaced. Headed Chromium verifies selected/hovered variants on desktop, selected-without-hover on touch, visible mobile tag differentiation, and the full interaction matrix with no runtime errors.
+
+Reviewed multi-component inspection on 2026-07-15:
+
+- Repair-visual inspection profiles now explicitly cover U2001, U4000, X2100, U0600, and J6101. Each has a source-bounded profile identity, category-based fidelity, and a visible note that the package is a repair-recognition representation rather than measured engineering geometry.
+- The same isolation state, camera transform, low-opacity board context, component rotation, status frame, and return action are reused across all five package entities. No parallel inspection implementation or model-specific UI branch was added.
+- VBAT1 and VBUS1 remain test-point locations rather than component bodies. They retain measurement and repair guidance, do not receive inspection profiles, and no longer show an unavailable `单体查看` action.
+- Dataset validation rejects an inspection profile attached to a test point. Headed Chromium enters and exits all five package entities, verifies zero label leaders in isolation, checks U4000 and J6101 visually, confirms X2100 mobile containment, and passes the strict full interaction matrix without runtime errors.

@@ -430,9 +430,10 @@ function updateInspectionUi() {
     && activeView === 'model';
   const button = document.querySelector('#inspectComponent');
   button.disabled = !canAcceptModelInteraction(modelInteraction) || (!active && !available);
+  button.hidden = !active && !available;
   button.textContent = active ? '返回主板' : '单体查看';
   button.setAttribute('aria-pressed', String(active));
-  button.title = available || active ? '' : '当前单体样板仅支持 U2001 第2面';
+  button.title = available || active ? '' : '该点位没有可单独检视的器件包体';
   document.querySelector('#inspectionStatus').hidden = !active;
   document.querySelector('#inspectionDesignator').textContent = entity?.designator || '—';
   document.querySelector('#modelView').classList.toggle('inspection-active', active);

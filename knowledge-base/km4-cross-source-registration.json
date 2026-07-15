@@ -130,7 +130,13 @@
       "schematic_links": [{"source": "F151_MAIN_PCB_1_维修原理图_V1.2_20250310.pdf", "page": "eMMC sheets", "facts": ["Designator U4000", "eMMC storage"]}],
       "repair_links": [{"source": "TECNO-L6735-KM4-F151手机维修通用操作指导书V1.0_20250331.pdf", "page": "7-11", "faults": ["No power", "Storage failure"], "instruction": "Check the memory power path and record VDDEMMCCORE before escalation."}],
       "measurement_profile": {"measurement_id": "vddemmccore-voltage", "label": "VDDEMMCCORE 电压", "quantity": "voltage", "unit": "V", "input_step": 0.01, "reference": {"kind": "nominal", "value": 3.3}, "source_link_index": 0},
-      "visual_profile": {"shape": "rectangle", "height": 0.05, "engineering_dimension": false}
+      "visual_profile": {"shape": "rectangle", "height": 0.05, "engineering_dimension": false},
+      "inspection_profile": {
+        "profile_id": "u4000-emmc-v1",
+        "fidelity": "repair_visual",
+        "source_status": "category_based",
+        "visual_note": "外观、层高和封装细节为维修识别示意，不代表实测尺寸、焊球数量或工程封装。"
+      }
     },
     {
       "component_id": "KM4-MAIN-X2100", "designator": "X2100", "name": "26 MHz crystal", "category": "crystal", "module": "Clock", "proxy_visibility": "concealed_by_shield",
@@ -138,21 +144,39 @@
       "schematic_links": [{"source": "F151_MAIN_PCB_1_维修原理图_V1.2_20250310.pdf", "page": "clock sheets", "facts": ["Designator X2100"]}],
       "repair_links": [{"source": "TECNO-L6735-KM4-F151手机维修通用操作指导书V1.0_20250331.pdf", "page": "10, 15", "faults": ["No power", "Clock failure"], "instruction": "Measure and record the X2100 output waveform; reference frequency is 26 MHz."}],
       "measurement_profile": {"measurement_id": "x2100-frequency", "label": "X2100 输出频率", "quantity": "frequency", "unit": "MHz", "input_step": 0.1, "reference": {"kind": "nominal", "value": 26}, "source_link_index": 0},
-      "visual_profile": {"shape": "rectangle", "height": 0.035, "engineering_dimension": false}
+      "visual_profile": {"shape": "rectangle", "height": 0.035, "engineering_dimension": false},
+      "inspection_profile": {
+        "profile_id": "x2100-crystal-v1",
+        "fidelity": "repair_visual",
+        "source_status": "category_based",
+        "visual_note": "晶振外观与层高为维修识别示意，不代表实测外壳尺寸、焊盘结构或内部构造。"
+      }
     },
     {
       "component_id": "KM4-MAIN-U0600", "designator": "U0600", "name": "RF/baseband device", "category": "bga_ic", "module": "RF network", "proxy_visibility": "concealed_by_shield",
       "geometry": {"center": {"x": 0.70, "y": 0.61}, "size": {"x": 0.10, "y": 0.14}, "rotation": 0},
       "schematic_links": [{"source": "F151_MAIN_PCB_1_维修原理图_V1.2_20250310.pdf", "page": "RF sheets", "facts": ["Designator U0600", "SR3595D reference"]}],
       "repair_links": [{"source": "TECNO-L6735-KM4-F151手机维修通用操作指导书V1.0_20250331.pdf", "page": "source relationship only", "faults": ["No service", "Weak signal"], "instruction": "Use the schematic relationship for RF path inspection; no component replacement instruction is asserted."}],
-      "visual_profile": {"shape": "square", "height": 0.055, "engineering_dimension": false}
+      "visual_profile": {"shape": "square", "height": 0.055, "engineering_dimension": false},
+      "inspection_profile": {
+        "profile_id": "u0600-rf-device-v1",
+        "fidelity": "repair_visual",
+        "source_status": "category_based",
+        "visual_note": "外观、层高和封装细节为维修识别示意，不代表实测尺寸、焊球数量或工程封装。"
+      }
     },
     {
       "component_id": "KM4-MAIN-J6101", "designator": "J6101", "name": "Mainboard connector", "category": "connector", "module": "USB and power interconnect", "proxy_visibility": "visible_context",
       "geometry": {"center": {"x": 0.626, "y": 0.866}, "size": {"x": 0.157, "y": 0.079}, "rotation": 0},
       "schematic_links": [{"source": "F151_MAIN_PCB_1_维修原理图_V1.2_20250310.pdf", "page": "connector sheets", "facts": ["Designator J6101", "VBUS1 and VBAT1 context"]}],
       "repair_links": [{"source": "TECNO-L6735-KM4-F151手机维修通用操作指导书V1.0_20250331.pdf", "page": "12-14", "faults": ["Not charging", "USB no response"], "instruction": "Inspect connector and FPC condition before continuing along the charging path."}],
-      "visual_profile": {"shape": "connector", "height": 0.085, "engineering_dimension": false}
+      "visual_profile": {"shape": "connector", "height": 0.085, "engineering_dimension": false},
+      "inspection_profile": {
+        "profile_id": "j6101-connector-v1",
+        "fidelity": "repair_visual",
+        "source_status": "category_based",
+        "visual_note": "连接器外观与层高为维修识别示意，不代表实测针脚数量、间距、卡扣或工程封装。"
+      }
     },
     {
       "component_id": "KM4-MAIN-VBAT1", "designator": "VBAT1", "name": "Battery supply test point", "category": "test_point", "module": "Basic power", "proxy_visibility": "visible_context",

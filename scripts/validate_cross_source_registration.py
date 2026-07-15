@@ -52,6 +52,13 @@ def validate_dataset(data, root):
             for link in entity.get(group, []):
                 if not link.get("source") or not link.get("page"):
                     errors.append(f"{entity_id} contains an unsupported source link")
+        inspection_profile = entity.get("inspection_profile")
+        if inspection_profile:
+            if entity.get("category") == "test_point":
+                errors.append(f"{entity_id} test point cannot expose component inspection")
+            for key in ("profile_id", "fidelity", "source_status", "visual_note"):
+                if not inspection_profile.get(key):
+                    errors.append(f"{entity_id} inspection profile requires {key}")
         profile = entity.get("measurement_profile")
         if profile:
             measurement_id = profile.get("measurement_id")
