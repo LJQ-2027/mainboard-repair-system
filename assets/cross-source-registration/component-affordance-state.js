@@ -73,21 +73,63 @@ export function placeHoverTooltip({ pointer, viewport, tooltip, gap = 12, margin
   };
 }
 
-export function buildLabelPositions(items, labelWidth = 0.13, laneHeight = 0.034) {
+export function buildScreenLabelPositions(items, {
+  viewport,
+  labelPixels = { width: 76, height: 22 },
+  gap = 4,
+  margin = 8,
+} = {}) {
+  const halfWidth = labelPixels.width / 2;
+  const halfHeight = labelPixels.height / 2;
+  const horizontalStep = labelPixels.width + gap;
+  const verticalStep = labelPixels.height + gap;
+  const clamp = (position) => ({
+    x: Math.max(margin + halfWidth, Math.min(position.x, viewport.width - margin - halfWidth)),
+    y: Math.max(margin + halfHeight, Math.min(position.y, viewport.height - margin - halfHeight)),
+  });
+  const rectangle = (position) => ({
+    left: position.x - halfWidth,
+    right: position.x + halfWidth,
+    top: position.y - halfHeight,
+    bottom: position.y + halfHeight,
+  });
   const placed = [];
+  const overlaps = (candidate) => {
+    const box = rectangle(candidate);
+    return placed.some((position) => {
+      const other = rectangle(position);
+      return box.left < other.right && box.right > other.left
+        && box.top < other.bottom && box.bottom > other.top;
+    });
+  };
+  const offsets = [
+    [0, -1], [0, 1], [-1, 0], [1, 0],
+    [-1, -1], [1, -1], [-1, 1], [1, 1],
+    [0, -2], [0, 2], [-1, -2], [1, -2], [-1, 2], [1, 2],
+  ];
   return items.map((item) => {
-    const baseY = item.center.y + item.dimensions.y / 2 + 0.025;
-    const direction = baseY > 0.56 ? -1 : 1;
-    let y = baseY;
-    while (placed.some((position) => (
-      Math.abs(position.x - item.center.x) < labelWidth
-      && Math.abs(position.y - y) < laneHeight
-    ))) y += laneHeight * direction;
-    const position = {
-      id: item.id,
-      x: item.center.x,
-      y: Math.round(y * 1_000_000) / 1_000_000,
-    };
+    const candidates = offsets.map(([column, row]) => clamp({
+      x: item.anchor.x + column * horizontalStep,
+      y: item.anchor.y + row * verticalStep,
+    }));
+    let candidate = candidates.find((position, index) => (
+      candidates.findIndex((other) => other.x === position.x && other.y === position.y) === index
+      && !overlaps(position)
+    ));
+    if (!candidate) {
+      const grid = [];
+      for (let y = margin + halfHeight; y <= viewport.height - margin - halfHeight; y += verticalStep) {
+        for (let x = margin + halfWidth; x <= viewport.width - margin - halfWidth; x += horizontalStep) {
+          grid.push({ x, y });
+        }
+      }
+      grid.sort((a, b) => (
+        Math.hypot(a.x - item.anchor.x, a.y - item.anchor.y)
+        - Math.hypot(b.x - item.anchor.x, b.y - item.anchor.y)
+      ));
+      candidate = grid.find((position) => !overlaps(position));
+    }
+    const position = { id: item.id, ...candidate };
     placed.push(position);
     return position;
   });

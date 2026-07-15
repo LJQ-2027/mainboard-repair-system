@@ -23,7 +23,7 @@ import {
 import {
   buildCornerSegments,
   buildHitArea,
-  buildLabelPositions,
+  buildScreenLabelPositions,
   buildScreenAwareHitScale,
   placeHoverTooltip,
   resolveAffordancePresentation,
@@ -567,21 +567,11 @@ export class BoardRenderer {
   }
 
   buildLabels() {
-    const labelPositions = new Map(buildLabelPositions(this.entities
-      .map((entity) => ({ entity, descriptor: this.descriptors.get(entity.component_id) }))
-      .filter(({ descriptor }) => Boolean(descriptor))
-      .map(({ entity, descriptor }) => ({
-        id: entity.component_id,
-        center: descriptor.center,
-        dimensions: descriptor.dimensions,
-      })))
-      .map((position) => [position.id, position]));
     this.entities.forEach((entity) => {
       const descriptor = this.descriptors.get(entity.component_id);
       if (!descriptor) return;
       const sprite = createLabelSprite(entity.designator);
-      const labelPosition = labelPositions.get(entity.component_id);
-      sprite.position.set(labelPosition.x, labelPosition.y, 0.12);
+      sprite.position.set(descriptor.center.x, descriptor.center.y, 0.12);
       this.group.add(sprite);
       this.labelSprites.set(entity.component_id, sprite);
     });
@@ -1349,16 +1339,46 @@ export class BoardRenderer {
   }
 
   render() {
-    const width = Math.max(this.container.clientWidth, 320);
-    const height = Math.max(this.container.clientHeight, 320);
+    const width = Math.max(this.container.clientWidth, 1);
+    const height = Math.max(this.container.clientHeight, 1);
     const worldPerPixelX = (this.camera.right - this.camera.left) / (width * this.camera.zoom);
     const worldPerPixelY = (this.camera.top - this.camera.bottom) / (height * this.camera.zoom);
     this.container.dataset.cameraZoom = this.camera.zoom.toFixed(3);
+    this.group.updateMatrixWorld(true);
+    const labelDepths = new Map();
+    const anchor = new THREE.Vector3();
+    const labelPositions = new Map(buildScreenLabelPositions(this.entities
+      .map((entity) => ({ entity, descriptor: this.descriptors.get(entity.component_id) }))
+      .filter(({ descriptor }) => Boolean(descriptor))
+      .map(({ entity, descriptor }) => {
+        anchor.set(descriptor.center.x, descriptor.center.y, 0.12)
+          .applyMatrix4(this.group.matrixWorld)
+          .project(this.camera);
+        labelDepths.set(entity.component_id, anchor.z);
+        return {
+          id: entity.component_id,
+          anchor: {
+            x: ((anchor.x + 1) / 2) * width,
+            y: ((1 - anchor.y) / 2) * height,
+          },
+        };
+      }), {
+      viewport: { width, height },
+    }).map((position) => [position.id, position]));
     this.labelSprites.forEach((sprite, componentId) => {
       const presentation = resolveAffordancePresentation({
         selected: componentId === this.selectedComponentId,
         hovered: componentId === this.hoveredComponentId,
       });
+      const position = labelPositions.get(componentId);
+      if (position) {
+        const worldPosition = new THREE.Vector3(
+          (position.x / width) * 2 - 1,
+          1 - (position.y / height) * 2,
+          labelDepths.get(componentId),
+        ).unproject(this.camera);
+        sprite.position.copy(this.group.worldToLocal(worldPosition));
+      }
       sprite.scale.set(
         worldPerPixelX * presentation.labelPixels.width,
         worldPerPixelY * presentation.labelPixels.height,
@@ -1375,6 +1395,37 @@ export class BoardRenderer {
       target.scale.set(scale.x, scale.y, 1);
     });
     this.group.updateMatrixWorld(true);
+    const screenLabels = [];
+    const projected = new THREE.Vector3();
+    this.labelSprites.forEach((sprite, componentId) => {
+      if (!sprite.visible) return;
+      const presentation = resolveAffordancePresentation({
+        selected: componentId === this.selectedComponentId,
+        hovered: componentId === this.hoveredComponentId,
+      });
+      sprite.getWorldPosition(projected).project(this.camera);
+      screenLabels.push({
+        left: ((projected.x + 1) / 2) * width - presentation.labelPixels.width / 2,
+        top: ((1 - projected.y) / 2) * height - presentation.labelPixels.height / 2,
+        width: presentation.labelPixels.width,
+        height: presentation.labelPixels.height,
+      });
+    });
+    let overlapCount = 0;
+    screenLabels.forEach((label, index) => {
+      screenLabels.slice(index + 1).forEach((other) => {
+        if (label.left < other.left + other.width
+          && label.left + label.width > other.left
+          && label.top < other.top + other.height
+          && label.top + label.height > other.top) overlapCount += 1;
+      });
+    });
+    this.container.dataset.labelOverlapCount = String(overlapCount);
+    this.container.dataset.labelOutsideCount = String(screenLabels.filter((label) => (
+      label.left < 0 || label.top < 0
+      || label.left + label.width > width
+      || label.top + label.height > height
+    )).length);
     this.renderer.render(this.scene, this.camera);
   }
 }

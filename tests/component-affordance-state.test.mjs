@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import {
   buildCornerSegments,
   buildHitArea,
-  buildLabelPositions,
+  buildScreenLabelPositions,
   buildScreenAwareHitScale,
   placeHoverTooltip,
   resolveAffordancePresentation,
@@ -17,14 +17,34 @@ test('interactive frame uses eight short segments outside the package footprint'
   assert.equal(segments.every((segment) => segment.every((point) => Math.abs(point.x) > 0.05 || Math.abs(point.y) > 0.03)), true);
 });
 
-test('nearby component labels are assigned separate vertical lanes', () => {
-  const positions = buildLabelPositions([
-    { id: 'A', center: { x: 0, y: -0.4 }, dimensions: { x: 0.04, y: 0.02 } },
-    { id: 'B', center: { x: 0.05, y: -0.4 }, dimensions: { x: 0.04, y: 0.02 } },
-    { id: 'C', center: { x: 0.1, y: -0.4 }, dimensions: { x: 0.04, y: 0.02 } },
-  ]);
-  assert.equal(new Set(positions.map((position) => position.y)).size, 3);
-  assert.deepEqual(positions.map((position) => position.id), ['A', 'B', 'C']);
+test('screen-space label layout stays inside a narrow canvas without collisions', () => {
+  const items = [
+    ['U2001', 170, 250], ['U4000', 80, 280], ['X2100', 185, 220],
+    ['U0600', 220, 255], ['J6101', 200, 330], ['VBAT1', 302, 315], ['VBUS1', 288, 300],
+  ].map(([id, x, y]) => ({ id, anchor: { x, y } }));
+  const positions = buildScreenLabelPositions(items, {
+    viewport: { width: 320, height: 440 },
+  });
+  const rectangles = positions.map((position) => ({
+    left: position.x - 38,
+    right: position.x + 38,
+    top: position.y - 11,
+    bottom: position.y + 11,
+  }));
+
+  rectangles.forEach((rectangle) => {
+    assert.ok(rectangle.left >= 8 && rectangle.right <= 312);
+    assert.ok(rectangle.top >= 8 && rectangle.bottom <= 432);
+  });
+  rectangles.forEach((rectangle, index) => {
+    rectangles.slice(index + 1).forEach((other) => {
+      assert.ok(rectangle.right <= other.left || other.right <= rectangle.left
+        || rectangle.bottom <= other.top || other.bottom <= rectangle.top);
+    });
+  });
+  positions.forEach((position, index) => {
+    assert.ok(Math.hypot(position.x - items[index].anchor.x, position.y - items[index].anchor.y) < 150);
+  });
 });
 
 test('reviewed components receive bounded hit areas without inheriting complex mesh bounds', () => {

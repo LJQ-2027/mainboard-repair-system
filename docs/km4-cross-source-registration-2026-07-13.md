@@ -321,3 +321,10 @@ Canvas-owned model controls on 2026-07-15:
 - The control group uses a compact bottom-left instrument panel. It remains separate from top-left shield anatomy, top-right side switching, and the bottom-right single-component status.
 - On 390 px and 320 px screens, the view header returns from two rows to one and the model canvas gains about 39 px of height. The larger stage produces a visibly larger whole-board frame without reducing the established 12 px/11 px control readability.
 - A structural test prevents `modelTools` from returning to the global header. Headed Chromium verifies canvas containment, no overlap with top controls or inspection status, compact view-head height, at least 440 px of mobile canvas height, and the full interaction matrix with zero runtime errors.
+
+Screen-space component-label layout on 2026-07-15:
+
+- Reviewed designator tags are no longer assigned once in board-world coordinates. Every render projects component anchors into the current canvas, resolves nearby label candidates in pixels, and unprojects the chosen positions back into the 3D scene.
+- The layout keeps all seven reviewed labels visible. It selects nearby positions above, below, left, or right of each anchor, then uses a bounded fallback grid only when every local candidate is occupied.
+- Collision and containment use the actual WebGL canvas size rather than the nominal browser viewport. At a 320 px browser width the drawable canvas is 304 px, so right-edge labels such as `VBAT1` and `VBUS1` now remain fully visible instead of being clipped.
+- The renderer exposes measured overlap and outside counts for browser QA. Headed Chromium verifies both counts remain zero at desktop, 390 px, 320 px, and after anchored wheel zoom while selection, touch gestures, rotation, and inspection remain intact.
