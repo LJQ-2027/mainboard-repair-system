@@ -43,3 +43,10 @@ test('inspection status is a canvas-local return action using the shared exit pa
   assert.match(statusMarkup, /inspection-return-icon/);
   assert.match(appSource, /#inspectionStatus'\)\.addEventListener\('click', \(\) => \{ void toggleComponentInspection\(\); \}\)/);
 });
+
+test('inspection mode hides board-only controls and keeps direct manipulation tools', () => {
+  assert.match(appSource, /querySelector\('\.anatomy-panel'\)\.hidden = toolbar\.boardControlsHidden/);
+  assert.match(appSource, /querySelector\('\.side-panel'\)\.hidden = toolbar\.boardControlsHidden/);
+  assert.match(appSource, /querySelector\('\[data-model-drag-mode="pan"\]'\)\.hidden = toolbar\.panHidden/);
+  assert.match(appSource, /querySelector\('#toggleInspection'\)\.hidden = toolbar\.inspectionAngleHidden/);
+});

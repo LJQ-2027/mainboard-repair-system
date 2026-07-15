@@ -204,6 +204,7 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
   border: 1px solid #bac3bd;
   background: #f8f9f6f2;
 }
+.anatomy-panel[hidden], .side-panel[hidden] { display: none; }
 .side-segments { display: grid; grid-template-columns: repeat(2, 48px); }
 .side-segments button,
 .side-flip {

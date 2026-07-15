@@ -64,6 +64,9 @@ test('inspection toolbar exposes component rotation and repurposes reset', () =>
     ready: true,
     boardMode: 'pan',
   }), {
+    boardControlsHidden: true,
+    inspectionAngleHidden: true,
+    panHidden: true,
     panDisabled: true,
     panPressed: false,
     rotateDisabled: false,
@@ -76,6 +79,9 @@ test('inspection toolbar exposes component rotation and repurposes reset', () =>
     ready: true,
     boardMode: 'pan',
   }), {
+    boardControlsHidden: false,
+    inspectionAngleHidden: false,
+    panHidden: false,
     panDisabled: false,
     panPressed: true,
     rotateDisabled: false,

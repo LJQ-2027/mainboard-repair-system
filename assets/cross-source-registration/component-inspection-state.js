@@ -34,6 +34,9 @@ export function inspectionOpacity(activeComponentId, componentId) {
 
 export function buildInspectionToolbarState({ active, ready, boardMode }) {
   return {
+    boardControlsHidden: active,
+    inspectionAngleHidden: active,
+    panHidden: active,
     panDisabled: active || !ready,
     panPressed: !active && boardMode === 'pan',
     rotateDisabled: !ready,

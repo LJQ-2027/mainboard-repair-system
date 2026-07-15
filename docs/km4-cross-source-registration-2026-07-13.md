@@ -380,3 +380,10 @@ Canvas-local inspection return on 2026-07-15:
 - Desktop click, keyboard Enter, and real mobile touch all leave isolation while preserving the selected component and restoring board context.
 - At 390 px the button retains `← U4000 单体检视`. At 320 px it keeps the 40 px touch height and source identity while hiding only the redundant `单体检视` suffix, preventing overlap with the canvas toolbar.
 - Headed Chromium verifies canvas containment, zero overlap with model/anatomy/side controls, zero horizontal overflow, and successful return at desktop, 390 px, and the actual 304 px drawable canvas inside a 320 px viewport. The strict full interaction matrix, 91 Node tests, 49 Python tests, source validation, and inline-script compilation passed without runtime errors.
+
+Contextual inspection controls on 2026-07-15:
+
+- Single-component inspection now shows only controls that operate on the isolated package: rotation, view reset, and canvas/evidence return. Board pan, board inspection angle, shield anatomy, and side switching leave the visual and accessibility trees while isolation is active.
+- Returning to the board restores every board-level control, its prior interaction state, and side-switch availability without reloading or clearing the selected component.
+- This removes four groups of disabled visual noise from the inspection canvas without adding an overlay, menu, or parallel interaction mode.
+- Headed Chromium verifies the reduced control set and complete restoration at desktop, 390 px, and 320 px, with zero toolbar/return overlap and zero horizontal overflow. The strict full interaction matrix, 92 Node tests, 49 Python tests, source validation, and inline-script compilation passed without runtime errors.

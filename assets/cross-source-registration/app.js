@@ -447,6 +447,10 @@ function updateInspectionUi() {
     ready: canAcceptModelInteraction(modelInteraction),
     boardMode: modelDragMode,
   });
+  document.querySelector('.anatomy-panel').hidden = toolbar.boardControlsHidden;
+  document.querySelector('.side-panel').hidden = toolbar.boardControlsHidden;
+  document.querySelector('[data-model-drag-mode="pan"]').hidden = toolbar.panHidden;
+  document.querySelector('#toggleInspection').hidden = toolbar.inspectionAngleHidden;
   document.querySelectorAll('[data-model-drag-mode]').forEach((control) => {
     const pan = control.dataset.modelDragMode === 'pan';
     control.disabled = pan ? toolbar.panDisabled : toolbar.rotateDisabled;
