@@ -69,6 +69,69 @@ test('screen-space label layout preserves a previously valid compass slot', () =
   assert.equal(position.y, 246);
 });
 
+test('screen-space labels stay outside their own projected package footprint', () => {
+  const [position] = buildScreenLabelPositions([
+    {
+      id: 'U4000',
+      anchor: { x: 160, y: 220 },
+      exclusion: { left: 118, right: 202, top: 178, bottom: 262 },
+    },
+  ], {
+    viewport: { width: 320, height: 440 },
+  });
+  const label = {
+    left: position.x - 38,
+    right: position.x + 38,
+    top: position.y - 11,
+    bottom: position.y + 11,
+  };
+
+  assert.equal(
+    label.right <= 114 || label.left >= 206 || label.bottom <= 174 || label.top >= 266,
+    true,
+  );
+});
+
+test('screen-space labels change side when clamping would cover the package', () => {
+  const [position] = buildScreenLabelPositions([
+    {
+      id: 'U2001',
+      anchor: { x: 160, y: 38 },
+      exclusion: { left: 112, right: 208, top: 6, bottom: 70 },
+    },
+  ], {
+    viewport: { width: 320, height: 200 },
+  });
+
+  assert.ok(position.y >= 85);
+});
+
+test('screen-space labels avoid neighboring interactive packages', () => {
+  const obstacle = { left: 100, right: 220, top: 40, bottom: 92 };
+  const [position] = buildScreenLabelPositions([
+    {
+      id: 'U4000',
+      anchor: { x: 160, y: 140 },
+      exclusion: { left: 118, right: 202, top: 108, bottom: 172 },
+    },
+  ], {
+    viewport: { width: 320, height: 300 },
+    obstacles: [obstacle],
+  });
+  const label = {
+    left: position.x - 38,
+    right: position.x + 38,
+    top: position.y - 11,
+    bottom: position.y + 11,
+  };
+
+  assert.equal(
+    label.left < obstacle.right && label.right > obstacle.left
+      && label.top < obstacle.bottom && label.bottom > obstacle.top,
+    false,
+  );
+});
+
 test('only displaced labels receive a leader ending at the label edge', () => {
   assert.equal(buildLabelLeaderSegment({
     anchor: { x: 100, y: 100 },
@@ -81,6 +144,24 @@ test('only displaced labels receive a leader ending at the label edge', () => {
   }), {
     start: { x: 28, y: 100 },
     end: { x: 82, y: 100 },
+  });
+});
+
+test('package-aware leaders start outside the component and skip adjacent labels', () => {
+  const exclusion = { left: 118, right: 202, top: 178, bottom: 262 };
+  assert.equal(buildLabelLeaderSegment({
+    anchor: { x: 160, y: 220 },
+    label: { x: 160, y: 163 },
+    exclusion,
+  }), null);
+
+  assert.deepEqual(buildLabelLeaderSegment({
+    anchor: { x: 160, y: 220 },
+    label: { x: 160, y: 120 },
+    exclusion,
+  }), {
+    start: { x: 160, y: 174 },
+    end: { x: 160, y: 131 },
   });
 });
 

@@ -512,6 +512,7 @@ export class BoardRenderer {
     this.pointer = new THREE.Vector2();
     this.drag = null;
     this.activePointers = new Map();
+    this.activationTargets = new Map();
     this.suppressTouchTap = false;
     this.inspectionAngle = false;
     this.hoveredComponentId = null;
@@ -649,6 +650,7 @@ export class BoardRenderer {
       const sprite = createLabelSprite(entity.designator);
       const leader = createLabelLeaderLine();
       sprite.position.set(descriptor.center.x, descriptor.center.y, 0.12);
+      sprite.userData.componentId = entity.component_id;
       this.group.add(leader, sprite);
       this.labelSprites.set(entity.component_id, sprite);
       this.labelLeaderLines.set(entity.component_id, leader);
@@ -795,6 +797,8 @@ export class BoardRenderer {
     const canvas = this.renderer.domElement;
     canvas.addEventListener('pointerdown', (event) => {
       if (this.interactionLocked) return;
+      const activationTarget = this.componentAtPointer(event);
+      this.activationTargets.set(event.pointerId, activationTarget);
       this.cancelCameraAnimation();
       this.cancelAngleAnimation();
       this.clearHover(false);
@@ -917,6 +921,8 @@ export class BoardRenderer {
       this.render();
     });
     canvas.addEventListener('pointerup', (event) => {
+      const activationTarget = this.activationTargets.get(event.pointerId);
+      this.activationTargets.delete(event.pointerId);
       if (this.interactionLocked) return;
       if (event.pointerType === 'touch') this.activePointers.delete(event.pointerId);
       if (this.suppressTouchTap) {
@@ -929,9 +935,10 @@ export class BoardRenderer {
       const moved = Boolean(this.drag?.moved);
       this.drag = null;
       this.container.classList.remove('dragging');
-      if (!moved && dragMode !== 'component') this.pick(event);
+      if (!moved && dragMode !== 'component') this.pick(event, activationTarget);
     });
     canvas.addEventListener('pointercancel', (event) => {
+      this.activationTargets.delete(event.pointerId);
       if (event.pointerType === 'touch') this.activePointers.delete(event.pointerId);
       this.drag = null;
       if (!this.activePointers.size) this.suppressTouchTap = false;
@@ -1001,9 +1008,8 @@ export class BoardRenderer {
     };
   }
 
-  pick(event) {
+  pick(event, componentId = this.componentAtPointer(event)) {
     if (this.interactionLocked) return;
-    const componentId = this.componentAtPointer(event);
     if (componentId) this.onSelect(componentId);
   }
 
@@ -1011,7 +1017,9 @@ export class BoardRenderer {
     const pointer = this.clientPointToNdc(event.clientX, event.clientY);
     this.pointer.set(pointer.x, pointer.y);
     this.raycaster.setFromCamera(this.pointer, this.camera);
-    const hits = this.raycaster.intersectObjects([...this.pickTargets.values()], false);
+    const hits = this.raycaster.intersectObjects([
+      ...this.pickTargets.values(), ...this.labelSprites.values(),
+    ].filter((object) => object.visible), false);
     if (!hits.length) return null;
     let nearestComponentId = null;
     let nearestDistance = Number.POSITIVE_INFINITY;
@@ -1633,8 +1641,9 @@ export class BoardRenderer {
       : (Math.abs(Math.sin(this.group.rotation.z)) > 0.7 ? 'portrait' : 'landscape');
     const labelDepths = new Map();
     const labelAnchors = new Map();
+    const componentScreenBounds = new Map();
     const anchor = new THREE.Vector3();
-    const labelLayout = buildScreenLabelPositions(this.entities
+    const labelItems = this.entities
       .map((entity) => ({ entity, descriptor: this.descriptors.get(entity.component_id) }))
       .filter(({ descriptor }) => Boolean(descriptor))
       .map(({ entity, descriptor }) => {
@@ -1647,13 +1656,39 @@ export class BoardRenderer {
           y: ((1 - anchor.y) / 2) * height,
         };
         labelAnchors.set(entity.component_id, screenAnchor);
+        const halfWidth = descriptor.dimensions.x / 2;
+        const halfHeight = descriptor.dimensions.y / 2;
+        const corners = [0.1, 0.1 + descriptor.dimensions.z].flatMap((z) => ([
+          [-halfWidth, -halfHeight], [halfWidth, -halfHeight],
+          [halfWidth, halfHeight], [-halfWidth, halfHeight],
+        ].map(([x, y]) => {
+          const point = new THREE.Vector3(
+            descriptor.center.x + x,
+            descriptor.center.y + y,
+            z,
+          ).applyMatrix4(this.group.matrixWorld).project(this.camera);
+          return {
+            x: ((point.x + 1) / 2) * width,
+            y: ((1 - point.y) / 2) * height,
+          };
+        })));
+        const exclusion = {
+          left: Math.min(...corners.map((point) => point.x)),
+          right: Math.max(...corners.map((point) => point.x)),
+          top: Math.min(...corners.map((point) => point.y)),
+          bottom: Math.max(...corners.map((point) => point.y)),
+        };
+        componentScreenBounds.set(entity.component_id, exclusion);
         return {
           id: entity.component_id,
           anchor: screenAnchor,
+          exclusion,
         };
-      }), {
+      });
+    const labelLayout = buildScreenLabelPositions(labelItems, {
       viewport: { width, height },
       preferredSlots: this.labelPlacementSlots,
+      obstacles: labelItems.map((item) => item.exclusion),
     });
     if (labelLayout.length) {
       this.labelPlacementSlots = new Map(labelLayout
@@ -1680,6 +1715,7 @@ export class BoardRenderer {
       const segment = position && buildLabelLeaderSegment({
         anchor: labelAnchors.get(componentId),
         label: position,
+        exclusion: componentScreenBounds.get(componentId),
       });
       if (leader && segment && !this.inspectionComponentId) {
         const depth = labelDepths.get(componentId);
@@ -1722,6 +1758,7 @@ export class BoardRenderer {
       });
       sprite.getWorldPosition(projected).project(this.camera);
       screenLabels.push({
+        componentId,
         left: ((projected.x + 1) / 2) * width - presentation.labelPixels.width / 2,
         top: ((1 - projected.y) / 2) * height - presentation.labelPixels.height / 2,
         width: presentation.labelPixels.width,
@@ -1738,11 +1775,33 @@ export class BoardRenderer {
       });
     });
     this.container.dataset.labelOverlapCount = String(overlapCount);
+    this.container.dataset.labelOwnComponentOverlapCount = String(screenLabels.filter((label) => {
+      const component = componentScreenBounds.get(label.componentId);
+      return component
+        && label.left < component.right && label.left + label.width > component.left
+        && label.top < component.bottom && label.top + label.height > component.top;
+    }).length);
+    this.container.dataset.labelInteractiveComponentOverlapCount = String(screenLabels.filter((label) => (
+      [...componentScreenBounds.entries()].some(([componentId, component]) => (
+        componentId !== label.componentId
+        && label.left < component.right && label.left + label.width > component.left
+        && label.top < component.bottom && label.top + label.height > component.top
+      ))
+    )).length);
     this.container.dataset.labelOutsideCount = String(screenLabels.filter((label) => (
       label.left < 0 || label.top < 0
       || label.left + label.width > width
       || label.top + label.height > height
     )).length);
+    this.container.dataset.labelScreenBounds = JSON.stringify(Object.fromEntries(screenLabels.map((label) => {
+      const designator = this.entities.find((entity) => entity.component_id === label.componentId)?.designator;
+      return [designator || label.componentId, {
+        left: label.left,
+        top: label.top,
+        width: label.width,
+        height: label.height,
+      }];
+    })));
     this.container.dataset.labelLeaderCount = String([...this.labelLeaderLines.values()]
       .filter((leader) => leader.visible).length);
     this.container.dataset.labelSlotSignature = [...this.labelPlacementSlots.entries()]

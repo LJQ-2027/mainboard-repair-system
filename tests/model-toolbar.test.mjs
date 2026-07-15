@@ -20,6 +20,30 @@ test('ordinary selection keeps native component materials and uses precise affor
   assert.match(rendererSource, /labelVariant/);
 });
 
+test('external component labels share the package picking and drill-down path', () => {
+  assert.match(rendererSource, /sprite\.userData\.componentId = entity\.component_id/);
+  assert.match(rendererSource, /\.\.\.this\.pickTargets\.values\(\), \.\.\.this\.labelSprites\.values\(\)/);
+  assert.match(rendererSource, /filter\(\(object\) => object\.visible\)/);
+  assert.match(rendererSource, /dataset\.labelScreenBounds/);
+});
+
+test('pointer activation keeps the visible target stable through hover cleanup', () => {
+  assert.match(rendererSource, /this\.activationTargets = new Map\(\)/);
+  assert.match(rendererSource, /const activationTarget = this\.componentAtPointer\(event\);[\s\S]*this\.activationTargets\.set\(event\.pointerId, activationTarget\);[\s\S]*this\.clearHover\(false\)/);
+  assert.match(rendererSource, /const activationTarget = this\.activationTargets\.get\(event\.pointerId\);/);
+  assert.match(rendererSource, /this\.pick\(event, activationTarget\)/);
+  assert.match(rendererSource, /this\.activationTargets\.delete\(event\.pointerId\)/);
+});
+
+test('hover and selection styling do not reorder external label placement', () => {
+  const labelLayoutSource = rendererSource.slice(
+    rendererSource.indexOf('const labelItems = this.entities'),
+    rendererSource.indexOf('const labelLayout = buildScreenLabelPositions'),
+  );
+  assert.doesNotMatch(labelLayoutSource, /priority/);
+  assert.doesNotMatch(labelLayoutSource, /\.sort\(/);
+});
+
 test('model interaction tools belong to the model canvas instead of the global view header', () => {
   const viewHead = toolbarMarkup.slice(
     toolbarMarkup.indexOf('<div class="view-head">'),

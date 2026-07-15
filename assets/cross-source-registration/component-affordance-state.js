@@ -79,6 +79,7 @@ export function buildScreenLabelPositions(items, {
   gap = 4,
   margin = 8,
   preferredSlots = new Map(),
+  obstacles = [],
 } = {}) {
   const halfWidth = labelPixels.width / 2;
   const halfHeight = labelPixels.height / 2;
@@ -97,13 +98,24 @@ export function buildScreenLabelPositions(items, {
     top: position.y - halfHeight,
     bottom: position.y + halfHeight,
   });
+  const intersects = (left, right) => (
+    left.left < right.right && left.right > right.left
+    && left.top < right.bottom && left.bottom > right.top
+  );
   const placed = [];
+  const expandedObstacles = obstacles.map((obstacle) => ({
+    left: obstacle.left - gap,
+    right: obstacle.right + gap,
+    top: obstacle.top - gap,
+    bottom: obstacle.bottom + gap,
+  }));
+  const intersectsObstacle = (position) => expandedObstacles
+    .some((obstacle) => intersects(rectangle(position), obstacle));
   const overlaps = (candidate) => {
     const box = rectangle(candidate);
     return placed.some((position) => {
       const other = rectangle(position);
-      return box.left < other.right && box.right > other.left
-        && box.top < other.bottom && box.bottom > other.top;
+      return intersects(box, other);
     });
   };
   const offsets = [
@@ -116,11 +128,33 @@ export function buildScreenLabelPositions(items, {
     const slotOrder = Number.isInteger(preferredSlot) && offsets[preferredSlot]
       ? [preferredSlot, ...offsets.keys()].filter((slot, index, slots) => slots.indexOf(slot) === index)
       : [...offsets.keys()];
+    const expandedExclusion = item.exclusion ? {
+      left: item.exclusion.left - gap,
+      right: item.exclusion.right + gap,
+      top: item.exclusion.top - gap,
+      bottom: item.exclusion.bottom + gap,
+    } : null;
+    const exclusionCenters = expandedExclusion ? [
+      { x: item.anchor.x, y: expandedExclusion.top - halfHeight },
+      { x: item.anchor.x, y: expandedExclusion.bottom + halfHeight },
+      { x: expandedExclusion.left - halfWidth, y: item.anchor.y },
+      { x: expandedExclusion.right + halfWidth, y: item.anchor.y },
+      { x: expandedExclusion.left - halfWidth, y: expandedExclusion.top - halfHeight },
+      { x: expandedExclusion.right + halfWidth, y: expandedExclusion.top - halfHeight },
+      { x: expandedExclusion.left - halfWidth, y: expandedExclusion.bottom + halfHeight },
+      { x: expandedExclusion.right + halfWidth, y: expandedExclusion.bottom + halfHeight },
+      { x: item.anchor.x, y: expandedExclusion.top - halfHeight - verticalStep },
+      { x: item.anchor.x, y: expandedExclusion.bottom + halfHeight + verticalStep },
+      { x: expandedExclusion.left - halfWidth, y: expandedExclusion.top - halfHeight - verticalStep },
+      { x: expandedExclusion.right + halfWidth, y: expandedExclusion.top - halfHeight - verticalStep },
+      { x: expandedExclusion.left - halfWidth, y: expandedExclusion.bottom + halfHeight + verticalStep },
+      { x: expandedExclusion.right + halfWidth, y: expandedExclusion.bottom + halfHeight + verticalStep },
+    ] : null;
     const candidates = slotOrder.map((slot) => {
       const [column, row] = offsets[slot];
       return {
         slot,
-        ...clamp({
+        ...clamp(exclusionCenters?.[slot] || {
           x: item.anchor.x + column * horizontalStep,
           y: item.anchor.y + row * verticalStep,
         }),
@@ -129,6 +163,8 @@ export function buildScreenLabelPositions(items, {
     let candidate = candidates.find((position, index) => (
       candidates.findIndex((other) => other.x === position.x && other.y === position.y) === index
       && !overlaps(position)
+      && (!expandedExclusion || !intersects(rectangle(position), expandedExclusion))
+      && !intersectsObstacle(position)
     ));
     if (!candidate) {
       const grid = [];
@@ -141,7 +177,11 @@ export function buildScreenLabelPositions(items, {
         Math.hypot(a.x - item.anchor.x, a.y - item.anchor.y)
         - Math.hypot(b.x - item.anchor.x, b.y - item.anchor.y)
       ));
-      const fallback = grid.find((position) => !overlaps(position));
+      const fallback = grid.find((position) => (
+        !overlaps(position)
+        && (!expandedExclusion || !intersects(rectangle(position), expandedExclusion))
+        && !intersectsObstacle(position)
+      ));
       candidate = fallback ? { slot: null, ...fallback } : null;
     }
     if (!candidate) return null;
@@ -154,14 +194,17 @@ export function buildScreenLabelPositions(items, {
 export function buildLabelLeaderSegment({
   anchor,
   label,
+  exclusion = null,
   labelPixels = { width: 76, height: 22 },
   minimumDistance = 48,
   anchorPadding = 8,
+  componentPadding = 4,
+  minimumVisibleLength = 8,
 } = {}) {
   const dx = label.x - anchor.x;
   const dy = label.y - anchor.y;
   const distance = Math.hypot(dx, dy);
-  if (distance < minimumDistance) return null;
+  if (!exclusion && distance < minimumDistance) return null;
   const unit = { x: dx / distance, y: dy / distance };
   const halfWidth = labelPixels.width / 2;
   const halfHeight = labelPixels.height / 2;
@@ -169,11 +212,22 @@ export function buildLabelLeaderSegment({
     Math.abs(unit.x) > Number.EPSILON ? halfWidth / Math.abs(unit.x) : Number.POSITIVE_INFINITY,
     Math.abs(unit.y) > Number.EPSILON ? halfHeight / Math.abs(unit.y) : Number.POSITIVE_INFINITY,
   );
+  const componentEdgeDistance = exclusion ? Math.min(
+    unit.x > Number.EPSILON
+      ? (exclusion.right - anchor.x) / unit.x
+      : (unit.x < -Number.EPSILON ? (exclusion.left - anchor.x) / unit.x : Number.POSITIVE_INFINITY),
+    unit.y > Number.EPSILON
+      ? (exclusion.bottom - anchor.y) / unit.y
+      : (unit.y < -Number.EPSILON ? (exclusion.top - anchor.y) / unit.y : Number.POSITIVE_INFINITY),
+  ) : 0;
+  const startDistance = exclusion ? componentEdgeDistance + componentPadding : anchorPadding;
+  const endDistance = distance - edgeDistance;
+  if (endDistance - startDistance < minimumVisibleLength) return null;
   const round = (value) => Math.round(value * 1_000_000) / 1_000_000;
   return {
     start: {
-      x: round(anchor.x + unit.x * anchorPadding),
-      y: round(anchor.y + unit.y * anchorPadding),
+      x: round(anchor.x + unit.x * startDistance),
+      y: round(anchor.y + unit.y * startDistance),
     },
     end: {
       x: round(label.x - unit.x * edgeDistance),

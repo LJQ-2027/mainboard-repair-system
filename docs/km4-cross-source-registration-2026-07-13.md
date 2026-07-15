@@ -461,3 +461,11 @@ Native-material component selection on 2026-07-16:
 - Entering and leaving single-component inspection no longer applies or restores an amber material tint. Isolation continues to use context opacity, camera framing, render order, and the existing return contract; abnormal repair observations retain their dedicated fault-color semantics.
 - A fixed-camera browser comparison sampled 2,200 pixels inside U4000 before selection, after selection, and after an inspection round trip. All package-interior pixels remained identical while the external selected affordance stayed visible and the camera remained at `1.000` zoom with unchanged board bounds.
 - The strict headed desktop/390 px/320 px interaction matrix, 120 Node tests, 50 Python tests, source validation, syntax checks, diff checks, and HTTP checks passed without runtime errors.
+
+External interactive component labels on 2026-07-16:
+
+- Reviewed designator tags now use the projected package bounds as layout obstacles. Tags remain outside their own package and every other reviewed interactive package at top, angled, zoomed, 390 px, and 320 px views while retaining collision-free, canvas-bounded placement.
+- Leader lines begin outside the package edge and appear only when collision avoidance creates a meaningful gap. Adjacent tags no longer draw a line through the component body.
+- Visible tags participate in the same raycast, selection, and direct-inspection path as package hit areas. Desktop hover/click and mobile tap can select a tag; reactivating an inspectable selected tag enters the existing isolation runtime, while test-point tags remain selection-only.
+- Label placement order is independent of hover and selection styling, so tags do not move when input modality changes. Pointer activation captures the visible target at press time and activates it only after a no-drag release, preserving drag-return and pinch suppression while fixing mouse-hover-to-touch transitions.
+- Headed Chromium verified zero label-to-label, label-to-own-package, label-to-other-interactive-package, and canvas-edge overlaps; desktop and mobile tag drill-down; mixed mouse/touch VBUS1 identity; and zero runtime errors. The strict full interaction matrix, 127 Node tests, 50 Python tests, source validation, syntax checks, diff checks, and HTTP checks passed.
