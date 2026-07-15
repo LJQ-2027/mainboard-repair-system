@@ -350,3 +350,10 @@ Drag-path click suppression on 2026-07-15:
 - Pointer down continues to clear hover feedback, dragging keeps the tooltip hidden, and mouse hover returns only after the next pointer movement. Touch gestures never leave desktop hover residue.
 - The same accumulated-travel rule applies to mouse and single-touch board gestures. Component inspection rotation remains non-selecting, while a genuine stationary tap still follows the existing component-pick path.
 - Headed Chromium reproduces a drag from X2100 outward and back to X2100 with both mouse and touch: U2001 remains selected, dragging state clears, hover recovers correctly for mouse, and no runtime errors occur. The full desktop/mobile interaction matrix also passes.
+
+Three-state component-tag hierarchy on 2026-07-15:
+
+- Reviewed component tags now render separate idle, hovered, and selected CanvasTexture variants. Idle uses a neutral complete border, hover uses a light amber complete border, and selection uses a stronger amber complete border with brighter text.
+- Tag dimensions and dark background area remain unchanged. The hierarchy does not introduce a side stripe, broad fill, module polygon, selection circle, or fault-coral treatment.
+- Selection remains authoritative when the same entity is hovered. Moving selection from U2001 to X2100 transfers the selected texture with the shared identity state, while touch interaction clears the desktop hover variant.
+- All three textures are owned by the sprite and disposed when a board side is replaced. Headed Chromium verifies selected/hovered variants on desktop, selected-without-hover on touch, visible mobile tag differentiation, and the full interaction matrix with no runtime errors.

@@ -337,29 +337,68 @@ function createModuleMesh(module) {
   return group;
 }
 
-function createLabelSprite(text) {
+function createLabelTexture(text, variant) {
   const canvas = document.createElement('canvas');
   canvas.width = 240;
   canvas.height = 64;
   const context = canvas.getContext('2d');
-  context.fillStyle = 'rgba(19,29,25,0.94)';
+  const styles = {
+    idle: {
+      background: 'rgba(19,29,25,0.9)',
+      border: 'rgba(196,206,200,0.72)',
+      borderWidth: 2,
+      locator: '#d0a63b',
+      text: '#eef2ef',
+      locatorSize: 8,
+    },
+    hovered: {
+      background: 'rgba(19,29,25,0.96)',
+      border: '#f3d77f',
+      borderWidth: 3,
+      locator: '#f3d77f',
+      text: '#ffffff',
+      locatorSize: 10,
+    },
+    selected: {
+      background: 'rgba(19,29,25,0.98)',
+      border: '#f2c94c',
+      borderWidth: 4,
+      locator: '#f2c94c',
+      text: '#fff4c7',
+      locatorSize: 12,
+    },
+  };
+  const style = styles[variant] || styles.idle;
+  context.fillStyle = style.background;
   context.fillRect(0, 0, 240, 64);
-  context.strokeStyle = 'rgba(196,206,200,0.82)';
-  context.lineWidth = 2;
-  context.strokeRect(1, 1, 238, 62);
-  context.fillStyle = '#f2c94c';
-  context.fillRect(12, 28, 8, 8);
-  context.fillStyle = '#ffffff';
+  context.strokeStyle = style.border;
+  context.lineWidth = style.borderWidth;
+  context.strokeRect(style.borderWidth / 2, style.borderWidth / 2, 240 - style.borderWidth, 64 - style.borderWidth);
+  context.fillStyle = style.locator;
+  context.fillRect(12, 32 - style.locatorSize / 2, style.locatorSize, style.locatorSize);
+  context.fillStyle = style.text;
   context.font = '700 29px Segoe UI, Arial';
   context.textAlign = 'left';
   context.textBaseline = 'middle';
-  context.fillText(text, 32, 33);
+  context.fillText(text, 36, 33);
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
-  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false }));
+  return texture;
+}
+
+function createLabelSprite(text) {
+  const labelTextures = Object.fromEntries(['idle', 'hovered', 'selected']
+    .map((variant) => [variant, createLabelTexture(text, variant)]));
+  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: labelTextures.idle,
+    transparent: true,
+    depthTest: false,
+  }));
   sprite.scale.set(0.1, 0.028, 1);
   sprite.renderOrder = 9;
   sprite.visible = true;
+  sprite.userData.labelTextures = labelTextures;
+  sprite.userData.activeVariant = 'idle';
   return sprite;
 }
 
@@ -650,7 +689,8 @@ export class BoardRenderer {
       child.geometry?.dispose();
       const materials = Array.isArray(child.material) ? child.material : [child.material];
       materials.filter(Boolean).forEach((item) => {
-        item.map?.dispose();
+        const textures = new Set([item.map, ...Object.values(child.userData.labelTextures || {})]);
+        textures.forEach((texture) => texture?.dispose());
         item.dispose();
       });
     });
@@ -996,6 +1036,12 @@ export class BoardRenderer {
       frame.visible = !this.inspectionComponentId;
       const label = this.labelSprites.get(componentId);
       if (label) {
+        const texture = label.userData.labelTextures?.[presentation.labelVariant];
+        if (texture && label.material.map !== texture) {
+          label.material.map = texture;
+          label.material.needsUpdate = true;
+        }
+        label.userData.activeVariant = presentation.labelVariant;
         label.material.opacity = presentation.labelOpacity;
         label.visible = !this.inspectionComponentId;
       }
@@ -1522,6 +1568,10 @@ export class BoardRenderer {
       .sort(([left], [right]) => left.localeCompare(right))
       .map(([componentId, slot]) => `${componentId}:${slot}`)
       .join('|');
+    this.container.dataset.selectedLabelVariant = this.labelSprites
+      .get(this.selectedComponentId)?.userData.activeVariant || '';
+    this.container.dataset.hoveredLabelVariant = this.labelSprites
+      .get(this.hoveredComponentId)?.userData.activeVariant || '';
     this.renderer.render(this.scene, this.camera);
   }
 }

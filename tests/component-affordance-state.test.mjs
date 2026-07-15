@@ -117,10 +117,14 @@ test('affordance states reserve coral for faults instead of ordinary selection',
 
 test('reviewed component tags keep a readable fixed screen size', () => {
   const idle = resolveAffordancePresentation({});
+  const hovered = resolveAffordancePresentation({ hovered: true });
   const selected = resolveAffordancePresentation({ selected: true });
 
   assert.deepEqual(idle.labelPixels, { width: 68, height: 20 });
   assert.deepEqual(selected.labelPixels, { width: 76, height: 22 });
+  assert.equal(idle.labelVariant, 'idle');
+  assert.equal(hovered.labelVariant, 'hovered');
+  assert.equal(selected.labelVariant, 'selected');
 });
 
 test('hover tooltip flips away from canvas edges and stays fully visible', () => {
