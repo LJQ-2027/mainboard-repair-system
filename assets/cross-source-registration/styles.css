@@ -87,7 +87,8 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
   background: white;
   color: #46534d;
   font: inherit;
-  font-size: 11px;
+  font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
 }
 .model-interaction-modes button:last-child { border-right: 1px solid var(--line); }
@@ -173,7 +174,8 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
   background: white;
   color: #405049;
   font: inherit;
-  font-size: 10px;
+  font-size: 11px;
+  font-weight: 600;
   cursor: pointer;
 }
 .anatomy-segments button:last-child { border-right: 1px solid #b9c2bc; }
@@ -187,7 +189,8 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
   color: #27332e;
   padding: 0 24px 0 8px;
   font: inherit;
-  font-size: 10px;
+  font-size: 11px;
+  font-weight: 600;
 }
 .side-panel {
   position: absolute;
@@ -208,7 +211,8 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
   background: white;
   color: #405049;
   font: inherit;
-  font-size: 10px;
+  font-size: 11px;
+  font-weight: 600;
   cursor: pointer;
 }
 .side-segments button { border-right: 0; }
@@ -461,6 +465,7 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
   main { display: block; height: auto; }
   .workspace { height: 610px; border-right: 0; }
   .view { padding: 9px; }
+  .model-view { padding: 0; }
   .image-layer img { max-height: 490px; }
   .evidence { padding: 16px; overflow: visible; }
   .entity-heading {
@@ -478,13 +483,13 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 @media (max-width: 480px) {
   .workspace { height: 540px; grid-template-rows: auto minmax(0, 1fr) 42px; }
   .view-head { flex-wrap: wrap; row-gap: 4px; padding: 5px 8px; }
-  .tabs button { padding: 8px 9px; font-size: 11px; }
+  .tabs button { padding: 8px 9px; font-size: 12px; }
   #modelTools { flex: 0 0 100%; justify-content: flex-end; gap: 4px; }
   #modelTools .icon-button { width: 32px; height: 32px; }
   #modelTools .model-interaction-modes button { height: 32px; }
   .entity-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .facts { grid-template-columns: 1fr; }
-  .source-note { font-size: 10px; }
+  .source-note { font-size: 11px; }
   .anatomy-panel { top: 8px; left: 8px; gap: 4px; padding: 4px; }
   .anatomy-segments { grid-template-columns: repeat(3, 36px); }
   .anatomy-panel select { width: 94px; }
@@ -496,8 +501,9 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 @media (max-width: 360px) {
   .anatomy-panel { gap: 3px; }
   .anatomy-segments { grid-template-columns: repeat(3, 30px); }
-  .anatomy-panel select { width: 82px; padding: 0 18px 0 4px; font-size: 9px; }
+  .anatomy-panel select { width: 82px; padding: 0 18px 0 4px; font-size: 11px; }
   .side-panel { gap: 3px; }
   .side-segments { grid-template-columns: repeat(2, 32px); }
+  .wide-side-prefix { display: none; }
   .side-flip { width: 26px; }
 }

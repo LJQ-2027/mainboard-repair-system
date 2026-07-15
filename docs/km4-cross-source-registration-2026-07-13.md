@@ -279,3 +279,10 @@ Readable component affordances on 2026-07-14:
 - Fixed screen-space tags increased from 48 x 14 px to 68 x 20 px, with the hovered or selected identity at 76 x 22 px. The text is now readable in the whole-board desktop and 390 px views without enlarging component hit geometry.
 - The raster tag treatment now uses a complete restrained border and a small amber locator square instead of an orange side stripe. Hover tooltips likewise use a uniform border, automatically flip around canvas edges, and remain fully inside the model surface.
 - Wheel zoom recomputes hover against the anchored camera state, while touch input clears desktop-style hover feedback. Headed Chromium kept X2100 as the same hover target through wheel zoom, showed no touch tooltip residue, and passed the full desktop/390 px/320 px interaction matrix with no runtime errors.
+
+Mobile model-control readability on 2026-07-15:
+
+- Model view tabs and pan/rotate modes now render at 12 px on narrow screens. Shield states, module selection, side selection, and the source note render at 11 px with stronger control-label weight, without increasing toolbar height.
+- The mobile `.view` padding rule no longer overrides the model surface's zero-padding contract. The WebGL canvas regains 18 px of horizontal space, and both floating control groups now sit fully inside the actual canvas rather than extending one pixel beyond each edge.
+- At 320 px, side buttons use the compact visible labels `1面` and `2面` while retaining the full accessible names `第1面` and `第2面`. The original compact widths preserve a measured two-pixel gap between the anatomy and side-control groups.
+- Headed Chromium at 390 px and 320 px verifies minimum font sizes, unwrapped labels, complete accessible side names, controls inside the WebGL canvas, no control overlap, no horizontal overflow, and correct selected states. The full interaction matrix passed with no runtime errors.
