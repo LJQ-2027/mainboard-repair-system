@@ -230,10 +230,10 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
   align-items: baseline;
   gap: 8px;
   padding: 8px 10px;
-  border-left: 3px solid var(--accent);
-  background: #17221ee8;
+  border: 1px solid #738079;
+  background: #17221ef2;
   color: white;
-  font-size: 10px;
+  font-size: 11px;
   pointer-events: none;
 }
 .inspection-status[hidden] { display: none; }
@@ -279,7 +279,7 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
   cursor: pointer;
 }
 .inspect-component:hover { border-color: var(--accent); }
-.inspect-component[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); }
+.inspect-component[aria-pressed="true"] { background: #177d69; border-color: #177d69; }
 .inspect-component:disabled { color: #8a9690; border-color: var(--line); background: #edf0ec; cursor: not-allowed; }
 .entity-name { margin: 20px 0 18px; color: var(--muted); }
 .facts { display: grid; grid-template-columns: 1fr 1fr; margin: 0 0 22px; border-block: 1px solid var(--line); }

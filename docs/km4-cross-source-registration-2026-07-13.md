@@ -286,3 +286,10 @@ Mobile model-control readability on 2026-07-15:
 - The mobile `.view` padding rule no longer overrides the model surface's zero-padding contract. The WebGL canvas regains 18 px of horizontal space, and both floating control groups now sit fully inside the actual canvas rather than extending one pixel beyond each edge.
 - At 320 px, side buttons use the compact visible labels `1面` and `2面` while retaining the full accessible names `第1面` and `第2面`. The original compact widths preserve a measured two-pixel gap between the anatomy and side-control groups.
 - Headed Chromium at 390 px and 320 px verifies minimum font sizes, unwrapped labels, complete accessible side names, controls inside the WebGL canvas, no control overlap, no horizontal overflow, and correct selected states. The full interaction matrix passed with no runtime errors.
+
+Neutral single-component inspection state on 2026-07-15:
+
+- Entering or leaving single-component inspection is a normal model-navigation state, not a fault result. The active `返回主板` action now uses the restrained engineering green instead of the coral reserved for abnormal observations.
+- The canvas inspection status no longer uses a coral side stripe. It uses a complete neutral border, a dark instrument surface, and 11 px supporting text while the isolated component keeps its precise amber edge treatment.
+- No new module polygon, broad overlay, or selection circle was introduced. The existing low-opacity board context remains the only visual isolation layer around the extracted component.
+- Headed Chromium on desktop and 390 px verifies non-fault active color, uniform status borders, readable status text, canvas containment, active/exit labels, entry and exit states, component interaction, and zero horizontal overflow. The full interaction matrix passed with no runtime errors.
