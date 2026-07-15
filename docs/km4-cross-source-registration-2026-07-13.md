@@ -446,3 +446,11 @@ Direct selected-component drill-down on 2026-07-16:
 - A selected inspectable package adds a compact `单体查看` action row to its existing hover card. No permanent instruction, new overlay, broad highlight, or duplicate inspection runtime was added.
 - Drag-return gestures retain accumulated-travel suppression and cannot become direct drill-down activations. Desktop and touch use the same activation state helper and the same inspection transition.
 - Headed Chromium verifies select-then-inspect behavior, immediate default-selection drill-down, test-point exclusion, drag-return suppression, mobile two-tap entry, zero horizontal overflow, and zero runtime errors. The strict full interaction matrix, 118 Node tests, 50 Python tests, source validation, syntax checks, diff checks, and HTTP checks passed.
+
+Free-browse versus guided-focus selection on 2026-07-16:
+
+- Component activation inside the WebGL board is now a free-browse action. It updates the selected identity, precise package affordance, hover action, and repair evidence without changing camera center, zoom, tilt, or board screen bounds.
+- Canvas selection cancels any in-flight focus camera animation and clears stale repair-region emphasis while preserving the technician's manual camera. This prevents ordinary exploration from retaining unrelated range dimming.
+- Entity-list, cross-source, and repair-flow selections retain the existing guided-focus path. They may change side, move the camera, zoom to the source-backed repair region, and apply local emphasis because those actions explicitly request navigation.
+- The stable free-browse frame lets desktop and touch users activate the same selected package again at the same screen coordinate to enter inspection. No timer, double-click dependency, or hidden coordinate cache was added.
+- Headed Chromium verifies pixel-coordinate-stable board bounds and unchanged `1.000` zoom for canvas selection at desktop and mobile, same-coordinate drill-down, and retained guided focus from `1.000` to `1.900`. The strict full interaction matrix, 119 Node tests, 50 Python tests, source validation, syntax checks, diff checks, and HTTP checks passed.

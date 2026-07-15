@@ -1422,6 +1422,7 @@ export class BoardRenderer {
   focusRegion(region, animate = true) {
     if (!region) return this.clearRepairFocus(animate);
     this.activeFocusRegion = region;
+    this.container.dataset.repairFocus = 'active';
     const aspect = Math.max(this.container.clientWidth, 320) / Math.max(this.container.clientHeight, 320);
     const frame = buildFocusFrame(region, aspect, this.group.rotation.z);
     const focusCenter = this.focusCenterFor(frame.center);
@@ -1443,8 +1444,21 @@ export class BoardRenderer {
     this.focusRegion(region, animate);
   }
 
+  clearRepairEmphasis() {
+    this.cancelCameraAnimation();
+    this.activeFocusRegion = null;
+    this.container.dataset.repairFocus = 'none';
+    this.activeModuleId = null;
+    this.container.dataset.activeModule = '';
+    this.moduleObjects.forEach((object) => { object.visible = false; });
+    this.applyRepairEmphasis(null);
+    this.updateLabelVisibility(false);
+    this.render();
+  }
+
   clearRepairFocus(animate = true, resetLabelPlacement = false) {
     this.activeFocusRegion = null;
+    this.container.dataset.repairFocus = 'none';
     this.manualPanCenter = null;
     this.applyRepairEmphasis(null);
     const settleLabels = () => {

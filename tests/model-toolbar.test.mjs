@@ -121,9 +121,23 @@ test('model activation uses selection first and direct inspection only for the s
   assert.match(activationSource, /resolveModelComponentActivation\([\s\S]*entity,[\s\S]*selectedId/);
   assert.match(activationSource, /action === 'inspect'/);
   assert.match(activationSource, /await enterSelectedComponentInspection\(\)/);
-  assert.match(activationSource, /await selectEntity\(componentId\)/);
+  assert.match(activationSource, /await selectEntity\(componentId, \{ focus: false \}\)/);
   assert.match(appSource, /new BoardRenderer\([\s\S]*handleModelComponentActivation/);
   assert.match(rendererSource, /action\.textContent = '单体查看'/);
+});
+
+test('canvas selection keeps the manual camera while guided selection retains repair focus', () => {
+  const selectEntitySource = appSource.slice(
+    appSource.indexOf('async function selectEntity'),
+    appSource.indexOf('async function handleModelComponentActivation'),
+  );
+
+  assert.match(selectEntitySource, /options\.focus === false && activeView === 'model'/);
+  assert.match(selectEntitySource, /renderer\.clearRepairEmphasis\(\)/);
+  assert.match(selectEntitySource, /else activateRepairTarget\(\)/);
+  assert.match(rendererSource, /clearRepairEmphasis\(\)/);
+  assert.match(rendererSource, /this\.cancelCameraAnimation\(\)/);
+  assert.match(rendererSource, /this\.applyRepairEmphasis\(null\)/);
 });
 
 test('responsive board orientation survives reset and side replacement', () => {

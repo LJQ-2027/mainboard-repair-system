@@ -787,7 +787,8 @@ async function selectEntity(componentId, options = {}) {
   const targetModules = sideDataById.get(entity.side_id)?.anatomy.modules || [];
   currentRepairTarget = buildEntityTarget(data.board_id, entity, targetModules);
   updateSideControls();
-  activateRepairTarget();
+  if (options.focus === false && activeView === 'model') renderer.clearRepairEmphasis();
+  else activateRepairTarget();
   if (activeView === 'model') modelInteraction = consumePendingFocus(modelInteraction);
   if (activeView === 'pointmap' && pointMapViewport) pointMapViewport.focus(state.boardPoint);
   updateInspectionUi();
@@ -804,7 +805,7 @@ async function handleModelComponentActivation(componentId) {
     await enterSelectedComponentInspection();
     return;
   }
-  if (action === 'select') await selectEntity(componentId);
+  if (action === 'select') await selectEntity(componentId, { focus: false });
 }
 
 async function setView(name) {
