@@ -6,7 +6,6 @@ import { mergeCompiledSchematicLinks } from './source-links.js';
 import { extractModuleRegions, extractShieldRegions } from './anatomy-state.js';
 import {
   buildEntityTarget,
-  buildModuleTarget,
   moduleOverlayId,
   nextSideId,
 } from './repair-focus-state.js';
@@ -62,8 +61,6 @@ let geometryData;
 let selectedId;
 let pointMapViewport;
 let activeView = 'photo';
-let moduleFocusMode = 'auto';
-let anatomy;
 let currentRepairTarget;
 let sideDataById = new Map();
 let sideIds = [];
@@ -440,7 +437,6 @@ function updateInspectionUi() {
   document.querySelector('#inspectionDesignator').textContent = entity?.designator || '—';
   document.querySelector('#modelView').classList.toggle('inspection-active', active);
   document.querySelector('#toggleInspection').disabled = active || !canAcceptModelInteraction(modelInteraction);
-  document.querySelector('#moduleFocus').disabled = active || !canAcceptModelInteraction(modelInteraction);
   document.querySelectorAll('[data-model-drag-mode]').forEach((control) => {
     control.disabled = active || !canAcceptModelInteraction(modelInteraction);
   });
@@ -516,25 +512,6 @@ async function toggleComponentInspection() {
   }
 }
 
-function populateModuleMenu(modules) {
-  const moduleMenu = document.querySelector('#moduleFocus');
-  moduleMenu.replaceChildren();
-  [['auto', '器件定位'], ['none', '全板视图']].forEach(([value, label]) => {
-    const option = document.createElement('option');
-    option.value = value;
-    option.textContent = label;
-    moduleMenu.append(option);
-  });
-  modules.forEach((module) => {
-    const option = document.createElement('option');
-    option.value = module.moduleId;
-    option.textContent = module.name;
-    moduleMenu.append(option);
-  });
-  moduleFocusMode = 'auto';
-  moduleMenu.value = 'auto';
-}
-
 function updateSideControls() {
   const locked = !canAcceptModelInteraction(modelInteraction);
   document.querySelectorAll('[data-side-id]').forEach((button) => {
@@ -577,8 +554,6 @@ async function switchModelSide(sideId, animate = true) {
     }
     await renderer.setSideData(sideDataById.get(sideId), animate);
     activeSideId = sideId;
-    anatomy = sideDataById.get(sideId).anatomy;
-    populateModuleMenu(anatomy.modules);
     if (currentRepairTarget?.sideId === activeSideId) {
       renderer.select(selectedId);
       applyRepairTarget();
@@ -709,8 +684,6 @@ async function selectEntity(componentId, options = {}) {
   renderComponentGuidance(entity);
   if (options.explicit !== false) document.querySelector('.evidence').scrollTo({ top: 0, behavior: 'auto' });
   renderer.select(componentId);
-  moduleFocusMode = 'auto';
-  document.querySelector('#moduleFocus').value = 'auto';
   const targetModules = sideDataById.get(entity.side_id)?.anatomy.modules || [];
   currentRepairTarget = buildEntityTarget(data.board_id, entity, targetModules);
   updateSideControls();
@@ -805,7 +778,6 @@ async function init() {
     }];
   }));
   activeSideId = sideManifest.default_side_id;
-  anatomy = sideDataById.get(activeSideId).anatomy;
   const source = data.registration.anchors.slice(0, 4).map((anchor) => anchor.board);
   const target = data.registration.anchors.slice(0, 4).map((anchor) => anchor.image);
   matrix = solveHomography(source, target);
@@ -826,7 +798,6 @@ async function init() {
     sideDataById.get(activeSideId),
     selectEntity,
   );
-  populateModuleMenu(anatomy.modules);
   updateSideControls();
   document.querySelector('#sourceNote').textContent = `${data.registration.proxy_label} · ${data.registration.proxy_limit}`;
   const list = document.querySelector('#entityList');
@@ -881,23 +852,6 @@ document.querySelectorAll('[data-shield-mode]').forEach((button) => button.addEv
   document.querySelectorAll('[data-shield-mode]').forEach((candidate) => candidate.setAttribute('aria-pressed', String(candidate === button)));
   renderer?.setShieldMode(button.dataset.shieldMode);
 }));
-document.querySelector('#moduleFocus').addEventListener('change', (event) => {
-  moduleFocusMode = event.currentTarget.value;
-  if (moduleFocusMode === 'auto') {
-    const entity = data?.entities.find((candidate) => candidate.component_id === selectedId);
-    const targetModules = entity ? sideDataById.get(entity.side_id)?.anatomy.modules || [] : [];
-    currentRepairTarget = entity ? buildEntityTarget(data.board_id, entity, targetModules) : null;
-    activateRepairTarget();
-  } else if (moduleFocusMode === 'none') {
-    currentRepairTarget = null;
-    renderer?.setModuleFocus(null);
-    renderer?.clearRepairFocus();
-  } else {
-    const module = anatomy.modules.find((candidate) => candidate.moduleId === moduleFocusMode);
-    currentRepairTarget = module ? buildModuleTarget(data.board_id, module) : null;
-    if (activeView === 'model') applyRepairTarget();
-  }
-});
 document.querySelectorAll('[data-side-id]').forEach((button) => button.addEventListener('click', () => {
   void switchModelSide(button.dataset.sideId);
 }));

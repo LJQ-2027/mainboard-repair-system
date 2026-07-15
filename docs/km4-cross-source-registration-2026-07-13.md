@@ -307,3 +307,10 @@ Semantic repair-result states on 2026-07-15:
 - Result messages no longer use a colored left stripe. Each state uses a complete semantic border with a light matching background, so the status reads as a bounded outcome instead of another locator or source-card accent.
 - Coral remains reserved for genuine abnormal feedback. Normal navigation, static evidence, and component inspection continue to use their neutral or engineering-green treatments.
 - Headed Chromium verifies all six result states with equal border widths on every side, distinct semantic backgrounds, retained repair wording, desktop/mobile containment, and zero runtime errors. The full interaction matrix passed without regressions to model navigation, repair flows, or touch gestures.
+
+Manual module-overlay control removal on 2026-07-15:
+
+- The model no longer exposes the `器件定位` module selector. It duplicated reviewed-component highlighting, consumed the most space in the left canvas tool group, and could reintroduce the broad orange module overlay through an unrelated manual state.
+- Source-driven repair targets remain intact. A documented repair step can still request a module target through the existing repair-focus contract, while ordinary component selection continues to produce no active module overlay.
+- The anatomy tool now contains only the three shield states. This reduces the desktop group from roughly 280 px to 150 px and leaves a materially wider gap between the anatomy and side controls at 390 px and 320 px.
+- A regression test prevents the manual selector and its independent application state from returning. Headed Chromium verifies no selector, no ordinary-selection module overlay, three retained shield controls, compact desktop/mobile layout, and the full interaction matrix with zero runtime errors.

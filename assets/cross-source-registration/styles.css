@@ -64,7 +64,6 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 .icon-button:focus-visible,
 .model-interaction-modes button:focus-visible,
 .anatomy-segments button:focus-visible,
-.anatomy-panel select:focus-visible,
 .side-panel button:focus-visible { outline: 3px solid #65a9ff; outline-offset: 2px; }
 .inspect-component:focus-visible { outline: 3px solid #65a9ff; outline-offset: 2px; }
 .icon-button {
@@ -181,17 +180,6 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 .anatomy-segments button:last-child { border-right: 1px solid #b9c2bc; }
 .anatomy-segments button:hover { border-color: var(--accent); color: #17221e; }
 .anatomy-segments button[aria-pressed="true"] { background: #17221e; color: white; border-color: #17221e; }
-.anatomy-panel select {
-  width: 132px;
-  height: 30px;
-  border: 1px solid #b9c2bc;
-  background: white;
-  color: #27332e;
-  padding: 0 24px 0 8px;
-  font: inherit;
-  font-size: 11px;
-  font-weight: 600;
-}
 .side-panel {
   position: absolute;
   top: 12px;
@@ -492,7 +480,6 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
   .source-note { font-size: 11px; }
   .anatomy-panel { top: 8px; left: 8px; gap: 4px; padding: 4px; }
   .anatomy-segments { grid-template-columns: repeat(3, 36px); }
-  .anatomy-panel select { width: 94px; }
   .side-panel { top: 8px; left: auto; right: 8px; padding: 4px; }
   .side-segments { grid-template-columns: repeat(2, 42px); }
   .inspection-status { right: 8px; bottom: 8px; }
@@ -501,7 +488,6 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 @media (max-width: 360px) {
   .anatomy-panel { gap: 3px; }
   .anatomy-segments { grid-template-columns: repeat(3, 30px); }
-  .anatomy-panel select { width: 82px; padding: 0 18px 0 4px; font-size: 11px; }
   .side-panel { gap: 3px; }
   .side-segments { grid-template-columns: repeat(2, 32px); }
   .wide-side-prefix { display: none; }
