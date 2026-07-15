@@ -293,3 +293,10 @@ Neutral single-component inspection state on 2026-07-15:
 - The canvas inspection status no longer uses a coral side stripe. It uses a complete neutral border, a dark instrument surface, and 11 px supporting text while the isolated component keeps its precise amber edge treatment.
 - No new module polygon, broad overlay, or selection circle was introduced. The existing low-opacity board context remains the only visual isolation layer around the extracted component.
 - Headed Chromium on desktop and 390 px verifies non-fault active color, uniform status borders, readable status text, canvas containment, active/exit labels, entry and exit states, component interaction, and zero horizontal overflow. The full interaction matrix passed with no runtime errors.
+
+Neutral source-evidence cards on 2026-07-15:
+
+- Schematic and repair-reference cards no longer use a coral left stripe. Static source material is not a fault state, so both card types now use the same complete low-contrast neutral border.
+- Source headings, two schematic images, repair instructions, filenames, and page references remain unchanged. The calmer container treatment preserves scan order while allowing actual abnormal observations to keep the coral semantic role.
+- Headed Chromium on desktop and 390 px verifies two visible evidence cards, equal nonzero border widths, border colors distinct from the fault accent, card containment inside the evidence panel, retained schematic images and repair text, and zero horizontal overflow.
+- The full interaction matrix passed with repair abnormal states, measurement classification, structured flows, single-component inspection, and mobile gestures intact and no runtime errors.
