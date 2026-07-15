@@ -3,6 +3,7 @@ import { buildSelectionState, entityListModelRevealOptions, nearestPointerTarget
 import { BoardRenderer } from './board-renderer.js';
 import { PointMapViewport } from './point-map-viewport.js';
 import { buildSourceNote } from './source-note-state.js';
+import { buildEntityAccessState } from './entity-access-state.js';
 import { mergeCompiledSchematicLinks } from './source-links.js';
 import { extractModuleRegions, extractShieldRegions } from './anatomy-state.js';
 import {
@@ -115,6 +116,17 @@ function updateSourceNote(inspectionEntity = null) {
     side,
     inspectionEntity,
   });
+}
+
+function updateEntityAccessStatus(entity) {
+  if (!entity) return;
+  const targetSideLabel = sideDataById.get(entity.side_id)?.label || entity.side_id;
+  const access = buildEntityAccessState(entity, activeSideId, targetSideLabel);
+  const visibility = document.querySelector('#entityVisibility');
+  visibility.textContent = access.label;
+  visibility.dataset.tone = access.tone;
+  visibility.title = access.description;
+  visibility.setAttribute('aria-label', `位置状态：${access.label}。${access.description}`);
 }
 
 const GUIDANCE_RESULT_COPY = {
@@ -608,11 +620,7 @@ function updateSideControls() {
   const linkedSide = sideDataById.get(data?.side_id);
   if (linkedSide) document.querySelector('#entityListHeading').textContent = `${linkedSide.label}已关联实体`;
   const selectedEntity = data?.entities.find((entity) => entity.component_id === selectedId);
-  if (selectedEntity) {
-    document.querySelector('#entityVisibility').textContent = selectedEntity.side_id === activeSideId
-      ? (selectedEntity.proxy_visibility === 'concealed_by_shield' ? '屏蔽罩下' : '代理图可见区域')
-      : `目标位于${sideDataById.get(selectedEntity.side_id)?.label || selectedEntity.side_id}`;
-  }
+  updateEntityAccessStatus(selectedEntity);
   if (activeView === 'model' && sideData) {
     updateSourceNote();
   }
@@ -778,7 +786,6 @@ async function selectEntity(componentId, options = {}) {
   document.querySelector('#entityName').textContent = entity.name;
   document.querySelector('#entityModule').textContent = entity.module;
   document.querySelector('#entityCoordinate').textContent = `${state.boardPoint.x.toFixed(3)}, ${state.boardPoint.y.toFixed(3)}`;
-  document.querySelector('#entityVisibility').textContent = entity.proxy_visibility === 'concealed_by_shield' ? '屏蔽罩下' : '代理图可见区域';
   document.querySelector('#schematicEvidence').innerHTML = entity.schematic_links.map((link) => evidenceCard(link, 'schematic')).join('');
   document.querySelector('#repairEvidence').innerHTML = entity.repair_links.map((link) => evidenceCard(link, 'repair')).join('');
   renderComponentGuidance(entity);

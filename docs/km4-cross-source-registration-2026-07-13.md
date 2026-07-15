@@ -469,3 +469,10 @@ External interactive component labels on 2026-07-16:
 - Visible tags participate in the same raycast, selection, and direct-inspection path as package hit areas. Desktop hover/click and mobile tap can select a tag; reactivating an inspectable selected tag enters the existing isolation runtime, while test-point tags remain selection-only.
 - Label placement order is independent of hover and selection styling, so tags do not move when input modality changes. Pointer activation captures the visible target at press time and activates it only after a no-drag release, preserving drag-return and pinch suppression while fixing mouse-hover-to-touch transitions.
 - Headed Chromium verified zero label-to-label, label-to-own-package, label-to-other-interactive-package, and canvas-edge overlaps; desktop and mobile tag drill-down; mixed mouse/touch VBUS1 identity; and zero runtime errors. The strict full interaction matrix, 127 Node tests, 50 Python tests, source validation, syntax checks, diff checks, and HTTP checks passed.
+
+Technician-facing component access status on 2026-07-16:
+
+- The evidence heading no longer exposes the source-data phrase `代理图可见区域` or uses one yellow treatment for every visibility state. A single tested state adapter translates source visibility and active side into `需拆屏蔽罩`, `可直接观察`, or `位于第X面`.
+- Yellow is reserved for the physical shield-removal caution, green identifies direct location access on the active side, and blue-gray identifies a side-location fact. Each state includes a technician-facing title and accessible description without changing the source `proxy_visibility` value.
+- Selection and side switching share the same renderer path, removing duplicate copy rules and preventing stale heading status after manual side changes or repair-flow navigation.
+- Headed Chromium verified all three states, distinct computed colors, complete text, action-button separation, zero overflow at desktop/390 px/320 px, and zero runtime errors. The strict full interaction matrix, 131 Node tests, 50 Python tests, source validation, syntax checks, diff checks, and HTTP checks passed.

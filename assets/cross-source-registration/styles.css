@@ -336,7 +336,10 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 .entity-actions { display: grid; justify-items: end; gap: 7px; }
 .entity-heading h2 { font-size: 31px; margin: 2px 0 0; }
 .entity-heading > div > span { font-size: 10px; text-transform: uppercase; color: var(--muted); }
-.visibility { font-size: 10px; padding: 6px 7px; border: 1px solid #d8a20d; background: #fff6cf; color: #6e5400; }
+.visibility { padding: 6px 7px; border: 1px solid #9faea5; background: #edf0ec; color: #34423c; font-size: 10px; }
+.visibility[data-tone="caution"] { border-color: #d8a20d; background: #fff6cf; color: #6e5400; }
+.visibility[data-tone="clear"] { border-color: #6a9b7f; background: #edf5f0; color: #17664f; }
+.visibility[data-tone="side"] { border-color: #8ba2b0; background: #eef4f7; color: #355366; }
 .inspect-component {
   min-width: 78px;
   height: 30px;

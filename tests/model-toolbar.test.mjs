@@ -44,6 +44,14 @@ test('hover and selection styling do not reorder external label placement', () =
   assert.doesNotMatch(labelLayoutSource, /\.sort\(/);
 });
 
+test('entity access status is rendered through one technician-facing state path', () => {
+  assert.match(appSource, /function updateEntityAccessStatus\(entity\)/);
+  assert.match(appSource, /buildEntityAccessState\(entity, activeSideId, targetSideLabel\)/);
+  assert.match(appSource, /visibility\.dataset\.tone = access\.tone/);
+  assert.doesNotMatch(appSource, /代理图可见区域/);
+  assert.doesNotMatch(appSource, /textContent = entity\.proxy_visibility/);
+});
+
 test('model interaction tools belong to the model canvas instead of the global view header', () => {
   const viewHead = toolbarMarkup.slice(
     toolbarMarkup.indexOf('<div class="view-head">'),
