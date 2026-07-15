@@ -336,3 +336,10 @@ Selective component-label leaders on 2026-07-15:
 - Leaders are hidden in single-component inspection because the isolated body already establishes identity. No module polygon, broad translucent overlay, or fault-coral treatment is used.
 - Label layout now defers during the initial pre-layout frame when the canvas is too small to contain one tag. This prevents invalid Three.js geometry before the real ResizeObserver dimensions arrive.
 - Headed Chromium verifies a selective leader count between one and six at 390 px and 320 px, zero leaders during inspection, zero label overlap or clipping, and the full desktop/mobile interaction matrix with no runtime errors.
+
+Stable component-label placement on 2026-07-15:
+
+- Each reviewed label now remembers its last valid compass slot relative to the projected component anchor. Rotation, pan, and zoom move the label with the component instead of restarting the placement search from the first candidate on every frame.
+- A remembered slot is reused only while it remains inside the canvas and free of collisions. Real conflicts still trigger the existing bounded fallback search, preserving all seven visible identities without overlap.
+- Full-board reset clears the slot memory together with camera and focus state. The reset frame is therefore deterministic rather than retaining a label arrangement created by an earlier edge collision.
+- A headed Chromium rotation audit sampled 26 consecutive frames with zero slot transitions, zero label overlaps, zero clipping, and zero runtime errors. The strict full matrix also verifies pixel-identical desktop and 390 px pan/reset recovery.

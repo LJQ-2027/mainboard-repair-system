@@ -56,6 +56,19 @@ test('screen-space label layout defers when the canvas cannot fit one tag', () =
   }), []);
 });
 
+test('screen-space label layout preserves a previously valid compass slot', () => {
+  const [position] = buildScreenLabelPositions([
+    { id: 'U2001', anchor: { x: 160, y: 220 } },
+  ], {
+    viewport: { width: 320, height: 440 },
+    preferredSlots: new Map([['U2001', 1]]),
+  });
+
+  assert.equal(position.slot, 1);
+  assert.equal(position.x, 160);
+  assert.equal(position.y, 246);
+});
+
 test('only displaced labels receive a leader ending at the label edge', () => {
   assert.equal(buildLabelLeaderSegment({
     anchor: { x: 100, y: 100 },

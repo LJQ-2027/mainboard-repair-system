@@ -421,6 +421,7 @@ export class BoardRenderer {
     this.moduleObjects = new Map();
     this.labelSprites = new Map();
     this.labelLeaderLines = new Map();
+    this.labelPlacementSlots = new Map();
     this.affordanceObjects = new Map();
     this.pickTargets = new Map();
     this.contextObjects = [];
@@ -667,6 +668,7 @@ export class BoardRenderer {
     this.moduleObjects = new Map();
     this.labelSprites = new Map();
     this.labelLeaderLines = new Map();
+    this.labelPlacementSlots = new Map();
     this.affordanceObjects = new Map();
     this.pickTargets = new Map();
     this.contextObjects = [];
@@ -1324,6 +1326,7 @@ export class BoardRenderer {
   reset(resetInteractionMode = true) {
     this.cancelCameraAnimation();
     if (this.inspectionComponentId) void this.clearComponentInspection(false);
+    this.labelPlacementSlots = new Map();
     this.group.rotation.set(TOP_VIEW_TILT, 0, 0);
     this.inspectionAngle = false;
     if (resetInteractionMode) this.setInteractionMode('pan');
@@ -1376,7 +1379,7 @@ export class BoardRenderer {
     const labelDepths = new Map();
     const labelAnchors = new Map();
     const anchor = new THREE.Vector3();
-    const labelPositions = new Map(buildScreenLabelPositions(this.entities
+    const labelLayout = buildScreenLabelPositions(this.entities
       .map((entity) => ({ entity, descriptor: this.descriptors.get(entity.component_id) }))
       .filter(({ descriptor }) => Boolean(descriptor))
       .map(({ entity, descriptor }) => {
@@ -1395,7 +1398,14 @@ export class BoardRenderer {
         };
       }), {
       viewport: { width, height },
-    }).map((position) => [position.id, position]));
+      preferredSlots: this.labelPlacementSlots,
+    });
+    if (labelLayout.length) {
+      this.labelPlacementSlots = new Map(labelLayout
+        .filter((position) => Number.isInteger(position.slot))
+        .map((position) => [position.id, position.slot]));
+    }
+    const labelPositions = new Map(labelLayout.map((position) => [position.id, position]));
     this.labelSprites.forEach((sprite, componentId) => {
       const presentation = resolveAffordancePresentation({
         selected: componentId === this.selectedComponentId,
@@ -1480,6 +1490,10 @@ export class BoardRenderer {
     )).length);
     this.container.dataset.labelLeaderCount = String([...this.labelLeaderLines.values()]
       .filter((leader) => leader.visible).length);
+    this.container.dataset.labelSlotSignature = [...this.labelPlacementSlots.entries()]
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([componentId, slot]) => `${componentId}:${slot}`)
+      .join('|');
     this.renderer.render(this.scene, this.camera);
   }
 }

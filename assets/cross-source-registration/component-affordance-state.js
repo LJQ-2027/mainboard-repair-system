@@ -78,6 +78,7 @@ export function buildScreenLabelPositions(items, {
   labelPixels = { width: 76, height: 22 },
   gap = 4,
   margin = 8,
+  preferredSlots = new Map(),
 } = {}) {
   const halfWidth = labelPixels.width / 2;
   const halfHeight = labelPixels.height / 2;
@@ -111,10 +112,20 @@ export function buildScreenLabelPositions(items, {
     [0, -2], [0, 2], [-1, -2], [1, -2], [-1, 2], [1, 2],
   ];
   return items.map((item) => {
-    const candidates = offsets.map(([column, row]) => clamp({
-      x: item.anchor.x + column * horizontalStep,
-      y: item.anchor.y + row * verticalStep,
-    }));
+    const preferredSlot = preferredSlots.get(item.id);
+    const slotOrder = Number.isInteger(preferredSlot) && offsets[preferredSlot]
+      ? [preferredSlot, ...offsets.keys()].filter((slot, index, slots) => slots.indexOf(slot) === index)
+      : [...offsets.keys()];
+    const candidates = slotOrder.map((slot) => {
+      const [column, row] = offsets[slot];
+      return {
+        slot,
+        ...clamp({
+          x: item.anchor.x + column * horizontalStep,
+          y: item.anchor.y + row * verticalStep,
+        }),
+      };
+    });
     let candidate = candidates.find((position, index) => (
       candidates.findIndex((other) => other.x === position.x && other.y === position.y) === index
       && !overlaps(position)
@@ -130,12 +141,14 @@ export function buildScreenLabelPositions(items, {
         Math.hypot(a.x - item.anchor.x, a.y - item.anchor.y)
         - Math.hypot(b.x - item.anchor.x, b.y - item.anchor.y)
       ));
-      candidate = grid.find((position) => !overlaps(position));
+      const fallback = grid.find((position) => !overlaps(position));
+      candidate = fallback ? { slot: null, ...fallback } : null;
     }
+    if (!candidate) return null;
     const position = { id: item.id, ...candidate };
     placed.push(position);
     return position;
-  });
+  }).filter(Boolean);
 }
 
 export function buildLabelLeaderSegment({
