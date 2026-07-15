@@ -20,6 +20,14 @@ export function findEntityAtPoint(entities, point) {
       - (right.geometry.size.x * right.geometry.size.y))[0] || null;
 }
 
+export function nearestPointerTarget(targets, pointer) {
+  if (!targets.length) return null;
+  return targets.reduce((nearest, target) => {
+    const distance = Math.hypot(target.center.x - pointer.x, target.center.y - pointer.y);
+    return !nearest || distance < nearest.distance ? { id: target.id, distance } : nearest;
+  }, null).id;
+}
+
 export function entityListModelRevealOptions({
   activeView,
   viewportWidth,

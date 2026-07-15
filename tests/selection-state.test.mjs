@@ -4,6 +4,7 @@ import {
   buildSelectionState,
   entityListModelRevealOptions,
   findEntityAtPoint,
+  nearestPointerTarget,
 } from '../assets/cross-source-registration/selection-state.js';
 
 const entity = {
@@ -28,6 +29,17 @@ test('point picking returns the smallest entity containing the point', () => {
   const small = { ...entity, component_id: 'small', geometry: { center: { x: 0.5, y: 0.5 }, size: { x: 0.1, y: 0.1 } } };
   assert.equal(findEntityAtPoint([large, small], { x: 0.52, y: 0.52 }).component_id, 'small');
   assert.equal(findEntityAtPoint([large, small], { x: 0.9, y: 0.9 }), null);
+});
+
+test('dense marker picking resolves the dot nearest the actual pointer', () => {
+  const targets = [
+    { id: 'U2001', center: { x: 100, y: 100 } },
+    { id: 'U4000', center: { x: 112, y: 108 } },
+    { id: 'VBUS1', center: { x: 300, y: 300 } },
+  ];
+  assert.equal(nearestPointerTarget(targets, { x: 111, y: 107 }), 'U4000');
+  assert.equal(nearestPointerTarget(targets, { x: 101, y: 99 }), 'U2001');
+  assert.equal(nearestPointerTarget([], { x: 0, y: 0 }), null);
 });
 
 test('entity list selection reveals the model workspace only on narrow model viewports', () => {

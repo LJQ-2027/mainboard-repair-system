@@ -13,6 +13,28 @@ export function canInspectComponent(entity) {
   return Boolean(entity?.inspection_profile?.profile_id);
 }
 
+export function buildInspectionActionState({ active, inspectable, ready }) {
+  if (active) {
+    return { hidden: false, disabled: !ready, label: '返回主板', title: '' };
+  }
+  return {
+    hidden: !inspectable,
+    disabled: !ready || !inspectable,
+    label: '单体查看',
+    title: inspectable ? '' : '该点位没有可单独检视的器件包体',
+  };
+}
+
+export function buildInspectionEntryIntent(entity, activeView, activeSideId) {
+  if (!canInspectComponent(entity)) return null;
+  return {
+    view: 'model',
+    sideId: entity.side_id,
+    changeView: activeView !== 'model',
+    changeSide: entity.side_id !== activeSideId,
+  };
+}
+
 export function enterComponentInspection(entity, activeSideId) {
   if (!canInspectComponent(entity) || entity.side_id !== activeSideId) return { ...IDLE_INSPECTION };
   return {

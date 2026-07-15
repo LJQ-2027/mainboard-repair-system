@@ -408,3 +408,10 @@ Compact cross-view markers on 2026-07-15:
 - A transparent 36 px button preserves mouse and touch acquisition without enlarging the visible mark. The complete designator appears only for hover, keyboard focus, or selection, and the selected identity remains synchronized across both image views and the evidence panel.
 - Keyboard navigation exposes the same complete identity and adds a blue focus ring around the compact locator. The focus treatment does not resize the target or shift the registered coordinate.
 - Headed Chromium verifies target/locator dimensions, final-state colors, complete U2001/U4000/X2100 labels, hover, Tab focus, synchronized photo/point-map selection, label containment, zero overflow, and zero runtime errors at desktop, 390 px, and 320 px. The strict full interaction matrix, 104 Node tests, and 50 Python tests passed.
+
+Cross-view component inspection on 2026-07-15:
+
+- `单体查看` now remains available for reviewed package entities selected in the proxy photo or engineering point map. One action serially opens the 2.5D view, switches to the entity's registered board side when needed, and enters package isolation.
+- On mobile, this explicit action also aligns the model workspace to the viewport. Desktop pages do not scroll, shared selection state does not own page movement, and non-package test points still expose no inspection action.
+- Point-map markers now receive pointer input before the pan surface. In dense marker groups, the target nearest the physical pointer position wins even when a neighboring 36 px acquisition area is visually above it; keyboard activation remains tied to the focused marker.
+- Headed Chromium verifies photo and point-map entry, automatic side correction, package return, test-point exclusion, zero horizontal overflow, and zero runtime errors at desktop, 390 px, and 320 px. The strict full interaction matrix, 109 Node tests, 50 Python tests, source validation, syntax checks, and UTF-8 validation passed.

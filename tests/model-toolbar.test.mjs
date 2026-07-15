@@ -71,3 +71,17 @@ test('mobile model reveal belongs only to explicit entity list selection', () =>
   assert.doesNotMatch(markerSource, /revealModelAfterEntityListSelection/);
   assert.match(entityListSource, /await selectEntity\(entity\.component_id\);\s*revealModelAfterEntityListSelection\(\);/);
 });
+
+test('cross-view inspection serializes model view, target side, isolation, and reveal', () => {
+  const entrySource = appSource.slice(
+    appSource.indexOf('async function enterSelectedComponentInspection'),
+    appSource.indexOf('async function toggleComponentInspection'),
+  );
+
+  assert.match(entrySource, /await setView\('model'\)/);
+  assert.match(entrySource, /await switchModelSide\(intent\.sideId\)/);
+  assert.match(entrySource, /await enterCurrentComponentInspection\(entity\)/);
+  assert.match(entrySource, /revealModelWorkspace\(\)/);
+  assert.ok(entrySource.indexOf("await setView('model')") < entrySource.indexOf('await switchModelSide(intent.sideId)'));
+  assert.ok(entrySource.indexOf('await switchModelSide(intent.sideId)') < entrySource.indexOf('await enterCurrentComponentInspection(entity)'));
+});

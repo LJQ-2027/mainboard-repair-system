@@ -23,6 +23,10 @@ export function centerPoint(point, layerSize, viewportSize, scale) {
   };
 }
 
+export function canStartPointMapPan({ interactive = false, button = 0 } = {}) {
+  return !interactive && button === 0;
+}
+
 export class PointMapViewport {
   constructor(view, layer) {
     this.view = view;
@@ -44,6 +48,8 @@ export class PointMapViewport {
       this.render();
     }, { passive: false });
     this.view.addEventListener('pointerdown', (event) => {
+      const interactive = Boolean(event.target.closest('button, a, input, select, textarea'));
+      if (!canStartPointMapPan({ interactive, button: event.button })) return;
       this.drag = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, originX: this.state.x, originY: this.state.y };
       this.view.setPointerCapture(event.pointerId);
       this.view.classList.add('dragging');

@@ -1,5 +1,5 @@
 import { solveHomography } from './registration-core.js';
-import { buildSelectionState, entityListModelRevealOptions } from './selection-state.js';
+import { buildSelectionState, entityListModelRevealOptions, nearestPointerTarget } from './selection-state.js';
 import { BoardRenderer } from './board-renderer.js';
 import { PointMapViewport } from './point-map-viewport.js';
 import { buildSourceNote } from './source-note-state.js';
@@ -11,6 +11,8 @@ import {
   nextSideId,
 } from './repair-focus-state.js';
 import {
+  buildInspectionActionState,
+  buildInspectionEntryIntent,
   buildInspectionToolbarState,
   canInspectComponent,
   enterComponentInspection,
@@ -89,13 +91,17 @@ const FAULT_LABELS = {
   'USB no response': 'USB 无响应',
 };
 
-function revealModelAfterEntityListSelection() {
+function revealModelWorkspace() {
   const options = entityListModelRevealOptions({
     activeView,
     viewportWidth: window.innerWidth,
     reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
   });
   if (options) document.querySelector('.workspace').scrollIntoView(options);
+}
+
+function revealModelAfterEntityListSelection() {
+  revealModelWorkspace();
 }
 
 function updateSourceNote(inspectionEntity = null) {
@@ -448,15 +454,17 @@ function renderRepairFlow(entity, guidance) {
 function updateInspectionUi() {
   const entity = data?.entities.find((candidate) => candidate.component_id === selectedId);
   const active = componentInspection.mode === 'isolated';
-  const available = canInspectComponent(entity)
-    && entity.side_id === activeSideId
-    && activeView === 'model';
+  const action = buildInspectionActionState({
+    active,
+    inspectable: canInspectComponent(entity),
+    ready: canAcceptModelInteraction(modelInteraction),
+  });
   const button = document.querySelector('#inspectComponent');
-  button.disabled = !canAcceptModelInteraction(modelInteraction) || (!active && !available);
-  button.hidden = !active && !available;
-  button.textContent = active ? '返回主板' : '单体查看';
+  button.disabled = action.disabled;
+  button.hidden = action.hidden;
+  button.textContent = action.label;
   button.setAttribute('aria-pressed', String(active));
-  button.title = available || active ? '' : '该点位没有可单独检视的器件包体';
+  button.title = action.title;
   const status = document.querySelector('#inspectionStatus');
   status.hidden = !active;
   status.disabled = !active || !canAcceptModelInteraction(modelInteraction);
@@ -538,23 +546,41 @@ async function leaveComponentInspection(animate = true) {
   }
 }
 
+async function enterCurrentComponentInspection(entity) {
+  const next = enterComponentInspection(entity, activeSideId);
+  if (next.mode !== 'isolated') return false;
+  const transitionId = startModelTransition('inspection');
+  if (transitionId === null) return false;
+  try {
+    const entered = await renderer.setComponentInspection(next.componentId);
+    componentInspection = entered ? next : exitComponentInspection();
+    return entered;
+  } finally {
+    finishModelTransition(transitionId);
+  }
+}
+
+async function enterSelectedComponentInspection() {
+  if (!canAcceptModelInteraction(modelInteraction)) return false;
+  const entity = data?.entities.find((candidate) => candidate.component_id === selectedId);
+  const intent = buildInspectionEntryIntent(entity, activeView, activeSideId);
+  if (!intent) return false;
+  if (intent.changeView) await setView('model');
+  if (intent.changeSide) await switchModelSide(intent.sideId);
+  if (!canAcceptModelInteraction(modelInteraction)) return false;
+  modelInteraction = consumePendingFocus(modelInteraction);
+  const entered = await enterCurrentComponentInspection(entity);
+  if (entered) revealModelWorkspace();
+  return entered;
+}
+
 async function toggleComponentInspection() {
   if (!canAcceptModelInteraction(modelInteraction)) return;
   if (componentInspection.mode === 'isolated') {
     await leaveComponentInspection();
     return;
   }
-  const entity = data?.entities.find((candidate) => candidate.component_id === selectedId);
-  const next = enterComponentInspection(entity, activeSideId);
-  if (next.mode !== 'isolated') return;
-  const transitionId = startModelTransition('inspection');
-  if (transitionId === null) return;
-  try {
-    const entered = await renderer.setComponentInspection(next.componentId);
-    componentInspection = entered ? next : exitComponentInspection();
-  } finally {
-    finishModelTransition(transitionId);
-  }
+  await enterSelectedComponentInspection();
 }
 
 function updateSideControls() {
@@ -641,7 +667,20 @@ function addMarkers(layer, positions, entities) {
     button.append(dot, label);
     button.title = `${entity.designator} · ${entity.name}`;
     button.setAttribute('aria-label', `选择 ${entity.designator} ${entity.name}`);
-    button.addEventListener('click', () => selectEntity(entity.component_id));
+    button.addEventListener('click', (event) => {
+      let componentId = entity.component_id;
+      if (event.detail > 0) {
+        const targets = [...layer.querySelectorAll('.marker')].map((marker) => {
+          const bounds = marker.getBoundingClientRect();
+          return {
+            id: marker.dataset.componentId,
+            center: { x: bounds.left + bounds.width / 2, y: bounds.top + bounds.height / 2 },
+          };
+        });
+        componentId = nearestPointerTarget(targets, { x: event.clientX, y: event.clientY });
+      }
+      if (componentId) void selectEntity(componentId);
+    });
     fragment.append(button);
   });
   layer.append(fragment);
@@ -756,13 +795,16 @@ async function setView(name) {
   if (name === 'model') {
     renderer.setInspectionAngle(true);
     document.querySelector('#toggleInspection').setAttribute('aria-pressed', 'false');
-    requestAnimationFrame(() => {
-      renderer.reset(false);
-      renderer.resize();
-      if (modelInteraction.pendingFocus && currentRepairTarget?.sideId === activeSideId) {
-        applyRepairTarget();
-        modelInteraction = consumePendingFocus(modelInteraction);
-      }
+    await new Promise((resolve) => {
+      requestAnimationFrame(() => {
+        renderer.reset(false);
+        renderer.resize();
+        if (modelInteraction.pendingFocus && currentRepairTarget?.sideId === activeSideId) {
+          applyRepairTarget();
+          modelInteraction = consumePendingFocus(modelInteraction);
+        }
+        resolve();
+      });
     });
   }
   if (name === 'pointmap') requestAnimationFrame(() => pointMapViewport?.reset());

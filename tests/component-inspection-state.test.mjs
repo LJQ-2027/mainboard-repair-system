@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+  buildInspectionActionState,
+  buildInspectionEntryIntent,
   buildInspectionTransform,
   buildInspectionToolbarState,
   canInspectComponent,
@@ -20,6 +22,45 @@ const u2001 = {
 test('inspection capability requires an explicit data profile', () => {
   assert.equal(canInspectComponent(u2001), true);
   assert.equal(canInspectComponent({ ...u2001, inspection_profile: null }), false);
+});
+
+test('inspection action remains available from any source view', () => {
+  assert.deepEqual(buildInspectionActionState({
+    active: false,
+    inspectable: true,
+    ready: true,
+  }), {
+    hidden: false,
+    disabled: false,
+    label: '单体查看',
+    title: '',
+  });
+  assert.equal(buildInspectionActionState({
+    active: false,
+    inspectable: false,
+    ready: true,
+  }).hidden, true);
+  assert.equal(buildInspectionActionState({
+    active: false,
+    inspectable: true,
+    ready: false,
+  }).disabled, true);
+});
+
+test('inspection entry intent routes through model view and the component side', () => {
+  assert.deepEqual(buildInspectionEntryIntent(u2001, 'photo', 'main_page_1'), {
+    view: 'model',
+    sideId: 'main_page_2',
+    changeView: true,
+    changeSide: true,
+  });
+  assert.deepEqual(buildInspectionEntryIntent(u2001, 'model', 'main_page_2'), {
+    view: 'model',
+    sideId: 'main_page_2',
+    changeView: false,
+    changeSide: false,
+  });
+  assert.equal(buildInspectionEntryIntent({ ...u2001, inspection_profile: null }, 'photo', 'main_page_1'), null);
 });
 
 test('inspection enters only when the component is present on the active side', () => {
