@@ -143,6 +143,8 @@ test('reviewed inspection profiles select only source-approved refined package a
   assert.equal(resolveInspectionVisualAsset({ profile_id: 'u0600-rf-device-v1' }), 'reviewed-bga');
   assert.equal(resolveInspectionVisualAsset({ profile_id: 'j6101-connector-v1' }), 'reviewed-connector');
   assert.equal(resolveInspectionVisualAsset({ profile_id: 'x2100-crystal-v1' }), 'reviewed-crystal');
+  assert.equal(resolveInspectionVisualAsset({ profile_id: 'crystal-26mhz-v1' }), 'reviewed-crystal');
+  assert.equal(resolveInspectionVisualAsset({ profile_id: 'connectivity-bga-v1' }), 'reviewed-bga');
   assert.equal(resolveInspectionVisualAsset({ profile_id: 'unreviewed-ic-v1' }), 'standard');
   assert.equal(resolveInspectionVisualAsset(null), 'standard');
 

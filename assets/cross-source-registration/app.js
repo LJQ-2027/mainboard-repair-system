@@ -90,6 +90,8 @@ const FAULT_LABELS = {
   'Weak signal': '信号弱',
   'Not charging': '无法充电',
   'USB no response': 'USB 无响应',
+  'WiFi connection failure': 'Wi-Fi 无法连接',
+  'Display failure': 'LCD 无显示',
 };
 
 function revealModelWorkspace() {

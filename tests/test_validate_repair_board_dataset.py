@@ -9,6 +9,7 @@ from scripts.validate_repair_board_dataset import validate_dataset_package, vali
 
 ROOT = Path(__file__).resolve().parents[1]
 DATASET_PATH = ROOT / "knowledge-base/kl4-cross-source-registration.json"
+H8918_DATASET_PATH = ROOT / "knowledge-base/h8918-cross-source-registration.json"
 
 
 class RepairBoardDatasetValidationTests(unittest.TestCase):
@@ -19,6 +20,9 @@ class RepairBoardDatasetValidationTests(unittest.TestCase):
 
     def test_validates_compiled_kl4_package(self):
         self.assertEqual(validate_dataset_path(DATASET_PATH, ROOT), [])
+
+    def test_allows_point_map_entities_without_claimed_schematic_links(self):
+        self.assertEqual(validate_dataset_path(H8918_DATASET_PATH, ROOT), [])
 
     def test_rejects_board_identity_drift(self):
         data = copy.deepcopy(self.data)

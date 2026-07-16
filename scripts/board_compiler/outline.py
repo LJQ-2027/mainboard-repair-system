@@ -144,19 +144,32 @@ def simplify_polygon(polygon, tolerance=2.0):
     return simplified[:-1] if simplified[-1] == simplified[0] else simplified
 
 
-def extract_board_outline(image_path, closing_radius=8, tolerance=2.5, method="engineering_marks"):
+def extract_board_outline(image_path, closing_radius=8, tolerance=2.5, method="engineering_marks", max_alpha_dimension=1600):
     source = Image.open(image_path)
+    source_width, source_height = source.size
     if method == "engineering_marks":
         image = np.asarray(source.convert("RGB"))
         engineering_marks = image.min(axis=2) < 235
         closed = dilate(engineering_marks, closing_radius)
         board = erode(fill_holes(largest_component(closed)), closing_radius)
     elif method == "alpha_silhouette":
-        image = np.asarray(source.convert("RGBA"))
+        working = source.convert("RGBA")
+        if max(working.size) > max_alpha_dimension:
+            scale = max_alpha_dimension / max(working.size)
+            working = working.resize(
+                (max(1, round(working.width * scale)), max(1, round(working.height * scale))),
+                Image.Resampling.NEAREST,
+            )
+        image = np.asarray(working)
         board = fill_holes(largest_component(image[:, :, 3] > 32))
     else:
         raise ValueError(f"Unsupported board outline method: {method}")
     polygon = simplify_polygon(mask_outer_polygon(board), tolerance)
     height, width = board.shape
     normalized = [{"x": round(x / width, 6), "y": round(y / height, 6)} for x, y in polygon]
-    return {"outline": normalized, "mask_area_ratio": round(float(board.mean()), 6), "image_size": {"width": width, "height": height}}
+    return {
+        "outline": normalized,
+        "mask_area_ratio": round(float(board.mean()), 6),
+        "image_size": {"width": source_width, "height": source_height},
+        "working_image_size": {"width": width, "height": height},
+    }

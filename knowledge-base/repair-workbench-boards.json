@@ -29,6 +29,24 @@
       },
       "shield": null,
       "atlas": null
+    },
+    "cm6-h8918": {
+      "title": "CM6 / CM5 · H8918_MAIN_PCB_V1.2",
+      "model": "CM6",
+      "compatible_models": [
+        "CM6",
+        "CM5"
+      ],
+      "board_version": "H8918_MAIN_PCB_V1.2",
+      "data": "../../knowledge-base/h8918-cross-source-registration.json",
+      "schematic": "../../knowledge-base/h8918-schematic-compiled.json",
+      "side_manifest": "../../knowledge-base/h8918-board-sides.json",
+      "geometry_by_side": {
+        "main_page_1": "../../knowledge-base/h8918-board-compiled-page-1.json",
+        "main_page_2": "../../knowledge-base/h8918-board-compiled.json"
+      },
+      "shield": null,
+      "atlas": null
     }
   }
 }

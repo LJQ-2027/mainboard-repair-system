@@ -36,6 +36,8 @@ const INSPECTION_VISUAL_ASSETS = {
   'u0600-rf-device-v1': 'reviewed-bga',
   'j6101-connector-v1': 'reviewed-connector',
   'x2100-crystal-v1': 'reviewed-crystal',
+  'crystal-26mhz-v1': 'reviewed-crystal',
+  'connectivity-bga-v1': 'reviewed-bga',
 };
 
 function clamp(value, minimum, maximum) {

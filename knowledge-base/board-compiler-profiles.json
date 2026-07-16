@@ -80,6 +80,49 @@
           "required_designators": ["U2001", "X2100"]
         }
       ]
+    },
+    {
+      "profile_id": "h8918-main-v1.2",
+      "model": "CM6",
+      "models": ["CM6", "CM5"],
+      "board_id": "BOARD-H8918-MAIN-V1.2",
+      "board_version": "H8918_MAIN_PCB_V1.2",
+      "component_prefix": "H8918-MAIN",
+      "outline_method": "alpha_silhouette",
+      "point_map_source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM6-H8918/H8918_MAIN_PCB_V1.2_╬╗║┼═╝20241030.pdf",
+      "schematic_source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM6-H8918/K6855_H8918_MAIN_PCB_V1.2_╬¼╨▐╘¡└φ═╝.pdf",
+      "repair_guide_source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM6-H8918/Tecno-CM6-H8918╩╓╗·╬¼╨▐═¿╙├▓┘╫≈╓╕╡╝╩ΘV1.0_20241218.pdf",
+      "default_side_id": "main_page_2",
+      "schematic_geometry_side_id": "main_page_2",
+      "side_manifest_output": "knowledge-base/h8918-board-sides.json",
+      "schematic_output": "knowledge-base/h8918-schematic-compiled.json",
+      "cross_source_output": "knowledge-base/h8918-cross-source-registration.json",
+      "reviewed_designators": ["U1001", "U2001", "X2101", "J6102", "U5007", "VBAT1"],
+      "schematic_reviewed_designators": ["U1001", "U2001", "X2101", "U5007"],
+      "visual_reference": {
+        "path": "assets/vision-reference-gallery/cm6/embedded/page-011-image-01.jpg",
+        "accuracy_boundary": "Installed CM6 main-board service-manual context; H8918 is shared with CM5 and no isolated two-side pair is available."
+      },
+      "sides": [
+        {
+          "side_id": "main_page_1",
+          "label": "第1面",
+          "source_pdf_page": 1,
+          "engineering_texture": "assets/board-atlas/h8918/main-point-map-page-1.png",
+          "compiled_data": "knowledge-base/h8918-board-compiled-page-1.json",
+          "source_crop": {"x": 0.035455, "y": 0.129216, "width": 0.929091, "height": 0.77},
+          "required_designators": ["U1001"]
+        },
+        {
+          "side_id": "main_page_2",
+          "label": "第2面",
+          "source_pdf_page": 2,
+          "engineering_texture": "assets/board-atlas/h8918/main-point-map-page-2.png",
+          "compiled_data": "knowledge-base/h8918-board-compiled.json",
+          "source_crop": {"x": 0.035455, "y": 0.133137, "width": 0.929848, "height": 0.764118},
+          "required_designators": ["U2001", "X2101", "J6102", "U5007", "VBAT1"]
+        }
+      ]
     }
   ]
 }

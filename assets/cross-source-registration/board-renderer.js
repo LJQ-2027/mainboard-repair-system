@@ -1167,6 +1167,7 @@ export class BoardRenderer {
       this.camera.updateProjectionMatrix();
       this.updateLabelVisibility(false);
       this.updateHover(event);
+      this.render();
     }, { passive: false });
     canvas.addEventListener('keydown', (event) => {
       if (this.interactionLocked || !this.inspectionComponentId) return;

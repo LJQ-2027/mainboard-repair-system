@@ -26,6 +26,17 @@ const catalog = {
       shield: null,
       atlas: null,
     },
+    'cm6-h8918': {
+      title: 'CM6 / CM5 · H8918_MAIN_PCB_V1.2',
+      model: 'CM6',
+      compatible_models: ['CM6', 'CM5'],
+      data: 'h8918-data.json',
+      schematic: 'h8918-schematic.json',
+      side_manifest: 'h8918-sides.json',
+      geometry_by_side: { main_page_1: 'h8918-p1.json', main_page_2: 'h8918-p2.json' },
+      shield: null,
+      atlas: null,
+    },
   },
 };
 
@@ -42,6 +53,13 @@ test('board assets retain an ordered side map without model conditionals', () =>
   assert.deepEqual(Object.keys(assets.geometry_by_side), ['main_page_1', 'main_page_2']);
   assert.equal(assets.shield, null);
   assert.equal(assets.atlas, null);
+});
+
+test('one board platform can declare multiple compatible sales models', () => {
+  const assets = resolveBoardAssets(catalog, 'cm6-h8918');
+  assert.equal(assets.model, 'CM6');
+  assert.deepEqual(assets.compatible_models, ['CM6', 'CM5']);
+  assert.deepEqual(Object.keys(assets.geometry_by_side), ['main_page_1', 'main_page_2']);
 });
 
 test('unknown board keys fail instead of silently opening another board', () => {

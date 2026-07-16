@@ -47,6 +47,19 @@ class BoardOutlineTests(unittest.TestCase):
             self.assertLess(result["mask_area_ratio"], 0.6)
             self.assertTrue(any(point["y"] > 0.6 for point in result["outline"]))
 
+    def test_large_alpha_silhouette_uses_a_bounded_working_mask(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "large-board.png"
+            image = Image.new("RGBA", (4000, 2000), (255, 255, 255, 0))
+            ImageDraw.Draw(image).rectangle((400, 200, 3600, 1800), fill=(255, 255, 255, 255))
+            image.save(path)
+
+            result = extract_board_outline(path, method="alpha_silhouette")
+
+            self.assertEqual(result["image_size"], {"width": 4000, "height": 2000})
+            self.assertLessEqual(max(result["working_image_size"].values()), 1600)
+            self.assertGreater(result["mask_area_ratio"], 0.6)
+
 
 if __name__ == "__main__":
     unittest.main()

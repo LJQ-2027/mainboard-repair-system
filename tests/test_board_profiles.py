@@ -9,9 +9,10 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class BoardProfileTests(unittest.TestCase):
-    def test_loads_ordered_km4_and_kl4_profiles(self):
+    def test_loads_ordered_km4_kl4_and_h8918_profiles(self):
         km4 = load_profile(ROOT, "km4-f151")
         kl4 = load_profile(ROOT, "kl4-f201")
+        h8918 = load_profile(ROOT, "h8918-main-v1.2")
 
         self.assertEqual(km4["board_id"], "BOARD-KM4-F151-MAIN-V1.2")
         self.assertEqual(kl4["board_id"], "BOARD-KL4-F201-MAIN-V1.2")
@@ -19,6 +20,12 @@ class BoardProfileTests(unittest.TestCase):
         self.assertEqual(kl4["default_side_id"], "main_page_2")
         self.assertTrue((ROOT / kl4["point_map_source"]).is_file())
         self.assertTrue((ROOT / kl4["schematic_source"]).is_file())
+        self.assertEqual(h8918["board_id"], "BOARD-H8918-MAIN-V1.2")
+        self.assertEqual(h8918["models"], ["CM6", "CM5"])
+        self.assertEqual([side["source_pdf_page"] for side in h8918["sides"]], [1, 2])
+        self.assertTrue((ROOT / h8918["point_map_source"]).is_file())
+        self.assertTrue((ROOT / h8918["schematic_source"]).is_file())
+        self.assertTrue((ROOT / h8918["repair_guide_source"]).is_file())
 
     def test_rejects_an_unknown_profile(self):
         with self.assertRaisesRegex(ValueError, "Unknown board profile"):

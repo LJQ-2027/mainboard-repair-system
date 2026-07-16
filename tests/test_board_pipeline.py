@@ -146,6 +146,21 @@ class BoardPipelineTests(unittest.TestCase):
         self.assertFalse(payload["audit"]["reviewed_recovery_complete"])
         self.assertEqual(payload["audit"]["missing_reviewed_designators"], ["U2001"])
 
+    def test_schematic_payload_uses_an_explicit_schematic_review_subset(self):
+        profile = sample_profile()
+        profile["reviewed_designators"] = ["U2001", "VBAT1"]
+        profile["schematic_reviewed_designators"] = ["U2001"]
+
+        payload = build_schematic_payload(
+            profile,
+            {"U2001", "VBAT1"},
+            {1: [{"text": "U2001", "x": 50, "y": 25, "font_size": 10}]},
+            {1: {"width": 100, "height": 50}},
+        )
+
+        self.assertTrue(payload["audit"]["reviewed_recovery_complete"])
+        self.assertEqual(payload["audit"]["reviewed_designators"], ["U2001"])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -162,7 +162,7 @@ def compile_geometry(
 
 
 def build_schematic_payload(profile, board_designators, pages, page_sizes):
-    reviewed = set(profile.get("reviewed_designators", []))
+    reviewed = set(profile.get("schematic_reviewed_designators", profile.get("reviewed_designators", [])))
     indexed = index_component_pages(pages, set(board_designators) | reviewed)
     components = {}
     for designator, occurrences in indexed.items():

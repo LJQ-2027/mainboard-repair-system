@@ -46,7 +46,7 @@ def validate_dataset_package(data, root, profile):
         designators = {component["designator"] for component in geometry.get("components", [])}
         if entity.get("designator") not in designators:
             errors.append(f"{entity_id} does not resolve in declared-side geometry")
-        if entity.get("designator") not in schematic.get("components", {}):
+        if entity.get("schematic_links") and entity.get("designator") not in schematic.get("components", {}):
             errors.append(f"{entity_id} does not resolve in exact schematic links")
     return errors
 

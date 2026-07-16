@@ -40,6 +40,8 @@ def validate_profile(root, profile):
 
     _repository_path(root, profile.get("point_map_source"), "point_map_source", must_exist=True)
     _repository_path(root, profile.get("schematic_source"), "schematic_source", must_exist=True)
+    if profile.get("repair_guide_source") is not None:
+        _repository_path(root, profile["repair_guide_source"], "repair_guide_source", must_exist=True)
 
     sides = profile.get("sides")
     if not isinstance(sides, list) or not sides:
@@ -75,6 +77,11 @@ def validate_profile(root, profile):
     reviewed = profile.get("reviewed_designators", [])
     if not isinstance(reviewed, list) or any(not isinstance(item, str) or not DESIGNATOR_PATTERN.fullmatch(item) for item in reviewed):
         raise ValueError("reviewed_designators must contain uppercase standalone identities")
+    schematic_reviewed = profile.get("schematic_reviewed_designators", reviewed)
+    if not isinstance(schematic_reviewed, list) or any(not isinstance(item, str) or not DESIGNATOR_PATTERN.fullmatch(item) for item in schematic_reviewed):
+        raise ValueError("schematic_reviewed_designators must contain uppercase standalone identities")
+    if not set(schematic_reviewed).issubset(reviewed):
+        raise ValueError("schematic_reviewed_designators must be a subset of reviewed_designators")
     for side in sides:
         required = side.get("required_designators", [])
         if not isinstance(required, list) or any(not isinstance(item, str) or not DESIGNATOR_PATTERN.fullmatch(item) for item in required):
