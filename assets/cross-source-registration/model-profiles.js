@@ -30,6 +30,12 @@ const PACKAGE_PROFILES = {
   transistor: { min: [0.018, 0.014], max: [0.11, 0.09], height: 0.018 },
 };
 
+const INSPECTION_VISUAL_ASSETS = {
+  'u2001-pmic-v1': 'reviewed-pmic',
+  'u4000-emmc-v1': 'reviewed-bga',
+  'u0600-rf-device-v1': 'reviewed-bga',
+};
+
 function clamp(value, minimum, maximum) {
   return Math.max(minimum, Math.min(maximum, value));
 }
@@ -49,6 +55,10 @@ export function resolvePackageFamily(category) {
 export function buildRenderProfile(category) {
   const family = resolvePackageFamily(category);
   return { family, ...PACKAGE_PROFILES[family] };
+}
+
+export function resolveInspectionVisualAsset(inspectionProfile) {
+  return INSPECTION_VISUAL_ASSETS[inspectionProfile?.profile_id] || 'standard';
 }
 
 export function buildRenderDescriptor(component, options = {}) {
@@ -74,6 +84,7 @@ export function buildRenderDescriptor(component, options = {}) {
     layer,
     selectable: Boolean(options.reviewed),
     inspectionProfile: component.inspection_profile || null,
+    visualAsset: resolveInspectionVisualAsset(component.inspection_profile),
     normalizedCenter: { ...source.center },
     center: {
       x: source.center.x * BOARD_WIDTH - BOARD_WIDTH / 2,

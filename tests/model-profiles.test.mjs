@@ -9,6 +9,7 @@ import {
   buildRenderDescriptor,
   buildSelectionRadius,
   buildUnresolvedMarkerPresentation,
+  resolveInspectionVisualAsset,
   resolvePackageFamily,
 } from '../assets/cross-source-registration/model-profiles.js';
 
@@ -134,4 +135,16 @@ test('reviewed inspection profile survives compilation into the render descripto
   source.inspection_profile = { profile_id: 'u2001-pmic-v1', fidelity: 'repair_visual' };
   const descriptor = buildRenderDescriptor(source, { reviewed: true });
   assert.deepEqual(descriptor.inspectionProfile, source.inspection_profile);
+});
+
+test('reviewed inspection profiles select only source-approved refined package assets', () => {
+  assert.equal(resolveInspectionVisualAsset({ profile_id: 'u2001-pmic-v1' }), 'reviewed-pmic');
+  assert.equal(resolveInspectionVisualAsset({ profile_id: 'u4000-emmc-v1' }), 'reviewed-bga');
+  assert.equal(resolveInspectionVisualAsset({ profile_id: 'u0600-rf-device-v1' }), 'reviewed-bga');
+  assert.equal(resolveInspectionVisualAsset({ profile_id: 'unreviewed-ic-v1' }), 'standard');
+  assert.equal(resolveInspectionVisualAsset(null), 'standard');
+
+  const source = component('bga_ic', 'reviewed', { x: 0.096, y: 0.135 });
+  source.inspection_profile = { profile_id: 'u4000-emmc-v1', fidelity: 'repair_visual' };
+  assert.equal(buildRenderDescriptor(source, { reviewed: true }).visualAsset, 'reviewed-bga');
 });

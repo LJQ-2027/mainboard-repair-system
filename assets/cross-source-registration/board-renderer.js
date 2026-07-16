@@ -189,6 +189,63 @@ function addInspectionPmicPackage(group, descriptor) {
   group.userData.inspectionProfileId = descriptor.inspectionProfile.profile_id;
 }
 
+function addInspectionBgaPackage(group, descriptor) {
+  const { x, y, z } = descriptor.dimensions;
+  const radius = Math.min(x, y) * 0.065;
+  const substrate = new THREE.Mesh(
+    new THREE.ExtrudeGeometry(roundedRectShape(x, y, radius * 0.7), {
+      depth: z * 0.2,
+      bevelEnabled: true,
+      bevelSize: Math.min(radius * 0.2, 0.0024),
+      bevelThickness: 0.0012,
+      bevelSegments: 2,
+    }),
+    material('dark', { color: 0x394840, roughness: 0.58, metalness: 0.2 }),
+  );
+  group.add(substrate);
+
+  const body = new THREE.Mesh(
+    new THREE.ExtrudeGeometry(roundedRectShape(x * 0.92, y * 0.92, radius), {
+      depth: z * 0.7,
+      bevelEnabled: true,
+      bevelSize: Math.min(radius * 0.48, 0.0045),
+      bevelThickness: Math.min(z * 0.075, 0.0026),
+      bevelSegments: 3,
+    }),
+    material('black', { color: 0x171c1b, roughness: 0.42, metalness: 0.16 }),
+  );
+  body.position.z = z * 0.2;
+  group.add(body);
+
+  const top = new THREE.Mesh(
+    new THREE.ShapeGeometry(roundedRectShape(x * 0.72, y * 0.68, radius * 0.58)),
+    material('dark', { color: 0x2c3331, roughness: 0.5, metalness: 0.1 }),
+  );
+  top.position.z = z * 0.91;
+  group.add(top);
+
+  const dotRadius = Math.max(Math.min(x, y) * 0.04, 0.0028);
+  const dot = new THREE.Mesh(
+    new THREE.CircleGeometry(dotRadius, 24),
+    material('ceramic', { color: 0x969e99, roughness: 0.66 }),
+  );
+  dot.position.set(-x * 0.31, y * 0.31, z * 0.925);
+  group.add(dot);
+
+  const substrateEdge = new THREE.LineSegments(
+    new THREE.EdgesGeometry(substrate.geometry, 24),
+    new THREE.LineBasicMaterial({ color: 0x8a7048, transparent: true, opacity: 0.62 }),
+  );
+  group.add(substrateEdge);
+  const bodyEdge = new THREE.LineSegments(
+    new THREE.EdgesGeometry(body.geometry, 24),
+    new THREE.LineBasicMaterial({ color: 0x525b57, transparent: true, opacity: 0.68 }),
+  );
+  bodyEdge.position.copy(body.position);
+  group.add(bodyEdge);
+  group.userData.inspectionProfileId = descriptor.inspectionProfile.profile_id;
+}
+
 function addConnectorPackage(group, descriptor) {
   const { x, y, z } = descriptor.dimensions;
   group.add(box(x, y, z * 0.7, material('metal')));
@@ -243,7 +300,8 @@ function addGenericPackage(group, descriptor) {
 
 function createPackageMesh(descriptor) {
   const group = new THREE.Group();
-  if (descriptor.inspectionProfile?.profile_id === 'u2001-pmic-v1') addInspectionPmicPackage(group, descriptor);
+  if (descriptor.visualAsset === 'reviewed-pmic') addInspectionPmicPackage(group, descriptor);
+  else if (descriptor.visualAsset === 'reviewed-bga') addInspectionBgaPackage(group, descriptor);
   else if (descriptor.family === 'passive') addPassivePackage(group, descriptor);
   else if (descriptor.family === 'ic') addIcPackage(group, descriptor);
   else if (descriptor.family === 'connector') addConnectorPackage(group, descriptor);
@@ -1330,6 +1388,7 @@ export class BoardRenderer {
     };
     this.inspectionTarget = target;
     this.container.dataset.dragMode = 'component';
+    this.container.dataset.inspectionVisualAsset = descriptor.visualAsset;
     const designator = descriptor.designator || componentId;
     this.renderer.domElement.setAttribute(
       'aria-label',
@@ -1403,6 +1462,7 @@ export class BoardRenderer {
     this.restoreInspectionContext();
     this.inspectionSnapshot = null;
     this.inspectionTarget = null;
+    delete this.container.dataset.inspectionVisualAsset;
     this.setInteractionMode(this.interactionMode);
     this.renderer.domElement.setAttribute('aria-label', '可交互 2.5D 主板模型');
     this.render();

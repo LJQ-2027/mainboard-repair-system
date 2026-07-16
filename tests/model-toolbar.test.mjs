@@ -198,6 +198,17 @@ test('inspection Escape key uses the same application-owned return path', () => 
   assert.match(appSource, /\(\) => \{ void toggleComponentInspection\(\); \}/);
 });
 
+test('reviewed BGA profiles use a layered inspection package without invented ball geometry', () => {
+  assert.match(rendererSource, /function addInspectionBgaPackage\(group, descriptor\)/);
+  assert.match(rendererSource, /descriptor\.visualAsset === 'reviewed-bga'/);
+  assert.doesNotMatch(rendererSource, /addInspectionBgaPackage[\s\S]*BallGeometry/);
+});
+
+test('component inspection exposes and clears the active visual asset for browser QA', () => {
+  assert.match(rendererSource, /this\.container\.dataset\.inspectionVisualAsset = descriptor\.visualAsset/);
+  assert.match(rendererSource, /delete this\.container\.dataset\.inspectionVisualAsset/);
+});
+
 test('inspection mode hides board-only controls and keeps direct manipulation tools', () => {
   assert.match(appSource, /querySelector\('\.anatomy-panel'\)\.hidden = toolbar\.boardControlsHidden/);
   assert.match(appSource, /querySelector\('\.side-panel'\)\.hidden = toolbar\.boardControlsHidden/);
