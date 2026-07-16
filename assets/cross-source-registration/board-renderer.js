@@ -22,6 +22,11 @@ import {
 import { recordDragTravel, transformBoardCenter } from './model-interaction-state.js';
 import { isPointInFocus } from './repair-focus-state.js';
 import {
+  beginSurfaceLoad,
+  createSurfaceLoadState,
+  finishSurfaceLoad,
+} from './model-surface-state.js';
+import {
   anchorZoomCenter,
   clampPanCenter,
   pinchZoom,
@@ -464,11 +469,19 @@ function createPickTarget(descriptor) {
 }
 
 export class BoardRenderer {
-  constructor(container, sideData, onSelect, onInspectionAngleChange = () => {}) {
+  constructor(
+    container,
+    sideData,
+    onSelect,
+    onInspectionAngleChange = () => {},
+    onSurfaceStateChange = () => {},
+  ) {
     this.container = container;
     this.assignSideData(sideData);
     this.onSelect = onSelect;
     this.onInspectionAngleChange = onInspectionAngleChange;
+    this.onSurfaceStateChange = onSurfaceStateChange;
+    this.surfaceLoadState = createSurfaceLoadState();
     this.meshes = new Map();
     this.renderObjects = new Map();
     this.descriptors = new Map();
@@ -558,6 +571,9 @@ export class BoardRenderer {
   }
 
   buildBoard() {
+    this.surfaceLoadState = beginSurfaceLoad(this.surfaceLoadState, this.sideId);
+    const requestId = this.surfaceLoadState.requestId;
+    this.onSurfaceStateChange(this.surfaceLoadState);
     const shape = this.createBoardShape();
     const substrate = new THREE.Mesh(
       new THREE.ExtrudeGeometry(shape, { depth: 0.026, bevelEnabled: false }),
@@ -600,13 +616,32 @@ export class BoardRenderer {
     captureMaterialState(surface);
     this.group.add(surface);
     this.contextObjects.push(surface);
-    new THREE.TextureLoader().load(this.engineeringTextureUrl, (texture) => {
-      texture.colorSpace = THREE.SRGBColorSpace;
-      texture.anisotropy = Math.min(this.renderer.capabilities.getMaxAnisotropy(), 8);
-      surfaceMaterial.map = texture;
-      surfaceMaterial.needsUpdate = true;
-      this.render();
-    });
+    new THREE.TextureLoader().load(
+      this.engineeringTextureUrl,
+      (texture) => {
+        if (requestId !== this.surfaceLoadState.requestId) {
+          texture.dispose();
+          return;
+        }
+        texture.colorSpace = THREE.SRGBColorSpace;
+        texture.anisotropy = Math.min(this.renderer.capabilities.getMaxAnisotropy(), 8);
+        surfaceMaterial.map = texture;
+        surfaceMaterial.needsUpdate = true;
+        this.surfaceLoadState = finishSurfaceLoad(this.surfaceLoadState, requestId, false);
+        this.render();
+        requestAnimationFrame(() => {
+          this.render();
+          this.onSurfaceStateChange(this.surfaceLoadState);
+        });
+      },
+      undefined,
+      () => {
+        if (requestId !== this.surfaceLoadState.requestId) return;
+        this.surfaceLoadState = finishSurfaceLoad(this.surfaceLoadState, requestId, true);
+        this.render();
+        this.onSurfaceStateChange(this.surfaceLoadState);
+      },
+    );
   }
 
   addDescriptor(descriptor) {

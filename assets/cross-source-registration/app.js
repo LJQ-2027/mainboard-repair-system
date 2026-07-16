@@ -73,6 +73,7 @@ let activeSideId = 'main_page_2';
 let componentInspection = exitComponentInspection();
 let modelInteraction = createModelInteractionState();
 let modelDragMode = 'pan';
+let modelAssetStatus = 'loading';
 const repairGuidanceByComponent = new Map();
 const repairFlowById = new Map();
 const confirmationTimers = new WeakMap();
@@ -531,16 +532,29 @@ function setModelDragMode(mode) {
 }
 
 function updateModelControlState() {
-  const locked = !canAcceptModelInteraction(modelInteraction);
+  const transitionLocked = !canAcceptModelInteraction(modelInteraction);
+  const locked = transitionLocked || modelAssetStatus === 'loading';
   const modelView = document.querySelector('#modelView');
   modelView.dataset.modelBusy = String(locked);
   modelView.setAttribute('aria-busy', String(locked));
   renderer?.setInteractionLocked(locked);
-  document.querySelectorAll('[role=tab], [data-side-id], #resetModel, #entityList button').forEach((control) => {
+  document.querySelectorAll('[role=tab]').forEach((control) => {
+    control.disabled = transitionLocked;
+  });
+  document.querySelectorAll('[data-side-id], #resetModel, #entityList button').forEach((control) => {
     control.disabled = locked;
   });
   updateSideControls();
   updateInspectionUi();
+}
+
+function updateModelAssetStatus(state) {
+  modelAssetStatus = state.status;
+  const status = document.querySelector('#modelLoadStatus');
+  status.hidden = state.status === 'ready';
+  status.dataset.tone = state.status;
+  status.textContent = state.status === 'error' ? '工程底图载入失败' : '正在准备主板模型';
+  updateModelControlState();
 }
 
 function startModelTransition(phase) {
@@ -930,7 +944,9 @@ async function init() {
     sideDataById.get(activeSideId),
     handleModelComponentActivation,
     syncInspectionAngleControl,
+    updateModelAssetStatus,
   );
+  updateModelControlState();
   updateSideControls();
   updateSourceNote();
   const list = document.querySelector('#entityList');

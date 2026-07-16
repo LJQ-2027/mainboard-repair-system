@@ -243,6 +243,21 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) clamp(360px, 27vw, 4
 .model-view[data-model-busy="true"] button:disabled { opacity: 0.72; cursor: wait; }
 .model-view[data-model-busy="true"] button[aria-pressed="true"]:disabled { opacity: 1; }
 .model-view[data-model-busy="true"] #modelCanvas canvas { cursor: wait; }
+.model-load-status {
+  position: absolute;
+  z-index: 19;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 6px 9px;
+  border: 1px solid #87958d;
+  background: rgb(247 249 246 / 94%);
+  color: #34443c;
+  font-size: 11px;
+  pointer-events: none;
+}
+.model-load-status[hidden] { display: none; }
+.model-load-status[data-tone="error"] { border-color: #d0a63b; background: #fff8dc; color: #6c5718; }
 @keyframes model-busy-track {
   from { transform: translateX(0); }
   to { transform: translateX(194%); }

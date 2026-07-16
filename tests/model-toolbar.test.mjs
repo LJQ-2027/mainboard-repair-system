@@ -163,6 +163,15 @@ test('model transitions expose a canvas-local busy state without erasing the act
   assert.match(stylesSource, /\.model-view\[data-model-busy="true"\] #modelCanvas canvas \{ cursor: wait; \}/);
 });
 
+test('model surface loading has a canvas-local status and stale-request guard', () => {
+  assert.match(toolbarMarkup, /id="modelLoadStatus"[^>]*role="status"[^>]*>正在准备主板模型<\/div>/);
+  assert.match(rendererSource, /beginSurfaceLoad\(this\.surfaceLoadState, this\.sideId\)/);
+  assert.match(rendererSource, /finishSurfaceLoad\(this\.surfaceLoadState, requestId, false\)/);
+  assert.match(appSource, /modelAssetStatus === 'loading'/);
+  assert.match(appSource, /\[role=tab\][\s\S]*control\.disabled = transitionLocked/);
+  assert.match(stylesSource, /\.model-load-status \{/);
+});
+
 test('model reset preserves active component inspection and resets its view', () => {
   const resetHandler = appSource.slice(
     appSource.indexOf("document.querySelector('#resetModel').addEventListener"),
