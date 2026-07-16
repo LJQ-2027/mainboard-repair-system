@@ -242,6 +242,7 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 }
 .model-view[data-model-busy="true"] button:disabled { opacity: 0.72; cursor: wait; }
 .model-view[data-model-busy="true"] button[aria-pressed="true"]:disabled { opacity: 1; }
+.model-view[data-model-busy="true"] #modelCanvas canvas { cursor: wait; }
 @keyframes model-busy-track {
   from { transform: translateX(0); }
   to { transform: translateX(194%); }

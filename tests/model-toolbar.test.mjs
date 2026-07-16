@@ -5,6 +5,7 @@ import test from 'node:test';
 const toolbarMarkup = await readFile(new URL('../assets/cross-source-registration/index.html', import.meta.url), 'utf8');
 const appSource = await readFile(new URL('../assets/cross-source-registration/app.js', import.meta.url), 'utf8');
 const rendererSource = await readFile(new URL('../assets/cross-source-registration/board-renderer.js', import.meta.url), 'utf8');
+const stylesSource = await readFile(new URL('../assets/cross-source-registration/styles.css', import.meta.url), 'utf8');
 
 test('model toolbar keeps source-driven focus without a manual module overlay selector', () => {
   assert.doesNotMatch(toolbarMarkup, /id="moduleFocus"/);
@@ -105,6 +106,7 @@ test('model transitions expose a canvas-local busy state without erasing the act
   assert.match(controlStateSource, /modelView\.dataset\.modelBusy = String\(locked\)/);
   assert.match(controlStateSource, /modelView\.setAttribute\('aria-busy', String\(locked\)\)/);
   assert.match(toolbarMarkup, /id="modelView"[^>]*aria-busy="false"/);
+  assert.match(stylesSource, /\.model-view\[data-model-busy="true"\] #modelCanvas canvas \{ cursor: wait; \}/);
 });
 
 test('model reset preserves active component inspection and resets its view', () => {
