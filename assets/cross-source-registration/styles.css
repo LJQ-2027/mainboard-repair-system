@@ -421,6 +421,7 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) clamp(360px, 27vw, 4
 .guidance-heading > strong { min-width: 40px; padding: 5px 6px; border: 1px solid #aeb9b2; background: white; font-size: 10px; text-align: center; }
 .guidance-heading > strong[hidden] { display: none; }
 .guidance-group { margin-top: 14px; }
+.guidance-group[hidden] { display: none; }
 .guidance-group h4 { margin: 0 0 7px; color: #56635d; font-size: 10px; font-weight: 600; }
 .fault-list { display: flex; flex-wrap: wrap; gap: 5px; }
 .fault-list button { padding: 6px 8px; border: 1px solid #aeb9b2; background: white; color: #425049; font: inherit; font-size: 11px; cursor: pointer; }

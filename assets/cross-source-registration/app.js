@@ -164,21 +164,14 @@ function guidanceResultCopy(guidance) {
   return GUIDANCE_RESULT_COPY[guidance.result];
 }
 
-function matchingRepairFlow(entity, guidance) {
+function matchingRepairFlow(entity) {
   const active = data?.repair_flows?.find((flow) => flow.flow_id === activeRepairFlowId);
-  if (active && (active.entry_type === 'precheck' || active.fault === guidance.selectedFault)) {
+  if (active) {
     const state = repairFlowById.get(active.flow_id) || createRepairFlowState(active);
     const target = repairFlowTargetComponentId(active, state);
     if (target === entity.component_id) return active;
   }
-  const entry = data?.repair_flows?.find((flow) => (
-    flow.entry_component_id === entity.component_id && flow.fault === guidance.selectedFault
-  )) || null;
-  if (entry) {
-    activeRepairFlowId = entry.flow_id;
-    renderRepairEntry();
-  }
-  return entry;
+  return null;
 }
 
 function renderRepairEntry() {
@@ -289,7 +282,7 @@ function renderActiveFlowReturn(entity, flowActive) {
 
 function renderRepairFlow(entity, guidance) {
   const control = document.querySelector('#repairFlowControl');
-  const flow = matchingRepairFlow(entity, guidance);
+  const flow = matchingRepairFlow(entity);
   document.querySelector('#guidanceProgress').hidden = Boolean(flow);
   control.hidden = !flow;
   document.querySelector('#resultControl').hidden = Boolean(flow);
@@ -801,6 +794,7 @@ function renderComponentGuidance(entity) {
     return;
   }
   const faultList = document.querySelector('#commonFaults');
+  const faultGroup = faultList.closest('.guidance-group');
   faultList.replaceChildren();
   guidance.faults.forEach((fault) => {
     const button = document.createElement('button');
@@ -825,6 +819,9 @@ function renderComponentGuidance(entity) {
   document.querySelector('#inspectionMethod').textContent = technicianInstruction(step.instruction);
   document.querySelector('#inspectionSource').textContent = `${step.source} · ${step.page}`;
   const repairFlowActive = renderRepairFlow(entity, guidance);
+  faultGroup.hidden = repairFlowActive;
+  document.querySelector('#guidanceContextLabel').textContent = repairFlowActive ? '当前维修路径' : '器件资料';
+  document.querySelector('#guidanceTitle').textContent = repairFlowActive ? '故障排查' : '检测参考';
   renderActiveFlowReturn(entity, repairFlowActive);
   const measurementControl = document.querySelector('#measurementControl');
   const profile = guidance.measurementProfile;
