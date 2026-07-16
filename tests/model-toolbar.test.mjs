@@ -37,11 +37,29 @@ test('repair workflow copy separates technician actions from collapsed source ev
   assert.match(toolbarMarkup, /<h4>关联故障资料<\/h4>/);
   assert.match(appSource, /faultGroup\.hidden = repairFlowActive/);
   assert.doesNotMatch(appSource, /const entry = data\?\.repair_flows\?\.find/);
-  assert.match(toolbarMarkup, /<span>排查路径<\/span>/);
+  assert.match(toolbarMarkup, /<span>当前任务<\/span>/);
   assert.match(toolbarMarkup, /<strong>检测指导<\/strong>/);
   assert.match(toolbarMarkup, /<summary>资料依据<\/summary>/);
   assert.doesNotMatch(toolbarMarkup, /来源分支|来源检测指导/);
   assert.doesNotMatch(appSource, /来源摘要|来源处理|来源步骤|来源资料/);
+});
+
+test('active repair entry collapses to the current route with an explicit change action', () => {
+  assert.match(toolbarMarkup, /id="repairEntryEyebrow">维修入口<\/span>/);
+  assert.match(toolbarMarkup, /id="changeRepairEntry"[^>]*hidden[^>]*>更换故障<\/button>/);
+  assert.match(appSource, /let repairEntryExpanded = false/);
+  assert.match(appSource, /entryRoot\.dataset\.active = String\(Boolean\(activeFlow\)\)/);
+  assert.match(appSource, /options\.hidden = Boolean\(activeFlow && !repairEntryExpanded\)/);
+  assert.match(appSource, /changeButton\.setAttribute\('aria-expanded', String\(repairEntryExpanded\)\)/);
+  assert.match(appSource, /repairEntryExpanded = false;[\s\S]*activeRepairFlowId = flow\.flow_id/);
+});
+
+test('active repair flow presents one current-task hierarchy without duplicate headings', () => {
+  assert.match(toolbarMarkup, /<span>当前任务<\/span>/);
+  assert.doesNotMatch(toolbarMarkup, /<span>排查路径<\/span>/);
+  assert.match(appSource, /guidanceRoot\.dataset\.repairFlowActive = String\(repairFlowActive\)/);
+  assert.match(stylesSource, /\.component-guidance\[data-repair-flow-active="true"\] > \.guidance-heading \{ display: none; \}/);
+  assert.match(stylesSource, /\.component-guidance\[data-repair-flow-active="true"\] \.repair-flow-control \{[^}]*margin-top:\s*0;[^}]*padding-top:\s*0;[^}]*border-top:\s*0;/);
 });
 
 test('source evidence stays available without occupying the default repair path', () => {

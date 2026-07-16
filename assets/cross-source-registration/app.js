@@ -80,6 +80,7 @@ const repairGuidanceByComponent = new Map();
 const repairFlowById = new Map();
 const confirmationTimers = new WeakMap();
 let activeRepairFlowId = null;
+let repairEntryExpanded = false;
 
 const FAULT_LABELS = {
   no_power: '无法开机',
@@ -175,8 +176,26 @@ function matchingRepairFlow(entity) {
 }
 
 function renderRepairEntry() {
+  const entryRoot = document.querySelector('#repairEntry');
   const options = document.querySelector('#repairEntryOptions');
-  if (!options || !data) return;
+  const changeButton = document.querySelector('#changeRepairEntry');
+  if (!entryRoot || !options || !changeButton || !data) return;
+  const activeFlow = data.repair_flows.find((flow) => flow.flow_id === activeRepairFlowId);
+  const activeState = activeFlow && repairFlowById.get(activeFlow.flow_id);
+  entryRoot.dataset.active = String(Boolean(activeFlow));
+  entryRoot.dataset.closed = String(Boolean(activeState?.closed));
+  document.querySelector('#repairEntryEyebrow').textContent = activeState?.closed
+    ? '排查已结束'
+    : activeFlow ? '当前排查' : '维修入口';
+  document.querySelector('#repairEntryTitle').textContent = activeFlow?.title || '选择故障现象';
+  options.hidden = Boolean(activeFlow && !repairEntryExpanded);
+  changeButton.hidden = !activeFlow;
+  changeButton.textContent = repairEntryExpanded ? '收起' : '更换故障';
+  changeButton.setAttribute('aria-expanded', String(repairEntryExpanded));
+  changeButton.onclick = () => {
+    repairEntryExpanded = !repairEntryExpanded;
+    renderRepairEntry();
+  };
   options.replaceChildren();
   buildRepairEntryOptions(data.repair_flows, activeRepairFlowId).forEach((entry) => {
     const button = document.createElement('button');
@@ -194,6 +213,7 @@ async function startRepairEntry(flowId) {
   const intent = resolveRepairEntryIntent(data?.repair_flows, flowId);
   const flow = data.repair_flows.find((candidate) => candidate.flow_id === intent.flowId);
   if (!repairFlowById.has(flow.flow_id)) repairFlowById.set(flow.flow_id, createRepairFlowState(flow));
+  repairEntryExpanded = false;
   activeRepairFlowId = flow.flow_id;
   renderRepairEntry();
   await selectEntity(intent.targetComponentId);
@@ -782,13 +802,14 @@ function evidenceCountCopy(count) {
 }
 
 function renderComponentGuidance(entity) {
-  const section = document.querySelector('#componentGuidance');
+  const guidanceRoot = document.querySelector('#componentGuidance');
   let guidance = repairGuidanceByComponent.get(entity.component_id);
   if (!guidance) {
     guidance = createRepairGuidance(entity);
     repairGuidanceByComponent.set(entity.component_id, guidance);
   }
-  section.hidden = !guidance.steps.length;
+  guidanceRoot.hidden = !guidance.steps.length;
+  guidanceRoot.dataset.repairFlowActive = 'false';
   if (!guidance.steps.length) {
     renderActiveFlowReturn(entity, false);
     return;
@@ -819,6 +840,7 @@ function renderComponentGuidance(entity) {
   document.querySelector('#inspectionMethod').textContent = technicianInstruction(step.instruction);
   document.querySelector('#inspectionSource').textContent = `${step.source} · ${step.page}`;
   const repairFlowActive = renderRepairFlow(entity, guidance);
+  guidanceRoot.dataset.repairFlowActive = String(repairFlowActive);
   faultGroup.hidden = repairFlowActive;
   document.querySelector('#guidanceContextLabel').textContent = repairFlowActive ? '当前维修路径' : '器件资料';
   document.querySelector('#guidanceTitle').textContent = repairFlowActive ? '故障排查' : '检测参考';
