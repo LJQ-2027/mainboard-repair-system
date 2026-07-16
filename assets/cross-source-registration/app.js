@@ -785,7 +785,7 @@ async function selectEntity(componentId, options = {}) {
   document.querySelector('#entityDesignator').textContent = entity.designator;
   document.querySelector('#entityName').textContent = entity.name;
   document.querySelector('#entityModule').textContent = entity.module;
-  document.querySelector('#entityCoordinate').textContent = `${state.boardPoint.x.toFixed(3)}, ${state.boardPoint.y.toFixed(3)}`;
+  document.querySelector('#entitySide').textContent = sideDataById.get(entity.side_id)?.label || entity.side_id;
   document.querySelector('#schematicEvidence').innerHTML = entity.schematic_links.map((link) => evidenceCard(link, 'schematic')).join('');
   document.querySelector('#repairEvidence').innerHTML = entity.repair_links.map((link) => evidenceCard(link, 'repair')).join('');
   renderComponentGuidance(entity);

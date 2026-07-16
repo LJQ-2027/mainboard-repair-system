@@ -18,6 +18,13 @@ test('view labels use technician language instead of registration internals', ()
   assert.doesNotMatch(toolbarMarkup, /实体代理图/);
 });
 
+test('entity facts expose the board side instead of normalized registration coordinates', () => {
+  assert.match(toolbarMarkup, /<dt>所在板面<\/dt><dd id="entitySide"><\/dd>/);
+  assert.doesNotMatch(toolbarMarkup, /统一坐标|entityCoordinate/);
+  assert.match(appSource, /#entitySide'\)\.textContent = sideDataById\.get\(entity\.side_id\)\?\.label \|\| entity\.side_id/);
+  assert.doesNotMatch(appSource, /#entityCoordinate/);
+});
+
 test('board side selection has one explicit control path without a duplicate flip action', () => {
   assert.equal((toolbarMarkup.match(/data-side-id=/g) || []).length, 2);
   assert.doesNotMatch(toolbarMarkup, /id="flipSide"|class="side-flip"|>⇄</);
