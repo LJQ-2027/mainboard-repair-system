@@ -210,6 +210,12 @@ test('reviewed connector profiles use a recessed package without invented pin ge
   assert.doesNotMatch(rendererSource, /addInspectionConnectorPackage[\s\S]*PinGeometry/);
 });
 
+test('reviewed crystal profiles use a layered can without invented internal geometry', () => {
+  assert.match(rendererSource, /function addInspectionCrystalPackage\(group, descriptor\)/);
+  assert.match(rendererSource, /descriptor\.visualAsset === 'reviewed-crystal'/);
+  assert.doesNotMatch(rendererSource, /addInspectionCrystalPackage[\s\S]*CrystalResonatorGeometry/);
+});
+
 test('component inspection exposes and clears the active visual asset for browser QA', () => {
   assert.match(rendererSource, /this\.container\.dataset\.inspectionVisualAsset = descriptor\.visualAsset/);
   assert.match(rendererSource, /delete this\.container\.dataset\.inspectionVisualAsset/);

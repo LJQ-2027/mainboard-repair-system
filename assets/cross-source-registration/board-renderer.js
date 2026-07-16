@@ -307,6 +307,55 @@ function addCrystalPackage(group, descriptor) {
   group.add(lid);
 }
 
+function addInspectionCrystalPackage(group, descriptor) {
+  const { x, y, z } = descriptor.dimensions;
+  const radius = Math.min(x, y) * 0.1;
+  const base = new THREE.Mesh(
+    new THREE.ExtrudeGeometry(roundedRectShape(x, y, radius * 0.72), {
+      depth: z * 0.22,
+      bevelEnabled: true,
+      bevelSize: Math.min(radius * 0.24, 0.0026),
+      bevelThickness: 0.0012,
+      bevelSegments: 2,
+    }),
+    material('ceramic', { color: 0x686d68, roughness: 0.68, metalness: 0.08 }),
+  );
+  group.add(base);
+
+  const can = new THREE.Mesh(
+    new THREE.ExtrudeGeometry(roundedRectShape(x * 0.9, y * 0.88, radius), {
+      depth: z * 0.62,
+      bevelEnabled: true,
+      bevelSize: Math.min(radius * 0.45, 0.004),
+      bevelThickness: Math.min(z * 0.07, 0.0024),
+      bevelSegments: 3,
+    }),
+    material('metal', { color: 0xc4c8c5, roughness: 0.3, metalness: 0.74 }),
+  );
+  can.position.z = z * 0.2;
+  group.add(can);
+
+  const lid = new THREE.Mesh(
+    new THREE.ShapeGeometry(roundedRectShape(x * 0.72, y * 0.68, radius * 0.58)),
+    material('metal', { color: 0xd9dcda, roughness: 0.24, metalness: 0.8 }),
+  );
+  lid.position.z = z * 0.83;
+  group.add(lid);
+
+  const canEdge = new THREE.LineSegments(
+    new THREE.EdgesGeometry(can.geometry, 24),
+    new THREE.LineBasicMaterial({ color: 0x747c78, transparent: true, opacity: 0.68 }),
+  );
+  canEdge.position.copy(can.position);
+  group.add(canEdge);
+  const baseEdge = new THREE.LineSegments(
+    new THREE.EdgesGeometry(base.geometry, 24),
+    new THREE.LineBasicMaterial({ color: 0x4f5854, transparent: true, opacity: 0.62 }),
+  );
+  group.add(baseEdge);
+  group.userData.inspectionProfileId = descriptor.inspectionProfile.profile_id;
+}
+
 function addInductorPackage(group, descriptor) {
   const { x, y, z } = descriptor.dimensions;
   const radius = Math.min(x, y) * 0.48;
@@ -348,6 +397,7 @@ function createPackageMesh(descriptor) {
   if (descriptor.visualAsset === 'reviewed-pmic') addInspectionPmicPackage(group, descriptor);
   else if (descriptor.visualAsset === 'reviewed-bga') addInspectionBgaPackage(group, descriptor);
   else if (descriptor.visualAsset === 'reviewed-connector') addInspectionConnectorPackage(group, descriptor);
+  else if (descriptor.visualAsset === 'reviewed-crystal') addInspectionCrystalPackage(group, descriptor);
   else if (descriptor.family === 'passive') addPassivePackage(group, descriptor);
   else if (descriptor.family === 'ic') addIcPackage(group, descriptor);
   else if (descriptor.family === 'connector') addConnectorPackage(group, descriptor);
