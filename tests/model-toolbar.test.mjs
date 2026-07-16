@@ -25,6 +25,14 @@ test('entity facts expose the board side instead of normalized registration coor
   assert.doesNotMatch(appSource, /#entityCoordinate/);
 });
 
+test('repair workflow copy separates technician actions from collapsed source evidence', () => {
+  assert.match(toolbarMarkup, /<span>排查路径<\/span>/);
+  assert.match(toolbarMarkup, /<strong>检测指导<\/strong>/);
+  assert.match(toolbarMarkup, /<summary>资料依据<\/summary>/);
+  assert.doesNotMatch(toolbarMarkup, /来源分支|来源检测指导/);
+  assert.doesNotMatch(appSource, /来源摘要|来源处理|来源步骤|来源资料/);
+});
+
 test('board side selection has one explicit control path without a duplicate flip action', () => {
   assert.equal((toolbarMarkup.match(/data-side-id=/g) || []).length, 2);
   assert.doesNotMatch(toolbarMarkup, /id="flipSide"|class="side-flip"|>⇄</);

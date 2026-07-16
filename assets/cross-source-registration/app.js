@@ -128,9 +128,9 @@ function updateEntityAccessStatus(entity) {
 }
 
 const GUIDANCE_RESULT_COPY = {
-  pending: '尚未返回检测结果。完成来源步骤后记录本次观察。',
+  pending: '尚未返回检测结果。完成当前检测步骤后记录本次观察。',
   normal: '已记录正常。继续结合下方原理图与维修指导排查其他路径。',
-  abnormal: '已记录异常。保留测量信息，并结合下方来源资料继续处理。',
+  abnormal: '已记录异常。保留测量信息，并结合下方维修资料继续处理。',
   uncertain: '已记录无法确认。复核检测条件后再次执行本步骤。',
 };
 
@@ -155,7 +155,7 @@ function guidanceResultCopy(guidance) {
   if (guidance.resultSource === 'source_range') {
     return guidance.result === 'normal'
       ? '资料范围判断：本次测量值位于范围内；这不是器件诊断。'
-      : '资料范围判断：本次测量值位于范围外；保留测量信息并继续来源步骤。';
+      : '资料范围判断：本次测量值位于范围外；保留测量信息并继续当前检测步骤。';
   }
   return GUIDANCE_RESULT_COPY[guidance.result];
 }
@@ -258,7 +258,7 @@ function renderRepairFlow(entity, guidance) {
   const progress = repairFlowProgress(flow, state);
   control.dataset.closed = String(state.closed);
   document.querySelector('#guidanceProgress').textContent = `${progress.current} / ${progress.total}`;
-  document.querySelector('#inspectionStepLabel').textContent = '来源摘要';
+  document.querySelector('#inspectionStepLabel').textContent = '检测摘要';
   document.querySelector('#repairFlowTitle').textContent = flow.title;
   document.querySelector('#repairFlowStep').textContent = state.closed
     ? `已结束 · ${progress.current} / ${progress.total}`
@@ -353,7 +353,7 @@ function renderRepairFlow(entity, guidance) {
   }
   if (state.terminal) {
     terminal.dataset.kind = state.terminal.kind;
-    document.querySelector('#repairFlowTerminalType').textContent = state.terminal.kind === 'boundary' ? '资料边界' : '来源处理';
+    document.querySelector('#repairFlowTerminalType').textContent = state.terminal.kind === 'boundary' ? '资料边界' : '维修处理';
     document.querySelector('#repairFlowTerminalLabel').textContent = state.terminal.label;
     const boundary = document.querySelector('#repairFlowBoundary');
     boundary.hidden = state.terminal.kind !== 'boundary';
@@ -372,8 +372,8 @@ function renderRepairFlow(entity, guidance) {
     : (actionExecuted ? '撤销执行记录' : '记录已执行');
   actionButton.title = state.closed ? '本次排查已结束，执行记录为只读' : '';
   document.querySelector('#repairFlowActionStatus').textContent = actionExecuted
-    ? '已记录来源处理已执行；维修结果仍需复检确认。'
-    : '尚未记录来源处理是否已执行。';
+    ? '已记录：维修处理已执行；维修结果仍需复检确认。'
+    : '尚未记录维修处理是否已执行。';
   actionButton.onclick = () => {
     const next = setRepairFlowActionExecuted(repairFlowById.get(flow.flow_id), !actionExecuted);
     applyRepairFlowState(flow, next, entity);
@@ -416,7 +416,7 @@ function renderRepairFlow(entity, guidance) {
     readiness = 'ready';
     readinessCopy = '资料路径已到边界，可结束并保留当前记录。';
   } else if (state.terminal?.kind === 'action' && state.actionExecution !== 'executed') {
-    readinessCopy = '先记录来源处理是否已执行。';
+    readinessCopy = '先记录维修处理是否已执行。';
   } else if (state.terminal?.kind === 'action' && !actionReady) {
     readinessCopy = '记录执行后的故障现象后即可结束。';
   } else if (actionReady) {
