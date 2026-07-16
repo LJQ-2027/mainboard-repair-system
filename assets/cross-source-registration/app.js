@@ -714,6 +714,10 @@ function evidenceCard(link, type) {
   return `<article class="evidence-card">${details}${previews}<small>${link.source} · ${link.page}</small></article>`;
 }
 
+function evidenceCountCopy(count) {
+  return `${count} 组资料`;
+}
+
 function renderComponentGuidance(entity) {
   const section = document.querySelector('#componentGuidance');
   let guidance = repairGuidanceByComponent.get(entity.component_id);
@@ -789,6 +793,8 @@ async function selectEntity(componentId, options = {}) {
   document.querySelector('#entityName').textContent = display.name;
   document.querySelector('#entityModule').textContent = display.module;
   document.querySelector('#entitySide').textContent = sideDataById.get(entity.side_id)?.label || entity.side_id;
+  document.querySelector('#schematicEvidenceCount').textContent = evidenceCountCopy(entity.schematic_links.length);
+  document.querySelector('#repairEvidenceCount').textContent = evidenceCountCopy(entity.repair_links.length);
   document.querySelector('#schematicEvidence').innerHTML = entity.schematic_links.map((link) => evidenceCard(link, 'schematic')).join('');
   document.querySelector('#repairEvidence').innerHTML = entity.repair_links.map((link) => evidenceCard(link, 'repair')).join('');
   renderComponentGuidance(entity);

@@ -36,6 +36,18 @@ test('repair workflow copy separates technician actions from collapsed source ev
   assert.doesNotMatch(appSource, /来源摘要|来源处理|来源步骤|来源资料/);
 });
 
+test('source evidence stays available without occupying the default repair path', () => {
+  assert.match(toolbarMarkup, /<details class="source-evidence-details" id="schematicEvidenceDetails">/);
+  assert.match(toolbarMarkup, /<summary><span>原理图依据<\/span><small id="schematicEvidenceCount"><\/small><\/summary>/);
+  assert.match(toolbarMarkup, /<details class="source-evidence-details" id="repairEvidenceDetails">/);
+  assert.match(toolbarMarkup, /<summary><span>维修手册原文<\/span><small id="repairEvidenceCount"><\/small><\/summary>/);
+  assert.doesNotMatch(toolbarMarkup, /<details class="source-evidence-details"[^>]*\sopen/);
+  assert.match(appSource, /#schematicEvidenceCount'\)\.textContent = evidenceCountCopy\(entity\.schematic_links\.length\)/);
+  assert.match(appSource, /#repairEvidenceCount'\)\.textContent = evidenceCountCopy\(entity\.repair_links\.length\)/);
+  assert.match(stylesSource, /\.source-evidence-details summary::after \{[^}]*content:\s*'\+'/);
+  assert.match(stylesSource, /\.source-evidence-details\[open\] summary::after \{[^}]*content:\s*'−'/);
+});
+
 test('repair workflow uses one framed work surface with readable execution states', () => {
   const flowSurface = stylesSource.match(/\.repair-flow-control \{([^}]*)\}/)?.[1] || '';
   const terminalSurface = stylesSource.match(/\.repair-flow-terminal \{([^}]*)\}/)?.[1] || '';

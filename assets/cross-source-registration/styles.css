@@ -542,6 +542,16 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) clamp(360px, 27vw, 4
 .model-boundary-details[hidden] { display: none; }
 .model-boundary-details summary { color: #59665f; font-size: 10px; cursor: pointer; }
 .model-boundary { margin: 7px 0 0; color: #53605a; font-size: 10px; line-height: 1.5; }
+.source-evidence-details { margin-top: 16px; border-block: 1px solid var(--line); background: #fafbf9; }
+.source-evidence-details + .source-evidence-details { margin-top: 8px; }
+.source-evidence-details summary { display: flex; align-items: center; justify-content: space-between; min-height: 40px; padding: 0 10px; color: #435149; cursor: pointer; list-style-position: inside; }
+.source-evidence-details summary span { font-size: 11px; font-weight: 700; }
+.source-evidence-details summary small { margin-left: auto; color: var(--muted); font-size: 10px; }
+.source-evidence-details summary::after { content: '+'; width: 18px; margin-left: 8px; color: #435149; font-size: 16px; line-height: 1; text-align: center; }
+.source-evidence-details[open] summary::after { content: '−'; }
+.source-evidence-details summary:focus-visible { outline: 3px solid #65a9ff; outline-offset: -3px; }
+.source-evidence-details[open] summary { border-bottom: 1px solid var(--line); }
+.source-evidence-content { padding: 10px 10px 3px; }
 .evidence-card { border: 1px solid #c5cec8; padding: 9px 11px; background: white; margin-bottom: 7px; font-size: 12px; line-height: 1.5; }
 .evidence-card small { display: block; color: var(--muted); margin-top: 5px; }
 .entity-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; }
