@@ -241,3 +241,15 @@ export function resolveAffordancePresentation({ selected = false, hovered = fals
   if (hovered) return { ...STATES.hovered };
   return { ...STATES.idle };
 }
+
+export function shouldExposeComponentLabel({
+  selected = false,
+  hovered = false,
+  inFocus = true,
+  anchorInsideViewport = true,
+  fullBoard = false,
+} = {}) {
+  if (selected || hovered) return true;
+  if (fullBoard) return true;
+  return inFocus && anchorInsideViewport;
+}

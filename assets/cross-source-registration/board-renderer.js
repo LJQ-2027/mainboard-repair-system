@@ -20,6 +20,7 @@ import {
   resolveInspectionKeyAction,
 } from './component-inspection-state.js';
 import { recordDragTravel, transformBoardCenter } from './model-interaction-state.js';
+import { isPointInFocus } from './repair-focus-state.js';
 import {
   anchorZoomCenter,
   clampPanCenter,
@@ -35,6 +36,7 @@ import {
   buildScreenAwareHitScale,
   placeHoverTooltip,
   resolveAffordancePresentation,
+  shouldExposeComponentLabel,
 } from './component-affordance-state.js';
 
 const ENGINEERING_SURFACE = buildEngineeringSurfacePresentation();
@@ -1647,7 +1649,7 @@ export class BoardRenderer {
     const labelAnchors = new Map();
     const componentScreenBounds = new Map();
     const anchor = new THREE.Vector3();
-    const labelItems = this.entities
+    const allLabelItems = this.entities
       .map((entity) => ({ entity, descriptor: this.descriptors.get(entity.component_id) }))
       .filter(({ descriptor }) => Boolean(descriptor))
       .map(({ entity, descriptor }) => {
@@ -1687,12 +1689,22 @@ export class BoardRenderer {
           id: entity.component_id,
           anchor: screenAnchor,
           exclusion,
+          normalizedCenter: descriptor.normalizedCenter,
         };
       });
+    const fullBoardLabels = !this.activeFocusRegion && this.camera.zoom <= 1.15;
+    const labelItems = allLabelItems.filter((item) => shouldExposeComponentLabel({
+      selected: item.id === this.selectedComponentId,
+      hovered: item.id === this.hoveredComponentId,
+      inFocus: isPointInFocus(item.normalizedCenter, this.activeFocusRegion),
+      anchorInsideViewport: item.anchor.x >= 8 && item.anchor.x <= width - 8
+        && item.anchor.y >= 8 && item.anchor.y <= height - 8,
+      fullBoard: fullBoardLabels,
+    }));
     const labelLayout = buildScreenLabelPositions(labelItems, {
       viewport: { width, height },
       preferredSlots: this.labelPlacementSlots,
-      obstacles: labelItems.map((item) => item.exclusion),
+      obstacles: allLabelItems.map((item) => item.exclusion),
     });
     if (labelLayout.length) {
       this.labelPlacementSlots = new Map(labelLayout
@@ -1779,6 +1791,7 @@ export class BoardRenderer {
       });
     });
     this.container.dataset.labelOverlapCount = String(overlapCount);
+    this.container.dataset.visibleLabelCount = String(screenLabels.length);
     this.container.dataset.labelOwnComponentOverlapCount = String(screenLabels.filter((label) => {
       const component = componentScreenBounds.get(label.componentId);
       return component

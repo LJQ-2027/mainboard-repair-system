@@ -9,7 +9,16 @@ import {
   buildScreenAwareHitScale,
   placeHoverTooltip,
   resolveAffordancePresentation,
+  shouldExposeComponentLabel,
 } from '../assets/cross-source-registration/component-affordance-state.js';
+
+test('label density keeps discovery at full board and removes off-context edge rails', () => {
+  assert.equal(shouldExposeComponentLabel({ fullBoard: true }), true);
+  assert.equal(shouldExposeComponentLabel({ inFocus: false, fullBoard: false }), false);
+  assert.equal(shouldExposeComponentLabel({ anchorInsideViewport: false, fullBoard: false }), false);
+  assert.equal(shouldExposeComponentLabel({ inFocus: false, anchorInsideViewport: false, selected: true }), true);
+  assert.equal(shouldExposeComponentLabel({ inFocus: false, anchorInsideViewport: false, hovered: true }), true);
+});
 
 test('interactive frame uses eight short segments outside the package footprint', () => {
   const segments = buildCornerSegments({ x: 0.1, y: 0.06 });
