@@ -531,6 +531,9 @@ function setModelDragMode(mode) {
 
 function updateModelControlState() {
   const locked = !canAcceptModelInteraction(modelInteraction);
+  const modelView = document.querySelector('#modelView');
+  modelView.dataset.modelBusy = String(locked);
+  modelView.setAttribute('aria-busy', String(locked));
   renderer?.setInteractionLocked(locked);
   document.querySelectorAll('[role=tab], [data-side-id], #resetModel, #entityList button').forEach((control) => {
     control.disabled = locked;

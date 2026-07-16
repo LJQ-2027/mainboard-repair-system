@@ -228,6 +228,27 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 .model-view #modelCanvas { width: 100%; height: 100%; }
 .model-view canvas { display: block; cursor: grab; touch-action: none; }
 .model-view canvas:active { cursor: grabbing; }
+.model-view[data-model-busy="true"]::before {
+  content: "";
+  position: absolute;
+  z-index: 20;
+  top: 0;
+  left: 0;
+  width: 34%;
+  height: 2px;
+  background: #1c8f75;
+  pointer-events: none;
+  animation: model-busy-track 760ms ease-in-out infinite alternate;
+}
+.model-view[data-model-busy="true"] button:disabled { opacity: 0.72; cursor: wait; }
+.model-view[data-model-busy="true"] button[aria-pressed="true"]:disabled { opacity: 1; }
+@keyframes model-busy-track {
+  from { transform: translateX(0); }
+  to { transform: translateX(194%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .model-view[data-model-busy="true"]::before { width: 100%; animation: none; }
+}
 .anatomy-panel {
   position: absolute;
   top: 12px;

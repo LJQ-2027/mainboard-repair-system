@@ -96,6 +96,17 @@ test('button and drag angle changes share renderer-owned state and cancellable a
   assert.match(appSource, /await renderer\?\.setInspectionAngle\(enabled\)/);
 });
 
+test('model transitions expose a canvas-local busy state without erasing the active control', () => {
+  const controlStateSource = appSource.slice(
+    appSource.indexOf('function updateModelControlState'),
+    appSource.indexOf('function startModelTransition'),
+  );
+
+  assert.match(controlStateSource, /modelView\.dataset\.modelBusy = String\(locked\)/);
+  assert.match(controlStateSource, /modelView\.setAttribute\('aria-busy', String\(locked\)\)/);
+  assert.match(toolbarMarkup, /id="modelView"[^>]*aria-busy="false"/);
+});
+
 test('model reset preserves active component inspection and resets its view', () => {
   const resetHandler = appSource.slice(
     appSource.indexOf("document.querySelector('#resetModel').addEventListener"),
