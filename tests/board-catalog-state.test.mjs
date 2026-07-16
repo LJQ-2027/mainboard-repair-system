@@ -47,6 +47,16 @@ const catalog = {
       shield: null,
       atlas: null,
     },
+    'bg6m-f069m': {
+      title: 'BG6M · F069M_MAIN_PCB_V1.0',
+      model: 'BG6M',
+      data: 'f069m-data.json',
+      schematic: 'f069m-schematic.json',
+      side_manifest: 'f069m-sides.json',
+      geometry_by_side: { main_page_1: 'f069m-p1.json', main_page_2: 'f069m-p2.json' },
+      shield: null,
+      atlas: null,
+    },
   },
 };
 
@@ -75,6 +85,12 @@ test('one board platform can declare multiple compatible sales models', () => {
 test('source-named board sides do not depend on legacy page identities', () => {
   const assets = resolveBoardAssets(catalog, 'ck6n-h6929');
   assert.deepEqual(Object.keys(assets.geometry_by_side), ['main_top', 'main_bot']);
+});
+
+test('reference-only boards use the same source-driven catalog contract', () => {
+  const assets = resolveBoardAssets(catalog, 'bg6m-f069m');
+  assert.equal(assets.model, 'BG6M');
+  assert.deepEqual(Object.keys(assets.geometry_by_side), ['main_page_1', 'main_page_2']);
 });
 
 test('unknown board keys fail instead of silently opening another board', () => {

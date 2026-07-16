@@ -64,6 +64,23 @@
       },
       "shield": null,
       "atlas": null
+    },
+    "bg6m-f069m": {
+      "title": "BG6M · F069M_MAIN_PCB_V1.0",
+      "model": "BG6M",
+      "compatible_models": [
+        "BG6M"
+      ],
+      "board_version": "F069M_MAIN_PCB_V1.0",
+      "data": "../../knowledge-base/f069m-cross-source-registration.json",
+      "schematic": "../../knowledge-base/f069m-schematic-compiled.json",
+      "side_manifest": "../../knowledge-base/f069m-board-sides.json",
+      "geometry_by_side": {
+        "main_page_1": "../../knowledge-base/f069m-board-compiled-page-1.json",
+        "main_page_2": "../../knowledge-base/f069m-board-compiled-page-2.json"
+      },
+      "shield": null,
+      "atlas": null
     }
   }
 }

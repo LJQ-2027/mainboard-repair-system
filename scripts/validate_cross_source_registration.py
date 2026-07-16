@@ -96,6 +96,13 @@ def validate_dataset(data, root):
             elif reference_kind != "record_only":
                 errors.append(f"{entity_id} measurement reference kind is unsupported")
     repair_flows = data.get("repair_flows", [])
+    if not repair_flows:
+        coverage = data.get("repair_coverage", {})
+        if coverage.get("status") != "source_unavailable" or any(
+            not isinstance(coverage.get(key), str) or not coverage[key].strip()
+            for key in ("title", "note")
+        ):
+            errors.append("repair coverage must declare the unavailable source boundary when no flows exist")
     declared_flow_ids = {flow.get("flow_id") for flow in repair_flows if flow.get("flow_id")}
     flow_ids = set()
     for flow in repair_flows:

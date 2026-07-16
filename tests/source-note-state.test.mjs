@@ -41,6 +41,16 @@ test('component inspection source note takes precedence over the board model not
   }), 'U4000 单体检视 · 第2面 · 已关联点位与维修资料');
 });
 
+test('reference-only inspection names schematic coverage without claiming repair material', () => {
+  assert.equal(buildSourceNote({
+    view: 'model',
+    registration,
+    side,
+    inspectionEntity: { designator: 'U4000' },
+    repairCoverage: { status: 'source_unavailable' },
+  }), 'U4000 单体检视 · 第2面 · 已关联点位与原理图');
+});
+
 test('narrow source note wraps completely instead of using an ellipsis', () => {
   const narrowStyles = styles.slice(styles.indexOf('@media (max-width: 480px)'));
   const noteStyles = narrowStyles.slice(

@@ -5,8 +5,10 @@ import { BoardRenderer } from './board-renderer.js';
 import { PointMapViewport } from './point-map-viewport.js';
 import { buildSourceNote } from './source-note-state.js';
 import { buildRegistrationViewState } from './registration-view-state.js';
+import { buildRepairCoverageState } from './repair-coverage-state.js';
 import { buildEntityAccessState } from './entity-access-state.js';
 import { mergeCompiledSchematicLinks } from './source-links.js';
+import { mergeCompiledFootprint } from './source-geometry-state.js';
 import { technicianEntityCopy, technicianInstruction } from './technician-copy.js';
 import { extractModuleRegions, extractShieldRegions } from './anatomy-state.js';
 import {
@@ -117,6 +119,7 @@ function updateSourceNote(inspectionEntity = null) {
     registration: data.registration,
     side,
     inspectionEntity,
+    repairCoverage: data.repair_coverage,
   });
 }
 
@@ -179,15 +182,21 @@ function renderRepairEntry() {
   const options = document.querySelector('#repairEntryOptions');
   const changeButton = document.querySelector('#changeRepairEntry');
   if (!entryRoot || !options || !changeButton || !data) return;
-  const activeFlow = data.repair_flows.find((flow) => flow.flow_id === activeRepairFlowId);
+  const coverage = buildRepairCoverageState(data);
+  const flows = data.repair_flows || [];
+  const activeFlow = flows.find((flow) => flow.flow_id === activeRepairFlowId);
   const activeState = activeFlow && repairFlowById.get(activeFlow.flow_id);
   entryRoot.dataset.active = String(Boolean(activeFlow));
   entryRoot.dataset.closed = String(Boolean(activeState?.closed));
+  entryRoot.dataset.available = String(coverage.available);
   document.querySelector('#repairEntryEyebrow').textContent = activeState?.closed
     ? '排查已结束'
-    : activeFlow ? '当前排查' : '维修入口';
-  document.querySelector('#repairEntryTitle').textContent = activeFlow?.title || '选择故障现象';
-  options.hidden = Boolean(activeFlow && !repairEntryExpanded);
+    : activeFlow ? '当前排查' : coverage.eyebrow;
+  document.querySelector('#repairEntryTitle').textContent = activeFlow?.title || coverage.title;
+  const coverageNote = document.querySelector('#repairCoverageNote');
+  coverageNote.hidden = coverage.available;
+  coverageNote.textContent = coverage.note;
+  options.hidden = !coverage.available || Boolean(activeFlow && !repairEntryExpanded);
   changeButton.hidden = !activeFlow;
   changeButton.textContent = repairEntryExpanded ? '收起' : '更换故障';
   changeButton.setAttribute('aria-expanded', String(repairEntryExpanded));
@@ -196,7 +205,7 @@ function renderRepairEntry() {
     renderRepairEntry();
   };
   options.replaceChildren();
-  buildRepairEntryOptions(data.repair_flows, activeRepairFlowId).forEach((entry) => {
+  buildRepairEntryOptions(flows, activeRepairFlowId).forEach((entry) => {
     const button = document.createElement('button');
     button.type = 'button';
     button.dataset.flowId = entry.flowId;
@@ -897,6 +906,8 @@ async function selectEntity(componentId, options = {}) {
   document.querySelector('#entitySide').textContent = sideDataById.get(entity.side_id)?.label || entity.side_id;
   document.querySelector('#schematicEvidenceCount').textContent = evidenceCountCopy(entity.schematic_links.length);
   document.querySelector('#repairEvidenceCount').textContent = evidenceCountCopy(entity.repair_links.length);
+  document.querySelector('#schematicEvidenceDetails').hidden = !entity.schematic_links.length;
+  document.querySelector('#repairEvidenceDetails').hidden = !entity.repair_links.length;
   document.querySelector('#schematicEvidence').innerHTML = entity.schematic_links.map((link) => evidenceCard(link, 'schematic')).join('');
   document.querySelector('#repairEvidence').innerHTML = entity.repair_links.map((link) => evidenceCard(link, 'repair')).join('');
   renderComponentGuidance(entity);
@@ -998,16 +1009,7 @@ async function init() {
       side_id: originalEntity.side_id || data.side_id,
     };
     const compiled = compiledBySide.get(entity.side_id)?.get(entity.designator);
-    if (!compiled?.footprint) return entity;
-    return {
-      ...entity,
-      geometry: {
-        ...entity.geometry,
-        center: compiled.footprint.center,
-        size: compiled.footprint.size,
-        source_status: compiled.footprint.confidence,
-      },
-    };
+    return mergeCompiledFootprint(entity, compiled);
   });
   sideDataById = new Map(sideManifest.sides.map((side) => {
     const compiled = geometryBySide.get(side.side_id);

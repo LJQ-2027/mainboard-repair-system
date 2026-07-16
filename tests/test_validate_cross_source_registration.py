@@ -30,6 +30,19 @@ class CrossSourceRegistrationTests(unittest.TestCase):
 
         self.assertEqual(validate_dataset(data, ROOT), [])
 
+    def test_dataset_without_repair_flows_requires_an_explicit_source_boundary(self):
+        data = json.loads((ROOT / "knowledge-base/km4-cross-source-registration.json").read_text(encoding="utf-8"))
+        data["repair_flows"] = []
+        errors = validate_dataset(data, ROOT)
+        self.assertTrue(any("repair coverage" in error for error in errors))
+
+        data["repair_coverage"] = {
+            "status": "source_unavailable",
+            "title": "No executable repair flow",
+            "note": "The approved package contains no repair guide.",
+        }
+        self.assertEqual(validate_dataset(data, ROOT), [])
+
     def test_repair_visual_inspection_is_explicitly_limited_to_package_entities(self):
         data = json.loads((ROOT / "knowledge-base/km4-cross-source-registration.json").read_text(encoding="utf-8"))
         inspectable = {

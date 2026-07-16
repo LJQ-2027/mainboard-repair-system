@@ -9,11 +9,12 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class BoardProfileTests(unittest.TestCase):
-    def test_loads_ordered_km4_kl4_h8918_and_h6929_profiles(self):
+    def test_loads_five_source_profiles_including_incomplete_bg6m_package(self):
         km4 = load_profile(ROOT, "km4-f151")
         kl4 = load_profile(ROOT, "kl4-f201")
         h8918 = load_profile(ROOT, "h8918-main-v1.2")
         h6929 = load_profile(ROOT, "h6929-main-v1.1")
+        f069m = load_profile(ROOT, "f069m-main-v1.0")
 
         self.assertEqual(km4["board_id"], "BOARD-KM4-F151-MAIN-V1.2")
         self.assertEqual(kl4["board_id"], "BOARD-KL4-F201-MAIN-V1.2")
@@ -31,6 +32,9 @@ class BoardProfileTests(unittest.TestCase):
         self.assertEqual([side["source_pdf_page"] for side in h6929["sides"]], [1, 1])
         self.assertEqual([side["component_page"] for side in h6929["sides"]], [1, 2])
         self.assertNotEqual(h6929["sides"][0].get("point_map_source", h6929["point_map_source"]), h6929["sides"][1]["point_map_source"])
+        self.assertEqual(f069m["board_id"], "BOARD-F069M-MAIN-V1.0")
+        self.assertEqual([side["source_pdf_page"] for side in f069m["sides"]], [1, 2])
+        self.assertNotIn("repair_guide_source", f069m)
 
     def test_rejects_an_unknown_profile(self):
         with self.assertRaisesRegex(ValueError, "Unknown board profile"):

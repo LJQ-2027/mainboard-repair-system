@@ -42,8 +42,9 @@ test('the initial repair entity belongs to the manifest default side', () => {
 
 test('repair workflow copy separates technician actions from collapsed source evidence', () => {
   assert.match(toolbarMarkup, /<section class="repair-entry" id="repairEntry"/);
+  assert.match(toolbarMarkup, /id="repairCoverageNote" hidden/);
   assert.match(toolbarMarkup, /<div class="repair-entry-options" id="repairEntryOptions"/);
-  assert.match(appSource, /buildRepairEntryOptions\(data\.repair_flows, activeRepairFlowId\)/);
+  assert.match(appSource, /buildRepairEntryOptions\(flows, activeRepairFlowId\)/);
   assert.match(toolbarMarkup, /<span id="guidanceContextLabel">器件资料<\/span>/);
   assert.match(toolbarMarkup, /<h3 id="guidanceTitle">检测参考<\/h3>/);
   assert.match(toolbarMarkup, /<h4>关联故障资料<\/h4>/);
@@ -61,7 +62,7 @@ test('active repair entry collapses to the current route with an explicit change
   assert.match(toolbarMarkup, /id="changeRepairEntry"[^>]*hidden[^>]*>更换故障<\/button>/);
   assert.match(appSource, /let repairEntryExpanded = false/);
   assert.match(appSource, /entryRoot\.dataset\.active = String\(Boolean\(activeFlow\)\)/);
-  assert.match(appSource, /options\.hidden = Boolean\(activeFlow && !repairEntryExpanded\)/);
+  assert.match(appSource, /options\.hidden = !coverage\.available \|\| Boolean\(activeFlow && !repairEntryExpanded\)/);
   assert.match(appSource, /changeButton\.setAttribute\('aria-expanded', String\(repairEntryExpanded\)\)/);
   assert.match(appSource, /repairEntryExpanded = false;[\s\S]*activeRepairFlowId = flow\.flow_id/);
 });
@@ -104,6 +105,8 @@ test('source evidence stays available without occupying the default repair path'
   assert.doesNotMatch(toolbarMarkup, /<details class="source-evidence-details"[^>]*\sopen/);
   assert.match(appSource, /#schematicEvidenceCount'\)\.textContent = evidenceCountCopy\(entity\.schematic_links\.length\)/);
   assert.match(appSource, /#repairEvidenceCount'\)\.textContent = evidenceCountCopy\(entity\.repair_links\.length\)/);
+  assert.match(appSource, /#schematicEvidenceDetails'\)\.hidden = !entity\.schematic_links\.length/);
+  assert.match(appSource, /#repairEvidenceDetails'\)\.hidden = !entity\.repair_links\.length/);
   assert.match(stylesSource, /\.source-evidence-details summary::after \{[^}]*content:\s*'\+'/);
   assert.match(stylesSource, /\.source-evidence-details\[open\] summary::after \{[^}]*content:\s*'−'/);
 });
