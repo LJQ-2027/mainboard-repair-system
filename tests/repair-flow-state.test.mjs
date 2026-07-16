@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
 import {
@@ -289,4 +290,31 @@ test('measurements without source tolerance retain every technician-judged resul
     { value: 'normal', label: '正常' },
     { value: 'abnormal', label: '异常' },
   ]);
+});
+
+test('the compiled KL4 small-current path advances from rails to X2100 without inferred tolerance', async () => {
+  const dataset = JSON.parse(await readFile(
+    new URL('../knowledge-base/kl4-cross-source-registration.json', import.meta.url),
+    'utf8',
+  ));
+  const flow = dataset.repair_flows[0];
+  let state = createRepairFlowState(flow);
+  assert.equal(repairFlowTargetComponentId(flow, state), 'KL4-MAIN-U2001');
+  assert.deepEqual(buildRepairFlowChoiceOptions(flow, state), []);
+
+  state = recordRepairFlowMeasurement(flow, state, 'vddcore-voltage', 1.14);
+  state = recordRepairFlowMeasurement(flow, state, 'vddemmccore-voltage', 3.28);
+  assert.deepEqual(buildRepairFlowChoiceOptions(flow, state).map(({ value }) => value), ['normal', 'abnormal']);
+  state = answerRepairFlow(flow, state, 'normal');
+  assert.equal(repairFlowTargetComponentId(flow, state), 'KL4-MAIN-X2100');
+
+  state = recordRepairFlowMeasurement(flow, state, 'x2100-frequency', 25.9);
+  assert.deepEqual(buildRepairFlowChoiceOptions(flow, state).map(({ value }) => value), ['normal', 'abnormal']);
+  state = answerRepairFlow(flow, state, 'abnormal');
+  assert.equal(state.terminal.label, '重焊或更换 X2100');
+  assert.equal(repairFlowTargetComponentId(flow, state), 'KL4-MAIN-X2100');
+
+  const backed = backRepairFlow(flow, state);
+  assert.equal(backed.currentStepId, 'crystal_check');
+  assert.equal(resetRepairFlow(flow).currentStepId, 'rail_check');
 });
