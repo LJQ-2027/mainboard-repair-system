@@ -326,7 +326,12 @@ function renderRepairFlow(entity, guidance) {
   document.querySelector('#repairFlowSource').textContent = `${flow.source.source} · 第 ${flow.source.page} 页`;
   const targetId = repairFlowTargetComponentId(flow, state);
   const targetEntity = data.entities.find((candidate) => candidate.component_id === targetId);
+  const targetDisplay = targetEntity && technicianEntityCopy(targetEntity);
+  const targetSideLabel = targetEntity && (sideDataById.get(targetEntity.side_id)?.label || targetEntity.side_id);
   document.querySelector('#repairFlowTarget').textContent = targetEntity?.designator || '当前结果';
+  document.querySelector('#repairFlowTargetMeta').textContent = targetEntity
+    ? `${targetDisplay.name} · ${targetSideLabel}`
+    : '';
 
   const trail = document.querySelector('#repairFlowTrail');
   trail.replaceChildren();
@@ -803,6 +808,7 @@ function evidenceCountCopy(count) {
 
 function renderComponentGuidance(entity) {
   const guidanceRoot = document.querySelector('#componentGuidance');
+  const evidenceRoot = document.querySelector('.evidence');
   let guidance = repairGuidanceByComponent.get(entity.component_id);
   if (!guidance) {
     guidance = createRepairGuidance(entity);
@@ -810,6 +816,7 @@ function renderComponentGuidance(entity) {
   }
   guidanceRoot.hidden = !guidance.steps.length;
   guidanceRoot.dataset.repairFlowActive = 'false';
+  evidenceRoot.dataset.repairFlowActive = 'false';
   if (!guidance.steps.length) {
     renderActiveFlowReturn(entity, false);
     return;
@@ -841,6 +848,7 @@ function renderComponentGuidance(entity) {
   document.querySelector('#inspectionSource').textContent = `${step.source} · ${step.page}`;
   const repairFlowActive = renderRepairFlow(entity, guidance);
   guidanceRoot.dataset.repairFlowActive = String(repairFlowActive);
+  evidenceRoot.dataset.repairFlowActive = String(repairFlowActive);
   faultGroup.hidden = repairFlowActive;
   document.querySelector('#guidanceContextLabel').textContent = repairFlowActive ? '当前维修路径' : '器件资料';
   document.querySelector('#guidanceTitle').textContent = repairFlowActive ? '故障排查' : '检测参考';

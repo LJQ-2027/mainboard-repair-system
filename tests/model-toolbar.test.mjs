@@ -62,6 +62,17 @@ test('active repair flow presents one current-task hierarchy without duplicate h
   assert.match(stylesSource, /\.component-guidance\[data-repair-flow-active="true"\] \.repair-flow-control \{[^}]*margin-top:\s*0;[^}]*padding-top:\s*0;[^}]*border-top:\s*0;/);
 });
 
+test('active repair target condenses repeated facts into the current-task summary', () => {
+  assert.match(toolbarMarkup, /<small id="repairFlowTargetMeta"><\/small>/);
+  assert.match(appSource, /const targetDisplay = targetEntity && technicianEntityCopy\(targetEntity\)/);
+  assert.match(appSource, /#repairFlowTargetMeta'\)\.textContent = targetEntity[\s\S]*targetDisplay\.name[\s\S]*targetSideLabel/);
+  assert.match(appSource, /evidenceRoot\.dataset\.repairFlowActive = String\(repairFlowActive\)/);
+  assert.match(stylesSource, /\.evidence\[data-repair-flow-active="true"\] \.entity-name,[\s\S]*\.evidence\[data-repair-flow-active="true"\] \.facts \{ display: none; \}/);
+  assert.match(stylesSource, /\.evidence\[data-repair-flow-active="true"\] \.entity-heading h2 \{[^}]*font-size:\s*24px/);
+  assert.match(stylesSource, /\.repair-flow-position small \{[^}]*font-size:\s*9px/);
+  assert.doesNotMatch(stylesSource, /\.evidence\[data-repair-flow-active="true"\] \.entity-heading \{[^}]*display:\s*none/);
+});
+
 test('source evidence stays available without occupying the default repair path', () => {
   assert.match(toolbarMarkup, /<details class="source-evidence-details" id="schematicEvidenceDetails">/);
   assert.match(toolbarMarkup, /<summary><span>原理图依据<\/span><small id="schematicEvidenceCount"><\/small><\/summary>/);
