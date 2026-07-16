@@ -34,6 +34,9 @@
   "repair_flows": [
     {
       "flow_id": "not-charging-page-14-reviewed",
+      "entry_label": "不充电",
+      "entry_order": 2,
+      "entry_type": "known_fault",
       "title": "不充电分步排查",
       "fault": "Not charging",
       "entry_component_id": "KM4-MAIN-J6101",
@@ -75,6 +78,9 @@
     },
     {
       "flow_id": "no-power-small-current-page-10",
+      "entry_label": "不开机",
+      "entry_order": 1,
+      "entry_type": "known_fault",
       "title": "小电流不开机排查",
       "fault": "No power",
       "entry_component_id": "KM4-MAIN-U4000",
@@ -107,6 +113,70 @@
           "choices": [
             {"value": "normal", "label": "正常", "outcome": {"kind": "action", "label": "重焊或更换 CPU/DDR"}},
             {"value": "abnormal", "label": "异常", "outcome": {"kind": "action", "label": "重焊或更换晶振", "target_component_id": "KM4-MAIN-X2100"}}
+          ]
+        }
+      ]
+    },
+    {
+      "flow_id": "unknown-basic-check-reviewed",
+      "entry_label": "还不确定，先做初步主板排查",
+      "entry_order": 3,
+      "entry_type": "precheck",
+      "title": "初步主板排查",
+      "fault": "Initial board check",
+      "entry_component_id": "KM4-MAIN-U2001",
+      "entry_step_id": "visual_check",
+      "source": {
+        "source": "TECNO-L6735-KM4-F151手机维修通用操作指导书V1.0_20250331.pdf",
+        "page": "7-11"
+      },
+      "source_status": "reviewed_partial",
+      "boundary_note": "发现明显烧毁、进液、变形、缺件或接口损伤时停止通电并记录现场；基础供电异常时保留测量记录，后续坏点仍需依据资料排查。",
+      "steps": [
+        {
+          "step_id": "visual_check",
+          "label": "外观检查",
+          "prompt": "主板是否存在明显烧毁、进液、变形、缺件或接口损伤？",
+          "target_component_id": "KM4-MAIN-U2001",
+          "choices": [
+            {
+              "value": "clear",
+              "label": "未发现",
+              "outcome": { "kind": "next", "step_id": "vbat_check" }
+            },
+            {
+              "value": "abnormal",
+              "label": "发现异常",
+              "outcome": { "kind": "boundary", "label": "停止通电，记录异常位置与照片" }
+            }
+          ]
+        },
+        {
+          "step_id": "vbat_check",
+          "label": "基础供电",
+          "prompt": "VBAT1 电压是否位于资料范围？",
+          "target_component_id": "KM4-MAIN-VBAT1",
+          "measurements": [
+            {
+              "measurement_id": "vbat1-voltage",
+              "label": "VBAT1 电压",
+              "unit": "V",
+              "input_step": 0.01,
+              "required": true,
+              "reference": { "kind": "range", "min": 3.4, "max": 4.35 }
+            }
+          ],
+          "choices": [
+            {
+              "value": "normal",
+              "label": "范围内",
+              "outcome": { "kind": "handoff", "flow_id": "no-power-small-current-page-10", "label": "进入不开机排查" }
+            },
+            {
+              "value": "abnormal",
+              "label": "范围外",
+              "outcome": { "kind": "boundary", "label": "基础供电异常，保留测量记录并检查电源管理区域", "target_component_id": "KM4-MAIN-U2001" }
+            }
           ]
         }
       ]

@@ -29,6 +29,7 @@ import {
   recordSelectionIntent,
 } from './model-interaction-state.js';
 import { resolveBoardInteractionMode } from './board-pan-state.js';
+import { buildRepairEntryOptions, resolveRepairEntryIntent } from './repair-entry-state.js';
 import {
   createRepairGuidance,
   guidanceProgress,
@@ -45,6 +46,7 @@ import {
   recordRepairFlowPostActionCheck,
   recordRepairFlowMeasurement,
   repairFlowMeasurementsComplete,
+  repairFlowMeasurementAssessment,
   repairFlowProgress,
   repairFlowTargetComponentId,
   repairFlowTrail,
@@ -164,7 +166,7 @@ function guidanceResultCopy(guidance) {
 
 function matchingRepairFlow(entity, guidance) {
   const active = data?.repair_flows?.find((flow) => flow.flow_id === activeRepairFlowId);
-  if (active && active.fault === guidance.selectedFault) {
+  if (active && (active.entry_type === 'precheck' || active.fault === guidance.selectedFault)) {
     const state = repairFlowById.get(active.flow_id) || createRepairFlowState(active);
     const target = repairFlowTargetComponentId(active, state);
     if (target === entity.component_id) return active;
@@ -172,13 +174,56 @@ function matchingRepairFlow(entity, guidance) {
   const entry = data?.repair_flows?.find((flow) => (
     flow.entry_component_id === entity.component_id && flow.fault === guidance.selectedFault
   )) || null;
-  if (entry) activeRepairFlowId = entry.flow_id;
+  if (entry) {
+    activeRepairFlowId = entry.flow_id;
+    renderRepairEntry();
+  }
   return entry;
+}
+
+function renderRepairEntry() {
+  const options = document.querySelector('#repairEntryOptions');
+  if (!options || !data) return;
+  options.replaceChildren();
+  buildRepairEntryOptions(data.repair_flows, activeRepairFlowId).forEach((entry) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.dataset.flowId = entry.flowId;
+    button.dataset.entryType = entry.type;
+    button.textContent = entry.label;
+    button.setAttribute('aria-pressed', String(entry.active));
+    button.addEventListener('click', () => { void startRepairEntry(entry.flowId); });
+    options.append(button);
+  });
+}
+
+async function startRepairEntry(flowId) {
+  const intent = resolveRepairEntryIntent(data?.repair_flows, flowId);
+  const flow = data.repair_flows.find((candidate) => candidate.flow_id === intent.flowId);
+  if (!repairFlowById.has(flow.flow_id)) repairFlowById.set(flow.flow_id, createRepairFlowState(flow));
+  activeRepairFlowId = flow.flow_id;
+  renderRepairEntry();
+  await selectEntity(intent.targetComponentId);
 }
 
 function applyRepairFlowState(flow, next, entity) {
   repairFlowById.set(flow.flow_id, next);
+  if (next.terminal?.kind === 'handoff') {
+    const targetFlow = data.repair_flows.find((candidate) => candidate.flow_id === next.terminal.flowId);
+    if (!targetFlow) throw new Error(`Unknown repair flow handoff: ${next.terminal.flowId}`);
+    if (!repairFlowById.has(targetFlow.flow_id)) {
+      repairFlowById.set(targetFlow.flow_id, createRepairFlowState(targetFlow));
+    }
+    activeRepairFlowId = targetFlow.flow_id;
+    renderRepairEntry();
+    const targetState = repairFlowById.get(targetFlow.flow_id);
+    const targetId = repairFlowTargetComponentId(targetFlow, targetState);
+    if (targetId === entity.component_id) renderComponentGuidance(entity);
+    else void selectEntity(targetId);
+    return;
+  }
   activeRepairFlowId = flow.flow_id;
+  renderRepairEntry();
   const target = repairFlowTargetComponentId(flow, next);
   if (target && target !== entity.component_id) {
     void selectEntity(target);
@@ -327,11 +372,17 @@ function renderRepairFlow(entity, guidance) {
       measurementFields.append(row);
     });
     const measurementsComplete = repairFlowMeasurementsComplete(flow, state);
+    const measurementAssessment = repairFlowMeasurementAssessment(flow, state);
     const measurementStatus = document.querySelector('#repairFlowMeasurementStatus');
     measurementStatus.dataset.complete = String(measurementsComplete);
-    measurementStatus.textContent = measurementsComplete
-      ? '本步测量已记录。资料未提供容差，请依据来源判断正常或异常。'
-      : `需记录本步 ${step.measurements?.filter((measurement) => measurement.required !== false).length || 0} 项测量后再选择结果。`;
+    measurementStatus.dataset.assessment = measurementAssessment?.result || 'unassessed';
+    measurementStatus.textContent = !measurementsComplete
+      ? `需记录本步 ${step.measurements?.filter((measurement) => measurement.required !== false).length || 0} 项测量后再选择结果。`
+      : measurementAssessment?.result === 'within_range'
+        ? `${measurementAssessment.values.join('、')} 位于资料范围内；请选择“范围内”继续。`
+        : measurementAssessment?.result === 'outside_range'
+          ? `${measurementAssessment.values.join('、')} 位于资料范围外；请选择“范围外”继续。`
+          : '本步测量已记录。资料未提供容差，请依据来源判断正常或异常。';
     document.querySelector('#repairFlowRecordMeasurements').onclick = () => {
       let next = repairFlowById.get(flow.flow_id);
       const inputs = [...measurementFields.querySelectorAll('[data-flow-measurement]')];
@@ -345,7 +396,12 @@ function renderRepairFlow(entity, guidance) {
       const button = document.createElement('button');
       button.type = 'button';
       button.textContent = choice.label;
-      button.disabled = !measurementsComplete;
+      button.disabled = !measurementsComplete || Boolean(
+        measurementAssessment && choice.value !== measurementAssessment.choiceValue
+      );
+      if (measurementAssessment && choice.value !== measurementAssessment.choiceValue) {
+        button.title = '当前记录值与此资料范围结果不一致';
+      }
       button.addEventListener('click', () => {
         const next = answerRepairFlow(flow, repairFlowById.get(flow.flow_id), choice.value);
         applyRepairFlowState(flow, next, entity);
@@ -750,7 +806,11 @@ function renderComponentGuidance(entity) {
     const button = document.createElement('button');
     button.type = 'button';
     button.textContent = FAULT_LABELS[fault] || fault;
-    button.setAttribute('aria-pressed', String(fault === guidance.selectedFault));
+    const activeFlow = data.repair_flows.find((flow) => flow.flow_id === activeRepairFlowId);
+    const activeState = activeFlow && repairFlowById.get(activeFlow.flow_id);
+    const activeTarget = activeFlow && repairFlowTargetComponentId(activeFlow, activeState || createRepairFlowState(activeFlow));
+    const displayedFault = activeTarget === entity.component_id ? activeFlow.fault : guidance.selectedFault;
+    button.setAttribute('aria-pressed', String(fault === displayedFault));
     button.addEventListener('click', () => {
       const next = selectGuidanceFault(repairGuidanceByComponent.get(entity.component_id), fault);
       repairGuidanceByComponent.set(entity.component_id, next);
@@ -963,6 +1023,7 @@ async function init() {
     });
     list.append(button);
   });
+  renderRepairEntry();
   selectEntity(data.entities[0].component_id, { explicit: false });
 }
 

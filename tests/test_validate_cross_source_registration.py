@@ -68,10 +68,28 @@ class CrossSourceRegistrationTests(unittest.TestCase):
     def test_committed_repair_flows_preserve_reviewed_entries(self):
         data = json.loads((ROOT / "knowledge-base/km4-cross-source-registration.json").read_text(encoding="utf-8"))
         flows = {flow["flow_id"]: flow for flow in data["repair_flows"]}
-        self.assertEqual(set(flows), {"not-charging-page-14-reviewed", "no-power-small-current-page-10"})
+        self.assertEqual(set(flows), {
+            "not-charging-page-14-reviewed",
+            "no-power-small-current-page-10",
+            "unknown-basic-check-reviewed",
+        })
+        self.assertEqual(
+            [flow["entry_label"] for flow in sorted(flows.values(), key=lambda flow: flow["entry_order"])],
+            ["不开机", "不充电", "还不确定，先做初步主板排查"],
+        )
         small_current = flows["no-power-small-current-page-10"]
         self.assertEqual(small_current["entry_component_id"], "KM4-MAIN-U4000")
         self.assertEqual([item["reference"]["value"] for item in small_current["steps"][0]["measurements"]], [1.15, 3.3])
+        basic_check = flows["unknown-basic-check-reviewed"]
+        self.assertEqual(basic_check["entry_type"], "precheck")
+        self.assertEqual(basic_check["steps"][0]["choices"][1]["outcome"]["kind"], "boundary")
+        self.assertEqual(basic_check["steps"][1]["target_component_id"], "KM4-MAIN-VBAT1")
+        self.assertEqual(basic_check["steps"][1]["measurements"][0]["reference"], {
+            "kind": "range", "min": 3.4, "max": 4.35,
+        })
+        self.assertEqual(basic_check["steps"][1]["choices"][0]["outcome"], {
+            "kind": "handoff", "flow_id": "no-power-small-current-page-10", "label": "进入不开机排查",
+        })
 
     def test_rejects_out_of_range_geometry(self):
         data = json.loads((ROOT / "knowledge-base/km4-cross-source-registration.json").read_text(encoding="utf-8"))

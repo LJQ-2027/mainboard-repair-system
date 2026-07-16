@@ -88,12 +88,18 @@ def validate_dataset(data, root):
                     errors.append(f"{entity_id} nominal measurement requires a numeric value")
             elif reference_kind != "record_only":
                 errors.append(f"{entity_id} measurement reference kind is unsupported")
+    repair_flows = data.get("repair_flows", [])
+    declared_flow_ids = {flow.get("flow_id") for flow in repair_flows if flow.get("flow_id")}
     flow_ids = set()
-    for flow in data.get("repair_flows", []):
+    for flow in repair_flows:
         flow_id = flow.get("flow_id")
         if not flow_id or flow_id in flow_ids:
             errors.append(f"duplicate or missing repair flow identity: {flow_id}")
         flow_ids.add(flow_id)
+        if not flow.get("entry_label") or flow.get("entry_type") not in ("known_fault", "precheck"):
+            errors.append(f"{flow_id} flow entry requires a label and supported type")
+        if not isinstance(flow.get("entry_order"), int) or isinstance(flow.get("entry_order"), bool):
+            errors.append(f"{flow_id} flow entry order must be an integer")
         entry_component_id = flow.get("entry_component_id")
         if entry_component_id not in identities:
             errors.append(f"{flow_id} flow component must resolve to a reviewed entity")
@@ -144,6 +150,9 @@ def validate_dataset(data, root):
                 if kind == "next":
                     if outcome.get("step_id") not in step_id_set:
                         errors.append(f"{flow_id}/{step_id} flow destination is outside the graph")
+                elif kind == "handoff":
+                    if outcome.get("flow_id") not in declared_flow_ids or not outcome.get("label"):
+                        errors.append(f"{flow_id}/{step_id} flow handoff must resolve to a reviewed flow")
                 elif kind in ("action", "boundary"):
                     if not outcome.get("label"):
                         errors.append(f"{flow_id}/{step_id} flow terminal requires a label")

@@ -10,6 +10,7 @@ import {
   recordRepairFlowPostActionCheck,
   recordRepairFlowMeasurement,
   repairFlowMeasurementsComplete,
+  repairFlowMeasurementAssessment,
   repairFlowProgress,
   repairFlowTargetComponentId,
   repairFlowTrail,
@@ -179,6 +180,29 @@ test('an ambiguous source branch stops at an explicit boundary terminal', () => 
   assert.deepEqual(terminal.terminal, { kind: 'boundary', label: '后续 Y/N 标注待复核' });
 });
 
+test('a handoff outcome preserves the completed preliminary trail and declares the next reviewed flow', () => {
+  const preliminary = {
+    flow_id: 'unknown-basic-check',
+    entry_step_id: 'visual',
+    steps: [{
+      step_id: 'visual',
+      prompt: '外观是否正常？',
+      choices: [{
+        value: 'normal',
+        label: '未发现异常',
+        outcome: { kind: 'handoff', flow_id: 'no-power', label: '进入不开机排查' },
+      }],
+    }],
+  };
+  const handedOff = answerRepairFlow(preliminary, createRepairFlowState(preliminary), 'normal');
+  assert.deepEqual(handedOff.history, [{ stepId: 'visual', choice: 'normal' }]);
+  assert.deepEqual(handedOff.terminal, {
+    kind: 'handoff',
+    flowId: 'no-power',
+    label: '进入不开机排查',
+  });
+});
+
 test('a measured step cannot advance until every required source value is recorded', () => {
   const measuredProfile = {
     flow_id: 'small-current',
@@ -204,4 +228,33 @@ test('a measured step cannot advance until every required source value is record
   assert.equal(answerRepairFlow(measuredProfile, complete, 'normal').terminal.label, '下一来源动作');
   assert.throws(() => recordRepairFlowMeasurement(measuredProfile, initial, 'unknown', 1));
   assert.throws(() => recordRepairFlowMeasurement(measuredProfile, initial, 'vddcore', 'bad'));
+});
+
+test('a source range recommends only the matching declared result', () => {
+  const rangedProfile = {
+    flow_id: 'basic-power',
+    entry_step_id: 'vbat',
+    steps: [{
+      step_id: 'vbat',
+      prompt: 'VBAT1 是否位于范围？',
+      measurements: [{
+        measurement_id: 'vbat1', label: 'VBAT1', unit: 'V', input_step: 0.01, required: true,
+        reference: { kind: 'range', min: 3.4, max: 4.35 },
+      }],
+      choices: [
+        { value: 'normal', label: '范围内', outcome: { kind: 'action', label: '继续' } },
+        { value: 'abnormal', label: '范围外', outcome: { kind: 'boundary', label: '停止' } },
+      ],
+    }],
+  };
+  const initial = createRepairFlowState(rangedProfile);
+  assert.equal(repairFlowMeasurementAssessment(rangedProfile, initial), null);
+  const within = recordRepairFlowMeasurement(rangedProfile, initial, 'vbat1', 3.9);
+  assert.deepEqual(repairFlowMeasurementAssessment(rangedProfile, within), {
+    result: 'within_range', choiceValue: 'normal', values: ['3.9 V'],
+  });
+  const outside = recordRepairFlowMeasurement(rangedProfile, initial, 'vbat1', 2.8);
+  assert.deepEqual(repairFlowMeasurementAssessment(rangedProfile, outside), {
+    result: 'outside_range', choiceValue: 'abnormal', values: ['2.8 V'],
+  });
 });

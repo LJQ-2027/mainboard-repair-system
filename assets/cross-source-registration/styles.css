@@ -354,6 +354,17 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) clamp(360px, 27vw, 4
 }
 
 .evidence { overflow: auto; background: var(--panel); padding: 20px; }
+.evidence .repair-entry { margin: 0 0 18px; padding: 0 0 16px; border-bottom: 1px solid var(--line); }
+.repair-entry header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.repair-entry header span { color: #177d69; font-size: 9px; font-weight: 700; text-transform: uppercase; }
+.repair-entry header h2 { margin: 0; color: var(--ink); font-size: 14px; }
+.repair-entry-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 10px; }
+.repair-entry-options button { min-width: 0; min-height: 36px; border: 1px solid #9faaa3; border-right: 0; background: white; padding: 6px 10px; color: #34423c; font: inherit; font-size: 11px; cursor: pointer; }
+.repair-entry-options button:nth-child(2) { border-right: 1px solid #9faaa3; }
+.repair-entry-options button[data-entry-type="precheck"] { grid-column: 1 / -1; margin-top: 6px; border-right: 1px solid #9faaa3; text-align: left; }
+.repair-entry-options button:hover { border-color: #177d69; background: #edf7f2; color: #145c4d; }
+.repair-entry-options button[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: white; }
+.repair-entry-options button:focus-visible { position: relative; z-index: 1; outline: 3px solid #65a9ff; outline-offset: 2px; }
 .entity-heading {
   position: sticky;
   top: 0;
@@ -456,6 +467,7 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) clamp(360px, 27vw, 4
 .repair-flow-measurements > button { width: 100%; min-height: 30px; margin-top: 8px; border: 1px solid var(--ink); background: var(--ink); color: white; font: inherit; font-size: 9px; cursor: pointer; }
 .repair-flow-measurements > p { margin: 6px 0 0; color: var(--muted); font-size: 9px; line-height: 1.4; }
 .repair-flow-measurements > p[data-complete="true"] { color: #177d69; }
+.repair-flow-measurements > p[data-assessment="outside_range"] { color: #a43d2b; }
 .repair-flow-measurement input:focus-visible,
 .repair-flow-measurements > button:focus-visible { outline: 3px solid #65a9ff; outline-offset: 2px; }
 .repair-flow-choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 10px; }

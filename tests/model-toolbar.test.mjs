@@ -29,6 +29,9 @@ test('entity facts expose the board side instead of normalized registration coor
 });
 
 test('repair workflow copy separates technician actions from collapsed source evidence', () => {
+  assert.match(toolbarMarkup, /<section class="repair-entry" id="repairEntry"/);
+  assert.match(toolbarMarkup, /<div class="repair-entry-options" id="repairEntryOptions"/);
+  assert.match(appSource, /buildRepairEntryOptions\(data\.repair_flows, activeRepairFlowId\)/);
   assert.match(toolbarMarkup, /<span>排查路径<\/span>/);
   assert.match(toolbarMarkup, /<strong>检测指导<\/strong>/);
   assert.match(toolbarMarkup, /<summary>资料依据<\/summary>/);

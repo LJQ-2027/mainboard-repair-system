@@ -65,7 +65,17 @@ export function answerRepairFlow(profile, state, choiceValue) {
       postActionCheck: null,
     };
   }
-  throw new Error('Repair flow outcome must be a declared next step, action, or source boundary');
+  if (outcome.kind === 'handoff' && outcome.flow_id && outcome.label) {
+    return {
+      ...state,
+      currentStepId: null,
+      history,
+      terminal: { kind: 'handoff', flowId: outcome.flow_id, label: outcome.label },
+      actionExecution: null,
+      postActionCheck: null,
+    };
+  }
+  throw new Error('Repair flow outcome must be a declared next step, action, handoff, or source boundary');
 }
 
 export function backRepairFlow(profile, state) {
@@ -153,6 +163,25 @@ export function repairFlowMeasurementsComplete(profile, state) {
   const required = (step.measurements || []).filter((measurement) => measurement.required !== false);
   const values = state.measurements?.[step.step_id] || {};
   return required.every((measurement) => Number.isFinite(values[measurement.measurement_id]));
+}
+
+export function repairFlowMeasurementAssessment(profile, state) {
+  const step = currentRepairFlowStep(profile, state);
+  if (!step || !repairFlowMeasurementsComplete(profile, state)) return null;
+  const measurements = step.measurements || [];
+  if (!measurements.length || measurements.some((measurement) => measurement.reference?.kind !== 'range')) return null;
+  const recorded = state.measurements?.[step.step_id] || {};
+  const outside = measurements.some((measurement) => {
+    const value = recorded[measurement.measurement_id];
+    return value < measurement.reference.min || value > measurement.reference.max;
+  });
+  const choiceValue = outside ? 'abnormal' : 'normal';
+  if (!step.choices?.some((choice) => choice.value === choiceValue)) return null;
+  return {
+    result: outside ? 'outside_range' : 'within_range',
+    choiceValue,
+    values: measurements.map((measurement) => `${recorded[measurement.measurement_id]} ${measurement.unit}`),
+  };
 }
 
 export function recordRepairFlowMeasurement(profile, state, measurementId, rawValue) {
