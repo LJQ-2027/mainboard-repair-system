@@ -1,0 +1,81 @@
+{
+  "registry_id": "BOARD-COMPILER-PROFILES-V1",
+  "profiles": [
+    {
+      "profile_id": "km4-f151",
+      "model": "KM4",
+      "board_id": "BOARD-KM4-F151-MAIN-V1.2",
+      "board_version": "F151_MAIN_PCB_V1.2",
+      "component_prefix": "KM4-F151",
+      "point_map_source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/F151_MAIN_PCB_V1.2_位号图.pdf",
+      "schematic_source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/F151_MAIN_PCB_1_维修原理图_V1.2_20250310.pdf",
+      "default_side_id": "main_page_2",
+      "side_manifest_output": "knowledge-base/km4-board-sides.json",
+      "schematic_output": "knowledge-base/km4-schematic-compiled.json",
+      "cross_source_output": "knowledge-base/km4-cross-source-registration.json",
+      "reviewed_designators": ["U2001", "U4000", "X2100", "U0600", "J6101", "VBAT1", "VBUS1"],
+      "visual_reference": {
+        "path": "assets/vision-reference-gallery/km4/embedded/page-010-image-05.jpg",
+        "accuracy_boundary": "Installed shield-side service-manual context; not an isolated two-side board pair."
+      },
+      "sides": [
+        {
+          "side_id": "main_page_1",
+          "label": "第1面",
+          "source_pdf_page": 1,
+          "engineering_texture": "assets/board-atlas/km4-f151/main-point-map-page-1.png",
+          "compiled_data": "knowledge-base/km4-board-compiled-page-1.json",
+          "source_crop": {"x": 0.13349, "y": 0.26528, "width": 0.73302, "height": 0.66085},
+          "required_designators": []
+        },
+        {
+          "side_id": "main_page_2",
+          "label": "第2面",
+          "source_pdf_page": 2,
+          "engineering_texture": "assets/board-atlas/km4-f151/main-point-map-page-2.png",
+          "compiled_data": "knowledge-base/km4-board-compiled.json",
+          "source_crop": {"x": 0.13444, "y": 0.27065, "width": 0.73159, "height": 0.65749},
+          "required_designators": ["U2001", "U4000", "X2100", "U0600", "J6101", "VBAT1", "VBUS1"]
+        }
+      ]
+    },
+    {
+      "profile_id": "kl4-f201",
+      "model": "KL4",
+      "board_id": "BOARD-KL4-F201-MAIN-V1.2",
+      "board_version": "F201_MAIN_V1.2",
+      "component_prefix": "KL4-F201",
+      "point_map_source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KL4-F201/F201_MAIN_V1.2_零件位号.pdf",
+      "schematic_source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KL4-F201/K6735_F201_MAIN_SCH_V1.2维修原理图20240614.pdf",
+      "default_side_id": "main_page_2",
+      "side_manifest_output": "knowledge-base/kl4-board-sides.json",
+      "schematic_output": "knowledge-base/kl4-schematic-compiled.json",
+      "cross_source_output": "knowledge-base/kl4-cross-source-registration.json",
+      "reviewed_designators": ["U1001", "U2001", "X2100", "VDDCORE", "VDDEMMCCORE"],
+      "visual_reference": {
+        "path": "assets/vision-reference-gallery/kl4/embedded/page-010-image-02.jpg",
+        "accuracy_boundary": "Installed main-board service-manual context; not an isolated two-side board pair."
+      },
+      "sides": [
+        {
+          "side_id": "main_page_1",
+          "label": "第1面",
+          "source_pdf_page": 1,
+          "engineering_texture": "assets/board-atlas/kl4-f201/main-point-map-page-1.png",
+          "compiled_data": "knowledge-base/kl4-board-compiled-page-1.json",
+          "source_crop": {"x": 0, "y": 0, "width": 1, "height": 1},
+          "required_designators": []
+        },
+        {
+          "side_id": "main_page_2",
+          "label": "第2面",
+          "source_pdf_page": 2,
+          "engineering_texture": "assets/board-atlas/kl4-f201/main-point-map-page-2.png",
+          "compiled_data": "knowledge-base/kl4-board-compiled.json",
+          "source_crop": {"x": 0, "y": 0, "width": 1, "height": 1},
+          "required_designators": ["U1001", "U2001", "X2100"]
+        }
+      ]
+    }
+  ]
+}
