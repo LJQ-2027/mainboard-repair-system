@@ -47,6 +47,11 @@ test('repair workflow uses one framed work surface with readable execution state
   assert.match(stylesSource, /\.repair-flow-source-details \{[^}]*font-size:\s*10px/);
 });
 
+test('desktop evidence column expands only when the workspace can afford it', () => {
+  assert.match(stylesSource, /main \{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) clamp\(360px, 27vw, 420px\)/);
+  assert.match(stylesSource, /@media \(max-width: 960px\)[\s\S]*main \{ display: block; height: auto; \}/);
+});
+
 test('board side selection has one explicit control path without a duplicate flip action', () => {
   assert.equal((toolbarMarkup.match(/data-side-id=/g) || []).length, 2);
   assert.doesNotMatch(toolbarMarkup, /id="flipSide"|class="side-flip"|>⇄</);
