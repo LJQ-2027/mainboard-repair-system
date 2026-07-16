@@ -1,4 +1,5 @@
 import * as THREE from '../vendor/three/three.module.min.js';
+import { technicianEntityCopy } from './technician-copy.js';
 import {
   BOARD_WORLD_SIZE,
   buildCameraFrame,
@@ -1073,10 +1074,11 @@ export class BoardRenderer {
   updateHoverTooltipContent(componentId) {
     const entity = this.entities.find((candidate) => candidate.component_id === componentId);
     if (!entity) return;
+    const display = technicianEntityCopy(entity);
     const designator = document.createElement('strong');
     designator.textContent = entity.designator;
     const name = document.createElement('span');
-    name.textContent = entity.name;
+    name.textContent = display.name;
     const children = [designator, name];
     if (componentId === this.selectedComponentId && entity.inspection_profile?.profile_id) {
       const action = document.createElement('em');

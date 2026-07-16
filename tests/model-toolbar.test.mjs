@@ -15,7 +15,10 @@ test('model toolbar keeps source-driven focus without a manual module overlay se
 
 test('view labels use technician language instead of registration internals', () => {
   assert.match(toolbarMarkup, /data-view="photo">主板实物参考<\/button>/);
+  assert.match(toolbarMarkup, /已选机型 · 工程资料已关联/);
+  assert.match(toolbarMarkup, /2\.5D 维修视图/);
   assert.doesNotMatch(toolbarMarkup, /实体代理图/);
+  assert.doesNotMatch(toolbarMarkup, /KNOWN BOARD|SOURCE-LINKED|维修级 2\.5D V2/);
 });
 
 test('entity facts expose the board side instead of normalized registration coordinates', () => {

@@ -5,6 +5,7 @@ import { PointMapViewport } from './point-map-viewport.js';
 import { buildSourceNote } from './source-note-state.js';
 import { buildEntityAccessState } from './entity-access-state.js';
 import { mergeCompiledSchematicLinks } from './source-links.js';
+import { technicianEntityCopy, technicianInstruction } from './technician-copy.js';
 import { extractModuleRegions, extractShieldRegions } from './anatomy-state.js';
 import {
   buildEntityTarget,
@@ -667,6 +668,7 @@ function activateRepairTarget() {
 function addMarkers(layer, positions, entities) {
   const fragment = document.createDocumentFragment();
   entities.forEach((entity) => {
+    const display = technicianEntityCopy(entity);
     const point = positions.get(entity.component_id);
     const button = document.createElement('button');
     button.className = 'marker';
@@ -682,8 +684,8 @@ function addMarkers(layer, positions, entities) {
     label.textContent = entity.designator;
     label.setAttribute('aria-hidden', 'true');
     button.append(dot, label);
-    button.title = `${entity.designator} · ${entity.name}`;
-    button.setAttribute('aria-label', `选择 ${entity.designator} ${entity.name}`);
+    button.title = `${entity.designator} · ${display.name}`;
+    button.setAttribute('aria-label', `选择 ${entity.designator} ${display.name}`);
     button.addEventListener('click', (event) => {
       let componentId = entity.component_id;
       if (event.detail > 0) {
@@ -742,7 +744,7 @@ function renderComponentGuidance(entity) {
   const progress = guidanceProgress(guidance);
   document.querySelector('#guidanceProgress').textContent = `${progress.completed} / ${progress.total}`;
   document.querySelector('#inspectionStepLabel').textContent = `检测步骤 1 / ${progress.total}`;
-  document.querySelector('#inspectionMethod').textContent = step.instruction;
+  document.querySelector('#inspectionMethod').textContent = technicianInstruction(step.instruction);
   document.querySelector('#inspectionSource').textContent = `${step.source} · ${step.page}`;
   const repairFlowActive = renderRepairFlow(entity, guidance);
   renderActiveFlowReturn(entity, repairFlowActive);
@@ -780,11 +782,12 @@ async function selectEntity(componentId, options = {}) {
   modelInteraction = recordSelectionIntent(modelInteraction, options.explicit !== false);
   selectedId = componentId;
   const state = buildSelectionState(entity, matrix);
+  const display = technicianEntityCopy(entity);
   document.querySelectorAll('[data-component-id]').forEach((node) => node.classList.toggle('selected', node.dataset.componentId === componentId));
-  document.querySelector('#entityCategory').textContent = entity.category.replaceAll('_', ' ');
+  document.querySelector('#entityCategory').textContent = display.category;
   document.querySelector('#entityDesignator').textContent = entity.designator;
-  document.querySelector('#entityName').textContent = entity.name;
-  document.querySelector('#entityModule').textContent = entity.module;
+  document.querySelector('#entityName').textContent = display.name;
+  document.querySelector('#entityModule').textContent = display.module;
   document.querySelector('#entitySide').textContent = sideDataById.get(entity.side_id)?.label || entity.side_id;
   document.querySelector('#schematicEvidence').innerHTML = entity.schematic_links.map((link) => evidenceCard(link, 'schematic')).join('');
   document.querySelector('#repairEvidence').innerHTML = entity.repair_links.map((link) => evidenceCard(link, 'repair')).join('');
@@ -926,10 +929,11 @@ async function init() {
   updateSourceNote();
   const list = document.querySelector('#entityList');
   data.entities.forEach((entity) => {
+    const display = technicianEntityCopy(entity);
     const button = document.createElement('button');
     button.type = 'button';
     button.dataset.componentId = entity.component_id;
-    button.innerHTML = `<strong>${entity.designator}</strong>${entity.module}`;
+    button.innerHTML = `<strong>${entity.designator}</strong>${display.module}`;
     button.addEventListener('click', async () => {
       await selectEntity(entity.component_id);
       revealModelAfterEntityListSelection();
