@@ -1,5 +1,7 @@
 import { projectPoint } from './registration-core.js';
 
+const STACKED_WORKSPACE_MAX_WIDTH = 1100;
+
 export function buildSelectionState(entity, registrationMatrix) {
   return {
     componentId: entity.component_id,
@@ -33,7 +35,7 @@ export function entityListModelRevealOptions({
   viewportWidth,
   reducedMotion = false,
 }) {
-  if (activeView !== 'model' || viewportWidth > 820) return null;
+  if (activeView !== 'model' || viewportWidth > STACKED_WORKSPACE_MAX_WIDTH) return null;
   return {
     behavior: reducedMotion ? 'auto' : 'smooth',
     block: 'start',

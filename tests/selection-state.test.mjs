@@ -55,15 +55,20 @@ test('entity list selection reveals the model workspace only on narrow model vie
   }), null);
   assert.equal(entityListModelRevealOptions({
     activeView: 'model',
-    viewportWidth: 821,
+    viewportWidth: 1101,
     reducedMotion: false,
   }), null);
-});
-
-test('entity list model reveal respects reduced motion and includes the mobile breakpoint', () => {
   assert.deepEqual(entityListModelRevealOptions({
     activeView: 'model',
-    viewportWidth: 820,
+    viewportWidth: 1024,
+    reducedMotion: false,
+  }), { behavior: 'smooth', block: 'start' });
+});
+
+test('entity list model reveal respects reduced motion and includes the stacked-workspace breakpoint', () => {
+  assert.deepEqual(entityListModelRevealOptions({
+    activeView: 'model',
+    viewportWidth: 1100,
     reducedMotion: true,
   }), { behavior: 'auto', block: 'start' });
 });
