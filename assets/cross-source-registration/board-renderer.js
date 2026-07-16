@@ -4,6 +4,7 @@ import {
   BOARD_WORLD_SIZE,
   buildCameraFrame,
   buildDefaultBoardRotation,
+  buildEngineeringSurfacePresentation,
   buildFocusFrame,
   buildRenderDescriptor,
   buildSelectionRadius,
@@ -36,9 +37,10 @@ import {
   resolveAffordancePresentation,
 } from './component-affordance-state.js';
 
+const ENGINEERING_SURFACE = buildEngineeringSurfacePresentation();
 const COLORS = {
-  board: 0x17473e,
-  boardEdge: 0xb4823a,
+  board: ENGINEERING_SURFACE.boardColor,
+  boardEdge: ENGINEERING_SURFACE.boardEdgeColor,
   copper: 0xc99149,
   dark: 0x202927,
   ink: 0x111816,
@@ -584,7 +586,7 @@ export class BoardRenderer {
     const surfaceMaterial = new THREE.MeshBasicMaterial({
       color: 0xffffff,
       transparent: true,
-      opacity: 0.88,
+      opacity: ENGINEERING_SURFACE.surfaceOpacity,
       blending: THREE.MultiplyBlending,
       premultipliedAlpha: true,
       depthWrite: false,

@@ -34,6 +34,14 @@ function clamp(value, minimum, maximum) {
   return Math.max(minimum, Math.min(maximum, value));
 }
 
+export function buildEngineeringSurfacePresentation() {
+  return {
+    boardColor: 0x285e51,
+    boardEdgeColor: 0xb4823a,
+    surfaceOpacity: 0.76,
+  };
+}
+
 export function resolvePackageFamily(category) {
   return FAMILY_BY_CATEGORY[category] || 'generic';
 }

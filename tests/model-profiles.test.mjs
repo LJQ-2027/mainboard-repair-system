@@ -4,12 +4,21 @@ import assert from 'node:assert/strict';
 import {
   buildCameraFrame,
   buildDefaultBoardRotation,
+  buildEngineeringSurfacePresentation,
   buildFocusFrame,
   buildRenderDescriptor,
   buildSelectionRadius,
   buildUnresolvedMarkerPresentation,
   resolvePackageFamily,
 } from '../assets/cross-source-registration/model-profiles.js';
+
+test('engineering surface stays readable without washing out elevated packages', () => {
+  assert.deepEqual(buildEngineeringSurfacePresentation(), {
+    boardColor: 0x285e51,
+    boardEdgeColor: 0xb4823a,
+    surfaceOpacity: 0.76,
+  });
+});
 
 function component(category, confidence, size = { x: 0.04, y: 0.06 }) {
   return {
