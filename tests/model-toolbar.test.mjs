@@ -38,7 +38,7 @@ test('repair workflow copy separates technician actions from collapsed source ev
   assert.match(appSource, /faultGroup\.hidden = repairFlowActive/);
   assert.doesNotMatch(appSource, /const entry = data\?\.repair_flows\?\.find/);
   assert.match(toolbarMarkup, /<span>当前任务<\/span>/);
-  assert.match(toolbarMarkup, /<strong>检测指导<\/strong>/);
+  assert.match(toolbarMarkup, /<strong id="inspectionSummaryLabel">检测指导<\/strong>/);
   assert.match(toolbarMarkup, /<summary>资料依据<\/summary>/);
   assert.doesNotMatch(toolbarMarkup, /来源分支|来源检测指导/);
   assert.doesNotMatch(appSource, /来源摘要|来源处理|来源步骤|来源资料/);
@@ -71,6 +71,17 @@ test('active repair target condenses repeated facts into the current-task summar
   assert.match(stylesSource, /\.evidence\[data-repair-flow-active="true"\] \.entity-heading h2 \{[^}]*font-size:\s*24px/);
   assert.match(stylesSource, /\.repair-flow-position small \{[^}]*font-size:\s*9px/);
   assert.doesNotMatch(stylesSource, /\.evidence\[data-repair-flow-active="true"\] \.entity-heading \{[^}]*display:\s*none/);
+});
+
+test('measurement decisions expose one confirmed action and collapse repeated component guidance', () => {
+  assert.match(appSource, /buildRepairFlowChoiceOptions\(flow, state\)/);
+  assert.match(appSource, /choices\.hidden = !step \|\| !choiceOptions\.length/);
+  assert.match(toolbarMarkup, /<details class="repair-step source-summary" id="componentSourceSummary" open>/);
+  assert.match(appSource, /sourceSummary\.open = !repairFlowActive/);
+  assert.match(appSource, /sourceSummary\.dataset\.context = repairFlowActive \? 'flow' : 'component'/);
+  assert.match(appSource, /#inspectionStepLabel'\)\.textContent = '辅助资料'/);
+  assert.match(stylesSource, /\.source-summary summary::after \{[^}]*content:\s*'\+'/);
+  assert.match(stylesSource, /\.source-summary\[open\] summary::after \{[^}]*content:\s*'−'/);
 });
 
 test('source evidence stays available without occupying the default repair path', () => {

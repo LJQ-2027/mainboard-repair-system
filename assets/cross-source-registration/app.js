@@ -40,6 +40,7 @@ import {
 import {
   answerRepairFlow,
   backRepairFlow,
+  buildRepairFlowChoiceOptions,
   closeRepairFlow,
   createRepairFlowState,
   currentRepairFlowStep,
@@ -318,7 +319,7 @@ function renderRepairFlow(entity, guidance) {
   const progress = repairFlowProgress(flow, state);
   control.dataset.closed = String(state.closed);
   document.querySelector('#guidanceProgress').textContent = `${progress.current} / ${progress.total}`;
-  document.querySelector('#inspectionStepLabel').textContent = '检测摘要';
+  document.querySelector('#inspectionStepLabel').textContent = '辅助资料';
   document.querySelector('#repairFlowTitle').textContent = flow.title;
   document.querySelector('#repairFlowStep').textContent = state.closed
     ? `已结束 · ${progress.current} / ${progress.total}`
@@ -384,22 +385,25 @@ function renderRepairFlow(entity, guidance) {
       input.addEventListener('input', () => {
         measurementStatus.dataset.complete = 'false';
         measurementStatus.textContent = '输入已修改，请重新记录本步测量后再选择结果。';
-        choices.querySelectorAll('button').forEach((button) => { button.disabled = true; });
+        choices.hidden = true;
       });
       row.append(label, input, unit);
       measurementFields.append(row);
     });
     const measurementsComplete = repairFlowMeasurementsComplete(flow, state);
     const measurementAssessment = repairFlowMeasurementAssessment(flow, state);
+    const choiceOptions = buildRepairFlowChoiceOptions(flow, state);
+    choices.hidden = !step || !choiceOptions.length;
+    choices.dataset.mode = measurementAssessment ? 'confirmed-range' : 'technician-choice';
     const measurementStatus = document.querySelector('#repairFlowMeasurementStatus');
     measurementStatus.dataset.complete = String(measurementsComplete);
     measurementStatus.dataset.assessment = measurementAssessment?.result || 'unassessed';
     measurementStatus.textContent = !measurementsComplete
       ? `需记录本步 ${step.measurements?.filter((measurement) => measurement.required !== false).length || 0} 项测量后再选择结果。`
       : measurementAssessment?.result === 'within_range'
-        ? `${measurementAssessment.values.join('、')} 位于资料范围内；请选择“范围内”继续。`
+        ? `${measurementAssessment.values.join('、')} 位于资料范围内；确认后继续。`
         : measurementAssessment?.result === 'outside_range'
-          ? `${measurementAssessment.values.join('、')} 位于资料范围外；请选择“范围外”继续。`
+          ? `${measurementAssessment.values.join('、')} 位于资料范围外；确认后继续。`
           : '本步测量已记录。资料未提供容差，请依据来源判断正常或异常。';
     document.querySelector('#repairFlowRecordMeasurements').onclick = () => {
       let next = repairFlowById.get(flow.flow_id);
@@ -410,16 +414,11 @@ function renderRepairFlow(entity, guidance) {
       });
       applyRepairFlowState(flow, next, entity);
     };
-    step.choices.forEach((choice) => {
+    choiceOptions.forEach((choice) => {
       const button = document.createElement('button');
       button.type = 'button';
       button.textContent = choice.label;
-      button.disabled = !measurementsComplete || Boolean(
-        measurementAssessment && choice.value !== measurementAssessment.choiceValue
-      );
-      if (measurementAssessment && choice.value !== measurementAssessment.choiceValue) {
-        button.title = '当前记录值与此资料范围结果不一致';
-      }
+      button.dataset.confirmedByRange = String(choice.confirmedByRange);
       button.addEventListener('click', () => {
         const next = answerRepairFlow(flow, repairFlowById.get(flow.flow_id), choice.value);
         applyRepairFlowState(flow, next, entity);
@@ -849,6 +848,11 @@ function renderComponentGuidance(entity) {
   const repairFlowActive = renderRepairFlow(entity, guidance);
   guidanceRoot.dataset.repairFlowActive = String(repairFlowActive);
   evidenceRoot.dataset.repairFlowActive = String(repairFlowActive);
+  const sourceSummary = document.querySelector('#componentSourceSummary');
+  const sourceContext = repairFlowActive ? 'flow' : 'component';
+  if (sourceSummary.dataset.context !== sourceContext) sourceSummary.open = !repairFlowActive;
+  sourceSummary.dataset.context = repairFlowActive ? 'flow' : 'component';
+  document.querySelector('#inspectionSummaryLabel').textContent = repairFlowActive ? '器件检测参考' : '检测指导';
   faultGroup.hidden = repairFlowActive;
   document.querySelector('#guidanceContextLabel').textContent = repairFlowActive ? '当前维修路径' : '器件资料';
   document.querySelector('#guidanceTitle').textContent = repairFlowActive ? '故障排查' : '检测参考';

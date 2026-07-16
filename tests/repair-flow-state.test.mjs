@@ -4,6 +4,7 @@ import test from 'node:test';
 import {
   answerRepairFlow,
   backRepairFlow,
+  buildRepairFlowChoiceOptions,
   closeRepairFlow,
   createRepairFlowState,
   currentRepairFlowStep,
@@ -249,12 +250,43 @@ test('a source range recommends only the matching declared result', () => {
   };
   const initial = createRepairFlowState(rangedProfile);
   assert.equal(repairFlowMeasurementAssessment(rangedProfile, initial), null);
+  assert.deepEqual(buildRepairFlowChoiceOptions(rangedProfile, initial), []);
   const within = recordRepairFlowMeasurement(rangedProfile, initial, 'vbat1', 3.9);
   assert.deepEqual(repairFlowMeasurementAssessment(rangedProfile, within), {
     result: 'within_range', choiceValue: 'normal', values: ['3.9 V'],
   });
+  assert.deepEqual(buildRepairFlowChoiceOptions(rangedProfile, within).map(({ value, label }) => ({ value, label })), [
+    { value: 'normal', label: '确认范围内并继续' },
+  ]);
   const outside = recordRepairFlowMeasurement(rangedProfile, initial, 'vbat1', 2.8);
   assert.deepEqual(repairFlowMeasurementAssessment(rangedProfile, outside), {
     result: 'outside_range', choiceValue: 'abnormal', values: ['2.8 V'],
   });
+  assert.deepEqual(buildRepairFlowChoiceOptions(rangedProfile, outside).map(({ value, label }) => ({ value, label })), [
+    { value: 'abnormal', label: '确认范围外并继续' },
+  ]);
+});
+
+test('measurements without source tolerance retain every technician-judged result', () => {
+  const measuredProfile = {
+    flow_id: 'nominal-only',
+    entry_step_id: 'rail',
+    steps: [{
+      step_id: 'rail',
+      prompt: '电压是否正常？',
+      measurements: [{
+        measurement_id: 'rail', label: 'RAIL', unit: 'V', required: true,
+        reference: { kind: 'nominal', value: 1.8 },
+      }],
+      choices: [
+        { value: 'normal', label: '正常', outcome: { kind: 'action', label: '继续' } },
+        { value: 'abnormal', label: '异常', outcome: { kind: 'boundary', label: '复核' } },
+      ],
+    }],
+  };
+  const recorded = recordRepairFlowMeasurement(measuredProfile, createRepairFlowState(measuredProfile), 'rail', 1.79);
+  assert.deepEqual(buildRepairFlowChoiceOptions(measuredProfile, recorded).map(({ value, label }) => ({ value, label })), [
+    { value: 'normal', label: '正常' },
+    { value: 'abnormal', label: '异常' },
+  ]);
 });

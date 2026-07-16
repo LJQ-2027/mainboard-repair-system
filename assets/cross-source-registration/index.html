@@ -136,11 +136,10 @@
             <div id="repairFlowNavigation"><button id="repairFlowBack" type="button">上一步</button><button id="repairFlowReset" type="button">重新开始</button></div>
           </footer>
         </section>
-        <article class="repair-step source-summary">
-          <header><span id="inspectionStepLabel">检测步骤 1</span><strong>检测指导</strong></header>
-          <p id="inspectionMethod"></p>
-          <small id="inspectionSource"></small>
-        </article>
+        <details class="repair-step source-summary" id="componentSourceSummary" open>
+          <summary><span id="inspectionStepLabel">检测步骤 1</span><strong id="inspectionSummaryLabel">检测指导</strong></summary>
+          <div class="repair-step-content"><p id="inspectionMethod"></p><small id="inspectionSource"></small></div>
+        </details>
         <section class="measurement-control" id="measurementControl" hidden>
           <header><label for="guidanceMeasurementValue" id="measurementLabel">测量值</label><span id="measurementReference"></span></header>
           <div class="measurement-input-row">

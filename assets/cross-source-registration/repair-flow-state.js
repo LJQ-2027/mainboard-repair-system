@@ -165,6 +165,20 @@ export function repairFlowMeasurementsComplete(profile, state) {
   return required.every((measurement) => Number.isFinite(values[measurement.measurement_id]));
 }
 
+export function buildRepairFlowChoiceOptions(profile, state) {
+  const step = currentRepairFlowStep(profile, state);
+  if (!step || !repairFlowMeasurementsComplete(profile, state)) return [];
+  const assessment = repairFlowMeasurementAssessment(profile, state);
+  const choices = assessment
+    ? (step.choices || []).filter((choice) => choice.value === assessment.choiceValue)
+    : (step.choices || []);
+  return choices.map((choice) => ({
+    ...choice,
+    label: assessment ? `确认${choice.label}并继续` : choice.label,
+    confirmedByRange: Boolean(assessment),
+  }));
+}
+
 export function repairFlowMeasurementAssessment(profile, state) {
   const step = currentRepairFlowStep(profile, state);
   if (!step || !repairFlowMeasurementsComplete(profile, state)) return null;
