@@ -193,6 +193,11 @@ test('inspection status is a canvas-local return action using the shared exit pa
   assert.match(appSource, /#inspectionStatus'\)\.addEventListener\('click', \(\) => \{ void toggleComponentInspection\(\); \}\)/);
 });
 
+test('inspection Escape key uses the same application-owned return path', () => {
+  assert.match(rendererSource, /if \(action\.exit\) \{[\s\S]*this\.onInspectionExitRequest\(\)/);
+  assert.match(appSource, /\(\) => \{ void toggleComponentInspection\(\); \}/);
+});
+
 test('inspection mode hides board-only controls and keeps direct manipulation tools', () => {
   assert.match(appSource, /querySelector\('\.anatomy-panel'\)\.hidden = toolbar\.boardControlsHidden/);
   assert.match(appSource, /querySelector\('\.side-panel'\)\.hidden = toolbar\.boardControlsHidden/);

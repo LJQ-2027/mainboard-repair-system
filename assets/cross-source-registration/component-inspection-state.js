@@ -83,6 +83,7 @@ const INSPECTION_KEY_ACTIONS = Object.freeze({
   '-': Object.freeze({ zoomFactor: 0.9 }),
   _: Object.freeze({ zoomFactor: 0.9 }),
   Home: Object.freeze({ reset: true }),
+  Escape: Object.freeze({ exit: true }),
 });
 
 export function resolveInspectionKeyAction(key) {

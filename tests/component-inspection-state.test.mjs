@@ -149,5 +149,6 @@ test('inspection keyboard controls map only deliberate model commands', () => {
   assert.deepEqual(resolveInspectionKeyAction('+'), { zoomFactor: 1.1 });
   assert.deepEqual(resolveInspectionKeyAction('-'), { zoomFactor: 0.9 });
   assert.deepEqual(resolveInspectionKeyAction('Home'), { reset: true });
+  assert.deepEqual(resolveInspectionKeyAction('Escape'), { exit: true });
   assert.equal(resolveInspectionKeyAction('Tab'), null);
 });

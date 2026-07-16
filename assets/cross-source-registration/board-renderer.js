@@ -475,12 +475,14 @@ export class BoardRenderer {
     onSelect,
     onInspectionAngleChange = () => {},
     onSurfaceStateChange = () => {},
+    onInspectionExitRequest = () => {},
   ) {
     this.container = container;
     this.assignSideData(sideData);
     this.onSelect = onSelect;
     this.onInspectionAngleChange = onInspectionAngleChange;
     this.onSurfaceStateChange = onSurfaceStateChange;
+    this.onInspectionExitRequest = onInspectionExitRequest;
     this.surfaceLoadState = createSurfaceLoadState();
     this.meshes = new Map();
     this.renderObjects = new Map();
@@ -1017,6 +1019,10 @@ export class BoardRenderer {
       const action = resolveInspectionKeyAction(event.key);
       if (!action) return;
       event.preventDefault();
+      if (action.exit) {
+        this.onInspectionExitRequest();
+        return;
+      }
       const inspected = this.renderObjects.get(this.inspectionComponentId);
       if (!inspected) return;
       if (action.reset) {

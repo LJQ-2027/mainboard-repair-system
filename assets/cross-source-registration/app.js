@@ -945,6 +945,7 @@ async function init() {
     handleModelComponentActivation,
     syncInspectionAngleControl,
     updateModelAssetStatus,
+    () => { void toggleComponentInspection(); },
   );
   updateModelControlState();
   updateSideControls();
