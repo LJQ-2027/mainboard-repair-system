@@ -267,8 +267,7 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 }
 .anatomy-panel[hidden], .side-panel[hidden] { display: none; }
 .side-segments { display: grid; grid-template-columns: repeat(2, 48px); }
-.side-segments button,
-.side-flip {
+.side-segments button {
   height: 30px;
   border: 1px solid #b9c2bc;
   background: white;
@@ -281,7 +280,6 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
 .side-segments button { border-right: 0; }
 .side-segments button:last-child { border-right: 1px solid #b9c2bc; }
 .side-segments button[aria-pressed="true"] { background: #17221e; color: white; border-color: #17221e; }
-.side-flip { width: 30px; padding: 0; font-size: 17px; }
 .side-panel button:disabled,
 .anatomy-segments button:disabled { opacity: 0.42; cursor: not-allowed; }
 #activeSideLabel { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
@@ -584,6 +582,5 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: calc(
   .side-panel { gap: 3px; }
   .side-segments { grid-template-columns: repeat(2, 32px); }
   .wide-side-prefix { display: none; }
-  .side-flip { width: 26px; }
   .inspection-status > span:last-child { display: none; }
 }

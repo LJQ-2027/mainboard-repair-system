@@ -9,7 +9,6 @@ import { extractModuleRegions, extractShieldRegions } from './anatomy-state.js';
 import {
   buildEntityTarget,
   moduleOverlayId,
-  nextSideId,
 } from './repair-focus-state.js';
 import {
   buildInspectionActionState,
@@ -69,7 +68,6 @@ let pointMapViewport;
 let activeView = 'photo';
 let currentRepairTarget;
 let sideDataById = new Map();
-let sideIds = [];
 let activeSideId = 'main_page_2';
 let componentInspection = exitComponentInspection();
 let modelInteraction = createModelInteractionState();
@@ -534,7 +532,7 @@ function setModelDragMode(mode) {
 function updateModelControlState() {
   const locked = !canAcceptModelInteraction(modelInteraction);
   renderer?.setInteractionLocked(locked);
-  document.querySelectorAll('[role=tab], [data-side-id], #flipSide, #resetModel, #entityList button').forEach((control) => {
+  document.querySelectorAll('[role=tab], [data-side-id], #resetModel, #entityList button').forEach((control) => {
     control.disabled = locked;
   });
   updateSideControls();
@@ -610,7 +608,6 @@ function updateSideControls() {
     button.setAttribute('aria-pressed', String(button.dataset.sideId === activeSideId));
     button.disabled = locked;
   });
-  document.querySelector('#flipSide').disabled = locked;
   const sideData = sideDataById.get(activeSideId);
   document.querySelector('#activeSideLabel').textContent = sideData?.label || activeSideId;
   const shieldsAvailable = Boolean(sideData?.anatomy.shields.length);
@@ -884,7 +881,6 @@ async function init() {
     ['main_page_1', pageOneGeometry],
     ['main_page_2', geometryData],
   ]);
-  sideIds = sideManifest.sides.map((side) => side.side_id);
   sideDataById = new Map(sideManifest.sides.map((side) => {
     const compiled = geometryBySide.get(side.side_id);
     return [side.side_id, {
@@ -999,10 +995,6 @@ document.querySelectorAll('[data-shield-mode]').forEach((button) => button.addEv
 document.querySelectorAll('[data-side-id]').forEach((button) => button.addEventListener('click', () => {
   void switchModelSide(button.dataset.sideId);
 }));
-document.querySelector('#flipSide').addEventListener('click', () => {
-  const targetSideId = nextSideId(sideIds, activeSideId);
-  if (targetSideId) void switchModelSide(targetSideId);
-});
 document.querySelector('#zoomOutPointMap').addEventListener('click', () => pointMapViewport?.zoomBy(0.8));
 document.querySelector('#zoomInPointMap').addEventListener('click', () => pointMapViewport?.zoomBy(1.25));
 document.querySelector('#resetPointMap').addEventListener('click', () => pointMapViewport?.reset());

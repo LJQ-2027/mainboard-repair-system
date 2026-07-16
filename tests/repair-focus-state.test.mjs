@@ -6,7 +6,6 @@ import {
   buildModuleTarget,
   isPointInFocus,
   moduleOverlayId,
-  nextSideId,
   polygonBounds,
   resetFocusView,
   resolveTargetSide,
@@ -95,12 +94,4 @@ test('focus membership limits labels to the local repair region', () => {
   assert.equal(isPointInFocus({ x: 0.58, y: 0.62 }, region), true);
   assert.equal(isPointInFocus({ x: 0.78, y: 0.5 }, region), false);
   assert.equal(isPointInFocus({ x: 0.78, y: 0.5 }, null), true);
-});
-
-test('manual flip cycles only through registered board sides', () => {
-  const sides = ['main_page_1', 'main_page_2'];
-  assert.equal(nextSideId(sides, 'main_page_2'), 'main_page_1');
-  assert.equal(nextSideId(sides, 'main_page_1'), 'main_page_2');
-  assert.equal(nextSideId(sides, 'unknown'), 'main_page_1');
-  assert.equal(nextSideId([], 'main_page_1'), null);
 });

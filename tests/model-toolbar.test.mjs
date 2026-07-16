@@ -12,6 +12,13 @@ test('model toolbar keeps source-driven focus without a manual module overlay se
   assert.match(appSource, /moduleOverlayId\(currentRepairTarget\)/);
 });
 
+test('board side selection has one explicit control path without a duplicate flip action', () => {
+  assert.equal((toolbarMarkup.match(/data-side-id=/g) || []).length, 2);
+  assert.doesNotMatch(toolbarMarkup, /id="flipSide"|class="side-flip"|>⇄</);
+  assert.doesNotMatch(appSource, /#flipSide|nextSideId/);
+  assert.match(appSource, /\[data-side-id\][\s\S]*switchModelSide\(button\.dataset\.sideId\)/);
+});
+
 test('ordinary selection keeps native component materials and uses precise affordances only', () => {
   assert.doesNotMatch(rendererSource, /presentation\.emissiveIntensity/);
   assert.doesNotMatch(rendererSource, /clearSelectionStyle\(\)/);
