@@ -141,6 +141,7 @@ test('reviewed inspection profiles select only source-approved refined package a
   assert.equal(resolveInspectionVisualAsset({ profile_id: 'u2001-pmic-v1' }), 'reviewed-pmic');
   assert.equal(resolveInspectionVisualAsset({ profile_id: 'u4000-emmc-v1' }), 'reviewed-bga');
   assert.equal(resolveInspectionVisualAsset({ profile_id: 'u0600-rf-device-v1' }), 'reviewed-bga');
+  assert.equal(resolveInspectionVisualAsset({ profile_id: 'j6101-connector-v1' }), 'reviewed-connector');
   assert.equal(resolveInspectionVisualAsset({ profile_id: 'unreviewed-ic-v1' }), 'standard');
   assert.equal(resolveInspectionVisualAsset(null), 'standard');
 

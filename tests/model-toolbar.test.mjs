@@ -204,6 +204,12 @@ test('reviewed BGA profiles use a layered inspection package without invented ba
   assert.doesNotMatch(rendererSource, /addInspectionBgaPackage[\s\S]*BallGeometry/);
 });
 
+test('reviewed connector profiles use a recessed package without invented pin geometry', () => {
+  assert.match(rendererSource, /function addInspectionConnectorPackage\(group, descriptor\)/);
+  assert.match(rendererSource, /descriptor\.visualAsset === 'reviewed-connector'/);
+  assert.doesNotMatch(rendererSource, /addInspectionConnectorPackage[\s\S]*PinGeometry/);
+});
+
 test('component inspection exposes and clears the active visual asset for browser QA', () => {
   assert.match(rendererSource, /this\.container\.dataset\.inspectionVisualAsset = descriptor\.visualAsset/);
   assert.match(rendererSource, /delete this\.container\.dataset\.inspectionVisualAsset/);

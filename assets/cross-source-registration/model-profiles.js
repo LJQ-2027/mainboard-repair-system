@@ -34,6 +34,7 @@ const INSPECTION_VISUAL_ASSETS = {
   'u2001-pmic-v1': 'reviewed-pmic',
   'u4000-emmc-v1': 'reviewed-bga',
   'u0600-rf-device-v1': 'reviewed-bga',
+  'j6101-connector-v1': 'reviewed-connector',
 };
 
 function clamp(value, minimum, maximum) {
