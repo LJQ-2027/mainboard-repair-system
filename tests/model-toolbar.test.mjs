@@ -33,6 +33,20 @@ test('repair workflow copy separates technician actions from collapsed source ev
   assert.doesNotMatch(appSource, /来源摘要|来源处理|来源步骤|来源资料/);
 });
 
+test('repair workflow uses one framed work surface with readable execution states', () => {
+  const flowSurface = stylesSource.match(/\.repair-flow-control \{([^}]*)\}/)?.[1] || '';
+  const terminalSurface = stylesSource.match(/\.repair-flow-terminal \{([^}]*)\}/)?.[1] || '';
+  assert.match(flowSurface, /border:\s*0/);
+  assert.match(flowSurface, /border-top:/);
+  assert.match(flowSurface, /background:\s*transparent/);
+  assert.match(terminalSurface, /border:\s*0/);
+  assert.match(terminalSurface, /border-top:/);
+  assert.match(terminalSurface, /background:\s*transparent/);
+  assert.match(stylesSource, /\.repair-flow-action-record p \{[^}]*font-size:\s*10px/);
+  assert.match(stylesSource, /\.repair-flow-completion p \{[^}]*font-size:\s*10px/);
+  assert.match(stylesSource, /\.repair-flow-source-details \{[^}]*font-size:\s*10px/);
+});
+
 test('board side selection has one explicit control path without a duplicate flip action', () => {
   assert.equal((toolbarMarkup.match(/data-side-id=/g) || []).length, 2);
   assert.doesNotMatch(toolbarMarkup, /id="flipSide"|class="side-flip"|>⇄</);
