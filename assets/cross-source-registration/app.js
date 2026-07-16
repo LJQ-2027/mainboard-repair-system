@@ -1,4 +1,5 @@
 import { solveHomography } from './registration-core.js';
+import { resolveBoardAssets, resolveBoardKey } from './board-catalog-state.js';
 import { buildSelectionState, entityListModelRevealOptions, nearestPointerTarget } from './selection-state.js';
 import { BoardRenderer } from './board-renderer.js';
 import { PointMapViewport } from './point-map-viewport.js';
@@ -55,13 +56,7 @@ import {
   setRepairFlowActionExecuted,
 } from './repair-flow-state.js';
 
-const DATA_URL = '../../knowledge-base/km4-cross-source-registration.json';
-const GEOMETRY_URL = '../../knowledge-base/km4-board-compiled.json';
-const SCHEMATIC_URL = '../../knowledge-base/km4-schematic-compiled.json';
-const SHIELD_URL = '../../knowledge-base/km4-point-map-geometry.json';
-const ATLAS_URL = '../../knowledge-base/board-atlas-mvp.json';
-const SIDE_MANIFEST_URL = '../../knowledge-base/km4-board-sides.json';
-const PAGE_ONE_GEOMETRY_URL = '../../knowledge-base/km4-board-compiled-page-1.json';
+const BOARD_CATALOG_URL = '../../knowledge-base/repair-workbench-boards.json';
 const views = { photo: document.querySelector('#photoView'), pointmap: document.querySelector('#pointmapView'), model: document.querySelector('#modelView') };
 let data;
 let matrix;
@@ -705,8 +700,7 @@ function updateSideControls() {
   document.querySelectorAll('[data-shield-mode]').forEach((button) => {
     button.disabled = locked || componentInspection.mode === 'isolated' || !shieldsAvailable;
   });
-  const linkedSide = sideDataById.get(data?.side_id);
-  if (linkedSide) document.querySelector('#entityListHeading').textContent = `${linkedSide.label}已关联实体`;
+  document.querySelector('#entityListHeading').textContent = '已关联维修实体';
   const selectedEntity = data?.entities.find((entity) => entity.component_id === selectedId);
   updateEntityAccessStatus(selectedEntity);
   if (activeView === 'model' && sideData) {
@@ -958,31 +952,39 @@ async function setView(name) {
 }
 
 async function init() {
-  const [response, geometryResponse, schematicResponse, shieldResponse, atlasResponse, manifestResponse, pageOneResponse] = await Promise.all([
-    fetch(DATA_URL),
-    fetch(GEOMETRY_URL),
-    fetch(SCHEMATIC_URL),
-    fetch(SHIELD_URL),
-    fetch(ATLAS_URL),
-    fetch(SIDE_MANIFEST_URL),
-    fetch(PAGE_ONE_GEOMETRY_URL),
+  const catalogResponse = await fetch(BOARD_CATALOG_URL);
+  if (!catalogResponse.ok) throw new Error(`主板目录载入失败 (${catalogResponse.status})`);
+  const catalog = await catalogResponse.json();
+  const boardKey = resolveBoardKey(new URL(window.location.href), catalog);
+  const boardAssets = resolveBoardAssets(catalog, boardKey);
+  const fetchAsset = async (label, url) => {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`${boardKey} ${label}载入失败 (${response.status})`);
+    return response.json();
+  };
+  const geometryEntries = Object.entries(boardAssets.geometry_by_side);
+  const [boardData, schematicData, sideManifest, geometryValues, shieldData, atlasData] = await Promise.all([
+    fetchAsset('维修数据', boardAssets.data),
+    fetchAsset('原理图数据', boardAssets.schematic),
+    fetchAsset('板面清单', boardAssets.side_manifest),
+    Promise.all(geometryEntries.map(([sideId, url]) => fetchAsset(`${sideId} 几何数据`, url))),
+    boardAssets.shield ? fetchAsset('屏蔽罩数据', boardAssets.shield) : Promise.resolve({ regions: [] }),
+    boardAssets.atlas ? fetchAsset('模块数据', boardAssets.atlas) : Promise.resolve({ boards: [] }),
   ]);
-  const responses = [response, geometryResponse, schematicResponse, shieldResponse, atlasResponse, manifestResponse, pageOneResponse];
-  if (responses.some((candidate) => !candidate.ok)) throw new Error(`Dataset failed to load: ${responses.map((candidate) => candidate.status).join('/')}`);
-  data = await response.json();
-  geometryData = await geometryResponse.json();
-  const schematicData = await schematicResponse.json();
-  const shieldData = await shieldResponse.json();
-  const atlasData = await atlasResponse.json();
-  const sideManifest = await manifestResponse.json();
-  const pageOneGeometry = await pageOneResponse.json();
-  const compiledByDesignator = new Map(geometryData.components.map((component) => [component.designator, component]));
+  data = boardData;
+  const geometryBySide = new Map(geometryEntries.map(([sideId], index) => [sideId, geometryValues[index]]));
+  geometryData = geometryBySide.get(sideManifest.default_side_id);
+  if (!geometryData) throw new Error(`${boardKey} 缺少默认板面 ${sideManifest.default_side_id} 的几何数据`);
+  const compiledBySide = new Map([...geometryBySide].map(([sideId, compiled]) => [
+    sideId,
+    new Map(compiled.components.map((component) => [component.designator, component])),
+  ]));
   data.entities = data.entities.map((originalEntity) => {
     const entity = {
       ...mergeCompiledSchematicLinks(originalEntity, schematicData),
       side_id: originalEntity.side_id || data.side_id,
     };
-    const compiled = compiledByDesignator.get(entity.designator);
+    const compiled = compiledBySide.get(entity.side_id)?.get(entity.designator);
     if (!compiled?.footprint) return entity;
     return {
       ...entity,
@@ -994,16 +996,13 @@ async function init() {
       },
     };
   });
-  const geometryBySide = new Map([
-    ['main_page_1', pageOneGeometry],
-    ['main_page_2', geometryData],
-  ]);
   sideDataById = new Map(sideManifest.sides.map((side) => {
     const compiled = geometryBySide.get(side.side_id);
+    if (!compiled) throw new Error(`${boardKey} 缺少 ${side.side_id} 的几何数据`);
     return [side.side_id, {
       sideId: side.side_id,
       label: side.label,
-      entities: side.side_id === data.side_id ? data.entities : [],
+      entities: data.entities.filter((entity) => entity.side_id === side.side_id),
       boardOutline: compiled.board_outline,
       compiledComponents: compiled.components,
       audit: compiled.audit,
@@ -1015,20 +1014,25 @@ async function init() {
     }];
   }));
   activeSideId = sideManifest.default_side_id;
+  document.title = `${boardAssets.title} 维修工作台`;
+  document.querySelector('#boardTitle').textContent = boardAssets.title;
   const source = data.registration.anchors.slice(0, 4).map((anchor) => anchor.board);
   const target = data.registration.anchors.slice(0, 4).map((anchor) => anchor.image);
   matrix = solveHomography(source, target);
 
   const photoImage = document.querySelector('#photoView img');
   const pointMapImage = document.querySelector('#pointmapView img');
+  photoImage.alt = `${data.model} 装机主板参考图`;
+  pointMapImage.alt = `${data.board_version} 主板点位图`;
   photoImage.src = `../../${data.registration.proxy_image}`;
   pointMapImage.src = `../../${data.registration.point_map_image}`;
   pointMapViewport = new PointMapViewport(document.querySelector('#pointmapView'), document.querySelector('#pointmapView .point-map'));
   pointMapImage.addEventListener('load', () => pointMapViewport.reset(), { once: true });
-  const boardPositions = new Map(data.entities.map((entity) => [entity.component_id, entity.geometry.center]));
-  const photoPositions = new Map(data.entities.map((entity) => [entity.component_id, buildSelectionState(entity, matrix).photoPoint]));
-  addMarkers(document.querySelector('#photoView .markers'), photoPositions, data.entities);
-  addMarkers(document.querySelector('#pointmapView .markers'), boardPositions, data.entities);
+  const registeredEntities = data.entities.filter((entity) => entity.side_id === data.side_id);
+  const boardPositions = new Map(registeredEntities.map((entity) => [entity.component_id, entity.geometry.center]));
+  const photoPositions = new Map(registeredEntities.map((entity) => [entity.component_id, buildSelectionState(entity, matrix).photoPoint]));
+  addMarkers(document.querySelector('#photoView .markers'), photoPositions, registeredEntities);
+  addMarkers(document.querySelector('#pointmapView .markers'), boardPositions, registeredEntities);
 
   renderer = new BoardRenderer(
     document.querySelector('#modelCanvas'),
@@ -1055,7 +1059,8 @@ async function init() {
     list.append(button);
   });
   renderRepairEntry();
-  selectEntity(data.entities[0].component_id, { explicit: false });
+  const initialEntity = data.entities.find((entity) => entity.side_id === activeSideId) || data.entities[0];
+  selectEntity(initialEntity.component_id, { explicit: false });
 }
 
 document.querySelectorAll('[role=tab]').forEach((button) => button.addEventListener('click', () => { void setView(button.dataset.view); }));

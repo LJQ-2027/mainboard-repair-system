@@ -28,6 +28,18 @@ test('entity facts expose the board side instead of normalized registration coor
   assert.doesNotMatch(appSource, /#entityCoordinate/);
 });
 
+test('the workbench loads source assets through a board catalog', () => {
+  assert.match(appSource, /BOARD_CATALOG_URL/);
+  assert.match(appSource, /resolveBoardKey\(new URL\(window\.location\.href\), catalog\)/);
+  assert.match(appSource, /geometry_by_side/);
+  assert.doesNotMatch(appSource, /km4-cross-source-registration\.json/);
+});
+
+test('the initial repair entity belongs to the manifest default side', () => {
+  assert.match(appSource, /data\.entities\.find\(\(entity\) => entity\.side_id === activeSideId\) \|\| data\.entities\[0\]/);
+  assert.match(appSource, /#entityListHeading'\)\.textContent = '已关联维修实体'/);
+});
+
 test('repair workflow copy separates technician actions from collapsed source evidence', () => {
   assert.match(toolbarMarkup, /<section class="repair-entry" id="repairEntry"/);
   assert.match(toolbarMarkup, /<div class="repair-entry-options" id="repairEntryOptions"/);

@@ -1,0 +1,34 @@
+{
+  "catalog_id": "REPAIR-WORKBENCH-BOARDS-V1",
+  "default_board_key": "km4-f151",
+  "boards": {
+    "km4-f151": {
+      "title": "KM4 · F151_MAIN_PCB_V1.2",
+      "model": "KM4",
+      "board_version": "F151_MAIN_PCB_V1.2",
+      "data": "../../knowledge-base/km4-cross-source-registration.json",
+      "schematic": "../../knowledge-base/km4-schematic-compiled.json",
+      "side_manifest": "../../knowledge-base/km4-board-sides.json",
+      "geometry_by_side": {
+        "main_page_1": "../../knowledge-base/km4-board-compiled-page-1.json",
+        "main_page_2": "../../knowledge-base/km4-board-compiled.json"
+      },
+      "shield": "../../knowledge-base/km4-point-map-geometry.json",
+      "atlas": "../../knowledge-base/board-atlas-mvp.json"
+    },
+    "kl4-f201": {
+      "title": "KL4 · F201_MAIN_V1.2",
+      "model": "KL4",
+      "board_version": "F201_MAIN_V1.2",
+      "data": "../../knowledge-base/kl4-cross-source-registration.json",
+      "schematic": "../../knowledge-base/kl4-schematic-compiled.json",
+      "side_manifest": "../../knowledge-base/kl4-board-sides.json",
+      "geometry_by_side": {
+        "main_page_1": "../../knowledge-base/kl4-board-compiled-page-1.json",
+        "main_page_2": "../../knowledge-base/kl4-board-compiled.json"
+      },
+      "shield": null,
+      "atlas": null
+    }
+  }
+}
