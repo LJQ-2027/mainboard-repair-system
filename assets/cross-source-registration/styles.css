@@ -303,7 +303,7 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) clamp(360px, 27vw, 4
   background: #f8f9f6f2;
 }
 .anatomy-panel[hidden], .side-panel[hidden] { display: none; }
-.side-segments { display: grid; grid-template-columns: repeat(2, 48px); }
+.side-segments { display: grid; grid-template-columns: repeat(2, 54px); }
 .side-segments button {
   height: 30px;
   border: 1px solid #b9c2bc;
@@ -312,6 +312,7 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) clamp(360px, 27vw, 4
   font: inherit;
   font-size: 11px;
   font-weight: 600;
+  white-space: nowrap;
   cursor: pointer;
 }
 .side-segments button { border-right: 0; }
@@ -654,7 +655,7 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) clamp(360px, 27vw, 4
   .anatomy-panel { top: 8px; left: 8px; gap: 4px; padding: 4px; }
   .anatomy-segments { grid-template-columns: repeat(3, 36px); }
   .side-panel { top: 8px; left: auto; right: 8px; padding: 4px; }
-  .side-segments { grid-template-columns: repeat(2, 42px); }
+  .side-segments { grid-template-columns: repeat(2, 46px); }
   .inspection-status { right: 8px; bottom: 8px; min-height: 40px; }
 }
 
@@ -662,7 +663,8 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) clamp(360px, 27vw, 4
   .anatomy-panel { gap: 3px; }
   .anatomy-segments { grid-template-columns: repeat(3, 30px); }
   .side-panel { gap: 3px; }
-  .side-segments { grid-template-columns: repeat(2, 32px); }
+  .side-segments { grid-template-columns: repeat(2, 38px); }
+  .side-segments button { font-size: 10px; }
   .wide-side-prefix { display: none; }
   .inspection-status > span:last-child { display: none; }
 }

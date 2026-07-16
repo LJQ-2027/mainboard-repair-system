@@ -56,17 +56,28 @@ def validate_profile(root, profile):
         raise ValueError("schematic_geometry_side_id must resolve to a declared side")
 
     outputs = []
+    source_pages = []
+    component_pages = []
     for side in sides:
         side_id = side["side_id"]
         if not isinstance(side.get("source_pdf_page"), int) or isinstance(side["source_pdf_page"], bool) or side["source_pdf_page"] < 1:
             raise ValueError(f"{side_id} source_pdf_page must be a positive integer")
+        source_path = side.get("point_map_source", profile["point_map_source"])
+        _repository_path(root, source_path, f"{side_id}.point_map_source", must_exist=True)
+        source_pages.append((source_path, side["source_pdf_page"]))
+        component_page = side.get("component_page", side["source_pdf_page"])
+        if not isinstance(component_page, int) or isinstance(component_page, bool) or component_page < 1:
+            raise ValueError(f"{side_id} component_page must be a positive integer")
+        component_pages.append(component_page)
         _validate_crop(side.get("source_crop"), side_id)
         for field in ("engineering_texture", "compiled_data"):
             _repository_path(root, side.get(field), f"{side_id}.{field}")
             outputs.append(side[field])
 
-    if len({side["source_pdf_page"] for side in sides}) != len(sides):
-        raise ValueError("profile contains duplicate source_pdf_page values")
+    if len(set(source_pages)) != len(source_pages):
+        raise ValueError("profile contains a duplicate point-map source page")
+    if len(set(component_pages)) != len(component_pages):
+        raise ValueError("profile contains duplicate component_page values")
 
     for field in ("side_manifest_output", "schematic_output", "cross_source_output"):
         _repository_path(root, profile.get(field), field)

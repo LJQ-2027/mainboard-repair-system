@@ -20,6 +20,11 @@ test('source note follows the active photo or point-map view', () => {
   assert.equal(buildSourceNote({ view: 'pointmap', registration, side }), registration.point_map_note);
 });
 
+test('a board without a photo proxy falls back to its point-map source note', () => {
+  const pointMapOnly = { reference_mode: 'point_map_only', point_map_note: 'H6929 TOP/BOT 点位图' };
+  assert.equal(buildSourceNote({ view: 'photo', registration: pointMapOnly, side }), pointMapOnly.point_map_note);
+});
+
 test('model source note identifies the repair view and linked point coverage', () => {
   assert.equal(
     buildSourceNote({ view: 'model', registration, side }),

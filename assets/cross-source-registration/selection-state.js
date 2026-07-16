@@ -7,7 +7,9 @@ export function buildSelectionState(entity, registrationMatrix) {
     componentId: entity.component_id,
     designator: entity.designator,
     boardPoint: { ...entity.geometry.center },
-    photoPoint: projectPoint(registrationMatrix, entity.geometry.center),
+    photoPoint: registrationMatrix?.length === 9
+      ? projectPoint(registrationMatrix, entity.geometry.center)
+      : null,
     schematicLinks: entity.schematic_links || [],
     repairLinks: entity.repair_links || [],
     entity,

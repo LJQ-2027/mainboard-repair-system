@@ -31,6 +31,7 @@ desktop.ini
 .local/
 .superpowers/
 output/playwright/
+.playwright-cli/
 
 # Large local service-manual binaries. Commit the generated manifest and intake
 # record instead of adding the multi-gigabyte source library to Git history.

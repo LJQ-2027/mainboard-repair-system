@@ -1,0 +1,26 @@
+{
+  "manifest_id": "H6929-MAIN-BOARD-SIDES-V1",
+  "profile_id": "h6929-main-v1.1",
+  "board_id": "BOARD-H6929-MAIN-V1.1",
+  "default_side_id": "main_bot",
+  "sides": [
+    {
+      "side_id": "main_top",
+      "label": "TOP 面",
+      "source_pdf_page": 1,
+      "component_page": 1,
+      "point_map_source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CK6N-H6929/H6929_MAIN_PCB_V1.1_╬╗║┼═╝_TOP.pdf",
+      "engineering_texture": "assets/board-atlas/h6929/main-point-map-top.png",
+      "compiled_data": "knowledge-base/h6929-board-compiled-top.json"
+    },
+    {
+      "side_id": "main_bot",
+      "label": "BOT 面",
+      "source_pdf_page": 1,
+      "component_page": 2,
+      "point_map_source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CK6N-H6929/H6929_MAIN_PCB_V1.1_╬╗║┼═╝_BOT.pdf",
+      "engineering_texture": "assets/board-atlas/h6929/main-point-map-bot.png",
+      "compiled_data": "knowledge-base/h6929-board-compiled-bot.json"
+    }
+  ]
+}

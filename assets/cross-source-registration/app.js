@@ -4,6 +4,7 @@ import { buildSelectionState, entityListModelRevealOptions, nearestPointerTarget
 import { BoardRenderer } from './board-renderer.js';
 import { PointMapViewport } from './point-map-viewport.js';
 import { buildSourceNote } from './source-note-state.js';
+import { buildRegistrationViewState } from './registration-view-state.js';
 import { buildEntityAccessState } from './entity-access-state.js';
 import { mergeCompiledSchematicLinks } from './source-links.js';
 import { technicianEntityCopy, technicianInstruction } from './technician-copy.js';
@@ -974,6 +975,16 @@ async function init() {
     boardAssets.atlas ? fetchAsset('模块数据', boardAssets.atlas) : Promise.resolve({ boards: [] }),
   ]);
   data = boardData;
+  const registrationView = buildRegistrationViewState(data.registration);
+  activeView = registrationView.initialView;
+  const photoTab = document.querySelector('[data-view="photo"]');
+  photoTab.hidden = !registrationView.photoAvailable;
+  document.querySelectorAll('[role=tab]').forEach((button) => {
+    button.setAttribute('aria-selected', String(button.dataset.view === activeView));
+  });
+  Object.entries(views).forEach(([key, view]) => view.classList.toggle('active', key === activeView));
+  document.querySelector('#pointMapTools').hidden = activeView !== 'pointmap';
+  document.querySelector('#modelTools').hidden = activeView !== 'model';
   const geometryBySide = new Map(geometryEntries.map(([sideId], index) => [sideId, geometryValues[index]]));
   geometryData = geometryBySide.get(sideManifest.default_side_id);
   if (!geometryData) throw new Error(`${boardKey} 缺少默认板面 ${sideManifest.default_side_id} 的几何数据`);
@@ -1016,24 +1027,37 @@ async function init() {
     }];
   }));
   activeSideId = sideManifest.default_side_id;
+  const sideButtons = [...document.querySelectorAll('[data-side-id]')];
+  sideButtons.forEach((button, index) => {
+    const side = sideManifest.sides[index];
+    button.hidden = !side;
+    if (!side) return;
+    button.dataset.sideId = side.side_id;
+    button.setAttribute('aria-label', side.label);
+    button.textContent = side.label;
+  });
   document.title = `${boardAssets.title} 维修工作台`;
   document.querySelector('#boardTitle').textContent = boardAssets.title;
-  const source = data.registration.anchors.slice(0, 4).map((anchor) => anchor.board);
-  const target = data.registration.anchors.slice(0, 4).map((anchor) => anchor.image);
-  matrix = solveHomography(source, target);
+  if (registrationView.photoAvailable) {
+    const source = data.registration.anchors.slice(0, 4).map((anchor) => anchor.board);
+    const target = data.registration.anchors.slice(0, 4).map((anchor) => anchor.image);
+    matrix = solveHomography(source, target);
+  }
 
   const photoImage = document.querySelector('#photoView img');
   const pointMapImage = document.querySelector('#pointmapView img');
   photoImage.alt = `${data.model} 装机主板参考图`;
   pointMapImage.alt = `${data.board_version} 主板点位图`;
-  photoImage.src = `../../${data.registration.proxy_image}`;
+  if (registrationView.photoAvailable) photoImage.src = `../../${data.registration.proxy_image}`;
   pointMapImage.src = `../../${data.registration.point_map_image}`;
   pointMapViewport = new PointMapViewport(document.querySelector('#pointmapView'), document.querySelector('#pointmapView .point-map'));
   pointMapImage.addEventListener('load', () => pointMapViewport.reset(), { once: true });
   const registeredEntities = data.entities.filter((entity) => entity.side_id === data.side_id);
   const boardPositions = new Map(registeredEntities.map((entity) => [entity.component_id, entity.geometry.center]));
-  const photoPositions = new Map(registeredEntities.map((entity) => [entity.component_id, buildSelectionState(entity, matrix).photoPoint]));
-  addMarkers(document.querySelector('#photoView .markers'), photoPositions, registeredEntities);
+  if (registrationView.photoAvailable) {
+    const photoPositions = new Map(registeredEntities.map((entity) => [entity.component_id, buildSelectionState(entity, matrix).photoPoint]));
+    addMarkers(document.querySelector('#photoView .markers'), photoPositions, registeredEntities);
+  }
   addMarkers(document.querySelector('#pointmapView .markers'), boardPositions, registeredEntities);
 
   renderer = new BoardRenderer(

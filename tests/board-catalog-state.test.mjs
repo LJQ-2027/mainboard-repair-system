@@ -37,6 +37,16 @@ const catalog = {
       shield: null,
       atlas: null,
     },
+    'ck6n-h6929': {
+      title: 'CK6N · H6929_MAIN_PCB_V1.1',
+      model: 'CK6N',
+      data: 'h6929-data.json',
+      schematic: 'h6929-schematic.json',
+      side_manifest: 'h6929-sides.json',
+      geometry_by_side: { main_top: 'h6929-top.json', main_bot: 'h6929-bot.json' },
+      shield: null,
+      atlas: null,
+    },
   },
 };
 
@@ -60,6 +70,11 @@ test('one board platform can declare multiple compatible sales models', () => {
   assert.equal(assets.model, 'CM6');
   assert.deepEqual(assets.compatible_models, ['CM6', 'CM5']);
   assert.deepEqual(Object.keys(assets.geometry_by_side), ['main_page_1', 'main_page_2']);
+});
+
+test('source-named board sides do not depend on legacy page identities', () => {
+  const assets = resolveBoardAssets(catalog, 'ck6n-h6929');
+  assert.deepEqual(Object.keys(assets.geometry_by_side), ['main_top', 'main_bot']);
 });
 
 test('unknown board keys fail instead of silently opening another board', () => {

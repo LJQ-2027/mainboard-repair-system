@@ -87,6 +87,19 @@ class BoardPipelineTests(unittest.TestCase):
         self.assertFalse(result["audit"]["required_recovery_complete"])
         self.assertEqual(result["audit"]["missing_required_designators"], ["U2001"])
 
+    def test_compile_side_separates_physical_source_page_from_logical_component_page(self):
+        profile = sample_profile()
+        side = profile["sides"][1]
+        side["point_map_source"] = "side-two.pdf"
+        side["source_pdf_page"] = 1
+        side["component_page"] = 2
+
+        result = compile_side(Path("."), profile, side, primitives=sample_primitives(), outline=sample_outline())
+
+        self.assertEqual(result["source"]["path"], "side-two.pdf")
+        self.assertEqual(result["source"]["page"], 1)
+        self.assertEqual(result["components"][0]["component_id"], "SAMPLE-MAIN-P2-U2001")
+
     def test_side_manifest_preserves_profile_order(self):
         manifest = build_side_manifest(sample_profile())
 

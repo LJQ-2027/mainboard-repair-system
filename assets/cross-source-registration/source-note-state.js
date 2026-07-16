@@ -11,5 +11,5 @@ export function buildSourceNote({
     return `${side.label} · 2.5D维修视图 · ${side.audit.accepted_designators} 个点位已关联`;
   }
   if (view === 'pointmap') return registration.point_map_note;
-  return registration.proxy_note;
+  return registration.proxy_note || registration.point_map_note;
 }

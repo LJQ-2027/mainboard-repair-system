@@ -24,6 +24,12 @@ test('selection state keeps one identity across every view', () => {
   assert.equal(state.repairLinks.length, 1);
 });
 
+test('point-map-only selection keeps board identity without a photo projection', () => {
+  const state = buildSelectionState(entity, null);
+  assert.deepEqual(state.boardPoint, entity.geometry.center);
+  assert.equal(state.photoPoint, null);
+});
+
 test('point picking returns the smallest entity containing the point', () => {
   const large = { ...entity, component_id: 'large', geometry: { center: { x: 0.5, y: 0.5 }, size: { x: 0.5, y: 0.5 } } };
   const small = { ...entity, component_id: 'small', geometry: { center: { x: 0.5, y: 0.5 }, size: { x: 0.1, y: 0.1 } } };

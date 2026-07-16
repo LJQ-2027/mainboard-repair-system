@@ -47,6 +47,23 @@
       },
       "shield": null,
       "atlas": null
+    },
+    "ck6n-h6929": {
+      "title": "CK6N · H6929_MAIN_PCB_V1.1",
+      "model": "CK6N",
+      "compatible_models": [
+        "CK6N"
+      ],
+      "board_version": "H6929_MAIN_PCB_V1.1",
+      "data": "../../knowledge-base/h6929-cross-source-registration.json",
+      "schematic": "../../knowledge-base/h6929-schematic-compiled.json",
+      "side_manifest": "../../knowledge-base/h6929-board-sides.json",
+      "geometry_by_side": {
+        "main_top": "../../knowledge-base/h6929-board-compiled-top.json",
+        "main_bot": "../../knowledge-base/h6929-board-compiled-bot.json"
+      },
+      "shield": null,
+      "atlas": null
     }
   }
 }

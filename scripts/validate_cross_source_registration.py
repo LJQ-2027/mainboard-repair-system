@@ -19,20 +19,27 @@ def validate_dataset(data, root):
     if len(outline) < 4 or any(not _normalized(point) for point in outline):
         errors.append("board outline requires at least four normalized points")
     registration = data.get("registration", {})
-    for key in ("proxy_image", "point_map_image"):
-        path = registration.get(key)
-        if not path or not (root / path).is_file():
-            errors.append(f"registration {key} does not resolve")
-    for key in ("proxy_note", "point_map_note"):
-        if not isinstance(registration.get(key), str) or not registration[key].strip():
-            errors.append(f"registration {key} is required")
+    reference_mode = registration.get("reference_mode", "photo_proxy")
+    if reference_mode not in ("photo_proxy", "point_map_only"):
+        errors.append("registration reference_mode is unsupported")
+    point_map_path = registration.get("point_map_image")
+    if not point_map_path or not (root / point_map_path).is_file():
+        errors.append("registration point_map_image does not resolve")
+    if not isinstance(registration.get("point_map_note"), str) or not registration["point_map_note"].strip():
+        errors.append("registration point_map_note is required")
 
     anchors = registration.get("anchors", [])
-    if len(anchors) < 4:
-        errors.append("registration requires at least four anchors")
-    for anchor in anchors:
-        if not _normalized(anchor.get("board")) or not _normalized(anchor.get("image")):
-            errors.append(f"anchor {anchor.get('anchor_id', 'unknown')} must use normalized coordinates")
+    if reference_mode != "point_map_only":
+        proxy_path = registration.get("proxy_image")
+        if not proxy_path or not (root / proxy_path).is_file():
+            errors.append("registration proxy_image does not resolve")
+        if not isinstance(registration.get("proxy_note"), str) or not registration["proxy_note"].strip():
+            errors.append("registration proxy_note is required")
+        if len(anchors) < 4:
+            errors.append("registration requires at least four anchors")
+        for anchor in anchors:
+            if not _normalized(anchor.get("board")) or not _normalized(anchor.get("image")):
+                errors.append(f"anchor {anchor.get('anchor_id', 'unknown')} must use normalized coordinates")
 
     identities = set()
     entities_by_id = {}
@@ -180,7 +187,8 @@ def main():
         for error in errors:
             print(f"  - {error}")
         return 1
-    print(f"Cross-source registration validation passed: {len(data['entities'])} entities, {len(data['registration']['anchors'])} anchors")
+    anchor_count = len(data["registration"].get("anchors", []))
+    print(f"Cross-source registration validation passed: {len(data['entities'])} entities, {anchor_count} anchors")
     return 0
 
 

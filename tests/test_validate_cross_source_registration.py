@@ -22,6 +22,14 @@ class CrossSourceRegistrationTests(unittest.TestCase):
             for error in validate_dataset(data, ROOT)
         ))
 
+    def test_point_map_only_registration_does_not_require_a_fake_photo_or_anchors(self):
+        data = json.loads((ROOT / "knowledge-base/km4-cross-source-registration.json").read_text(encoding="utf-8"))
+        data["registration"]["reference_mode"] = "point_map_only"
+        for key in ("proxy_image", "proxy_label", "proxy_limit", "proxy_note", "method", "confidence", "anchors"):
+            data["registration"].pop(key, None)
+
+        self.assertEqual(validate_dataset(data, ROOT), [])
+
     def test_repair_visual_inspection_is_explicitly_limited_to_package_entities(self):
         data = json.loads((ROOT / "knowledge-base/km4-cross-source-registration.json").read_text(encoding="utf-8"))
         inspectable = {

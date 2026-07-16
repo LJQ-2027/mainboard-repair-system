@@ -17,7 +17,8 @@ from scripts.build_board_atlas_assets import (
 
 
 def compile_side(root, profile, side, *, primitives=None, outline=None):
-    source = root / profile["point_map_source"]
+    source_path = side.get("point_map_source", profile["point_map_source"])
+    source = root / source_path
     texture = root / side["engineering_texture"]
     primitives = primitives or extract_form_primitives(source, side["source_pdf_page"])
     outline = outline or extract_board_outline(texture)
@@ -25,7 +26,7 @@ def compile_side(root, profile, side, *, primitives=None, outline=None):
         primitives["labels"],
         primitives["rectangles"],
         primitives["visible_bounds"],
-        component_prefix=f"{profile['component_prefix']}-P{side['source_pdf_page']}",
+        component_prefix=f"{profile['component_prefix']}-P{side.get('component_page', side['source_pdf_page'])}",
     )
     required = set(side.get("required_designators", []))
     recovered = {item["designator"] for item in components} & required
@@ -40,7 +41,7 @@ def compile_side(root, profile, side, *, primitives=None, outline=None):
         "side_id": side["side_id"],
         "coordinate_system": "normalized_form_xobject",
         "source": {
-            "path": profile["point_map_source"],
+            "path": source_path,
             "page": side["source_pdf_page"],
             "form_xobject": primitives["form_name"],
             "bounds": primitives["bounds"],
@@ -81,6 +82,8 @@ def build_side_manifest(profile):
                 "side_id": side["side_id"],
                 "label": side["label"],
                 "source_pdf_page": side["source_pdf_page"],
+                "component_page": side.get("component_page", side["source_pdf_page"]),
+                "point_map_source": side.get("point_map_source", profile["point_map_source"]),
                 "engineering_texture": side["engineering_texture"],
                 "compiled_data": side["compiled_data"],
             }
@@ -91,11 +94,18 @@ def build_side_manifest(profile):
 
 def render_profile_textures(root, profile, sides=None):
     selected = sides or profile["sides"]
-    source = root / profile["point_map_source"]
     temporary = root / ".local" / "board-atlas-build" / profile["profile_id"]
-    rendered = render_pdf_pages(source, temporary, "main-point-map")
+    rendered_by_source = {}
     built = []
     for side in selected:
+        source_path = side.get("point_map_source", profile["point_map_source"])
+        if source_path not in rendered_by_source:
+            rendered_by_source[source_path] = render_pdf_pages(
+                root / source_path,
+                temporary,
+                f"point-map-source-{len(rendered_by_source) + 1}",
+            )
+        rendered = rendered_by_source[source_path]
         page_index = side["source_pdf_page"] - 1
         if page_index >= len(rendered):
             raise ValueError(f"{side['side_id']} source page is outside the point-map PDF")
@@ -143,8 +153,8 @@ def compile_geometry(
 
     payloads = {}
     compiled = []
-    source = root / profile["point_map_source"]
     for side in selected:
+        source = root / side.get("point_map_source", profile["point_map_source"])
         primitives = primitive_extractor(source, side["source_pdf_page"])
         outline = outline_extractor(
             root / side["engineering_texture"],
