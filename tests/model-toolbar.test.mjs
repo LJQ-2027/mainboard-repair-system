@@ -13,6 +13,11 @@ test('model toolbar keeps source-driven focus without a manual module overlay se
   assert.match(appSource, /moduleOverlayId\(currentRepairTarget\)/);
 });
 
+test('view labels use technician language instead of registration internals', () => {
+  assert.match(toolbarMarkup, /data-view="photo">主板实物参考<\/button>/);
+  assert.doesNotMatch(toolbarMarkup, /实体代理图/);
+});
+
 test('board side selection has one explicit control path without a duplicate flip action', () => {
   assert.equal((toolbarMarkup.match(/data-side-id=/g) || []).length, 2);
   assert.doesNotMatch(toolbarMarkup, /id="flipSide"|class="side-flip"|>⇄</);

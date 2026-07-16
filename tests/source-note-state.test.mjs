@@ -7,8 +7,8 @@ const styles = await readFile(new URL('../assets/cross-source-registration/style
 const appSource = await readFile(new URL('../assets/cross-source-registration/app.js', import.meta.url), 'utf8');
 
 const registration = {
-  proxy_note: '实体代理图 · 维修手册第10页 · 装机屏蔽罩面 · 罩下器件不可见',
-  point_map_note: '工程点位图 · F151_MAIN_PCB_V1.2 · 第2页',
+  proxy_note: '主板实物参考 · 维修手册第10页 · 屏蔽罩下器件不可直接观察',
+  point_map_note: '点位图 · F151_MAIN_PCB_V1.2 · 第2面',
 };
 const side = {
   label: '第2面',
@@ -20,10 +20,10 @@ test('source note follows the active photo or point-map view', () => {
   assert.equal(buildSourceNote({ view: 'pointmap', registration, side }), registration.point_map_note);
 });
 
-test('model source note identifies side, compiled coverage, and geometry boundary', () => {
+test('model source note identifies the repair view and linked point coverage', () => {
   assert.equal(
     buildSourceNote({ view: 'model', registration, side }),
-    '第2面点位图 · 820 个已编译位号 · 几何按来源置信度分层',
+    '第2面 · 2.5D维修视图 · 820 个点位已关联',
   );
 });
 
@@ -33,7 +33,7 @@ test('component inspection source note takes precedence over the board model not
     registration,
     side,
     inspectionEntity: { designator: 'U4000' },
-  }), 'U4000 单体检视 · 第2面注册坐标 · 维修视觉封装');
+  }), 'U4000 单体检视 · 第2面 · 已关联点位与维修资料');
 });
 
 test('narrow source note wraps completely instead of using an ellipsis', () => {
