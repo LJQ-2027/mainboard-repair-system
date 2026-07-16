@@ -47,6 +47,9 @@ def validate_profile(root, profile):
         raise ValueError("profile contains a missing or duplicate side_id")
     if profile["default_side_id"] not in side_ids:
         raise ValueError("default_side_id must resolve to a declared side")
+    schematic_side_id = profile.get("schematic_geometry_side_id", profile["default_side_id"])
+    if schematic_side_id not in side_ids:
+        raise ValueError("schematic_geometry_side_id must resolve to a declared side")
 
     outputs = []
     for side in sides:

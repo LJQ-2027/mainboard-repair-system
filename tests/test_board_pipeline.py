@@ -4,7 +4,12 @@ from pathlib import Path
 
 from PIL import Image
 
-from scripts.board_compiler.pipeline import build_side_manifest, compile_geometry, compile_side
+from scripts.board_compiler.pipeline import (
+    build_schematic_payload,
+    build_side_manifest,
+    compile_geometry,
+    compile_side,
+)
 
 
 def sample_profile():
@@ -17,6 +22,7 @@ def sample_profile():
         "point_map_source": "source.pdf",
         "schematic_source": "schematic.pdf",
         "default_side_id": "side_2",
+        "schematic_geometry_side_id": "side_2",
         "side_manifest_output": "out/sides.json",
         "schematic_output": "out/schematic.json",
         "cross_source_output": "out/registration.json",
@@ -111,6 +117,34 @@ class BoardPipelineTests(unittest.TestCase):
             self.assertFalse((root / "out/page-1.json").exists())
             self.assertFalse((root / "out/page-2.json").exists())
             self.assertFalse((root / "out/sides.json").exists())
+
+    def test_schematic_payload_links_only_exact_reviewed_identities(self):
+        profile = sample_profile()
+        pages = {
+            1: [
+                {"text": "U2001", "x": 50, "y": 25, "font_size": 10},
+                {"text": "replace U2001", "x": 10, "y": 10, "font_size": 10},
+            ]
+        }
+        page_sizes = {1: {"width": 100, "height": 50}}
+
+        payload = build_schematic_payload(profile, {"U2001", "U3001"}, pages, page_sizes)
+
+        self.assertEqual(payload["board_id"], profile["board_id"])
+        self.assertEqual(payload["audit"]["linked_designators"], 1)
+        self.assertTrue(payload["audit"]["reviewed_recovery_complete"])
+        self.assertEqual(payload["components"]["U2001"][0]["text_origin"], {"x": 0.5, "y": 0.5})
+
+    def test_schematic_payload_reports_missing_reviewed_identity(self):
+        payload = build_schematic_payload(
+            sample_profile(),
+            {"U3001"},
+            {1: [{"text": "U3001", "x": 20, "y": 10, "font_size": 10}]},
+            {1: {"width": 100, "height": 50}},
+        )
+
+        self.assertFalse(payload["audit"]["reviewed_recovery_complete"])
+        self.assertEqual(payload["audit"]["missing_reviewed_designators"], ["U2001"])
 
 
 if __name__ == "__main__":

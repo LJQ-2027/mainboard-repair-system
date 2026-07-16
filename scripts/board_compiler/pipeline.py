@@ -8,6 +8,7 @@ from PIL import Image
 from scripts.board_compiler.compiler import compile_designators
 from scripts.board_compiler.outline import extract_board_outline
 from scripts.board_compiler.pdf_primitives import extract_form_primitives
+from scripts.board_compiler.schematic import extract_schematic_pages, index_component_pages
 from scripts.build_board_atlas_assets import (
     remove_connected_page_background,
     render_pdf_pages,
@@ -155,3 +156,90 @@ def compile_geometry(
     payloads[profile["side_manifest_output"]] = build_side_manifest(profile)
     _stage_json_outputs(root, payloads)
     return compiled
+
+
+def build_schematic_payload(profile, board_designators, pages, page_sizes):
+    reviewed = set(profile.get("reviewed_designators", []))
+    indexed = index_component_pages(pages, set(board_designators) | reviewed)
+    components = {}
+    for designator, occurrences in indexed.items():
+        if not occurrences:
+            continue
+        normalized = []
+        for occurrence in occurrences:
+            size = page_sizes[occurrence["page"]]
+            normalized.append({
+                **occurrence,
+                "text_origin": {
+                    "x": round(occurrence["x"] / size["width"], 6),
+                    "y": round(1 - occurrence["y"] / size["height"], 6),
+                },
+                "source_status": "decoded_pdf_text_run",
+            })
+        components[designator] = normalized
+
+    page_counts = Counter(
+        occurrence["page"]
+        for occurrences in components.values()
+        for occurrence in occurrences
+    )
+    recovered = set(components) & reviewed
+    missing = sorted(reviewed - recovered)
+    linked_board_designators = set(components) & set(board_designators)
+    return {
+        "compiler_id": "SCHEMATIC-COMPILER-PYPDF-V2",
+        "profile_id": profile["profile_id"],
+        "board_id": profile["board_id"],
+        "source": {
+            "path": profile["schematic_source"],
+            "pages": len(pages),
+        },
+        "audit": {
+            "board_designators": len(board_designators),
+            "linked_designators": len(linked_board_designators),
+            "unlinked_designators": len(set(board_designators) - linked_board_designators),
+            "schematic_occurrences": sum(len(occurrences) for occurrences in components.values()),
+            "page_occurrences": {str(page): count for page, count in sorted(page_counts.items())},
+            "reviewed_designators": sorted(reviewed),
+            "recovered_reviewed_designators": sorted(recovered),
+            "missing_reviewed_designators": missing,
+            "reviewed_recovery_complete": not missing,
+            "standalone_match_only": True,
+            "quality_gate_complete": not missing,
+        },
+        "accuracy_boundary": "Only standalone exact designator text runs are linked. Coordinates are normalized PDF text origins, not symbol centers. Embedded note references and merged runs are excluded, and electrical net connectivity is not inferred.",
+        "components": components,
+    }
+
+
+def compile_schematic(
+    root,
+    profile,
+    *,
+    pages=None,
+    page_sizes=None,
+    board_designators=None,
+    preview_builder=None,
+    publish=True,
+):
+    if board_designators is None:
+        board_designators = set()
+        schematic_side_id = profile.get("schematic_geometry_side_id", profile["default_side_id"])
+        side = next(item for item in profile["sides"] if item["side_id"] == schematic_side_id)
+        path = root / side["compiled_data"]
+        data = json.loads(path.read_text(encoding="utf-8"))
+        if data.get("board_id") != profile["board_id"]:
+            raise ValueError(f"{side['side_id']} geometry board_id does not match the profile")
+        board_designators.update(component["designator"] for component in data["components"])
+    if pages is None or page_sizes is None:
+        pages, page_sizes = extract_schematic_pages(root / profile["schematic_source"])
+
+    payload = build_schematic_payload(profile, board_designators, pages, page_sizes)
+    if not payload["audit"]["reviewed_recovery_complete"]:
+        missing = ", ".join(payload["audit"]["missing_reviewed_designators"])
+        raise ValueError(f"schematic is missing reviewed designators: {missing}")
+    if preview_builder:
+        preview_builder(payload["components"])
+    if publish:
+        _stage_json_outputs(root, {profile["schematic_output"]: payload})
+    return payload

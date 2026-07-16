@@ -6,7 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from scripts.board_compiler.pipeline import compile_geometry
+from scripts.board_compiler.pipeline import compile_geometry, compile_schematic
 from scripts.board_compiler.profiles import load_profile
 
 
@@ -19,12 +19,15 @@ def main(argv=None):
     args = parser.parse_args(argv)
     if args.geometry_only and args.schematic_only:
         parser.error("--geometry-only and --schematic-only are mutually exclusive")
-    if args.schematic_only:
-        raise SystemExit("Schematic pipeline is not available until the next implementation task.")
-
     profile = load_profile(ROOT, args.profile)
-    payloads = compile_geometry(ROOT, profile, side_id=args.side)
-    print(json.dumps({"profile_id": args.profile, "sides": [item["audit"] for item in payloads]}, indent=2, ensure_ascii=False))
+    result = {"profile_id": args.profile}
+    if not args.schematic_only:
+        payloads = compile_geometry(ROOT, profile, side_id=args.side)
+        result["sides"] = [item["audit"] for item in payloads]
+    if not args.geometry_only:
+        schematic = compile_schematic(ROOT, profile)
+        result["schematic"] = schematic["audit"]
+    print(json.dumps(result, indent=2, ensure_ascii=False))
     return 0
 
 

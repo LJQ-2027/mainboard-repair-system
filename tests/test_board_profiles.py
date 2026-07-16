@@ -45,6 +45,13 @@ class BoardProfileTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "default_side_id"):
             validate_profile(ROOT, profile)
 
+    def test_rejects_schematic_geometry_side_outside_profile(self):
+        profile = copy.deepcopy(load_profile(ROOT, "kl4-f201"))
+        profile["schematic_geometry_side_id"] = "missing_side"
+
+        with self.assertRaisesRegex(ValueError, "schematic_geometry_side_id"):
+            validate_profile(ROOT, profile)
+
     def test_rejects_outputs_outside_repository(self):
         profile = copy.deepcopy(load_profile(ROOT, "kl4-f201"))
         profile["sides"][0]["compiled_data"] = "../outside.json"
