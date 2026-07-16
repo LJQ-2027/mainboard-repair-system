@@ -1,8 +1,11 @@
 import unittest
+import tempfile
+from pathlib import Path
 
 import numpy as np
+from PIL import Image, ImageDraw
 
-from scripts.board_compiler.outline import largest_component, mask_outer_polygon, simplify_polygon
+from scripts.board_compiler.outline import extract_board_outline, largest_component, mask_outer_polygon, simplify_polygon
 
 
 class BoardOutlineTests(unittest.TestCase):
@@ -28,6 +31,21 @@ class BoardOutlineTests(unittest.TestCase):
         simplified = simplify_polygon(polygon, tolerance=0.1)
         self.assertLess(len(simplified), len(polygon))
         self.assertIn((3, 3), simplified)
+
+    def test_alpha_silhouette_uses_transparency_instead_of_internal_marks(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "board.png"
+            image = Image.new("RGBA", (100, 80), (255, 255, 255, 0))
+            draw = ImageDraw.Draw(image)
+            draw.polygon([(10, 10), (90, 10), (90, 70), (60, 70), (60, 50), (40, 50), (40, 70), (10, 70)], fill=(255, 255, 255, 255))
+            draw.rectangle((45, 20, 55, 30), fill=(0, 0, 0, 255))
+            image.save(path)
+
+            result = extract_board_outline(path, method="alpha_silhouette", closing_radius=0, tolerance=0.5)
+
+            self.assertGreater(result["mask_area_ratio"], 0.5)
+            self.assertLess(result["mask_area_ratio"], 0.6)
+            self.assertTrue(any(point["y"] > 0.6 for point in result["outline"]))
 
 
 if __name__ == "__main__":

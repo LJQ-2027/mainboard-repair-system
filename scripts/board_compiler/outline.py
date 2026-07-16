@@ -144,11 +144,18 @@ def simplify_polygon(polygon, tolerance=2.0):
     return simplified[:-1] if simplified[-1] == simplified[0] else simplified
 
 
-def extract_board_outline(image_path, closing_radius=8, tolerance=2.5):
-    image = np.asarray(Image.open(image_path).convert("RGB"))
-    engineering_marks = image.min(axis=2) < 235
-    closed = dilate(engineering_marks, closing_radius)
-    board = erode(fill_holes(largest_component(closed)), closing_radius)
+def extract_board_outline(image_path, closing_radius=8, tolerance=2.5, method="engineering_marks"):
+    source = Image.open(image_path)
+    if method == "engineering_marks":
+        image = np.asarray(source.convert("RGB"))
+        engineering_marks = image.min(axis=2) < 235
+        closed = dilate(engineering_marks, closing_radius)
+        board = erode(fill_holes(largest_component(closed)), closing_radius)
+    elif method == "alpha_silhouette":
+        image = np.asarray(source.convert("RGBA"))
+        board = fill_holes(largest_component(image[:, :, 3] > 32))
+    else:
+        raise ValueError(f"Unsupported board outline method: {method}")
     polygon = simplify_polygon(mask_outer_polygon(board), tolerance)
     height, width = board.shape
     normalized = [{"x": round(x / width, 6), "y": round(y / height, 6)} for x, y in polygon]

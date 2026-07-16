@@ -7,6 +7,7 @@
       "board_id": "BOARD-KM4-F151-MAIN-V1.2",
       "board_version": "F151_MAIN_PCB_V1.2",
       "component_prefix": "KM4-F151",
+      "outline_method": "engineering_marks",
       "point_map_source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/F151_MAIN_PCB_V1.2_位号图.pdf",
       "schematic_source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/F151_MAIN_PCB_1_维修原理图_V1.2_20250310.pdf",
       "default_side_id": "main_page_2",
@@ -46,6 +47,7 @@
       "board_id": "BOARD-KL4-F201-MAIN-V1.2",
       "board_version": "F201_MAIN_V1.2",
       "component_prefix": "KL4-F201",
+      "outline_method": "alpha_silhouette",
       "point_map_source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KL4-F201/F201_MAIN_V1.2_零件位号.pdf",
       "schematic_source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KL4-F201/K6735_F201_MAIN_SCH_V1.2维修原理图20240614.pdf",
       "default_side_id": "main_page_2",
@@ -65,8 +67,8 @@
           "source_pdf_page": 1,
           "engineering_texture": "assets/board-atlas/kl4-f201/main-point-map-page-1.png",
           "compiled_data": "knowledge-base/kl4-board-compiled-page-1.json",
-          "source_crop": {"x": 0, "y": 0, "width": 1, "height": 1},
-          "required_designators": []
+          "source_crop": {"x": 0.038636, "y": 0.190196, "width": 0.922727, "height": 0.759804},
+          "required_designators": ["U1001"]
         },
         {
           "side_id": "main_page_2",
@@ -74,8 +76,8 @@
           "source_pdf_page": 2,
           "engineering_texture": "assets/board-atlas/kl4-f201/main-point-map-page-2.png",
           "compiled_data": "knowledge-base/kl4-board-compiled.json",
-          "source_crop": {"x": 0, "y": 0, "width": 1, "height": 1},
-          "required_designators": ["U1001", "U2001", "X2100"]
+          "source_crop": {"x": 0.038636, "y": 0.168627, "width": 0.922727, "height": 0.781373},
+          "required_designators": ["U2001", "X2100"]
         }
       ]
     }

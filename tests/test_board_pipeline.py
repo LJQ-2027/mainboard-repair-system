@@ -111,7 +111,7 @@ class BoardPipelineTests(unittest.TestCase):
                     profile,
                     render_textures=False,
                     primitive_extractor=primitive_extractor,
-                    outline_extractor=lambda _path: sample_outline(),
+                    outline_extractor=lambda _path, **_options: sample_outline(),
                 )
 
             self.assertFalse((root / "out/page-1.json").exists())

@@ -35,6 +35,8 @@ def validate_profile(root, profile):
     for field in required_text:
         if not isinstance(profile.get(field), str) or not profile[field].strip():
             raise ValueError(f"{field} is required")
+    if profile.get("outline_method", "engineering_marks") not in ("engineering_marks", "alpha_silhouette"):
+        raise ValueError("outline_method must be engineering_marks or alpha_silhouette")
 
     _repository_path(root, profile.get("point_map_source"), "point_map_source", must_exist=True)
     _repository_path(root, profile.get("schematic_source"), "schematic_source", must_exist=True)

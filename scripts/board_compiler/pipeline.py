@@ -146,7 +146,10 @@ def compile_geometry(
     source = root / profile["point_map_source"]
     for side in selected:
         primitives = primitive_extractor(source, side["source_pdf_page"])
-        outline = outline_extractor(root / side["engineering_texture"])
+        outline = outline_extractor(
+            root / side["engineering_texture"],
+            method=profile.get("outline_method", "engineering_marks"),
+        )
         result = compile_side(root, profile, side, primitives=primitives, outline=outline)
         if not result["audit"]["required_recovery_complete"]:
             missing = ", ".join(result["audit"]["missing_required_designators"])
