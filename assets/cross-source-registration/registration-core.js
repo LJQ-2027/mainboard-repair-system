@@ -8,6 +8,39 @@ export function validateNormalizedPoint(point) {
   return { x: point.x, y: point.y };
 }
 
+function pointsEqual(left, right) {
+  return Math.abs(left.x - right.x) < EPSILON && Math.abs(left.y - right.y) < EPSILON;
+}
+
+function signedPolygonArea(points) {
+  return points.reduce((sum, point, index) => {
+    const next = points[(index + 1) % points.length];
+    return sum + point.x * next.y - next.x * point.y;
+  }, 0) / 2;
+}
+
+export function validateAnchorPairs(source, target) {
+  if (!Array.isArray(source) || !Array.isArray(target) || source.length !== 4 || target.length !== 4) {
+    throw new Error('Registration requires exactly four source and target anchors.');
+  }
+  const normalizedSource = source.map(validateNormalizedPoint);
+  const normalizedTarget = target.map(validateNormalizedPoint);
+  for (const [label, points] of [['source', normalizedSource], ['target', normalizedTarget]]) {
+    for (let index = 0; index < points.length; index += 1) {
+      if (points.slice(index + 1).some((point) => pointsEqual(points[index], point))) {
+        throw new Error(`Registration ${label} anchors contain a duplicate point.`);
+      }
+    }
+    if (Math.abs(signedPolygonArea(points)) < EPSILON) {
+      throw new Error(`Registration ${label} anchor order is degenerate.`);
+    }
+  }
+  if (Math.sign(signedPolygonArea(normalizedSource)) !== Math.sign(signedPolygonArea(normalizedTarget))) {
+    throw new Error('Registration source and target anchor order must use the same winding.');
+  }
+  return { source: normalizedSource, target: normalizedTarget };
+}
+
 function solveLinearSystem(matrix, values) {
   const rows = matrix.map((row, index) => [...row, values[index]]);
   const size = values.length;
@@ -83,4 +116,22 @@ export function invertHomography(matrix) {
 
 export function projectPolygon(matrix, polygon) {
   return polygon.map((point) => projectPoint(matrix, point));
+}
+
+export function calculateRegistrationError(matrix, checkPairs) {
+  if (!Array.isArray(checkPairs) || !checkPairs.length) {
+    return { count: 0, rms: null, maximum: null, errors: [] };
+  }
+  const errors = checkPairs.map((pair) => {
+    const board = validateNormalizedPoint(pair?.board);
+    const image = validateNormalizedPoint(pair?.image);
+    const projected = projectPoint(matrix, board);
+    return Math.hypot(projected.x - image.x, projected.y - image.y);
+  });
+  return {
+    count: errors.length,
+    rms: Math.sqrt(errors.reduce((sum, error) => sum + error * error, 0) / errors.length),
+    maximum: Math.max(...errors),
+    errors,
+  };
 }

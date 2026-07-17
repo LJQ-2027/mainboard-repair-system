@@ -2,6 +2,14 @@
 
 基于 AI 大模型的智能主板维修辅助系统，支持 Anthropic Claude 和 DeepSeek 双平台。
 
+## 视觉 QC 数据工作台
+
+本机工作台入口：
+
+`http://127.0.0.1:8898/assets/visual-qc-workbench/`
+
+当前覆盖图片质量检查、四锚点配准、独立检查点、人工审核、矩形/多边形缺陷标注、编译器件 footprint 建议、IndexedDB 草稿，以及 `VISUAL-QC-CASE-V1` JSON 和标注预览图导出。数据边界和实物照片验收门禁见 `docs/visual-qc-workbench-2026-07-17.md`。
+
 ## 功能特性
 
 - 🤖 **AI 智能诊断**：通过大语言模型辅助分析主板故障
