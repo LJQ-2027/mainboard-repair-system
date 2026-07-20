@@ -161,6 +161,17 @@ The production server must enforce authentication, role-based access, controlled
 7. Re-run acceptance with a known KM4/F151 bare-board front/back photo set.
 8. Begin model training only after a separate audit confirms sufficient real labels and class distribution.
 
+## Implementation Progress
+
+The first two delivery items are implemented locally:
+
+- deterministic synthetic transforms cover all ten sides in the five-board catalog;
+- the CPU OpenCV core uses contour evidence, ORB with AKAZE fallback, RANSAC homography validation, and structured manual fallback;
+- `VISUAL-QC-REGISTRATION-CANDIDATE-V1` keeps automatic output in a draft candidate state;
+- the committed benchmark covers 20 synthetic cases and all 21 reviewed Service Manual proxy images.
+
+This progress does not imply server deployment. Upload, persistent jobs, Golden Sample review, difference candidates, and browser integration remain open.
+
 ## Acceptance Boundary
 
 The first server increment is accepted when:

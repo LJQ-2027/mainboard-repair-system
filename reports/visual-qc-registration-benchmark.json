@@ -1,0 +1,2984 @@
+{
+  "field_accuracy_claim_allowed": false,
+  "schema_version": "VISUAL-QC-REGISTRATION-BENCHMARK-BUNDLE-V1",
+  "service_manual_proxy": {
+    "cases": [
+      {
+        "asset_path": "assets/vision-reference-gallery/km4/embedded/page-003-image-02.jpg",
+        "board_key": "km4-f151",
+        "board_scope": "mixed_phone_components",
+        "case_id": "km4-page-003-image-02",
+        "comparison_reason": "reference_role_not_isolated_mainboard",
+        "counts_as_field_qc_evidence": false,
+        "declared_board_side": "unknown",
+        "evidence_role": "service_manual_proxy",
+        "model": "KM4",
+        "reference_role": "exploded_structure",
+        "registration": null,
+        "selected_side_id": null,
+        "status": "not_comparable"
+      },
+      {
+        "asset_path": "assets/vision-reference-gallery/km4/embedded/page-010-image-05.jpg",
+        "board_key": "km4-f151",
+        "board_scope": "main",
+        "case_id": "km4-page-010-image-05",
+        "comparison_reason": "low_inlier_count",
+        "counts_as_field_qc_evidence": false,
+        "declared_board_side": "unknown",
+        "evidence_role": "service_manual_proxy",
+        "model": "KM4",
+        "reference_role": "installed_mainboard",
+        "registration": {
+          "board_to_image_matrix": null,
+          "evidence": {
+            "attempts": [
+              {
+                "capture_keypoints": 5000,
+                "detector": "orb",
+                "failure_code": "low_inlier_count",
+                "inlier_ratio": 0.19230769230769232,
+                "inliers": 5,
+                "matches": 26,
+                "reference_keypoints": 5000,
+                "status": "failed"
+              },
+              {
+                "capture_keypoints": 1470,
+                "detector": "akaze",
+                "failure_code": "low_inlier_count",
+                "inlier_ratio": 0.2222222222222222,
+                "inliers": 6,
+                "matches": 27,
+                "reference_keypoints": 4020,
+                "status": "failed"
+              }
+            ],
+            "board_contour": {
+              "area_fraction": 0.5048955803788246,
+              "bbox": {
+                "height": 0.9084507042253521,
+                "width": 0.6413793103448275,
+                "x": 0.16160220994475138,
+                "y": 0.09176470588235294
+              },
+              "polygon": [
+                [
+                  0.8024861216545105,
+                  0.9999998807907104
+                ],
+                [
+                  0.1616022139787674,
+                  0.9999998807907104
+                ],
+                [
+                  0.1616022139787674,
+                  0.09176470339298248
+                ],
+                [
+                  0.8024861216545105,
+                  0.09176470339298248
+                ]
+              ],
+              "status": "candidate"
+            }
+          },
+          "failure": {
+            "code": "low_inlier_count",
+            "message": "Automatic registration did not produce a technically valid candidate."
+          },
+          "fallback": {
+            "method": "reviewed_manual_four_point",
+            "reason_code": "low_inlier_count"
+          },
+          "method": null,
+          "requires_human_review": false,
+          "requires_manual_registration": true,
+          "review_status": null,
+          "schema_version": "VISUAL-QC-REGISTRATION-CANDIDATE-V1",
+          "status": "manual_required"
+        },
+        "selected_side_id": "main_page_2",
+        "status": "manual_required"
+      },
+      {
+        "asset_path": "assets/vision-reference-gallery/km4/embedded/page-010-image-03.jpg",
+        "board_key": "km4-f151",
+        "board_scope": "sub",
+        "case_id": "km4-page-010-image-03",
+        "comparison_reason": "reference_role_not_isolated_mainboard",
+        "counts_as_field_qc_evidence": false,
+        "declared_board_side": "unknown",
+        "evidence_role": "service_manual_proxy",
+        "model": "KM4",
+        "reference_role": "installed_subboard",
+        "registration": null,
+        "selected_side_id": null,
+        "status": "not_comparable"
+      },
+      {
+        "asset_path": "assets/vision-reference-gallery/kl4/embedded/page-003-image-02.jpg",
+        "board_key": "kl4-f201",
+        "board_scope": "mixed_phone_components",
+        "case_id": "kl4-page-003-image-02",
+        "comparison_reason": "reference_role_not_isolated_mainboard",
+        "counts_as_field_qc_evidence": false,
+        "declared_board_side": "unknown",
+        "evidence_role": "service_manual_proxy",
+        "model": "KL4",
+        "reference_role": "exploded_structure",
+        "registration": null,
+        "selected_side_id": null,
+        "status": "not_comparable"
+      },
+      {
+        "asset_path": "assets/vision-reference-gallery/kl4/embedded/page-010-image-02.jpg",
+        "board_key": "kl4-f201",
+        "board_scope": "main",
+        "case_id": "kl4-page-010-image-02",
+        "comparison_reason": "low_inlier_count",
+        "counts_as_field_qc_evidence": false,
+        "declared_board_side": "unknown",
+        "evidence_role": "service_manual_proxy",
+        "model": "KL4",
+        "reference_role": "installed_mainboard",
+        "registration": {
+          "board_to_image_matrix": null,
+          "evidence": {
+            "attempts": [
+              {
+                "capture_keypoints": 4917,
+                "detector": "orb",
+                "failure_code": "low_inlier_count",
+                "inlier_ratio": 0.07692307692307693,
+                "inliers": 3,
+                "matches": 39,
+                "reference_keypoints": 5000,
+                "status": "failed"
+              },
+              {
+                "capture_keypoints": 1154,
+                "detector": "akaze",
+                "failure_code": "low_inlier_count",
+                "inlier_ratio": 0.10714285714285714,
+                "inliers": 3,
+                "matches": 28,
+                "reference_keypoints": 2368,
+                "status": "failed"
+              }
+            ],
+            "board_contour": {
+              "area_fraction": 0.8968198116685098,
+              "bbox": {
+                "height": 1.0,
+                "width": 1.0,
+                "x": 0.0,
+                "y": 0.0
+              },
+              "polygon": [
+                [
+                  0.9999998211860657,
+                  0.9999998211860657
+                ],
+                [
+                  -1.968901450676897e-17,
+                  0.9999998211860657
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.9999998211860657,
+                  0.0
+                ]
+              ],
+              "status": "candidate"
+            }
+          },
+          "failure": {
+            "code": "low_inlier_count",
+            "message": "Automatic registration did not produce a technically valid candidate."
+          },
+          "fallback": {
+            "method": "reviewed_manual_four_point",
+            "reason_code": "low_inlier_count"
+          },
+          "method": null,
+          "requires_human_review": false,
+          "requires_manual_registration": true,
+          "review_status": null,
+          "schema_version": "VISUAL-QC-REGISTRATION-CANDIDATE-V1",
+          "status": "manual_required"
+        },
+        "selected_side_id": "main_page_1",
+        "status": "manual_required"
+      },
+      {
+        "asset_path": "assets/vision-reference-gallery/kl4/embedded/page-011-image-01.jpg",
+        "board_key": "kl4-f201",
+        "board_scope": "sub",
+        "case_id": "kl4-page-011-image-01",
+        "comparison_reason": "reference_role_not_isolated_mainboard",
+        "counts_as_field_qc_evidence": false,
+        "declared_board_side": "unknown",
+        "evidence_role": "service_manual_proxy",
+        "model": "KL4",
+        "reference_role": "installed_subboard",
+        "registration": null,
+        "selected_side_id": null,
+        "status": "not_comparable"
+      },
+      {
+        "asset_path": "assets/vision-reference-gallery/cla5/embedded/page-003-image-02.jpg",
+        "board_key": null,
+        "board_scope": "mixed_phone_components",
+        "case_id": "cla5-page-003-image-02",
+        "comparison_reason": "board_reference_unavailable",
+        "counts_as_field_qc_evidence": false,
+        "declared_board_side": "unknown",
+        "evidence_role": "service_manual_proxy",
+        "model": "CLA5",
+        "reference_role": "exploded_structure",
+        "registration": null,
+        "selected_side_id": null,
+        "status": "not_comparable"
+      },
+      {
+        "asset_path": "assets/vision-reference-gallery/cla5/embedded/page-011-image-04.jpg",
+        "board_key": null,
+        "board_scope": "main",
+        "case_id": "cla5-page-011-image-04",
+        "comparison_reason": "board_reference_unavailable",
+        "counts_as_field_qc_evidence": false,
+        "declared_board_side": "unknown",
+        "evidence_role": "service_manual_proxy",
+        "model": "CLA5",
+        "reference_role": "installed_mainboard",
+        "registration": null,
+        "selected_side_id": null,
+        "status": "not_comparable"
+      },
+      {
+        "asset_path": "assets/vision-reference-gallery/cla5/embedded/page-011-image-02.jpg",
+        "board_key": null,
+        "board_scope": "sub",
+        "case_id": "cla5-page-011-image-02",
+        "comparison_reason": "board_reference_unavailable",
+        "counts_as_field_qc_evidence": false,
+        "declared_board_side": "unknown",
+        "evidence_role": "service_manual_proxy",
+        "model": "CLA5",
+        "reference_role": "installed_subboard",
+        "registration": null,
+        "selected_side_id": null,
+        "status": "not_comparable"
+      },
+      {
+        "asset_path": "assets/vision-reference-gallery/kj5/embedded/page-003-image-02.jpg",
+        "board_key": null,
+        "board_scope": "mixed_phone_components",
+        "case_id": "kj5-page-003-image-02",
+        "comparison_reason": "board_reference_unavailable",
+        "counts_as_field_qc_evidence": false,
+        "declared_board_side": "unknown",
+        "evidence_role": "service_manual_proxy",
+        "model": "KJ5",
+        "reference_role": "exploded_structure",
+        "registration": null,
+        "selected_side_id": null,
+        "status": "not_comparable"
+      },
+      {
+        "asset_path": "assets/vision-reference-gallery/kj5/embedded/page-009-image-06.jpg",
+        "board_key": null,
+        "board_scope": "main",
+        "case_id": "kj5-page-009-image-06",
+        "comparison_reason": "board_reference_unavailable",
+        "counts_as_field_qc_evidence": false,
+        "declared_board_side": "unknown",
+        "evidence_role": "service_manual_proxy",
+        "model": "KJ5",
+        "reference_role": "installed_mainboard",
+        "registration": null,
+        "selected_side_id": null,
+        "status": "not_comparable"
+      },
+      {
+        "asset_path": "assets/vision-reference-gallery/kj5/embedded/page-009-image-04.jpg",
+        "board_key": null,
+        "board_scope": "sub",
+        "case_id": "kj5-page-009-image-04",
+        "comparison_reason": "board_reference_unavailable",
+        "counts_as_field_qc_evidence": false,
+        "declared_board_side": "unknown",
+        "evidence_role": "service_manual_proxy",
+        "model": "KJ5",
+        "reference_role": "installed_subboard",
+        "registration": null,
+        "selected_side_id": null,
+        "status": "not_comparable"
+      },
+      {
+        "asset_path": "assets/vision-reference-gallery/cm5/embedded/page-003-image-02.jpg",
+        "board_key": "cm6-h8918",
+        "board_scope": "mixed_phone_components",
+        "case_id": "cm5-page-003-image-02",
+        "comparison_reason": "reference_role_not_isolated_mainboard",
+        "counts_as_field_qc_evidence": false,
+        "declared_board_side": "unknown",
+        "evidence_role": "service_manual_proxy",
+        "model": "CM5",
+        "reference_role": "exploded_structure",
+        "registration": null,
+        "selected_side_id": null,
+        "status": "not_comparable"
+      },
+      {
+        "asset_path": "assets/vision-reference-gallery/cm5/embedded/page-011-image-01.jpg",
+        "board_key": "cm6-h8918",
+        "board_scope": "main",
+        "case_id": "cm5-page-011-image-01",
+        "comparison_reason": "low_inlier_count",
+        "counts_as_field_qc_evidence": false,
+        "declared_board_side": "unknown",
+        "evidence_role": "service_manual_proxy",
+        "model": "CM5",
+        "reference_role": "installed_mainboard",
+        "registration": {
+          "board_to_image_matrix": null,
+          "evidence": {
+            "attempts": [
+              {
+                "capture_keypoints": 5000,
+                "detector": "orb",
+                "failure_code": "low_inlier_count",
+                "inlier_ratio": 0.022727272727272728,
+                "inliers": 1,
+                "matches": 44,
+                "reference_keypoints": 5000,
+                "status": "failed"
+              },
+              {
+                "capture_keypoints": 1807,
+                "detector": "akaze",
+                "failure_code": "low_inlier_count",
+                "inlier_ratio": 0.2,
+                "inliers": 6,
+                "matches": 30,
+                "reference_keypoints": 3041,
+                "status": "failed"
+              }
+            ],
+            "board_contour": {
+              "area_fraction": 0.6941586458679058,
+              "bbox": {
+                "height": 1.0,
+                "width": 1.0,
+                "x": 0.0,
+                "y": 0.0
+              },
+              "polygon": [
+                [
+                  0.9999998807907104,
+                  0.9999997615814209
+                ],
+                [
+                  -1.883794491812541e-17,
+                  0.9999997615814209
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.9999998807907104,
+                  0.0
+                ]
+              ],
+              "status": "candidate"
+            }
+          },
+          "failure": {
+            "code": "low_inlier_count",
+            "message": "Automatic registration did not produce a technically valid candidate."
+          },
+          "fallback": {
+            "method": "reviewed_manual_four_point",
+            "reason_code": "low_inlier_count"
+          },
+          "method": null,
+          "requires_human_review": false,
+          "requires_manual_registration": true,
+          "review_status": null,
+          "schema_version": "VISUAL-QC-REGISTRATION-CANDIDATE-V1",
+          "status": "manual_required"
+        },
+        "selected_side_id": "main_page_1",
+        "status": "manual_required"
+      },
+      {
+        "asset_path": "assets/vision-reference-gallery/cm5/embedded/page-011-image-06.jpg",
+        "board_key": "cm6-h8918",
+        "board_scope": "sub",
+        "case_id": "cm5-page-011-image-06",
+        "comparison_reason": "reference_role_not_isolated_mainboard",
+        "counts_as_field_qc_evidence": false,
+        "declared_board_side": "unknown",
+        "evidence_role": "service_manual_proxy",
+        "model": "CM5",
+        "reference_role": "installed_subboard",
+        "registration": null,
+        "selected_side_id": null,
+        "status": "not_comparable"
+      },
+      {
+        "asset_path": "assets/vision-reference-gallery/cm6/embedded/page-003-image-02.jpg",
+        "board_key": "cm6-h8918",
+        "board_scope": "mixed_phone_components",
+        "case_id": "cm6-page-003-image-02",
+        "comparison_reason": "reference_role_not_isolated_mainboard",
+        "counts_as_field_qc_evidence": false,
+        "declared_board_side": "unknown",
+        "evidence_role": "service_manual_proxy",
+        "model": "CM6",
+        "reference_role": "exploded_structure",
+        "registration": null,
+        "selected_side_id": null,
+        "status": "not_comparable"
+      },
+      {
+        "asset_path": "assets/vision-reference-gallery/cm6/embedded/page-011-image-01.jpg",
+        "board_key": "cm6-h8918",
+        "board_scope": "main",
+        "case_id": "cm6-page-011-image-01",
+        "comparison_reason": "low_inlier_count",
+        "counts_as_field_qc_evidence": false,
+        "declared_board_side": "unknown",
+        "evidence_role": "service_manual_proxy",
+        "model": "CM6",
+        "reference_role": "installed_mainboard",
+        "registration": {
+          "board_to_image_matrix": null,
+          "evidence": {
+            "attempts": [
+              {
+                "capture_keypoints": 5000,
+                "detector": "orb",
+                "failure_code": "low_inlier_count",
+                "inlier_ratio": 0.21621621621621623,
+                "inliers": 8,
+                "matches": 37,
+                "reference_keypoints": 5000,
+                "status": "failed"
+              },
+              {
+                "capture_keypoints": 1679,
+                "detector": "akaze",
+                "failure_code": "low_inlier_count",
+                "inlier_ratio": 0.16666666666666666,
+                "inliers": 5,
+                "matches": 30,
+                "reference_keypoints": 3076,
+                "status": "failed"
+              }
+            ],
+            "board_contour": {
+              "area_fraction": 0.7030718332137799,
+              "bbox": {
+                "height": 1.0,
+                "width": 1.0,
+                "x": 0.0,
+                "y": 0.0
+              },
+              "polygon": [
+                [
+                  0.9999998807907104,
+                  0.9999998807907104
+                ],
+                [
+                  -1.7865350916969236e-17,
+                  0.9999998807907104
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.9999998807907104,
+                  0.0
+                ]
+              ],
+              "status": "candidate"
+            }
+          },
+          "failure": {
+            "code": "low_inlier_count",
+            "message": "Automatic registration did not produce a technically valid candidate."
+          },
+          "fallback": {
+            "method": "reviewed_manual_four_point",
+            "reason_code": "low_inlier_count"
+          },
+          "method": null,
+          "requires_human_review": false,
+          "requires_manual_registration": true,
+          "review_status": null,
+          "schema_version": "VISUAL-QC-REGISTRATION-CANDIDATE-V1",
+          "status": "manual_required"
+        },
+        "selected_side_id": "main_page_2",
+        "status": "manual_required"
+      },
+      {
+        "asset_path": "assets/vision-reference-gallery/cm6/embedded/page-011-image-05.jpg",
+        "board_key": "cm6-h8918",
+        "board_scope": "sub",
+        "case_id": "cm6-page-011-image-05",
+        "comparison_reason": "reference_role_not_isolated_mainboard",
+        "counts_as_field_qc_evidence": false,
+        "declared_board_side": "unknown",
+        "evidence_role": "service_manual_proxy",
+        "model": "CM6",
+        "reference_role": "installed_subboard",
+        "registration": null,
+        "selected_side_id": null,
+        "status": "not_comparable"
+      },
+      {
+        "asset_path": "assets/vision-reference-gallery/x6880/embedded/page-003-image-02.jpg",
+        "board_key": null,
+        "board_scope": "mixed_phone_components",
+        "case_id": "x6880-page-003-image-02",
+        "comparison_reason": "board_reference_unavailable",
+        "counts_as_field_qc_evidence": false,
+        "declared_board_side": "unknown",
+        "evidence_role": "service_manual_proxy",
+        "model": "X6880",
+        "reference_role": "exploded_structure",
+        "registration": null,
+        "selected_side_id": null,
+        "status": "not_comparable"
+      },
+      {
+        "asset_path": "assets/vision-reference-gallery/x6880/embedded/page-009-image-06.jpg",
+        "board_key": null,
+        "board_scope": "main",
+        "case_id": "x6880-page-009-image-06",
+        "comparison_reason": "board_reference_unavailable",
+        "counts_as_field_qc_evidence": false,
+        "declared_board_side": "unknown",
+        "evidence_role": "service_manual_proxy",
+        "model": "X6880",
+        "reference_role": "installed_mainboard",
+        "registration": null,
+        "selected_side_id": null,
+        "status": "not_comparable"
+      },
+      {
+        "asset_path": "assets/vision-reference-gallery/x6880/embedded/page-010-image-05.jpg",
+        "board_key": null,
+        "board_scope": "sub",
+        "case_id": "x6880-page-010-image-05",
+        "comparison_reason": "board_reference_unavailable",
+        "counts_as_field_qc_evidence": false,
+        "declared_board_side": "unknown",
+        "evidence_role": "service_manual_proxy",
+        "model": "X6880",
+        "reference_role": "installed_subboard",
+        "registration": null,
+        "selected_side_id": null,
+        "status": "not_comparable"
+      }
+    ],
+    "evidence_role": "service_manual_proxy",
+    "field_accuracy_claim_allowed": false,
+    "schema_version": "VISUAL-QC-REGISTRATION-BENCHMARK-V1",
+    "summary": {
+      "case_count": 21,
+      "comparable_count": 4,
+      "not_comparable_count": 17,
+      "status_counts": {
+        "manual_required": 4,
+        "not_comparable": 17
+      }
+    }
+  },
+  "synthetic": {
+    "cases": [
+      {
+        "board_id": "BOARD-F069M-MAIN-V1.0",
+        "board_key": "bg6m-f069m",
+        "case_id": "bg6m-f069m-main_page_1-seed-41",
+        "counts_as_field_qc_evidence": false,
+        "evidence_role": "synthetic_proxy",
+        "failure_code": null,
+        "mean_corner_error": 0.0007479856714730827,
+        "registration": {
+          "board_to_image_matrix": [
+            1.0023497998123556,
+            0.023972326362496185,
+            -0.016766630762114668,
+            -0.1348334997340292,
+            0.9277473424477292,
+            0.08005228947514102,
+            0.02213777583543415,
+            -0.08883886993871314,
+            1.0
+          ],
+          "evidence": {
+            "attempts": [
+              {
+                "capture_keypoints": 5000,
+                "detector": "orb",
+                "failure_code": null,
+                "inlier_ratio": 0.9359801488833747,
+                "inliers": 1886,
+                "matches": 2015,
+                "reference_keypoints": 5000,
+                "status": "candidate"
+              }
+            ],
+            "board_contour": {
+              "area_fraction": 0.8179001250390747,
+              "bbox": {
+                "height": 1.0,
+                "width": 1.0,
+                "x": 0.0,
+                "y": 0.0
+              },
+              "polygon": [
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  -1.9980388877540773e-17,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ]
+              ],
+              "status": "candidate"
+            },
+            "capture_keypoints": 5000,
+            "detector": "orb",
+            "inlier_count": 1886,
+            "inlier_ratio": 0.9359801488833747,
+            "match_count": 2015,
+            "projected_area": 1.0445330142974854,
+            "projected_convex": true,
+            "projected_quad": [
+              [
+                -0.016766630113124847,
+                0.08005228638648987
+              ],
+              [
+                0.9637268781661987,
+                -0.053525228053331375
+              ],
+              [
+                1.0810600519180298,
+                0.9346935153007507
+              ],
+              [
+                0.007889493368566036,
+                1.1052806377410889
+              ]
+            ],
+            "reference_coverage": 0.7384127546138473,
+            "reference_keypoints": 5000,
+            "reprojection_maximum": 0.0040618497878313065,
+            "reprojection_rms": 0.0011668271028327875,
+            "technical_thresholds": {
+              "max_dimension": 1400,
+              "maximum_reprojection_rms": 0.03,
+              "minimum_inlier_ratio": 0.35,
+              "minimum_inliers": 10,
+              "minimum_keypoints": 12,
+              "minimum_matches": 12,
+              "minimum_reference_coverage": 0.08,
+              "ransac_reprojection_pixels": 4.0,
+              "ratio_test": 0.78
+            }
+          },
+          "failure": null,
+          "fallback": {
+            "method": "reviewed_manual_four_point",
+            "reason_code": null
+          },
+          "method": "automatic_feature_homography",
+          "requires_human_review": true,
+          "requires_manual_registration": false,
+          "review_status": "draft",
+          "schema_version": "VISUAL-QC-REGISTRATION-CANDIDATE-V1",
+          "status": "candidate"
+        },
+        "seed": 41,
+        "side_id": "main_page_1",
+        "status": "candidate"
+      },
+      {
+        "board_id": "BOARD-F069M-MAIN-V1.0",
+        "board_key": "bg6m-f069m",
+        "case_id": "bg6m-f069m-main_page_1-seed-82",
+        "counts_as_field_qc_evidence": false,
+        "evidence_role": "synthetic_proxy",
+        "failure_code": null,
+        "mean_corner_error": 0.0007568676285990209,
+        "registration": {
+          "board_to_image_matrix": [
+            0.9326885980350851,
+            -0.11881832869592787,
+            0.05693803975056778,
+            0.17365442905723869,
+            0.9075389449484014,
+            -0.05720853717106751,
+            -0.038081153054841076,
+            -0.06521251509780117,
+            1.0
+          ],
+          "evidence": {
+            "attempts": [
+              {
+                "capture_keypoints": 5000,
+                "detector": "orb",
+                "failure_code": null,
+                "inlier_ratio": 0.942960615663196,
+                "inliers": 2083,
+                "matches": 2209,
+                "reference_keypoints": 5000,
+                "status": "candidate"
+              }
+            ],
+            "board_contour": {
+              "area_fraction": 0.8443779306033136,
+              "bbox": {
+                "height": 1.0,
+                "width": 1.0,
+                "x": 0.0,
+                "y": 0.0
+              },
+              "polygon": [
+                [
+                  0.9999999403953552,
+                  0.9999998807907104
+                ],
+                [
+                  8.725540823206757e-08,
+                  0.9999998807907104
+                ],
+                [
+                  8.725540823206757e-08,
+                  0.0
+                ],
+                [
+                  0.9999999403953552,
+                  0.0
+                ]
+              ],
+              "status": "candidate"
+            },
+            "capture_keypoints": 5000,
+            "detector": "orb",
+            "inlier_count": 2083,
+            "inlier_ratio": 0.942960615663196,
+            "match_count": 2209,
+            "projected_area": 1.0156396627426147,
+            "projected_convex": true,
+            "projected_quad": [
+              [
+                0.056938041001558304,
+                -0.05720853805541992
+              ],
+              [
+                1.0282676219940186,
+                0.12095731496810913
+              ],
+              [
+                0.9705867171287537,
+                1.1410526037216187
+              ],
+              [
+                -0.0661059096455574,
+                0.9089344143867493
+              ]
+            ],
+            "reference_coverage": 0.7565360134664836,
+            "reference_keypoints": 5000,
+            "reprojection_maximum": 0.004170255735516548,
+            "reprojection_rms": 0.0011316588526855147,
+            "technical_thresholds": {
+              "max_dimension": 1400,
+              "maximum_reprojection_rms": 0.03,
+              "minimum_inlier_ratio": 0.35,
+              "minimum_inliers": 10,
+              "minimum_keypoints": 12,
+              "minimum_matches": 12,
+              "minimum_reference_coverage": 0.08,
+              "ransac_reprojection_pixels": 4.0,
+              "ratio_test": 0.78
+            }
+          },
+          "failure": null,
+          "fallback": {
+            "method": "reviewed_manual_four_point",
+            "reason_code": null
+          },
+          "method": "automatic_feature_homography",
+          "requires_human_review": true,
+          "requires_manual_registration": false,
+          "review_status": "draft",
+          "schema_version": "VISUAL-QC-REGISTRATION-CANDIDATE-V1",
+          "status": "candidate"
+        },
+        "seed": 82,
+        "side_id": "main_page_1",
+        "status": "candidate"
+      },
+      {
+        "board_id": "BOARD-F069M-MAIN-V1.0",
+        "board_key": "bg6m-f069m",
+        "case_id": "bg6m-f069m-main_page_2-seed-41",
+        "counts_as_field_qc_evidence": false,
+        "evidence_role": "synthetic_proxy",
+        "failure_code": null,
+        "mean_corner_error": 0.0006588535931568883,
+        "registration": {
+          "board_to_image_matrix": [
+            1.0027489902609967,
+            0.024121291438194126,
+            -0.0166717995233825,
+            -0.13460448390906696,
+            0.9285824752510856,
+            0.07972206725203307,
+            0.022824804886034496,
+            -0.0885658330692285,
+            1.0
+          ],
+          "evidence": {
+            "attempts": [
+              {
+                "capture_keypoints": 5000,
+                "detector": "orb",
+                "failure_code": null,
+                "inlier_ratio": 0.9465039887376818,
+                "inliers": 2017,
+                "matches": 2131,
+                "reference_keypoints": 5000,
+                "status": "candidate"
+              }
+            ],
+            "board_contour": {
+              "area_fraction": 0.8279243513597999,
+              "bbox": {
+                "height": 1.0,
+                "width": 1.0,
+                "x": 0.0,
+                "y": 0.0
+              },
+              "polygon": [
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  -1.9980388877540773e-17,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ]
+              ],
+              "status": "candidate"
+            },
+            "capture_keypoints": 5000,
+            "detector": "orb",
+            "inlier_count": 2017,
+            "inlier_ratio": 0.9465039887376818,
+            "match_count": 2131,
+            "projected_area": 1.044280767440796,
+            "projected_convex": true,
+            "projected_quad": [
+              [
+                -0.0166717991232872,
+                0.07972206920385361
+              ],
+              [
+                0.9635626673698425,
+                -0.05358836054801941
+              ],
+              [
+                1.0806376934051514,
+                0.9345184564590454
+              ],
+              [
+                0.008154487237334251,
+                1.1055030822753906
+              ]
+            ],
+            "reference_coverage": 0.7450015784189574,
+            "reference_keypoints": 5000,
+            "reprojection_maximum": 0.0037443996407091618,
+            "reprojection_rms": 0.0011609884206006103,
+            "technical_thresholds": {
+              "max_dimension": 1400,
+              "maximum_reprojection_rms": 0.03,
+              "minimum_inlier_ratio": 0.35,
+              "minimum_inliers": 10,
+              "minimum_keypoints": 12,
+              "minimum_matches": 12,
+              "minimum_reference_coverage": 0.08,
+              "ransac_reprojection_pixels": 4.0,
+              "ratio_test": 0.78
+            }
+          },
+          "failure": null,
+          "fallback": {
+            "method": "reviewed_manual_four_point",
+            "reason_code": null
+          },
+          "method": "automatic_feature_homography",
+          "requires_human_review": true,
+          "requires_manual_registration": false,
+          "review_status": "draft",
+          "schema_version": "VISUAL-QC-REGISTRATION-CANDIDATE-V1",
+          "status": "candidate"
+        },
+        "seed": 41,
+        "side_id": "main_page_2",
+        "status": "candidate"
+      },
+      {
+        "board_id": "BOARD-F069M-MAIN-V1.0",
+        "board_key": "bg6m-f069m",
+        "case_id": "bg6m-f069m-main_page_2-seed-82",
+        "counts_as_field_qc_evidence": false,
+        "evidence_role": "synthetic_proxy",
+        "failure_code": null,
+        "mean_corner_error": 0.0008531397177827824,
+        "registration": {
+          "board_to_image_matrix": [
+            0.9321227804338618,
+            -0.11846549368667078,
+            0.05695624680822686,
+            0.17351757967447,
+            0.9078230137648216,
+            -0.05742687795093992,
+            -0.038492799440438104,
+            -0.0649991857309511,
+            1.0
+          ],
+          "evidence": {
+            "attempts": [
+              {
+                "capture_keypoints": 5000,
+                "detector": "orb",
+                "failure_code": null,
+                "inlier_ratio": 0.9506578947368421,
+                "inliers": 2023,
+                "matches": 2128,
+                "reference_keypoints": 5000,
+                "status": "candidate"
+              }
+            ],
+            "board_contour": {
+              "area_fraction": 0.8503301813066584,
+              "bbox": {
+                "height": 1.0,
+                "width": 1.0,
+                "x": 0.0,
+                "y": 0.0
+              },
+              "polygon": [
+                [
+                  0.9999999403953552,
+                  0.9999998807907104
+                ],
+                [
+                  8.725540823206757e-08,
+                  0.9999998807907104
+                ],
+                [
+                  8.725540823206757e-08,
+                  0.0
+                ],
+                [
+                  0.9999999403953552,
+                  0.0
+                ]
+              ],
+              "status": "candidate"
+            },
+            "capture_keypoints": 5000,
+            "detector": "orb",
+            "inlier_count": 2023,
+            "inlier_ratio": 0.9506578947368421,
+            "match_count": 2128,
+            "projected_area": 1.0156038999557495,
+            "projected_convex": true,
+            "projected_quad": [
+              [
+                0.05695624276995659,
+                -0.057426877319812775
+              ],
+              [
+                1.0281383991241455,
+                0.12063974887132645
+              ],
+              [
+                0.9705842137336731,
+                1.1412253379821777
+              ],
+              [
+                -0.06569427996873856,
+                0.9087973237037659
+              ]
+            ],
+            "reference_coverage": 0.7359192634786318,
+            "reference_keypoints": 5000,
+            "reprojection_maximum": 0.0040923054330050945,
+            "reprojection_rms": 0.0011389481861867265,
+            "technical_thresholds": {
+              "max_dimension": 1400,
+              "maximum_reprojection_rms": 0.03,
+              "minimum_inlier_ratio": 0.35,
+              "minimum_inliers": 10,
+              "minimum_keypoints": 12,
+              "minimum_matches": 12,
+              "minimum_reference_coverage": 0.08,
+              "ransac_reprojection_pixels": 4.0,
+              "ratio_test": 0.78
+            }
+          },
+          "failure": null,
+          "fallback": {
+            "method": "reviewed_manual_four_point",
+            "reason_code": null
+          },
+          "method": "automatic_feature_homography",
+          "requires_human_review": true,
+          "requires_manual_registration": false,
+          "review_status": "draft",
+          "schema_version": "VISUAL-QC-REGISTRATION-CANDIDATE-V1",
+          "status": "candidate"
+        },
+        "seed": 82,
+        "side_id": "main_page_2",
+        "status": "candidate"
+      },
+      {
+        "board_id": "BOARD-H6929-MAIN-V1.1",
+        "board_key": "ck6n-h6929",
+        "case_id": "ck6n-h6929-main_top-seed-41",
+        "counts_as_field_qc_evidence": false,
+        "evidence_role": "synthetic_proxy",
+        "failure_code": null,
+        "mean_corner_error": 0.0006795342859924238,
+        "registration": {
+          "board_to_image_matrix": [
+            0.993612914276944,
+            0.02656371620081708,
+            -0.01579580072909873,
+            -0.11625462365948612,
+            0.9159875206562882,
+            0.07096088808183713,
+            0.02378125991379956,
+            -0.10140062946057422,
+            1.0
+          ],
+          "evidence": {
+            "attempts": [
+              {
+                "capture_keypoints": 5000,
+                "detector": "orb",
+                "failure_code": null,
+                "inlier_ratio": 0.9265143992055611,
+                "inliers": 1866,
+                "matches": 2014,
+                "reference_keypoints": 5000,
+                "status": "candidate"
+              }
+            ],
+            "board_contour": {
+              "area_fraction": 0.8523834658623526,
+              "bbox": {
+                "height": 1.0,
+                "width": 1.0,
+                "x": 0.0,
+                "y": 0.0
+              },
+              "polygon": [
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  -2.2781583082392398e-17,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ]
+              ],
+              "status": "candidate"
+            },
+            "capture_keypoints": 5000,
+            "detector": "orb",
+            "inlier_count": 1866,
+            "inlier_ratio": 0.9265143992055611,
+            "match_count": 2014,
+            "projected_area": 1.041148066520691,
+            "projected_convex": true,
+            "projected_quad": [
+              [
+                -0.01579580083489418,
+                0.0709608867764473
+              ],
+              [
+                0.9546437859535217,
+                -0.04418705776333809
+              ],
+              [
+                1.088254451751709,
+                0.9430207014083862
+              ],
+              [
+                0.011954369954764843,
+                1.097259759902954
+              ]
+            ],
+            "reference_coverage": 0.7907754343937583,
+            "reference_keypoints": 5000,
+            "reprojection_maximum": 0.003770242678001523,
+            "reprojection_rms": 0.0011080033991072887,
+            "technical_thresholds": {
+              "max_dimension": 1400,
+              "maximum_reprojection_rms": 0.03,
+              "minimum_inlier_ratio": 0.35,
+              "minimum_inliers": 10,
+              "minimum_keypoints": 12,
+              "minimum_matches": 12,
+              "minimum_reference_coverage": 0.08,
+              "ransac_reprojection_pixels": 4.0,
+              "ratio_test": 0.78
+            }
+          },
+          "failure": null,
+          "fallback": {
+            "method": "reviewed_manual_four_point",
+            "reason_code": null
+          },
+          "method": "automatic_feature_homography",
+          "requires_human_review": true,
+          "requires_manual_registration": false,
+          "review_status": "draft",
+          "schema_version": "VISUAL-QC-REGISTRATION-CANDIDATE-V1",
+          "status": "candidate"
+        },
+        "seed": 41,
+        "side_id": "main_top",
+        "status": "candidate"
+      },
+      {
+        "board_id": "BOARD-H6929-MAIN-V1.1",
+        "board_key": "ck6n-h6929",
+        "case_id": "ck6n-h6929-main_top-seed-82",
+        "counts_as_field_qc_evidence": false,
+        "evidence_role": "synthetic_proxy",
+        "failure_code": null,
+        "mean_corner_error": 0.0014629799484178253,
+        "registration": {
+          "board_to_image_matrix": [
+            0.924664838405872,
+            -0.1367779089430913,
+            0.06744556789412266,
+            0.15492034102379626,
+            0.8947305424737093,
+            -0.046256449361239654,
+            -0.03554904307736118,
+            -0.0783437901581669,
+            1.0
+          ],
+          "evidence": {
+            "attempts": [
+              {
+                "capture_keypoints": 5000,
+                "detector": "orb",
+                "failure_code": null,
+                "inlier_ratio": 0.9135265700483092,
+                "inliers": 1891,
+                "matches": 2070,
+                "reference_keypoints": 5000,
+                "status": "candidate"
+              }
+            ],
+            "board_contour": {
+              "area_fraction": 0.8740334521524541,
+              "bbox": {
+                "height": 1.0,
+                "width": 1.0,
+                "x": 0.0,
+                "y": 0.0
+              },
+              "polygon": [
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  -2.2781583082392398e-17,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ]
+              ],
+              "status": "candidate"
+            },
+            "capture_keypoints": 5000,
+            "detector": "orb",
+            "inlier_count": 1891,
+            "inlier_ratio": 0.9135265700483092,
+            "match_count": 2070,
+            "projected_area": 1.0116488933563232,
+            "projected_convex": true,
+            "projected_quad": [
+              [
+                0.06744556874036789,
+                -0.046256452798843384
+              ],
+              [
+                1.028195858001709,
+                0.1125892847776413
+              ],
+              [
+                0.9648091197013855,
+                1.131227731704712
+              ],
+              [
+                -0.0750824511051178,
+                0.9196256399154663
+              ]
+            ],
+            "reference_coverage": 0.8162547831966265,
+            "reference_keypoints": 5000,
+            "reprojection_maximum": 0.0037038633599877357,
+            "reprojection_rms": 0.0011171769533993865,
+            "technical_thresholds": {
+              "max_dimension": 1400,
+              "maximum_reprojection_rms": 0.03,
+              "minimum_inlier_ratio": 0.35,
+              "minimum_inliers": 10,
+              "minimum_keypoints": 12,
+              "minimum_matches": 12,
+              "minimum_reference_coverage": 0.08,
+              "ransac_reprojection_pixels": 4.0,
+              "ratio_test": 0.78
+            }
+          },
+          "failure": null,
+          "fallback": {
+            "method": "reviewed_manual_four_point",
+            "reason_code": null
+          },
+          "method": "automatic_feature_homography",
+          "requires_human_review": true,
+          "requires_manual_registration": false,
+          "review_status": "draft",
+          "schema_version": "VISUAL-QC-REGISTRATION-CANDIDATE-V1",
+          "status": "candidate"
+        },
+        "seed": 82,
+        "side_id": "main_top",
+        "status": "candidate"
+      },
+      {
+        "board_id": "BOARD-H6929-MAIN-V1.1",
+        "board_key": "ck6n-h6929",
+        "case_id": "ck6n-h6929-main_bot-seed-41",
+        "counts_as_field_qc_evidence": false,
+        "evidence_role": "synthetic_proxy",
+        "failure_code": null,
+        "mean_corner_error": 0.0006977562644488228,
+        "registration": {
+          "board_to_image_matrix": [
+            0.9939774255333148,
+            0.027739238116749925,
+            -0.016427338463729534,
+            -0.11691439309160584,
+            0.9168295806968068,
+            0.07100301738868908,
+            0.02296350571816249,
+            -0.10001051016302423,
+            1.0
+          ],
+          "evidence": {
+            "attempts": [
+              {
+                "capture_keypoints": 5000,
+                "detector": "orb",
+                "failure_code": null,
+                "inlier_ratio": 0.9061569016881827,
+                "inliers": 1825,
+                "matches": 2014,
+                "reference_keypoints": 5000,
+                "status": "candidate"
+              }
+            ],
+            "board_contour": {
+              "area_fraction": 0.8744917055113792,
+              "bbox": {
+                "height": 1.0,
+                "width": 1.0,
+                "x": 0.0,
+                "y": 0.0
+              },
+              "polygon": [
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  -2.2781583082392398e-17,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ]
+              ],
+              "status": "candidate"
+            },
+            "capture_keypoints": 5000,
+            "detector": "orb",
+            "inlier_count": 1825,
+            "inlier_ratio": 0.9061569016881827,
+            "match_count": 2014,
+            "projected_area": 1.041427731513977,
+            "projected_convex": true,
+            "projected_quad": [
+              [
+                -0.016427338123321533,
+                0.0710030123591423
+              ],
+              [
+                0.9551452994346619,
+                -0.04482583329081535
+              ],
+              [
+                1.0885635614395142,
+                0.9426794648170471
+              ],
+              [
+                0.012539085932075977,
+                1.096548080444336
+              ]
+            ],
+            "reference_coverage": 0.8193238828046745,
+            "reference_keypoints": 5000,
+            "reprojection_maximum": 0.003779143327847123,
+            "reprojection_rms": 0.001094587772009726,
+            "technical_thresholds": {
+              "max_dimension": 1400,
+              "maximum_reprojection_rms": 0.03,
+              "minimum_inlier_ratio": 0.35,
+              "minimum_inliers": 10,
+              "minimum_keypoints": 12,
+              "minimum_matches": 12,
+              "minimum_reference_coverage": 0.08,
+              "ransac_reprojection_pixels": 4.0,
+              "ratio_test": 0.78
+            }
+          },
+          "failure": null,
+          "fallback": {
+            "method": "reviewed_manual_four_point",
+            "reason_code": null
+          },
+          "method": "automatic_feature_homography",
+          "requires_human_review": true,
+          "requires_manual_registration": false,
+          "review_status": "draft",
+          "schema_version": "VISUAL-QC-REGISTRATION-CANDIDATE-V1",
+          "status": "candidate"
+        },
+        "seed": 41,
+        "side_id": "main_bot",
+        "status": "candidate"
+      },
+      {
+        "board_id": "BOARD-H6929-MAIN-V1.1",
+        "board_key": "ck6n-h6929",
+        "case_id": "ck6n-h6929-main_bot-seed-82",
+        "counts_as_field_qc_evidence": false,
+        "evidence_role": "synthetic_proxy",
+        "failure_code": null,
+        "mean_corner_error": 0.0010504618230293826,
+        "registration": {
+          "board_to_image_matrix": [
+            0.9237164868911634,
+            -0.13628280895342573,
+            0.06765202761113194,
+            0.15332334929906313,
+            0.8957330983363204,
+            -0.04610369700212366,
+            -0.037720639379260776,
+            -0.0767835501092043,
+            1.0
+          ],
+          "evidence": {
+            "attempts": [
+              {
+                "capture_keypoints": 5000,
+                "detector": "orb",
+                "failure_code": null,
+                "inlier_ratio": 0.913317191283293,
+                "inliers": 1886,
+                "matches": 2065,
+                "reference_keypoints": 5000,
+                "status": "candidate"
+              }
+            ],
+            "board_contour": {
+              "area_fraction": 0.853487112695366,
+              "bbox": {
+                "height": 1.0,
+                "width": 1.0,
+                "x": 0.0,
+                "y": 0.0
+              },
+              "polygon": [
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  -2.2781583082392398e-17,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ]
+              ],
+              "status": "candidate"
+            },
+            "capture_keypoints": 5000,
+            "detector": "orb",
+            "inlier_count": 1886,
+            "inlier_ratio": 0.913317191283293,
+            "match_count": 2065,
+            "projected_area": 1.012607216835022,
+            "projected_convex": true,
+            "projected_quad": [
+              [
+                0.06765203177928925,
+                -0.04610369727015495
+              ],
+              [
+                1.0297445058822632,
+                0.11134321242570877
+              ],
+              [
+                0.9651968479156494,
+                1.1315102577209473
+              ],
+              [
+                -0.07419633120298386,
+                0.9193232655525208
+              ]
+            ],
+            "reference_coverage": 0.8332524509356176,
+            "reference_keypoints": 5000,
+            "reprojection_maximum": 0.0034020247403532267,
+            "reprojection_rms": 0.001126504045064721,
+            "technical_thresholds": {
+              "max_dimension": 1400,
+              "maximum_reprojection_rms": 0.03,
+              "minimum_inlier_ratio": 0.35,
+              "minimum_inliers": 10,
+              "minimum_keypoints": 12,
+              "minimum_matches": 12,
+              "minimum_reference_coverage": 0.08,
+              "ransac_reprojection_pixels": 4.0,
+              "ratio_test": 0.78
+            }
+          },
+          "failure": null,
+          "fallback": {
+            "method": "reviewed_manual_four_point",
+            "reason_code": null
+          },
+          "method": "automatic_feature_homography",
+          "requires_human_review": true,
+          "requires_manual_registration": false,
+          "review_status": "draft",
+          "schema_version": "VISUAL-QC-REGISTRATION-CANDIDATE-V1",
+          "status": "candidate"
+        },
+        "seed": 82,
+        "side_id": "main_bot",
+        "status": "candidate"
+      },
+      {
+        "board_id": "BOARD-H8918-MAIN-V1.2",
+        "board_key": "cm6-h8918",
+        "case_id": "cm6-h8918-main_page_1-seed-41",
+        "counts_as_field_qc_evidence": false,
+        "evidence_role": "synthetic_proxy",
+        "failure_code": null,
+        "mean_corner_error": 0.0005283518295690553,
+        "registration": {
+          "board_to_image_matrix": [
+            1.0044749436974885,
+            0.022677374735348064,
+            -0.016475609996843072,
+            -0.13642666452797284,
+            0.9286280561026264,
+            0.08114507406487943,
+            0.02442224952969564,
+            -0.08852750419161742,
+            1.0
+          ],
+          "evidence": {
+            "attempts": [
+              {
+                "capture_keypoints": 5000,
+                "detector": "orb",
+                "failure_code": null,
+                "inlier_ratio": 0.9153652392947104,
+                "inliers": 1817,
+                "matches": 1985,
+                "reference_keypoints": 5000,
+                "status": "candidate"
+              }
+            ],
+            "board_contour": {
+              "area_fraction": 0.7235901417423156,
+              "bbox": {
+                "height": 1.0,
+                "width": 1.0,
+                "x": 0.0,
+                "y": 0.0
+              },
+              "polygon": [
+                [
+                  0.9999999403953552,
+                  0.9999998807907104
+                ],
+                [
+                  8.725540823206757e-08,
+                  0.9999998807907104
+                ],
+                [
+                  8.725540823206757e-08,
+                  0.0
+                ],
+                [
+                  0.9999999403953552,
+                  0.0
+                ]
+              ],
+              "status": "candidate"
+            },
+            "capture_keypoints": 5000,
+            "detector": "orb",
+            "inlier_count": 1817,
+            "inlier_ratio": 0.9153652392947104,
+            "match_count": 1985,
+            "projected_area": 1.0437999963760376,
+            "projected_convex": true,
+            "projected_quad": [
+              [
+                -0.016475608572363853,
+                0.08114507049322128
+              ],
+              [
+                0.9638915061950684,
+                -0.05388738587498665
+              ],
+              [
+                1.0792492628097534,
+                0.9328346252441406
+              ],
+              [
+                0.006793924141675234,
+                1.1073986291885376
+              ]
+            ],
+            "reference_coverage": 0.7949476179300774,
+            "reference_keypoints": 5000,
+            "reprojection_maximum": 0.00419602170586586,
+            "reprojection_rms": 0.0011760584107943595,
+            "technical_thresholds": {
+              "max_dimension": 1400,
+              "maximum_reprojection_rms": 0.03,
+              "minimum_inlier_ratio": 0.35,
+              "minimum_inliers": 10,
+              "minimum_keypoints": 12,
+              "minimum_matches": 12,
+              "minimum_reference_coverage": 0.08,
+              "ransac_reprojection_pixels": 4.0,
+              "ratio_test": 0.78
+            }
+          },
+          "failure": null,
+          "fallback": {
+            "method": "reviewed_manual_four_point",
+            "reason_code": null
+          },
+          "method": "automatic_feature_homography",
+          "requires_human_review": true,
+          "requires_manual_registration": false,
+          "review_status": "draft",
+          "schema_version": "VISUAL-QC-REGISTRATION-CANDIDATE-V1",
+          "status": "candidate"
+        },
+        "seed": 41,
+        "side_id": "main_page_1",
+        "status": "candidate"
+      },
+      {
+        "board_id": "BOARD-H8918-MAIN-V1.2",
+        "board_key": "cm6-h8918",
+        "case_id": "cm6-h8918-main_page_1-seed-82",
+        "counts_as_field_qc_evidence": false,
+        "evidence_role": "synthetic_proxy",
+        "failure_code": null,
+        "mean_corner_error": 0.00047935887247865566,
+        "registration": {
+          "board_to_image_matrix": [
+            0.9331170951369924,
+            -0.11684083168933869,
+            0.05597564884689102,
+            0.17688606082309702,
+            0.9083430994608035,
+            -0.05900592279115242,
+            -0.037597369595769085,
+            -0.06468042116149067,
+            1.0
+          ],
+          "evidence": {
+            "attempts": [
+              {
+                "capture_keypoints": 5000,
+                "detector": "orb",
+                "failure_code": null,
+                "inlier_ratio": 0.9239287433798749,
+                "inliers": 1919,
+                "matches": 2077,
+                "reference_keypoints": 5000,
+                "status": "candidate"
+              }
+            ],
+            "board_contour": {
+              "area_fraction": 0.8456820353559484,
+              "bbox": {
+                "height": 1.0,
+                "width": 1.0,
+                "x": 0.0,
+                "y": 0.0
+              },
+              "polygon": [
+                [
+                  0.9999998211860657,
+                  0.9999998807907104
+                ],
+                [
+                  -1.9608352816516473e-17,
+                  0.9999998807907104
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.9999998211860657,
+                  0.0
+                ]
+              ],
+              "status": "candidate"
+            },
+            "capture_keypoints": 5000,
+            "detector": "orb",
+            "inlier_count": 1919,
+            "inlier_ratio": 0.9239287433798749,
+            "match_count": 2077,
+            "projected_area": 1.015446662902832,
+            "projected_convex": true,
+            "projected_quad": [
+              [
+                0.05597565323114395,
+                -0.05900592356920242
+              ],
+              [
+                1.027148723602295,
+                0.12237618118524551
+              ],
+              [
+                0.9710270762443542,
+                1.1425628662109375
+              ],
+              [
+                -0.06502256542444229,
+                0.9076590538024902
+              ]
+            ],
+            "reference_coverage": 0.7942530487262047,
+            "reference_keypoints": 5000,
+            "reprojection_maximum": 0.004161500371992588,
+            "reprojection_rms": 0.0011830670556726161,
+            "technical_thresholds": {
+              "max_dimension": 1400,
+              "maximum_reprojection_rms": 0.03,
+              "minimum_inlier_ratio": 0.35,
+              "minimum_inliers": 10,
+              "minimum_keypoints": 12,
+              "minimum_matches": 12,
+              "minimum_reference_coverage": 0.08,
+              "ransac_reprojection_pixels": 4.0,
+              "ratio_test": 0.78
+            }
+          },
+          "failure": null,
+          "fallback": {
+            "method": "reviewed_manual_four_point",
+            "reason_code": null
+          },
+          "method": "automatic_feature_homography",
+          "requires_human_review": true,
+          "requires_manual_registration": false,
+          "review_status": "draft",
+          "schema_version": "VISUAL-QC-REGISTRATION-CANDIDATE-V1",
+          "status": "candidate"
+        },
+        "seed": 82,
+        "side_id": "main_page_1",
+        "status": "candidate"
+      },
+      {
+        "board_id": "BOARD-H8918-MAIN-V1.2",
+        "board_key": "cm6-h8918",
+        "case_id": "cm6-h8918-main_page_2-seed-41",
+        "counts_as_field_qc_evidence": false,
+        "evidence_role": "synthetic_proxy",
+        "failure_code": null,
+        "mean_corner_error": 0.0008125438326134496,
+        "registration": {
+          "board_to_image_matrix": [
+            1.003906713920106,
+            0.023389448803025497,
+            -0.01651685349831675,
+            -0.13875759591427442,
+            0.9304414359230436,
+            0.08204851459046271,
+            0.022533991846671056,
+            -0.08650166699316962,
+            1.0
+          ],
+          "evidence": {
+            "attempts": [
+              {
+                "capture_keypoints": 5000,
+                "detector": "orb",
+                "failure_code": null,
+                "inlier_ratio": 0.9035043169121382,
+                "inliers": 1779,
+                "matches": 1969,
+                "reference_keypoints": 5000,
+                "status": "candidate"
+              }
+            ],
+            "board_contour": {
+              "area_fraction": 0.7088908082918207,
+              "bbox": {
+                "height": 1.0,
+                "width": 1.0,
+                "x": 0.0,
+                "y": 0.0
+              },
+              "polygon": [
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  -1.943328169423085e-17,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ]
+              ],
+              "status": "candidate"
+            },
+            "capture_keypoints": 5000,
+            "detector": "orb",
+            "inlier_count": 1779,
+            "inlier_ratio": 0.9035043169121382,
+            "match_count": 1969,
+            "projected_area": 1.0442192554473877,
+            "projected_convex": true,
+            "projected_quad": [
+              [
+                -0.016516853123903275,
+                0.08204851299524307
+              ],
+              [
+                0.9650745987892151,
+                -0.05538155511021614
+              ],
+              [
+                1.0791397094726562,
+                0.9325892925262451
+              ],
+              [
+                0.007500189822167158,
+                1.1073753833770752
+              ]
+            ],
+            "reference_coverage": 0.8508720599223771,
+            "reference_keypoints": 5000,
+            "reprojection_maximum": 0.004282491747289896,
+            "reprojection_rms": 0.0012125246061679008,
+            "technical_thresholds": {
+              "max_dimension": 1400,
+              "maximum_reprojection_rms": 0.03,
+              "minimum_inlier_ratio": 0.35,
+              "minimum_inliers": 10,
+              "minimum_keypoints": 12,
+              "minimum_matches": 12,
+              "minimum_reference_coverage": 0.08,
+              "ransac_reprojection_pixels": 4.0,
+              "ratio_test": 0.78
+            }
+          },
+          "failure": null,
+          "fallback": {
+            "method": "reviewed_manual_four_point",
+            "reason_code": null
+          },
+          "method": "automatic_feature_homography",
+          "requires_human_review": true,
+          "requires_manual_registration": false,
+          "review_status": "draft",
+          "schema_version": "VISUAL-QC-REGISTRATION-CANDIDATE-V1",
+          "status": "candidate"
+        },
+        "seed": 41,
+        "side_id": "main_page_2",
+        "status": "candidate"
+      },
+      {
+        "board_id": "BOARD-H8918-MAIN-V1.2",
+        "board_key": "cm6-h8918",
+        "case_id": "cm6-h8918-main_page_2-seed-82",
+        "counts_as_field_qc_evidence": false,
+        "evidence_role": "synthetic_proxy",
+        "failure_code": null,
+        "mean_corner_error": 0.0009642931872692886,
+        "registration": {
+          "board_to_image_matrix": [
+            0.934983862080762,
+            -0.11639673143671296,
+            0.05531822534979332,
+            0.17956037402651584,
+            0.9100954449418064,
+            -0.06041267187270599,
+            -0.036653291944236825,
+            -0.0640636012038829,
+            1.0
+          ],
+          "evidence": {
+            "attempts": [
+              {
+                "capture_keypoints": 5000,
+                "detector": "orb",
+                "failure_code": null,
+                "inlier_ratio": 0.9178695868591339,
+                "inliers": 1844,
+                "matches": 2009,
+                "reference_keypoints": 5000,
+                "status": "candidate"
+              }
+            ],
+            "board_contour": {
+              "area_fraction": 0.7581568375381649,
+              "bbox": {
+                "height": 1.0,
+                "width": 1.0,
+                "x": 0.0,
+                "y": 0.0
+              },
+              "polygon": [
+                [
+                  0.9999998211860657,
+                  0.9999998807907104
+                ],
+                [
+                  -1.94332783855084e-17,
+                  0.9999998807907104
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.9999998211860657,
+                  0.0
+                ]
+              ],
+              "status": "candidate"
+            },
+            "capture_keypoints": 5000,
+            "detector": "orb",
+            "inlier_count": 1844,
+            "inlier_ratio": 0.9178695868591339,
+            "match_count": 2009,
+            "projected_area": 1.0163493156433105,
+            "projected_convex": true,
+            "projected_quad": [
+              [
+                0.05531822517514229,
+                -0.06041267141699791
+              ],
+              [
+                1.02739679813385,
+                0.12357045710086823
+              ],
+              [
+                0.9712086915969849,
+                1.143409013748169
+              ],
+              [
+                -0.06514572352170944,
+                0.9069307446479797
+              ]
+            ],
+            "reference_coverage": 0.8172087073326111,
+            "reference_keypoints": 5000,
+            "reprojection_maximum": 0.0043205376714468,
+            "reprojection_rms": 0.001207941607600275,
+            "technical_thresholds": {
+              "max_dimension": 1400,
+              "maximum_reprojection_rms": 0.03,
+              "minimum_inlier_ratio": 0.35,
+              "minimum_inliers": 10,
+              "minimum_keypoints": 12,
+              "minimum_matches": 12,
+              "minimum_reference_coverage": 0.08,
+              "ransac_reprojection_pixels": 4.0,
+              "ratio_test": 0.78
+            }
+          },
+          "failure": null,
+          "fallback": {
+            "method": "reviewed_manual_four_point",
+            "reason_code": null
+          },
+          "method": "automatic_feature_homography",
+          "requires_human_review": true,
+          "requires_manual_registration": false,
+          "review_status": "draft",
+          "schema_version": "VISUAL-QC-REGISTRATION-CANDIDATE-V1",
+          "status": "candidate"
+        },
+        "seed": 82,
+        "side_id": "main_page_2",
+        "status": "candidate"
+      },
+      {
+        "board_id": "BOARD-KL4-F201-MAIN-V1.2",
+        "board_key": "kl4-f201",
+        "case_id": "kl4-f201-main_page_1-seed-41",
+        "counts_as_field_qc_evidence": false,
+        "evidence_role": "synthetic_proxy",
+        "failure_code": null,
+        "mean_corner_error": 0.0005827383052391655,
+        "registration": {
+          "board_to_image_matrix": [
+            1.0056207146302871,
+            0.022933525242734076,
+            -0.016957428835742992,
+            -0.13782978856114195,
+            0.9303356994530559,
+            0.08154064167227881,
+            0.024446176749986833,
+            -0.08747229495830659,
+            1.0
+          ],
+          "evidence": {
+            "attempts": [
+              {
+                "capture_keypoints": 5000,
+                "detector": "orb",
+                "failure_code": null,
+                "inlier_ratio": 0.906686626746507,
+                "inliers": 1817,
+                "matches": 2004,
+                "reference_keypoints": 5000,
+                "status": "candidate"
+              }
+            ],
+            "board_contour": {
+              "area_fraction": 0.8312105178771846,
+              "bbox": {
+                "height": 1.0,
+                "width": 1.0,
+                "x": 0.0,
+                "y": 0.0
+              },
+              "polygon": [
+                [
+                  0.9999999403953552,
+                  0.9999998807907104
+                ],
+                [
+                  8.725540823206757e-08,
+                  0.9999998807907104
+                ],
+                [
+                  8.725540823206757e-08,
+                  0.0
+                ],
+                [
+                  0.9999999403953552,
+                  0.0
+                ]
+              ],
+              "status": "candidate"
+            },
+            "capture_keypoints": 5000,
+            "detector": "orb",
+            "inlier_count": 1817,
+            "inlier_ratio": 0.906686626746507,
+            "match_count": 2004,
+            "projected_area": 1.0447108745574951,
+            "projected_convex": true,
+            "projected_quad": [
+              [
+                -0.01695742830634117,
+                0.08154064416885376
+              ],
+              [
+                0.96451735496521,
+                -0.05486898496747017
+              ],
+              [
+                1.078952670097351,
+                0.9321954846382141
+              ],
+              [
+                0.006531218532472849,
+                1.1080970764160156
+              ]
+            ],
+            "reference_coverage": 0.8031251867944675,
+            "reference_keypoints": 5000,
+            "reprojection_maximum": 0.00435930909588933,
+            "reprojection_rms": 0.0012214645231452858,
+            "technical_thresholds": {
+              "max_dimension": 1400,
+              "maximum_reprojection_rms": 0.03,
+              "minimum_inlier_ratio": 0.35,
+              "minimum_inliers": 10,
+              "minimum_keypoints": 12,
+              "minimum_matches": 12,
+              "minimum_reference_coverage": 0.08,
+              "ransac_reprojection_pixels": 4.0,
+              "ratio_test": 0.78
+            }
+          },
+          "failure": null,
+          "fallback": {
+            "method": "reviewed_manual_four_point",
+            "reason_code": null
+          },
+          "method": "automatic_feature_homography",
+          "requires_human_review": true,
+          "requires_manual_registration": false,
+          "review_status": "draft",
+          "schema_version": "VISUAL-QC-REGISTRATION-CANDIDATE-V1",
+          "status": "candidate"
+        },
+        "seed": 41,
+        "side_id": "main_page_1",
+        "status": "candidate"
+      },
+      {
+        "board_id": "BOARD-KL4-F201-MAIN-V1.2",
+        "board_key": "kl4-f201",
+        "case_id": "kl4-f201-main_page_1-seed-82",
+        "counts_as_field_qc_evidence": false,
+        "evidence_role": "synthetic_proxy",
+        "failure_code": null,
+        "mean_corner_error": 0.0006396665326619101,
+        "registration": {
+          "board_to_image_matrix": [
+            0.9340792948812344,
+            -0.11654823586235659,
+            0.05552479404435378,
+            0.1788764000876626,
+            0.9080292967006609,
+            -0.05929294579911676,
+            -0.03653999219064211,
+            -0.06516165971719,
+            1.0
+          ],
+          "evidence": {
+            "attempts": [
+              {
+                "capture_keypoints": 5000,
+                "detector": "orb",
+                "failure_code": null,
+                "inlier_ratio": 0.9077849860982391,
+                "inliers": 1959,
+                "matches": 2158,
+                "reference_keypoints": 5000,
+                "status": "candidate"
+              }
+            ],
+            "board_contour": {
+              "area_fraction": 0.8250376783710117,
+              "bbox": {
+                "height": 1.0,
+                "width": 1.0,
+                "x": 0.0,
+                "y": 0.0
+              },
+              "polygon": [
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  -1.9477049474802256e-17,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ]
+              ],
+              "status": "candidate"
+            },
+            "capture_keypoints": 5000,
+            "detector": "orb",
+            "inlier_count": 1959,
+            "inlier_ratio": 0.9077849860982391,
+            "match_count": 2158,
+            "projected_area": 1.0149422883987427,
+            "projected_convex": true,
+            "projected_quad": [
+              [
+                0.055524792522192,
+                -0.05929294601082802
+              ],
+              [
+                1.0265532732009888,
+                0.12400881201028824
+              ],
+              [
+                0.9713171124458313,
+                1.1430602073669434
+              ],
+              [
+                -0.06518805772066116,
+                0.9071842432022095
+              ]
+            ],
+            "reference_coverage": 0.8496049626506164,
+            "reference_keypoints": 5000,
+            "reprojection_maximum": 0.004364767111837864,
+            "reprojection_rms": 0.0012335920130282661,
+            "technical_thresholds": {
+              "max_dimension": 1400,
+              "maximum_reprojection_rms": 0.03,
+              "minimum_inlier_ratio": 0.35,
+              "minimum_inliers": 10,
+              "minimum_keypoints": 12,
+              "minimum_matches": 12,
+              "minimum_reference_coverage": 0.08,
+              "ransac_reprojection_pixels": 4.0,
+              "ratio_test": 0.78
+            }
+          },
+          "failure": null,
+          "fallback": {
+            "method": "reviewed_manual_four_point",
+            "reason_code": null
+          },
+          "method": "automatic_feature_homography",
+          "requires_human_review": true,
+          "requires_manual_registration": false,
+          "review_status": "draft",
+          "schema_version": "VISUAL-QC-REGISTRATION-CANDIDATE-V1",
+          "status": "candidate"
+        },
+        "seed": 82,
+        "side_id": "main_page_1",
+        "status": "candidate"
+      },
+      {
+        "board_id": "BOARD-KL4-F201-MAIN-V1.2",
+        "board_key": "kl4-f201",
+        "case_id": "kl4-f201-main_page_2-seed-41",
+        "counts_as_field_qc_evidence": false,
+        "evidence_role": "synthetic_proxy",
+        "failure_code": null,
+        "mean_corner_error": 0.000829413854602618,
+        "registration": {
+          "board_to_image_matrix": [
+            1.0040747944579937,
+            0.024395534282466748,
+            -0.017204185936940137,
+            -0.13362328294387268,
+            0.9291274928115429,
+            0.07919470503677087,
+            0.023994117674659813,
+            -0.0888354780867786,
+            1.0
+          ],
+          "evidence": {
+            "attempts": [
+              {
+                "capture_keypoints": 5000,
+                "detector": "orb",
+                "failure_code": null,
+                "inlier_ratio": 0.9249093733816676,
+                "inliers": 1786,
+                "matches": 1931,
+                "reference_keypoints": 5000,
+                "status": "candidate"
+              }
+            ],
+            "board_contour": {
+              "area_fraction": 0.6969085308796007,
+              "bbox": {
+                "height": 1.0,
+                "width": 1.0,
+                "x": 0.0,
+                "y": 0.0
+              },
+              "polygon": [
+                [
+                  0.9999998211860657,
+                  0.9999998807907104
+                ],
+                [
+                  -2.0024155003750954e-17,
+                  0.9999998807907104
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.9999998211860657,
+                  0.0
+                ]
+              ],
+              "status": "candidate"
+            },
+            "capture_keypoints": 5000,
+            "detector": "orb",
+            "inlier_count": 1786,
+            "inlier_ratio": 0.9249093733816676,
+            "match_count": 1931,
+            "projected_area": 1.044480800628662,
+            "projected_convex": true,
+            "projected_quad": [
+              [
+                -0.01720418594777584,
+                0.07919470965862274
+              ],
+              [
+                0.9631931185722351,
+                -0.05307856947183609
+              ],
+              [
+                1.0806539058685303,
+                0.9343805313110352
+              ],
+              [
+                0.007865405641496181,
+                1.10552179813385
+              ]
+            ],
+            "reference_coverage": 0.8429127789987341,
+            "reference_keypoints": 5000,
+            "reprojection_maximum": 0.00423692399635911,
+            "reprojection_rms": 0.001158738577552941,
+            "technical_thresholds": {
+              "max_dimension": 1400,
+              "maximum_reprojection_rms": 0.03,
+              "minimum_inlier_ratio": 0.35,
+              "minimum_inliers": 10,
+              "minimum_keypoints": 12,
+              "minimum_matches": 12,
+              "minimum_reference_coverage": 0.08,
+              "ransac_reprojection_pixels": 4.0,
+              "ratio_test": 0.78
+            }
+          },
+          "failure": null,
+          "fallback": {
+            "method": "reviewed_manual_four_point",
+            "reason_code": null
+          },
+          "method": "automatic_feature_homography",
+          "requires_human_review": true,
+          "requires_manual_registration": false,
+          "review_status": "draft",
+          "schema_version": "VISUAL-QC-REGISTRATION-CANDIDATE-V1",
+          "status": "candidate"
+        },
+        "seed": 41,
+        "side_id": "main_page_2",
+        "status": "candidate"
+      },
+      {
+        "board_id": "BOARD-KL4-F201-MAIN-V1.2",
+        "board_key": "kl4-f201",
+        "case_id": "kl4-f201-main_page_2-seed-82",
+        "counts_as_field_qc_evidence": false,
+        "evidence_role": "synthetic_proxy",
+        "failure_code": null,
+        "mean_corner_error": 0.0008506085575645078,
+        "registration": {
+          "board_to_image_matrix": [
+            0.9320292593943041,
+            -0.11987434564145509,
+            0.057525027553976975,
+            0.17374913930540697,
+            0.9062548772267737,
+            -0.05691448016027032,
+            -0.03768223926236687,
+            -0.06690750642740445,
+            1.0
+          ],
+          "evidence": {
+            "attempts": [
+              {
+                "capture_keypoints": 5000,
+                "detector": "orb",
+                "failure_code": null,
+                "inlier_ratio": 0.9299839657936932,
+                "inliers": 1740,
+                "matches": 1871,
+                "reference_keypoints": 5000,
+                "status": "candidate"
+              }
+            ],
+            "board_contour": {
+              "area_fraction": 0.7381257797878977,
+              "bbox": {
+                "height": 1.0,
+                "width": 1.0,
+                "x": 0.0,
+                "y": 0.0
+              },
+              "polygon": [
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  -2.0024158312473404e-17,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ]
+              ],
+              "status": "candidate"
+            },
+            "capture_keypoints": 5000,
+            "detector": "orb",
+            "inlier_count": 1740,
+            "inlier_ratio": 0.9299839657936932,
+            "match_count": 1871,
+            "projected_area": 1.015464186668396,
+            "projected_convex": true,
+            "projected_quad": [
+              [
+                0.05752503126859665,
+                -0.05691447854042053
+              ],
+              [
+                1.0277204513549805,
+                0.12130262702703476
+              ],
+              [
+                0.9706997871398926,
+                1.1413744688034058
+              ],
+              [
+                -0.06668908894062042,
+                0.9092235565185547
+              ]
+            ],
+            "reference_coverage": 0.8387499869193675,
+            "reference_keypoints": 5000,
+            "reprojection_maximum": 0.0038733205292373896,
+            "reprojection_rms": 0.0011624623929694352,
+            "technical_thresholds": {
+              "max_dimension": 1400,
+              "maximum_reprojection_rms": 0.03,
+              "minimum_inlier_ratio": 0.35,
+              "minimum_inliers": 10,
+              "minimum_keypoints": 12,
+              "minimum_matches": 12,
+              "minimum_reference_coverage": 0.08,
+              "ransac_reprojection_pixels": 4.0,
+              "ratio_test": 0.78
+            }
+          },
+          "failure": null,
+          "fallback": {
+            "method": "reviewed_manual_four_point",
+            "reason_code": null
+          },
+          "method": "automatic_feature_homography",
+          "requires_human_review": true,
+          "requires_manual_registration": false,
+          "review_status": "draft",
+          "schema_version": "VISUAL-QC-REGISTRATION-CANDIDATE-V1",
+          "status": "candidate"
+        },
+        "seed": 82,
+        "side_id": "main_page_2",
+        "status": "candidate"
+      },
+      {
+        "board_id": "BOARD-KM4-F151-MAIN-V1.2",
+        "board_key": "km4-f151",
+        "case_id": "km4-f151-main_page_1-seed-41",
+        "counts_as_field_qc_evidence": false,
+        "evidence_role": "synthetic_proxy",
+        "failure_code": null,
+        "mean_corner_error": 0.0010804495007856237,
+        "registration": {
+          "board_to_image_matrix": [
+            1.0047688804432473,
+            0.023541454397003395,
+            -0.01700483166079042,
+            -0.13752138874565117,
+            0.9310992149234436,
+            0.08133978352334532,
+            0.02310786684623021,
+            -0.08688217116947516,
+            1.0
+          ],
+          "evidence": {
+            "attempts": [
+              {
+                "capture_keypoints": 5000,
+                "detector": "orb",
+                "failure_code": null,
+                "inlier_ratio": 0.9281217208814271,
+                "inliers": 1769,
+                "matches": 1906,
+                "reference_keypoints": 5000,
+                "status": "candidate"
+              }
+            ],
+            "board_contour": {
+              "area_fraction": 0.8224811819346572,
+              "bbox": {
+                "height": 1.0,
+                "width": 1.0,
+                "x": 0.0,
+                "y": 0.0
+              },
+              "polygon": [
+                [
+                  0.9999999403953552,
+                  0.9999998807907104
+                ],
+                [
+                  8.725540823206757e-08,
+                  0.9999998807907104
+                ],
+                [
+                  8.725540823206757e-08,
+                  0.0
+                ],
+                [
+                  0.9999999403953552,
+                  0.0
+                ]
+              ],
+              "status": "candidate"
+            },
+            "capture_keypoints": 5000,
+            "detector": "orb",
+            "inlier_count": 1769,
+            "inlier_ratio": 0.9281217208814271,
+            "match_count": 1906,
+            "projected_area": 1.0449330806732178,
+            "projected_convex": true,
+            "projected_quad": [
+              [
+                -0.01700483076274395,
+                0.08133978396654129
+              ],
+              [
+                0.9649240374565125,
+                -0.054839134216308594
+              ],
+              [
+                1.0794376134872437,
+                0.9330704212188721
+              ],
+              [
+                0.007120906841009855,
+                1.1071697473526
+              ]
+            ],
+            "reference_coverage": 0.8040175366256896,
+            "reference_keypoints": 5000,
+            "reprojection_maximum": 0.0043090637773275375,
+            "reprojection_rms": 0.0012474313877014038,
+            "technical_thresholds": {
+              "max_dimension": 1400,
+              "maximum_reprojection_rms": 0.03,
+              "minimum_inlier_ratio": 0.35,
+              "minimum_inliers": 10,
+              "minimum_keypoints": 12,
+              "minimum_matches": 12,
+              "minimum_reference_coverage": 0.08,
+              "ransac_reprojection_pixels": 4.0,
+              "ratio_test": 0.78
+            }
+          },
+          "failure": null,
+          "fallback": {
+            "method": "reviewed_manual_four_point",
+            "reason_code": null
+          },
+          "method": "automatic_feature_homography",
+          "requires_human_review": true,
+          "requires_manual_registration": false,
+          "review_status": "draft",
+          "schema_version": "VISUAL-QC-REGISTRATION-CANDIDATE-V1",
+          "status": "candidate"
+        },
+        "seed": 41,
+        "side_id": "main_page_1",
+        "status": "candidate"
+      },
+      {
+        "board_id": "BOARD-KM4-F151-MAIN-V1.2",
+        "board_key": "km4-f151",
+        "case_id": "km4-f151-main_page_1-seed-82",
+        "counts_as_field_qc_evidence": false,
+        "evidence_role": "synthetic_proxy",
+        "failure_code": null,
+        "mean_corner_error": 0.00121280636134522,
+        "registration": {
+          "board_to_image_matrix": [
+            0.9328749772379767,
+            -0.11717236722421914,
+            0.05591259262226436,
+            0.17810626589293568,
+            0.9074240237129846,
+            -0.05884265668758949,
+            -0.03739621562319903,
+            -0.06620203390354434,
+            1.0
+          ],
+          "evidence": {
+            "attempts": [
+              {
+                "capture_keypoints": 5000,
+                "detector": "orb",
+                "failure_code": null,
+                "inlier_ratio": 0.9339759036144578,
+                "inliers": 1938,
+                "matches": 2075,
+                "reference_keypoints": 5000,
+                "status": "candidate"
+              }
+            ],
+            "board_contour": {
+              "area_fraction": 0.8435434016655989,
+              "bbox": {
+                "height": 1.0,
+                "width": 1.0,
+                "x": 0.0,
+                "y": 0.0
+              },
+              "polygon": [
+                [
+                  0.9999999403953552,
+                  0.9999998807907104
+                ],
+                [
+                  8.725540823206757e-08,
+                  0.9999998807907104
+                ],
+                [
+                  8.725540823206757e-08,
+                  0.0
+                ],
+                [
+                  0.9999999403953552,
+                  0.0
+                ]
+              ],
+              "status": "candidate"
+            },
+            "capture_keypoints": 5000,
+            "detector": "orb",
+            "inlier_count": 1938,
+            "inlier_ratio": 0.9339759036144578,
+            "match_count": 2075,
+            "projected_area": 1.0153968334197998,
+            "projected_convex": true,
+            "projected_quad": [
+              [
+                0.05591259151697159,
+                -0.05884265527129173
+              ],
+              [
+                1.0266437530517578,
+                0.12379202991724014
+              ],
+              [
+                0.9718355536460876,
+                1.1436456441879272
+              ],
+              [
+                -0.0654175728559494,
+                0.9072669148445129
+              ]
+            ],
+            "reference_coverage": 0.7996990453767978,
+            "reference_keypoints": 5000,
+            "reprojection_maximum": 0.0042181736789643764,
+            "reprojection_rms": 0.0012366700222778868,
+            "technical_thresholds": {
+              "max_dimension": 1400,
+              "maximum_reprojection_rms": 0.03,
+              "minimum_inlier_ratio": 0.35,
+              "minimum_inliers": 10,
+              "minimum_keypoints": 12,
+              "minimum_matches": 12,
+              "minimum_reference_coverage": 0.08,
+              "ransac_reprojection_pixels": 4.0,
+              "ratio_test": 0.78
+            }
+          },
+          "failure": null,
+          "fallback": {
+            "method": "reviewed_manual_four_point",
+            "reason_code": null
+          },
+          "method": "automatic_feature_homography",
+          "requires_human_review": true,
+          "requires_manual_registration": false,
+          "review_status": "draft",
+          "schema_version": "VISUAL-QC-REGISTRATION-CANDIDATE-V1",
+          "status": "candidate"
+        },
+        "seed": 82,
+        "side_id": "main_page_1",
+        "status": "candidate"
+      },
+      {
+        "board_id": "BOARD-KM4-F151-MAIN-V1.2",
+        "board_key": "km4-f151",
+        "case_id": "km4-f151-main_page_2-seed-41",
+        "counts_as_field_qc_evidence": false,
+        "evidence_role": "synthetic_proxy",
+        "failure_code": null,
+        "mean_corner_error": 0.0006145555681725536,
+        "registration": {
+          "board_to_image_matrix": [
+            1.0046514886469753,
+            0.0231347088878852,
+            -0.016907434949171025,
+            -0.1378565605566331,
+            0.9298618981496263,
+            0.08147042088354124,
+            0.02321989983541677,
+            -0.087330660251952,
+            1.0
+          ],
+          "evidence": {
+            "attempts": [
+              {
+                "capture_keypoints": 5000,
+                "detector": "orb",
+                "failure_code": null,
+                "inlier_ratio": 0.9383726528647087,
+                "inliers": 1949,
+                "matches": 2077,
+                "reference_keypoints": 5000,
+                "status": "candidate"
+              }
+            ],
+            "board_contour": {
+              "area_fraction": 0.8629137239165329,
+              "bbox": {
+                "height": 1.0,
+                "width": 1.0,
+                "x": 0.0,
+                "y": 0.0
+              },
+              "polygon": [
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  -1.9455165584516553e-17,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ]
+              ],
+              "status": "candidate"
+            },
+            "capture_keypoints": 5000,
+            "detector": "orb",
+            "inlier_count": 1949,
+            "inlier_ratio": 0.9383726528647087,
+            "match_count": 2077,
+            "projected_area": 1.0451087951660156,
+            "projected_convex": true,
+            "projected_quad": [
+              [
+                -0.016907434910535812,
+                0.08147042244672775
+              ],
+              [
+                0.9647993445396423,
+                -0.0550328865647316
+              ],
+              [
+                1.0794835090637207,
+                0.9328431487083435
+              ],
+              [
+                0.006809621583670378,
+                1.1075187921524048
+              ]
+            ],
+            "reference_coverage": 0.8022200438225155,
+            "reference_keypoints": 5000,
+            "reprojection_maximum": 0.004032658413052559,
+            "reprojection_rms": 0.0011476839913554541,
+            "technical_thresholds": {
+              "max_dimension": 1400,
+              "maximum_reprojection_rms": 0.03,
+              "minimum_inlier_ratio": 0.35,
+              "minimum_inliers": 10,
+              "minimum_keypoints": 12,
+              "minimum_matches": 12,
+              "minimum_reference_coverage": 0.08,
+              "ransac_reprojection_pixels": 4.0,
+              "ratio_test": 0.78
+            }
+          },
+          "failure": null,
+          "fallback": {
+            "method": "reviewed_manual_four_point",
+            "reason_code": null
+          },
+          "method": "automatic_feature_homography",
+          "requires_human_review": true,
+          "requires_manual_registration": false,
+          "review_status": "draft",
+          "schema_version": "VISUAL-QC-REGISTRATION-CANDIDATE-V1",
+          "status": "candidate"
+        },
+        "seed": 41,
+        "side_id": "main_page_2",
+        "status": "candidate"
+      },
+      {
+        "board_id": "BOARD-KM4-F151-MAIN-V1.2",
+        "board_key": "km4-f151",
+        "case_id": "km4-f151-main_page_2-seed-82",
+        "counts_as_field_qc_evidence": false,
+        "evidence_role": "synthetic_proxy",
+        "failure_code": null,
+        "mean_corner_error": 0.0007419204872373026,
+        "registration": {
+          "board_to_image_matrix": [
+            0.9320236830853961,
+            -0.11665382144606243,
+            0.05587436760794468,
+            0.17773843317531657,
+            0.906624011602671,
+            -0.05888557852113467,
+            -0.03860050777754586,
+            -0.06571798315283271,
+            1.0
+          ],
+          "evidence": {
+            "attempts": [
+              {
+                "capture_keypoints": 5000,
+                "detector": "orb",
+                "failure_code": null,
+                "inlier_ratio": 0.9522431259044862,
+                "inliers": 1974,
+                "matches": 2073,
+                "reference_keypoints": 5000,
+                "status": "candidate"
+              }
+            ],
+            "board_contour": {
+              "area_fraction": 0.8509903691813804,
+              "bbox": {
+                "height": 1.0,
+                "width": 1.0,
+                "x": 0.0,
+                "y": 0.0
+              },
+              "polygon": [
+                [
+                  0.9999998211860657,
+                  0.9999998807907104
+                ],
+                [
+                  -1.9455162275794103e-17,
+                  0.9999998807907104
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.9999998211860657,
+                  0.0
+                ]
+              ],
+              "status": "candidate"
+            },
+            "capture_keypoints": 5000,
+            "detector": "orb",
+            "inlier_count": 1974,
+            "inlier_ratio": 0.9522431259044862,
+            "match_count": 2073,
+            "projected_area": 1.0157471895217896,
+            "projected_convex": true,
+            "projected_quad": [
+              [
+                0.05587437003850937,
+                -0.05888557806611061
+              ],
+              [
+                1.027004599571228,
+                0.12352004647254944
+              ],
+              [
+                0.972149670124054,
+                1.1442055702209473
+              ],
+              [
+                -0.06498740613460541,
+                0.9068310260772705
+              ]
+            ],
+            "reference_coverage": 0.8247304953856371,
+            "reference_keypoints": 5000,
+            "reprojection_maximum": 0.003891490399837494,
+            "reprojection_rms": 0.0011675593703093384,
+            "technical_thresholds": {
+              "max_dimension": 1400,
+              "maximum_reprojection_rms": 0.03,
+              "minimum_inlier_ratio": 0.35,
+              "minimum_inliers": 10,
+              "minimum_keypoints": 12,
+              "minimum_matches": 12,
+              "minimum_reference_coverage": 0.08,
+              "ransac_reprojection_pixels": 4.0,
+              "ratio_test": 0.78
+            }
+          },
+          "failure": null,
+          "fallback": {
+            "method": "reviewed_manual_four_point",
+            "reason_code": null
+          },
+          "method": "automatic_feature_homography",
+          "requires_human_review": true,
+          "requires_manual_registration": false,
+          "review_status": "draft",
+          "schema_version": "VISUAL-QC-REGISTRATION-CANDIDATE-V1",
+          "status": "candidate"
+        },
+        "seed": 82,
+        "side_id": "main_page_2",
+        "status": "candidate"
+      }
+    ],
+    "evidence_role": "synthetic_proxy",
+    "field_accuracy_claim_allowed": false,
+    "schema_version": "VISUAL-QC-REGISTRATION-BENCHMARK-V1",
+    "summary": {
+      "candidate_count": 20,
+      "case_count": 20,
+      "manual_required_count": 0,
+      "maximum_corner_error": 0.0014629799484178253,
+      "mean_corner_error": 0.000812214291121979,
+      "status_counts": {
+        "candidate": 20
+      }
+    }
+  }
+}

@@ -24,6 +24,8 @@ Cases and source image blobs are recoverable from IndexedDB. Imported JSON requi
 
 This `local_only` behavior remains truthful for V1. The next contract version will upload authorized physical-board photos to the controlled server, persist processing jobs and review state centrally, and retain IndexedDB only for draft recovery and weak-network retry.
 
+The first local server-side registration core now exists in `scripts/visual_qc/`. It generates deterministic point-map proxies, returns draft automatic homography candidates with technical evidence, and falls back to the existing reviewed manual four-point method. This is a worker-core baseline only; upload, persistent jobs, server review state, and browser integration remain the next increment. See `docs/visual-qc-auto-registration-2026-07-20.md`.
+
 ## Data Boundary
 
 - The KM4 Service Manual image is a proxy used to verify interaction, projective overlay, annotation, storage, and export behavior.

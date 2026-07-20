@@ -12,6 +12,8 @@
 
 当前页面是本地数据工作台基线，不是正式部署架构。已确认的目标是服务器主导的Web平台：主板照片上传现有受控服务器，OpenCV异步处理，自动失败回退人工四点配准，Golden Sample和候选审核集中保存，浏览器仅保留弱网草稿。权威设计见 `docs/superpowers/specs/2026-07-20-visual-qc-server-architecture-design.md`。
 
+服务器侧首轮自动配准核心已在本地实现：确定性合成透视、轮廓证据、ORB/AKAZE 特征、RANSAC 单应性、结构化失败原因和人工四点回退。它尚未部署，也尚未改变 V1 的本地存储行为。运行方式、候选契约和代理证据基准见 `docs/visual-qc-auto-registration-2026-07-20.md`。
+
 ## 功能特性
 
 - 🤖 **AI 智能诊断**：通过大语言模型辅助分析主板故障
