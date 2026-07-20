@@ -55,7 +55,7 @@ ANTHROPIC_API_KEY=...
 ## Current Deployment
 
 - Deployed on: 2026-07-20
-- Deployed commit: `2659769`
+- Deployed commit: `2a2436b`
 - Internal service: `http://127.0.0.1:3010`
 - Internal visual-QC API: `http://127.0.0.1:3020`
 - External beta URL: `https://cccsat.top/mb-repair-beta/`
@@ -72,6 +72,12 @@ ANTHROPIC_API_KEY=...
   console errors or horizontal overflow; technician/reviewer roles pass through
   the HTTPS gateway; forged actor headers are overwritten; PM2 restart retains
   the persisted proxy case and completed registration job.
+- 2026-07-20 capture-intake increment: the authenticated production route
+  exposes the compact physical-capture panel and actor-scoped capture-session
+  API. Same-board front/back pairing, the three capture confirmations,
+  transaction-level session identity protection, and Golden/training gates are
+  deployed. An authenticated no-write smoke returned the expected technician
+  identity and typed `capture_session_not_found` response from the new API.
 - Proxy evidence: one KM4 reviewed manual image was accepted as a proxy case,
   scored `usable`, and correctly fell back to manual four-point registration
   after ORB/AKAZE evidence failed the inlier gate. It is not physical-board
