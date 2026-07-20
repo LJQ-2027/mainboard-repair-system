@@ -241,6 +241,40 @@ class VisualQcServerApiTests(unittest.TestCase):
             [],
         )
 
+    def test_development_cors_allows_only_configured_workbench_origin(self):
+        cors_settings = VisualQcServerSettings(
+            project_root=ROOT,
+            data_root=Path(self.temp_dir.name) / "cors",
+            minimum_image_dimension=64,
+            worker_count=0,
+            allowed_origins=("http://127.0.0.1:8899",),
+        )
+        cors_client = TestClient(create_app(cors_settings))
+
+        allowed = cors_client.options(
+            "/api/v1/visual-qc/cases",
+            headers={
+                "Origin": "http://127.0.0.1:8899",
+                "Access-Control-Request-Method": "POST",
+                "Access-Control-Request-Headers": "x-actor-id,idempotency-key",
+            },
+        )
+        denied = cors_client.options(
+            "/api/v1/visual-qc/cases",
+            headers={
+                "Origin": "https://untrusted.example",
+                "Access-Control-Request-Method": "POST",
+            },
+        )
+        cors_client.close()
+
+        self.assertEqual(allowed.status_code, 200)
+        self.assertEqual(
+            allowed.headers["access-control-allow-origin"],
+            "http://127.0.0.1:8899",
+        )
+        self.assertNotIn("access-control-allow-origin", denied.headers)
+
     def test_declared_mime_type_must_match_image_bytes(self):
         ok, encoded = cv2.imencode(".png", np.full((180, 260, 3), 190, dtype=np.uint8))
         self.assertTrue(ok)

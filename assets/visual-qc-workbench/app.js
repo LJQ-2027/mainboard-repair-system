@@ -35,8 +35,21 @@ import {
   loadVisualQcCase,
   saveVisualQcCase,
 } from './visual-qc-storage.js';
+import {
+  applyServerJobResult,
+  createServerSyncState,
+  getVisualQcJob,
+  pollVisualQcJob,
+  retryVisualQcJob,
+  reviewVisualQcRegistration,
+  transitionServerSync,
+  uploadVisualQcCase,
+} from './visual-qc-server-client.js';
 
 const CATALOG_URL = '../../knowledge-base/repair-workbench-boards.json';
+const QUERY = new URLSearchParams(window.location.search);
+const VISUAL_QC_API = QUERY.get('qcApi') || '../../api/v1/visual-qc';
+const VISUAL_QC_ACTOR_ID = globalThis.VISUAL_QC_ACTOR_ID || 'local-technician';
 const ANALYSIS_MAX_EDGE = 720;
 const CATEGORY_LABELS = {
   burn_or_heat_damage: '烧焦或热损伤',
@@ -93,9 +106,15 @@ const elements = {
   qualityResolution: byId('qualityResolution'),
   qualitySharpness: byId('qualitySharpness'),
   qualityGuidance: byId('qualityGuidance'),
+  serverSyncTitle: byId('serverSyncTitle'),
+  serverSyncBadge: byId('serverSyncBadge'),
+  serverSyncProgress: byId('serverSyncProgress'),
+  serverSyncDetail: byId('serverSyncDetail'),
+  serverSyncButton: byId('serverSyncButton'),
   registrationTitle: byId('registrationTitle'),
   registrationBadge: byId('registrationBadge'),
   anchorCount: byId('anchorCount'),
+  checkCountLabel: byId('checkCountLabel'),
   checkCount: byId('checkCount'),
   registrationError: byId('registrationError'),
   removeLastPairButton: byId('removeLastPairButton'),
@@ -147,6 +166,7 @@ const state = {
   saveTimer: null,
   awaitingImportedImage: false,
   loadRevision: 0,
+  serverBusy: false,
 };
 
 const QUALITY_GUIDANCE_COPY = Object.freeze({
@@ -375,6 +395,17 @@ function commitCase(nextCase) {
   render();
 }
 
+function replaceCurrentCase(nextCase, persist = false) {
+  if (!state.history) return;
+  state.history = {
+    ...state.history,
+    current: structuredClone(nextCase),
+  };
+  syncRegistrationState();
+  if (persist) scheduleSave();
+  render();
+}
+
 function scheduleSave() {
   clearTimeout(state.saveTimer);
   const visualCase = currentCase();
@@ -405,6 +436,123 @@ async function flushPendingSave() {
   } catch (error) {
     elements.saveStatus.textContent = '本机保存不可用';
     console.warn(error);
+  }
+}
+
+function acceptedCaseFromSync(sync) {
+  return {
+    case_id: sync.server_case_id,
+    image: { image_id: sync.server_image_id },
+    job: { job_id: sync.job_id, status: sync.job_status },
+  };
+}
+
+async function pollCurrentServerJob(acceptedCase) {
+  const sync = currentCase()?.server_sync;
+  if (!sync?.job_id) throw new Error('服务器任务编号不存在。');
+  const terminal = await pollVisualQcJob({
+    jobId: sync.job_id,
+    getJob: (jobId) => getVisualQcJob(VISUAL_QC_API, VISUAL_QC_ACTOR_ID, jobId),
+    onSnapshot: (snapshot) => {
+      const visualCase = currentCase();
+      if (!visualCase) return;
+      const next = structuredClone(visualCase);
+      next.server_sync = transitionServerSync(next.server_sync, {
+        type: 'job_snapshot',
+        snapshot,
+      });
+      replaceCurrentCase(next, snapshot.status === 'failed');
+    },
+  });
+  if (terminal.status === 'failed') {
+    throw new Error(terminal.error?.message || '服务器图像处理失败。');
+  }
+  const next = applyServerJobResult(
+    currentCase(),
+    acceptedCase || acceptedCaseFromSync(currentCase().server_sync),
+    terminal,
+  );
+  commitCase(next);
+  elements.interactionPrompt.textContent = next.server_sync.status === 'candidate_ready'
+    ? '自动配准候选已返回，请检查叠图后人工确认'
+    : '自动配准未通过，请使用四组锚点完成配准';
+}
+
+async function syncCurrentCaseWithServer() {
+  if (state.serverBusy) return;
+  const visualCase = currentCase();
+  if (!visualCase || !state.photoBlob) return;
+  state.serverBusy = true;
+  render();
+  try {
+    let sync = visualCase.server_sync || createServerSyncState(visualCase);
+    if (sync.status === 'failed' && sync.job_id) {
+      const queued = await retryVisualQcJob(
+        VISUAL_QC_API,
+        VISUAL_QC_ACTOR_ID,
+        sync.job_id,
+      );
+      const next = structuredClone(currentCase());
+      next.server_sync = transitionServerSync(sync, {
+        type: 'job_snapshot',
+        snapshot: queued,
+      });
+      replaceCurrentCase(next, true);
+      await pollCurrentServerJob(acceptedCaseFromSync(next.server_sync));
+      return;
+    }
+    if (sync.server_case_id && sync.job_id) {
+      await pollCurrentServerJob(acceptedCaseFromSync(sync));
+      return;
+    }
+
+    let next = structuredClone(currentCase());
+    next.server_sync = transitionServerSync(sync, { type: 'upload_started' });
+    replaceCurrentCase(next, true);
+    const accepted = await uploadVisualQcCase({
+      apiBase: VISUAL_QC_API,
+      actorId: VISUAL_QC_ACTOR_ID,
+      visualCase: next,
+      imageBlob: state.photoBlob,
+      syncState: next.server_sync,
+      onProgress: (progress) => {
+        const active = currentCase();
+        if (!active) return;
+        const progressed = structuredClone(active);
+        progressed.server_sync = transitionServerSync(progressed.server_sync, {
+          type: 'upload_progress',
+          progress,
+        });
+        replaceCurrentCase(progressed);
+      },
+    });
+    next = structuredClone(currentCase());
+    next.server_sync = transitionServerSync(next.server_sync, {
+      type: 'upload_accepted',
+      caseId: accepted.case_id,
+      imageId: accepted.image.image_id,
+      jobId: accepted.job.job_id,
+      jobStatus: accepted.job.status,
+    });
+    replaceCurrentCase(next, true);
+    await pollCurrentServerJob(accepted);
+  } catch (error) {
+    const active = currentCase();
+    if (active && active.server_sync?.status !== 'failed') {
+      const next = structuredClone(active);
+      next.server_sync = transitionServerSync(
+        next.server_sync || createServerSyncState(next),
+        {
+          type: next.server_sync?.server_case_id ? 'sync_interrupted' : 'upload_failed',
+          message: error.message,
+        },
+      );
+      replaceCurrentCase(next, true);
+    }
+    reportUserError(error);
+  } finally {
+    state.serverBusy = false;
+    render();
   }
 }
 
@@ -450,6 +598,7 @@ async function loadPhotoBlob(blob, fileName, isProxy = false) {
       guidance: quality.guidance,
     },
   });
+  visualCase.server_sync = createServerSyncState(visualCase);
   if (quality.status === 'retake') {
     visualCase.qc_result = { status: 'image_invalid', reviewed_at: null };
   }
@@ -566,11 +715,39 @@ function removeLastPair() {
   render();
 }
 
-function confirmRegistration() {
+async function confirmRegistration() {
   try {
-    commitCase(reviewRegistration(currentCase()));
+    const visualCase = currentCase();
+    if (!visualCase) return;
+    const isAutomatic = visualCase.registration?.method === 'automatic_feature_homography';
+    const next = isAutomatic
+      ? structuredClone(visualCase)
+      : reviewRegistration(visualCase);
+    if (visualCase.server_sync?.server_case_id) {
+      state.serverBusy = true;
+      render();
+      const reviewed = await reviewVisualQcRegistration({
+        apiBase: VISUAL_QC_API,
+        actorId: VISUAL_QC_ACTOR_ID,
+        serverCaseId: visualCase.server_sync.server_case_id,
+        registration: visualCase.registration,
+      });
+      next.registration.status = 'reviewed';
+      next.registration.reviewed_at = reviewed.created_at;
+      next.registration.server_review_id = reviewed.review_id;
+      next.server_sync = {
+        ...next.server_sync,
+        status: 'reviewed',
+        updated_at: new Date().toISOString(),
+      };
+    }
+    commitCase(next);
+    elements.interactionPrompt.textContent = '配准已人工确认，可以进入缺陷标注';
   } catch (error) {
-    elements.interactionPrompt.textContent = error.message;
+    reportUserError(error);
+  } finally {
+    state.serverBusy = false;
+    render();
   }
 }
 
@@ -944,7 +1121,7 @@ function renderQuality() {
     elements.qualityScore.textContent = '—';
     elements.qualityResolution.textContent = '—';
     elements.qualitySharpness.textContent = '—';
-    elements.qualityGuidance.textContent = '图片只在当前浏览器处理，不会上传云端。';
+    elements.qualityGuidance.textContent = '导入后立即本机检查；服务器处理会保留独立质量证据。';
     return;
   }
   const quality = visualCase.quality;
@@ -959,22 +1136,77 @@ function renderQuality() {
     .join(' ') || '图像质量检查完成。';
 }
 
+function renderServerSync() {
+  const visualCase = currentCase();
+  const sync = visualCase?.server_sync;
+  const status = sync?.status || 'local_draft';
+  const presentations = {
+    local_draft: ['本机草稿', '本机', '图片尚未上传，原图与编辑状态保存在当前浏览器。'],
+    uploading: ['正在上传', '上传中', `已上传 ${Math.round((sync?.progress || 0) * 100)}%`],
+    queued: ['等待服务器处理', '排队', '案例已由服务器接受，等待 CPU 任务。'],
+    running: ['正在自动配准', '处理中', '服务器正在检查质量、轮廓和特征配准。'],
+    succeeded: ['处理结果已返回', '待整理', '正在载入服务器结果。'],
+    candidate_ready: ['自动配准待确认', '候选', '检查半透明叠图；确认前不会成为审核配准。'],
+    manual_required: ['需要人工四点配准', '人工回退', '自动配准未通过，请选择四组锚点和独立检查点。'],
+    reviewed: ['配准已同步审核', '已审核', '服务器已保存本次人工审核记录。'],
+    failed: ['服务器处理失败', '失败', sync?.last_error || '可保留案例并重试处理。'],
+    upload_failed: ['上传未完成', '可重试', sync?.last_error || '本机草稿仍然保留。'],
+    sync_interrupted: ['连接暂时中断', '待续传', sync?.last_error || '服务器任务仍可继续查询。'],
+  };
+  const [title, badge, detail] = presentations[status] || presentations.local_draft;
+  elements.serverSyncTitle.textContent = visualCase ? title : '等待图片';
+  elements.serverSyncBadge.textContent = visualCase ? badge : '本机';
+  elements.serverSyncBadge.className = `badge ${status.replaceAll('_', '-')}`;
+  elements.serverSyncDetail.textContent = visualCase
+    ? detail
+    : '图片先保存在本机草稿，服务器接受后再成为共享案例。';
+  elements.serverSyncProgress.value = Math.round((sync?.progress || 0) * 100);
+  const actionLabels = {
+    upload_failed: '重新上传',
+    sync_interrupted: '继续查询',
+    failed: '重试处理',
+    queued: '继续查询',
+    running: '继续查询',
+    succeeded: '正在载入结果',
+    candidate_ready: '等待人工确认',
+    manual_required: '请完成四点配准',
+    reviewed: '服务器记录已审核',
+  };
+  elements.serverSyncButton.textContent = actionLabels[status] || '上传并自动配准';
+  elements.serverSyncButton.disabled = !visualCase
+    || !state.photoBlob
+    || state.serverBusy
+    || ['candidate_ready', 'manual_required', 'reviewed', 'succeeded'].includes(status);
+  elements.captureStage.disabled = Boolean(sync?.server_case_id);
+}
+
 function renderRegistration() {
   const registration = currentCase()?.registration;
   const reviewed = registration?.status === 'reviewed';
+  const automatic = registration?.method === 'automatic_feature_homography';
   elements.registrationTitle.textContent = reviewed ? '配准已人工确认' : (
-    registration?.matrix ? '等待配准确认' : '尚未配准'
+    automatic && registration?.matrix ? '自动配准等待确认' : (
+      registration?.matrix ? '等待配准确认' : '尚未配准'
+    )
   );
   elements.registrationBadge.textContent = reviewed ? '已审核' : '草稿';
   elements.registrationBadge.className = `badge ${reviewed ? 'reviewed' : 'draft'}`;
-  elements.anchorCount.textContent = `${state.boardAnchors.length} / 4`;
-  elements.checkCount.textContent = String(state.checkPoints.length);
+  elements.anchorCount.textContent = automatic ? '自动' : `${state.boardAnchors.length} / 4`;
+  elements.checkCountLabel.textContent = automatic ? 'RANSAC 内点' : '独立检查点';
+  elements.checkCount.textContent = automatic
+    ? String(registration?.error?.count || 0)
+    : String(state.checkPoints.length);
   elements.registrationError.textContent = registration?.error?.rms == null
     ? '—'
     : registration.error.rms.toFixed(5);
   elements.removeLastPairButton.disabled = !state.boardAnchors.length && !state.checkPoints.length;
-  elements.clearRegistrationButton.disabled = !state.boardAnchors.length && !registration?.matrix;
-  elements.reviewRegistrationButton.disabled = !registration?.matrix || !state.checkPoints.length || reviewed;
+  elements.clearRegistrationButton.disabled = reviewed
+    || (!state.boardAnchors.length && !registration?.matrix);
+  elements.reviewRegistrationButton.textContent = automatic ? '确认自动配准' : '确认配准';
+  elements.reviewRegistrationButton.disabled = !registration?.matrix
+    || (!automatic && !state.checkPoints.length)
+    || reviewed
+    || state.serverBusy;
   elements.annotationModeButton.disabled = !reviewed;
   elements.overlayOpacity.disabled = !registration?.matrix;
   elements.registrationTools.querySelector('[data-registration-tool="check"]').disabled = state.boardAnchors.length !== 4;
@@ -1030,6 +1262,13 @@ function renderQcResult() {
 function renderInteractionPrompt() {
   if (!currentCase()) {
     elements.interactionPrompt.textContent = '请先导入一张主板图片';
+  } else if (currentCase()?.registration?.status === 'reviewed') {
+    elements.interactionPrompt.textContent = state.mode === 'annotation'
+      ? '在实拍图上标注并人工确认可见异常'
+      : '配准已确认，可以进入缺陷标注';
+  } else if (currentCase()?.registration?.method === 'automatic_feature_homography'
+    && currentCase()?.registration?.status === 'draft') {
+    elements.interactionPrompt.textContent = '检查叠图位置；确认自动配准，或清除后改用人工四点配准';
   } else if (state.mode === 'annotation') {
     elements.interactionPrompt.textContent = state.annotationTool === 'polygon'
       ? '在实拍图上逐点标注，多边形至少三个点'
@@ -1057,6 +1296,7 @@ function render() {
     : '尚未导入图片';
   elements.undoButton.disabled = !state.history?.past.length;
   elements.redoButton.disabled = !state.history?.future.length;
+  renderServerSync();
   renderQuality();
   renderRegistration();
   renderAnnotations();
@@ -1137,6 +1377,7 @@ async function importCase(file) {
   state.awaitingImportedImage = true;
   syncRegistrationState();
   render();
+  elements.saveStatus.textContent = '案例已导入，等待原图';
   elements.interactionPrompt.textContent = '案例已导入，请重新选择原图以核对 SHA-256';
 }
 
@@ -1184,6 +1425,7 @@ async function renderSavedCases() {
         elements.savedCasesDialog.close();
         resizeCanvases();
         render();
+        elements.saveStatus.textContent = '已从本机恢复';
       } catch (error) {
         reportUserError(error);
       }
@@ -1283,6 +1525,7 @@ function bindEvents() {
   elements.removeLastPairButton.addEventListener('click', removeLastPair);
   elements.clearRegistrationButton.addEventListener('click', clearRegistration);
   elements.reviewRegistrationButton.addEventListener('click', confirmRegistration);
+  elements.serverSyncButton.addEventListener('click', syncCurrentCaseWithServer);
   elements.finalizeQcButton.addEventListener('click', finalizeVisualQc);
   elements.undoButton.addEventListener('click', () => {
     state.history = undoHistory(state.history);

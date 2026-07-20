@@ -10,7 +10,7 @@
 <body>
   <header class="app-header">
     <div>
-      <span class="eyebrow">内部数据工作台 · 本机处理</span>
+      <span class="eyebrow">内部视觉 QC · 弱网草稿与服务器处理</span>
       <h1>主板视觉 QC</h1>
     </div>
     <div class="header-status">
@@ -105,6 +105,19 @@
       </div>
 
       <aside class="inspection-panel" aria-label="QC 案例详情">
+        <section class="panel-section server-sync-section">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">服务器处理</span>
+              <h2 id="serverSyncTitle">等待图片</h2>
+            </div>
+            <span id="serverSyncBadge" class="badge neutral">本机</span>
+          </div>
+          <progress id="serverSyncProgress" max="100" value="0"></progress>
+          <p id="serverSyncDetail" class="source-note">图片先保存在本机草稿，服务器接受后再成为共享案例。</p>
+          <button id="serverSyncButton" class="primary-button full-button" type="button" disabled>上传并自动配准</button>
+        </section>
+
         <section class="panel-section">
           <div class="section-heading">
             <div>
@@ -118,7 +131,7 @@
             <div><dt>分辨率</dt><dd id="qualityResolution">—</dd></div>
             <div><dt>清晰度</dt><dd id="qualitySharpness">—</dd></div>
           </dl>
-          <p id="qualityGuidance" class="source-note">图片只在当前浏览器处理，不会上传云端。</p>
+          <p id="qualityGuidance" class="source-note">导入后立即本机检查；服务器处理会保留独立质量证据。</p>
         </section>
 
         <section class="panel-section">
@@ -131,7 +144,7 @@
           </div>
           <div class="progress-rows">
             <div><span>求解锚点</span><strong id="anchorCount">0 / 4</strong></div>
-            <div><span>独立检查点</span><strong id="checkCount">0</strong></div>
+            <div><span id="checkCountLabel">独立检查点</span><strong id="checkCount">0</strong></div>
             <div><span>归一化 RMS</span><strong id="registrationError">—</strong></div>
           </div>
           <div class="button-row">

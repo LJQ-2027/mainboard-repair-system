@@ -85,6 +85,20 @@ class VisualQcGoldenSampleTests(unittest.TestCase):
     def test_reviewed_physical_capture_can_become_versioned_golden_sample(self):
         first_case = self.create_processed_case(idempotency_key="golden-001")
         self.accept_automatic_registration(first_case["case_id"])
+        conflicting_review = self.client.post(
+            f"/api/v1/visual-qc/cases/{first_case['case_id']}/registration-reviews",
+            json={
+                "decision": "accept_manual",
+                "board_to_image_matrix": [1, 0, 0, 0, 1, 0, 0, 0, 1],
+                "anchors": [
+                    {"board": [0, 0], "image": [0, 0]},
+                    {"board": [1, 0], "image": [1, 0]},
+                    {"board": [1, 1], "image": [1, 1]},
+                    {"board": [0, 1], "image": [0, 1]},
+                ],
+            },
+            headers={"X-Actor-Id": "technician-001"},
+        )
 
         forbidden = self.client.post(
             "/api/v1/visual-qc/golden-samples",
@@ -109,6 +123,11 @@ class VisualQcGoldenSampleTests(unittest.TestCase):
         )
 
         self.assertEqual(forbidden.status_code, 403)
+        self.assertEqual(conflicting_review.status_code, 409)
+        self.assertEqual(
+            conflicting_review.json()["detail"]["code"],
+            "registration_already_reviewed",
+        )
         self.assertEqual(created.status_code, 201)
         self.assertEqual(created.json()["status"], "active")
         self.assertEqual(created.json()["version"], 1)

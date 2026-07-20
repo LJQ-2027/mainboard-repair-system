@@ -10,9 +10,9 @@
 
 当前覆盖图片质量检查、四锚点配准、独立检查点、人工审核、矩形/多边形缺陷标注、编译器件 footprint 建议、IndexedDB 草稿，以及 `VISUAL-QC-CASE-V1` JSON 和标注预览图导出。数据边界和实物照片验收门禁见 `docs/visual-qc-workbench-2026-07-17.md`。
 
-当前页面是本地数据工作台基线，不是正式部署架构。已确认的目标是服务器主导的Web平台：主板照片上传现有受控服务器，OpenCV异步处理，自动失败回退人工四点配准，Golden Sample和候选审核集中保存，浏览器仅保留弱网草稿。权威设计见 `docs/superpowers/specs/2026-07-20-visual-qc-server-architecture-design.md`。
+当前实现遵循服务器主导的 Web 架构：主板照片上传受控 FastAPI 服务，OpenCV 异步处理，自动失败回退人工四点配准，Golden Sample 和候选审核集中保存，浏览器保留弱网草稿。权威设计见 `docs/superpowers/specs/2026-07-20-visual-qc-server-architecture-design.md`。
 
-服务器侧首轮自动配准核心已在本地实现：确定性合成透视、轮廓证据、ORB/AKAZE 特征、RANSAC 单应性、结构化失败原因和人工四点回退。它尚未部署，也尚未改变 V1 的本地存储行为。运行方式、候选契约和代理证据基准见 `docs/visual-qc-auto-registration-2026-07-20.md`。
+浏览器工作台已接入本地 QC 服务：支持稳定幂等上传、字节进度、任务轮询、失败重试、刷新恢复、自动候选叠图确认和人工四点回退。服务器侧包含确定性合成透视、轮廓证据、ORB/AKAZE 特征、RANSAC 单应性、结构化失败原因和持久化审核。当前仍未部署生产环境；运行方式、候选契约和代理证据基准见 `docs/visual-qc-auto-registration-2026-07-20.md` 与 `docs/visual-qc-server-api-2026-07-20.md`。
 
 ## 功能特性
 
@@ -103,6 +103,7 @@ python ai_proxy_server.py
 - **目标后端**：同域FastAPI服务、持久化QC任务、受控图片存储和CPU OpenCV Worker
 - **当前后端实现**：`visual_qc_server.py` 已提供版本化上传、SQLite任务恢复、图像质量证据、自动配准候选与人工四点回退；本地运行和部署边界见 `docs/visual-qc-server-api-2026-07-20.md`
 - **当前审核闭环**：服务器已支持配准审核、Golden Sample版本化、差异热区、受控artifact以及维修员确认/驳回；全球站点拍摄与入库规范见 `docs/visual-qc-capture-intake-spec-2026-07-20.md`
+- **当前浏览器接入**：视觉 QC 工作台已支持本机草稿、受控上传、任务轮询、自动候选人工确认、四点回退和刷新恢复；Golden Sample 与差异候选的浏览器审核界面仍待接入
 - **AI 平台**：Anthropic Claude / DeepSeek
 - **通信协议**：SSE (Server-Sent Events) 流式传输
 

@@ -297,6 +297,12 @@ class VisualQcService:
             )
         existing = self.store.get_latest_registration_review(case_id)
         if existing:
+            if existing["decision"] != decision:
+                raise VisualQcServiceError(
+                    "registration_already_reviewed",
+                    "Registration review is immutable; create a new case to use a different method.",
+                    409,
+                )
             return existing
         review = {
             "review_id": f"regrev_{uuid.uuid4().hex}",

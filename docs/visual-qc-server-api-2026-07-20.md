@@ -20,6 +20,15 @@ python visual_qc_server.py
 
 The default port is `3020`. Production paths are expected to be routed by Nginx under the existing controlled origin:
 
+For split-port local development, allow only the explicit workbench origins:
+
+```powershell
+$env:VISUAL_QC_ALLOWED_ORIGINS='http://127.0.0.1:8899,http://localhost:8899'
+python visual_qc_server.py
+```
+
+Open the workbench with `?qcApi=http://127.0.0.1:3020/api/v1/visual-qc`. Production should use the same origin and leave cross-origin access disabled. The allowlist is strict and does not use wildcard CORS.
+
 ```nginx
 location /mb-repair-beta/api/v1/visual-qc/ {
     proxy_pass http://127.0.0.1:3020/api/v1/visual-qc/;
@@ -113,11 +122,16 @@ Implemented:
 - interrupted-job recovery;
 - explicit failed-job retry;
 - server-side image quality metrics;
-- automatic registration candidate or reviewed-manual fallback.
+- automatic registration candidate or reviewed-manual fallback;
+- IndexedDB draft recovery before and after upload;
+- stable browser idempotency keys across retry and refresh;
+- byte-level upload progress, job polling, failed-job retry, and interrupted polling recovery;
+- automatic candidate overlay with explicit human confirmation;
+- safe return to the existing four-point workflow when automatic registration is unavailable.
 
 Still open:
 
-- browser upload and weak-network retry integration;
 - production authentication and Nginx deployment verification;
 - operational retention cleanup and disk-pressure monitoring;
+- browser surfaces for Golden Sample approval and difference-candidate review;
 - physical bare-board acceptance.

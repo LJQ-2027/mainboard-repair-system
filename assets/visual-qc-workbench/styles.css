@@ -306,6 +306,12 @@ button:disabled {
   font-size: 12px;
 }
 
+.canvas-pane figcaption span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
 .canvas-wrap {
   position: relative;
   min-height: 420px;
@@ -389,6 +395,37 @@ button:disabled {
   border-bottom: 1px solid var(--line);
 }
 
+.server-sync-section {
+  background: #f8faf8;
+}
+
+.server-sync-section progress {
+  width: 100%;
+  height: 6px;
+  margin: 14px 0 0;
+  display: block;
+  border: 0;
+  border-radius: 0;
+  overflow: hidden;
+  background: #dfe5e1;
+}
+
+.server-sync-section progress::-webkit-progress-bar {
+  background: #dfe5e1;
+}
+
+.server-sync-section progress::-webkit-progress-value {
+  background: var(--green);
+}
+
+.server-sync-section progress::-moz-progress-bar {
+  background: var(--green);
+}
+
+.server-sync-section .full-button {
+  margin-top: 12px;
+}
+
 .section-heading {
   display: flex;
   align-items: start;
@@ -432,9 +469,21 @@ button:disabled {
 }
 
 .badge.retake,
-.badge.confirmed-anomaly {
+.badge.confirmed-anomaly,
+.badge.failed,
+.badge.upload-failed {
   color: #9f3829;
   background: var(--coral-soft);
+}
+
+.badge.uploading,
+.badge.queued,
+.badge.running,
+.badge.candidate-ready,
+.badge.manual-required,
+.badge.sync-interrupted {
+  color: #83520a;
+  background: var(--amber-soft);
 }
 
 .metrics {
@@ -732,6 +781,24 @@ dialog::backdrop {
 
   .canvas-wrap {
     min-height: 330px;
+  }
+
+  .canvas-pane {
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .canvas-pane figcaption {
+    min-height: 38px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .canvas-pane figcaption span {
+    width: 100%;
+    text-align: left;
   }
 
   .canvas-footer {

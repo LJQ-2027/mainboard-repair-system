@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, File, Form, Header, HTTPException, UploadFile
 from fastapi.responses import FileResponse
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from scripts.visual_qc.server.config import VisualQcServerSettings
@@ -52,6 +53,19 @@ def create_app(settings: VisualQcServerSettings | None = None) -> FastAPI:
         lifespan=lifespan,
     )
     app.state.visual_qc_service = service
+    if settings.allowed_origins:
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=list(settings.allowed_origins),
+            allow_credentials=False,
+            allow_methods=["GET", "POST", "OPTIONS"],
+            allow_headers=[
+                "Content-Type",
+                "Idempotency-Key",
+                "X-Actor-Id",
+                "X-Actor-Role",
+            ],
+        )
 
     def actor_id(value: str | None):
         if not value or not value.strip():

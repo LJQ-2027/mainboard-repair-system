@@ -13,6 +13,7 @@ class VisualQcServerSettings:
     minimum_image_dimension: int = 480
     minimum_free_bytes: int = 2 * 1024 * 1024 * 1024
     worker_count: int = 1
+    allowed_origins: tuple[str, ...] = ()
 
     @classmethod
     def from_environment(cls) -> "VisualQcServerSettings":
@@ -32,4 +33,9 @@ class VisualQcServerSettings:
                 os.environ.get("VISUAL_QC_MIN_FREE_BYTES", 2 * 1024 * 1024 * 1024)
             ),
             worker_count=max(0, min(2, int(os.environ.get("VISUAL_QC_WORKERS", "1")))),
+            allowed_origins=tuple(
+                origin.strip()
+                for origin in os.environ.get("VISUAL_QC_ALLOWED_ORIGINS", "").split(",")
+                if origin.strip()
+            ),
         )

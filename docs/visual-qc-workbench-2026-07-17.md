@@ -4,11 +4,11 @@
 
 `http://127.0.0.1:8898/assets/visual-qc-workbench/`
 
-This document records the implemented local baseline at commit `45a8613`. It is not the production deployment architecture. The approved target is the server-led asynchronous architecture in `docs/superpowers/specs/2026-07-20-visual-qc-server-architecture-design.md`.
+This document began as the local baseline at commit `45a8613`. The workbench now also implements the browser side of the approved server-led asynchronous architecture in `docs/superpowers/specs/2026-07-20-visual-qc-server-architecture-design.md`. Production deployment is still pending.
 
 ## Workflow
 
-The current internal workbench supports the five compiled mainboard platforms and keeps all photos in the local browser:
+The current internal workbench supports the five compiled mainboard platforms:
 
 1. Select the known board and board side.
 2. Import a `golden_reference`, `before_repair`, or `after_repair` image.
@@ -22,9 +22,9 @@ The current internal workbench supports the five compiled mainboard platforms an
 
 Cases and source image blobs are recoverable from IndexedDB. Imported JSON requires the original image to be selected again and accepted only after its SHA-256 and dimensions match.
 
-This `local_only` behavior remains truthful for V1. The next contract version will upload authorized physical-board photos to the controlled server, persist processing jobs and review state centrally, and retain IndexedDB only for draft recovery and weak-network retry.
+When a QC API is configured, the browser creates a stable idempotency key, uploads the authorized image with byte progress, polls the persistent job, and restores interrupted synchronization after refresh. An automatic registration result remains a draft candidate until the operator checks the overlay and confirms it. A structured automatic failure returns to the same manual four-point process. IndexedDB remains the weak-network and in-progress editing layer; the server owns accepted cases and review evidence.
 
-The first local server-side registration core now exists in `scripts/visual_qc/`. It generates deterministic point-map proxies, returns draft automatic homography candidates with technical evidence, and falls back to the existing reviewed manual four-point method. This is a worker-core baseline only; upload, persistent jobs, server review state, and browser integration remain the next increment. See `docs/visual-qc-auto-registration-2026-07-20.md`.
+The server-side registration core in `scripts/visual_qc/` generates deterministic point-map proxies, returns draft automatic homography candidates with technical evidence, and falls back to the reviewed manual four-point method. FastAPI upload, persistent jobs, server review state, and browser integration are implemented locally. Golden Sample approval and difference-candidate review are available through the API but do not yet have workbench screens. See `docs/visual-qc-auto-registration-2026-07-20.md` and `docs/visual-qc-server-api-2026-07-20.md`.
 
 ## Data Boundary
 
