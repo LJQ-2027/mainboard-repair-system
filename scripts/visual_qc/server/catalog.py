@@ -16,7 +16,7 @@ class BoardCatalog:
         catalog_path = self.project_root / "knowledge-base" / "repair-workbench-boards.json"
         self.catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
 
-    def resolve_side(self, board_key: str, side_id: str) -> dict:
+    def resolve_board(self, board_key: str) -> dict:
         board = self.catalog.get("boards", {}).get(board_key)
         if not board:
             raise CatalogError("unknown_board", f"Unknown board_key: {board_key}")
@@ -24,6 +24,16 @@ class BoardCatalog:
         manifest_name = Path(board["side_manifest"]).name
         manifest_path = self.project_root / "knowledge-base" / manifest_name
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        return {
+            "board_key": board_key,
+            "board_id": manifest["board_id"],
+            "side_ids": [side["side_id"] for side in manifest.get("sides", [])],
+            "manifest": manifest,
+        }
+
+    def resolve_side(self, board_key: str, side_id: str) -> dict:
+        resolved_board = self.resolve_board(board_key)
+        manifest = resolved_board["manifest"]
         side = next(
             (candidate for candidate in manifest.get("sides", []) if candidate["side_id"] == side_id),
             None,
@@ -44,7 +54,8 @@ class BoardCatalog:
 
         return {
             "board_key": board_key,
-            "board_id": manifest["board_id"],
+            "board_id": resolved_board["board_id"],
             "side_id": side_id,
+            "expected_side_ids": resolved_board["side_ids"],
             "reference_path": reference_path,
         }

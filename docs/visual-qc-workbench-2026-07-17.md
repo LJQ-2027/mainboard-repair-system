@@ -4,21 +4,22 @@
 
 `http://127.0.0.1:8898/assets/visual-qc-workbench/`
 
-This document began as the local baseline at commit `45a8613`. The workbench now also implements the browser side of the approved server-led asynchronous architecture in `docs/superpowers/specs/2026-07-20-visual-qc-server-architecture-design.md`. Production deployment is still pending.
+This document began as the local baseline at commit `45a8613`. The workbench now implements the browser side of the approved server-led asynchronous architecture in `docs/superpowers/specs/2026-07-20-visual-qc-server-architecture-design.md`. The controlled pilot is deployed at `https://cccsat.top/mb-repair-beta/assets/visual-qc-workbench/`; this route is an authenticated pilot, not a field-accuracy claim.
 
 ## Workflow
 
 The current internal workbench supports the five compiled mainboard platforms:
 
 1. Select the known board and board side.
-2. Import a `golden_reference`, `before_repair`, or `after_repair` image.
-3. Review brightness, exposure, sharpness, and resolution checks.
-4. Pair four board/photo anchors to solve a homography.
-5. Add at least one independent check point and review the normalized projection error.
-6. Confirm the registration manually.
-7. Draw rectangle or polygon defect annotations.
-8. Confirm or reject each human annotation and finalize the QC result.
-9. Export the `VISUAL-QC-CASE-V1` JSON and an annotated PNG preview.
+2. Start or resume one capture session for the same physical board and capture setup.
+3. Import a `golden_reference`, `before_repair`, or `after_repair` image.
+4. Confirm complete-board framing, focus/lens cleanliness, and even unobstructed lighting.
+5. Capture the other declared board side in the same session when the board has two sides.
+6. Review brightness, exposure, sharpness, and resolution checks.
+7. Let the server propose registration or pair four board/photo anchors as the fallback.
+8. Add an independent check point when using manual registration and review the normalized projection error.
+9. Confirm registration, annotate visible defects, and review each human or model candidate.
+10. Export the V2 JSON and annotated PNG preview.
 
 Cases and source image blobs are recoverable from IndexedDB. Imported JSON requires the original image to be selected again and accepted only after its SHA-256 and dimensions match.
 
@@ -26,12 +27,14 @@ When a QC API is configured, the browser creates a stable idempotency key, uploa
 
 The server-side registration core in `scripts/visual_qc/` generates deterministic point-map proxies, returns draft automatic homography candidates with technical evidence, and falls back to the reviewed manual four-point method. FastAPI upload, persistent jobs, server review state, Golden Sample approval, difference-candidate review, and browser integration are implemented locally. See `docs/visual-qc-auto-registration-2026-07-20.md` and `docs/visual-qc-server-api-2026-07-20.md`.
 
-Historical local cases remain `VISUAL-QC-CASE-V1`. New server-connected drafts use `VISUAL-QC-CASE-V2`, whose schema explicitly permits server synchronization, reviewed automatic registration, capture-setup Golden state, and difference-review state without silently changing V1 semantics.
+Historical local cases remain `VISUAL-QC-CASE-V1`. New server-connected drafts use `VISUAL-QC-CASE-V2`, whose schema explicitly permits server synchronization, reviewed automatic registration, physical-board capture sessions, capture checklists, capture-setup Golden state, and difference-review state without silently changing V1 semantics.
 
 ## Data Boundary
 
 - The KM4 Service Manual image is a proxy used to verify interaction, projective overlay, annotation, storage, and export behavior.
 - Every image records `physical_capture` or `proxy_sample` as its evidence role. Proxy samples may exercise the tools but are rejected by the training gate even if their image quality is otherwise acceptable.
+- Physical uploads require all three capture confirmations. One capture session may contain only one board identity, stage, evidence role, and capture setup; the server enforces this again inside the database write transaction.
+- `pair_complete` means every source-declared side for that board has been captured in the session. It does not mean the board is normal, registered, or approved.
 - Registration error is reported as normalized RMS and maximum error. No industrial pass threshold is invented.
 - Component association is suggested only when the annotation center falls inside a compiled footprint. Overlapping footprints resolve to the smallest area. Otherwise the defect stays board-level.
 - Human annotations and future `model_candidate` records remain separate. Model candidates cannot become confirmed labels without human review.
@@ -57,7 +60,7 @@ Export reviewed cases to deterministic COCO:
 py -3 scripts/export_visual_qc_coco.py cases/ visual-qc.coco.json
 ```
 
-Training-ready data requires a valid image hash, acceptable image quality, reviewed registration, legal normalized coordinates, resolved board identity, reviewed human labels, and a final human QC result.
+Training-ready V2 data requires a valid image hash, a confirmed physical-capture checklist, acceptable image quality, reviewed registration, legal normalized coordinates, resolved board identity, reviewed human labels, and a final human QC result.
 
 ## Real Acceptance Gate
 

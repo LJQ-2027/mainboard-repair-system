@@ -12,7 +12,7 @@
 
 当前实现遵循服务器主导的 Web 架构：主板照片上传受控 FastAPI 服务，OpenCV 异步处理，自动失败回退人工四点配准，Golden Sample 和候选审核集中保存，浏览器保留弱网草稿。权威设计见 `docs/superpowers/specs/2026-07-20-visual-qc-server-architecture-design.md`。
 
-浏览器工作台已接入受控服务器 QC 服务：支持稳定幂等上传、字节进度、任务轮询、失败重试、刷新恢复、自动候选叠图确认、人工四点回退、Golden Sample 审核、差异热图和候选确认/驳回/暂缓。服务器侧包含确定性合成透视、轮廓证据、ORB/AKAZE 特征、RANSAC 单应性、结构化失败原因、持久化审核、磁盘压力健康状态，以及默认只预览的旧草稿留存清理。2026-07-20 已以逐用户 Basic Auth 受控试点方式部署到 `https://cccsat.top/mb-repair-beta/`；运行方式、候选契约、运维命令和代理证据基准见 `docs/visual-qc-auto-registration-2026-07-20.md` 与 `docs/visual-qc-server-api-2026-07-20.md`。
+浏览器工作台已接入受控服务器 QC 服务：支持同一实体板正反面采集批次、三项拍摄确认、稳定幂等上传、字节进度、任务轮询、失败重试、刷新恢复、自动候选叠图确认、人工四点回退、Golden Sample 审核、差异热图和候选确认/驳回/暂缓。服务器侧包含采集批次身份防污染、确定性合成透视、轮廓证据、ORB/AKAZE 特征、RANSAC 单应性、结构化失败原因、持久化审核、磁盘压力健康状态，以及默认只预览的旧草稿留存清理。2026-07-20 已以逐用户 Basic Auth 受控试点方式部署到 `https://cccsat.top/mb-repair-beta/`；运行方式、候选契约、运维命令和代理证据基准见 `docs/visual-qc-auto-registration-2026-07-20.md` 与 `docs/visual-qc-server-api-2026-07-20.md`。
 
 2026-07-20 的只读 P4 预检确认现有 beta 路由尚无认证，不能直接开放内部工程资料和图片上传。新的部署增量会先用逐用户 Nginx Basic Auth 保护整条 beta 路由，以网关注入的用户和角色驱动 QC API，并把 3020 绑定到回环地址；最终可在不改变 API 契约的情况下替换为公司 SSO/OIDC。部署与回滚步骤见 `docs/beta-deployment.md`。
 
@@ -105,7 +105,7 @@ python ai_proxy_server.py
 - **目标后端**：同域FastAPI服务、持久化QC任务、受控图片存储和CPU OpenCV Worker
 - **当前后端实现**：`visual_qc_server.py` 已提供版本化上传、SQLite任务恢复、图像质量证据、自动配准候选与人工四点回退；本地运行和部署边界见 `docs/visual-qc-server-api-2026-07-20.md`
 - **当前审核闭环**：服务器已支持配准审核、Golden Sample版本化、差异热区、受控artifact以及维修员确认/驳回；全球站点拍摄与入库规范见 `docs/visual-qc-capture-intake-spec-2026-07-20.md`
-- **当前浏览器接入**：视觉 QC 工作台已支持本机草稿、受控上传、任务轮询、自动候选人工确认、四点回退、刷新恢复、Golden Sample 版本审核、差异热图和逐候选人工决策
+- **当前浏览器接入**：视觉 QC 工作台已支持同板正反面批次、拍摄确认门禁、本机草稿、受控上传、任务轮询、自动候选人工确认、四点回退、刷新恢复、Golden Sample 版本审核、差异热图和逐候选人工决策
 - **当前案例契约**：本地历史基线保留 `VISUAL-QC-CASE-V1`；接入服务器的新案例使用 `VISUAL-QC-CASE-V2`，机器可读定义见 `knowledge-base/visual-qc-case-v2-schema.json`
 - **AI 平台**：Anthropic Claude / DeepSeek
 - **通信协议**：SSE (Server-Sent Events) 流式传输

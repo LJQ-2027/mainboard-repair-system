@@ -12,9 +12,10 @@ For a new board-side baseline:
 2. Remove the board from the device when the repair procedure permits it.
 3. Capture the complete first side.
 4. Turn the board over without changing the camera setup and capture the complete second side.
-5. Record the capture setup id.
-6. Upload each side as `golden_reference`.
-7. A reviewer checks image quality, registration, and normal-board status before activation.
+5. Keep both sides in one `capture_session_id` and record the stable `capture_setup_id`.
+6. Confirm complete-board framing, focus/lens cleanliness, and even unobstructed lighting for each image.
+7. Upload each side as `golden_reference`.
+8. A reviewer checks image quality, registration, and normal-board status before activation.
 
 For a repair case:
 
@@ -60,6 +61,28 @@ The site record behind this id should retain:
 
 Changing the camera, lens, stand, background, or light arrangement creates a new capture setup id. Golden Samples from different setups must not be silently mixed.
 
+## Capture Session Identity
+
+`capture_session_id` identifies one physical board during one capture stage. The server binds it to:
+
+- actor;
+- board key and board id;
+- capture stage;
+- evidence role;
+- capture setup id.
+
+The first accepted side establishes that identity. Later sides must match it. The binding is checked inside the database write transaction, so concurrent uploads cannot reuse the same session for a different board, stage, evidence role, or setup.
+
+`pair_in_progress` means at least one required side is still missing. `pair_complete` means all source-declared sides are present. Neither status confirms registration, image quality, a normal board, or a defect.
+
+Each physical image carries three boolean capture checks:
+
+- complete board is visible and the selected side is correct;
+- lens is clean and the board is in focus;
+- lighting is even and the board is unobstructed.
+
+The browser blocks upload until all three are confirmed. The server derives the checklist status from the booleans instead of trusting a submitted status string. Proxy evidence is always `not_applicable`.
+
 ## Intake States
 
 The browser creates a local draft before network transfer:
@@ -95,6 +118,7 @@ A Golden Sample requires:
 - confirmed normal-board status;
 - reviewer identity and timestamp;
 - capture setup id;
+- confirmed physical-capture checklist;
 - active version.
 
 Replacing a Golden Sample creates a new version. Historical cases continue to reference the version used when their difference job ran.

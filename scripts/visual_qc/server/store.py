@@ -11,6 +11,10 @@ def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
 
 
+class CaptureSessionIdentityConflict(RuntimeError):
+    pass
+
+
 class VisualQcStore:
     def __init__(self, database_path: Path, recover_interrupted_jobs: bool = True):
         self.database_path = database_path
@@ -44,6 +48,9 @@ class VisualQcStore:
                     side_id TEXT NOT NULL,
                     capture_stage TEXT NOT NULL,
                     evidence_role TEXT NOT NULL,
+                    capture_session_id TEXT NOT NULL DEFAULT '',
+                    capture_setup_id TEXT NOT NULL DEFAULT 'standard-bench',
+                    capture_checklist_json TEXT NOT NULL DEFAULT '{}',
                     reference_path TEXT NOT NULL,
                     created_at TEXT NOT NULL,
                     UNIQUE(actor_id, idempotency_key)
@@ -59,6 +66,17 @@ class VisualQcStore:
                     sha256 TEXT NOT NULL,
                     storage_path TEXT NOT NULL,
                     created_at TEXT NOT NULL
+                );
+                CREATE TABLE IF NOT EXISTS capture_sessions (
+                    actor_id TEXT NOT NULL,
+                    capture_session_id TEXT NOT NULL,
+                    board_key TEXT NOT NULL,
+                    board_id TEXT NOT NULL,
+                    capture_stage TEXT NOT NULL,
+                    evidence_role TEXT NOT NULL,
+                    capture_setup_id TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    PRIMARY KEY(actor_id, capture_session_id)
                 );
                 CREATE TABLE IF NOT EXISTS jobs (
                     job_id TEXT PRIMARY KEY,
@@ -157,6 +175,43 @@ class VisualQcStore:
                 CREATE INDEX IF NOT EXISTS candidate_reviews_job_candidate
                     ON candidate_reviews(job_id, candidate_id, created_at);
                 """
+            )
+            case_columns = {
+                row["name"]
+                for row in connection.execute("PRAGMA table_info(cases)").fetchall()
+            }
+            if "capture_session_id" not in case_columns:
+                connection.execute(
+                    "ALTER TABLE cases ADD COLUMN capture_session_id TEXT NOT NULL DEFAULT ''"
+                )
+            if "capture_setup_id" not in case_columns:
+                connection.execute(
+                    "ALTER TABLE cases ADD COLUMN capture_setup_id TEXT NOT NULL "
+                    "DEFAULT 'standard-bench'"
+                )
+            if "capture_checklist_json" not in case_columns:
+                connection.execute(
+                    "ALTER TABLE cases ADD COLUMN capture_checklist_json TEXT NOT NULL DEFAULT '{}'"
+                )
+            connection.execute(
+                "UPDATE cases SET capture_session_id = 'legacy-' || case_id "
+                "WHERE capture_session_id = ''"
+            )
+            connection.execute(
+                """
+                INSERT OR IGNORE INTO capture_sessions (
+                    actor_id, capture_session_id, board_key, board_id,
+                    capture_stage, evidence_role, capture_setup_id, created_at
+                )
+                SELECT actor_id, capture_session_id, board_key, board_id,
+                       capture_stage, evidence_role, capture_setup_id, created_at
+                FROM cases
+                ORDER BY created_at, case_id
+                """
+            )
+            connection.execute(
+                "CREATE INDEX IF NOT EXISTS cases_capture_session "
+                "ON cases(actor_id, capture_session_id, created_at)"
             )
             review_columns = {
                 row["name"]
@@ -437,23 +492,84 @@ class VisualQcStore:
             ).fetchone()
         return dict(row) if row else None
 
+    def list_capture_session(self, actor_id: str, capture_session_id: str):
+        with self.connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT case_id, actor_id, board_key, board_id, side_id,
+                       capture_stage, evidence_role, capture_session_id,
+                       capture_setup_id, capture_checklist_json, created_at
+                FROM cases
+                WHERE actor_id = ? AND capture_session_id = ?
+                ORDER BY created_at, case_id
+                """,
+                (actor_id, capture_session_id),
+            ).fetchall()
+        return [dict(row) for row in rows]
+
     def create_case(self, case_record: dict, image_record: dict, job_record: dict):
         timestamp = case_record["created_at"]
         with self.connect() as connection:
             connection.execute("BEGIN IMMEDIATE")
             connection.execute(
                 """
+                INSERT OR IGNORE INTO capture_sessions (
+                    actor_id, capture_session_id, board_key, board_id,
+                    capture_stage, evidence_role, capture_setup_id, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                tuple(
+                    case_record[key]
+                    for key in (
+                        "actor_id", "capture_session_id", "board_key", "board_id",
+                        "capture_stage", "evidence_role", "capture_setup_id", "created_at",
+                    )
+                ),
+            )
+            capture_session = connection.execute(
+                """
+                SELECT board_key, board_id, capture_stage, evidence_role, capture_setup_id
+                FROM capture_sessions
+                WHERE actor_id = ? AND capture_session_id = ?
+                """,
+                (
+                    case_record["actor_id"],
+                    case_record["capture_session_id"],
+                ),
+            ).fetchone()
+            requested_identity = tuple(
+                case_record[key]
+                for key in (
+                    "board_key", "board_id", "capture_stage",
+                    "evidence_role", "capture_setup_id",
+                )
+            )
+            stored_identity = tuple(
+                capture_session[key]
+                for key in (
+                    "board_key", "board_id", "capture_stage",
+                    "evidence_role", "capture_setup_id",
+                )
+            )
+            if requested_identity != stored_identity:
+                raise CaptureSessionIdentityConflict(
+                    "Capture session identity does not match the stored identity."
+                )
+            connection.execute(
+                """
                 INSERT INTO cases (
                     case_id, actor_id, idempotency_key, request_fingerprint,
                     board_key, board_id, side_id, capture_stage, evidence_role,
+                    capture_session_id, capture_setup_id, capture_checklist_json,
                     reference_path, created_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 tuple(
                     case_record[key]
                     for key in (
                         "case_id", "actor_id", "idempotency_key", "request_fingerprint",
                         "board_key", "board_id", "side_id", "capture_stage", "evidence_role",
+                        "capture_session_id", "capture_setup_id", "capture_checklist_json",
                         "reference_path", "created_at",
                     )
                 ),

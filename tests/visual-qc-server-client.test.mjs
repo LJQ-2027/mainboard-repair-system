@@ -12,6 +12,7 @@ import {
   createServerSyncState,
   createUploadDescriptor,
   getVisualQcIdentity,
+  normalizeServerCaptureSession,
   pollVisualQcJob,
   transitionServerSync,
 } from '../assets/visual-qc-workbench/visual-qc-server-client.js';
@@ -26,6 +27,23 @@ function visualCase() {
     side_id: 'main_page_2',
     capture_stage: 'before_repair',
     storage_scope: 'local_only',
+    capture_session: {
+      schema_version: 'VISUAL-QC-CAPTURE-SESSION-V1',
+      session_id: 'capture-session-001',
+      setup_id: 'standard-bench',
+      expected_side_ids: ['main_page_1', 'main_page_2'],
+      captured_side_ids: ['main_page_2'],
+      pair_status: 'pair_in_progress',
+      checklist: {
+        status: 'confirmed',
+        items: {
+          board_and_side_confirmed: true,
+          focus_and_lens_confirmed: true,
+          lighting_and_occlusion_confirmed: true,
+        },
+        confirmed_at: '2026-07-20T10:00:00.000Z',
+      },
+    },
     image: {
       file_name: 'board.jpg',
       mime_type: 'image/jpeg',
@@ -69,6 +87,17 @@ test('upload descriptor preserves known board identity and physical evidence rol
     side_id: 'main_page_2',
     capture_stage: 'before_repair',
     evidence_role: 'physical_capture',
+    capture_session_id: 'capture-session-001',
+    capture_setup_id: 'standard-bench',
+    capture_checklist: JSON.stringify({
+      status: 'confirmed',
+      items: {
+        board_and_side_confirmed: true,
+        focus_and_lens_confirmed: true,
+        lighting_and_occlusion_confirmed: true,
+      },
+      confirmed_at: '2026-07-20T10:00:00.000Z',
+    }),
     sha256: 'a'.repeat(64),
   });
   assert.equal(descriptor.idempotencyKey, createServerSyncState(visualCase()).idempotency_key);
@@ -111,6 +140,18 @@ test('automatic result remains a draft candidate until server review succeeds', 
     case_id: 'vqc_server_case',
     image: { image_id: 'img_server' },
     job: { job_id: 'job_server', status: 'queued' },
+    capture_session: {
+      schema_version: 'VISUAL-QC-CAPTURE-SESSION-V1',
+      session_id: 'capture-session-001',
+      setup_id: 'standard-bench',
+      expected_side_ids: ['main_page_1', 'main_page_2'],
+      captured_side_ids: ['main_page_1', 'main_page_2'],
+      pair_status: 'pair_complete',
+      checklist: { status: 'confirmed', items: {}, confirmed_at: null },
+      board_key: 'km4-f151',
+      board_id: 'BOARD-KM4-F151-MAIN-V1.2',
+      cases: [{ case_id: 'vqc_server_case', side_id: 'main_page_2' }],
+    },
   };
   const job = {
     job_id: 'job_server',
@@ -144,6 +185,33 @@ test('automatic result remains a draft candidate until server review succeeds', 
   assert.equal(updated.registration.status, 'draft');
   assert.deepEqual(updated.registration.matrix, job.result.registration.board_to_image_matrix);
   assert.equal(updated.quality.score, 91);
+  assert.equal(updated.capture_session.pair_status, 'pair_complete');
+  assert.equal('board_key' in updated.capture_session, false);
+  assert.equal('cases' in updated.capture_session, false);
+});
+
+test('server capture session is reduced to the exported case contract', () => {
+  const normalized = normalizeServerCaptureSession({
+    schema_version: 'VISUAL-QC-CAPTURE-SESSION-V1',
+    session_id: 'capture-session-001',
+    setup_id: 'standard-bench',
+    expected_side_ids: ['main_page_1', 'main_page_2'],
+    captured_side_ids: ['main_page_1', 'main_page_2'],
+    pair_status: 'pair_complete',
+    checklist: visualCase().capture_session.checklist,
+    board_key: 'km4-f151',
+    cases: [{ case_id: 'server-only' }],
+  });
+
+  assert.deepEqual(Object.keys(normalized), [
+    'schema_version',
+    'session_id',
+    'setup_id',
+    'expected_side_ids',
+    'captured_side_ids',
+    'pair_status',
+    'checklist',
+  ]);
 });
 
 test('manual-required result preserves the local four-point fallback', () => {

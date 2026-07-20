@@ -18,6 +18,11 @@ DEFECT_CATEGORIES = (
     "unknown_visible_anomaly",
 )
 CAPTURE_STAGES = {"golden_reference", "before_repair", "after_repair"}
+CAPTURE_CHECKLIST_ITEMS = {
+    "board_and_side_confirmed",
+    "focus_and_lens_confirmed",
+    "lighting_and_occlusion_confirmed",
+}
 QC_RESULTS = {"image_invalid", "needs_review", "no_visible_anomaly", "confirmed_anomaly"}
 REVIEW_STATUSES = {"suspected", "confirmed", "not_defect"}
 SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
@@ -36,6 +41,12 @@ def _normalized_point(point):
         isinstance(point, dict)
         and all(isinstance(point.get(axis), (int, float)) and 0 <= point[axis] <= 1 for axis in ("x", "y"))
     )
+
+
+def _string_set(value):
+    if not isinstance(value, list) or any(not isinstance(item, str) for item in value):
+        return None
+    return set(value)
 
 
 def _project_point(matrix, point):
@@ -151,7 +162,7 @@ def validate_visual_qc_case(visual_case, root, training_ready=False):
         errors.append("storage_scope is unsupported for this schema version")
     if visual_case.get("capture_stage") not in CAPTURE_STAGES:
         errors.append("capture_stage is unsupported")
-    dataset, _, board_entry = _board_contract(root, visual_case, errors)
+    dataset, manifest, board_entry = _board_contract(root, visual_case, errors)
 
     image = visual_case.get("image", {})
     if not isinstance(image.get("file_name"), str) or not image["file_name"].strip():
@@ -164,6 +175,67 @@ def validate_visual_qc_case(visual_case, root, training_ready=False):
         errors.append("image sha256 must contain 64 lowercase hexadecimal characters")
     if image.get("evidence_role") not in {"physical_capture", "proxy_sample"}:
         errors.append("image evidence_role is unsupported")
+
+    capture_session = visual_case.get("capture_session")
+    if capture_session is not None:
+        if not isinstance(capture_session, dict):
+            errors.append("capture_session must be an object")
+            capture_session = {}
+        if capture_session.get("schema_version") != "VISUAL-QC-CAPTURE-SESSION-V1":
+            errors.append("capture_session schema_version is unsupported")
+        if not isinstance(capture_session.get("session_id"), str) or not capture_session["session_id"].strip():
+            errors.append("capture_session session_id is required")
+        if not isinstance(capture_session.get("setup_id"), str) or not capture_session["setup_id"].strip():
+            errors.append("capture_session setup_id is required")
+        expected_sides = capture_session.get("expected_side_ids")
+        captured_sides = capture_session.get("captured_side_ids")
+        manifest_sides = {
+            side.get("side_id")
+            for side in (manifest or {}).get("sides", [])
+        }
+        expected_side_set = _string_set(expected_sides)
+        captured_side_set = _string_set(captured_sides)
+        if expected_side_set != manifest_sides:
+            errors.append("capture_session expected_side_ids must match the board manifest")
+        if (
+            captured_side_set is None
+            or not captured_side_set.issubset(manifest_sides)
+            or visual_case.get("side_id") not in captured_side_set
+        ):
+            errors.append("capture_session captured_side_ids are invalid")
+        expected_pair_status = (
+            "single_side"
+            if len(manifest_sides) <= 1
+            else "pair_complete"
+            if captured_side_set is not None
+            and manifest_sides.issubset(captured_side_set)
+            else "pair_in_progress"
+        )
+        if capture_session.get("pair_status") != expected_pair_status:
+            errors.append("capture_session pair_status does not match captured sides")
+        checklist = capture_session.get("checklist", {})
+        if not isinstance(checklist, dict):
+            errors.append("capture_session checklist must be an object")
+            checklist = {}
+        items = checklist.get("items", {})
+        if image.get("evidence_role") == "physical_capture":
+            if (
+                not isinstance(items, dict)
+                or set(items) != CAPTURE_CHECKLIST_ITEMS
+                or any(not isinstance(value, bool) for value in items.values())
+            ):
+                errors.append("physical capture checklist items are invalid")
+            expected_checklist_status = (
+                "confirmed"
+                if isinstance(items, dict)
+                and set(items) == CAPTURE_CHECKLIST_ITEMS
+                and all(items.values())
+                else "pending"
+            )
+            if checklist.get("status") != expected_checklist_status:
+                errors.append("physical capture checklist status does not match its items")
+        elif checklist.get("status") != "not_applicable":
+            errors.append("proxy capture checklist must be not_applicable")
 
     quality = visual_case.get("quality", {})
     if quality.get("status") not in {"good", "usable", "retake"}:
@@ -310,6 +382,17 @@ def validate_visual_qc_case(visual_case, root, training_ready=False):
             errors.append("training cases require reviewed registration")
         if image.get("evidence_role") != "physical_capture":
             errors.append("training cases require physical capture images")
+        if (
+            schema_version == "VISUAL-QC-CASE-V2"
+            and (
+                not isinstance(capture_session, dict)
+                or not isinstance(capture_session.get("checklist"), dict)
+                or capture_session["checklist"].get("status") != "confirmed"
+            )
+        ):
+            errors.append(
+                "training V2 cases require a confirmed physical capture checklist"
+            )
         if quality.get("status") == "retake":
             errors.append("training cases cannot use retake-quality images")
         if any(

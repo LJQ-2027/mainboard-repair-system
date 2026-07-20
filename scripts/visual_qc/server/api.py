@@ -102,6 +102,9 @@ def create_app(settings: VisualQcServerSettings | None = None) -> FastAPI:
         side_id: str = Form(...),
         capture_stage: str = Form(...),
         evidence_role: str = Form(...),
+        capture_session_id: str | None = Form(None),
+        capture_setup_id: str = Form("standard-bench"),
+        capture_checklist: str = Form("{}"),
         sha256: str = Form(..., min_length=64, max_length=64),
         file: UploadFile = File(...),
         x_actor_id: str | None = Header(None, alias="X-Actor-Id"),
@@ -117,10 +120,26 @@ def create_app(settings: VisualQcServerSettings | None = None) -> FastAPI:
                 side_id=side_id,
                 capture_stage=capture_stage,
                 evidence_role=evidence_role,
+                capture_session_id=capture_session_id,
+                capture_setup_id=capture_setup_id,
+                capture_checklist=capture_checklist,
                 claimed_sha256=sha256,
                 original_filename=file.filename or "upload",
                 mime_type=(file.content_type or "").lower(),
                 content=content,
+            )
+        except VisualQcServiceError as exc:
+            service_error(exc)
+
+    @app.get("/api/v1/visual-qc/capture-sessions/{capture_session_id}")
+    def get_capture_session(
+        capture_session_id: str,
+        x_actor_id: str | None = Header(None, alias="X-Actor-Id"),
+    ):
+        try:
+            return service.get_capture_session(
+                capture_session_id,
+                actor_id(x_actor_id),
             )
         except VisualQcServiceError as exc:
             service_error(exc)

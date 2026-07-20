@@ -224,7 +224,8 @@ button:disabled {
 }
 
 .workbench {
-  min-height: calc(100vh - 122px);
+  height: calc(100vh - 122px);
+  min-height: 540px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 350px;
 }
@@ -276,6 +277,7 @@ button:disabled {
   min-height: 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
+  overflow: hidden;
 }
 
 .canvas-pane {
@@ -328,6 +330,8 @@ button:disabled {
 }
 
 .canvas-wrap canvas {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   display: block;
@@ -394,6 +398,50 @@ button:disabled {
 .panel-section {
   padding: 16px;
   border-bottom: 1px solid var(--line);
+}
+
+.capture-intake-section {
+  background: #fff;
+}
+
+.capture-checklist {
+  margin: 12px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 7px;
+  border: 0;
+}
+
+.capture-checklist legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.capture-checklist label {
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink);
+  font-size: 12px;
+}
+
+.capture-checklist input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--green);
+}
+
+.capture-session-actions {
+  margin-top: 12px;
+}
+
+.capture-intake-section .source-note {
+  overflow-wrap: anywhere;
 }
 
 .server-sync-section {
@@ -844,6 +892,8 @@ dialog::backdrop {
   }
 
   .workbench {
+    height: auto;
+    min-height: 0;
     grid-template-columns: 1fr;
   }
 

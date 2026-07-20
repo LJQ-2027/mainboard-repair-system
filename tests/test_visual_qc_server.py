@@ -54,6 +54,15 @@ class VisualQcServerApiTests(unittest.TestCase):
             "side_id": "main_page_2",
             "capture_stage": "before_repair",
             "evidence_role": "physical_capture",
+            "capture_session_id": "capture-session-001",
+            "capture_setup_id": "standard-bench",
+            "capture_checklist": (
+                '{"status":"confirmed","items":{'
+                '"board_and_side_confirmed":true,'
+                '"focus_and_lens_confirmed":true,'
+                '"lighting_and_occlusion_confirmed":true},'
+                '"confirmed_at":"2026-07-20T10:00:00.000Z"}'
+            ),
             "sha256": hashlib.sha256(image_bytes).hexdigest(),
         }
         fields.update(overrides)
@@ -76,6 +85,8 @@ class VisualQcServerApiTests(unittest.TestCase):
         payload = first.json()
         self.assertEqual(payload["schema_version"], "VISUAL-QC-SERVER-CASE-V1")
         self.assertEqual(payload["job"]["status"], "queued")
+        self.assertEqual(payload["capture_session"]["session_id"], "capture-session-001")
+        self.assertEqual(payload["capture_session"]["pair_status"], "pair_in_progress")
 
         restored = self.client.get(
             f"/api/v1/visual-qc/cases/{payload['case_id']}",
@@ -86,6 +97,75 @@ class VisualQcServerApiTests(unittest.TestCase):
         self.assertTrue((Path(self.temp_dir.name) / "visual-qc.sqlite3").exists())
         originals = list((Path(self.temp_dir.name) / "objects" / "originals").rglob("*.jpg"))
         self.assertEqual(len(originals), 1)
+
+    def test_capture_session_pairs_board_sides_and_rejects_identity_pollution(self):
+        first_bytes = encode_jpeg(np.full((120, 180, 3), 170, dtype=np.uint8))
+        first = self.upload(first_bytes)
+        self.assertEqual(first.status_code, 202)
+
+        self.headers["Idempotency-Key"] = "capture-request-002"
+        second_bytes = encode_jpeg(np.full((120, 180, 3), 150, dtype=np.uint8))
+        second = self.upload(second_bytes, side_id="main_page_1")
+
+        self.assertEqual(second.status_code, 202)
+        self.assertEqual(
+            set(second.json()["capture_session"]["captured_side_ids"]),
+            {"main_page_1", "main_page_2"},
+        )
+        self.assertEqual(second.json()["capture_session"]["pair_status"], "pair_complete")
+
+        restored = self.client.get(
+            "/api/v1/visual-qc/capture-sessions/capture-session-001",
+            headers={"X-Actor-Id": "technician-001"},
+        )
+        self.assertEqual(restored.status_code, 200)
+        self.assertEqual(restored.json()["pair_status"], "pair_complete")
+        self.assertEqual(len(restored.json()["cases"]), 2)
+
+        self.headers["Idempotency-Key"] = "capture-request-003"
+        polluted = self.upload(
+            encode_jpeg(np.full((120, 180, 3), 130, dtype=np.uint8)),
+            capture_stage="after_repair",
+        )
+        self.assertEqual(polluted.status_code, 409)
+        self.assertEqual(
+            polluted.json()["detail"]["code"],
+            "capture_session_identity_conflict",
+        )
+
+    def test_capture_session_identity_is_enforced_inside_the_write_transaction(self):
+        first_bytes = encode_jpeg(np.full((120, 180, 3), 170, dtype=np.uint8))
+        first = self.upload(first_bytes)
+        self.assertEqual(first.status_code, 202)
+
+        self.headers["Idempotency-Key"] = "capture-request-race"
+        original_list_capture_session = (
+            self.app.state.visual_qc_service.store.list_capture_session
+        )
+        calls = iter(
+            [
+                [],
+                original_list_capture_session(
+                    "technician-001",
+                    "capture-session-001",
+                ),
+            ]
+        )
+        with patch.object(
+            self.app.state.visual_qc_service.store,
+            "list_capture_session",
+            side_effect=lambda *_args, **_kwargs: next(calls),
+        ):
+            polluted = self.upload(
+                encode_jpeg(np.full((120, 180, 3), 140, dtype=np.uint8)),
+                capture_stage="after_repair",
+            )
+
+        self.assertEqual(polluted.status_code, 409)
+        self.assertEqual(
+            polluted.json()["detail"]["code"],
+            "capture_session_identity_conflict",
+        )
 
     def test_upload_rejects_unknown_side_and_hash_mismatch(self):
         image_bytes = encode_jpeg(np.full((120, 180, 3), 170, dtype=np.uint8))

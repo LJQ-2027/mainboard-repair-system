@@ -84,6 +84,23 @@ class VisualQcDatasetTests(unittest.TestCase):
         visual_case = sample_case()
         visual_case["schema_version"] = "VISUAL-QC-CASE-V2"
         visual_case["storage_scope"] = "server_authoritative_with_local_draft"
+        visual_case["capture_session"] = {
+            "schema_version": "VISUAL-QC-CAPTURE-SESSION-V1",
+            "session_id": "capture-session-001",
+            "setup_id": "standard-bench",
+            "expected_side_ids": ["main_page_1", "main_page_2"],
+            "captured_side_ids": ["main_page_2"],
+            "pair_status": "pair_in_progress",
+            "checklist": {
+                "status": "confirmed",
+                "items": {
+                    "board_and_side_confirmed": True,
+                    "focus_and_lens_confirmed": True,
+                    "lighting_and_occlusion_confirmed": True,
+                },
+                "confirmed_at": "2026-07-20T10:00:00Z",
+            },
+        }
         visual_case["registration"] = {
             "method": "automatic_feature_homography",
             "status": "reviewed",
@@ -115,6 +132,58 @@ class VisualQcDatasetTests(unittest.TestCase):
             )
         )
         jsonschema.validate(visual_case, schema)
+
+    def test_training_ready_v2_case_requires_confirmed_capture_checklist(self):
+        visual_case = sample_case()
+        visual_case["schema_version"] = "VISUAL-QC-CASE-V2"
+        visual_case["storage_scope"] = "server_authoritative_with_local_draft"
+        visual_case["capture_session"] = {
+            "schema_version": "VISUAL-QC-CAPTURE-SESSION-V1",
+            "session_id": "capture-session-002",
+            "setup_id": "standard-bench",
+            "expected_side_ids": ["main_page_1", "main_page_2"],
+            "captured_side_ids": ["main_page_2"],
+            "pair_status": "pair_in_progress",
+            "checklist": {
+                "status": "pending",
+                "items": {
+                    "board_and_side_confirmed": True,
+                    "focus_and_lens_confirmed": False,
+                    "lighting_and_occlusion_confirmed": True,
+                },
+                "confirmed_at": None,
+            },
+        }
+
+        errors = validate_visual_qc_case(visual_case, ROOT, training_ready=True)
+
+        self.assertIn(
+            "training V2 cases require a confirmed physical capture checklist",
+            errors,
+        )
+
+    def test_malformed_capture_session_returns_validation_errors_instead_of_crashing(self):
+        visual_case = sample_case()
+        visual_case["schema_version"] = "VISUAL-QC-CASE-V2"
+        visual_case["storage_scope"] = "server_authoritative_with_local_draft"
+        visual_case["capture_session"] = {
+            "schema_version": "VISUAL-QC-CAPTURE-SESSION-V1",
+            "session_id": "capture-session-malformed",
+            "setup_id": "standard-bench",
+            "expected_side_ids": [["main_page_1"], "main_page_2"],
+            "captured_side_ids": [{"side_id": "main_page_2"}],
+            "pair_status": "pair_in_progress",
+            "checklist": [],
+        }
+
+        errors = validate_visual_qc_case(visual_case, ROOT)
+
+        self.assertIn(
+            "capture_session expected_side_ids must match the board manifest",
+            errors,
+        )
+        self.assertIn("capture_session captured_side_ids are invalid", errors)
+        self.assertIn("capture_session checklist must be an object", errors)
 
     def test_invalid_hash_and_cross_board_identity_are_rejected(self):
         visual_case = sample_case()

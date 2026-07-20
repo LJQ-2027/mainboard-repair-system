@@ -4,6 +4,19 @@ const clone = (value) => (typeof structuredClone === 'function'
 
 const TERMINAL_JOB_STATES = new Set(['succeeded', 'failed']);
 
+export function normalizeServerCaptureSession(serverSession, checklist) {
+  if (!serverSession) return null;
+  return {
+    schema_version: serverSession.schema_version,
+    session_id: serverSession.session_id,
+    setup_id: serverSession.setup_id,
+    expected_side_ids: clone(serverSession.expected_side_ids || []),
+    captured_side_ids: clone(serverSession.captured_side_ids || []),
+    pair_status: serverSession.pair_status,
+    checklist: clone(checklist || serverSession.checklist || {}),
+  };
+}
+
 export function createServerSyncState(visualCase) {
   const caseId = visualCase?.case_id;
   const sha256 = visualCase?.image?.sha256;
@@ -71,6 +84,14 @@ export function createUploadDescriptor(visualCase, syncState) {
       evidence_role: visualCase.image?.evidence_role === 'physical_capture'
         ? 'physical_capture'
         : 'service_manual_proxy',
+      capture_session_id: visualCase.capture_session?.session_id
+        || `capture-${visualCase.case_id}`,
+      capture_setup_id: visualCase.capture_session?.setup_id || 'standard-bench',
+      capture_checklist: JSON.stringify(visualCase.capture_session?.checklist || {
+        status: 'not_applicable',
+        items: {},
+        confirmed_at: null,
+      }),
       sha256: visualCase.image?.sha256,
     },
   };
@@ -172,6 +193,13 @@ export function getVisualQcJob(apiBase, actorId, jobId) {
   });
 }
 
+export function getVisualQcCaptureSession(apiBase, actorId, captureSessionId) {
+  return jsonRequest(
+    `${apiBase.replace(/\/$/, '')}/capture-sessions/${encodeURIComponent(captureSessionId)}`,
+    { actorId },
+  );
+}
+
 export function retryVisualQcJob(apiBase, actorId, jobId) {
   return jsonRequest(
     `${apiBase.replace(/\/$/, '')}/jobs/${encodeURIComponent(jobId)}/retry`,
@@ -210,6 +238,11 @@ export function applyServerJobResult(visualCase, acceptedCase, jobSnapshot) {
   next.schema_version = 'VISUAL-QC-CASE-V2';
   next.storage_scope = 'server_authoritative_with_local_draft';
   next.quality = clone(result.quality);
+  if (acceptedCase.capture_session) {
+    next.capture_session = normalizeServerCaptureSession(
+      acceptedCase.capture_session,
+    );
+  }
   next.server_sync = {
     ...baseSync,
     status: registration.status === 'candidate' ? 'candidate_ready' : 'manual_required',

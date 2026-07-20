@@ -58,6 +58,9 @@ Multipart fields:
 - `side_id`
 - `capture_stage`: `golden_reference`, `before_repair`, or `after_repair`
 - `evidence_role`: `physical_capture`, `synthetic_proxy`, or `service_manual_proxy`
+- `capture_session_id`: stable id for one physical board, capture stage, and setup
+- `capture_setup_id`: stable optical setup id
+- `capture_checklist`: JSON object containing the three physical-capture confirmations
 - `sha256`: lowercase or uppercase SHA-256 of the original bytes
 - `file`: JPEG, PNG, or WebP
 
@@ -69,8 +72,11 @@ Acceptance validates:
 - decodability and minimum dimensions;
 - configured upload size and free-space reserve;
 - idempotency ownership and request fingerprint.
+- capture-session identity consistency, including inside the database write transaction.
 
 Accepted uploads return HTTP `202` with `VISUAL-QC-SERVER-CASE-V1`, an image record, and a persisted queued job. Originals use content-addressed storage under the configured data root. The browser must keep its local draft until this response is received.
+
+`GET /api/v1/visual-qc/capture-sessions/{capture_session_id}` returns the expected and captured board sides, `pair_in_progress` or `pair_complete`, and the accepted cases for the authenticated actor. A session is actor-scoped and cannot be read by another actor.
 
 ## Job Contract
 
@@ -98,7 +104,7 @@ A successful processing job returns `VISUAL-QC-SERVER-JOB-RESULT-V1`:
 
 Automatic registration review adopts the exact candidate matrix. Manual review requires four unique normalized board/image anchor pairs and a finite, non-degenerate normalized homography.
 
-Golden approval additionally requires the gateway-asserted `reviewer` role, `physical_capture` evidence, `golden_reference` capture stage, acceptable image quality, reviewed registration, explicit normal-board confirmation, and an immutable source hash. Golden scope is board, side, and capture setup. Activating a replacement increments the version and retires rather than rewrites the previous record.
+Golden approval additionally requires the gateway-asserted `reviewer` role, `physical_capture` evidence, `golden_reference` capture stage, a confirmed capture checklist, acceptable image quality, reviewed registration, explicit normal-board confirmation, and an immutable source hash. The requested Golden setup must equal the original capture setup. Golden scope is board, side, and capture setup. Activating a replacement increments the version and retires rather than rewrites the previous record.
 
 The browser uses `allow_missing=true` when looking up an active Golden. That optional lookup returns a typed `VISUAL-QC-GOLDEN-LOOKUP-V1` `missing` result instead of turning a normal empty state into an HTTP error. Strict callers that omit the flag retain the original `404 golden_sample_not_found` behavior.
 
@@ -111,6 +117,7 @@ Every region begins as `model_candidate`. A technician may mark it `confirmed`, 
 The pilot stores:
 
 - SQLite case, image, job, and audit records;
+- actor-scoped capture-session identity and per-image capture checklists;
 - content-addressed originals on controlled server disk;
 - registration and quality evidence in the completed job record.
 

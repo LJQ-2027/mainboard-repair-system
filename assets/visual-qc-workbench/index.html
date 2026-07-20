@@ -105,6 +105,36 @@
       </div>
 
       <aside class="inspection-panel" aria-label="QC 案例详情">
+        <section class="panel-section capture-intake-section">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">实物采集</span>
+              <h2 id="captureSessionTitle">等待实拍图</h2>
+            </div>
+            <span id="captureSessionBadge" class="badge neutral">未开始</span>
+          </div>
+          <p id="captureSessionSummary" class="source-note">导入后建立本块主板的正反面采集批次。</p>
+          <fieldset id="captureChecklist" class="capture-checklist">
+            <legend>拍摄确认</legend>
+            <label>
+              <input type="checkbox" data-capture-check="board_and_side_confirmed">
+              <span>整板入镜，板面无误</span>
+            </label>
+            <label>
+              <input type="checkbox" data-capture-check="focus_and_lens_confirmed">
+              <span>镜头清洁，对焦清晰</span>
+            </label>
+            <label>
+              <input type="checkbox" data-capture-check="lighting_and_occlusion_confirmed">
+              <span>光线均匀，没有遮挡</span>
+            </label>
+          </fieldset>
+          <div class="button-row capture-session-actions">
+            <button id="refreshCaptureSessionButton" class="secondary-button" type="button" disabled>刷新批次</button>
+            <button id="captureOtherSideButton" class="primary-button" type="button" disabled>采集另一面</button>
+          </div>
+        </section>
+
         <section class="panel-section server-sync-section">
           <div class="section-heading">
             <div>

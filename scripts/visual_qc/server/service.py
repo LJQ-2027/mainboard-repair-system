@@ -21,7 +21,11 @@ from scripts.visual_qc.server.storage import (
     StorageError,
     detect_image_mime_type,
 )
-from scripts.visual_qc.server.store import VisualQcStore, utc_now
+from scripts.visual_qc.server.store import (
+    CaptureSessionIdentityConflict,
+    VisualQcStore,
+    utc_now,
+)
 
 
 CAPTURE_STAGES = {"golden_reference", "before_repair", "after_repair"}
@@ -38,6 +42,11 @@ DEFECT_CATEGORIES = {
     "unclassified_visible_anomaly",
 }
 CANDIDATE_REVIEW_DECISIONS = {"confirmed", "rejected", "needs_review"}
+CAPTURE_CHECKLIST_ITEMS = {
+    "board_and_side_confirmed",
+    "focus_and_lens_confirmed",
+    "lighting_and_occlusion_confirmed",
+}
 
 
 class VisualQcServiceError(ValueError):
@@ -187,6 +196,9 @@ class VisualQcService:
         original_filename: str,
         mime_type: str,
         content: bytes,
+        capture_session_id: str | None = None,
+        capture_setup_id: str = "standard-bench",
+        capture_checklist: str = "{}",
     ) -> dict:
         if capture_stage not in CAPTURE_STAGES:
             raise VisualQcServiceError(
@@ -228,6 +240,39 @@ class VisualQcService:
             side = self.catalog.resolve_side(board_key, side_id)
         except CatalogError as exc:
             raise VisualQcServiceError(exc.code, str(exc)) from exc
+        capture_session_id = self._normalized_capture_session_id(
+            capture_session_id,
+            actor_id,
+            idempotency_key,
+        )
+        capture_setup_id = self._normalized_capture_setup_id(capture_setup_id)
+        normalized_checklist = self._normalized_capture_checklist(
+            capture_checklist,
+            evidence_role,
+        )
+        session_records = self.store.list_capture_session(actor_id, capture_session_id)
+        if session_records:
+            identity = session_records[0]
+            requested_identity = (
+                board_key,
+                side["board_id"],
+                capture_stage,
+                evidence_role,
+                capture_setup_id,
+            )
+            stored_identity = (
+                identity["board_key"],
+                identity["board_id"],
+                identity["capture_stage"],
+                identity["evidence_role"],
+                identity["capture_setup_id"],
+            )
+            if requested_identity != stored_identity:
+                raise VisualQcServiceError(
+                    "capture_session_identity_conflict",
+                    "Capture session already belongs to a different board, stage, evidence role, or setup.",
+                    409,
+                )
 
         image = cv2.imdecode(np.frombuffer(content, dtype=np.uint8), cv2.IMREAD_COLOR)
         if image is None:
@@ -246,6 +291,9 @@ class VisualQcService:
                     "side_id": side_id,
                     "capture_stage": capture_stage,
                     "evidence_role": evidence_role,
+                    "capture_session_id": capture_session_id,
+                    "capture_setup_id": capture_setup_id,
+                    "capture_checklist": normalized_checklist,
                     "sha256": actual_sha256,
                 },
                 sort_keys=True,
@@ -276,6 +324,13 @@ class VisualQcService:
             "side_id": side_id,
             "capture_stage": capture_stage,
             "evidence_role": evidence_role,
+            "capture_session_id": capture_session_id,
+            "capture_setup_id": capture_setup_id,
+            "capture_checklist_json": json.dumps(
+                normalized_checklist,
+                sort_keys=True,
+                separators=(",", ":"),
+            ),
             "reference_path": str(side["reference_path"]),
             "created_at": timestamp,
         }
@@ -315,6 +370,12 @@ class VisualQcService:
             image_record["storage_path"] = str(storage_path)
             try:
                 self.store.create_case(case_record, image_record, job_record)
+            except CaptureSessionIdentityConflict as exc:
+                raise VisualQcServiceError(
+                    "capture_session_identity_conflict",
+                    "Capture session already belongs to a different board, stage, evidence role, or setup.",
+                    409,
+                ) from exc
             except Exception:
                 existing = self.store.get_case_for_idempotency(actor_id, idempotency_key)
                 if existing and existing["request_fingerprint"] == fingerprint:
@@ -337,6 +398,11 @@ class VisualQcService:
             "side_id": case["side_id"],
             "capture_stage": case["capture_stage"],
             "evidence_role": case["evidence_role"],
+            "capture_session": self._capture_session_payload(
+                case["capture_session_id"],
+                actor_id,
+                case["case_id"],
+            ),
             "created_at": case["created_at"],
             "image": {
                 key: image[key]
@@ -346,6 +412,141 @@ class VisualQcService:
                 )
             },
             "job": self._public_job(job),
+        }
+
+    def get_capture_session(self, capture_session_id: str, actor_id: str) -> dict:
+        normalized_id = self._normalized_capture_session_id(
+            capture_session_id,
+            actor_id,
+            "lookup",
+        )
+        records = self.store.list_capture_session(actor_id, normalized_id)
+        if not records:
+            raise VisualQcServiceError(
+                "capture_session_not_found",
+                "Capture session was not found.",
+                404,
+            )
+        return self._capture_session_payload(normalized_id, actor_id)
+
+    def _capture_session_payload(
+        self,
+        capture_session_id: str,
+        actor_id: str,
+        current_case_id: str | None = None,
+    ) -> dict:
+        records = self.store.list_capture_session(actor_id, capture_session_id)
+        first = records[0]
+        try:
+            board = self.catalog.resolve_board(first["board_key"])
+        except CatalogError as exc:
+            raise VisualQcServiceError(exc.code, str(exc)) from exc
+        expected_side_ids = board["side_ids"]
+        captured_side_ids = sorted({record["side_id"] for record in records})
+        pair_status = "single_side"
+        if len(expected_side_ids) > 1:
+            pair_status = (
+                "pair_complete"
+                if set(expected_side_ids).issubset(captured_side_ids)
+                else "pair_in_progress"
+            )
+        checklist_record = next(
+            (
+                record
+                for record in records
+                if record["case_id"] == current_case_id
+            ),
+            records[-1],
+        )
+        latest_checklist = json.loads(
+            checklist_record["capture_checklist_json"] or "{}"
+        )
+        return {
+            "schema_version": "VISUAL-QC-CAPTURE-SESSION-V1",
+            "session_id": capture_session_id,
+            "board_key": first["board_key"],
+            "board_id": first["board_id"],
+            "capture_stage": first["capture_stage"],
+            "evidence_role": first["evidence_role"],
+            "setup_id": first["capture_setup_id"],
+            "expected_side_ids": expected_side_ids,
+            "captured_side_ids": captured_side_ids,
+            "pair_status": pair_status,
+            "checklist": latest_checklist,
+            "cases": [
+                {
+                    "case_id": record["case_id"],
+                    "side_id": record["side_id"],
+                    "checklist_status": json.loads(
+                        record["capture_checklist_json"] or "{}"
+                    ).get("status", "pending"),
+                    "created_at": record["created_at"],
+                }
+                for record in records
+            ],
+        }
+
+    @staticmethod
+    def _normalized_capture_session_id(
+        value: str | None,
+        actor_id: str,
+        idempotency_key: str,
+    ) -> str:
+        normalized = (value or "").strip()
+        if not normalized:
+            digest = hashlib.sha256(
+                f"{actor_id}:{idempotency_key}".encode("utf-8")
+            ).hexdigest()[:24]
+            normalized = f"legacy-{digest}"
+        if len(normalized) > 128 or not all(
+            character.isalnum() or character in "-_." for character in normalized
+        ):
+            raise VisualQcServiceError(
+                "invalid_capture_session_id",
+                "capture_session_id must use letters, numbers, dot, dash, or underscore and be at most 128 characters.",
+            )
+        return normalized
+
+    @staticmethod
+    def _normalized_capture_setup_id(value: str) -> str:
+        normalized = (value or "").strip()
+        if not normalized or len(normalized) > 128:
+            raise VisualQcServiceError(
+                "invalid_capture_setup_id",
+                "capture_setup_id is required and must not exceed 128 characters.",
+            )
+        return normalized
+
+    @staticmethod
+    def _normalized_capture_checklist(value: str, evidence_role: str) -> dict:
+        try:
+            parsed = json.loads(value or "{}")
+        except json.JSONDecodeError as exc:
+            raise VisualQcServiceError(
+                "invalid_capture_checklist",
+                "capture_checklist must be valid JSON.",
+            ) from exc
+        if not isinstance(parsed, dict):
+            raise VisualQcServiceError(
+                "invalid_capture_checklist",
+                "capture_checklist must be a JSON object.",
+            )
+        if evidence_role != "physical_capture":
+            return {"status": "not_applicable", "items": {}, "confirmed_at": None}
+        items = parsed.get("items") if isinstance(parsed.get("items"), dict) else {}
+        normalized_items = {
+            key: items.get(key) is True
+            for key in sorted(CAPTURE_CHECKLIST_ITEMS)
+        }
+        status = (
+            "confirmed"
+            if all(normalized_items.values())
+            else "pending"
+        )
+        return {
+            "status": status,
+            "items": normalized_items,
+            "confirmed_at": parsed.get("confirmed_at") if status == "confirmed" else None,
         }
 
     def get_job(self, job_id: str, actor_id: str) -> dict:
@@ -570,6 +771,19 @@ class VisualQcService:
             raise VisualQcServiceError(
                 "golden_reference_stage_required",
                 "Golden Sample creation requires a golden_reference capture.",
+                409,
+            )
+        capture_checklist = json.loads(case["capture_checklist_json"] or "{}")
+        if capture_checklist.get("status") != "confirmed":
+            raise VisualQcServiceError(
+                "capture_checklist_confirmation_required",
+                "Golden Sample creation requires a confirmed physical capture checklist.",
+                409,
+            )
+        if capture_setup_id.strip() != case["capture_setup_id"]:
+            raise VisualQcServiceError(
+                "capture_setup_mismatch",
+                "Golden Sample setup must match the original capture session.",
                 409,
             )
         review = self.store.get_latest_registration_review(case_id)

@@ -4,6 +4,7 @@ import {
   createVisualQcCase,
   DEFECT_CATEGORIES,
   suggestEntityAtPoint,
+  updateCaptureChecklist,
 } from './visual-qc-core.js';
 import {
   addAnnotation,
@@ -44,9 +45,11 @@ import {
   createDifferenceJob,
   createServerSyncState,
   getActiveGoldenSample,
+  getVisualQcCaptureSession,
   getVisualQcIdentity,
   getVisualQcArtifact,
   getVisualQcJob,
+  normalizeServerCaptureSession,
   pollVisualQcJob,
   reviewDifferenceCandidate,
   retryVisualQcJob,
@@ -125,6 +128,12 @@ const elements = {
   photoCanvasMeta: byId('photoCanvasMeta'),
   interactionPrompt: byId('interactionPrompt'),
   overlayOpacity: byId('overlayOpacity'),
+  captureSessionTitle: byId('captureSessionTitle'),
+  captureSessionBadge: byId('captureSessionBadge'),
+  captureSessionSummary: byId('captureSessionSummary'),
+  captureChecklist: byId('captureChecklist'),
+  refreshCaptureSessionButton: byId('refreshCaptureSessionButton'),
+  captureOtherSideButton: byId('captureOtherSideButton'),
   qualityTitle: byId('qualityTitle'),
   qualityBadge: byId('qualityBadge'),
   qualityScore: byId('qualityScore'),
@@ -211,6 +220,7 @@ const state = {
   heatmapUrl: null,
   heatmapArtifactId: null,
   heatmapLoadingArtifactId: null,
+  captureSessionDraft: null,
 };
 
 const QUALITY_GUIDANCE_COPY = Object.freeze({
@@ -235,6 +245,28 @@ function reportUserError(error) {
 
 function captureSetupId() {
   return elements.captureSetupId.value.trim() || 'standard-bench';
+}
+
+function expectedSideIds() {
+  return (state.manifest?.sides || []).map((side) => side.side_id);
+}
+
+function captureSessionForNewCase(isProxy) {
+  const draft = state.captureSessionDraft;
+  const expected = expectedSideIds();
+  const reusable = !isProxy
+    && draft?.boardKey === state.boardKey
+    && draft?.captureStage === elements.captureStage.value
+    && draft?.setupId === captureSetupId();
+  const session = {
+    sessionId: reusable ? draft.sessionId : `${isProxy ? 'proxy' : 'capture'}-${crypto.randomUUID()}`,
+    setupId: captureSetupId(),
+    expectedSideIds: expected,
+    capturedSideIds: reusable ? draft.capturedSideIds : [],
+    checklist: {},
+  };
+  state.captureSessionDraft = null;
+  return session;
 }
 
 function clearHeatmap() {
@@ -410,7 +442,10 @@ function renderSideSelector() {
     button.dataset.sideId = side.side_id;
     button.setAttribute('aria-pressed', String(side.side_id === state.sideId));
     button.addEventListener('click', () => {
-      if (side.side_id !== state.sideId) loadSide(side.side_id, true);
+      if (side.side_id !== state.sideId) {
+        state.captureSessionDraft = null;
+        loadSide(side.side_id, true);
+      }
     });
     elements.sideSelector.append(button);
   }
@@ -761,6 +796,11 @@ async function syncCurrentCaseWithServer() {
       jobId: accepted.job.job_id,
       jobStatus: accepted.job.status,
     });
+    if (accepted.capture_session) {
+      next.capture_session = normalizeServerCaptureSession(
+        accepted.capture_session,
+      );
+    }
     replaceCurrentCase(next, true);
     await pollCurrentServerJob(accepted);
   } catch (error) {
@@ -818,6 +858,7 @@ async function loadPhotoBlob(blob, fileName, isProxy = false) {
     boardId: state.dataset.board_id,
     sideId: state.sideId,
     captureStage: elements.captureStage.value,
+    captureSession: captureSessionForNewCase(isProxy),
     image: imageMetadata,
     quality: {
       status: quality.status,
@@ -853,6 +894,52 @@ async function loadPhotoBlob(blob, fileName, isProxy = false) {
   scheduleSave();
   resizeCanvases();
   render();
+}
+
+async function refreshCurrentCaptureSession() {
+  const visualCase = currentCase();
+  const sessionId = visualCase?.capture_session?.session_id;
+  if (!sessionId || !visualCase.server_sync?.server_case_id) return;
+  state.serverBusy = true;
+  render();
+  try {
+    const serverSession = await getVisualQcCaptureSession(
+      VISUAL_QC_API,
+      VISUAL_QC_ACTOR_ID,
+      sessionId,
+    );
+    const next = structuredClone(currentCase());
+    next.capture_session = normalizeServerCaptureSession(
+      serverSession,
+      next.capture_session.checklist,
+    );
+    replaceCurrentCase(next, true);
+  } catch (error) {
+    reportUserError(error);
+  } finally {
+    state.serverBusy = false;
+    render();
+  }
+}
+
+async function startOtherSideCapture() {
+  const visualCase = currentCase();
+  const session = visualCase?.capture_session;
+  if (!session || visualCase.image?.evidence_role !== 'physical_capture') return;
+  const captured = new Set(session.captured_side_ids || [visualCase.side_id]);
+  const nextSideId = (session.expected_side_ids || expectedSideIds())
+    .find((sideId) => !captured.has(sideId));
+  if (!nextSideId) return;
+  await flushPendingSave();
+  state.captureSessionDraft = {
+    sessionId: session.session_id,
+    setupId: session.setup_id,
+    boardKey: visualCase.board_key,
+    captureStage: visualCase.capture_stage,
+    capturedSideIds: session.captured_side_ids || [visualCase.side_id],
+  };
+  await loadSide(nextSideId, true);
+  elements.interactionPrompt.textContent = '采集批次已保留，请导入另一面的实拍图';
 }
 
 function recomputeRegistration() {
@@ -1368,6 +1455,66 @@ function renderQuality() {
     .join(' ') || '图像质量检查完成。';
 }
 
+function renderCaptureSession() {
+  const visualCase = currentCase();
+  const session = visualCase?.capture_session;
+  const isPhysical = visualCase?.image?.evidence_role === 'physical_capture';
+  const synced = Boolean(visualCase?.server_sync?.server_case_id);
+  const checklistInputs = elements.captureChecklist.querySelectorAll('[data-capture-check]');
+  if (!visualCase || !session) {
+    const draft = state.captureSessionDraft;
+    const sideLabel = state.manifest?.sides
+      ?.find((side) => side.side_id === state.sideId)?.label;
+    elements.captureSessionTitle.textContent = draft
+      ? `等待${sideLabel || '另一面'}照片`
+      : '等待实拍图';
+    elements.captureSessionBadge.textContent = draft ? '批次继续' : '未开始';
+    elements.captureSessionBadge.className = `badge ${draft ? 'draft' : 'neutral'}`;
+    elements.captureSessionSummary.textContent = draft
+      ? `${draft.setupId} · 批次 ${draft.sessionId.slice(-8)}`
+      : '导入后建立本块主板的正反面采集批次。';
+    checklistInputs.forEach((input) => {
+      input.checked = false;
+      input.disabled = true;
+    });
+    elements.refreshCaptureSessionButton.disabled = true;
+    elements.captureOtherSideButton.disabled = true;
+    return;
+  }
+
+  if (!isPhysical) {
+    elements.captureSessionTitle.textContent = '代理验证样本';
+    elements.captureSessionBadge.textContent = '非实拍';
+    elements.captureSessionBadge.className = 'badge neutral';
+    elements.captureSessionSummary.textContent = '仅验证软件流程，不计入实物 QC 证据。';
+  } else {
+    const pairPresentations = {
+      single_side: ['单面板采集', '单面'],
+      pair_in_progress: ['等待另一面', '1 / 2'],
+      pair_complete: ['正反面已齐', '完整'],
+    };
+    const [title, badge] = pairPresentations[session.pair_status]
+      || pairPresentations.pair_in_progress;
+    elements.captureSessionTitle.textContent = title;
+    elements.captureSessionBadge.textContent = badge;
+    elements.captureSessionBadge.className = `badge ${
+      session.pair_status === 'pair_complete' ? 'reviewed' : 'draft'
+    }`;
+    const captured = session.captured_side_ids?.length || 1;
+    const expected = session.expected_side_ids?.length || 1;
+    elements.captureSessionSummary.textContent = `${session.setup_id} · 已采集 ${captured} / ${expected} 面 · 批次 ${session.session_id.slice(-8)}`;
+  }
+  checklistInputs.forEach((input) => {
+    input.checked = session.checklist?.items?.[input.dataset.captureCheck] === true;
+    input.disabled = !isPhysical || synced;
+  });
+  elements.refreshCaptureSessionButton.disabled = !synced || state.serverBusy;
+  elements.captureOtherSideButton.disabled = !isPhysical
+    || session.checklist?.status !== 'confirmed'
+    || session.pair_status !== 'pair_in_progress'
+    || state.serverBusy;
+}
+
 function renderServerSync() {
   const visualCase = currentCase();
   const sync = visualCase?.server_sync;
@@ -1392,6 +1539,11 @@ function renderServerSync() {
   elements.serverSyncDetail.textContent = visualCase
     ? detail
     : '图片先保存在本机草稿，服务器接受后再成为共享案例。';
+  const captureReady = visualCase?.image?.evidence_role !== 'physical_capture'
+    || visualCase?.capture_session?.checklist?.status === 'confirmed';
+  if (visualCase && !captureReady && status === 'local_draft') {
+    elements.serverSyncDetail.textContent = '完成三项拍摄确认后，才可上传实物图片。';
+  }
   elements.serverSyncProgress.value = Math.round((sync?.progress || 0) * 100);
   const actionLabels = {
     upload_failed: '重新上传',
@@ -1407,9 +1559,10 @@ function renderServerSync() {
   elements.serverSyncButton.textContent = actionLabels[status] || '上传并自动配准';
   elements.serverSyncButton.disabled = !visualCase
     || !state.photoBlob
+    || !captureReady
     || state.serverBusy
     || ['candidate_ready', 'manual_required', 'reviewed', 'succeeded'].includes(status);
-  elements.captureStage.disabled = Boolean(sync?.server_case_id);
+  elements.captureStage.disabled = Boolean(visualCase);
 }
 
 function renderRegistration() {
@@ -1463,7 +1616,9 @@ function renderComparison() {
   elements.approveGoldenButton.hidden = !isGoldenCapture;
   elements.runDifferenceButton.hidden = isGoldenCapture;
   elements.refreshGoldenButton.disabled = !visualCase || state.comparisonBusy;
-  elements.captureSetupId.disabled = !visualCase || state.comparisonBusy;
+  elements.captureSetupId.disabled = !visualCase
+    || state.comparisonBusy
+    || Boolean(visualCase.server_sync?.server_case_id);
 
   if (!visualCase) {
     elements.comparisonTitle.textContent = '等待已审核案例';
@@ -1676,6 +1831,7 @@ function render() {
     : '尚未导入图片';
   elements.undoButton.disabled = !state.history?.past.length;
   elements.redoButton.disabled = !state.history?.future.length;
+  renderCaptureSession();
   renderServerSync();
   renderQuality();
   renderRegistration();
@@ -1840,7 +1996,10 @@ function bindCanvas(canvas, role) {
 }
 
 function bindEvents() {
-  elements.boardSelect.addEventListener('change', () => loadBoard(elements.boardSelect.value));
+  elements.boardSelect.addEventListener('change', () => {
+    state.captureSessionDraft = null;
+    loadBoard(elements.boardSelect.value);
+  });
   elements.captureStage.addEventListener('change', () => {
     if (!currentCase()) return;
     const next = structuredClone(currentCase());
@@ -1911,6 +2070,22 @@ function bindEvents() {
   elements.clearRegistrationButton.addEventListener('click', clearRegistration);
   elements.reviewRegistrationButton.addEventListener('click', confirmRegistration);
   elements.serverSyncButton.addEventListener('click', syncCurrentCaseWithServer);
+  elements.captureChecklist.querySelectorAll('[data-capture-check]').forEach((input) => {
+    input.addEventListener('change', () => {
+      const visualCase = currentCase();
+      if (!visualCase || visualCase.server_sync?.server_case_id) return;
+      commitCase(updateCaptureChecklist(
+        visualCase,
+        input.dataset.captureCheck,
+        input.checked,
+      ));
+    });
+  });
+  elements.refreshCaptureSessionButton.addEventListener(
+    'click',
+    refreshCurrentCaptureSession,
+  );
+  elements.captureOtherSideButton.addEventListener('click', startOtherSideCapture);
   elements.refreshGoldenButton.addEventListener('click', () => refreshCurrentGoldenSample());
   elements.approveGoldenButton.addEventListener('click', approveCurrentGoldenSample);
   elements.runDifferenceButton.addEventListener('click', runDifferenceAnalysis);
@@ -1918,6 +2093,11 @@ function bindEvents() {
   elements.captureSetupId.addEventListener('change', () => {
     if (!currentCase()) return;
     clearHeatmap();
+    const next = structuredClone(currentCase());
+    if (!next.server_sync?.server_case_id && next.capture_session) {
+      next.capture_session.setup_id = captureSetupId();
+      replaceCurrentCase(next, true);
+    }
     updateComparisonDraft({
       capture_setup_id: captureSetupId(),
       golden_sample: null,

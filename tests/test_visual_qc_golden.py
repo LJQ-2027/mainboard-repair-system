@@ -1,4 +1,5 @@
 import hashlib
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -47,8 +48,22 @@ class VisualQcGoldenSampleTests(unittest.TestCase):
         capture_stage="golden_reference",
         evidence_role="physical_capture",
         image_bytes=None,
+        checklist_confirmed=True,
     ):
         image_bytes = image_bytes or self.image_bytes
+        checklist = {
+            "status": "confirmed" if checklist_confirmed else "pending",
+            "items": {
+                "board_and_side_confirmed": True,
+                "focus_and_lens_confirmed": checklist_confirmed,
+                "lighting_and_occlusion_confirmed": True,
+            },
+            "confirmed_at": (
+                "2026-07-20T10:00:00.000Z"
+                if checklist_confirmed
+                else None
+            ),
+        }
         response = self.client.post(
             "/api/v1/visual-qc/cases",
             data={
@@ -56,6 +71,12 @@ class VisualQcGoldenSampleTests(unittest.TestCase):
                 "side_id": "main_page_2",
                 "capture_stage": capture_stage,
                 "evidence_role": evidence_role,
+                "capture_session_id": f"capture-{idempotency_key}",
+                "capture_setup_id": "bench-a",
+                "capture_checklist": json.dumps(
+                    checklist,
+                    separators=(",", ":"),
+                ),
                 "sha256": hashlib.sha256(image_bytes).hexdigest(),
             },
             files={"file": ("reference.jpg", image_bytes, "image/jpeg")},
@@ -69,6 +90,57 @@ class VisualQcGoldenSampleTests(unittest.TestCase):
         processed = self.app.state.visual_qc_service.process_next_job()
         self.assertEqual(processed["status"], "succeeded")
         return case
+
+    def test_pending_capture_checklist_cannot_become_golden_sample(self):
+        case = self.create_processed_case(
+            idempotency_key="golden-pending-capture",
+            checklist_confirmed=False,
+        )
+        self.accept_automatic_registration(case["case_id"])
+
+        response = self.client.post(
+            "/api/v1/visual-qc/golden-samples",
+            json={
+                "case_id": case["case_id"],
+                "capture_setup_id": "bench-a",
+                "confirmed_normal": True,
+            },
+            headers={
+                "X-Actor-Id": "reviewer-001",
+                "X-Actor-Role": "reviewer",
+            },
+        )
+
+        self.assertEqual(response.status_code, 409)
+        self.assertEqual(
+            response.json()["detail"]["code"],
+            "capture_checklist_confirmation_required",
+        )
+
+    def test_golden_setup_must_match_the_original_capture_session(self):
+        case = self.create_processed_case(
+            idempotency_key="golden-setup-mismatch",
+        )
+        self.accept_automatic_registration(case["case_id"])
+
+        response = self.client.post(
+            "/api/v1/visual-qc/golden-samples",
+            json={
+                "case_id": case["case_id"],
+                "capture_setup_id": "different-bench",
+                "confirmed_normal": True,
+            },
+            headers={
+                "X-Actor-Id": "reviewer-001",
+                "X-Actor-Role": "reviewer",
+            },
+        )
+
+        self.assertEqual(response.status_code, 409)
+        self.assertEqual(
+            response.json()["detail"]["code"],
+            "capture_setup_mismatch",
+        )
 
     def accept_automatic_registration(self, case_id):
         response = self.client.post(
