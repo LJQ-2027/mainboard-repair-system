@@ -9,6 +9,7 @@ import json
 import mimetypes
 import os
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
+from pathlib import Path
 from urllib.parse import unquote, urlparse
 from urllib.request import Request, urlopen
 from urllib.error import URLError, HTTPError
@@ -55,6 +56,29 @@ def get_configured_api_key():
     if not api_key or api_key in PLACEHOLDER_API_KEYS or api_key.endswith("your-key-here"):
         return ""
     return api_key
+
+
+def resolve_static_target(request_path, static_root, index_file):
+    if request_path in ("", "/"):
+        request_path = "/" + index_file
+
+    rel_path = unquote(request_path).lstrip("/")
+    rel_parts = [part for part in rel_path.replace("\\", "/").split("/") if part]
+    if any(part in DENIED_STATIC_DIRS or part.startswith(".") for part in rel_parts):
+        return None
+
+    root = Path(static_root).resolve()
+    target = root.joinpath(*rel_parts).resolve()
+    try:
+        target.relative_to(root)
+    except ValueError:
+        return None
+
+    if target.is_dir():
+        target = target / "index.html"
+    if target.suffix.lower() in DENIED_STATIC_EXTENSIONS or not target.is_file():
+        return None
+    return target
 
 
 def convert_to_anthropic_sse(openai_chunk):
@@ -177,29 +201,13 @@ class ProxyHandler(BaseHTTPRequestHandler):
             self._serve_static(request_path)
 
     def _serve_static(self, request_path):
-        if request_path in ("", "/"):
-            request_path = "/" + INDEX_FILE
-
-        rel_path = unquote(request_path).lstrip("/")
-        rel_parts = [part for part in rel_path.replace("\\", "/").split("/") if part]
-        if any(part in DENIED_STATIC_DIRS or part.startswith(".") for part in rel_parts):
+        target = resolve_static_target(request_path, STATIC_ROOT, INDEX_FILE)
+        if target is None:
             self.send_response(404)
             self.end_headers()
             return
 
-        target = os.path.abspath(os.path.join(STATIC_ROOT, *rel_parts))
-        static_root = os.path.abspath(STATIC_ROOT)
-        if not target.startswith(static_root + os.sep) and target != static_root:
-            self.send_response(404)
-            self.end_headers()
-            return
-
-        ext = os.path.splitext(target)[1].lower()
-        if ext in DENIED_STATIC_EXTENSIONS or not os.path.isfile(target):
-            self.send_response(404)
-            self.end_headers()
-            return
-
+        ext = target.suffix.lower()
         content_type = mimetypes.guess_type(target)[0] or "application/octet-stream"
         if ext in {".html", ".js", ".css", ".json", ".md", ".txt"}:
             content_type = content_type + "; charset=utf-8"
