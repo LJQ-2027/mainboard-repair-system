@@ -180,7 +180,9 @@ The first four delivery items now have a local server implementation:
 - reviewer-gated Golden Sample approval, active-version lookup, difference heatmaps, and per-candidate confirm/reject/defer decisions are available in the same workbench;
 - server-connected browser cases use `VISUAL-QC-CASE-V2`, while the local-only V1 contract retains its original meaning.
 
-This progress does not imply production deployment. The controlled gateway/Nginx route, production authentication assertion, retention operations, and physical bare-board acceptance remain open.
+The local pilot now reports disk pressure and object/job counts, rejects writes below its reserve, and supports bounded retention of terminal unreviewed drafts through a default-dry-run server maintenance command. Registration reviews, Golden versions, candidate reviews, active work, and content-addressed objects still referenced by another case are protected. Execution requires an explicit confirmation phrase and records a retention run.
+
+This progress does not imply production deployment. The controlled gateway/Nginx route, production authentication assertion, alert delivery and retention scheduling, and physical bare-board acceptance remain open.
 
 ## Acceptance Boundary
 

@@ -83,12 +83,7 @@ def create_app(settings: VisualQcServerSettings | None = None) -> FastAPI:
 
     @app.get("/api/v1/visual-qc/health")
     def health():
-        return {
-            "status": "ok",
-            "service": "visual-qc",
-            "schema_version": "VISUAL-QC-SERVER-CASE-V1",
-            "workers": settings.worker_count,
-        }
+        return service.health()
 
     @app.post("/api/v1/visual-qc/cases", status_code=202)
     async def create_case(

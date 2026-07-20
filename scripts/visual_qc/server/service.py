@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import threading
 import uuid
@@ -16,6 +17,7 @@ from scripts.visual_qc.server.difference import generate_difference_candidates
 from scripts.visual_qc.server.quality import analyze_image_quality
 from scripts.visual_qc.server.storage import (
     LocalObjectStorage,
+    StorageCleanupError,
     StorageError,
     detect_image_mime_type,
 )
@@ -46,14 +48,131 @@ class VisualQcServiceError(ValueError):
 
 
 class VisualQcService:
-    def __init__(self, settings: VisualQcServerSettings):
+    def __init__(
+        self,
+        settings: VisualQcServerSettings,
+        *,
+        recover_interrupted_jobs: bool = True,
+    ):
         self.settings = settings
         self.settings.data_root.mkdir(parents=True, exist_ok=True)
         self.catalog = BoardCatalog(settings.project_root)
         self.storage = LocalObjectStorage(settings.data_root, settings.minimum_free_bytes)
-        self.store = VisualQcStore(settings.data_root / "visual-qc.sqlite3")
+        self.store = VisualQcStore(
+            settings.data_root / "visual-qc.sqlite3",
+            recover_interrupted_jobs=recover_interrupted_jobs,
+        )
         self._stop_event = threading.Event()
         self._workers: list[threading.Thread] = []
+
+    def health(self) -> dict:
+        storage = self.storage.health(self.settings.warning_free_bytes)
+        counts = self.store.operational_counts()
+        return {
+            "status": "ok" if storage["pressure"] == "normal" else "degraded",
+            "service": "visual-qc",
+            "schema_version": "VISUAL-QC-SERVER-HEALTH-V2",
+            "workers": self.settings.worker_count,
+            "storage": storage,
+            **counts,
+        }
+
+    def run_retention(
+        self,
+        *,
+        dry_run: bool = True,
+        now: datetime | None = None,
+    ) -> dict:
+        current_time = now or datetime.now(timezone.utc)
+        if current_time.tzinfo is None:
+            raise ValueError("Retention clock must be timezone-aware.")
+        cutoff = current_time.astimezone(timezone.utc) - timedelta(
+            days=self.settings.retention_days
+        )
+        cutoff_at = cutoff.isoformat(timespec="milliseconds").replace("+00:00", "Z")
+        candidates = self.store.list_retention_candidates(
+            cutoff_at,
+            self.settings.retention_batch_limit,
+        )
+        result = {
+            "schema_version": "VISUAL-QC-RETENTION-RUN-V1",
+            "dry_run": dry_run,
+            "cutoff_at": cutoff_at,
+            "retention_days": self.settings.retention_days,
+            "candidate_case_ids": [item["case_id"] for item in candidates],
+            "candidate_count": len(candidates),
+            "deleted_cases": 0,
+            "deleted_objects": 0,
+            "deleted_bytes": 0,
+        }
+        if dry_run:
+            return result
+
+        timestamp = current_time.astimezone(timezone.utc).isoformat(
+            timespec="milliseconds"
+        ).replace("+00:00", "Z")
+        run_id = f"retention_{uuid.uuid4().hex}"
+        self.store.create_retention_run(
+            {
+                "run_id": run_id,
+                "status": "running",
+                "cutoff_at": cutoff_at,
+                "candidate_count": len(candidates),
+                "payload": {
+                    "candidate_case_ids": result["candidate_case_ids"],
+                    "retention_days": self.settings.retention_days,
+                },
+                "created_at": timestamp,
+            }
+        )
+        deleted_ids = []
+        object_result = {"deleted_objects": 0, "deleted_bytes": 0}
+        try:
+            with self.storage.reference_transaction():
+                deleted_ids = self.store.delete_retention_candidates(
+                    candidates,
+                    cutoff_at,
+                )
+                deleted_paths = [
+                    path
+                    for candidate in candidates
+                    if candidate["case_id"] in deleted_ids
+                    for path in candidate["storage_paths"]
+                ]
+                object_result = self.storage.delete_unreferenced(
+                    deleted_paths,
+                    self.store.storage_path_is_referenced,
+                )
+            self.store.complete_retention_run(
+                run_id,
+                len(deleted_ids),
+                object_result["deleted_objects"],
+                object_result["deleted_bytes"],
+                utc_now(),
+            )
+        except Exception as exc:
+            if isinstance(exc, StorageCleanupError):
+                object_result = {
+                    "deleted_objects": exc.deleted_objects,
+                    "deleted_bytes": exc.deleted_bytes,
+                }
+            self.store.fail_retention_run(
+                run_id,
+                len(deleted_ids),
+                object_result["deleted_objects"],
+                object_result["deleted_bytes"],
+                str(exc),
+                utc_now(),
+            )
+            raise
+        result.update(
+            {
+                "run_id": run_id,
+                "deleted_cases": len(deleted_ids),
+                **object_result,
+            }
+        )
+        return result
 
     def create_case(
         self,
@@ -143,12 +262,6 @@ class VisualQcService:
                 )
             return self.get_case(existing["case_id"], actor_id)
 
-        try:
-            storage_path = self.storage.put_original(content, actual_sha256, mime_type)
-        except StorageError as exc:
-            status_code = 507 if exc.code == "insufficient_storage" else 415
-            raise VisualQcServiceError(exc.code, str(exc), status_code) from exc
-
         timestamp = utc_now()
         case_id = f"vqc_{uuid.uuid4().hex}"
         image_id = f"img_{uuid.uuid4().hex}"
@@ -175,7 +288,6 @@ class VisualQcService:
             "width": width,
             "height": height,
             "sha256": actual_sha256,
-            "storage_path": str(storage_path),
             "created_at": timestamp,
         }
         job_record = {
@@ -190,13 +302,24 @@ class VisualQcService:
             "created_at": timestamp,
             "updated_at": timestamp,
         }
-        try:
-            self.store.create_case(case_record, image_record, job_record)
-        except Exception:
-            existing = self.store.get_case_for_idempotency(actor_id, idempotency_key)
-            if existing and existing["request_fingerprint"] == fingerprint:
-                return self.get_case(existing["case_id"], actor_id)
-            raise
+        with self.storage.reference_transaction():
+            try:
+                storage_path = self.storage.put_original(
+                    content,
+                    actual_sha256,
+                    mime_type,
+                )
+            except StorageError as exc:
+                status_code = 507 if exc.code == "insufficient_storage" else 415
+                raise VisualQcServiceError(exc.code, str(exc), status_code) from exc
+            image_record["storage_path"] = str(storage_path)
+            try:
+                self.store.create_case(case_record, image_record, job_record)
+            except Exception:
+                existing = self.store.get_case_for_idempotency(actor_id, idempotency_key)
+                if existing and existing["request_fingerprint"] == fingerprint:
+                    return self.get_case(existing["case_id"], actor_id)
+                raise
         return self.get_case(case_id, actor_id)
 
     def get_case(self, case_id: str, actor_id: str) -> dict:
@@ -683,24 +806,25 @@ class VisualQcService:
             current_review["board_to_image_matrix"],
         )
         artifact_sha256 = hashlib.sha256(heatmap_bytes).hexdigest()
-        artifact_path = self.storage.put_artifact(
-            heatmap_bytes,
-            artifact_sha256,
-            ".png",
-        )
-        artifact = self.store.create_artifact(
-            {
-                "artifact_id": f"artifact_{uuid.uuid4().hex}",
-                "case_id": job["case_id"],
-                "job_id": job["job_id"],
-                "kind": "difference_heatmap",
-                "mime_type": "image/png",
-                "sha256": artifact_sha256,
-                "byte_size": len(heatmap_bytes),
-                "storage_path": str(artifact_path),
-                "created_at": utc_now(),
-            }
-        )
+        with self.storage.reference_transaction():
+            artifact_path = self.storage.put_artifact(
+                heatmap_bytes,
+                artifact_sha256,
+                ".png",
+            )
+            artifact = self.store.create_artifact(
+                {
+                    "artifact_id": f"artifact_{uuid.uuid4().hex}",
+                    "case_id": job["case_id"],
+                    "job_id": job["job_id"],
+                    "kind": "difference_heatmap",
+                    "mime_type": "image/png",
+                    "sha256": artifact_sha256,
+                    "byte_size": len(heatmap_bytes),
+                    "storage_path": str(artifact_path),
+                    "created_at": utc_now(),
+                }
+            )
         result["golden_sample_id"] = golden["golden_sample_id"]
         result["heatmap"] = {
             "artifact_id": artifact["artifact_id"],

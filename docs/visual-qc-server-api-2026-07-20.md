@@ -112,6 +112,37 @@ The pilot stores:
 
 The SQLite and object-storage classes are isolated behind service boundaries so later PostgreSQL and controlled object-storage migration does not require changing browser routes.
 
+## Health And Retention
+
+`GET /api/v1/visual-qc/health` returns `VISUAL-QC-SERVER-HEALTH-V2` with:
+
+- `normal`, `warning`, or `critical` disk pressure;
+- total, used, free, reserve, and warning bytes;
+- physical original and artifact object counts and bytes;
+- case totals, job-state counts, and active/retired Golden counts.
+
+The upload path still rejects a write before it would cross `VISUAL_QC_MIN_FREE_BYTES`. `VISUAL_QC_WARNING_FREE_BYTES` provides an earlier operational warning. The defaults are 2 GB reserve and 4 GB warning; production may raise both after observing real capture sizes.
+
+Retention is deliberately not exposed as a browser route. Run it on the controlled server while the QC service is stopped. The default command only reports the bounded plan:
+
+```powershell
+python -m scripts.maintain_visual_qc_server
+```
+
+Only cases older than `VISUAL_QC_RETENTION_DAYS` are eligible, up to `VISUAL_QC_RETENTION_BATCH_LIMIT` per run. Eligibility requires at least one job and requires every job to have the explicit terminal state `succeeded` or `failed`; missing, unknown, queued, and running states fail closed. Any registration review, Golden version, or candidate review also protects the case. Content-addressed files are deleted only after the database case is removed and only when no remaining image or artifact references the same path.
+
+Original and artifact writes hold the same data-root OS file lock from object creation through database reference commit. Retention holds that lock from its final transactional eligibility check through reference-aware object deletion. This closes the upload/cleanup race across API and CLI processes, but the operational procedure still stops the QC service before destructive maintenance.
+
+Actual deletion requires both the execution flag and the exact confirmation phrase:
+
+```powershell
+python -m scripts.maintain_visual_qc_server `
+  --execute `
+  --confirm DELETE-EXPIRED-DRAFTS
+```
+
+Every executed run is recorded in `retention_runs` with its cutoff, candidate IDs, and deletion totals. Cleanup errors mark the run as failed with a bounded error message plus case, object, and byte totals already removed, so partial work is visible. A dry run never mutates cases, records, or job state.
+
 ## Current Boundary
 
 Implemented:
@@ -133,9 +164,10 @@ Implemented:
 - reviewer-gated Golden Sample approval and active-version lookup in the workbench;
 - difference heatmap retrieval plus per-candidate confirm, reject, and needs-review decisions;
 - versioned `VISUAL-QC-CASE-V2` browser drafts for server synchronization and comparison state.
+- disk-pressure health reporting, bounded old-draft retention planning, protected evidence rules, and audited explicit cleanup.
 
 Still open:
 
 - production authentication and Nginx deployment verification;
-- operational retention cleanup and disk-pressure monitoring;
+- production scheduling and alert delivery for the implemented retention and health primitives;
 - physical bare-board acceptance.

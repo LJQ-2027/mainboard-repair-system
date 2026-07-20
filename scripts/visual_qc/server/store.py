@@ -12,11 +12,12 @@ def utc_now() -> str:
 
 
 class VisualQcStore:
-    def __init__(self, database_path: Path):
+    def __init__(self, database_path: Path, recover_interrupted_jobs: bool = True):
         self.database_path = database_path
         self.database_path.parent.mkdir(parents=True, exist_ok=True)
         self._initialize()
-        self.recover_interrupted_jobs()
+        if recover_interrupted_jobs:
+            self.recover_interrupted_jobs()
 
     @contextmanager
     def connect(self):
@@ -134,6 +135,19 @@ class VisualQcStore:
                     notes TEXT NOT NULL,
                     created_at TEXT NOT NULL
                 );
+                CREATE TABLE IF NOT EXISTS retention_runs (
+                    run_id TEXT PRIMARY KEY,
+                    status TEXT NOT NULL,
+                    cutoff_at TEXT NOT NULL,
+                    candidate_count INTEGER NOT NULL,
+                    deleted_cases INTEGER NOT NULL DEFAULT 0,
+                    deleted_objects INTEGER NOT NULL DEFAULT 0,
+                    deleted_bytes INTEGER NOT NULL DEFAULT 0,
+                    payload_json TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    completed_at TEXT,
+                    error_message TEXT
+                );
                 CREATE INDEX IF NOT EXISTS jobs_status_created
                     ON jobs(status, created_at);
                 CREATE INDEX IF NOT EXISTS registration_reviews_case_created
@@ -169,6 +183,234 @@ class VisualQcStore:
                     "CREATE UNIQUE INDEX IF NOT EXISTS jobs_dedupe_key "
                     "ON jobs(dedupe_key) WHERE dedupe_key IS NOT NULL"
                 )
+            retention_columns = {
+                row["name"]
+                for row in connection.execute(
+                    "PRAGMA table_info(retention_runs)"
+                ).fetchall()
+            }
+            if "error_message" not in retention_columns:
+                connection.execute(
+                    "ALTER TABLE retention_runs ADD COLUMN error_message TEXT"
+                )
+            connection.commit()
+
+    def operational_counts(self):
+        with self.connect() as connection:
+            cases = connection.execute("SELECT COUNT(*) AS count FROM cases").fetchone()["count"]
+            jobs = {
+                row["status"]: row["count"]
+                for row in connection.execute(
+                    "SELECT status, COUNT(*) AS count FROM jobs GROUP BY status"
+                ).fetchall()
+            }
+            golden = {
+                row["status"]: row["count"]
+                for row in connection.execute(
+                    "SELECT status, COUNT(*) AS count FROM golden_samples GROUP BY status"
+                ).fetchall()
+            }
+        return {
+            "cases": {"total": cases},
+            "jobs": {
+                status: jobs.get(status, 0)
+                for status in ("queued", "running", "succeeded", "failed")
+            },
+            "golden_samples": {
+                status: golden.get(status, 0)
+                for status in ("active", "retired")
+            },
+        }
+
+    def list_retention_candidates(self, cutoff_at: str, limit: int):
+        with self.connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT cases.case_id, cases.created_at, images.storage_path
+                FROM cases
+                JOIN images USING(case_id)
+                WHERE cases.created_at < ?
+                  AND EXISTS (
+                    SELECT 1 FROM jobs
+                    WHERE jobs.case_id = cases.case_id
+                  )
+                  AND NOT EXISTS (
+                    SELECT 1 FROM jobs
+                    WHERE jobs.case_id = cases.case_id
+                      AND jobs.status NOT IN ('succeeded', 'failed')
+                  )
+                  AND NOT EXISTS (
+                    SELECT 1 FROM registration_reviews
+                    WHERE registration_reviews.case_id = cases.case_id
+                  )
+                  AND NOT EXISTS (
+                    SELECT 1 FROM golden_samples
+                    WHERE golden_samples.case_id = cases.case_id
+                  )
+                  AND NOT EXISTS (
+                    SELECT 1 FROM candidate_reviews
+                    WHERE candidate_reviews.case_id = cases.case_id
+                  )
+                ORDER BY cases.created_at, cases.case_id
+                LIMIT ?
+                """,
+                (cutoff_at, limit),
+            ).fetchall()
+            candidates = []
+            for row in rows:
+                artifact_paths = [
+                    item["storage_path"]
+                    for item in connection.execute(
+                        "SELECT storage_path FROM artifacts WHERE case_id = ?",
+                        (row["case_id"],),
+                    ).fetchall()
+                ]
+                candidates.append(
+                    {
+                        "case_id": row["case_id"],
+                        "created_at": row["created_at"],
+                        "storage_paths": [row["storage_path"], *artifact_paths],
+                    }
+                )
+        return candidates
+
+    def create_retention_run(self, record: dict):
+        with self.connect() as connection:
+            connection.execute(
+                """
+                INSERT INTO retention_runs (
+                    run_id, status, cutoff_at, candidate_count, payload_json,
+                    created_at
+                ) VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    record["run_id"],
+                    record["status"],
+                    record["cutoff_at"],
+                    record["candidate_count"],
+                    json.dumps(record["payload"], separators=(",", ":")),
+                    record["created_at"],
+                ),
+            )
+            connection.commit()
+
+    def delete_retention_candidates(self, candidates: list[dict], cutoff_at: str):
+        requested_ids = [candidate["case_id"] for candidate in candidates]
+        if not requested_ids:
+            return []
+        placeholders = ",".join("?" for _ in requested_ids)
+        with self.connect() as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            eligible_rows = connection.execute(
+                f"""
+                SELECT cases.case_id
+                FROM cases
+                WHERE cases.case_id IN ({placeholders})
+                  AND cases.created_at < ?
+                  AND EXISTS (
+                    SELECT 1 FROM jobs
+                    WHERE jobs.case_id = cases.case_id
+                  )
+                  AND NOT EXISTS (
+                    SELECT 1 FROM jobs
+                    WHERE jobs.case_id = cases.case_id
+                      AND jobs.status NOT IN ('succeeded', 'failed')
+                  )
+                  AND NOT EXISTS (
+                    SELECT 1 FROM registration_reviews
+                    WHERE registration_reviews.case_id = cases.case_id
+                  )
+                  AND NOT EXISTS (
+                    SELECT 1 FROM golden_samples
+                    WHERE golden_samples.case_id = cases.case_id
+                  )
+                  AND NOT EXISTS (
+                    SELECT 1 FROM candidate_reviews
+                    WHERE candidate_reviews.case_id = cases.case_id
+                  )
+                """,
+                (*requested_ids, cutoff_at),
+            ).fetchall()
+            eligible_ids = [row["case_id"] for row in eligible_rows]
+            if eligible_ids:
+                eligible_placeholders = ",".join("?" for _ in eligible_ids)
+                for table in ("artifacts", "audit_events", "jobs", "images"):
+                    connection.execute(
+                        f"DELETE FROM {table} WHERE case_id IN ({eligible_placeholders})",
+                        eligible_ids,
+                    )
+                connection.execute(
+                    f"DELETE FROM cases WHERE case_id IN ({eligible_placeholders})",
+                    eligible_ids,
+                )
+            connection.commit()
+        return eligible_ids
+
+    def storage_path_is_referenced(self, storage_path: str):
+        with self.connect() as connection:
+            image = connection.execute(
+                "SELECT 1 FROM images WHERE storage_path = ? LIMIT 1",
+                (storage_path,),
+            ).fetchone()
+            artifact = connection.execute(
+                "SELECT 1 FROM artifacts WHERE storage_path = ? LIMIT 1",
+                (storage_path,),
+            ).fetchone()
+        return bool(image or artifact)
+
+    def complete_retention_run(
+        self,
+        run_id: str,
+        deleted_cases: int,
+        deleted_objects: int,
+        deleted_bytes: int,
+        completed_at: str,
+    ):
+        with self.connect() as connection:
+            connection.execute(
+                """
+                UPDATE retention_runs
+                SET status = 'completed', deleted_cases = ?,
+                    deleted_objects = ?, deleted_bytes = ?, completed_at = ?
+                WHERE run_id = ?
+                """,
+                (
+                    deleted_cases,
+                    deleted_objects,
+                    deleted_bytes,
+                    completed_at,
+                    run_id,
+                ),
+            )
+            connection.commit()
+
+    def fail_retention_run(
+        self,
+        run_id: str,
+        deleted_cases: int,
+        deleted_objects: int,
+        deleted_bytes: int,
+        error_message: str,
+        completed_at: str,
+    ):
+        with self.connect() as connection:
+            connection.execute(
+                """
+                UPDATE retention_runs
+                SET status = 'failed', deleted_cases = ?,
+                    deleted_objects = ?, deleted_bytes = ?,
+                    error_message = ?, completed_at = ?
+                WHERE run_id = ?
+                """,
+                (
+                    deleted_cases,
+                    deleted_objects,
+                    deleted_bytes,
+                    error_message[:1000],
+                    completed_at,
+                    run_id,
+                ),
+            )
             connection.commit()
 
     def recover_interrupted_jobs(self):

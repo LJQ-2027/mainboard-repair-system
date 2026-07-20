@@ -12,6 +12,9 @@ class VisualQcServerSettings:
     maximum_upload_bytes: int = 20 * 1024 * 1024
     minimum_image_dimension: int = 480
     minimum_free_bytes: int = 2 * 1024 * 1024 * 1024
+    warning_free_bytes: int = 4 * 1024 * 1024 * 1024
+    retention_days: int = 90
+    retention_batch_limit: int = 100
     worker_count: int = 1
     allowed_origins: tuple[str, ...] = ()
 
@@ -31,6 +34,14 @@ class VisualQcServerSettings:
             ),
             minimum_free_bytes=int(
                 os.environ.get("VISUAL_QC_MIN_FREE_BYTES", 2 * 1024 * 1024 * 1024)
+            ),
+            warning_free_bytes=int(
+                os.environ.get("VISUAL_QC_WARNING_FREE_BYTES", 4 * 1024 * 1024 * 1024)
+            ),
+            retention_days=max(1, int(os.environ.get("VISUAL_QC_RETENTION_DAYS", "90"))),
+            retention_batch_limit=max(
+                1,
+                min(1000, int(os.environ.get("VISUAL_QC_RETENTION_BATCH_LIMIT", "100"))),
             ),
             worker_count=max(0, min(2, int(os.environ.get("VISUAL_QC_WORKERS", "1")))),
             allowed_origins=tuple(
