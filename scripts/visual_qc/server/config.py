@@ -1,0 +1,35 @@
+from __future__ import annotations
+
+from dataclasses import dataclass
+import os
+from pathlib import Path
+
+
+@dataclass(frozen=True)
+class VisualQcServerSettings:
+    project_root: Path
+    data_root: Path
+    maximum_upload_bytes: int = 20 * 1024 * 1024
+    minimum_image_dimension: int = 480
+    minimum_free_bytes: int = 2 * 1024 * 1024 * 1024
+    worker_count: int = 1
+
+    @classmethod
+    def from_environment(cls) -> "VisualQcServerSettings":
+        project_root = Path(__file__).resolve().parents[3]
+        return cls(
+            project_root=Path(os.environ.get("VISUAL_QC_PROJECT_ROOT", project_root)).resolve(),
+            data_root=Path(
+                os.environ.get("VISUAL_QC_DATA_ROOT", project_root / ".local" / "visual-qc-server")
+            ).resolve(),
+            maximum_upload_bytes=int(
+                os.environ.get("VISUAL_QC_MAX_UPLOAD_BYTES", 20 * 1024 * 1024)
+            ),
+            minimum_image_dimension=int(
+                os.environ.get("VISUAL_QC_MIN_IMAGE_DIMENSION", 480)
+            ),
+            minimum_free_bytes=int(
+                os.environ.get("VISUAL_QC_MIN_FREE_BYTES", 2 * 1024 * 1024 * 1024)
+            ),
+            worker_count=max(0, min(2, int(os.environ.get("VISUAL_QC_WORKERS", "1")))),
+        )

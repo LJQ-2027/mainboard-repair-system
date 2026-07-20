@@ -101,6 +101,8 @@ python ai_proxy_server.py
 - **前端**：纯 HTML/CSS/JS 页面，核心数据拆分到 `data/` 目录
 - **当前后端**：Python HTTP Server 代理（端口 8899）
 - **目标后端**：同域FastAPI服务、持久化QC任务、受控图片存储和CPU OpenCV Worker
+- **当前后端实现**：`visual_qc_server.py` 已提供版本化上传、SQLite任务恢复、图像质量证据、自动配准候选与人工四点回退；本地运行和部署边界见 `docs/visual-qc-server-api-2026-07-20.md`
+- **当前审核闭环**：服务器已支持配准审核、Golden Sample版本化、差异热区、受控artifact以及维修员确认/驳回；全球站点拍摄与入库规范见 `docs/visual-qc-capture-intake-spec-2026-07-20.md`
 - **AI 平台**：Anthropic Claude / DeepSeek
 - **通信协议**：SSE (Server-Sent Events) 流式传输
 

@@ -163,14 +163,20 @@ The production server must enforce authentication, role-based access, controlled
 
 ## Implementation Progress
 
-The first two delivery items are implemented locally:
+The first four delivery items now have a local server implementation:
 
 - deterministic synthetic transforms cover all ten sides in the five-board catalog;
 - the CPU OpenCV core uses contour evidence, ORB with AKAZE fallback, RANSAC homography validation, and structured manual fallback;
 - `VISUAL-QC-REGISTRATION-CANDIDATE-V1` keeps automatic output in a draft candidate state;
 - the committed benchmark covers 20 synthetic cases and all 21 reviewed Service Manual proxy images.
+- FastAPI accepts controlled, idempotent multipart uploads and persists cases, images, jobs, reviews, Golden versions, artifacts, and audit events in SQLite;
+- one or two bounded workers recover interrupted jobs and return quality plus registration evidence outside request handlers;
+- reviewed automatic or manual registration is required before a physical capture can become a Golden Sample;
+- Golden Samples are versioned by board, side, and capture setup, while proxy evidence is rejected;
+- reviewed cases can produce difference heatmaps and `model_candidate` regions;
+- technician confirm/reject decisions are stored separately, and only a confirmed region receives `human_annotation`.
 
-This progress does not imply server deployment. Upload, persistent jobs, Golden Sample review, difference candidates, and browser integration remain open.
+This progress does not imply server deployment or browser integration. The controlled gateway/Nginx route, production authentication assertion, retention operations, browser upload/retry UI, and physical bare-board acceptance remain open.
 
 ## Acceptance Boundary
 
