@@ -182,9 +182,17 @@ The first four delivery items now have a local server implementation:
 
 The local pilot now reports disk pressure and object/job counts, rejects writes below its reserve, and supports bounded retention of terminal unreviewed drafts through a default-dry-run server maintenance command. Registration reviews, Golden versions, candidate reviews, active work, and content-addressed objects still referenced by another case are protected. Execution requires an explicit confirmation phrase and records a retention run.
 
-This progress does not imply production deployment. The controlled gateway/Nginx route, production authentication assertion, alert delivery and retention scheduling, and physical bare-board acceptance remain open.
+The controlled pilot was deployed on 2026-07-20 at commit `2659769`. The
+gateway/Nginx route, Basic Auth identity assertion, loopback-only services,
+upload and async processing, restart recovery, and proxy-case fallback have
+passed P4 checks. Alert delivery, retention scheduling, corporate SSO/OIDC, and
+physical bare-board acceptance remain open.
 
-Read-only P4 preflight on 2026-07-20 found that the currently deployed beta route has no authentication or verified actor-header injection. Deployment is therefore gated on protecting the complete beta route before exposing the recent engineering assets or upload API. The bounded pilot uses per-user Nginx Basic Auth, server-side technician/reviewer mapping, loopback-only QC service binding, and gateway-owned actor headers. This pilot mechanism may later be replaced by corporate SSO/OIDC without changing the browser/API identity contract.
+Read-only P4 preflight on 2026-07-20 found the old beta route unprotected. The
+completed bounded-pilot deployment now uses per-user Nginx Basic Auth,
+server-side technician/reviewer mapping, loopback-only service binding, and
+gateway-owned actor headers. This pilot mechanism may later be replaced by
+corporate SSO/OIDC without changing the browser/API identity contract.
 
 ## Acceptance Boundary
 

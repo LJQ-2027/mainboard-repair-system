@@ -5,7 +5,8 @@ This project is deployed as an isolated beta service on the same server used by 
 ## Isolation Rules
 
 - Remote directory: `/opt/motherboard-repair-beta`
-- Public beta port: `3010`
+- Loopback static/AI service port: `3010`
+- Loopback visual-QC API port: `3020`
 - PM2 process name: `motherboard-repair-beta`
 - Env file: `/opt/motherboard-repair-beta/app/.env`
 - Do not reuse the CSAT directory, port, PM2 process, database, upload directory, or env file.
@@ -53,16 +54,28 @@ ANTHROPIC_API_KEY=...
 
 ## Current Deployment
 
-- Deployed on: 2026-07-01
-- Deployed commit: `47b4bd3`
+- Deployed on: 2026-07-20
+- Deployed commit: `2659769`
 - Internal service: `http://127.0.0.1:3010`
+- Internal visual-QC API: `http://127.0.0.1:3020`
 - External beta URL: `https://cccsat.top/mb-repair-beta/`
 - Health URL: `https://cccsat.top/mb-repair-beta/health`
-- PM2 process: `motherboard-repair-beta`
+- Visual-QC workbench:
+  `https://cccsat.top/mb-repair-beta/assets/visual-qc-workbench/`
+- PM2 processes: `motherboard-repair-beta` and
+  `motherboard-repair-visual-qc`
+- Access control: per-user Nginx Basic Auth with gateway-owned actor headers
 - Nginx config touched: `/etc/nginx/sites-available/sikayetvar`
 - Nginx config backup: `/etc/nginx/sites-available/sikayetvar.before-mb-repair-20260622_095918`
 - Current AI status: service is reachable, but `.env` still has no valid `ANTHROPIC_API_KEY`, so AI features are not enabled yet.
-- Latest smoke check: complete; readiness dashboard, interactive SOP, and repair case template render through the external beta URL.
+- Latest P4 evidence: desktop and 390px workbench paths render with no fresh
+  console errors or horizontal overflow; technician/reviewer roles pass through
+  the HTTPS gateway; forged actor headers are overwritten; PM2 restart retains
+  the persisted proxy case and completed registration job.
+- Proxy evidence: one KM4 reviewed manual image was accepted as a proxy case,
+  scored `usable`, and correctly fell back to manual four-point registration
+  after ORB/AKAZE evidence failed the inlier gate. It is not physical-board
+  accuracy evidence.
 
 ## Approved Visual-QC Evolution
 
@@ -70,11 +83,18 @@ The beta server remains the target technician entry for the visual-QC pilot. Phy
 
 The server was inspected read-only on 2026-07-20: 4 x86_64 vCPU, 7.3 GB RAM, 4 GB swap, 19 GB free disk, Python 3.10, Node.js 20, no GPU, no installed OpenCV, and no active PostgreSQL or Redis. This supports a bounded CPU pilot, not deep-model training or unrestricted long-term image retention.
 
-The current deployed commit `47b4bd3` predates the recent 2.5D and visual-QC work. A future deployment must use the new server architecture and pass upload, restart recovery, storage-limit, and proxy-path smoke tests before field use. Canonical design: `docs/superpowers/specs/2026-07-20-visual-qc-server-architecture-design.md`.
+The bounded visual-QC pilot is now deployed with the approved same-origin
+architecture. Upload, async processing, manual fallback, role assertion,
+loopback binding, restart recovery, storage health, and proxy-path smoke checks
+have passed. Physical bare-board photos, reviewed Golden Samples, and
+real-defect acceptance remain the field-readiness gate. Canonical design:
+`docs/superpowers/specs/2026-07-20-visual-qc-server-architecture-design.md`.
 
 ### 2026-07-20 P4 Preflight
 
-Read-only inspection confirmed that the current `/mb-repair-beta/` route has no authentication directive or verified user-header injection. It remains unsuitable for internal point maps, physical-board uploads, Golden review, or visual evidence. The server also has no FastAPI, Uvicorn, NumPy, OpenCV, or multipart runtime installed yet.
+Read-only inspection initially confirmed that `/mb-repair-beta/` had no
+authentication or verified user-header injection. The 2026-07-20 deployment
+closed that gate and installed the isolated Python 3.10 visual-QC runtime.
 
 The bounded pilot deployment therefore adds:
 

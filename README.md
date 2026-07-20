@@ -12,7 +12,7 @@
 
 当前实现遵循服务器主导的 Web 架构：主板照片上传受控 FastAPI 服务，OpenCV 异步处理，自动失败回退人工四点配准，Golden Sample 和候选审核集中保存，浏览器保留弱网草稿。权威设计见 `docs/superpowers/specs/2026-07-20-visual-qc-server-architecture-design.md`。
 
-浏览器工作台已接入本地 QC 服务：支持稳定幂等上传、字节进度、任务轮询、失败重试、刷新恢复、自动候选叠图确认、人工四点回退、Golden Sample 审核、差异热图和候选确认/驳回/暂缓。服务器侧包含确定性合成透视、轮廓证据、ORB/AKAZE 特征、RANSAC 单应性、结构化失败原因、持久化审核、磁盘压力健康状态，以及默认只预览的旧草稿留存清理。当前仍未部署生产环境；运行方式、候选契约、运维命令和代理证据基准见 `docs/visual-qc-auto-registration-2026-07-20.md` 与 `docs/visual-qc-server-api-2026-07-20.md`。
+浏览器工作台已接入受控服务器 QC 服务：支持稳定幂等上传、字节进度、任务轮询、失败重试、刷新恢复、自动候选叠图确认、人工四点回退、Golden Sample 审核、差异热图和候选确认/驳回/暂缓。服务器侧包含确定性合成透视、轮廓证据、ORB/AKAZE 特征、RANSAC 单应性、结构化失败原因、持久化审核、磁盘压力健康状态，以及默认只预览的旧草稿留存清理。2026-07-20 已以逐用户 Basic Auth 受控试点方式部署到 `https://cccsat.top/mb-repair-beta/`；运行方式、候选契约、运维命令和代理证据基准见 `docs/visual-qc-auto-registration-2026-07-20.md` 与 `docs/visual-qc-server-api-2026-07-20.md`。
 
 2026-07-20 的只读 P4 预检确认现有 beta 路由尚无认证，不能直接开放内部工程资料和图片上传。新的部署增量会先用逐用户 Nginx Basic Auth 保护整条 beta 路由，以网关注入的用户和角色驱动 QC API，并把 3020 绑定到回环地址；最终可在不改变 API 契约的情况下替换为公司 SSO/OIDC。部署与回滚步骤见 `docs/beta-deployment.md`。
 
