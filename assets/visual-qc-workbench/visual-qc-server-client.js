@@ -159,6 +159,13 @@ async function jsonRequest(
   return payload;
 }
 
+export function getVisualQcIdentity(apiBase, actorId, actorRole = null) {
+  return jsonRequest(`${apiBase.replace(/\/$/, '')}/identity`, {
+    actorId,
+    actorRole,
+  });
+}
+
 export function getVisualQcJob(apiBase, actorId, jobId) {
   return jsonRequest(`${apiBase.replace(/\/$/, '')}/jobs/${encodeURIComponent(jobId)}`, {
     actorId,

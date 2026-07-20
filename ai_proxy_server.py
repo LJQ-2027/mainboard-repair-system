@@ -17,6 +17,7 @@ APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 STATIC_ROOT = os.environ.get("STATIC_ROOT", APP_ROOT)
 INDEX_FILE = os.environ.get("INDEX_FILE", "mainboard_repair_system_v7.4_updated.html")
 PORT = int(os.environ.get("PORT", "8899"))
+HOST = os.environ.get("HOST", "127.0.0.1")
 DENIED_STATIC_DIRS = {".git", ".local", "__pycache__", "node_modules"}
 DENIED_STATIC_EXTENSIONS = {".bat", ".env", ".pem", ".ps1", ".py", ".pyc"}
 PLACEHOLDER_API_KEYS = {"sk-ant-api03-your-key-here", "sk-your-deepseek-key-here"}
@@ -452,7 +453,7 @@ def main():
     print("  按 Ctrl+C 停止服务")
     print()
 
-    server = ThreadingHTTPServer(("0.0.0.0", PORT), ProxyHandler)
+    server = ThreadingHTTPServer((HOST, PORT), ProxyHandler)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

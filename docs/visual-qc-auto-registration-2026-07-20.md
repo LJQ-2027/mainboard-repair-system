@@ -2,7 +2,7 @@
 
 ## Status
 
-The first server-side visual registration core is implemented locally. It is not deployed to the controlled beta server yet and does not change the browser-only behavior of `VISUAL-QC-CASE-V1`.
+The first server-side visual registration core is implemented locally and remains pending controlled-beta deployment. Historical local-only cases retain `VISUAL-QC-CASE-V1`; server-connected workbench drafts use `VISUAL-QC-CASE-V2` with weak-network recovery, reviewed registration, Golden state, and difference-review state.
 
 The implementation consists of:
 

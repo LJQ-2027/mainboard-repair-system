@@ -1,4 +1,5 @@
 # CPU-only visual registration worker dependencies.
+numpy==2.2.6
 opencv-python-headless==4.13.0.92
 fastapi==0.116.1
 uvicorn==0.35.0

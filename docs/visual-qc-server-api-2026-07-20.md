@@ -39,6 +39,10 @@ location /mb-repair-beta/api/v1/visual-qc/ {
 
 The example assumes the controlled gateway has already authenticated the request. Nginx must remove any client-supplied `X-Actor-Id` and set the verified identity itself. The current API refuses requests without that identity, but it does not replace the gateway's authentication system.
 
+`GET /api/v1/visual-qc/identity` returns `VISUAL-QC-IDENTITY-V1` from those gateway headers. Unknown roles fail closed to `technician`; only the exact server-injected `reviewer` role enables Golden approval. The workbench uses this response instead of treating URL identity hints as authoritative.
+
+The QC process defaults to `127.0.0.1:3020` through `VISUAL_QC_HOST=127.0.0.1`. It must not listen on a public interface. The bounded pilot uses per-user Nginx Basic Auth and may later replace that gateway with corporate SSO/OIDC without changing this API identity contract.
+
 ## Upload Contract
 
 `POST /api/v1/visual-qc/cases`

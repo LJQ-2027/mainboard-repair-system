@@ -71,3 +71,53 @@ The beta server remains the target technician entry for the visual-QC pilot. Phy
 The server was inspected read-only on 2026-07-20: 4 x86_64 vCPU, 7.3 GB RAM, 4 GB swap, 19 GB free disk, Python 3.10, Node.js 20, no GPU, no installed OpenCV, and no active PostgreSQL or Redis. This supports a bounded CPU pilot, not deep-model training or unrestricted long-term image retention.
 
 The current deployed commit `47b4bd3` predates the recent 2.5D and visual-QC work. A future deployment must use the new server architecture and pass upload, restart recovery, storage-limit, and proxy-path smoke tests before field use. Canonical design: `docs/superpowers/specs/2026-07-20-visual-qc-server-architecture-design.md`.
+
+### 2026-07-20 P4 Preflight
+
+Read-only inspection confirmed that the current `/mb-repair-beta/` route has no authentication directive or verified user-header injection. It remains unsuitable for internal point maps, physical-board uploads, Golden review, or visual evidence. The server also has no FastAPI, Uvicorn, NumPy, OpenCV, or multipart runtime installed yet.
+
+The bounded pilot deployment therefore adds:
+
+- per-user Nginx Basic Auth around the complete beta route;
+- `$remote_user` as the gateway-owned `X-Actor-Id`;
+- a server-owned reviewer map that fails closed to `technician`;
+- removal of client `Authorization` before proxying;
+- a loopback-only static/AI process on `127.0.0.1:3010`;
+- a loopback-only QC process on `127.0.0.1:3020`;
+- a commit-versioned QC runtime behind the stable
+  `/opt/motherboard-repair-beta/venv-visual-qc` symlink;
+- persistent data outside the replaceable app directory;
+- Nginx, PM2, internal health, authenticated technician/reviewer identity,
+  forged-header rejection, and unauthenticated-401 checks;
+- consistent SQLite backup plus automatic application, runtime, database, and
+  gateway rollback on deployment failure.
+
+Run the read-only gate first:
+
+```powershell
+.\scripts\deploy-visual-qc-pilot.ps1 `
+  -KeyPath "C:\Users\Mercurluto\OneDrive\AI\90_Meta\Sensitive\Milo.pem" `
+  -PreflightOnly
+```
+
+Actual deployment additionally requires a local htpasswd file, reviewer-map
+file, and matching technician/reviewer credentials for the authenticated smoke
+test:
+
+```powershell
+$technician = Get-Credential -UserName "pilot-technician"
+$reviewer = Get-Credential -UserName "pilot-reviewer"
+.\scripts\deploy-visual-qc-pilot.ps1 `
+  -KeyPath "C:\Users\Mercurluto\OneDrive\AI\90_Meta\Sensitive\Milo.pem" `
+  -HtpasswdPath "C:\secure\mb-repair.htpasswd" `
+  -ReviewerMapPath "C:\secure\mb-repair-reviewers.map" `
+  -TechnicianCredential $technician `
+  -ReviewerCredential $reviewer
+```
+
+Passwords and account lists remain outside Git. Uploaded authentication inputs
+are mode `0600` and removed from the staging directory after success or
+rollback. The script refuses a dirty worktree and deploys only committed
+`HEAD`.
+
+Basic Auth is the controlled-pilot identity provider, not the final global identity architecture. A later corporate SSO/OIDC gateway may replace it while preserving the same verified `X-Actor-Id` and `X-Actor-Role` API contract.

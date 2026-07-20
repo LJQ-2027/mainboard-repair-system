@@ -85,6 +85,17 @@ def create_app(settings: VisualQcServerSettings | None = None) -> FastAPI:
     def health():
         return service.health()
 
+    @app.get("/api/v1/visual-qc/identity")
+    def identity(
+        x_actor_id: str | None = Header(None, alias="X-Actor-Id"),
+        x_actor_role: str | None = Header(None, alias="X-Actor-Role"),
+    ):
+        return {
+            "schema_version": "VISUAL-QC-IDENTITY-V1",
+            "actor_id": actor_id(x_actor_id),
+            "role": "reviewer" if x_actor_role == "reviewer" else "technician",
+        }
+
     @app.post("/api/v1/visual-qc/cases", status_code=202)
     async def create_case(
         board_key: str = Form(...),

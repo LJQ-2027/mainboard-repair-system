@@ -44,6 +44,7 @@ import {
   createDifferenceJob,
   createServerSyncState,
   getActiveGoldenSample,
+  getVisualQcIdentity,
   getVisualQcArtifact,
   getVisualQcJob,
   pollVisualQcJob,
@@ -57,10 +58,10 @@ import {
 const CATALOG_URL = '../../knowledge-base/repair-workbench-boards.json';
 const QUERY = new URLSearchParams(window.location.search);
 const VISUAL_QC_API = QUERY.get('qcApi') || '../../api/v1/visual-qc';
-const VISUAL_QC_ACTOR_ID = QUERY.get('qcActor')
+let VISUAL_QC_ACTOR_ID = QUERY.get('qcActor')
   || globalThis.VISUAL_QC_ACTOR_ID
   || 'local-technician';
-const VISUAL_QC_ACTOR_ROLE = QUERY.get('qcRole')
+let VISUAL_QC_ACTOR_ROLE = QUERY.get('qcRole')
   || globalThis.VISUAL_QC_ACTOR_ROLE
   || 'technician';
 const ANALYSIS_MAX_EDGE = 720;
@@ -2003,6 +2004,20 @@ async function initialize() {
     option.textContent = CATEGORY_LABELS[category];
     elements.defectCategory.append(option);
   });
+  try {
+    const identity = await getVisualQcIdentity(
+      VISUAL_QC_API,
+      VISUAL_QC_ACTOR_ID,
+      VISUAL_QC_ACTOR_ROLE,
+    );
+    if (identity?.schema_version === 'VISUAL-QC-IDENTITY-V1') {
+      VISUAL_QC_ACTOR_ID = identity.actor_id;
+      VISUAL_QC_ACTOR_ROLE = identity.role === 'reviewer' ? 'reviewer' : 'technician';
+    }
+  } catch (error) {
+    VISUAL_QC_ACTOR_ROLE = 'technician';
+    if (error.status !== 404) console.warn('Visual-QC identity unavailable:', error.message);
+  }
   state.catalog = await fetchJson(CATALOG_URL);
   state.boardKey = state.catalog.default_board_key;
   renderBoardSelector();

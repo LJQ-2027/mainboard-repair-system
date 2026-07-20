@@ -11,6 +11,7 @@ import {
   createRegistrationReviewDescriptor,
   createServerSyncState,
   createUploadDescriptor,
+  getVisualQcIdentity,
   pollVisualQcJob,
   transitionServerSync,
 } from '../assets/visual-qc-workbench/visual-qc-server-client.js';
@@ -71,6 +72,38 @@ test('upload descriptor preserves known board identity and physical evidence rol
     sha256: 'a'.repeat(64),
   });
   assert.equal(descriptor.idempotencyKey, createServerSyncState(visualCase()).idempotency_key);
+});
+
+test('server identity replaces browser hints with the gateway assertion', async () => {
+  const originalFetch = globalThis.fetch;
+  let request = null;
+  globalThis.fetch = async (url, options) => {
+    request = { url, options };
+    return {
+      ok: true,
+      status: 200,
+      json: async () => ({
+        schema_version: 'VISUAL-QC-IDENTITY-V1',
+        actor_id: 'gateway-reviewer',
+        role: 'reviewer',
+      }),
+    };
+  };
+  try {
+    const identity = await getVisualQcIdentity(
+      '/api/v1/visual-qc',
+      'browser-hint',
+      'technician',
+    );
+
+    assert.equal(identity.actor_id, 'gateway-reviewer');
+    assert.equal(identity.role, 'reviewer');
+    assert.equal(request.url, '/api/v1/visual-qc/identity');
+    assert.equal(request.options.headers['X-Actor-Id'], 'browser-hint');
+    assert.equal(request.options.headers['X-Actor-Role'], 'technician');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });
 
 test('automatic result remains a draft candidate until server review succeeds', () => {

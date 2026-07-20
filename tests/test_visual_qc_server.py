@@ -14,6 +14,7 @@ from scripts.visual_qc.server.config import VisualQcServerSettings
 from scripts.visual_qc.server.quality import analyze_image_quality
 from scripts.visual_qc.server.storage import LocalObjectStorage, StorageError
 from scripts.visual_qc.synthetic import SyntheticTransformConfig, generate_synthetic_capture
+from visual_qc_server import runtime_options
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -285,6 +286,43 @@ class VisualQcServerApiTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 415)
         self.assertEqual(response.json()["detail"]["code"], "mime_content_mismatch")
+
+    def test_identity_comes_from_gateway_headers_and_unknown_roles_fail_closed(self):
+        reviewer = self.client.get(
+            "/api/v1/visual-qc/identity",
+            headers={
+                "X-Actor-Id": "reviewer-001",
+                "X-Actor-Role": "reviewer",
+            },
+        )
+        unknown_role = self.client.get(
+            "/api/v1/visual-qc/identity",
+            headers={
+                "X-Actor-Id": "technician-001",
+                "X-Actor-Role": "administrator",
+            },
+        )
+        missing_actor = self.client.get("/api/v1/visual-qc/identity")
+
+        self.assertEqual(reviewer.status_code, 200)
+        self.assertEqual(
+            reviewer.json(),
+            {
+                "schema_version": "VISUAL-QC-IDENTITY-V1",
+                "actor_id": "reviewer-001",
+                "role": "reviewer",
+            },
+        )
+        self.assertEqual(unknown_role.status_code, 200)
+        self.assertEqual(unknown_role.json()["role"], "technician")
+        self.assertEqual(missing_actor.status_code, 401)
+
+    def test_runtime_binds_qc_api_to_loopback_by_default(self):
+        with patch.dict("os.environ", {}, clear=True):
+            options = runtime_options()
+
+        self.assertEqual(options["host"], "127.0.0.1")
+        self.assertEqual(options["port"], 3020)
 
 
 class VisualQcServerQualityTests(unittest.TestCase):

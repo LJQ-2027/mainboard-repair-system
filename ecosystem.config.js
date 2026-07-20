@@ -6,6 +6,7 @@ module.exports = {
       interpreter: "python3",
       cwd: "/opt/motherboard-repair-beta/app",
       env: {
+        HOST: "127.0.0.1",
         PORT: "3010",
         STATIC_ROOT: "/opt/motherboard-repair-beta/app",
         INDEX_FILE: "mainboard_repair_system_v7.4_updated.html"
@@ -14,7 +15,7 @@ module.exports = {
     {
       name: "motherboard-repair-visual-qc",
       script: "visual_qc_server.py",
-      interpreter: "python3",
+      interpreter: "/opt/motherboard-repair-beta/venv-visual-qc/bin/python",
       cwd: "/opt/motherboard-repair-beta/app",
       env: {
         VISUAL_QC_PROJECT_ROOT: "/opt/motherboard-repair-beta/app",
@@ -26,6 +27,7 @@ module.exports = {
         VISUAL_QC_RETENTION_DAYS: "90",
         VISUAL_QC_RETENTION_BATCH_LIMIT: "100",
         VISUAL_QC_WORKERS: "1",
+        VISUAL_QC_HOST: "127.0.0.1",
         VISUAL_QC_PORT: "3020"
       }
     }

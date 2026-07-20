@@ -184,6 +184,8 @@ The local pilot now reports disk pressure and object/job counts, rejects writes 
 
 This progress does not imply production deployment. The controlled gateway/Nginx route, production authentication assertion, alert delivery and retention scheduling, and physical bare-board acceptance remain open.
 
+Read-only P4 preflight on 2026-07-20 found that the currently deployed beta route has no authentication or verified actor-header injection. Deployment is therefore gated on protecting the complete beta route before exposing the recent engineering assets or upload API. The bounded pilot uses per-user Nginx Basic Auth, server-side technician/reviewer mapping, loopback-only QC service binding, and gateway-owned actor headers. This pilot mechanism may later be replaced by corporate SSO/OIDC without changing the browser/API identity contract.
+
 ## Acceptance Boundary
 
 The first server increment is accepted when:
