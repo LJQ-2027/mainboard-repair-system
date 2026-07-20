@@ -63,3 +63,11 @@ ANTHROPIC_API_KEY=...
 - Nginx config backup: `/etc/nginx/sites-available/sikayetvar.before-mb-repair-20260622_095918`
 - Current AI status: service is reachable, but `.env` still has no valid `ANTHROPIC_API_KEY`, so AI features are not enabled yet.
 - Latest smoke check: complete; readiness dashboard, interactive SOP, and repair case template render through the external beta URL.
+
+## Approved Visual-QC Evolution
+
+The beta server remains the target technician entry for the visual-QC pilot. Physical-board photos are authorized for upload to this controlled server. The approved architecture adds a same-origin QC API, persisted image-processing jobs, controlled image storage, one or two CPU OpenCV workers, Golden Sample review, and candidate confirmation/rejection.
+
+The server was inspected read-only on 2026-07-20: 4 x86_64 vCPU, 7.3 GB RAM, 4 GB swap, 19 GB free disk, Python 3.10, Node.js 20, no GPU, no installed OpenCV, and no active PostgreSQL or Redis. This supports a bounded CPU pilot, not deep-model training or unrestricted long-term image retention.
+
+The current deployed commit `47b4bd3` predates the recent 2.5D and visual-QC work. A future deployment must use the new server architecture and pass upload, restart recovery, storage-limit, and proxy-path smoke tests before field use. Canonical design: `docs/superpowers/specs/2026-07-20-visual-qc-server-architecture-design.md`.

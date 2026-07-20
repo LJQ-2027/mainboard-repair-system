@@ -1,12 +1,14 @@
 # Visual QC Workbench Baseline
 
-## Route
+## Status And Route
 
 `http://127.0.0.1:8898/assets/visual-qc-workbench/`
 
+This document records the implemented local baseline at commit `45a8613`. It is not the production deployment architecture. The approved target is the server-led asynchronous architecture in `docs/superpowers/specs/2026-07-20-visual-qc-server-architecture-design.md`.
+
 ## Workflow
 
-The internal workbench supports the five compiled mainboard platforms and keeps all photos in the local browser:
+The current internal workbench supports the five compiled mainboard platforms and keeps all photos in the local browser:
 
 1. Select the known board and board side.
 2. Import a `golden_reference`, `before_repair`, or `after_repair` image.
@@ -19,6 +21,8 @@ The internal workbench supports the five compiled mainboard platforms and keeps 
 9. Export the `VISUAL-QC-CASE-V1` JSON and an annotated PNG preview.
 
 Cases and source image blobs are recoverable from IndexedDB. Imported JSON requires the original image to be selected again and accepted only after its SHA-256 and dimensions match.
+
+This `local_only` behavior remains truthful for V1. The next contract version will upload authorized physical-board photos to the controlled server, persist processing jobs and review state centrally, and retain IndexedDB only for draft recovery and weak-network retry.
 
 ## Data Boundary
 
@@ -54,3 +58,5 @@ Training-ready data requires a valid image hash, acceptable image quality, revie
 ## Real Acceptance Gate
 
 The next evidence milestone is one known KM4/F151 bare mainboard photographed on both sides. That sample must be used to recheck registration quality, visible component association, and annotation projection before any visual QC accuracy claim or model training begins.
+
+Synthetic point-map transforms and the 21 reviewed Service Manual images may be used before that gate as explicit proxy evidence. They cannot become Golden Samples or field-accuracy evidence.

@@ -10,6 +10,8 @@
 
 当前覆盖图片质量检查、四锚点配准、独立检查点、人工审核、矩形/多边形缺陷标注、编译器件 footprint 建议、IndexedDB 草稿，以及 `VISUAL-QC-CASE-V1` JSON 和标注预览图导出。数据边界和实物照片验收门禁见 `docs/visual-qc-workbench-2026-07-17.md`。
 
+当前页面是本地数据工作台基线，不是正式部署架构。已确认的目标是服务器主导的Web平台：主板照片上传现有受控服务器，OpenCV异步处理，自动失败回退人工四点配准，Golden Sample和候选审核集中保存，浏览器仅保留弱网草稿。权威设计见 `docs/superpowers/specs/2026-07-20-visual-qc-server-architecture-design.md`。
+
 ## 功能特性
 
 - 🤖 **AI 智能诊断**：通过大语言模型辅助分析主板故障
@@ -95,7 +97,8 @@ python ai_proxy_server.py
 ## 技术架构
 
 - **前端**：纯 HTML/CSS/JS 页面，核心数据拆分到 `data/` 目录
-- **后端**：Python HTTP Server 代理（端口 8899）
+- **当前后端**：Python HTTP Server 代理（端口 8899）
+- **目标后端**：同域FastAPI服务、持久化QC任务、受控图片存储和CPU OpenCV Worker
 - **AI 平台**：Anthropic Claude / DeepSeek
 - **通信协议**：SSE (Server-Sent Events) 流式传输
 
