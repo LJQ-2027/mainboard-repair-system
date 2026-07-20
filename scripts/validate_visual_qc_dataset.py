@@ -137,12 +137,18 @@ def _board_contract(root, visual_case, errors):
 def validate_visual_qc_case(visual_case, root, training_ready=False):
     root = Path(root).resolve()
     errors = []
-    if visual_case.get("schema_version") != "VISUAL-QC-CASE-V1":
-        errors.append("schema_version must be VISUAL-QC-CASE-V1")
+    schema_version = visual_case.get("schema_version")
+    if schema_version not in {"VISUAL-QC-CASE-V1", "VISUAL-QC-CASE-V2"}:
+        errors.append("schema_version must be VISUAL-QC-CASE-V1 or VISUAL-QC-CASE-V2")
     if not isinstance(visual_case.get("case_id"), str) or not visual_case["case_id"].strip():
         errors.append("case_id is required")
-    if visual_case.get("storage_scope") != "local_only":
-        errors.append("storage_scope must remain local_only")
+    expected_storage_scopes = (
+        {"local_only"}
+        if schema_version == "VISUAL-QC-CASE-V1"
+        else {"local_only", "server_authoritative_with_local_draft"}
+    )
+    if visual_case.get("storage_scope") not in expected_storage_scopes:
+        errors.append("storage_scope is unsupported for this schema version")
     if visual_case.get("capture_stage") not in CAPTURE_STAGES:
         errors.append("capture_stage is unsupported")
     dataset, _, board_entry = _board_contract(root, visual_case, errors)
@@ -166,7 +172,16 @@ def validate_visual_qc_case(visual_case, root, training_ready=False):
         errors.append("quality score must be between 0 and 100")
 
     registration = visual_case.get("registration", {})
-    if registration.get("method") != "reviewed_manual_homography":
+    supported_registration_methods = (
+        {"reviewed_manual_homography"}
+        if schema_version == "VISUAL-QC-CASE-V1"
+        else {
+            "reviewed_manual_homography",
+            "reviewed_manual_four_point",
+            "automatic_feature_homography",
+        }
+    )
+    if registration.get("method") not in supported_registration_methods:
         errors.append("registration method is unsupported")
     if registration.get("status") not in {"draft", "reviewed"}:
         errors.append("registration status is unsupported")
@@ -192,10 +207,16 @@ def validate_visual_qc_case(visual_case, root, training_ready=False):
         for check in checks
     ):
         errors.append("registration check_points must use normalized pairs")
-    if registration.get("status") == "reviewed" and (
-        matrix is None or len(anchors) != 4 or not checks
-    ):
-        errors.append("reviewed registration requires a matrix, four anchors, and check points")
+    if registration.get("status") == "reviewed":
+        if matrix is None:
+            errors.append("reviewed registration requires a matrix")
+        elif registration.get("method") == "automatic_feature_homography":
+            if not registration.get("server_review_id"):
+                errors.append("reviewed automatic registration requires a server review id")
+        elif len(anchors) != 4 or not checks:
+            errors.append(
+                "reviewed manual registration requires a matrix, four anchors, and check points"
+            )
     matrix_valid = (
         isinstance(matrix, list)
         and len(matrix) == 9

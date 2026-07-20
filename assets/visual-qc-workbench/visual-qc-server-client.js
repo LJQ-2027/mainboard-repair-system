@@ -128,12 +128,21 @@ export function uploadVisualQcCase({
   });
 }
 
-async function jsonRequest(url, { actorId, method = 'GET', body = null } = {}) {
+async function jsonRequest(
+  url,
+  {
+    actorId,
+    actorRole = null,
+    method = 'GET',
+    body = null,
+  } = {},
+) {
   const response = await fetch(url, {
     method,
     cache: 'no-store',
     headers: {
       'X-Actor-Id': actorId,
+      ...(actorRole ? { 'X-Actor-Role': actorRole } : {}),
       ...(body ? { 'Content-Type': 'application/json' } : {}),
     },
     body: body ? JSON.stringify(body) : null,
@@ -191,6 +200,7 @@ export function applyServerJobResult(visualCase, acceptedCase, jobSnapshot) {
   const registration = result.registration;
   const next = clone(visualCase);
   const baseSync = next.server_sync || createServerSyncState(next);
+  next.schema_version = 'VISUAL-QC-CASE-V2';
   next.storage_scope = 'server_authoritative_with_local_draft';
   next.quality = clone(result.quality);
   next.server_sync = {
@@ -267,4 +277,191 @@ export function reviewVisualQcRegistration({
     `${apiBase.replace(/\/$/, '')}/cases/${encodeURIComponent(serverCaseId)}/registration-reviews`,
     { actorId, method: 'POST', body },
   );
+}
+
+function normalizedCaptureSetupId(value) {
+  const captureSetupId = String(value || '').trim();
+  if (!captureSetupId || captureSetupId.length > 128) {
+    throw new Error('Capture setup id is required and must not exceed 128 characters.');
+  }
+  return captureSetupId;
+}
+
+export function createGoldenSampleDescriptor(visualCase, captureSetupId, confirmedNormal) {
+  if (!visualCase?.server_sync?.server_case_id && !visualCase?.case_id) {
+    throw new Error('A server case is required for Golden Sample approval.');
+  }
+  if (!confirmedNormal) {
+    throw new Error('Golden Sample approval requires an explicit normal-board confirmation.');
+  }
+  return {
+    case_id: visualCase.server_sync?.server_case_id || visualCase.case_id,
+    capture_setup_id: normalizedCaptureSetupId(captureSetupId),
+    confirmed_normal: true,
+  };
+}
+
+export function approveGoldenSample({
+  apiBase,
+  actorId,
+  actorRole,
+  visualCase,
+  captureSetupId,
+  confirmedNormal,
+}) {
+  return jsonRequest(
+    `${apiBase.replace(/\/$/, '')}/golden-samples`,
+    {
+      actorId,
+      actorRole,
+      method: 'POST',
+      body: createGoldenSampleDescriptor(visualCase, captureSetupId, confirmedNormal),
+    },
+  );
+}
+
+export function getActiveGoldenSample(
+  apiBase,
+  actorId,
+  { boardKey, sideId, captureSetupId },
+) {
+  const query = new URLSearchParams({
+    board_key: boardKey,
+    side_id: sideId,
+    capture_setup_id: normalizedCaptureSetupId(captureSetupId),
+    allow_missing: 'true',
+  });
+  return jsonRequest(
+    `${apiBase.replace(/\/$/, '')}/golden-samples/active?${query}`,
+    { actorId },
+  );
+}
+
+export function createDifferenceJobDescriptor(captureSetupId) {
+  return { capture_setup_id: normalizedCaptureSetupId(captureSetupId) };
+}
+
+export function createDifferenceJob({
+  apiBase,
+  actorId,
+  serverCaseId,
+  captureSetupId,
+}) {
+  return jsonRequest(
+    `${apiBase.replace(/\/$/, '')}/cases/${encodeURIComponent(serverCaseId)}/difference-jobs`,
+    {
+      actorId,
+      method: 'POST',
+      body: createDifferenceJobDescriptor(captureSetupId),
+    },
+  );
+}
+
+export function reviewDifferenceCandidate({
+  apiBase,
+  actorId,
+  jobId,
+  candidateId,
+  decision,
+  defectCategory = null,
+  notes = '',
+}) {
+  return jsonRequest(
+    `${apiBase.replace(/\/$/, '')}/jobs/${encodeURIComponent(jobId)}/candidate-reviews`,
+    {
+      actorId,
+      method: 'POST',
+      body: {
+        candidate_id: candidateId,
+        decision,
+        defect_category: decision === 'confirmed' ? defectCategory : null,
+        notes,
+      },
+    },
+  );
+}
+
+export async function getVisualQcArtifact(apiBase, actorId, artifactId) {
+  const response = await fetch(
+    `${apiBase.replace(/\/$/, '')}/artifacts/${encodeURIComponent(artifactId)}`,
+    {
+      cache: 'no-store',
+      headers: { 'X-Actor-Id': actorId },
+    },
+  );
+  if (!response.ok) {
+    const payload = await response.json().catch(() => null);
+    const error = new Error(
+      payload?.detail?.message || payload?.detail || `Server returned ${response.status}.`,
+    );
+    error.status = response.status;
+    error.code = payload?.detail?.code || 'server_request_failed';
+    throw error;
+  }
+  return response.blob();
+}
+
+export function applyGoldenSample(visualCase, goldenSample) {
+  const next = clone(visualCase);
+  next.visual_comparison = {
+    ...(next.visual_comparison || {}),
+    capture_setup_id: goldenSample.capture_setup_id,
+    golden_sample: clone(goldenSample),
+    difference: next.visual_comparison?.difference || null,
+  };
+  return next;
+}
+
+export function applyDifferenceJobResult(visualCase, jobSnapshot) {
+  if (jobSnapshot?.status !== 'succeeded'
+    || jobSnapshot.result?.schema_version !== 'VISUAL-QC-DIFFERENCE-CANDIDATES-V1') {
+    throw new Error('A succeeded visual-QC difference job is required.');
+  }
+  const next = clone(visualCase);
+  next.visual_comparison = {
+    ...(next.visual_comparison || {}),
+    difference: {
+      job_id: jobSnapshot.job_id,
+      status: jobSnapshot.result.status,
+      source: 'model_candidate',
+      requires_human_review: true,
+      evidence: clone(jobSnapshot.result.evidence || {}),
+      heatmap: clone(jobSnapshot.result.heatmap || null),
+      candidates: clone(jobSnapshot.result.candidates || []),
+      updated_at: new Date().toISOString(),
+    },
+  };
+  next.qc_result = {
+    status: 'needs_review',
+    reviewed_at: null,
+  };
+  return next;
+}
+
+export function applyCandidateReview(visualCase, review) {
+  const next = clone(visualCase);
+  const candidates = next.visual_comparison?.difference?.candidates;
+  if (!Array.isArray(candidates)) throw new Error('Difference candidates are unavailable.');
+  const candidate = candidates.find((item) => item.candidate_id === review.candidate_id);
+  if (!candidate) throw new Error('Difference candidate was not found.');
+  candidate.review_status = review.decision;
+  candidate.human_review = clone(review);
+  next.visual_comparison.difference.updated_at = new Date().toISOString();
+  if (candidates.some((item) => item.review_status === 'confirmed')) {
+    next.qc_result = {
+      status: 'confirmed_anomaly',
+      reviewed_at: review.created_at || new Date().toISOString(),
+    };
+  } else if (candidates.length && candidates.every((item) => item.review_status === 'rejected')) {
+    next.qc_result = {
+      status: 'no_visible_anomaly',
+      reviewed_at: review.created_at || new Date().toISOString(),
+    };
+  } else {
+    next.qc_result = {
+      status: 'needs_review',
+      reviewed_at: null,
+    };
+  }
+  return next;
 }

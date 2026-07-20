@@ -177,8 +177,10 @@ The first four delivery items now have a local server implementation:
 - technician confirm/reject decisions are stored separately, and only a confirmed region receives `human_annotation`.
 - the browser workbench now persists weak-network drafts, uploads with a stable idempotency key and byte progress, polls or retries jobs, restores interrupted synchronization after refresh, and keeps every automatic transform in draft until a person confirms it;
 - automatic failure returns the operator to the existing four-point registration workflow, whose review is then persisted by the server.
+- reviewer-gated Golden Sample approval, active-version lookup, difference heatmaps, and per-candidate confirm/reject/defer decisions are available in the same workbench;
+- server-connected browser cases use `VISUAL-QC-CASE-V2`, while the local-only V1 contract retains its original meaning.
 
-This progress does not imply production deployment. The controlled gateway/Nginx route, production authentication assertion, retention operations, browser Golden/difference review surfaces, and physical bare-board acceptance remain open.
+This progress does not imply production deployment. The controlled gateway/Nginx route, production authentication assertion, retention operations, and physical bare-board acceptance remain open.
 
 ## Acceptance Boundary
 

@@ -2,7 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+  applyCandidateReview,
+  applyDifferenceJobResult,
+  applyGoldenSample,
   applyServerJobResult,
+  createDifferenceJobDescriptor,
+  createGoldenSampleDescriptor,
   createRegistrationReviewDescriptor,
   createServerSyncState,
   createUploadDescriptor,
@@ -99,6 +104,7 @@ test('automatic result remains a draft candidate until server review succeeds', 
 
   const updated = applyServerJobResult(visualCase(), accepted, job);
 
+  assert.equal(updated.schema_version, 'VISUAL-QC-CASE-V2');
   assert.equal(updated.storage_scope, 'server_authoritative_with_local_draft');
   assert.equal(updated.server_sync.status, 'candidate_ready');
   assert.equal(updated.registration.method, 'automatic_feature_homography');
@@ -181,4 +187,95 @@ test('registration review descriptor keeps automatic and manual evidence distinc
   assert.equal(manual.decision, 'accept_manual');
   assert.deepEqual(manual.anchors[2], { board: [1, 1], image: [1, 1] });
   assert.equal(manual.board_to_image_matrix.length, 9);
+});
+
+test('Golden approval descriptor requires an explicit normal-board confirmation', () => {
+  assert.throws(
+    () => createGoldenSampleDescriptor(visualCase(), 'bench-a', false),
+    /explicit normal-board confirmation/i,
+  );
+
+  const descriptor = createGoldenSampleDescriptor(visualCase(), 'bench-a', true);
+
+  assert.deepEqual(descriptor, {
+    case_id: 'case-001',
+    capture_setup_id: 'bench-a',
+    confirmed_normal: true,
+  });
+});
+
+test('Golden state preserves the active version and capture setup', () => {
+  const updated = applyGoldenSample(visualCase(), {
+    golden_sample_id: 'gold-002',
+    capture_setup_id: 'bench-a',
+    status: 'active',
+    version: 2,
+    source_sha256: 'b'.repeat(64),
+  });
+
+  assert.equal(updated.visual_comparison.capture_setup_id, 'bench-a');
+  assert.equal(updated.visual_comparison.golden_sample.version, 2);
+  assert.equal(updated.visual_comparison.golden_sample.status, 'active');
+});
+
+test('difference result remains a review queue and never confirms a defect', () => {
+  const descriptor = createDifferenceJobDescriptor('bench-a');
+  assert.deepEqual(descriptor, { capture_setup_id: 'bench-a' });
+
+  const updated = applyDifferenceJobResult(visualCase(), {
+    job_id: 'job-difference',
+    status: 'succeeded',
+    result: {
+      schema_version: 'VISUAL-QC-DIFFERENCE-CANDIDATES-V1',
+      status: 'candidate_review_required',
+      source: 'model_candidate',
+      requires_human_review: true,
+      heatmap: { artifact_id: 'artifact-001', mime_type: 'image/png' },
+      candidates: [{
+        candidate_id: 'candidate_001',
+        source: 'model_candidate',
+        review_status: 'pending',
+        board_bbox: [0.2, 0.3, 0.4, 0.5],
+        area_fraction: 0.04,
+        mean_difference: 52,
+        maximum_difference: 180,
+      }],
+    },
+  });
+
+  assert.equal(updated.visual_comparison.difference.status, 'candidate_review_required');
+  assert.equal(updated.visual_comparison.difference.candidates[0].review_status, 'pending');
+  assert.equal(updated.visual_comparison.difference.candidates[0].source, 'model_candidate');
+  assert.equal(updated.qc_result.status, 'needs_review');
+});
+
+test('candidate review records human decision without overwriting model evidence', () => {
+  const withDifference = applyDifferenceJobResult(visualCase(), {
+    job_id: 'job-difference',
+    status: 'succeeded',
+    result: {
+      schema_version: 'VISUAL-QC-DIFFERENCE-CANDIDATES-V1',
+      status: 'candidate_review_required',
+      candidates: [{
+        candidate_id: 'candidate_001',
+        source: 'model_candidate',
+        review_status: 'pending',
+        board_bbox: [0.2, 0.3, 0.4, 0.5],
+      }],
+      heatmap: { artifact_id: 'artifact-001' },
+    },
+  });
+  const reviewed = applyCandidateReview(withDifference, {
+    candidate_review_id: 'review-001',
+    candidate_id: 'candidate_001',
+    decision: 'confirmed',
+    defect_category: 'burn_or_thermal_damage',
+    label_source: 'human_annotation',
+  });
+
+  const candidate = reviewed.visual_comparison.difference.candidates[0];
+  assert.equal(candidate.source, 'model_candidate');
+  assert.equal(candidate.review_status, 'confirmed');
+  assert.equal(candidate.human_review.label_source, 'human_annotation');
+  assert.equal(reviewed.qc_result.status, 'confirmed_anomaly');
 });

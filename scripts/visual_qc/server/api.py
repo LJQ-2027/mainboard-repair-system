@@ -200,6 +200,7 @@ def create_app(settings: VisualQcServerSettings | None = None) -> FastAPI:
         board_key: str,
         side_id: str,
         capture_setup_id: str,
+        allow_missing: bool = False,
         x_actor_id: str | None = Header(None, alias="X-Actor-Id"),
     ):
         actor_id(x_actor_id)
@@ -210,6 +211,14 @@ def create_app(settings: VisualQcServerSettings | None = None) -> FastAPI:
                 capture_setup_id,
             )
         except VisualQcServiceError as exc:
+            if allow_missing and exc.code == "golden_sample_not_found":
+                return {
+                    "schema_version": "VISUAL-QC-GOLDEN-LOOKUP-V1",
+                    "status": "missing",
+                    "board_key": board_key,
+                    "side_id": side_id,
+                    "capture_setup_id": capture_setup_id,
+                }
             service_error(exc)
 
     @app.post(

@@ -154,6 +154,41 @@
           </div>
         </section>
 
+        <section id="comparisonSection" class="panel-section comparison-section">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">基准与差异</span>
+              <h2 id="comparisonTitle">等待已审核案例</h2>
+            </div>
+            <span id="comparisonBadge" class="badge neutral">未就绪</span>
+          </div>
+          <label class="full-field">
+            <span>拍摄工位</span>
+            <input id="captureSetupId" type="text" value="standard-bench" maxlength="128">
+          </label>
+          <p id="goldenSummary" class="source-note">选择固定拍摄工位后查询正常板基准。</p>
+          <label id="normalConfirmationField" class="check-field" hidden>
+            <input id="normalConfirmation" type="checkbox">
+            <span>已确认这是正常板</span>
+          </label>
+          <div class="button-row comparison-actions">
+            <button id="refreshGoldenButton" class="secondary-button" type="button" disabled>查询基准</button>
+            <button id="approveGoldenButton" class="primary-button" type="button" hidden disabled>批准为 Golden</button>
+            <button id="runDifferenceButton" class="primary-button" type="button" disabled>生成差异候选</button>
+          </div>
+          <figure id="heatmapFigure" class="heatmap-figure" hidden>
+            <figcaption>
+              <strong>差异热图</strong>
+              <span id="heatmapMeta">等待结果</span>
+            </figcaption>
+            <div class="heatmap-stage">
+              <img id="heatmapImage" alt="Golden Sample 差异候选热图">
+              <div id="heatmapOverlay" aria-hidden="true"></div>
+            </div>
+          </figure>
+          <div id="candidateList" class="candidate-list"></div>
+        </section>
+
         <section id="annotationSection" class="panel-section" hidden>
           <div class="section-heading">
             <div>

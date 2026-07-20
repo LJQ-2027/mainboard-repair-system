@@ -1,0 +1,182 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "VISUAL-QC-CASE-V2",
+  "title": "Server-connected Mainboard Visual QC Case",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "case_id",
+    "board_key",
+    "board_id",
+    "side_id",
+    "storage_scope",
+    "capture_stage",
+    "image",
+    "quality",
+    "registration",
+    "annotations",
+    "qc_result",
+    "server_sync"
+  ],
+  "properties": {
+    "schema_version": { "const": "VISUAL-QC-CASE-V2" },
+    "case_id": { "type": "string", "minLength": 1 },
+    "board_key": { "type": "string", "minLength": 1 },
+    "board_id": { "type": "string", "minLength": 1 },
+    "side_id": { "type": "string", "minLength": 1 },
+    "storage_scope": {
+      "enum": ["local_only", "server_authoritative_with_local_draft"]
+    },
+    "capture_stage": {
+      "enum": ["golden_reference", "before_repair", "after_repair"]
+    },
+    "image": {
+      "type": "object",
+      "required": ["file_name", "mime_type", "width", "height", "sha256", "evidence_role"],
+      "properties": {
+        "file_name": { "type": "string", "minLength": 1 },
+        "mime_type": { "enum": ["image/jpeg", "image/png", "image/webp"] },
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "evidence_role": { "enum": ["physical_capture", "proxy_sample"] }
+      }
+    },
+    "quality": {
+      "type": "object",
+      "required": ["status", "score", "metrics"],
+      "properties": {
+        "status": { "enum": ["good", "usable", "retake"] },
+        "score": { "type": "number", "minimum": 0, "maximum": 100 },
+        "metrics": { "type": "object" }
+      }
+    },
+    "registration": {
+      "type": "object",
+      "required": [
+        "method",
+        "status",
+        "matrix",
+        "solve_anchors",
+        "check_points",
+        "error"
+      ],
+      "properties": {
+        "method": {
+          "enum": [
+            "reviewed_manual_homography",
+            "reviewed_manual_four_point",
+            "automatic_feature_homography"
+          ]
+        },
+        "status": { "enum": ["draft", "reviewed"] },
+        "matrix": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "array",
+              "minItems": 9,
+              "maxItems": 9,
+              "items": { "type": "number" }
+            }
+          ]
+        },
+        "solve_anchors": {
+          "type": "array",
+          "maxItems": 4,
+          "items": { "$ref": "#/$defs/pointPair" }
+        },
+        "check_points": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/pointPair" }
+        },
+        "error": { "type": "object" },
+        "server_review_id": { "type": "string" },
+        "server_candidate": { "type": "object" },
+        "fallback_reason": { "type": "string" },
+        "reviewed_at": { "type": ["string", "null"] }
+      }
+    },
+    "annotations": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "qc_result": {
+      "type": "object",
+      "required": ["status", "reviewed_at"],
+      "properties": {
+        "status": {
+          "enum": [
+            "image_invalid",
+            "needs_review",
+            "no_visible_anomaly",
+            "confirmed_anomaly"
+          ]
+        },
+        "reviewed_at": { "type": ["string", "null"] }
+      }
+    },
+    "server_sync": {
+      "type": "object",
+      "required": ["schema_version", "status", "idempotency_key"],
+      "properties": {
+        "schema_version": { "const": "VISUAL-QC-SERVER-SYNC-V1" },
+        "status": {
+          "enum": [
+            "local_draft",
+            "uploading",
+            "upload_failed",
+            "queued",
+            "running",
+            "succeeded",
+            "candidate_ready",
+            "manual_required",
+            "sync_interrupted",
+            "failed",
+            "reviewed"
+          ]
+        },
+        "idempotency_key": { "type": "string", "minLength": 1 },
+        "attempt_count": { "type": "integer", "minimum": 0 },
+        "progress": { "type": "number", "minimum": 0, "maximum": 1 },
+        "server_case_id": { "type": ["string", "null"] },
+        "server_image_id": { "type": ["string", "null"] },
+        "job_id": { "type": ["string", "null"] },
+        "job_status": { "type": ["string", "null"] },
+        "last_error": { "type": ["string", "null"] },
+        "updated_at": { "type": "string" }
+      }
+    },
+    "visual_comparison": {
+      "type": "object",
+      "required": ["capture_setup_id"],
+      "properties": {
+        "capture_setup_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "golden_sample": { "type": ["object", "null"] },
+        "difference": { "type": ["object", "null"] },
+        "golden_lookup_status": { "type": "string" }
+      }
+    }
+  },
+  "$defs": {
+    "point": {
+      "type": "object",
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "number", "minimum": 0, "maximum": 1 },
+        "y": { "type": "number", "minimum": 0, "maximum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "pointPair": {
+      "type": "object",
+      "required": ["board", "image"],
+      "properties": {
+        "board": { "$ref": "#/$defs/point" },
+        "image": { "$ref": "#/$defs/point" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

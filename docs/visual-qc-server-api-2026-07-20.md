@@ -96,6 +96,8 @@ Automatic registration review adopts the exact candidate matrix. Manual review r
 
 Golden approval additionally requires the gateway-asserted `reviewer` role, `physical_capture` evidence, `golden_reference` capture stage, acceptable image quality, reviewed registration, explicit normal-board confirmation, and an immutable source hash. Golden scope is board, side, and capture setup. Activating a replacement increments the version and retires rather than rewrites the previous record.
 
+The browser uses `allow_missing=true` when looking up an active Golden. That optional lookup returns a typed `VISUAL-QC-GOLDEN-LOOKUP-V1` `missing` result instead of turning a normal empty state into an HTTP error. Strict callers that omit the flag retain the original `404 golden_sample_not_found` behavior.
+
 Difference jobs require reviewed current registration and an active Golden in the same scope. They align both images to the board coordinate plane, normalize broad luminance variation, and persist a controlled PNG heatmap plus normalized candidate boxes. These technical thresholds propose review regions; they are not industrial defect-acceptance thresholds.
 
 Every region begins as `model_candidate`. A technician may mark it `confirmed`, `rejected`, or `needs_review`. Only `confirmed` plus a supported human defect category becomes `human_annotation`; model output never becomes a repair instruction.
@@ -127,11 +129,13 @@ Implemented:
 - stable browser idempotency keys across retry and refresh;
 - byte-level upload progress, job polling, failed-job retry, and interrupted polling recovery;
 - automatic candidate overlay with explicit human confirmation;
-- safe return to the existing four-point workflow when automatic registration is unavailable.
+- safe return to the existing four-point workflow when automatic registration is unavailable;
+- reviewer-gated Golden Sample approval and active-version lookup in the workbench;
+- difference heatmap retrieval plus per-candidate confirm, reject, and needs-review decisions;
+- versioned `VISUAL-QC-CASE-V2` browser drafts for server synchronization and comparison state.
 
 Still open:
 
 - production authentication and Nginx deployment verification;
 - operational retention cleanup and disk-pressure monitoring;
-- browser surfaces for Golden Sample approval and difference-candidate review;
 - physical bare-board acceptance.

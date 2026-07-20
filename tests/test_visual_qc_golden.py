@@ -162,6 +162,22 @@ class VisualQcGoldenSampleTests(unittest.TestCase):
         self.assertEqual(active.status_code, 200)
         self.assertEqual(active.json()["golden_sample_id"], replacement.json()["golden_sample_id"])
 
+    def test_optional_golden_lookup_returns_a_clean_missing_state(self):
+        response = self.client.get(
+            "/api/v1/visual-qc/golden-samples/active",
+            params={
+                "board_key": "km4-f151",
+                "side_id": "main_page_2",
+                "capture_setup_id": "bench-without-golden",
+                "allow_missing": "true",
+            },
+            headers={"X-Actor-Id": "technician-001"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["schema_version"], "VISUAL-QC-GOLDEN-LOOKUP-V1")
+        self.assertEqual(response.json()["status"], "missing")
+
     def test_proxy_and_unreviewed_cases_cannot_become_golden_samples(self):
         proxy_case = self.create_processed_case(
             idempotency_key="proxy-001",

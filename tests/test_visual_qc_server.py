@@ -1,8 +1,9 @@
 import hashlib
-import shutil
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
 
 import cv2
 import numpy as np
@@ -307,11 +308,19 @@ class VisualQcServerQualityTests(unittest.TestCase):
             root = Path(temp_dir)
             storage = LocalObjectStorage(
                 root,
-                minimum_free_bytes=shutil.disk_usage(root).free,
+                minimum_free_bytes=100,
             )
 
-            with self.assertRaises(StorageError) as raised:
-                storage.put_artifact(b"artifact", hashlib.sha256(b"artifact").hexdigest(), ".png")
+            with patch(
+                "scripts.visual_qc.server.storage.shutil.disk_usage",
+                return_value=SimpleNamespace(free=100),
+            ):
+                with self.assertRaises(StorageError) as raised:
+                    storage.put_artifact(
+                        b"artifact",
+                        hashlib.sha256(b"artifact").hexdigest(),
+                        ".png",
+                    )
 
         self.assertEqual(raised.exception.code, "insufficient_storage")
 

@@ -36,10 +36,18 @@ import {
   saveVisualQcCase,
 } from './visual-qc-storage.js';
 import {
+  applyCandidateReview,
+  applyDifferenceJobResult,
+  applyGoldenSample,
   applyServerJobResult,
+  approveGoldenSample,
+  createDifferenceJob,
   createServerSyncState,
+  getActiveGoldenSample,
+  getVisualQcArtifact,
   getVisualQcJob,
   pollVisualQcJob,
+  reviewDifferenceCandidate,
   retryVisualQcJob,
   reviewVisualQcRegistration,
   transitionServerSync,
@@ -49,7 +57,12 @@ import {
 const CATALOG_URL = '../../knowledge-base/repair-workbench-boards.json';
 const QUERY = new URLSearchParams(window.location.search);
 const VISUAL_QC_API = QUERY.get('qcApi') || '../../api/v1/visual-qc';
-const VISUAL_QC_ACTOR_ID = globalThis.VISUAL_QC_ACTOR_ID || 'local-technician';
+const VISUAL_QC_ACTOR_ID = QUERY.get('qcActor')
+  || globalThis.VISUAL_QC_ACTOR_ID
+  || 'local-technician';
+const VISUAL_QC_ACTOR_ROLE = QUERY.get('qcRole')
+  || globalThis.VISUAL_QC_ACTOR_ROLE
+  || 'technician';
 const ANALYSIS_MAX_EDGE = 720;
 const CATEGORY_LABELS = {
   burn_or_heat_damage: '烧焦或热损伤',
@@ -67,6 +80,17 @@ const QC_LABELS = {
   needs_review: '待人工审核',
   no_visible_anomaly: '未见可见异常',
   confirmed_anomaly: '已确认可见异常',
+};
+const SERVER_CATEGORY_LABELS = {
+  burn_or_thermal_damage: '烧焦或热损伤',
+  corrosion_or_oxidation: '腐蚀或氧化',
+  missing_component: '元器件缺失',
+  displaced_component: '元器件移位',
+  connector_damage: '连接器损伤',
+  shield_or_structural_damage: '屏蔽罩或结构破损',
+  solder_appearance_anomaly: '焊接外观异常',
+  foreign_material_or_contamination: '异物或污染',
+  unclassified_visible_anomaly: '未分类可见异常',
 };
 
 const byId = (id) => document.getElementById(id);
@@ -120,6 +144,21 @@ const elements = {
   removeLastPairButton: byId('removeLastPairButton'),
   clearRegistrationButton: byId('clearRegistrationButton'),
   reviewRegistrationButton: byId('reviewRegistrationButton'),
+  comparisonSection: byId('comparisonSection'),
+  comparisonTitle: byId('comparisonTitle'),
+  comparisonBadge: byId('comparisonBadge'),
+  captureSetupId: byId('captureSetupId'),
+  goldenSummary: byId('goldenSummary'),
+  normalConfirmationField: byId('normalConfirmationField'),
+  normalConfirmation: byId('normalConfirmation'),
+  refreshGoldenButton: byId('refreshGoldenButton'),
+  approveGoldenButton: byId('approveGoldenButton'),
+  runDifferenceButton: byId('runDifferenceButton'),
+  heatmapFigure: byId('heatmapFigure'),
+  heatmapImage: byId('heatmapImage'),
+  heatmapMeta: byId('heatmapMeta'),
+  heatmapOverlay: byId('heatmapOverlay'),
+  candidateList: byId('candidateList'),
   annotationSection: byId('annotationSection'),
   annotationCount: byId('annotationCount'),
   defectCategory: byId('defectCategory'),
@@ -167,6 +206,10 @@ const state = {
   awaitingImportedImage: false,
   loadRevision: 0,
   serverBusy: false,
+  comparisonBusy: false,
+  heatmapUrl: null,
+  heatmapArtifactId: null,
+  heatmapLoadingArtifactId: null,
 };
 
 const QUALITY_GUIDANCE_COPY = Object.freeze({
@@ -187,6 +230,18 @@ function reportUserError(error) {
   elements.interactionPrompt.textContent = error instanceof Error
     ? error.message
     : '操作失败，请重试。';
+}
+
+function captureSetupId() {
+  return elements.captureSetupId.value.trim() || 'standard-bench';
+}
+
+function clearHeatmap() {
+  if (state.heatmapUrl) URL.revokeObjectURL(state.heatmapUrl);
+  state.heatmapUrl = null;
+  state.heatmapArtifactId = null;
+  state.heatmapLoadingArtifactId = null;
+  elements.heatmapImage.removeAttribute('src');
 }
 
 async function fetchJson(url) {
@@ -363,6 +418,7 @@ function renderSideSelector() {
 function resetVisualCase() {
   clearTimeout(state.saveTimer);
   state.saveTimer = null;
+  clearHeatmap();
   state.photoImage = null;
   state.photoBlob = null;
   state.isProxy = false;
@@ -478,6 +534,176 @@ async function pollCurrentServerJob(acceptedCase) {
     : '自动配准未通过，请使用四组锚点完成配准';
 }
 
+async function ensureDifferenceHeatmap() {
+  const artifactId = currentCase()?.visual_comparison?.difference?.heatmap?.artifact_id;
+  if (!artifactId
+    || artifactId === state.heatmapArtifactId
+    || artifactId === state.heatmapLoadingArtifactId) return;
+  state.heatmapLoadingArtifactId = artifactId;
+  try {
+    const blob = await getVisualQcArtifact(VISUAL_QC_API, VISUAL_QC_ACTOR_ID, artifactId);
+    if (currentCase()?.visual_comparison?.difference?.heatmap?.artifact_id !== artifactId) return;
+    clearHeatmap();
+    state.heatmapUrl = URL.createObjectURL(blob);
+    state.heatmapArtifactId = artifactId;
+    elements.heatmapImage.src = state.heatmapUrl;
+  } catch (error) {
+    reportUserError(error);
+  } finally {
+    if (state.heatmapLoadingArtifactId === artifactId) {
+      state.heatmapLoadingArtifactId = null;
+    }
+  }
+}
+
+function updateComparisonDraft(patch, persist = true) {
+  const visualCase = currentCase();
+  if (!visualCase) return;
+  const next = structuredClone(visualCase);
+  next.visual_comparison = {
+    capture_setup_id: captureSetupId(),
+    golden_sample: null,
+    difference: null,
+    ...(next.visual_comparison || {}),
+    ...patch,
+  };
+  replaceCurrentCase(next, persist);
+}
+
+async function refreshCurrentGoldenSample({ quietMissing = false } = {}) {
+  const visualCase = currentCase();
+  if (!visualCase || state.comparisonBusy) return;
+  state.comparisonBusy = true;
+  render();
+  try {
+    const golden = await getActiveGoldenSample(
+      VISUAL_QC_API,
+      VISUAL_QC_ACTOR_ID,
+      {
+        boardKey: visualCase.board_key,
+        sideId: visualCase.side_id,
+        captureSetupId: captureSetupId(),
+      },
+    );
+    if (golden.status === 'missing') {
+      updateComparisonDraft({
+        capture_setup_id: captureSetupId(),
+        golden_sample: null,
+        golden_lookup_status: 'missing',
+      });
+      if (!quietMissing) elements.interactionPrompt.textContent = '当前拍摄工位还没有 Golden Sample';
+    } else {
+      replaceCurrentCase(applyGoldenSample(currentCase(), golden), true);
+    }
+  } catch (error) {
+    reportUserError(error);
+  } finally {
+    state.comparisonBusy = false;
+    render();
+  }
+}
+
+async function approveCurrentGoldenSample() {
+  const visualCase = currentCase();
+  if (!visualCase || state.comparisonBusy) return;
+  state.comparisonBusy = true;
+  render();
+  try {
+    const golden = await approveGoldenSample({
+      apiBase: VISUAL_QC_API,
+      actorId: VISUAL_QC_ACTOR_ID,
+      actorRole: VISUAL_QC_ACTOR_ROLE,
+      visualCase,
+      captureSetupId: captureSetupId(),
+      confirmedNormal: elements.normalConfirmation.checked,
+    });
+    replaceCurrentCase(applyGoldenSample(currentCase(), golden), true);
+    elements.normalConfirmation.checked = false;
+    elements.interactionPrompt.textContent = `Golden Sample V${golden.version} 已生效`;
+  } catch (error) {
+    reportUserError(error);
+  } finally {
+    state.comparisonBusy = false;
+    render();
+  }
+}
+
+async function runDifferenceAnalysis() {
+  const visualCase = currentCase();
+  if (!visualCase?.server_sync?.server_case_id || state.comparisonBusy) return;
+  state.comparisonBusy = true;
+  clearHeatmap();
+  render();
+  try {
+    const queued = await createDifferenceJob({
+      apiBase: VISUAL_QC_API,
+      actorId: VISUAL_QC_ACTOR_ID,
+      serverCaseId: visualCase.server_sync.server_case_id,
+      captureSetupId: captureSetupId(),
+    });
+    updateComparisonDraft({
+      capture_setup_id: captureSetupId(),
+      difference: {
+        job_id: queued.job_id,
+        status: queued.status,
+        source: 'model_candidate',
+        candidates: [],
+        heatmap: null,
+      },
+    });
+    const terminal = await pollVisualQcJob({
+      jobId: queued.job_id,
+      getJob: (jobId) => getVisualQcJob(VISUAL_QC_API, VISUAL_QC_ACTOR_ID, jobId),
+      onSnapshot: (snapshot) => {
+        const current = currentCase();
+        if (!current) return;
+        updateComparisonDraft({
+          difference: {
+            ...(current.visual_comparison?.difference || {}),
+            job_id: snapshot.job_id,
+            status: snapshot.status,
+            last_error: snapshot.error?.message || null,
+          },
+        });
+      },
+    });
+    if (terminal.status === 'failed') {
+      throw new Error(terminal.error?.message || '差异分析失败。');
+    }
+    replaceCurrentCase(applyDifferenceJobResult(currentCase(), terminal), true);
+    await ensureDifferenceHeatmap();
+    elements.interactionPrompt.textContent = '差异候选已生成，请逐项确认、驳回或暂缓';
+  } catch (error) {
+    reportUserError(error);
+  } finally {
+    state.comparisonBusy = false;
+    render();
+  }
+}
+
+async function submitCandidateReview(candidate, decision, defectCategory) {
+  const difference = currentCase()?.visual_comparison?.difference;
+  if (!difference?.job_id || state.comparisonBusy) return;
+  state.comparisonBusy = true;
+  render();
+  try {
+    const review = await reviewDifferenceCandidate({
+      apiBase: VISUAL_QC_API,
+      actorId: VISUAL_QC_ACTOR_ID,
+      jobId: difference.job_id,
+      candidateId: candidate.candidate_id,
+      decision,
+      defectCategory,
+    });
+    replaceCurrentCase(applyCandidateReview(currentCase(), review), true);
+  } catch (error) {
+    reportUserError(error);
+  } finally {
+    state.comparisonBusy = false;
+    render();
+  }
+}
+
 async function syncCurrentCaseWithServer() {
   if (state.serverBusy) return;
   const visualCase = currentCase();
@@ -582,6 +808,7 @@ async function loadPhotoBlob(blob, fileName, isProxy = false) {
   }
 
   const quality = analyzeImageQuality(imagePixels(image));
+  clearHeatmap();
   const imageMetadata = caseImageMetadata(blob, image, fileName, isProxy);
   imageMetadata.sha256 = imageHash;
   const visualCase = createVisualQcCase({
@@ -598,6 +825,7 @@ async function loadPhotoBlob(blob, fileName, isProxy = false) {
       guidance: quality.guidance,
     },
   });
+  visualCase.schema_version = 'VISUAL-QC-CASE-V2';
   visualCase.server_sync = createServerSyncState(visualCase);
   if (quality.status === 'retake') {
     visualCase.qc_result = { status: 'image_invalid', reviewed_at: null };
@@ -743,6 +971,9 @@ async function confirmRegistration() {
     }
     commitCase(next);
     elements.interactionPrompt.textContent = '配准已人工确认，可以进入缺陷标注';
+    if (next.server_sync?.server_case_id) {
+      await refreshCurrentGoldenSample({ quietMissing: true });
+    }
   } catch (error) {
     reportUserError(error);
   } finally {
@@ -1212,6 +1443,154 @@ function renderRegistration() {
   elements.registrationTools.querySelector('[data-registration-tool="check"]').disabled = state.boardAnchors.length !== 4;
 }
 
+function renderComparison() {
+  const visualCase = currentCase();
+  const comparison = visualCase?.visual_comparison || {};
+  const golden = comparison.golden_sample;
+  const difference = comparison.difference;
+  const isGoldenCapture = visualCase?.capture_stage === 'golden_reference';
+  const serverReviewed = visualCase?.server_sync?.status === 'reviewed'
+    && visualCase?.registration?.status === 'reviewed';
+  const physicalCapture = visualCase?.image?.evidence_role === 'physical_capture';
+  const acceptableQuality = visualCase?.quality?.status !== 'retake';
+  if (comparison.capture_setup_id
+    && document.activeElement !== elements.captureSetupId) {
+    elements.captureSetupId.value = comparison.capture_setup_id;
+  }
+
+  elements.normalConfirmationField.hidden = !isGoldenCapture;
+  elements.approveGoldenButton.hidden = !isGoldenCapture;
+  elements.runDifferenceButton.hidden = isGoldenCapture;
+  elements.refreshGoldenButton.disabled = !visualCase || state.comparisonBusy;
+  elements.captureSetupId.disabled = !visualCase || state.comparisonBusy;
+
+  if (!visualCase) {
+    elements.comparisonTitle.textContent = '等待已审核案例';
+    elements.comparisonBadge.textContent = '未就绪';
+    elements.comparisonBadge.className = 'badge neutral';
+    elements.goldenSummary.textContent = '选择固定拍摄工位后查询正常板基准。';
+  } else if (isGoldenCapture) {
+    const eligible = serverReviewed && physicalCapture && acceptableQuality;
+    elements.comparisonTitle.textContent = golden
+      ? `Golden Sample V${golden.version}`
+      : eligible ? '可以提交正常板基准' : '尚不符合基准条件';
+    elements.comparisonBadge.textContent = golden ? '已生效' : eligible ? '待批准' : '未就绪';
+    elements.comparisonBadge.className = `badge ${golden ? 'reviewed' : eligible ? 'draft' : 'neutral'}`;
+    if (golden) {
+      elements.goldenSummary.textContent = `${golden.capture_setup_id} · ${golden.golden_sample_id}`;
+    } else if (!physicalCapture) {
+      elements.goldenSummary.textContent = '代理或合成图片不能成为 Golden Sample。';
+    } else if (!acceptableQuality) {
+      elements.goldenSummary.textContent = '图像质量为 retake，需重新拍摄。';
+    } else if (!serverReviewed) {
+      elements.goldenSummary.textContent = '需先完成服务器配准审核。';
+    } else if (VISUAL_QC_ACTOR_ROLE !== 'reviewer') {
+      elements.goldenSummary.textContent = '当前账号没有 Golden Sample 审核权限。';
+    } else {
+      elements.goldenSummary.textContent = `${captureSetupId()} · 等待正常板确认`;
+    }
+    elements.approveGoldenButton.disabled = !eligible
+      || VISUAL_QC_ACTOR_ROLE !== 'reviewer'
+      || !elements.normalConfirmation.checked
+      || state.comparisonBusy;
+  } else {
+    const candidateCount = difference?.candidates?.length || 0;
+    const pendingCount = (difference?.candidates || [])
+      .filter((candidate) => !['confirmed', 'rejected'].includes(candidate.review_status))
+      .length;
+    if (difference?.status === 'candidate_review_required') {
+      elements.comparisonTitle.textContent = `${candidateCount} 个差异候选`;
+      elements.comparisonBadge.textContent = pendingCount ? `${pendingCount} 待审` : '已审核';
+      elements.comparisonBadge.className = `badge ${pendingCount ? 'draft' : 'reviewed'}`;
+    } else if (['queued', 'running'].includes(difference?.status)) {
+      elements.comparisonTitle.textContent = '正在生成差异候选';
+      elements.comparisonBadge.textContent = difference.status === 'queued' ? '排队' : '处理中';
+      elements.comparisonBadge.className = 'badge running';
+    } else if (golden) {
+      elements.comparisonTitle.textContent = `使用 Golden V${golden.version}`;
+      elements.comparisonBadge.textContent = '有基准';
+      elements.comparisonBadge.className = 'badge reviewed';
+    } else {
+      elements.comparisonTitle.textContent = '当前工位没有 Golden';
+      elements.comparisonBadge.textContent = '无基准';
+      elements.comparisonBadge.className = 'badge neutral';
+    }
+    elements.goldenSummary.textContent = golden
+      ? `${golden.capture_setup_id} · V${golden.version} · ${golden.golden_sample_id}`
+      : `${captureSetupId()} · 尚未绑定正常板基准`;
+    elements.runDifferenceButton.disabled = !serverReviewed || !golden || state.comparisonBusy;
+  }
+
+  const artifactId = difference?.heatmap?.artifact_id;
+  elements.heatmapFigure.hidden = !artifactId;
+  elements.heatmapMeta.textContent = artifactId
+    ? `${difference.candidates?.length || 0} 个候选 · 需人工审核`
+    : '等待结果';
+  elements.heatmapOverlay.replaceChildren();
+  for (const [index, candidate] of (difference?.candidates || []).entries()) {
+    const [left, top, right, bottom] = candidate.board_bbox;
+    const marker = document.createElement('div');
+    marker.className = `heatmap-candidate ${candidate.review_status.replaceAll('_', '-')}`;
+    marker.style.left = `${left * 100}%`;
+    marker.style.top = `${top * 100}%`;
+    marker.style.width = `${(right - left) * 100}%`;
+    marker.style.height = `${(bottom - top) * 100}%`;
+    const label = document.createElement('span');
+    label.textContent = String(index + 1);
+    marker.append(label);
+    elements.heatmapOverlay.append(marker);
+  }
+  if (artifactId && state.heatmapArtifactId !== artifactId) {
+    void ensureDifferenceHeatmap();
+  }
+
+  elements.candidateList.replaceChildren();
+  for (const [index, candidate] of (difference?.candidates || []).entries()) {
+    const item = document.createElement('article');
+    item.className = 'candidate-item';
+    const header = document.createElement('header');
+    const identity = document.createElement('strong');
+    identity.textContent = `候选 ${index + 1}`;
+    const evidence = document.createElement('small');
+    evidence.textContent = `面积 ${(candidate.area_fraction * 100).toFixed(2)}% · 差异 ${Math.round(candidate.mean_difference || 0)}`;
+    header.append(identity, evidence);
+
+    const category = document.createElement('select');
+    category.setAttribute('aria-label', `候选 ${index + 1} 缺陷类别`);
+    for (const [value, labelText] of Object.entries(SERVER_CATEGORY_LABELS)) {
+      const option = document.createElement('option');
+      option.value = value;
+      option.textContent = labelText;
+      category.append(option);
+    }
+    category.value = candidate.human_review?.defect_category
+      || 'unclassified_visible_anomaly';
+
+    const actions = document.createElement('div');
+    actions.className = 'button-row';
+    for (const [decision, labelText] of [
+      ['confirmed', '确认异常'],
+      ['rejected', '驳回'],
+      ['needs_review', '暂缓'],
+    ]) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.textContent = labelText;
+      button.dataset.decision = decision;
+      button.setAttribute('aria-pressed', String(candidate.review_status === decision));
+      button.disabled = state.comparisonBusy;
+      button.addEventListener('click', () => submitCandidateReview(
+        candidate,
+        decision,
+        category.value,
+      ));
+      actions.append(button);
+    }
+    item.append(header, category, actions);
+    elements.candidateList.append(item);
+  }
+}
+
 function renderAnnotations() {
   const annotations = currentCase()?.annotations || [];
   elements.annotationCount.textContent = `${annotations.length} 项`;
@@ -1299,6 +1678,7 @@ function render() {
   renderServerSync();
   renderQuality();
   renderRegistration();
+  renderComparison();
   renderAnnotations();
   renderQcResult();
   renderInteractionPrompt();
@@ -1364,12 +1744,15 @@ async function importCase(file) {
   if (operationRevision !== state.loadRevision) {
     throw new Error('案例导入被新的主板切换中断。');
   }
-  if (visualCase.schema_version !== 'VISUAL-QC-CASE-V1') throw new Error('案例版本不受支持。');
+  if (!['VISUAL-QC-CASE-V1', 'VISUAL-QC-CASE-V2'].includes(visualCase.schema_version)) {
+    throw new Error('案例版本不受支持。');
+  }
   if (!state.catalog.boards[visualCase.board_key]) throw new Error('案例主板不在当前目录中。');
   elements.boardSelect.value = visualCase.board_key;
   const loaded = await loadBoard(visualCase.board_key, visualCase.side_id, false);
   if (!loaded) throw new Error('案例载入被新的主板切换中断。');
   elements.captureStage.value = visualCase.capture_stage;
+  clearHeatmap();
   state.history = createHistory(visualCase);
   state.photoImage = null;
   state.photoBlob = null;
@@ -1417,6 +1800,7 @@ async function renderSavedCases() {
         if (!loaded) return;
         elements.boardSelect.value = saved.visualCase.board_key;
         elements.captureStage.value = saved.visualCase.capture_stage;
+        clearHeatmap();
         state.history = createHistory(saved.visualCase);
         state.photoBlob = saved.imageBlob;
         state.photoImage = photoImage;
@@ -1526,6 +1910,21 @@ function bindEvents() {
   elements.clearRegistrationButton.addEventListener('click', clearRegistration);
   elements.reviewRegistrationButton.addEventListener('click', confirmRegistration);
   elements.serverSyncButton.addEventListener('click', syncCurrentCaseWithServer);
+  elements.refreshGoldenButton.addEventListener('click', () => refreshCurrentGoldenSample());
+  elements.approveGoldenButton.addEventListener('click', approveCurrentGoldenSample);
+  elements.runDifferenceButton.addEventListener('click', runDifferenceAnalysis);
+  elements.normalConfirmation.addEventListener('change', render);
+  elements.captureSetupId.addEventListener('change', () => {
+    if (!currentCase()) return;
+    clearHeatmap();
+    updateComparisonDraft({
+      capture_setup_id: captureSetupId(),
+      golden_sample: null,
+      difference: null,
+      golden_lookup_status: 'unknown',
+    });
+    void refreshCurrentGoldenSample({ quietMissing: true });
+  });
   elements.finalizeQcButton.addEventListener('click', finalizeVisualQc);
   elements.undoButton.addEventListener('click', () => {
     state.history = undoHistory(state.history);

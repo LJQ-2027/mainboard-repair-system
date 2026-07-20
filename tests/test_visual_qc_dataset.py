@@ -1,6 +1,9 @@
 import copy
+import json
 import unittest
 from pathlib import Path
+
+import jsonschema
 
 from scripts.export_visual_qc_coco import build_coco_dataset
 from scripts.validate_visual_qc_dataset import validate_visual_qc_case
@@ -76,6 +79,42 @@ def sample_case():
 class VisualQcDatasetTests(unittest.TestCase):
     def test_reviewed_case_passes_board_and_training_contract(self):
         self.assertEqual(validate_visual_qc_case(sample_case(), ROOT), [])
+
+    def test_server_authoritative_v2_case_accepts_reviewed_automatic_registration(self):
+        visual_case = sample_case()
+        visual_case["schema_version"] = "VISUAL-QC-CASE-V2"
+        visual_case["storage_scope"] = "server_authoritative_with_local_draft"
+        visual_case["registration"] = {
+            "method": "automatic_feature_homography",
+            "status": "reviewed",
+            "matrix": [1, 0, 0, 0, 1, 0, 0, 0, 1],
+            "solve_anchors": [],
+            "check_points": [],
+            "error": {"count": 240, "rms": 0.001, "maximum": 0.003},
+            "server_review_id": "regrev-001",
+        }
+        visual_case["server_sync"] = {
+            "schema_version": "VISUAL-QC-SERVER-SYNC-V1",
+            "status": "reviewed",
+            "idempotency_key": "visual-qc:case-km4-001:aaaaaaaaaaaaaaaa",
+            "server_case_id": "server-case-001",
+            "server_image_id": "server-image-001",
+            "job_id": "job-001",
+            "job_status": "succeeded",
+        }
+        visual_case["visual_comparison"] = {
+            "capture_setup_id": "standard-bench",
+            "golden_sample": None,
+            "difference": None,
+        }
+
+        self.assertEqual(validate_visual_qc_case(visual_case, ROOT), [])
+        schema = json.loads(
+            (ROOT / "knowledge-base/visual-qc-case-v2-schema.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        jsonschema.validate(visual_case, schema)
 
     def test_invalid_hash_and_cross_board_identity_are_rejected(self):
         visual_case = sample_case()
