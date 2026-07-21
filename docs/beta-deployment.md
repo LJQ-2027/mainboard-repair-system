@@ -65,7 +65,7 @@ ANTHROPIC_API_KEY=...
 ## Current Deployment
 
 - Deployed on: 2026-07-21
-- Deployed commit: `5e9680a`
+- Deployed commit: `7b46333`
 - Internal service: `http://127.0.0.1:3010`
 - Internal visual-QC API: `http://127.0.0.1:3020`
 - External beta URL: `https://cccsat.top/mb-repair-beta/`
@@ -114,6 +114,10 @@ ANTHROPIC_API_KEY=...
   physical role despite its empty checklist; it was corrected transactionally
   in both case and capture-session rows after a SQLite backup at
   `/opt/motherboard-repair-beta/data/visual-qc/visual-qc.sqlite3.before-proxy-role-fix-20260721_134220`.
+  Commit `7b46333` adds a default-collapsed reviewer drill-down listing the
+  excluded board, side, case suffix, and primary blocker. Production Chrome
+  verified keyboard focus, expanded desktop and 390 px states, zero overflow,
+  intact download controls, and zero console warnings/errors.
 - Proxy evidence: one KM4 reviewed manual image was accepted as a proxy case,
   scored `usable`, and correctly fell back to manual four-point registration
   after ORB/AKAZE evidence failed the inlier gate. It is not physical-board

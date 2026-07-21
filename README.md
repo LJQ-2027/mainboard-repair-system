@@ -106,7 +106,7 @@ python ai_proxy_server.py
 - **当前后端实现**：`visual_qc_server.py` 已提供版本化上传、SQLite任务恢复、图像质量证据、自动配准候选与人工四点回退；本地运行和部署边界见 `docs/visual-qc-server-api-2026-07-20.md`
 - **当前审核闭环**：服务器已支持配准审核、最终人工 QC 版本、Golden Sample版本化、差异热区、受控artifact以及维修员确认/驳回；全球站点拍摄与入库规范见 `docs/visual-qc-capture-intake-spec-2026-07-20.md`
 - **当前训练出口**：reviewer 可获取仅含训练合格实拍案例的 `VISUAL-QC-TRAINING-MANIFEST-V1`、对应原图和服务器即时生成的确定性 `VISUAL-QC-COCO-V1`；`VISUAL-QC-DATASET-AUDIT-V1` 同时解释每个服务器案例当前被排除的首要门禁原因
-- **当前浏览器接入**：视觉 QC 工作台已支持同板正反面批次、拍摄确认门禁、本机草稿、受控上传、任务轮询、自动候选人工确认、四点回退、刷新恢复、Golden Sample 版本审核、差异热图和逐候选人工决策；审核员还可查看训练合格案例/标注/类别、排除案例和门禁原因，并下载清单与 COCO，维修员界面不显示该区
+- **当前浏览器接入**：视觉 QC 工作台已支持同板正反面批次、拍摄确认门禁、本机草稿、受控上传、任务轮询、自动候选人工确认、四点回退、刷新恢复、Golden Sample 版本审核、差异热图和逐候选人工决策；审核员还可查看训练合格案例/标注/类别、排除案例和门禁原因，下钻具体板型/板面/案例，并下载清单与 COCO，维修员界面不显示该区
 - **当前案例契约**：本地历史基线保留 `VISUAL-QC-CASE-V1`；接入服务器的新案例使用 `VISUAL-QC-CASE-V2`，机器可读定义见 `knowledge-base/visual-qc-case-v2-schema.json`
 - **AI 平台**：Anthropic Claude / DeepSeek
 - **通信协议**：SSE (Server-Sent Events) 流式传输
