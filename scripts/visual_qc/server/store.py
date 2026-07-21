@@ -51,6 +51,8 @@ class VisualQcStore:
                     capture_session_id TEXT NOT NULL DEFAULT '',
                     capture_setup_id TEXT NOT NULL DEFAULT 'standard-bench',
                     capture_checklist_json TEXT NOT NULL DEFAULT '{}',
+                    intake_batch_id TEXT,
+                    intake_entry_id TEXT,
                     reference_path TEXT NOT NULL,
                     created_at TEXT NOT NULL,
                     UNIQUE(actor_id, idempotency_key)
@@ -209,6 +211,15 @@ class VisualQcStore:
                 connection.execute(
                     "ALTER TABLE cases ADD COLUMN capture_checklist_json TEXT NOT NULL DEFAULT '{}'"
                 )
+            if "intake_batch_id" not in case_columns:
+                connection.execute("ALTER TABLE cases ADD COLUMN intake_batch_id TEXT")
+            if "intake_entry_id" not in case_columns:
+                connection.execute("ALTER TABLE cases ADD COLUMN intake_entry_id TEXT")
+            connection.execute(
+                "CREATE UNIQUE INDEX IF NOT EXISTS cases_actor_intake_entry "
+                "ON cases(actor_id, intake_batch_id, intake_entry_id) "
+                "WHERE intake_batch_id IS NOT NULL AND intake_entry_id IS NOT NULL"
+            )
             connection.execute(
                 "UPDATE cases SET capture_session_id = 'legacy-' || case_id "
                 "WHERE capture_session_id = ''"
@@ -588,8 +599,8 @@ class VisualQcStore:
                     case_id, actor_id, idempotency_key, request_fingerprint,
                     board_key, board_id, side_id, capture_stage, evidence_role,
                     capture_session_id, capture_setup_id, capture_checklist_json,
-                    reference_path, created_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    intake_batch_id, intake_entry_id, reference_path, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 tuple(
                     case_record[key]
@@ -597,7 +608,7 @@ class VisualQcStore:
                         "case_id", "actor_id", "idempotency_key", "request_fingerprint",
                         "board_key", "board_id", "side_id", "capture_stage", "evidence_role",
                         "capture_session_id", "capture_setup_id", "capture_checklist_json",
-                        "reference_path", "created_at",
+                        "intake_batch_id", "intake_entry_id", "reference_path", "created_at",
                     )
                 ),
             )
@@ -641,7 +652,12 @@ class VisualQcStore:
                     case_record["case_id"],
                     case_record["actor_id"],
                     json.dumps(
-                        {"image_id": image_record["image_id"], "job_id": job_record["job_id"]},
+                        {
+                            "image_id": image_record["image_id"],
+                            "job_id": job_record["job_id"],
+                            "intake_batch_id": case_record["intake_batch_id"],
+                            "intake_entry_id": case_record["intake_entry_id"],
+                        },
                         separators=(",", ":"),
                     ),
                     timestamp,

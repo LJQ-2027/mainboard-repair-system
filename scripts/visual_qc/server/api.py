@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, File, Form, Header, HTTPException, UploadFile
-from fastapi.responses import FileResponse
+from fastapi import FastAPI, File, Form, Header, HTTPException, Request, UploadFile
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from starlette.background import BackgroundTask
@@ -68,6 +68,25 @@ def create_app(settings: VisualQcServerSettings | None = None) -> FastAPI:
         lifespan=lifespan,
     )
     app.state.visual_qc_service = service
+
+    @app.middleware("http")
+    async def protect_visual_intake(request: Request, call_next):
+        if (
+            request.method == "POST"
+            and request.url.path.rstrip("/") == "/api/v1/visual-qc/cases"
+            and request.headers.get("X-Actor-Role") != "reviewer"
+        ):
+            return JSONResponse(
+                status_code=403,
+                content={
+                    "detail": {
+                        "code": "data_admin_role_required",
+                        "message": "Visual data intake requires the data administrator role.",
+                    }
+                },
+            )
+        return await call_next(request)
+
     if settings.allowed_origins:
         app.add_middleware(
             CORSMiddleware,
@@ -120,11 +139,22 @@ def create_app(settings: VisualQcServerSettings | None = None) -> FastAPI:
         capture_session_id: str | None = Form(None),
         capture_setup_id: str = Form("standard-bench"),
         capture_checklist: str = Form("{}"),
+        intake_batch_id: str | None = Form(None, max_length=128),
+        intake_entry_id: str | None = Form(None, max_length=128),
         sha256: str = Form(..., min_length=64, max_length=64),
         file: UploadFile = File(...),
         x_actor_id: str | None = Header(None, alias="X-Actor-Id"),
+        x_actor_role: str | None = Header(None, alias="X-Actor-Role"),
         idempotency_key: str | None = Header(None, alias="Idempotency-Key"),
     ):
+        if x_actor_role != "reviewer":
+            raise HTTPException(
+                status_code=403,
+                detail={
+                    "code": "data_admin_role_required",
+                    "message": "Visual data intake requires the data administrator role.",
+                },
+            )
         verified_actor = actor_id(x_actor_id)
         content = await file.read(settings.maximum_upload_bytes + 1)
         try:
@@ -138,6 +168,8 @@ def create_app(settings: VisualQcServerSettings | None = None) -> FastAPI:
                 capture_session_id=capture_session_id,
                 capture_setup_id=capture_setup_id,
                 capture_checklist=capture_checklist,
+                intake_batch_id=intake_batch_id,
+                intake_entry_id=intake_entry_id,
                 claimed_sha256=sha256,
                 original_filename=file.filename or "upload",
                 mime_type=(file.content_type or "").lower(),

@@ -125,6 +125,14 @@ class VisualQcDeploymentContractTests(unittest.TestCase):
         ecosystem = (ROOT / "ecosystem.config.js").read_text(encoding="utf-8")
         self.assertIn('HOST: "127.0.0.1"', ecosystem)
 
+    def test_visual_intake_has_a_server_side_data_administrator_gate(self):
+        source = (ROOT / "scripts" / "visual_qc" / "server" / "api.py").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("data_admin_role_required", source)
+        self.assertIn('X-Actor-Role', source)
+
 
 if __name__ == "__main__":
     unittest.main()

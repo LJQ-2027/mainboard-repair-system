@@ -217,6 +217,8 @@ class VisualQcService:
         capture_session_id: str | None = None,
         capture_setup_id: str = "standard-bench",
         capture_checklist: str = "{}",
+        intake_batch_id: str | None = None,
+        intake_entry_id: str | None = None,
     ) -> dict:
         if capture_stage not in CAPTURE_STAGES:
             raise VisualQcServiceError(
@@ -268,6 +270,10 @@ class VisualQcService:
             capture_checklist,
             evidence_role,
         )
+        intake_batch_id, intake_entry_id = self._normalized_intake_provenance(
+            intake_batch_id,
+            intake_entry_id,
+        )
         session_records = self.store.list_capture_session(actor_id, capture_session_id)
         if session_records:
             identity = session_records[0]
@@ -312,6 +318,8 @@ class VisualQcService:
                     "capture_session_id": capture_session_id,
                     "capture_setup_id": capture_setup_id,
                     "capture_checklist": normalized_checklist,
+                    "intake_batch_id": intake_batch_id,
+                    "intake_entry_id": intake_entry_id,
                     "sha256": actual_sha256,
                 },
                 sort_keys=True,
@@ -349,6 +357,8 @@ class VisualQcService:
                 sort_keys=True,
                 separators=(",", ":"),
             ),
+            "intake_batch_id": intake_batch_id,
+            "intake_entry_id": intake_entry_id,
             "reference_path": str(side["reference_path"]),
             "created_at": timestamp,
         }
@@ -416,6 +426,10 @@ class VisualQcService:
             "side_id": case["side_id"],
             "capture_stage": case["capture_stage"],
             "evidence_role": case["evidence_role"],
+            "intake": {
+                "batch_id": case["intake_batch_id"],
+                "entry_id": case["intake_entry_id"],
+            },
             "capture_session": self._capture_session_payload(
                 case["capture_session_id"],
                 actor_id,
@@ -984,6 +998,33 @@ class VisualQcService:
                 "capture_setup_id is required and must not exceed 128 characters.",
             )
         return normalized
+
+    @staticmethod
+    def _normalized_intake_provenance(
+        batch_id: str | None,
+        entry_id: str | None,
+    ) -> tuple[str | None, str | None]:
+        normalized_batch = (batch_id or "").strip() or None
+        normalized_entry = (entry_id or "").strip() or None
+        if (normalized_batch is None) != (normalized_entry is None):
+            raise VisualQcServiceError(
+                "incomplete_intake_provenance",
+                "intake_batch_id and intake_entry_id must be provided together.",
+            )
+        for field, value in (
+            ("intake_batch_id", normalized_batch),
+            ("intake_entry_id", normalized_entry),
+        ):
+            if value is not None and (
+                len(value) > 128
+                or not value[0].isalnum()
+                or not all(character.isalnum() or character in "-_." for character in value)
+            ):
+                raise VisualQcServiceError(
+                    "invalid_intake_provenance",
+                    f"{field} must use letters, numbers, dot, dash, or underscore and be at most 128 characters.",
+                )
+        return normalized_batch, normalized_entry
 
     @staticmethod
     def _normalized_capture_checklist(value: str, evidence_role: str) -> dict:

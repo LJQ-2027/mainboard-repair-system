@@ -131,7 +131,7 @@ git commit -m "feat: validate owner-managed visual QC intake"
 - Modify: `tests/test_visual_qc_server.py`
 - Modify: `tests/test_visual_qc_deployment.py`
 
-- [ ] **Step 1: Write failing authorization and migration tests**
+- [x] **Step 1: Write failing authorization and migration tests**
 
 Add an API test that patches the service method and proves a technician request is rejected before `create_case` is invoked:
 
@@ -152,7 +152,7 @@ def test_technician_cannot_upload_visual_qc_case(self):
 
 Update successful upload tests to send `X-Actor-Role: reviewer`. Add a legacy SQLite fixture without intake columns, open `VisualQcStore`, and assert existing rows survive with null provenance. Add a creation test asserting `intake_batch_id` and `intake_entry_id` round-trip.
 
-- [ ] **Step 2: Run targeted server tests and verify RED**
+- [x] **Step 2: Run targeted server tests and verify RED**
 
 Run:
 
@@ -162,7 +162,7 @@ Run:
 
 Expected: technician upload still reaches the endpoint and intake fields are absent.
 
-- [ ] **Step 3: Enforce authorization before multipart parsing**
+- [x] **Step 3: Enforce authorization before multipart parsing**
 
 Add a narrow HTTP middleware before route handling:
 
@@ -183,7 +183,7 @@ async def protect_visual_intake(request, call_next):
 
 Keep a route-level role assertion for defense in depth. The production gateway remains responsible for replacing client-supplied actor headers.
 
-- [ ] **Step 4: Add additive intake provenance migration**
+- [x] **Step 4: Add additive intake provenance migration**
 
 Add nullable columns to the create-table declaration and migration:
 
@@ -197,7 +197,7 @@ WHERE intake_batch_id IS NOT NULL AND intake_entry_id IS NOT NULL;
 
 Accept both fields as optional bounded form values, validate that they are either both absent or both present, include them in the request fingerprint, case insert, public server-case response, and `case_created` audit payload. Historical browser-created admin cases remain valid with null provenance.
 
-- [ ] **Step 5: Run targeted authorization, migration, and deployment tests**
+- [x] **Step 5: Run targeted authorization, migration, and deployment tests**
 
 Run:
 

@@ -1,4 +1,5 @@
 import hashlib
+import sqlite3
 import tempfile
 import unittest
 from pathlib import Path
@@ -13,6 +14,7 @@ from scripts.visual_qc.server.api import create_app
 from scripts.visual_qc.server.config import VisualQcServerSettings
 from scripts.visual_qc.server.quality import analyze_image_quality
 from scripts.visual_qc.server.storage import LocalObjectStorage, StorageError
+from scripts.visual_qc.server.store import VisualQcStore
 from scripts.visual_qc.synthetic import SyntheticTransformConfig, generate_synthetic_capture
 from visual_qc_server import runtime_options
 
@@ -41,6 +43,7 @@ class VisualQcServerApiTests(unittest.TestCase):
         self.client = TestClient(self.app)
         self.headers = {
             "X-Actor-Id": "technician-001",
+            "X-Actor-Role": "reviewer",
             "Idempotency-Key": "capture-request-001",
         }
 
@@ -97,6 +100,94 @@ class VisualQcServerApiTests(unittest.TestCase):
         self.assertTrue((Path(self.temp_dir.name) / "visual-qc.sqlite3").exists())
         originals = list((Path(self.temp_dir.name) / "objects" / "originals").rglob("*.jpg"))
         self.assertEqual(len(originals), 1)
+
+    def test_technician_cannot_upload_visual_qc_case_before_route_handling(self):
+        image_bytes = encode_jpeg(np.full((120, 180, 3), 170, dtype=np.uint8))
+        service = self.app.state.visual_qc_service
+        with patch.object(service, "create_case") as create_case:
+            response = self.client.post(
+                "/api/v1/visual-qc/cases",
+                data={
+                    "board_key": "km4-f151",
+                    "side_id": "main_page_2",
+                    "capture_stage": "golden_reference",
+                    "evidence_role": "physical_capture",
+                    "sha256": fields_sha256(image_bytes),
+                },
+                files={"file": ("board.jpg", image_bytes, "image/jpeg")},
+                headers={
+                    "X-Actor-Id": "technician-001",
+                    "X-Actor-Role": "technician",
+                    "Idempotency-Key": "forbidden-upload",
+                },
+            )
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json()["detail"]["code"], "data_admin_role_required")
+        create_case.assert_not_called()
+
+    def test_intake_provenance_round_trips_on_created_case(self):
+        image_bytes = encode_jpeg(np.full((120, 180, 3), 170, dtype=np.uint8))
+
+        response = self.upload(
+            image_bytes,
+            intake_batch_id="km4-first-physical-batch",
+            intake_entry_id="km4-board-01-side-2",
+        )
+
+        self.assertEqual(response.status_code, 202)
+        self.assertEqual(
+            response.json()["intake"],
+            {
+                "batch_id": "km4-first-physical-batch",
+                "entry_id": "km4-board-01-side-2",
+            },
+        )
+
+    def test_legacy_database_migrates_intake_columns_without_data_loss(self):
+        database_path = Path(self.temp_dir.name) / "legacy.sqlite3"
+        connection = sqlite3.connect(database_path)
+        try:
+            connection.executescript(
+                """
+                CREATE TABLE cases (
+                    case_id TEXT PRIMARY KEY,
+                    actor_id TEXT NOT NULL,
+                    idempotency_key TEXT NOT NULL,
+                    request_fingerprint TEXT NOT NULL,
+                    board_key TEXT NOT NULL,
+                    board_id TEXT NOT NULL,
+                    side_id TEXT NOT NULL,
+                    capture_stage TEXT NOT NULL,
+                    evidence_role TEXT NOT NULL,
+                    capture_session_id TEXT NOT NULL DEFAULT '',
+                    capture_setup_id TEXT NOT NULL DEFAULT 'standard-bench',
+                    capture_checklist_json TEXT NOT NULL DEFAULT '{}',
+                    reference_path TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    UNIQUE(actor_id, idempotency_key)
+                );
+                INSERT INTO cases VALUES (
+                    'legacy-case', 'owner-001', 'legacy-key', 'fingerprint',
+                    'km4-f151', 'BOARD-KM4-F151-MAIN-V1.2', 'main_page_2',
+                    'golden_reference', 'service_manual_proxy', 'legacy-session',
+                    'standard-bench', '{}', 'reference.png', '2026-07-20T00:00:00.000Z'
+                );
+                """
+            )
+            connection.commit()
+        finally:
+            connection.close()
+
+        store = VisualQcStore(database_path, recover_interrupted_jobs=False)
+        with store.connect() as connection:
+            row = connection.execute(
+                "SELECT case_id, intake_batch_id, intake_entry_id FROM cases"
+            ).fetchone()
+
+        self.assertEqual(row["case_id"], "legacy-case")
+        self.assertIsNone(row["intake_batch_id"])
+        self.assertIsNone(row["intake_entry_id"])
 
     def test_capture_session_pairs_board_sides_and_rejects_identity_pollution(self):
         first_bytes = encode_jpeg(np.full((120, 180, 3), 170, dtype=np.uint8))
