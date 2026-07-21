@@ -65,7 +65,7 @@ ANTHROPIC_API_KEY=...
 ## Current Deployment
 
 - Deployed on: 2026-07-21
-- Deployed commit: `508cddb`
+- Deployed commit: `5e9680a`
 - Internal service: `http://127.0.0.1:3010`
 - Internal visual-QC API: `http://127.0.0.1:3020`
 - External beta URL: `https://cccsat.top/mb-repair-beta/`
@@ -105,6 +105,15 @@ ANTHROPIC_API_KEY=...
   categories and byte-identical repeated responses. Headed Chrome QA passed
   desktop and 390 px layouts, both downloads, no horizontal overflow, and
   zero console warnings or errors.
+- 2026-07-21 dataset-readiness increment: reviewer-only
+  `VISUAL-QC-DATASET-AUDIT-V1` reports one ordered primary gate reason per
+  server case without exposing actor identity. Production contains one known
+  KM4 manual proxy and now reports `0` eligible, `1` excluded, and
+  `non_physical_evidence: 1`; technicians receive 403 and do not see the
+  workbench audit fields. The legacy P4 case had been stored with the obsolete
+  physical role despite its empty checklist; it was corrected transactionally
+  in both case and capture-session rows after a SQLite backup at
+  `/opt/motherboard-repair-beta/data/visual-qc/visual-qc.sqlite3.before-proxy-role-fix-20260721_134220`.
 - Proxy evidence: one KM4 reviewed manual image was accepted as a proxy case,
   scored `usable`, and correctly fell back to manual four-point registration
   after ORB/AKAZE evidence failed the inlier gate. It is not physical-board

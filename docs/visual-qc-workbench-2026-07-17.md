@@ -20,7 +20,7 @@ The current internal workbench supports the five compiled mainboard platforms:
 8. Add an independent check point when using manual registration and review the normalized projection error.
 9. Confirm registration, annotate visible defects, and review each human or model candidate.
 10. Complete the final human QC result. Server-connected physical cases persist an append-only QC review version; local-only cases remain browser drafts.
-11. Export the V2 JSON and annotated PNG preview. Reviewers additionally see the server-owned eligible case, confirmed annotation, and covered-category totals and can download the current manifest or deterministic COCO dataset.
+11. Export the V2 JSON and annotated PNG preview. Reviewers additionally see the server-owned eligible case, confirmed annotation, covered-category and excluded-case totals, together with the current primary gate reasons, and can download the current manifest or deterministic COCO dataset.
 
 Cases and source image blobs are recoverable from IndexedDB. Imported JSON requires the original image to be selected again and accepted only after its SHA-256 and dimensions match.
 

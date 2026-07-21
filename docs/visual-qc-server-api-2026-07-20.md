@@ -150,9 +150,10 @@ Only cases older than `VISUAL_QC_RETENTION_DAYS` are eligible, up to `VISUAL_QC_
 
 - `GET /api/v1/visual-qc/datasets/training-manifest`
 - `GET /api/v1/visual-qc/datasets/coco`
+- `GET /api/v1/visual-qc/datasets/audit`
 - `GET /api/v1/visual-qc/datasets/images/{image_id}`
 
-All three routes require the exact gateway-injected `reviewer` role. The manifest uses `VISUAL-QC-TRAINING-MANIFEST-V1` and contains only the latest eligible final review for each physical case, together with immutable board identity, capture setup, source hash, QC result, and reviewed annotations. The image route serves an original only when it belongs to a case represented by an eligible latest QC review. The COCO route builds `VISUAL-QC-COCO-V1` from that server-owned manifest on each request, sorts cases and annotations deterministically, keeps the nine fixed defect categories even for an empty dataset, and includes only confirmed human annotations. These routes are the server-owned training-data boundary; browser drafts and proxy evidence are never enumerated.
+All four routes require the exact gateway-injected `reviewer` role. The manifest uses `VISUAL-QC-TRAINING-MANIFEST-V1` and contains only the latest eligible final review for each physical case, together with immutable board identity, capture setup, source hash, QC result, and reviewed annotations. The image route serves an original only when it belongs to a case represented by an eligible latest QC review. The COCO route builds `VISUAL-QC-COCO-V1` from that server-owned manifest on each request, sorts cases and annotations deterministically, keeps the nine fixed defect categories even for an empty dataset, and includes only confirmed human annotations. The read-only `VISUAL-QC-DATASET-AUDIT-V1` route evaluates every server case against one ordered primary blocker: non-physical evidence, incomplete capture confirmation, incomplete processing, retake quality, missing registration review, or missing final QC review. It exposes board and processing state without actor identity and does not alter manifest eligibility. These routes are the server-owned training-data boundary; browser drafts and proxy evidence never enter the eligible export.
 
 Original and artifact writes hold the same data-root OS file lock from object creation through database reference commit. Retention holds that lock from its final transactional eligibility check through reference-aware object deletion. This closes the upload/cleanup race across API and CLI processes, but the operational procedure still stops the QC service before destructive maintenance.
 
@@ -189,6 +190,7 @@ Implemented:
 - versioned `VISUAL-QC-CASE-V2` browser drafts for server synchronization and comparison state;
 - append-only final human QC review versions synchronized from the browser;
 - reviewer-only training manifest, deterministic COCO export, and eligible source-image download;
+- reviewer-only dataset-readiness audit with one actionable primary blocker per server case;
 - disk-pressure health reporting, bounded old-draft retention planning, protected evidence rules, and audited explicit cleanup.
 
 Still open:
