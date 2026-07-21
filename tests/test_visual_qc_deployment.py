@@ -6,6 +6,38 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class VisualQcDeploymentContractTests(unittest.TestCase):
+    def test_runtime_archive_manifest_is_bounded_and_contains_required_services(self):
+        manifest_path = ROOT / "deploy" / "visual-qc-runtime-files.txt"
+        self.assertTrue(manifest_path.is_file())
+        entries = [
+            line.strip()
+            for line in manifest_path.read_text(encoding="utf-8").splitlines()
+            if line.strip() and not line.lstrip().startswith("#")
+        ]
+
+        self.assertEqual(len(entries), len(set(entries)))
+        for entry in entries:
+            self.assertTrue((ROOT / entry).exists(), entry)
+        for required in (
+            "ai_proxy_server.py",
+            "visual_qc_server.py",
+            "ecosystem.config.js",
+            "requirements-visual-qc.txt",
+            "mainboard_repair_system_v7.4_updated.html",
+            "assets",
+            "data",
+            "knowledge-base",
+            "scripts/visual_qc",
+            "scripts/validate_visual_qc_dataset.py",
+            "scripts/maintain_visual_qc_server.py",
+        ):
+            self.assertIn(required, entries)
+        for excluded in ("source-materials", "tests", "docs", "output", "reports"):
+            self.assertFalse(
+                any(entry == excluded or entry.startswith(f"{excluded}/") for entry in entries),
+                excluded,
+            )
+
     def test_nginx_template_protects_static_app_and_injects_verified_api_identity(self):
         template = (
             ROOT / "deploy" / "nginx" / "mb-repair-beta.locations.conf"
@@ -42,6 +74,9 @@ class VisualQcDeploymentContractTests(unittest.TestCase):
 
         for required in (
             "git archive",
+            "visual-qc-runtime-files.txt",
+            "$runtimePaths",
+            "HEAD -- @runtimePaths",
             "set -o pipefail",
             "base64 -d | bash",
             "requirements-visual-qc.txt",

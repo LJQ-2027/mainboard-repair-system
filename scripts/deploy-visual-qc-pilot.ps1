@@ -114,7 +114,30 @@ if (Test-Path -LiteralPath $artifact) {
   Remove-Item -LiteralPath $artifact -Force
 }
 $commit = (git rev-parse --short HEAD).Trim()
-git archive --format=tar.gz -o $artifact HEAD
+$runtimeManifest = Join-Path $repoRoot "deploy\visual-qc-runtime-files.txt"
+$runtimePaths = @(
+  Get-Content -LiteralPath $runtimeManifest -Encoding UTF8 |
+    ForEach-Object { $_.Trim() } |
+    Where-Object { $_ -and -not $_.StartsWith("#") }
+)
+if (-not $runtimePaths) {
+  throw "Visual-QC runtime manifest is empty."
+}
+if (($runtimePaths | Select-Object -Unique).Count -ne $runtimePaths.Count) {
+  throw "Visual-QC runtime manifest contains duplicate entries."
+}
+foreach ($runtimePath in $runtimePaths) {
+  if ($runtimePath -match '(^/|^\.\.|\\)') {
+    throw "Unsafe Visual-QC runtime path: $runtimePath"
+  }
+  git cat-file -e "HEAD:$runtimePath"
+}
+git archive --format=tar.gz -o $artifact HEAD -- @runtimePaths
+$artifactSizeMb = [Math]::Round(
+  (Get-Item -LiteralPath $artifact).Length / 1MB,
+  1
+)
+Write-Host "Runtime archive: $artifactSizeMb MB from $($runtimePaths.Count) paths."
 
 $stagingStarted = $false
 try {

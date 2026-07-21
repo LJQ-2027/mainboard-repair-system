@@ -1,0 +1,13 @@
+# Controlled-server runtime. Keep source archives, tests, reports, and docs out.
+ai_proxy_server.py
+visual_qc_server.py
+ecosystem.config.js
+requirements-visual-qc.txt
+mainboard_repair_system_v7.4_updated.html
+assets
+data
+knowledge-base
+scripts/maintain_visual_qc_server.py
+scripts/export_visual_qc_coco.py
+scripts/validate_visual_qc_dataset.py
+scripts/visual_qc
