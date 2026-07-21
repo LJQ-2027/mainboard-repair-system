@@ -755,6 +755,44 @@ class VisualQcStore:
             ).fetchall()
         return [self._case_qc_review_dict(row) for row in rows]
 
+    def list_dataset_audit_cases(self):
+        with self.connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT
+                    cases.case_id,
+                    cases.board_key,
+                    cases.board_id,
+                    cases.side_id,
+                    cases.capture_stage,
+                    cases.evidence_role,
+                    cases.capture_checklist_json,
+                    cases.created_at,
+                    images.image_id,
+                    jobs.job_id,
+                    jobs.status AS job_status,
+                    jobs.result_json
+                FROM cases
+                JOIN images USING(case_id)
+                JOIN jobs
+                  ON jobs.case_id = cases.case_id
+                 AND jobs.job_type = 'automatic_registration'
+                ORDER BY cases.created_at, cases.case_id
+                """
+            ).fetchall()
+        records = []
+        for row in rows:
+            record = dict(row)
+            record["capture_checklist"] = json.loads(
+                record.pop("capture_checklist_json") or "{}"
+            )
+            record["job_result"] = json.loads(
+                record.pop("result_json")
+            ) if record.get("result_json") else None
+            record.pop("result_json", None)
+            records.append(record)
+        return records
+
     def get_training_image(self, image_id: str):
         with self.connect() as connection:
             row = connection.execute(

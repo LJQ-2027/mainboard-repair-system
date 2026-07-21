@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "VISUAL-QC-DATASET-AUDIT-V1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "generated_at",
+    "total_case_count",
+    "eligible_case_count",
+    "excluded_case_count",
+    "reason_counts",
+    "cases"
+  ],
+  "properties": {
+    "schema_version": { "const": "VISUAL-QC-DATASET-AUDIT-V1" },
+    "generated_at": { "type": "string" },
+    "total_case_count": { "type": "integer", "minimum": 0 },
+    "eligible_case_count": { "type": "integer", "minimum": 0 },
+    "excluded_case_count": { "type": "integer", "minimum": 0 },
+    "reason_counts": {
+      "type": "object",
+      "propertyNames": {
+        "enum": [
+          "non_physical_evidence",
+          "capture_checklist_required",
+          "processing_incomplete",
+          "image_retake_required",
+          "registration_review_required",
+          "final_qc_review_required"
+        ]
+      },
+      "additionalProperties": { "type": "integer", "minimum": 1 }
+    },
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "case_id",
+          "board_key",
+          "board_id",
+          "side_id",
+          "capture_stage",
+          "evidence_role",
+          "image_id",
+          "job_status",
+          "quality_status",
+          "registration_reviewed",
+          "final_qc_reviewed",
+          "status",
+          "blocking_reason",
+          "created_at"
+        ],
+        "properties": {
+          "case_id": { "type": "string", "minLength": 1 },
+          "board_key": { "type": "string", "minLength": 1 },
+          "board_id": { "type": "string", "minLength": 1 },
+          "side_id": { "type": "string", "minLength": 1 },
+          "capture_stage": { "enum": ["golden_reference", "before_repair", "after_repair"] },
+          "evidence_role": { "enum": ["physical_capture", "service_manual_proxy"] },
+          "image_id": { "type": "string", "minLength": 1 },
+          "job_status": { "enum": ["queued", "running", "succeeded", "failed"] },
+          "quality_status": { "type": ["string", "null"] },
+          "registration_reviewed": { "type": "boolean" },
+          "final_qc_reviewed": { "type": "boolean" },
+          "status": { "enum": ["eligible", "excluded"] },
+          "blocking_reason": {
+            "type": ["string", "null"],
+            "enum": [
+              null,
+              "non_physical_evidence",
+              "capture_checklist_required",
+              "processing_incomplete",
+              "image_retake_required",
+              "registration_review_required",
+              "final_qc_review_required"
+            ]
+          },
+          "created_at": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

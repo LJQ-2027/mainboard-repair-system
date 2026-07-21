@@ -201,6 +201,13 @@ export function getVisualQcCocoDataset(apiBase, actorId, actorRole = 'reviewer')
   });
 }
 
+export function getVisualQcDatasetAudit(apiBase, actorId, actorRole = 'reviewer') {
+  return jsonRequest(`${apiBase.replace(/\/$/, '')}/datasets/audit`, {
+    actorId,
+    actorRole,
+  });
+}
+
 export function getVisualQcJob(apiBase, actorId, jobId) {
   return jsonRequest(`${apiBase.replace(/\/$/, '')}/jobs/${encodeURIComponent(jobId)}`, {
     actorId,

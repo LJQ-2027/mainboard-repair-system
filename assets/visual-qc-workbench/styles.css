@@ -844,7 +844,7 @@ button:disabled {
 .training-metrics {
   margin: 0 0 10px;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
 }
@@ -872,6 +872,26 @@ button:disabled {
 
 .training-dataset-actions button {
   flex: 1 1 auto;
+}
+
+.training-gate-summary {
+  margin: -2px 0 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 10px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.training-gate-summary span::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  margin-right: 5px;
+  display: inline-block;
+  vertical-align: 1px;
+  border-radius: 50%;
+  background: #b4792a;
 }
 
 dialog {

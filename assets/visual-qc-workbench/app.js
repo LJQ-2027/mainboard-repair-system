@@ -48,6 +48,7 @@ import {
   getActiveGoldenSample,
   getVisualQcCaptureSession,
   getVisualQcCocoDataset,
+  getVisualQcDatasetAudit,
   getVisualQcIdentity,
   getVisualQcTrainingManifest,
   getVisualQcArtifact,
@@ -182,7 +183,9 @@ const elements = {
   trainingCaseCount: byId('trainingCaseCount'),
   trainingAnnotationCount: byId('trainingAnnotationCount'),
   trainingCategoryCount: byId('trainingCategoryCount'),
+  trainingExcludedCount: byId('trainingExcludedCount'),
   trainingDatasetSummary: byId('trainingDatasetSummary'),
+  trainingGateSummary: byId('trainingGateSummary'),
   refreshTrainingDatasetButton: byId('refreshTrainingDatasetButton'),
   downloadTrainingManifestButton: byId('downloadTrainingManifestButton'),
   downloadTrainingCocoButton: byId('downloadTrainingCocoButton'),
@@ -234,6 +237,7 @@ const state = {
   heatmapLoadingArtifactId: null,
   captureSessionDraft: null,
   trainingManifest: null,
+  trainingAudit: null,
   trainingDatasetBusy: false,
   trainingDatasetError: null,
 };
@@ -246,6 +250,15 @@ const QUALITY_GUIDANCE_COPY = Object.freeze({
   blurred: '请稳定相机，并点击主板区域完成对焦。',
   soft_focus: '请靠近并重新对焦后拍摄。',
   ready: '图像质量可用于内部参考配准。',
+});
+
+const TRAINING_GATE_LABELS = Object.freeze({
+  non_physical_evidence: '代理或非实拍',
+  capture_checklist_required: '拍摄确认未完成',
+  processing_incomplete: '服务器处理未完成',
+  image_retake_required: '图片需要重拍',
+  registration_review_required: '配准尚未审核',
+  final_qc_review_required: '最终 QC 未审核',
 });
 
 function currentCase() {
@@ -1850,12 +1863,21 @@ function renderTrainingDataset() {
   const manifest = state.trainingManifest;
   const caseCount = Number(manifest?.case_count || 0);
   const annotationCount = Number(manifest?.annotation_count || 0);
+  const audit = state.trainingAudit;
+  const excludedCount = Number(audit?.excluded_case_count || 0);
   const categoryCount = Object.values(manifest?.category_counts || {})
     .filter((count) => Number(count) > 0).length;
   elements.trainingCaseCount.textContent = `${caseCount} 案例`;
   elements.trainingCaseCount.className = `badge ${caseCount ? 'reviewed' : 'neutral'}`;
   elements.trainingAnnotationCount.textContent = String(annotationCount);
   elements.trainingCategoryCount.textContent = String(categoryCount);
+  elements.trainingExcludedCount.textContent = String(excludedCount);
+  elements.trainingGateSummary.replaceChildren();
+  for (const [reason, count] of Object.entries(audit?.reason_counts || {})) {
+    const item = document.createElement('span');
+    item.textContent = `${TRAINING_GATE_LABELS[reason] || reason} ${count}`;
+    elements.trainingGateSummary.append(item);
+  }
 
   if (state.trainingDatasetBusy) {
     elements.trainingDatasetSummary.textContent = '正在读取服务器训练门禁结果。';
@@ -1880,15 +1902,26 @@ async function refreshTrainingDataset({ quiet = false } = {}) {
   state.trainingDatasetError = null;
   renderTrainingDataset();
   try {
-    const manifest = await getVisualQcTrainingManifest(
-      VISUAL_QC_API,
-      VISUAL_QC_ACTOR_ID,
-      VISUAL_QC_ACTOR_ROLE,
-    );
+    const [manifest, audit] = await Promise.all([
+      getVisualQcTrainingManifest(
+        VISUAL_QC_API,
+        VISUAL_QC_ACTOR_ID,
+        VISUAL_QC_ACTOR_ROLE,
+      ),
+      getVisualQcDatasetAudit(
+        VISUAL_QC_API,
+        VISUAL_QC_ACTOR_ID,
+        VISUAL_QC_ACTOR_ROLE,
+      ),
+    ]);
     if (manifest?.schema_version !== 'VISUAL-QC-TRAINING-MANIFEST-V1') {
       throw new Error('服务器训练清单版本不受支持');
     }
+    if (audit?.schema_version !== 'VISUAL-QC-DATASET-AUDIT-V1') {
+      throw new Error('服务器数据门禁审计版本不受支持');
+    }
     state.trainingManifest = manifest;
+    state.trainingAudit = audit;
   } catch (error) {
     state.trainingDatasetError = error.message || '服务器请求失败';
     if (!quiet) reportUserError(error);

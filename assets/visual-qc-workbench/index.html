@@ -246,8 +246,10 @@
           <dl class="training-metrics">
             <div><dt>合格标注</dt><dd id="trainingAnnotationCount">0</dd></div>
             <div><dt>异常类别</dt><dd id="trainingCategoryCount">0</dd></div>
+            <div><dt>排除案例</dt><dd id="trainingExcludedCount">0</dd></div>
           </dl>
           <p id="trainingDatasetSummary" class="source-note">正在读取服务器训练门禁结果。</p>
+          <div id="trainingGateSummary" class="training-gate-summary" aria-live="polite"></div>
           <div class="button-row training-dataset-actions">
             <button id="refreshTrainingDatasetButton" class="secondary-button" type="button">刷新</button>
             <button id="downloadTrainingManifestButton" class="secondary-button" type="button" disabled>下载清单</button>

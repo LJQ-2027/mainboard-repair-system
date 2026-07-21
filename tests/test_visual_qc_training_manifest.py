@@ -319,3 +319,73 @@ class VisualQcTrainingManifestTests(unittest.TestCase):
             ).read_text(encoding="utf-8")
         )
         jsonschema.validate(payload, schema)
+
+    def test_reviewer_dataset_audit_explains_the_current_training_gate(self):
+        proxy = self.create_processed_case(
+            "audit-proxy",
+            evidence_role="service_manual_proxy",
+        )
+        waiting_registration = self.create_processed_case("audit-registration")
+        eligible = self.create_processed_case("audit-eligible")
+        self.accept_registration(eligible["case_id"])
+        self.assertEqual(self.submit_no_anomaly(eligible["case_id"]).status_code, 201)
+
+        forbidden = self.client.get(
+            "/api/v1/visual-qc/datasets/audit",
+            headers={"X-Actor-Id": "technician-001"},
+        )
+        first = self.client.get(
+            "/api/v1/visual-qc/datasets/audit",
+            headers={
+                "X-Actor-Id": "reviewer-001",
+                "X-Actor-Role": "reviewer",
+            },
+        )
+        second = self.client.get(
+            "/api/v1/visual-qc/datasets/audit",
+            headers={
+                "X-Actor-Id": "reviewer-001",
+                "X-Actor-Role": "reviewer",
+            },
+        )
+
+        self.assertEqual(forbidden.status_code, 403)
+        self.assertEqual(first.status_code, 200)
+        first_stable = {
+            key: value for key, value in first.json().items() if key != "generated_at"
+        }
+        second_stable = {
+            key: value for key, value in second.json().items() if key != "generated_at"
+        }
+        self.assertEqual(first_stable, second_stable)
+        payload = first.json()
+        jsonschema.validate(
+            payload,
+            json.loads(
+                (
+                    ROOT
+                    / "knowledge-base"
+                    / "visual-qc-dataset-audit-v1-schema.json"
+                ).read_text(encoding="utf-8")
+            ),
+        )
+        self.assertEqual(payload["schema_version"], "VISUAL-QC-DATASET-AUDIT-V1")
+        self.assertEqual(payload["total_case_count"], 3)
+        self.assertEqual(payload["eligible_case_count"], 1)
+        self.assertEqual(payload["excluded_case_count"], 2)
+        self.assertEqual(payload["reason_counts"], {
+            "non_physical_evidence": 1,
+            "registration_review_required": 1,
+        })
+        cases = {case["case_id"]: case for case in payload["cases"]}
+        self.assertEqual(cases[proxy["case_id"]]["status"], "excluded")
+        self.assertEqual(
+            cases[proxy["case_id"]]["blocking_reason"],
+            "non_physical_evidence",
+        )
+        self.assertEqual(
+            cases[waiting_registration["case_id"]]["blocking_reason"],
+            "registration_review_required",
+        )
+        self.assertEqual(cases[eligible["case_id"]]["status"], "eligible")
+        self.assertIsNone(cases[eligible["case_id"]]["blocking_reason"])

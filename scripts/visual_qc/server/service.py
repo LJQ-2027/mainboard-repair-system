@@ -686,6 +686,62 @@ class VisualQcService:
     def training_coco(self) -> dict:
         return build_coco_from_training_manifest(self.training_manifest())
 
+    def training_audit(self) -> dict:
+        cases = []
+        reason_counts = {}
+        eligible_count = 0
+        for record in self.store.list_dataset_audit_cases():
+            quality = (record.get("job_result") or {}).get("quality") or {}
+            registration_review = self.store.get_latest_registration_review(
+                record["case_id"]
+            )
+            qc_review = self.store.get_latest_case_qc_review(record["case_id"])
+            if record["evidence_role"] != "physical_capture":
+                reason = "non_physical_evidence"
+            elif record["capture_checklist"].get("status") != "confirmed":
+                reason = "capture_checklist_required"
+            elif record["job_status"] != "succeeded":
+                reason = "processing_incomplete"
+            elif quality.get("status") == "retake":
+                reason = "image_retake_required"
+            elif not registration_review:
+                reason = "registration_review_required"
+            elif not qc_review:
+                reason = "final_qc_review_required"
+            else:
+                reason = None
+
+            status = "eligible" if reason is None else "excluded"
+            if status == "eligible":
+                eligible_count += 1
+            else:
+                reason_counts[reason] = reason_counts.get(reason, 0) + 1
+            cases.append({
+                "case_id": record["case_id"],
+                "board_key": record["board_key"],
+                "board_id": record["board_id"],
+                "side_id": record["side_id"],
+                "capture_stage": record["capture_stage"],
+                "evidence_role": record["evidence_role"],
+                "image_id": record["image_id"],
+                "job_status": record["job_status"],
+                "quality_status": quality.get("status"),
+                "registration_reviewed": registration_review is not None,
+                "final_qc_reviewed": qc_review is not None,
+                "status": status,
+                "blocking_reason": reason,
+                "created_at": record["created_at"],
+            })
+        return {
+            "schema_version": "VISUAL-QC-DATASET-AUDIT-V1",
+            "generated_at": utc_now(),
+            "total_case_count": len(cases),
+            "eligible_case_count": eligible_count,
+            "excluded_case_count": len(cases) - eligible_count,
+            "reason_counts": dict(sorted(reason_counts.items())),
+            "cases": cases,
+        }
+
     def training_image(self, image_id: str) -> dict:
         image = self.store.get_training_image(image_id)
         if not image:

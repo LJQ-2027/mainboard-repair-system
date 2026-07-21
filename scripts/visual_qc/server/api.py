@@ -393,6 +393,22 @@ def create_app(settings: VisualQcServerSettings | None = None) -> FastAPI:
             )
         return service.training_coco()
 
+    @app.get("/api/v1/visual-qc/datasets/audit")
+    def training_audit(
+        x_actor_id: str | None = Header(None, alias="X-Actor-Id"),
+        x_actor_role: str | None = Header(None, alias="X-Actor-Role"),
+    ):
+        actor_id(x_actor_id)
+        if x_actor_role != "reviewer":
+            raise HTTPException(
+                status_code=403,
+                detail={
+                    "code": "reviewer_role_required",
+                    "message": "Dataset readiness audit requires the reviewer role.",
+                },
+            )
+        return service.training_audit()
+
     return app
 
 

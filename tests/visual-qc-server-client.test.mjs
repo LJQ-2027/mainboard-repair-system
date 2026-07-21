@@ -14,6 +14,7 @@ import {
   createServerSyncState,
   createUploadDescriptor,
   getVisualQcCocoDataset,
+  getVisualQcDatasetAudit,
   getVisualQcIdentity,
   getVisualQcTrainingManifest,
   normalizeServerCaptureSession,
@@ -139,7 +140,7 @@ test('server identity replaces browser hints with the gateway assertion', async 
   }
 });
 
-test('reviewer dataset requests use the governed manifest and COCO routes', async () => {
+test('reviewer dataset requests use all governed export and audit routes', async () => {
   const originalFetch = globalThis.fetch;
   const requests = [];
   globalThis.fetch = async (url, options) => {
@@ -153,6 +154,7 @@ test('reviewer dataset requests use the governed manifest and COCO routes', asyn
   try {
     await getVisualQcTrainingManifest('/api/v1/visual-qc', 'reviewer-001', 'reviewer');
     await getVisualQcCocoDataset('/api/v1/visual-qc/', 'reviewer-001', 'reviewer');
+    await getVisualQcDatasetAudit('/api/v1/visual-qc/', 'reviewer-001', 'reviewer');
   } finally {
     globalThis.fetch = originalFetch;
   }
@@ -160,6 +162,7 @@ test('reviewer dataset requests use the governed manifest and COCO routes', asyn
   assert.deepEqual(requests.map((request) => request.url), [
     '/api/v1/visual-qc/datasets/training-manifest',
     '/api/v1/visual-qc/datasets/coco',
+    '/api/v1/visual-qc/datasets/audit',
   ]);
   assert.ok(requests.every(
     (request) => request.options.headers['X-Actor-Role'] === 'reviewer',
