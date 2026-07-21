@@ -29,7 +29,10 @@ reviewed runtime allowlist. It includes the technician UI, five-board assets,
 knowledge data, API/worker code, and maintenance validators while excluding raw
 source archives, tests, reports, output, and documentation. The 2026-07-21
 archive smoke reduced the package from about 197 MB to 52.4 MB with 305 tracked
-entries and all required runtime files present.
+entries and all required runtime files present. The first production deployment
+through this allowlist completed in about 194 seconds versus about 808 seconds
+for the preceding full-repository deployment, while preserving the existing
+case database and serving the workbench, KM4 atlas, and training manifest.
 
 ## Runtime
 
@@ -62,7 +65,7 @@ ANTHROPIC_API_KEY=...
 ## Current Deployment
 
 - Deployed on: 2026-07-21
-- Deployed commit: `5ece9c8`
+- Deployed commit: `3396463` (runtime behavior from `5ece9c8`)
 - Internal service: `http://127.0.0.1:3010`
 - Internal visual-QC API: `http://127.0.0.1:3020`
 - External beta URL: `https://cccsat.top/mb-repair-beta/`
