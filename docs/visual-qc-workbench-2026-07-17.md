@@ -20,7 +20,7 @@ The current internal workbench supports the five compiled mainboard platforms:
 8. Add an independent check point when using manual registration and review the normalized projection error.
 9. Confirm registration, annotate visible defects, and review each human or model candidate.
 10. Complete the final human QC result. Server-connected physical cases persist an append-only QC review version; local-only cases remain browser drafts.
-11. Export the V2 JSON and annotated PNG preview.
+11. Export the V2 JSON and annotated PNG preview. Reviewers additionally see the server-owned eligible case, confirmed annotation, and covered-category totals and can download the current manifest or deterministic COCO dataset.
 
 Cases and source image blobs are recoverable from IndexedDB. Imported JSON requires the original image to be selected again and accepted only after its SHA-256 and dimensions match.
 
@@ -61,7 +61,7 @@ Export reviewed cases to deterministic COCO:
 py -3 scripts/export_visual_qc_coco.py cases/ visual-qc.coco.json
 ```
 
-Training-ready V2 data requires a valid image hash, a confirmed physical-capture checklist, acceptable image quality, reviewed registration, legal normalized coordinates, resolved board identity, reviewed human labels, a final human QC result, and a matching eligible server QC review. The reviewer-only server manifest is `VISUAL-QC-TRAINING-MANIFEST-V1`; its image route exposes only originals attached to an eligible latest QC review.
+Training-ready V2 data requires a valid image hash, a confirmed physical-capture checklist, acceptable image quality, reviewed registration, legal normalized coordinates, resolved board identity, reviewed human labels, a final human QC result, and a matching eligible server QC review. The reviewer-only server manifest is `VISUAL-QC-TRAINING-MANIFEST-V1`; its image route exposes only originals attached to an eligible latest QC review. `GET /datasets/coco` derives `VISUAL-QC-COCO-V1` directly from that manifest, so local drafts and proxy samples cannot bypass the server gate. The reviewer workbench shows the same server-owned counts and downloads; technicians do not see that section and remain blocked by the API role check.
 
 ## Real Acceptance Gate
 

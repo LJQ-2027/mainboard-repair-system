@@ -65,7 +65,7 @@ ANTHROPIC_API_KEY=...
 ## Current Deployment
 
 - Deployed on: 2026-07-21
-- Deployed commit: `3396463` (runtime behavior from `5ece9c8`)
+- Deployed commit: `508cddb`
 - Internal service: `http://127.0.0.1:3010`
 - Internal visual-QC API: `http://127.0.0.1:3020`
 - External beta URL: `https://cccsat.top/mb-repair-beta/`
@@ -95,6 +95,16 @@ ANTHROPIC_API_KEY=...
   `VISUAL-QC-TRAINING-MANIFEST-V1` with zero eligible cases, and typed
   `404 training_image_not_found` for an unknown image. The empty manifest is
   expected because the only stored case is proxy evidence.
+- 2026-07-21 governed COCO increment: the reviewer-only
+  `VISUAL-QC-COCO-V1` route deterministically derives images and confirmed
+  human annotations from the eligible training manifest. The reviewer
+  workbench displays server-owned case, annotation, and category totals and
+  downloads both JSON contracts; technicians do not see this panel and the
+  API independently returns `403 reviewer_role_required`. Production P4 at
+  `508cddb` returned an empty but schema-valid dataset with nine fixed
+  categories and byte-identical repeated responses. Headed Chrome QA passed
+  desktop and 390 px layouts, both downloads, no horizontal overflow, and
+  zero console warnings or errors.
 - Proxy evidence: one KM4 reviewed manual image was accepted as a proxy case,
   scored `usable`, and correctly fell back to manual four-point registration
   after ORB/AKAZE evidence failed the inlier gate. It is not physical-board
