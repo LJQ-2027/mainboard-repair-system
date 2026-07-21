@@ -49,6 +49,7 @@ import {
   getVisualQcCaptureSession,
   getVisualQcCocoDataset,
   getVisualQcDatasetAudit,
+  getVisualQcDatasetBundle,
   getVisualQcIdentity,
   getVisualQcTrainingManifest,
   getVisualQcArtifact,
@@ -192,6 +193,7 @@ const elements = {
   refreshTrainingDatasetButton: byId('refreshTrainingDatasetButton'),
   downloadTrainingManifestButton: byId('downloadTrainingManifestButton'),
   downloadTrainingCocoButton: byId('downloadTrainingCocoButton'),
+  downloadTrainingBundleButton: byId('downloadTrainingBundleButton'),
   qcResultTitle: byId('qcResultTitle'),
   qcResultBadge: byId('qcResultBadge'),
   exportJsonButton: byId('exportJsonButton'),
@@ -1925,6 +1927,7 @@ function renderTrainingDataset() {
   elements.refreshTrainingDatasetButton.disabled = state.trainingDatasetBusy;
   elements.downloadTrainingManifestButton.disabled = state.trainingDatasetBusy || !manifest;
   elements.downloadTrainingCocoButton.disabled = state.trainingDatasetBusy || !manifest;
+  elements.downloadTrainingBundleButton.disabled = state.trainingDatasetBusy || !manifest;
 }
 
 async function refreshTrainingDataset({ quiet = false } = {}) {
@@ -2044,6 +2047,30 @@ async function downloadTrainingCoco() {
     downloadJsonDocument(dataset, 'visual-qc-reviewed-dataset.coco.json');
   } catch (error) {
     state.trainingDatasetError = error.message || 'COCO 下载失败';
+    reportUserError(error);
+  } finally {
+    state.trainingDatasetBusy = false;
+    renderTrainingDataset();
+  }
+}
+
+async function downloadTrainingBundle() {
+  if (VISUAL_QC_ACTOR_ROLE !== 'reviewer') return;
+  state.trainingDatasetBusy = true;
+  state.trainingDatasetError = null;
+  renderTrainingDataset();
+  try {
+    const bundle = await getVisualQcDatasetBundle(
+      VISUAL_QC_API,
+      VISUAL_QC_ACTOR_ID,
+      VISUAL_QC_ACTOR_ROLE,
+    );
+    if (bundle.type && bundle.type !== 'application/zip') {
+      throw new Error('服务器返回的数据包格式不受支持');
+    }
+    downloadBlob(bundle, 'visual-qc-training-dataset.zip');
+  } catch (error) {
+    state.trainingDatasetError = error.message || '完整数据包下载失败';
     reportUserError(error);
   } finally {
     state.trainingDatasetBusy = false;
@@ -2355,6 +2382,7 @@ function bindEvents() {
     }
   });
   elements.downloadTrainingCocoButton.addEventListener('click', downloadTrainingCoco);
+  elements.downloadTrainingBundleButton.addEventListener('click', downloadTrainingBundle);
   elements.savedCasesButton.addEventListener('click', async () => {
     await renderSavedCases();
     elements.savedCasesDialog.showModal();

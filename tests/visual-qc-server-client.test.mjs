@@ -14,6 +14,7 @@ import {
   createServerSyncState,
   createUploadDescriptor,
   getVisualQcCocoDataset,
+  getVisualQcDatasetBundle,
   getVisualQcDatasetAudit,
   getVisualQcIdentity,
   getVisualQcTrainingManifest,
@@ -149,12 +150,19 @@ test('reviewer dataset requests use all governed export and audit routes', async
       ok: true,
       status: 200,
       json: async () => ({ schema_version: 'test' }),
+      blob: async () => new Blob(['bundle-bytes'], { type: 'application/zip' }),
     };
   };
   try {
     await getVisualQcTrainingManifest('/api/v1/visual-qc', 'reviewer-001', 'reviewer');
     await getVisualQcCocoDataset('/api/v1/visual-qc/', 'reviewer-001', 'reviewer');
     await getVisualQcDatasetAudit('/api/v1/visual-qc/', 'reviewer-001', 'reviewer');
+    const bundle = await getVisualQcDatasetBundle(
+      '/api/v1/visual-qc/',
+      'reviewer-001',
+      'reviewer',
+    );
+    assert.equal(await bundle.text(), 'bundle-bytes');
   } finally {
     globalThis.fetch = originalFetch;
   }
@@ -163,6 +171,7 @@ test('reviewer dataset requests use all governed export and audit routes', async
     '/api/v1/visual-qc/datasets/training-manifest',
     '/api/v1/visual-qc/datasets/coco',
     '/api/v1/visual-qc/datasets/audit',
+    '/api/v1/visual-qc/datasets/bundle',
   ]);
   assert.ok(requests.every(
     (request) => request.options.headers['X-Actor-Role'] === 'reviewer',

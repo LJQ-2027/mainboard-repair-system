@@ -1,7 +1,9 @@
 import hashlib
+import io
 import json
 import tempfile
 import unittest
+import zipfile
 from pathlib import Path
 
 import cv2
@@ -319,6 +321,100 @@ class VisualQcTrainingManifestTests(unittest.TestCase):
             ).read_text(encoding="utf-8")
         )
         jsonschema.validate(payload, schema)
+
+    def test_reviewer_bundle_is_deterministic_and_contains_governed_images(self):
+        case = self.create_processed_case("training-bundle")
+        self.accept_registration(case["case_id"])
+        self.assertEqual(self.submit_no_anomaly(case["case_id"]).status_code, 201)
+
+        forbidden = self.client.get(
+            "/api/v1/visual-qc/datasets/bundle",
+            headers={"X-Actor-Id": "technician-001"},
+        )
+        headers = {
+            "X-Actor-Id": "reviewer-001",
+            "X-Actor-Role": "reviewer",
+        }
+        first = self.client.get("/api/v1/visual-qc/datasets/bundle", headers=headers)
+        second = self.client.get("/api/v1/visual-qc/datasets/bundle", headers=headers)
+
+        self.assertEqual(forbidden.status_code, 403)
+        self.assertEqual(
+            forbidden.json()["detail"]["code"],
+            "reviewer_role_required",
+        )
+        self.assertEqual(first.status_code, 200)
+        self.assertEqual(first.headers["content-type"], "application/zip")
+        self.assertIn(
+            'filename="visual-qc-training-dataset.zip"',
+            first.headers["content-disposition"],
+        )
+        self.assertEqual(first.content, second.content)
+
+        with zipfile.ZipFile(io.BytesIO(first.content)) as bundle:
+            names = bundle.namelist()
+            self.assertEqual(
+                names,
+                [
+                    "manifest.json",
+                    "annotations.coco.json",
+                    "bundle-index.json",
+                    f"images/{case['case_id']}.jpg",
+                ],
+            )
+            manifest = json.loads(bundle.read("manifest.json"))
+            coco = json.loads(bundle.read("annotations.coco.json"))
+            index = json.loads(bundle.read("bundle-index.json"))
+            image_bytes = bundle.read(f"images/{case['case_id']}.jpg")
+
+        jsonschema.validate(
+            index,
+            json.loads(
+                (
+                    ROOT
+                    / "knowledge-base"
+                    / "visual-qc-dataset-bundle-v1-schema.json"
+                ).read_text(encoding="utf-8")
+            ),
+        )
+        jsonschema.validate(
+            manifest,
+            json.loads(
+                (
+                    ROOT
+                    / "knowledge-base"
+                    / "visual-qc-training-manifest-v1-schema.json"
+                ).read_text(encoding="utf-8")
+            ),
+        )
+        jsonschema.validate(
+            coco,
+            json.loads(
+                (
+                    ROOT
+                    / "knowledge-base"
+                    / "visual-qc-coco-v1-schema.json"
+                ).read_text(encoding="utf-8")
+            ),
+        )
+        self.assertEqual(index["schema_version"], "VISUAL-QC-DATASET-BUNDLE-V1")
+        self.assertEqual(index["case_count"], 1)
+        self.assertEqual(index["files"][0]["case_id"], case["case_id"])
+        self.assertEqual(
+            index["files"][0]["archive_path"],
+            f"images/{case['case_id']}.jpg",
+        )
+        self.assertEqual(manifest["case_count"], 1)
+        self.assertEqual(coco["images"][0]["file_name"], index["files"][0]["archive_path"])
+        self.assertEqual(
+            hashlib.sha256(image_bytes).hexdigest(),
+            index["files"][0]["sha256"],
+        )
+        self.assertEqual(image_bytes, self.image_bytes)
+        self.assertEqual(
+            list((Path(self.temp_dir.name) / "exports").glob("*.zip")),
+            [],
+        )
 
     def test_reviewer_dataset_audit_explains_the_current_training_gate(self):
         proxy = self.create_processed_case(

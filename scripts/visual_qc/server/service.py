@@ -3,9 +3,13 @@ from __future__ import annotations
 import hashlib
 import json
 from datetime import datetime, timedelta, timezone
+import os
 from pathlib import Path
+import shutil
+import tempfile
 import threading
 import uuid
+import zipfile
 
 import cv2
 import numpy as np
@@ -19,6 +23,7 @@ from scripts.visual_qc.server.difference import generate_difference_candidates
 from scripts.visual_qc.server.quality import analyze_image_quality
 from scripts.visual_qc.server.storage import (
     LocalObjectStorage,
+    MIME_EXTENSIONS,
     StorageCleanupError,
     StorageError,
     detect_image_mime_type,
@@ -685,6 +690,139 @@ class VisualQcService:
 
     def training_coco(self) -> dict:
         return build_coco_from_training_manifest(self.training_manifest())
+
+    @staticmethod
+    def _bundle_timestamp(manifest: dict) -> str:
+        reviewed_at = [
+            case["qc_review"]["created_at"]
+            for case in manifest["cases"]
+        ]
+        return max(reviewed_at, default="1970-01-01T00:00:00+00:00")
+
+    @staticmethod
+    def _bundle_zip_info(archive_path: str) -> zipfile.ZipInfo:
+        info = zipfile.ZipInfo(archive_path, date_time=(1980, 1, 1, 0, 0, 0))
+        info.compress_type = zipfile.ZIP_STORED
+        info.create_system = 3
+        info.external_attr = 0o100644 << 16
+        return info
+
+    @staticmethod
+    def _bundle_json_bytes(payload: dict) -> bytes:
+        return (
+            json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
+        ).encode("utf-8")
+
+    @staticmethod
+    def _sha256_file(path: Path) -> str:
+        digest = hashlib.sha256()
+        with path.open("rb") as handle:
+            for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                digest.update(chunk)
+        return digest.hexdigest()
+
+    def training_bundle(self) -> Path:
+        manifest = self.training_manifest()
+        generated_at = self._bundle_timestamp(manifest)
+        manifest["generated_at"] = generated_at
+        cases = sorted(manifest["cases"], key=lambda item: item["case_id"])
+        manifest["cases"] = cases
+
+        files = []
+        source_images = []
+        for case in cases:
+            image = self.training_image(case["image"]["image_id"])
+            extension = MIME_EXTENSIONS.get(image["mime_type"])
+            if not extension:
+                raise VisualQcServiceError(
+                    "training_image_type_unsupported",
+                    "Training image MIME type cannot be packaged.",
+                    422,
+                )
+            source_path = Path(image["storage_path"])
+            archive_path = f"images/{case['case_id']}{extension}"
+            source_images.append((source_path, archive_path, image["sha256"]))
+            files.append({
+                "case_id": case["case_id"],
+                "image_id": image["image_id"],
+                "archive_path": archive_path,
+                "mime_type": image["mime_type"],
+                "sha256": image["sha256"],
+                "byte_size": image["byte_size"],
+            })
+
+        required_bytes = sum(file["byte_size"] for file in files) + 1024 * 1024
+        free_after_export = (
+            shutil.disk_usage(self.settings.data_root).free - required_bytes
+        )
+        if free_after_export < self.settings.minimum_free_bytes:
+            raise VisualQcServiceError(
+                "insufficient_storage",
+                "Server free-space reserve would be exceeded by the dataset bundle.",
+                507,
+            )
+
+        coco = build_coco_from_training_manifest(manifest)
+        archive_paths = {
+            file["case_id"]: file["archive_path"]
+            for file in files
+        }
+        for image in coco["images"]:
+            image["file_name"] = archive_paths[image["case_id"]]
+        index = {
+            "schema_version": "VISUAL-QC-DATASET-BUNDLE-V1",
+            "generated_at": generated_at,
+            "case_count": len(cases),
+            "annotation_count": manifest["annotation_count"],
+            "manifest_path": "manifest.json",
+            "coco_path": "annotations.coco.json",
+            "files": files,
+        }
+
+        export_root = self.settings.data_root / "exports"
+        export_root.mkdir(parents=True, exist_ok=True)
+        descriptor, temporary_name = tempfile.mkstemp(
+            prefix="visual-qc-training-",
+            suffix=".zip",
+            dir=export_root,
+        )
+        os.close(descriptor)
+        try:
+            with self.storage.reference_transaction():
+                for source_path, _archive_path, expected_sha256 in source_images:
+                    if not source_path.is_file():
+                        raise VisualQcServiceError(
+                            "training_image_missing",
+                            "Training image storage object is missing.",
+                            410,
+                        )
+                    if self._sha256_file(source_path) != expected_sha256:
+                        raise VisualQcServiceError(
+                            "training_image_integrity_mismatch",
+                            "Training image does not match its governed SHA-256.",
+                            409,
+                        )
+                with zipfile.ZipFile(temporary_name, mode="w") as bundle:
+                    bundle.writestr(
+                        self._bundle_zip_info("manifest.json"),
+                        self._bundle_json_bytes(manifest),
+                    )
+                    bundle.writestr(
+                        self._bundle_zip_info("annotations.coco.json"),
+                        self._bundle_json_bytes(coco),
+                    )
+                    bundle.writestr(
+                        self._bundle_zip_info("bundle-index.json"),
+                        self._bundle_json_bytes(index),
+                    )
+                    for source_path, archive_path, _sha256 in source_images:
+                        with bundle.open(self._bundle_zip_info(archive_path), "w") as target:
+                            with source_path.open("rb") as source:
+                                shutil.copyfileobj(source, target, length=1024 * 1024)
+            return Path(temporary_name)
+        except Exception:
+            Path(temporary_name).unlink(missing_ok=True)
+            raise
 
     def training_audit(self) -> dict:
         cases = []

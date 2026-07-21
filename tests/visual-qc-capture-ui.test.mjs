@@ -31,6 +31,11 @@ test('reviewer training export has one compact governed dataset section', () => 
   assert.match(html, /id="refreshTrainingDatasetButton"/);
   assert.match(html, /id="downloadTrainingManifestButton"/);
   assert.match(html, /id="downloadTrainingCocoButton"/);
+  assert.match(html, /id="downloadTrainingBundleButton"/);
+  assert.match(
+    css,
+    /\.training-dataset-actions\s*\{[^}]*display:\s*grid[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/s,
+  );
 });
 
 test('canvas elements cannot feed their intrinsic bitmap height back into layout', () => {

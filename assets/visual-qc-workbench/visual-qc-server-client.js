@@ -180,6 +180,26 @@ async function jsonRequest(
   return payload;
 }
 
+async function blobRequest(url, { actorId, actorRole = null } = {}) {
+  const response = await fetch(url, {
+    cache: 'no-store',
+    headers: {
+      'X-Actor-Id': actorId,
+      ...(actorRole ? { 'X-Actor-Role': actorRole } : {}),
+    },
+  });
+  if (!response.ok) {
+    const payload = await response.json().catch(() => null);
+    const error = new Error(
+      payload?.detail?.message || payload?.detail || `Server returned ${response.status}.`,
+    );
+    error.status = response.status;
+    error.code = payload?.detail?.code || 'server_request_failed';
+    throw error;
+  }
+  return response.blob();
+}
+
 export function getVisualQcIdentity(apiBase, actorId, actorRole = null) {
   return jsonRequest(`${apiBase.replace(/\/$/, '')}/identity`, {
     actorId,
@@ -203,6 +223,13 @@ export function getVisualQcCocoDataset(apiBase, actorId, actorRole = 'reviewer')
 
 export function getVisualQcDatasetAudit(apiBase, actorId, actorRole = 'reviewer') {
   return jsonRequest(`${apiBase.replace(/\/$/, '')}/datasets/audit`, {
+    actorId,
+    actorRole,
+  });
+}
+
+export function getVisualQcDatasetBundle(apiBase, actorId, actorRole = 'reviewer') {
+  return blobRequest(`${apiBase.replace(/\/$/, '')}/datasets/bundle`, {
     actorId,
     actorRole,
   });

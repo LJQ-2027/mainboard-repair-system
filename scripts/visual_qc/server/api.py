@@ -6,6 +6,7 @@ from fastapi import FastAPI, File, Form, Header, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+from starlette.background import BackgroundTask
 
 from scripts.visual_qc.server.config import VisualQcServerSettings
 from scripts.visual_qc.server.service import VisualQcService, VisualQcServiceError
@@ -408,6 +409,31 @@ def create_app(settings: VisualQcServerSettings | None = None) -> FastAPI:
                 },
             )
         return service.training_audit()
+
+    @app.get("/api/v1/visual-qc/datasets/bundle")
+    def training_bundle(
+        x_actor_id: str | None = Header(None, alias="X-Actor-Id"),
+        x_actor_role: str | None = Header(None, alias="X-Actor-Role"),
+    ):
+        actor_id(x_actor_id)
+        if x_actor_role != "reviewer":
+            raise HTTPException(
+                status_code=403,
+                detail={
+                    "code": "reviewer_role_required",
+                    "message": "Training dataset bundle export requires the reviewer role.",
+                },
+            )
+        try:
+            bundle_path = service.training_bundle()
+            return FileResponse(
+                bundle_path,
+                media_type="application/zip",
+                filename="visual-qc-training-dataset.zip",
+                background=BackgroundTask(bundle_path.unlink, missing_ok=True),
+            )
+        except VisualQcServiceError as exc:
+            service_error(exc)
 
     return app
 
