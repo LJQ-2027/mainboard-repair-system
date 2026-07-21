@@ -19,7 +19,7 @@
 - Create: `scripts/visual_qc/intake.py`
 - Create: `tests/test_visual_qc_intake.py`
 
-- [ ] **Step 1: Write failing schema and validation tests**
+- [x] **Step 1: Write failing schema and validation tests**
 
 Add tests that build temporary JPEG files and assert the public validator returns normalized entries only when board, side, stage, session, setup, checklist, signature, dimensions, and optional hash agree:
 
@@ -42,7 +42,7 @@ def test_duplicate_session_side_fails_before_upload(self):
 
 Also cover unsafe identifiers, duplicate entry ids, duplicate resolved paths, unknown boards/sides, mixed session identity, incomplete checklist, MIME/signature mismatch, undecodable image, dimension limits, and expected-hash mismatch. Validate a generated receipt against the committed receipt schema.
 
-- [ ] **Step 2: Run the targeted tests and verify RED**
+- [x] **Step 2: Run the targeted tests and verify RED**
 
 Run:
 
@@ -52,7 +52,7 @@ Run:
 
 Expected: import failure because `scripts.visual_qc.intake` does not exist.
 
-- [ ] **Step 3: Add the exact JSON contracts**
+- [x] **Step 3: Add the exact JSON contracts**
 
 Define `VISUAL-QC-INTAKE-BATCH-V1` with bounded safe identifiers and this entry shape:
 
@@ -76,7 +76,7 @@ Define `VISUAL-QC-INTAKE-BATCH-V1` with bounded safe identifiers and this entry 
 
 Define the receipt with stable `batch_id`, one row per `entry_id`, computed evidence, idempotency key, nullable server ids, terminal state, and nullable typed error. Commit an example that uses placeholder paths and hashes only; never commit a real photo path or credential.
 
-- [ ] **Step 4: Implement the focused validator and receipt helpers**
+- [x] **Step 4: Implement the focused validator and receipt helpers**
 
 Expose these interfaces from `scripts/visual_qc/intake.py`:
 
@@ -103,7 +103,7 @@ def write_json_atomic(path: Path, payload: dict) -> None:
 
 Use `BoardCatalog`, `detect_image_mime_type`, and `cv2.imdecode`; do not duplicate board-side truth or infer metadata from image content.
 
-- [ ] **Step 5: Run tests and contract validation**
+- [x] **Step 5: Run tests and contract validation**
 
 Run:
 

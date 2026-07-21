@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "VISUAL-QC-INTAKE-RECEIPT-V1",
+  "title": "Owner-managed visual QC intake receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "batch_id", "entries"],
+  "properties": {
+    "schema_version": {"const": "VISUAL-QC-INTAKE-RECEIPT-V1"},
+    "batch_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["entry_id", "sha256", "idempotency_key", "mime_type", "width", "height", "byte_size", "state", "server_case_id", "server_job_id", "error"],
+        "properties": {
+          "entry_id": {"type": "string"},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "idempotency_key": {"type": "string", "pattern": "^intake:[0-9a-f]{48}$"},
+          "mime_type": {"enum": ["image/jpeg", "image/png", "image/webp"]},
+          "width": {"type": "integer", "minimum": 64},
+          "height": {"type": "integer", "minimum": 64},
+          "byte_size": {"type": "integer", "minimum": 1},
+          "state": {"enum": ["validated", "uploading", "uploaded", "processing", "completed", "failed"]},
+          "server_case_id": {"type": ["string", "null"]},
+          "server_job_id": {"type": ["string", "null"]},
+          "error": {
+            "oneOf": [
+              {"type": "null"},
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["code", "message"],
+                "properties": {
+                  "code": {"type": "string"},
+                  "message": {"type": "string"}
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}
