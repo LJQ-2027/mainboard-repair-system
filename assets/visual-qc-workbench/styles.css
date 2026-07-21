@@ -894,6 +894,65 @@ button:disabled {
   background: #b4792a;
 }
 
+.training-gate-cases {
+  margin: 0 0 10px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.training-gate-cases summary {
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.training-gate-cases summary:focus-visible {
+  outline: 3px solid rgba(49, 95, 120, 0.32);
+  outline-offset: 2px;
+}
+
+.training-gate-cases summary span {
+  margin-left: auto;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.training-gate-case {
+  min-width: 0;
+  padding: 8px 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: start;
+  border-top: 1px solid var(--line);
+}
+
+.training-gate-case > span:first-child {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.training-gate-case strong {
+  overflow-wrap: anywhere;
+  font-size: 11px;
+}
+
+.training-gate-case small,
+.training-gate-case > span:last-child {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.training-gate-case > span:last-child {
+  max-width: 92px;
+  text-align: right;
+}
+
 dialog {
   width: min(520px, calc(100vw - 28px));
   max-height: min(640px, calc(100vh - 40px));

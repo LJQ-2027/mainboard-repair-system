@@ -250,6 +250,10 @@
           </dl>
           <p id="trainingDatasetSummary" class="source-note">正在读取服务器训练门禁结果。</p>
           <div id="trainingGateSummary" class="training-gate-summary" aria-live="polite"></div>
+          <details id="trainingGateCasesDisclosure" class="training-gate-cases" hidden>
+            <summary>排除案例明细 <span id="trainingGateCaseCount">0</span></summary>
+            <div id="trainingGateCaseList"></div>
+          </details>
           <div class="button-row training-dataset-actions">
             <button id="refreshTrainingDatasetButton" class="secondary-button" type="button">刷新</button>
             <button id="downloadTrainingManifestButton" class="secondary-button" type="button" disabled>下载清单</button>

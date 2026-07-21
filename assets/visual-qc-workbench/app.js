@@ -186,6 +186,9 @@ const elements = {
   trainingExcludedCount: byId('trainingExcludedCount'),
   trainingDatasetSummary: byId('trainingDatasetSummary'),
   trainingGateSummary: byId('trainingGateSummary'),
+  trainingGateCasesDisclosure: byId('trainingGateCasesDisclosure'),
+  trainingGateCaseCount: byId('trainingGateCaseCount'),
+  trainingGateCaseList: byId('trainingGateCaseList'),
   refreshTrainingDatasetButton: byId('refreshTrainingDatasetButton'),
   downloadTrainingManifestButton: byId('downloadTrainingManifestButton'),
   downloadTrainingCocoButton: byId('downloadTrainingCocoButton'),
@@ -259,6 +262,13 @@ const TRAINING_GATE_LABELS = Object.freeze({
   image_retake_required: '图片需要重拍',
   registration_review_required: '配准尚未审核',
   final_qc_review_required: '最终 QC 未审核',
+});
+
+const BOARD_SIDE_LABELS = Object.freeze({
+  main_page_1: '第1面',
+  main_page_2: '第2面',
+  main_top: 'TOP',
+  main_bot: 'BOT',
 });
 
 function currentCase() {
@@ -1877,6 +1887,27 @@ function renderTrainingDataset() {
     const item = document.createElement('span');
     item.textContent = `${TRAINING_GATE_LABELS[reason] || reason} ${count}`;
     elements.trainingGateSummary.append(item);
+  }
+  const excludedCases = (audit?.cases || [])
+    .filter((auditCase) => auditCase.status === 'excluded');
+  elements.trainingGateCasesDisclosure.hidden = excludedCases.length === 0;
+  elements.trainingGateCaseCount.textContent = String(excludedCases.length);
+  elements.trainingGateCaseList.replaceChildren();
+  for (const auditCase of excludedCases) {
+    const row = document.createElement('div');
+    row.className = 'training-gate-case';
+    const identity = document.createElement('span');
+    const title = document.createElement('strong');
+    title.textContent = state.catalog?.boards?.[auditCase.board_key]?.title
+      || auditCase.board_key;
+    const meta = document.createElement('small');
+    meta.textContent = `${BOARD_SIDE_LABELS[auditCase.side_id] || auditCase.side_id} · ${auditCase.case_id.slice(-8)}`;
+    identity.append(title, meta);
+    const reason = document.createElement('span');
+    reason.textContent = TRAINING_GATE_LABELS[auditCase.blocking_reason]
+      || auditCase.blocking_reason;
+    row.append(identity, reason);
+    elements.trainingGateCaseList.append(row);
   }
 
   if (state.trainingDatasetBusy) {
