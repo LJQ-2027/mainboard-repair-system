@@ -110,6 +110,8 @@ class VisualQcStore:
                     method TEXT NOT NULL,
                     matrix_json TEXT NOT NULL,
                     anchors_json TEXT NOT NULL DEFAULT '[]',
+                    check_points_json TEXT NOT NULL DEFAULT '[]',
+                    error_json TEXT NOT NULL DEFAULT '{"count":0,"rms":null,"maximum":null}',
                     notes TEXT NOT NULL,
                     created_at TEXT NOT NULL
                 );
@@ -153,6 +155,18 @@ class VisualQcStore:
                     notes TEXT NOT NULL,
                     created_at TEXT NOT NULL
                 );
+                CREATE TABLE IF NOT EXISTS case_qc_reviews (
+                    qc_review_id TEXT PRIMARY KEY,
+                    case_id TEXT NOT NULL REFERENCES cases(case_id),
+                    registration_review_id TEXT NOT NULL REFERENCES registration_reviews(review_id),
+                    reviewer_id TEXT NOT NULL,
+                    version INTEGER NOT NULL,
+                    qc_result TEXT NOT NULL,
+                    annotations_json TEXT NOT NULL,
+                    notes TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    UNIQUE(case_id, version)
+                );
                 CREATE TABLE IF NOT EXISTS retention_runs (
                     run_id TEXT PRIMARY KEY,
                     status TEXT NOT NULL,
@@ -174,6 +188,8 @@ class VisualQcStore:
                     ON golden_samples(board_key, side_id, capture_setup_id, status);
                 CREATE INDEX IF NOT EXISTS candidate_reviews_job_candidate
                     ON candidate_reviews(job_id, candidate_id, created_at);
+                CREATE INDEX IF NOT EXISTS case_qc_reviews_case_version
+                    ON case_qc_reviews(case_id, version);
                 """
             )
             case_columns = {
@@ -223,6 +239,17 @@ class VisualQcStore:
                 connection.execute(
                     "ALTER TABLE registration_reviews "
                     "ADD COLUMN anchors_json TEXT NOT NULL DEFAULT '[]'"
+                )
+            if "check_points_json" not in review_columns:
+                connection.execute(
+                    "ALTER TABLE registration_reviews "
+                    "ADD COLUMN check_points_json TEXT NOT NULL DEFAULT '[]'"
+                )
+            if "error_json" not in review_columns:
+                connection.execute(
+                    "ALTER TABLE registration_reviews "
+                    "ADD COLUMN error_json TEXT NOT NULL "
+                    """DEFAULT '{"count":0,"rms":null,"maximum":null}'"""
                 )
             job_columns = {
                 row["name"]
@@ -622,6 +649,132 @@ class VisualQcStore:
             )
             connection.commit()
 
+    def create_case_qc_review(self, record: dict):
+        with self.connect() as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            version = connection.execute(
+                """
+                SELECT COALESCE(MAX(version), 0) + 1 AS version
+                FROM case_qc_reviews
+                WHERE case_id = ?
+                """,
+                (record["case_id"],),
+            ).fetchone()["version"]
+            connection.execute(
+                """
+                INSERT INTO case_qc_reviews (
+                    qc_review_id, case_id, registration_review_id,
+                    reviewer_id, version, qc_result, annotations_json,
+                    notes, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    record["qc_review_id"],
+                    record["case_id"],
+                    record["registration_review_id"],
+                    record["reviewer_id"],
+                    version,
+                    record["qc_result"],
+                    json.dumps(
+                        record["annotations"],
+                        sort_keys=True,
+                        separators=(",", ":"),
+                    ),
+                    record["notes"],
+                    record["created_at"],
+                ),
+            )
+            connection.execute(
+                """
+                INSERT INTO audit_events (
+                    case_id, actor_id, event_type, payload_json, created_at
+                ) VALUES (?, ?, 'case_qc_reviewed', ?, ?)
+                """,
+                (
+                    record["case_id"],
+                    record["reviewer_id"],
+                    json.dumps(
+                        {
+                            "qc_review_id": record["qc_review_id"],
+                            "version": version,
+                            "qc_result": record["qc_result"],
+                            "annotation_count": len(record["annotations"]),
+                        },
+                        separators=(",", ":"),
+                    ),
+                    record["created_at"],
+                ),
+            )
+            connection.commit()
+        return self.get_latest_case_qc_review(record["case_id"])
+
+    def get_latest_case_qc_review(self, case_id: str):
+        with self.connect() as connection:
+            row = connection.execute(
+                """
+                SELECT *
+                FROM case_qc_reviews
+                WHERE case_id = ?
+                ORDER BY version DESC
+                LIMIT 1
+                """,
+                (case_id,),
+            ).fetchone()
+        return self._case_qc_review_dict(row) if row else None
+
+    def list_latest_case_qc_reviews(self):
+        with self.connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT
+                    case_qc_reviews.*,
+                    cases.board_key,
+                    cases.board_id,
+                    cases.side_id,
+                    cases.capture_stage,
+                    cases.capture_setup_id,
+                    cases.capture_session_id,
+                    images.image_id,
+                    images.original_filename,
+                    images.mime_type,
+                    images.width,
+                    images.height,
+                    images.sha256
+                FROM case_qc_reviews
+                JOIN (
+                    SELECT case_id, MAX(version) AS version
+                    FROM case_qc_reviews
+                    GROUP BY case_id
+                ) latest
+                  ON latest.case_id = case_qc_reviews.case_id
+                 AND latest.version = case_qc_reviews.version
+                JOIN cases USING(case_id)
+                JOIN images USING(case_id)
+                ORDER BY cases.created_at, cases.case_id
+                """
+            ).fetchall()
+        return [self._case_qc_review_dict(row) for row in rows]
+
+    def get_training_image(self, image_id: str):
+        with self.connect() as connection:
+            row = connection.execute(
+                """
+                SELECT images.*
+                FROM images
+                JOIN case_qc_reviews USING(case_id)
+                JOIN (
+                    SELECT case_id, MAX(version) AS version
+                    FROM case_qc_reviews
+                    GROUP BY case_id
+                ) latest
+                  ON latest.case_id = case_qc_reviews.case_id
+                 AND latest.version = case_qc_reviews.version
+                WHERE images.image_id = ?
+                """,
+                (image_id,),
+            ).fetchone()
+        return dict(row) if row else None
+
     def get_case(self, case_id: str):
         with self.connect() as connection:
             case = connection.execute(
@@ -710,8 +863,9 @@ class VisualQcStore:
                 """
                 INSERT INTO registration_reviews (
                     review_id, case_id, job_id, reviewer_id, decision,
-                    method, matrix_json, anchors_json, notes, created_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    method, matrix_json, anchors_json, check_points_json,
+                    error_json, notes, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     record["review_id"],
@@ -722,6 +876,14 @@ class VisualQcStore:
                     record["method"],
                     json.dumps(record["board_to_image_matrix"], separators=(",", ":")),
                     json.dumps(record["anchors"], separators=(",", ":")),
+                    json.dumps(record.get("check_points", []), separators=(",", ":")),
+                    json.dumps(
+                        record.get(
+                            "error",
+                            {"count": 0, "rms": None, "maximum": None},
+                        ),
+                        separators=(",", ":"),
+                    ),
                     record["notes"],
                     record["created_at"],
                 ),
@@ -1064,6 +1226,8 @@ class VisualQcStore:
         result = dict(row)
         result["board_to_image_matrix"] = json.loads(result.pop("matrix_json"))
         result["anchors"] = json.loads(result.pop("anchors_json"))
+        result["check_points"] = json.loads(result.pop("check_points_json"))
+        result["error"] = json.loads(result.pop("error_json"))
         result["status"] = "reviewed"
         return result
 
@@ -1078,4 +1242,13 @@ class VisualQcStore:
     def _candidate_review_dict(row):
         result = dict(row)
         result["candidate"] = json.loads(result.pop("candidate_json"))
+        return result
+
+    @staticmethod
+    def _case_qc_review_dict(row):
+        if not row:
+            return None
+        result = dict(row)
+        result["annotations"] = json.loads(result.pop("annotations_json"))
+        result["training_status"] = "eligible"
         return result

@@ -19,11 +19,12 @@ The current internal workbench supports the five compiled mainboard platforms:
 7. Let the server propose registration or pair four board/photo anchors as the fallback.
 8. Add an independent check point when using manual registration and review the normalized projection error.
 9. Confirm registration, annotate visible defects, and review each human or model candidate.
-10. Export the V2 JSON and annotated PNG preview.
+10. Complete the final human QC result. Server-connected physical cases persist an append-only QC review version; local-only cases remain browser drafts.
+11. Export the V2 JSON and annotated PNG preview.
 
 Cases and source image blobs are recoverable from IndexedDB. Imported JSON requires the original image to be selected again and accepted only after its SHA-256 and dimensions match.
 
-When a QC API is configured, the browser creates a stable idempotency key, uploads the authorized image with byte progress, polls the persistent job, and restores interrupted synchronization after refresh. An automatic registration result remains a draft candidate until the operator checks the overlay and confirms it. A structured automatic failure returns to the same manual four-point process. Reviewed normal-board captures can enter reviewer-gated Golden Sample versioning; reviewed repair captures can request a difference heatmap and receive `model_candidate` regions that remain pending until a technician confirms, rejects, or defers each one. IndexedDB remains the weak-network and in-progress editing layer; the server owns accepted cases and review evidence.
+When a QC API is configured, the browser creates a stable idempotency key, uploads the authorized image with byte progress, polls the persistent job, and restores interrupted synchronization after refresh. An automatic registration result remains a draft candidate until the operator checks the overlay and confirms it. A structured automatic failure returns to the same manual four-point process. Reviewed normal-board captures can enter reviewer-gated Golden Sample versioning; reviewed repair captures can request a difference heatmap and receive `model_candidate` regions that remain pending until a technician confirms, rejects, or defers each one. Final `no_visible_anomaly` or `confirmed_anomaly` decisions are synchronized as immutable server QC review versions. Editing an annotation invalidates the browser's synchronized-review marker and requires a new final review. IndexedDB remains the weak-network and in-progress editing layer; the server owns accepted cases and review evidence.
 
 The server-side registration core in `scripts/visual_qc/` generates deterministic point-map proxies, returns draft automatic homography candidates with technical evidence, and falls back to the reviewed manual four-point method. FastAPI upload, persistent jobs, server review state, Golden Sample approval, difference-candidate review, and browser integration are implemented locally. See `docs/visual-qc-auto-registration-2026-07-20.md` and `docs/visual-qc-server-api-2026-07-20.md`.
 
@@ -60,7 +61,7 @@ Export reviewed cases to deterministic COCO:
 py -3 scripts/export_visual_qc_coco.py cases/ visual-qc.coco.json
 ```
 
-Training-ready V2 data requires a valid image hash, a confirmed physical-capture checklist, acceptable image quality, reviewed registration, legal normalized coordinates, resolved board identity, reviewed human labels, and a final human QC result.
+Training-ready V2 data requires a valid image hash, a confirmed physical-capture checklist, acceptable image quality, reviewed registration, legal normalized coordinates, resolved board identity, reviewed human labels, a final human QC result, and a matching eligible server QC review. The reviewer-only server manifest is `VISUAL-QC-TRAINING-MANIFEST-V1`; its image route exposes only originals attached to an eligible latest QC review.
 
 ## Real Acceptance Gate
 

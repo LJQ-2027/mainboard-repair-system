@@ -39,6 +39,7 @@ import {
 import {
   applyCandidateReview,
   applyDifferenceJobResult,
+  applyFinalQcReview,
   applyGoldenSample,
   applyServerJobResult,
   approveGoldenSample,
@@ -53,6 +54,7 @@ import {
   pollVisualQcJob,
   reviewDifferenceCandidate,
   retryVisualQcJob,
+  reviewVisualQcCase,
   reviewVisualQcRegistration,
   transitionServerSync,
   uploadVisualQcCase,
@@ -1131,11 +1133,30 @@ function deleteAnnotation(annotationId) {
   if (state.selectedAnnotationId === annotationId) state.selectedAnnotationId = null;
 }
 
-function finalizeVisualQc() {
+async function finalizeVisualQc() {
   try {
-    commitCase(finalizeQc(currentCase()));
+    const finalized = finalizeQc(currentCase());
+    commitCase(finalized);
+    const serverCaseId = finalized.server_sync?.server_case_id;
+    if (!serverCaseId) {
+      elements.interactionPrompt.textContent = '人工 QC 已保存在本机草稿';
+      return;
+    }
+    state.serverBusy = true;
+    render();
+    const review = await reviewVisualQcCase({
+      apiBase: VISUAL_QC_API,
+      actorId: VISUAL_QC_ACTOR_ID,
+      serverCaseId,
+      visualCase: finalized,
+    });
+    commitCase(applyFinalQcReview(currentCase(), review));
+    elements.interactionPrompt.textContent = `人工 QC 已同步为服务器审核版本 ${review.version}`;
   } catch (error) {
     elements.interactionPrompt.textContent = error.message;
+  } finally {
+    state.serverBusy = false;
+    render();
   }
 }
 
@@ -1781,7 +1802,20 @@ function renderAnnotations() {
   const hasUnresolved = annotations.some(
     (annotation) => annotation.review_status === 'suspected' || annotation.source !== 'human_annotation',
   );
-  elements.finalizeQcButton.disabled = currentCase()?.registration.status !== 'reviewed' || hasUnresolved;
+  const serverReview = currentCase()?.server_qc_review;
+  const invalidImage = currentCase()?.quality?.status === 'retake';
+  elements.finalizeQcButton.textContent = invalidImage
+    ? '图片质量不合格'
+    : serverReview
+      ? `已同步审核 v${serverReview.version}`
+      : currentCase()?.server_sync?.server_case_id
+        ? '完成并同步人工 QC'
+        : '完成人工 QC';
+  elements.finalizeQcButton.disabled = currentCase()?.registration.status !== 'reviewed'
+    || hasUnresolved
+    || invalidImage
+    || state.serverBusy
+    || Boolean(serverReview);
   elements.finishPolygonButton.disabled = state.polygonPoints.length < 3;
 }
 

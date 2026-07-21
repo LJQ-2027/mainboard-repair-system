@@ -2,7 +2,7 @@
 
 ## Status
 
-This is the first local implementation of the approved server-led visual-QC architecture. It is not deployed yet. It adds a persistent FastAPI upload and automatic-registration job boundary while leaving the existing AI proxy unchanged.
+This is the implemented server-led visual-QC architecture used by the authenticated controlled pilot. It adds a persistent FastAPI upload, automatic-registration jobs, human review evidence, and a governed training-data export boundary while leaving the existing AI proxy unchanged.
 
 ## Runtime
 
@@ -96,6 +96,7 @@ A successful processing job returns `VISUAL-QC-SERVER-JOB-RESULT-V1`:
 ## Review, Golden, And Difference Contracts
 
 - `POST /api/v1/visual-qc/cases/{case_id}/registration-reviews`
+- `POST /api/v1/visual-qc/cases/{case_id}/qc-reviews`
 - `POST /api/v1/visual-qc/golden-samples`
 - `GET /api/v1/visual-qc/golden-samples/active`
 - `POST /api/v1/visual-qc/cases/{case_id}/difference-jobs`
@@ -103,6 +104,8 @@ A successful processing job returns `VISUAL-QC-SERVER-JOB-RESULT-V1`:
 - `GET /api/v1/visual-qc/artifacts/{artifact_id}`
 
 Automatic registration review adopts the exact candidate matrix. Manual review requires four unique normalized board/image anchor pairs and a finite, non-degenerate normalized homography.
+
+Final QC review requires a physical capture with a confirmed capture checklist, acceptable completed image quality, reviewed registration, resolved human annotations, and either `no_visible_anomaly` or `confirmed_anomaly`. Every accepted submission creates a new append-only `case_qc_reviews` version. A confirmed anomaly must contain at least one confirmed human annotation; a no-anomaly result cannot contain one. Proxy evidence and retake-quality images are rejected.
 
 Golden approval additionally requires the gateway-asserted `reviewer` role, `physical_capture` evidence, `golden_reference` capture stage, a confirmed capture checklist, acceptable image quality, reviewed registration, explicit normal-board confirmation, and an immutable source hash. The requested Golden setup must equal the original capture setup. Golden scope is board, side, and capture setup. Activating a replacement increments the version and retires rather than rewrites the previous record.
 
@@ -119,7 +122,8 @@ The pilot stores:
 - SQLite case, image, job, and audit records;
 - actor-scoped capture-session identity and per-image capture checklists;
 - content-addressed originals on controlled server disk;
-- registration and quality evidence in the completed job record.
+- registration and quality evidence in the completed job record;
+- append-only final human QC review versions and their exact registration-review identity.
 
 The SQLite and object-storage classes are isolated behind service boundaries so later PostgreSQL and controlled object-storage migration does not require changing browser routes.
 
@@ -140,7 +144,14 @@ Retention is deliberately not exposed as a browser route. Run it on the controll
 python -m scripts.maintain_visual_qc_server
 ```
 
-Only cases older than `VISUAL_QC_RETENTION_DAYS` are eligible, up to `VISUAL_QC_RETENTION_BATCH_LIMIT` per run. Eligibility requires at least one job and requires every job to have the explicit terminal state `succeeded` or `failed`; missing, unknown, queued, and running states fail closed. Any registration review, Golden version, or candidate review also protects the case. Content-addressed files are deleted only after the database case is removed and only when no remaining image or artifact references the same path.
+Only cases older than `VISUAL_QC_RETENTION_DAYS` are eligible, up to `VISUAL_QC_RETENTION_BATCH_LIMIT` per run. Eligibility requires at least one job and requires every job to have the explicit terminal state `succeeded` or `failed`; missing, unknown, queued, and running states fail closed. Any registration review, final QC review, Golden version, or candidate review also protects the case. Content-addressed files are deleted only after the database case is removed and only when no remaining image or artifact references the same path.
+
+## Training Dataset Export
+
+- `GET /api/v1/visual-qc/datasets/training-manifest`
+- `GET /api/v1/visual-qc/datasets/images/{image_id}`
+
+Both routes require the exact gateway-injected `reviewer` role. The manifest uses `VISUAL-QC-TRAINING-MANIFEST-V1` and contains only the latest eligible final review for each physical case, together with immutable board identity, capture setup, source hash, QC result, and reviewed annotations. The image route serves an original only when it belongs to a case represented by an eligible latest QC review. These routes are the server-owned training-data boundary; browser drafts and proxy evidence are never enumerated.
 
 Original and artifact writes hold the same data-root OS file lock from object creation through database reference commit. Retention holds that lock from its final transactional eligibility check through reference-aware object deletion. This closes the upload/cleanup race across API and CLI processes, but the operational procedure still stops the QC service before destructive maintenance.
 
@@ -174,11 +185,12 @@ Implemented:
 - safe return to the existing four-point workflow when automatic registration is unavailable;
 - reviewer-gated Golden Sample approval and active-version lookup in the workbench;
 - difference heatmap retrieval plus per-candidate confirm, reject, and needs-review decisions;
-- versioned `VISUAL-QC-CASE-V2` browser drafts for server synchronization and comparison state.
+- versioned `VISUAL-QC-CASE-V2` browser drafts for server synchronization and comparison state;
+- append-only final human QC review versions synchronized from the browser;
+- reviewer-only training manifest and eligible source-image download;
 - disk-pressure health reporting, bounded old-draft retention planning, protected evidence rules, and audited explicit cleanup.
 
 Still open:
 
-- production authentication and Nginx deployment verification;
 - production scheduling and alert delivery for the implemented retention and health primitives;
 - physical bare-board acceptance.

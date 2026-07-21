@@ -1,0 +1,173 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "VISUAL-QC-TRAINING-MANIFEST-V1",
+  "title": "Reviewed Mainboard Visual QC Training Manifest",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "generated_at",
+    "case_count",
+    "annotation_count",
+    "category_counts",
+    "cases"
+  ],
+  "properties": {
+    "schema_version": { "const": "VISUAL-QC-TRAINING-MANIFEST-V1" },
+    "generated_at": { "type": "string" },
+    "case_count": { "type": "integer", "minimum": 0 },
+    "annotation_count": { "type": "integer", "minimum": 0 },
+    "category_counts": {
+      "type": "object",
+      "properties": {
+        "burn_or_heat_damage": { "type": "integer", "minimum": 0 },
+        "corrosion_or_oxidation": { "type": "integer", "minimum": 0 },
+        "missing_component": { "type": "integer", "minimum": 0 },
+        "displaced_component": { "type": "integer", "minimum": 0 },
+        "connector_damage": { "type": "integer", "minimum": 0 },
+        "shield_or_structure_damage": { "type": "integer", "minimum": 0 },
+        "solder_anomaly": { "type": "integer", "minimum": 0 },
+        "foreign_material": { "type": "integer", "minimum": 0 },
+        "unknown_visible_anomaly": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "case_id",
+          "board_key",
+          "board_id",
+          "side_id",
+          "capture_stage",
+          "capture_session_id",
+          "capture_setup_id",
+          "image",
+          "qc_review"
+        ],
+        "properties": {
+          "case_id": { "type": "string", "minLength": 1 },
+          "board_key": { "type": "string", "minLength": 1 },
+          "board_id": { "type": "string", "minLength": 1 },
+          "side_id": { "type": "string", "minLength": 1 },
+          "capture_stage": {
+            "enum": ["golden_reference", "before_repair", "after_repair"]
+          },
+          "capture_session_id": { "type": "string", "minLength": 1 },
+          "capture_setup_id": { "type": "string", "minLength": 1 },
+          "image": {
+            "type": "object",
+            "required": [
+              "image_id",
+              "file_name",
+              "mime_type",
+              "width",
+              "height",
+              "sha256"
+            ],
+            "properties": {
+              "image_id": { "type": "string", "minLength": 1 },
+              "file_name": { "type": "string", "minLength": 1 },
+              "mime_type": { "enum": ["image/jpeg", "image/png", "image/webp"] },
+              "width": { "type": "integer", "minimum": 1 },
+              "height": { "type": "integer", "minimum": 1 },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "additionalProperties": false
+          },
+          "qc_review": {
+            "type": "object",
+            "required": [
+              "qc_review_id",
+              "version",
+              "reviewer_id",
+              "qc_result",
+              "annotations",
+              "created_at"
+            ],
+            "properties": {
+              "qc_review_id": { "type": "string", "minLength": 1 },
+              "version": { "type": "integer", "minimum": 1 },
+              "reviewer_id": { "type": "string", "minLength": 1 },
+              "qc_result": {
+                "enum": ["no_visible_anomaly", "confirmed_anomaly"]
+              },
+              "annotations": {
+                "type": "array",
+                "items": { "$ref": "#/$defs/annotation" }
+              },
+              "created_at": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "$defs": {
+    "point": {
+      "type": "object",
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "number", "minimum": 0, "maximum": 1 },
+        "y": { "type": "number", "minimum": 0, "maximum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "geometry": {
+      "type": "object",
+      "required": ["type", "points"],
+      "properties": {
+        "type": { "enum": ["rectangle", "polygon"] },
+        "points": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "$ref": "#/$defs/point" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "annotation": {
+      "type": "object",
+      "required": [
+        "annotation_id",
+        "category",
+        "source",
+        "review_status",
+        "component",
+        "image_geometry",
+        "board_geometry",
+        "note"
+      ],
+      "properties": {
+        "annotation_id": { "type": "string", "minLength": 1 },
+        "category": {
+          "enum": [
+            "burn_or_heat_damage",
+            "corrosion_or_oxidation",
+            "missing_component",
+            "displaced_component",
+            "connector_damage",
+            "shield_or_structure_damage",
+            "solder_anomaly",
+            "foreign_material",
+            "unknown_visible_anomaly"
+          ]
+        },
+        "source": { "const": "human_annotation" },
+        "review_status": { "enum": ["confirmed", "not_defect"] },
+        "component": { "type": ["object", "null"] },
+        "image_geometry": { "$ref": "#/$defs/geometry" },
+        "board_geometry": { "$ref": "#/$defs/geometry" },
+        "note": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

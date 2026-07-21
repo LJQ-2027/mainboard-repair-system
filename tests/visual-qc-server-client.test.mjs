@@ -6,7 +6,9 @@ import {
   applyDifferenceJobResult,
   applyGoldenSample,
   applyServerJobResult,
+  applyFinalQcReview,
   createDifferenceJobDescriptor,
+  createFinalQcReviewDescriptor,
   createGoldenSampleDescriptor,
   createRegistrationReviewDescriptor,
   createServerSyncState,
@@ -282,12 +284,58 @@ test('registration review descriptor keeps automatic and manual evidence distinc
       { board: { x: 1, y: 1 }, image: { x: 1, y: 1 } },
       { board: { x: 0, y: 1 }, image: { x: 0, y: 1 } },
     ],
+    check_points: [
+      { board: { x: 0.5, y: 0.5 }, image: { x: 0.5, y: 0.5 } },
+    ],
+    error: { count: 1, rms: 0, maximum: 0 },
   });
 
   assert.deepEqual(automatic, { decision: 'accept_automatic', notes: '' });
   assert.equal(manual.decision, 'accept_manual');
   assert.deepEqual(manual.anchors[2], { board: [1, 1], image: [1, 1] });
+  assert.deepEqual(manual.check_points[0], {
+    board: [0.5, 0.5],
+    image: [0.5, 0.5],
+  });
+  assert.deepEqual(manual.error, { count: 1, rms: 0, maximum: 0 });
   assert.equal(manual.board_to_image_matrix.length, 9);
+});
+
+test('final QC review descriptor contains only resolved human evidence', () => {
+  const reviewedCase = visualCase();
+  reviewedCase.qc_result = {
+    status: 'confirmed_anomaly',
+    reviewed_at: '2026-07-20T12:00:00.000Z',
+  };
+  reviewedCase.annotations = [{
+    annotation_id: 'annotation-001',
+    category: 'burn_or_heat_damage',
+    source: 'human_annotation',
+    review_status: 'confirmed',
+    image_geometry: {
+      type: 'polygon',
+      points: [{ x: 0.2, y: 0.2 }, { x: 0.3, y: 0.2 }, { x: 0.3, y: 0.3 }],
+    },
+    board_geometry: {
+      type: 'polygon',
+      points: [{ x: 0.2, y: 0.2 }, { x: 0.3, y: 0.2 }, { x: 0.3, y: 0.3 }],
+    },
+    component: null,
+    note: '',
+  }];
+
+  const descriptor = createFinalQcReviewDescriptor(reviewedCase);
+  const synchronized = applyFinalQcReview(reviewedCase, {
+    qc_review_id: 'qcrev-001',
+    version: 1,
+    training_status: 'eligible',
+    created_at: '2026-07-20T12:01:00.000Z',
+  });
+
+  assert.equal(descriptor.qc_result, 'confirmed_anomaly');
+  assert.equal(descriptor.annotations.length, 1);
+  assert.equal(synchronized.server_qc_review.version, 1);
+  assert.equal(synchronized.server_qc_review.training_status, 'eligible');
 });
 
 test('Golden approval descriptor requires an explicit normal-board confirmation', () => {

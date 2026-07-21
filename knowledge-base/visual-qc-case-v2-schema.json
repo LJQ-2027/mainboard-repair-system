@@ -198,6 +198,30 @@
         "updated_at": { "type": "string" }
       }
     },
+    "server_qc_review": {
+      "type": "object",
+      "required": [
+        "qc_review_id",
+        "version",
+        "training_status",
+        "created_at"
+      ],
+      "properties": {
+        "qc_review_id": { "type": "string", "minLength": 1 },
+        "case_id": { "type": "string", "minLength": 1 },
+        "registration_review_id": { "type": "string", "minLength": 1 },
+        "reviewer_id": { "type": "string", "minLength": 1 },
+        "version": { "type": "integer", "minimum": 1 },
+        "qc_result": {
+          "enum": ["no_visible_anomaly", "confirmed_anomaly"]
+        },
+        "annotations": { "type": "array" },
+        "notes": { "type": "string" },
+        "created_at": { "type": "string" },
+        "training_status": { "const": "eligible" }
+      },
+      "additionalProperties": false
+    },
     "visual_comparison": {
       "type": "object",
       "required": ["capture_setup_id"],

@@ -11,6 +11,7 @@ import cv2
 import numpy as np
 
 from scripts.visual_qc.registration import RegistrationConfig, register_board_image
+from scripts.validate_visual_qc_dataset import validate_visual_qc_case
 from scripts.visual_qc.server.catalog import BoardCatalog, CatalogError
 from scripts.visual_qc.server.config import VisualQcServerSettings
 from scripts.visual_qc.server.difference import generate_difference_candidates
@@ -46,6 +47,17 @@ CAPTURE_CHECKLIST_ITEMS = {
     "board_and_side_confirmed",
     "focus_and_lens_confirmed",
     "lighting_and_occlusion_confirmed",
+}
+HUMAN_DEFECT_CATEGORIES = {
+    "burn_or_heat_damage",
+    "corrosion_or_oxidation",
+    "missing_component",
+    "displaced_component",
+    "connector_damage",
+    "shield_or_structure_damage",
+    "solder_anomaly",
+    "foreign_material",
+    "unknown_visible_anomaly",
 }
 
 
@@ -390,7 +402,7 @@ class VisualQcService:
         case = record["case"]
         image = record["image"]
         job = record["job"]
-        return {
+        response = {
             "schema_version": "VISUAL-QC-SERVER-CASE-V1",
             "case_id": case["case_id"],
             "board_key": case["board_key"],
@@ -413,6 +425,10 @@ class VisualQcService:
             },
             "job": self._public_job(job),
         }
+        qc_review = self.store.get_latest_case_qc_review(case_id)
+        if qc_review:
+            response["server_qc_review"] = qc_review
+        return response
 
     def get_capture_session(self, capture_session_id: str, actor_id: str) -> dict:
         normalized_id = self._normalized_capture_session_id(
@@ -428,6 +444,260 @@ class VisualQcService:
                 404,
             )
         return self._capture_session_payload(normalized_id, actor_id)
+
+    def review_case_qc(
+        self,
+        case_id: str,
+        actor_id: str,
+        qc_result: str,
+        annotations: list[dict],
+        notes: str,
+    ) -> dict:
+        record = self.store.get_case(case_id)
+        if not record or record["case"]["actor_id"] != actor_id:
+            raise VisualQcServiceError(
+                "case_not_found",
+                "Visual-QC case was not found.",
+                404,
+            )
+        case = record["case"]
+        image = record["image"]
+        job = record["job"]
+        if case["evidence_role"] != "physical_capture":
+            raise VisualQcServiceError(
+                "physical_capture_required",
+                "Final QC review for training requires a physical capture.",
+                409,
+            )
+        checklist = json.loads(case["capture_checklist_json"] or "{}")
+        if checklist.get("status") != "confirmed":
+            raise VisualQcServiceError(
+                "capture_checklist_confirmation_required",
+                "Final QC review requires a confirmed physical capture checklist.",
+                409,
+            )
+        registration_review = self.store.get_latest_registration_review(case_id)
+        if not registration_review:
+            raise VisualQcServiceError(
+                "registration_review_required",
+                "Final QC review requires reviewed registration.",
+                409,
+            )
+        quality = (job.get("result") or {}).get("quality") or {}
+        if job.get("status") != "succeeded" or quality.get("status") == "retake":
+            raise VisualQcServiceError(
+                "acceptable_image_quality_required",
+                "Final QC review requires a completed image-quality result that is not retake.",
+                409,
+            )
+        if qc_result not in {"no_visible_anomaly", "confirmed_anomaly"}:
+            raise VisualQcServiceError(
+                "invalid_final_qc_result",
+                "Final QC result must be no_visible_anomaly or confirmed_anomaly.",
+            )
+        if not isinstance(annotations, list) or len(annotations) > 1000:
+            raise VisualQcServiceError(
+                "invalid_final_annotations",
+                "Final QC annotations must be an array containing at most 1000 items.",
+            )
+        confirmed_count = sum(
+            isinstance(annotation, dict)
+            and annotation.get("source") == "human_annotation"
+            and annotation.get("review_status") == "confirmed"
+            for annotation in annotations
+        )
+        if qc_result == "confirmed_anomaly" and confirmed_count == 0:
+            raise VisualQcServiceError(
+                "confirmed_anomaly_requires_annotation",
+                "confirmed_anomaly requires at least one confirmed human annotation.",
+            )
+        if qc_result == "no_visible_anomaly" and confirmed_count:
+            raise VisualQcServiceError(
+                "no_visible_anomaly_conflicts_with_annotations",
+                "no_visible_anomaly cannot contain confirmed annotations.",
+            )
+
+        reviewed_at = utc_now()
+        qc_review_id = f"qcrev_{uuid.uuid4().hex}"
+        capture_session = self._capture_session_payload(
+            case["capture_session_id"],
+            actor_id,
+            case_id,
+        )
+        canonical_case = {
+            "schema_version": "VISUAL-QC-CASE-V2",
+            "case_id": case_id,
+            "board_key": case["board_key"],
+            "board_id": case["board_id"],
+            "side_id": case["side_id"],
+            "storage_scope": "server_authoritative_with_local_draft",
+            "capture_stage": case["capture_stage"],
+            "capture_session": {
+                key: capture_session[key]
+                for key in (
+                    "schema_version",
+                    "session_id",
+                    "setup_id",
+                    "expected_side_ids",
+                    "captured_side_ids",
+                    "pair_status",
+                    "checklist",
+                )
+            },
+            "image": {
+                "file_name": image["original_filename"],
+                "mime_type": image["mime_type"],
+                "width": image["width"],
+                "height": image["height"],
+                "sha256": image["sha256"],
+                "evidence_role": "physical_capture",
+            },
+            "quality": quality,
+            "registration": self._training_registration_payload(
+                registration_review,
+                job,
+            ),
+            "annotations": annotations,
+            "qc_result": {
+                "status": qc_result,
+                "reviewed_at": reviewed_at,
+            },
+            "server_qc_review": {
+                "qc_review_id": qc_review_id,
+                "case_id": case_id,
+                "registration_review_id": registration_review["review_id"],
+                "reviewer_id": actor_id,
+                "version": 1,
+                "qc_result": qc_result,
+                "annotations": annotations,
+                "notes": notes[:1000],
+                "created_at": reviewed_at,
+                "training_status": "eligible",
+            },
+        }
+        validation_errors = validate_visual_qc_case(
+            canonical_case,
+            self.settings.project_root,
+            training_ready=True,
+        )
+        if validation_errors:
+            raise VisualQcServiceError(
+                "training_review_invalid",
+                "Final QC review is not training eligible: "
+                + "; ".join(validation_errors),
+            )
+        return self.store.create_case_qc_review(
+            {
+                "qc_review_id": qc_review_id,
+                "case_id": case_id,
+                "registration_review_id": registration_review["review_id"],
+                "reviewer_id": actor_id,
+                "qc_result": qc_result,
+                "annotations": annotations,
+                "notes": notes[:1000],
+                "created_at": reviewed_at,
+            }
+        )
+
+    @staticmethod
+    def _training_registration_payload(registration_review: dict, job: dict) -> dict:
+        anchors = [
+            {
+                "board": {"x": pair["board"][0], "y": pair["board"][1]},
+                "image": {"x": pair["image"][0], "y": pair["image"][1]},
+            }
+            for pair in registration_review.get("anchors", [])
+        ]
+        check_points = [
+            {
+                "board": {"x": pair["board"][0], "y": pair["board"][1]},
+                "image": {"x": pair["image"][0], "y": pair["image"][1]},
+            }
+            for pair in registration_review.get("check_points", [])
+        ]
+        registration = (job.get("result") or {}).get("registration") or {}
+        evidence = registration.get("evidence") or {}
+        return {
+            "method": registration_review["method"],
+            "status": "reviewed",
+            "matrix": registration_review["board_to_image_matrix"],
+            "solve_anchors": anchors,
+            "check_points": check_points,
+            "error": registration_review.get("error") or {
+                "count": 0,
+                "rms": evidence.get("reprojection_rms"),
+                "maximum": evidence.get("reprojection_maximum"),
+            },
+            "server_review_id": registration_review["review_id"],
+        }
+
+    def training_manifest(self) -> dict:
+        cases = []
+        annotation_count = 0
+        category_counts = {category: 0 for category in sorted(HUMAN_DEFECT_CATEGORIES)}
+        for review in self.store.list_latest_case_qc_reviews():
+            confirmed = [
+                annotation
+                for annotation in review["annotations"]
+                if annotation.get("review_status") == "confirmed"
+            ]
+            annotation_count += len(confirmed)
+            for annotation in confirmed:
+                category = annotation.get("category")
+                if category in category_counts:
+                    category_counts[category] += 1
+            cases.append(
+                {
+                    "case_id": review["case_id"],
+                    "board_key": review["board_key"],
+                    "board_id": review["board_id"],
+                    "side_id": review["side_id"],
+                    "capture_stage": review["capture_stage"],
+                    "capture_session_id": review["capture_session_id"],
+                    "capture_setup_id": review["capture_setup_id"],
+                    "image": {
+                        "image_id": review["image_id"],
+                        "file_name": review["original_filename"],
+                        "mime_type": review["mime_type"],
+                        "width": review["width"],
+                        "height": review["height"],
+                        "sha256": review["sha256"],
+                    },
+                    "qc_review": {
+                        "qc_review_id": review["qc_review_id"],
+                        "version": review["version"],
+                        "reviewer_id": review["reviewer_id"],
+                        "qc_result": review["qc_result"],
+                        "annotations": review["annotations"],
+                        "created_at": review["created_at"],
+                    },
+                }
+            )
+        return {
+            "schema_version": "VISUAL-QC-TRAINING-MANIFEST-V1",
+            "generated_at": utc_now(),
+            "case_count": len(cases),
+            "annotation_count": annotation_count,
+            "category_counts": category_counts,
+            "cases": cases,
+        }
+
+    def training_image(self, image_id: str) -> dict:
+        image = self.store.get_training_image(image_id)
+        if not image:
+            raise VisualQcServiceError(
+                "training_image_not_found",
+                "Training image was not found or is not attached to an eligible review.",
+                404,
+            )
+        storage_path = Path(image["storage_path"])
+        if not storage_path.is_file():
+            raise VisualQcServiceError(
+                "training_image_missing",
+                "Training image storage object is missing.",
+                410,
+            )
+        return image
 
     def _capture_session_payload(
         self,
@@ -585,6 +855,8 @@ class VisualQcService:
         notes: str,
         board_to_image_matrix: list[float] | None = None,
         anchors: list[dict] | None = None,
+        check_points: list[dict] | None = None,
+        error: dict | None = None,
     ) -> dict:
         record = self.store.get_case(case_id)
         if not record or record["case"]["actor_id"] != actor_id:
@@ -607,10 +879,23 @@ class VisualQcService:
             method = registration["method"]
             matrix = registration["board_to_image_matrix"]
             reviewed_anchors = []
+            reviewed_check_points = []
+            reviewed_error = {
+                "count": 0,
+                "rms": None,
+                "maximum": None,
+            }
         elif decision == "accept_manual":
             matrix = self._validate_manual_registration(
                 board_to_image_matrix,
                 anchors or [],
+            )
+            reviewed_check_points, reviewed_error = (
+                self._validate_manual_check_points(
+                    matrix,
+                    check_points or [],
+                    error or {},
+                )
             )
             method = "reviewed_manual_four_point"
             reviewed_anchors = anchors or []
@@ -637,6 +922,8 @@ class VisualQcService:
             "method": method,
             "board_to_image_matrix": matrix,
             "anchors": reviewed_anchors,
+            "check_points": reviewed_check_points,
+            "error": reviewed_error,
             "notes": notes[:1000],
             "created_at": utc_now(),
         }
@@ -735,6 +1022,58 @@ class VisualQcService:
                 "Manual registration projects an invalid board shape.",
             )
         return matrix.reshape(-1).tolist()
+
+    @staticmethod
+    def _validate_manual_check_points(
+        matrix_values: list[float],
+        check_points: list[dict],
+        error: dict,
+    ) -> tuple[list[dict], dict]:
+        if not check_points:
+            return [], {"count": 0, "rms": None, "maximum": None}
+        for pair in check_points:
+            for key in ("board", "image"):
+                point = pair.get(key) if isinstance(pair, dict) else None
+                if (
+                    not isinstance(point, list)
+                    or len(point) != 2
+                    or not all(
+                        isinstance(value, (int, float))
+                        and np.isfinite(value)
+                        and 0 <= value <= 1
+                        for value in point
+                    )
+                ):
+                    raise VisualQcServiceError(
+                        "invalid_manual_check_points",
+                        "Manual check-point coordinates must be normalized pairs.",
+                    )
+        matrix = np.asarray(matrix_values, dtype=np.float64).reshape(3, 3)
+        board_points = np.asarray(
+            [[pair["board"]] for pair in check_points],
+            dtype=np.float64,
+        )
+        image_points = np.asarray(
+            [pair["image"] for pair in check_points],
+            dtype=np.float64,
+        )
+        projected = cv2.perspectiveTransform(board_points, matrix).reshape(-1, 2)
+        errors = np.linalg.norm(projected - image_points, axis=1)
+        expected = {
+            "count": len(check_points),
+            "rms": float(np.sqrt(np.mean(np.square(errors)))),
+            "maximum": float(np.max(errors)),
+        }
+        if error.get("count") != expected["count"] or any(
+            not isinstance(error.get(key), (int, float))
+            or abs(float(error[key]) - expected[key]) > 1e-5
+            for key in ("rms", "maximum")
+        ):
+            raise VisualQcServiceError(
+                "manual_check_error_mismatch",
+                "Manual registration error must match its independent check points.",
+            )
+        return check_points, expected
 
     def create_golden_sample(
         self,

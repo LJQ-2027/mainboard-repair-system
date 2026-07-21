@@ -16,6 +16,14 @@ class RegistrationReviewRequest(BaseModel):
     notes: str = Field(default="", max_length=1000)
     board_to_image_matrix: list[float] | None = None
     anchors: list[dict] = Field(default_factory=list)
+    check_points: list[dict] = Field(default_factory=list)
+    error: dict = Field(
+        default_factory=lambda: {
+            "count": 0,
+            "rms": None,
+            "maximum": None,
+        }
+    )
 
 
 class GoldenSampleRequest(BaseModel):
@@ -32,6 +40,12 @@ class CandidateReviewRequest(BaseModel):
     candidate_id: str
     decision: str
     defect_category: str | None = None
+    notes: str = Field(default="", max_length=1000)
+
+
+class FinalQcReviewRequest(BaseModel):
+    qc_result: str
+    annotations: list[dict] = Field(default_factory=list, max_length=1000)
     notes: str = Field(default="", max_length=1000)
 
 
@@ -154,6 +168,26 @@ def create_app(settings: VisualQcServerSettings | None = None) -> FastAPI:
         except VisualQcServiceError as exc:
             service_error(exc)
 
+    @app.post(
+        "/api/v1/visual-qc/cases/{case_id}/qc-reviews",
+        status_code=201,
+    )
+    def review_case_qc(
+        case_id: str,
+        request: FinalQcReviewRequest,
+        x_actor_id: str | None = Header(None, alias="X-Actor-Id"),
+    ):
+        try:
+            return service.review_case_qc(
+                case_id=case_id,
+                actor_id=actor_id(x_actor_id),
+                qc_result=request.qc_result,
+                annotations=request.annotations,
+                notes=request.notes,
+            )
+        except VisualQcServiceError as exc:
+            service_error(exc)
+
     @app.get("/api/v1/visual-qc/jobs/{job_id}")
     def get_job(
         job_id: str,
@@ -191,6 +225,8 @@ def create_app(settings: VisualQcServerSettings | None = None) -> FastAPI:
                 request.notes,
                 request.board_to_image_matrix,
                 request.anchors,
+                request.check_points,
+                request.error,
             )
         except VisualQcServiceError as exc:
             service_error(exc)
@@ -296,6 +332,47 @@ def create_app(settings: VisualQcServerSettings | None = None) -> FastAPI:
                 defect_category=request.defect_category,
                 notes=request.notes,
                 actor_id=actor_id(x_actor_id),
+            )
+        except VisualQcServiceError as exc:
+            service_error(exc)
+
+    @app.get("/api/v1/visual-qc/datasets/training-manifest")
+    def training_manifest(
+        x_actor_id: str | None = Header(None, alias="X-Actor-Id"),
+        x_actor_role: str | None = Header(None, alias="X-Actor-Role"),
+    ):
+        actor_id(x_actor_id)
+        if x_actor_role != "reviewer":
+            raise HTTPException(
+                status_code=403,
+                detail={
+                    "code": "reviewer_role_required",
+                    "message": "Training dataset export requires the reviewer role.",
+                },
+            )
+        return service.training_manifest()
+
+    @app.get("/api/v1/visual-qc/datasets/images/{image_id}")
+    def training_image(
+        image_id: str,
+        x_actor_id: str | None = Header(None, alias="X-Actor-Id"),
+        x_actor_role: str | None = Header(None, alias="X-Actor-Role"),
+    ):
+        actor_id(x_actor_id)
+        if x_actor_role != "reviewer":
+            raise HTTPException(
+                status_code=403,
+                detail={
+                    "code": "reviewer_role_required",
+                    "message": "Training image export requires the reviewer role.",
+                },
+            )
+        try:
+            image = service.training_image(image_id)
+            return FileResponse(
+                image["storage_path"],
+                media_type=image["mime_type"],
+                filename=image["original_filename"],
             )
         except VisualQcServiceError as exc:
             service_error(exc)

@@ -302,6 +302,15 @@ export function createRegistrationReviewDescriptor(registration) {
       board: [pair.board.x, pair.board.y],
       image: [pair.image.x, pair.image.y],
     })),
+    check_points: (registration.check_points || []).map((pair) => ({
+      board: [pair.board.x, pair.board.y],
+      image: [pair.image.x, pair.image.y],
+    })),
+    error: clone(registration.error || {
+      count: 0,
+      rms: null,
+      maximum: null,
+    }),
     notes: '',
   };
 }
@@ -317,6 +326,47 @@ export function reviewVisualQcRegistration({
     `${apiBase.replace(/\/$/, '')}/cases/${encodeURIComponent(serverCaseId)}/registration-reviews`,
     { actorId, method: 'POST', body },
   );
+}
+
+export function createFinalQcReviewDescriptor(visualCase) {
+  const status = visualCase?.qc_result?.status;
+  if (!['no_visible_anomaly', 'confirmed_anomaly'].includes(status)) {
+    throw new Error('Final QC review requires a completed human QC result.');
+  }
+  const annotations = visualCase.annotations || [];
+  if (annotations.some(
+    (annotation) => annotation.source !== 'human_annotation'
+      || !['confirmed', 'not_defect'].includes(annotation.review_status),
+  )) {
+    throw new Error('Final QC review cannot contain unresolved annotations.');
+  }
+  return {
+    qc_result: status,
+    annotations: clone(annotations),
+    notes: '',
+  };
+}
+
+export function reviewVisualQcCase({
+  apiBase,
+  actorId,
+  serverCaseId,
+  visualCase,
+}) {
+  return jsonRequest(
+    `${apiBase.replace(/\/$/, '')}/cases/${encodeURIComponent(serverCaseId)}/qc-reviews`,
+    {
+      actorId,
+      method: 'POST',
+      body: createFinalQcReviewDescriptor(visualCase),
+    },
+  );
+}
+
+export function applyFinalQcReview(visualCase, review) {
+  const next = clone(visualCase);
+  next.server_qc_review = clone(review);
+  return next;
 }
 
 function normalizedCaptureSetupId(value) {

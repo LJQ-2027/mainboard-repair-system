@@ -393,6 +393,25 @@ def validate_visual_qc_case(visual_case, root, training_ready=False):
             errors.append(
                 "training V2 cases require a confirmed physical capture checklist"
             )
+        server_qc_review = visual_case.get("server_qc_review")
+        if (
+            schema_version == "VISUAL-QC-CASE-V2"
+            and visual_case.get("storage_scope")
+            == "server_authoritative_with_local_draft"
+            and (
+                not isinstance(server_qc_review, dict)
+                or server_qc_review.get("training_status") != "eligible"
+                or server_qc_review.get("case_id") != visual_case.get("case_id")
+                or server_qc_review.get("registration_review_id")
+                != registration.get("server_review_id")
+                or server_qc_review.get("qc_result") != qc_result.get("status")
+                or server_qc_review.get("annotations")
+                != visual_case.get("annotations")
+            )
+        ):
+            errors.append(
+                "training server-authoritative V2 cases require an eligible server QC review"
+            )
         if quality.get("status") == "retake":
             errors.append("training cases cannot use retake-quality images")
         if any(

@@ -9,6 +9,7 @@ import {
   finalizeQc,
   redoHistory,
   reviewRegistration,
+  updateAnnotation,
   updateDraftRegistration,
   undoHistory,
 } from '../assets/visual-qc-workbench/visual-qc-state.js';
@@ -123,6 +124,46 @@ test('QC cannot finalize while suspected annotations remain', () => {
   });
 
   assert.throws(() => finalizeQc(visualCase), /suspected/i);
+});
+
+test('editing reviewed annotations invalidates the synchronized server QC review', () => {
+  let visualCase = applyRegistration(draftCase(), boardAnchors, imageAnchors, [
+    { board: { x: 0.5, y: 0.5 }, image: { x: 0.5, y: 0.5 } },
+  ]);
+  visualCase = reviewRegistration(visualCase);
+  visualCase.server_qc_review = {
+    qc_review_id: 'qcrev-001',
+    version: 1,
+    training_status: 'eligible',
+  };
+  visualCase.annotations = [{
+    annotation_id: 'annotation-001',
+    category: 'burn_or_heat_damage',
+    source: 'human_annotation',
+    review_status: 'confirmed',
+    component: null,
+    image_geometry: {
+      type: 'rectangle',
+      points: [{ x: 0.2, y: 0.2 }, { x: 0.3, y: 0.3 }],
+    },
+    board_geometry: {
+      type: 'polygon',
+      points: [
+        { x: 0.2, y: 0.2 },
+        { x: 0.3, y: 0.2 },
+        { x: 0.3, y: 0.3 },
+        { x: 0.2, y: 0.3 },
+      ],
+    },
+    note: '',
+  }];
+
+  const updated = updateAnnotation(visualCase, 'annotation-001', {
+    review_status: 'not_defect',
+  });
+
+  assert.equal(updated.server_qc_review, undefined);
+  assert.equal(updated.qc_result.status, 'needs_review');
 });
 
 test('changing a solved registration invalidates annotations projected by the old matrix', () => {

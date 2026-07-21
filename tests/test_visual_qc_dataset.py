@@ -124,6 +124,18 @@ class VisualQcDatasetTests(unittest.TestCase):
             "golden_sample": None,
             "difference": None,
         }
+        visual_case["server_qc_review"] = {
+            "qc_review_id": "qcrev-001",
+            "case_id": "case-km4-001",
+            "registration_review_id": "regrev-001",
+            "reviewer_id": "technician-001",
+            "version": 1,
+            "qc_result": "confirmed_anomaly",
+            "annotations": visual_case["annotations"],
+            "notes": "",
+            "created_at": "2026-07-20T12:00:00Z",
+            "training_status": "eligible",
+        }
 
         self.assertEqual(validate_visual_qc_case(visual_case, ROOT), [])
         schema = json.loads(
@@ -132,6 +144,18 @@ class VisualQcDatasetTests(unittest.TestCase):
             )
         )
         jsonschema.validate(visual_case, schema)
+
+    def test_server_authoritative_training_case_requires_matching_server_qc_review(self):
+        visual_case = sample_case()
+        visual_case["schema_version"] = "VISUAL-QC-CASE-V2"
+        visual_case["storage_scope"] = "server_authoritative_with_local_draft"
+
+        errors = validate_visual_qc_case(visual_case, ROOT, training_ready=True)
+
+        self.assertIn(
+            "training server-authoritative V2 cases require an eligible server QC review",
+            errors,
+        )
 
     def test_training_ready_v2_case_requires_confirmed_capture_checklist(self):
         visual_case = sample_case()

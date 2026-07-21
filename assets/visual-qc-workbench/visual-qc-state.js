@@ -23,6 +23,10 @@ function pendingQcResult(visualCase) {
   };
 }
 
+function invalidateServerQcReview(visualCase) {
+  delete visualCase.server_qc_review;
+}
+
 export function createHistory(initial, limit = 50) {
   return { past: [], current: clone(initial), future: [], limit };
 }
@@ -182,6 +186,7 @@ export function addAnnotation(visualCase, {
     board_geometry: boardGeometry,
     note,
   });
+  invalidateServerQcReview(next);
   next.qc_result = pendingQcResult(next);
   return next;
 }
@@ -194,6 +199,7 @@ export function updateAnnotation(visualCase, annotationId, changes) {
     throw new Error('Unsupported defect category.');
   }
   Object.assign(annotation, clone(changes));
+  invalidateServerQcReview(next);
   next.qc_result = pendingQcResult(next);
   return next;
 }
@@ -201,6 +207,7 @@ export function updateAnnotation(visualCase, annotationId, changes) {
 export function removeAnnotation(visualCase, annotationId) {
   const next = clone(visualCase);
   next.annotations = next.annotations.filter((item) => item.annotation_id !== annotationId);
+  invalidateServerQcReview(next);
   next.qc_result = pendingQcResult(next);
   return next;
 }
