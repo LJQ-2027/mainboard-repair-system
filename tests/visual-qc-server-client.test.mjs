@@ -17,9 +17,13 @@ import {
   getVisualQcDatasetBundle,
   getVisualQcDatasetAudit,
   getVisualQcIdentity,
+  getVisualQcAdminCase,
+  getVisualQcAdminCaseImage,
   getVisualQcTrainingManifest,
+  listVisualQcAdminCases,
   normalizeServerCaptureSession,
   pollVisualQcJob,
+  restoreAdminServerCase,
   transitionServerSync,
 } from '../assets/visual-qc-workbench/visual-qc-server-client.js';
 
@@ -69,6 +73,216 @@ function visualCase() {
     qc_result: { status: 'needs_review', reviewed_at: null },
   };
 }
+
+async function sha256Hex(blob) {
+  const digest = await globalThis.crypto.subtle.digest('SHA-256', await blob.arrayBuffer());
+  return [...new Uint8Array(digest)].map((value) => value.toString(16).padStart(2, '0')).join('');
+}
+
+async function adminServerCaseFixture() {
+  const imageBlob = Object.assign(new Blob(['visual-qc-image'], { type: 'image/jpeg' }), {
+    width: 180,
+    height: 120,
+  });
+  const sha256 = await sha256Hex(imageBlob);
+  const registrationReview = {
+    review_id: 'reg-review-2',
+    case_id: 'vqc_server_case',
+    job_id: 'job-server',
+    decision: 'accept_manual',
+    method: 'reviewed_manual_four_point',
+    board_to_image_matrix: [1, 0, 0, 0, 1, 0, 0, 0, 1],
+    anchors: [
+      { board: [0, 0], image: [0, 0] },
+      { board: [1, 0], image: [1, 0] },
+      { board: [1, 1], image: [1, 1] },
+      { board: [0, 1], image: [0, 1] },
+    ],
+    check_points: [{ board: [0.5, 0.5], image: [0.5, 0.5] }],
+    error: { count: 1, rms: 0, maximum: 0 },
+    created_at: '2026-07-21T10:00:00.000Z',
+    status: 'reviewed',
+  };
+  return {
+    imageBlob,
+    serverCase: {
+      schema_version: 'VISUAL-QC-SERVER-CASE-V2',
+      case_id: 'vqc_server_case',
+      board_key: 'km4-f151',
+      board_id: 'BOARD-KM4-F151-MAIN-V1.2',
+      side_id: 'main_page_2',
+      capture_stage: 'before_repair',
+      evidence_role: 'physical_capture',
+      intake: { batch_id: 'batch-1', entry_id: 'entry-1' },
+      capture_session: {
+        schema_version: 'VISUAL-QC-CAPTURE-SESSION-V1',
+        session_id: 'session-1',
+        setup_id: 'standard-bench',
+        expected_side_ids: ['main_page_1', 'main_page_2'],
+        captured_side_ids: ['main_page_2'],
+        pair_status: 'pair_in_progress',
+        checklist: {
+          status: 'confirmed',
+          items: {
+            board_and_side_confirmed: true,
+            focus_and_lens_confirmed: true,
+            lighting_and_occlusion_confirmed: true,
+          },
+          confirmed_at: '2026-07-21T09:00:00.000Z',
+        },
+      },
+      image: {
+        image_id: 'img-server',
+        original_filename: 'board.jpg',
+        mime_type: 'image/jpeg',
+        byte_size: imageBlob.size,
+        width: 180,
+        height: 120,
+        sha256,
+      },
+      job: {
+        job_id: 'job-server',
+        status: 'succeeded',
+        result: {
+          schema_version: 'VISUAL-QC-SERVER-JOB-RESULT-V1',
+          quality: { status: 'good', score: 93, metrics: {}, guidance: [] },
+          registration: {
+            status: 'candidate',
+            method: 'automatic_feature_homography',
+            board_to_image_matrix: [1, 0, 0, 0, 1, 0, 0, 0, 1],
+            evidence: { reprojection_rms: 0.002 },
+          },
+        },
+      },
+      server_registration_review: registrationReview,
+      server_qc_review: {
+        qc_review_id: 'qc-review-2',
+        case_id: 'vqc_server_case',
+        registration_review_id: 'reg-review-2',
+        version: 2,
+        qc_result: 'confirmed_anomaly',
+        annotations: [{
+          annotation_id: 'defect-1',
+          source: 'human_annotation',
+          review_status: 'confirmed',
+          category: 'burn_or_heat_damage',
+        }],
+        notes: '',
+        created_at: '2026-07-21T11:00:00.000Z',
+      },
+    },
+  };
+}
+
+test('admin case API requests carry role, bounded filters, and binary response', async () => {
+  const originalFetch = globalThis.fetch;
+  const requests = [];
+  globalThis.fetch = async (url, options) => {
+    requests.push({ url, options });
+    return {
+      ok: true,
+      status: 200,
+      json: async () => ({ schema_version: 'test' }),
+      blob: async () => new Blob(['original']),
+    };
+  };
+  try {
+    await listVisualQcAdminCases('/api/v1/visual-qc/', 'owner-001', 'reviewer', {
+      page: 2,
+      pageSize: 10,
+      boardKey: 'km4-f151',
+      sideId: 'main_page_2',
+      captureStage: 'before_repair',
+      state: 'ready_for_human_qc',
+    });
+    await getVisualQcAdminCase('/api/v1/visual-qc', 'owner-001', 'reviewer', 'case/1');
+    const blob = await getVisualQcAdminCaseImage(
+      '/api/v1/visual-qc', 'owner-001', 'reviewer', 'case/1',
+    );
+    assert.equal(await blob.text(), 'original');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+
+  assert.equal(
+    requests[0].url,
+    '/api/v1/visual-qc/admin/cases?page=2&page_size=10&board_key=km4-f151&side_id=main_page_2&capture_stage=before_repair&state=ready_for_human_qc',
+  );
+  assert.equal(requests[1].url, '/api/v1/visual-qc/admin/cases/case%2F1');
+  assert.equal(requests[2].url, '/api/v1/visual-qc/admin/cases/case%2F1/image');
+  assert.ok(requests.every(
+    ({ options }) => options.headers['X-Actor-Role'] === 'reviewer',
+  ));
+});
+
+test('server case restoration preserves reviewed registration and final QC evidence', async () => {
+  const { serverCase, imageBlob } = await adminServerCaseFixture();
+
+  const restored = await restoreAdminServerCase(serverCase, imageBlob);
+
+  assert.equal(restored.visualCase.schema_version, 'VISUAL-QC-CASE-V2');
+  assert.equal(restored.visualCase.server_sync.server_case_id, 'vqc_server_case');
+  assert.equal(restored.visualCase.registration.status, 'reviewed');
+  assert.deepEqual(
+    restored.visualCase.registration.matrix,
+    [1, 0, 0, 0, 1, 0, 0, 0, 1],
+  );
+  assert.equal(restored.visualCase.server_qc_review.version, 2);
+  assert.equal(restored.visualCase.qc_result.status, 'confirmed_anomaly');
+  assert.equal(restored.visualCase.annotations[0].annotation_id, 'defect-1');
+  assert.equal(restored.imageBlob, imageBlob);
+});
+
+test('server restoration rejects misleading or stale evidence with typed errors', async () => {
+  const fixture = await adminServerCaseFixture();
+  const cases = [
+    ['unsupported_server_schema', { ...fixture.serverCase, schema_version: 'V1' }, fixture.imageBlob],
+    [
+      'image_hash_mismatch',
+      { ...fixture.serverCase, image: { ...fixture.serverCase.image, sha256: '0'.repeat(64) } },
+      fixture.imageBlob,
+    ],
+    [
+      'image_dimension_mismatch',
+      { ...fixture.serverCase, image: { ...fixture.serverCase.image, width: 181 } },
+      fixture.imageBlob,
+    ],
+    [
+      'missing_server_job_result',
+      { ...fixture.serverCase, job: { ...fixture.serverCase.job, result: null } },
+      fixture.imageBlob,
+    ],
+    [
+      'stale_registration_review',
+      {
+        ...fixture.serverCase,
+        server_registration_review: {
+          ...fixture.serverCase.server_registration_review,
+          job_id: 'other-job',
+        },
+      },
+      fixture.imageBlob,
+    ],
+    [
+      'stale_qc_review',
+      {
+        ...fixture.serverCase,
+        server_qc_review: {
+          ...fixture.serverCase.server_qc_review,
+          registration_review_id: 'other-review',
+        },
+      },
+      fixture.imageBlob,
+    ],
+  ];
+
+  for (const [code, serverCase, imageBlob] of cases) {
+    await assert.rejects(
+      restoreAdminServerCase(serverCase, imageBlob),
+      (error) => error.code === code,
+    );
+  }
+});
 
 test('server sync keeps a stable idempotency key across retry transitions', () => {
   const initial = createServerSyncState(visualCase());

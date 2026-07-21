@@ -404,7 +404,7 @@ git commit -m "feat: import visual QC batches resumably"
 - Modify: `assets/visual-qc-workbench/visual-qc-server-client.js`
 - Modify: `tests/visual-qc-server-client.test.mjs`
 
-- [ ] **Step 1: Write failing client and reconstruction tests**
+- [x] **Step 1: Write failing client and reconstruction tests**
 
 Add tests for role headers, filters, binary original response, and complete V2 restoration:
 
@@ -422,7 +422,7 @@ test('server case restoration preserves reviewed registration and final QC evide
 
 Assert unsupported server schema, image hash mismatch, dimension mismatch, missing job result, and stale QC/registration linkage throw typed client errors instead of opening a misleading draft.
 
-- [ ] **Step 2: Run the client test and verify RED**
+- [x] **Step 2: Run the client test and verify RED**
 
 Run:
 
@@ -432,7 +432,7 @@ node --test tests/visual-qc-server-client.test.mjs
 
 Expected: missing admin API and restoration exports.
 
-- [ ] **Step 3: Implement admin API client functions**
+- [x] **Step 3: Implement admin API client functions**
 
 Add:
 
@@ -445,7 +445,7 @@ export async function restoreAdminServerCase(serverCase, imageBlob) {}
 
 Use the existing JSON/blob error shape. Reconstruct through `createVisualQcCase`, `applyServerJobResult`, reviewed registration evidence, and `applyFinalQcReview`; verify SHA-256 and decoded dimensions before returning the case plus image blob.
 
-- [ ] **Step 4: Run client and state suites**
+- [x] **Step 4: Run client and state suites**
 
 ```powershell
 node --test tests/visual-qc-server-client.test.mjs tests/visual-qc-state.test.mjs tests/visual-qc-core.test.mjs
