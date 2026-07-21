@@ -223,7 +223,7 @@ git commit -m "feat: restrict visual intake to data administrators"
 - Create: `knowledge-base/visual-qc-admin-case-list-v1-schema.json`
 - Create: `tests/test_visual_qc_admin_cases.py`
 
-- [ ] **Step 1: Write failing catalog, detail, and original tests**
+- [x] **Step 1: Write failing catalog, detail, and original tests**
 
 Create cases in queued, failed, manual-required, candidate-ready, registration-reviewed, and final-QC states. Assert data-admin-only access, actor isolation, newest-first stable ordering, bounded pagination, fixed filters, and typed errors:
 
@@ -243,7 +243,7 @@ def test_admin_catalog_is_actor_scoped_filtered_and_stably_paginated(self):
 
 Assert `GET /admin/cases/{case_id}` includes the latest registration review and latest final QC review, while `GET /admin/cases/{case_id}/image` returns byte-identical original content only to its owner. Technician and different-admin access return 403 or privacy-preserving 404 as specified.
 
-- [ ] **Step 2: Run the new test module and verify RED**
+- [x] **Step 2: Run the new test module and verify RED**
 
 Run:
 
@@ -253,7 +253,7 @@ Run:
 
 Expected: all three admin routes return 404 because they do not exist.
 
-- [ ] **Step 3: Implement catalog storage query and state derivation**
+- [x] **Step 3: Implement catalog storage query and state derivation**
 
 Add:
 
@@ -272,7 +272,7 @@ def list_admin_cases(
 
 Derive one state in `VisualQcService` from persisted job result, registration review, and final QC review. Sort `created_at DESC, case_id DESC`; validate page size `1..100` and fixed filter enums.
 
-- [ ] **Step 4: Implement governed detail and original routes**
+- [x] **Step 4: Implement governed detail and original routes**
 
 Add reviewer/data-admin-only routes:
 
@@ -284,7 +284,7 @@ GET /api/v1/visual-qc/admin/cases/{case_id}/image
 
 The detail route emits `VISUAL-QC-SERVER-CASE-V2` with intake provenance and `server_registration_review`. The original route resolves through a service method that confirms ownership, managed storage, file existence, and current SHA-256 before returning `FileResponse` with the original MIME and filename.
 
-- [ ] **Step 5: Run catalog tests and the complete server suite**
+- [x] **Step 5: Run catalog tests and the complete server suite**
 
 Run:
 

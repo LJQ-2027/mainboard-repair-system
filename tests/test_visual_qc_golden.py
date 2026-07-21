@@ -82,6 +82,7 @@ class VisualQcGoldenSampleTests(unittest.TestCase):
             files={"file": ("reference.jpg", image_bytes, "image/jpeg")},
             headers={
                 "X-Actor-Id": "technician-001",
+                "X-Actor-Role": "reviewer",
                 "Idempotency-Key": idempotency_key,
             },
         )
@@ -308,6 +309,7 @@ class VisualQcGoldenSampleTests(unittest.TestCase):
             files={"file": ("blank.jpg", blank_bytes, "image/jpeg")},
             headers={
                 "X-Actor-Id": "technician-001",
+                "X-Actor-Role": "reviewer",
                 "Idempotency-Key": "manual-001",
             },
         )

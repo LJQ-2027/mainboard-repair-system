@@ -545,6 +545,82 @@ class VisualQcStore:
             ).fetchall()
         return [dict(row) for row in rows]
 
+    def list_admin_cases(
+        self,
+        actor_id: str,
+        *,
+        board_key: str | None,
+        side_id: str | None,
+        capture_stage: str | None,
+        state: str | None,
+        limit: int,
+        offset: int,
+    ) -> tuple[list[dict], int]:
+        filters = ["cases.actor_id = ?"]
+        parameters: list[object] = [actor_id]
+        for column, value in (
+            ("cases.board_key", board_key),
+            ("cases.side_id", side_id),
+            ("cases.capture_stage", capture_stage),
+        ):
+            if value is not None:
+                filters.append(f"{column} = ?")
+                parameters.append(value)
+        where_clause = " AND ".join(filters)
+        state_filter = "WHERE state = ?" if state is not None else ""
+        state_parameters = [state] if state is not None else []
+        common = f"""
+            WITH admin_cases AS (
+                SELECT
+                    cases.case_id, cases.board_key, cases.board_id, cases.side_id,
+                    cases.capture_stage, cases.evidence_role,
+                    cases.capture_session_id, cases.capture_setup_id,
+                    cases.intake_batch_id, cases.intake_entry_id,
+                    cases.created_at,
+                    images.image_id, images.original_filename, images.mime_type,
+                    images.byte_size, images.width, images.height, images.sha256,
+                    jobs.job_id, jobs.status AS job_status,
+                    CASE
+                        WHEN EXISTS (
+                            SELECT 1 FROM case_qc_reviews q
+                            WHERE q.case_id = cases.case_id
+                        ) THEN 'completed'
+                        WHEN EXISTS (
+                            SELECT 1 FROM registration_reviews r
+                            WHERE r.case_id = cases.case_id
+                        ) THEN 'ready_for_human_qc'
+                        WHEN jobs.status = 'failed' THEN 'processing_failed'
+                        WHEN jobs.status IN ('queued', 'running') THEN 'processing'
+                        WHEN jobs.status = 'succeeded'
+                         AND json_extract(jobs.result_json, '$.registration.status') = 'manual_required'
+                            THEN 'manual_registration_required'
+                        WHEN jobs.status = 'succeeded' THEN 'registration_review_required'
+                        ELSE 'processing'
+                    END AS state
+                FROM cases
+                JOIN images ON images.case_id = cases.case_id
+                JOIN jobs ON jobs.case_id = cases.case_id
+                         AND jobs.job_type = 'automatic_registration'
+                WHERE {where_clause}
+            )
+        """
+        with self.connect() as connection:
+            total = connection.execute(
+                common + f"SELECT COUNT(*) AS count FROM admin_cases {state_filter}",
+                (*parameters, *state_parameters),
+            ).fetchone()["count"]
+            rows = connection.execute(
+                common
+                + f"""
+                    SELECT * FROM admin_cases
+                    {state_filter}
+                    ORDER BY created_at DESC, case_id DESC
+                    LIMIT ? OFFSET ?
+                """,
+                (*parameters, *state_parameters, limit, offset),
+            ).fetchall()
+        return [dict(row) for row in rows], int(total)
+
     def create_case(self, case_record: dict, image_record: dict, job_record: dict):
         timestamp = case_record["created_at"]
         with self.connect() as connection:

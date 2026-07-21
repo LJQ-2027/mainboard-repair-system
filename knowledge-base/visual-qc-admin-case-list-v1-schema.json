@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "VISUAL-QC-ADMIN-CASE-LIST-V1",
+  "title": "Actor-scoped visual QC data-administrator case list",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "page", "page_size", "total", "cases"],
+  "properties": {
+    "schema_version": {"const": "VISUAL-QC-ADMIN-CASE-LIST-V1"},
+    "page": {"type": "integer", "minimum": 1},
+    "page_size": {"type": "integer", "minimum": 1, "maximum": 100},
+    "total": {"type": "integer", "minimum": 0},
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["case_id", "board_key", "board_id", "side_id", "capture_stage", "evidence_role", "capture_session_id", "capture_setup_id", "intake", "state", "created_at", "image", "job"],
+        "properties": {
+          "case_id": {"type": "string"},
+          "board_key": {"type": "string"},
+          "board_id": {"type": "string"},
+          "side_id": {"type": "string"},
+          "capture_stage": {"enum": ["golden_reference", "before_repair", "after_repair"]},
+          "evidence_role": {"type": "string"},
+          "capture_session_id": {"type": "string"},
+          "capture_setup_id": {"type": "string"},
+          "intake": {"type": "object"},
+          "state": {"enum": ["processing", "processing_failed", "manual_registration_required", "registration_review_required", "ready_for_human_qc", "completed"]},
+          "created_at": {"type": "string"},
+          "image": {"type": "object"},
+          "job": {"type": "object"}
+        }
+      }
+    }
+  }
+}

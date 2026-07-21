@@ -36,6 +36,14 @@ from scripts.visual_qc.server.store import (
 
 
 CAPTURE_STAGES = {"golden_reference", "before_repair", "after_repair"}
+ADMIN_CASE_STATES = {
+    "processing",
+    "processing_failed",
+    "manual_registration_required",
+    "registration_review_required",
+    "ready_for_human_qc",
+    "completed",
+}
 EVIDENCE_ROLES = {"physical_capture", "synthetic_proxy", "service_manual_proxy"}
 DEFECT_CATEGORIES = {
     "burn_or_thermal_damage",
@@ -449,6 +457,122 @@ class VisualQcService:
         if qc_review:
             response["server_qc_review"] = qc_review
         return response
+
+    def list_admin_cases(
+        self,
+        actor_id: str,
+        *,
+        board_key: str | None,
+        side_id: str | None,
+        capture_stage: str | None,
+        state: str | None,
+        page: int,
+        page_size: int,
+    ) -> dict:
+        if state is not None and state not in ADMIN_CASE_STATES:
+            raise VisualQcServiceError(
+                "invalid_admin_case_state",
+                f"Unsupported admin case state: {state}",
+            )
+        if capture_stage is not None and capture_stage not in CAPTURE_STAGES:
+            raise VisualQcServiceError(
+                "invalid_capture_stage",
+                f"Unsupported capture_stage: {capture_stage}",
+            )
+        if board_key is not None:
+            try:
+                if side_id is None:
+                    self.catalog.resolve_board(board_key)
+                else:
+                    self.catalog.resolve_side(board_key, side_id)
+            except CatalogError as exc:
+                raise VisualQcServiceError(exc.code, str(exc)) from exc
+        rows, total = self.store.list_admin_cases(
+            actor_id,
+            board_key=board_key,
+            side_id=side_id,
+            capture_stage=capture_stage,
+            state=state,
+            limit=page_size,
+            offset=(page - 1) * page_size,
+        )
+        cases = []
+        for row in rows:
+            cases.append(
+                {
+                    "case_id": row["case_id"],
+                    "board_key": row["board_key"],
+                    "board_id": row["board_id"],
+                    "side_id": row["side_id"],
+                    "capture_stage": row["capture_stage"],
+                    "evidence_role": row["evidence_role"],
+                    "capture_session_id": row["capture_session_id"],
+                    "capture_setup_id": row["capture_setup_id"],
+                    "intake": {
+                        "batch_id": row["intake_batch_id"],
+                        "entry_id": row["intake_entry_id"],
+                    },
+                    "state": row["state"],
+                    "created_at": row["created_at"],
+                    "image": {
+                        key: row[key]
+                        for key in (
+                            "image_id", "original_filename", "mime_type", "byte_size",
+                            "width", "height", "sha256",
+                        )
+                    },
+                    "job": {
+                        "job_id": row["job_id"],
+                        "status": row["job_status"],
+                    },
+                }
+            )
+        return {
+            "schema_version": "VISUAL-QC-ADMIN-CASE-LIST-V1",
+            "page": page,
+            "page_size": page_size,
+            "total": total,
+            "cases": cases,
+        }
+
+    def get_admin_case(self, case_id: str, actor_id: str) -> dict:
+        response = self.get_case(case_id, actor_id)
+        response["schema_version"] = "VISUAL-QC-SERVER-CASE-V2"
+        registration_review = self.store.get_latest_registration_review(case_id)
+        if registration_review:
+            response["server_registration_review"] = registration_review
+        return response
+
+    def get_admin_case_original(self, case_id: str, actor_id: str) -> dict:
+        record = self.store.get_case(case_id)
+        if not record or record["case"]["actor_id"] != actor_id:
+            raise VisualQcServiceError("case_not_found", "Visual-QC case was not found.", 404)
+        image = record["image"]
+        storage_path = Path(image["storage_path"]).resolve()
+        try:
+            storage_path.relative_to(self.storage.originals_root.resolve())
+        except ValueError as exc:
+            raise VisualQcServiceError(
+                "invalid_original_storage_path",
+                "The case original is outside managed storage.",
+                500,
+            ) from exc
+        if not storage_path.is_file():
+            raise VisualQcServiceError(
+                "original_not_found", "The case original is unavailable.", 404
+            )
+        actual_sha256 = hashlib.sha256(storage_path.read_bytes()).hexdigest()
+        if actual_sha256 != image["sha256"]:
+            raise VisualQcServiceError(
+                "original_integrity_failure",
+                "The case original failed its integrity check.",
+                409,
+            )
+        return {
+            "storage_path": storage_path,
+            "mime_type": image["mime_type"],
+            "original_filename": image["original_filename"],
+        }
 
     def get_capture_session(self, capture_session_id: str, actor_id: str) -> dict:
         normalized_id = self._normalized_capture_session_id(

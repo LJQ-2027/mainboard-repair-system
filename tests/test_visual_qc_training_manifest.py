@@ -78,6 +78,7 @@ class VisualQcTrainingManifestTests(unittest.TestCase):
             files={"file": ("reference.jpg", self.image_bytes, "image/jpeg")},
             headers={
                 "X-Actor-Id": "technician-001",
+                "X-Actor-Role": "reviewer",
                 "Idempotency-Key": request_id,
             },
         )

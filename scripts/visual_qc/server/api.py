@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, File, Form, Header, HTTPException, Request, UploadFile
+from fastapi import FastAPI, File, Form, Header, HTTPException, Query, Request, UploadFile
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
@@ -115,6 +115,16 @@ def create_app(settings: VisualQcServerSettings | None = None) -> FastAPI:
             detail={"code": exc.code, "message": str(exc)},
         ) from exc
 
+    def require_data_admin(role: str | None):
+        if role != "reviewer":
+            raise HTTPException(
+                status_code=403,
+                detail={
+                    "code": "data_admin_role_required",
+                    "message": "Visual data management requires the data administrator role.",
+                },
+            )
+
     @app.get("/api/v1/visual-qc/health")
     def health():
         return service.health()
@@ -198,6 +208,60 @@ def create_app(settings: VisualQcServerSettings | None = None) -> FastAPI:
     ):
         try:
             return service.get_case(case_id, actor_id(x_actor_id))
+        except VisualQcServiceError as exc:
+            service_error(exc)
+
+    @app.get("/api/v1/visual-qc/admin/cases")
+    def list_admin_cases(
+        page: int = Query(1, ge=1),
+        page_size: int = Query(25, ge=1, le=100),
+        board_key: str | None = None,
+        side_id: str | None = None,
+        capture_stage: str | None = None,
+        state: str | None = None,
+        x_actor_id: str | None = Header(None, alias="X-Actor-Id"),
+        x_actor_role: str | None = Header(None, alias="X-Actor-Role"),
+    ):
+        require_data_admin(x_actor_role)
+        try:
+            return service.list_admin_cases(
+                actor_id(x_actor_id),
+                board_key=board_key,
+                side_id=side_id,
+                capture_stage=capture_stage,
+                state=state,
+                page=page,
+                page_size=page_size,
+            )
+        except VisualQcServiceError as exc:
+            service_error(exc)
+
+    @app.get("/api/v1/visual-qc/admin/cases/{case_id}")
+    def get_admin_case(
+        case_id: str,
+        x_actor_id: str | None = Header(None, alias="X-Actor-Id"),
+        x_actor_role: str | None = Header(None, alias="X-Actor-Role"),
+    ):
+        require_data_admin(x_actor_role)
+        try:
+            return service.get_admin_case(case_id, actor_id(x_actor_id))
+        except VisualQcServiceError as exc:
+            service_error(exc)
+
+    @app.get("/api/v1/visual-qc/admin/cases/{case_id}/image")
+    def get_admin_case_original(
+        case_id: str,
+        x_actor_id: str | None = Header(None, alias="X-Actor-Id"),
+        x_actor_role: str | None = Header(None, alias="X-Actor-Role"),
+    ):
+        require_data_admin(x_actor_role)
+        try:
+            original = service.get_admin_case_original(case_id, actor_id(x_actor_id))
+            return FileResponse(
+                original["storage_path"],
+                media_type=original["mime_type"],
+                filename=original["original_filename"],
+            )
         except VisualQcServiceError as exc:
             service_error(exc)
 
