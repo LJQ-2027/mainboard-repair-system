@@ -13,7 +13,9 @@ import {
   createRegistrationReviewDescriptor,
   createServerSyncState,
   createUploadDescriptor,
+  getVisualQcCocoDataset,
   getVisualQcIdentity,
+  getVisualQcTrainingManifest,
   normalizeServerCaptureSession,
   pollVisualQcJob,
   transitionServerSync,
@@ -135,6 +137,33 @@ test('server identity replaces browser hints with the gateway assertion', async 
   } finally {
     globalThis.fetch = originalFetch;
   }
+});
+
+test('reviewer dataset requests use the governed manifest and COCO routes', async () => {
+  const originalFetch = globalThis.fetch;
+  const requests = [];
+  globalThis.fetch = async (url, options) => {
+    requests.push({ url, options });
+    return {
+      ok: true,
+      status: 200,
+      json: async () => ({ schema_version: 'test' }),
+    };
+  };
+  try {
+    await getVisualQcTrainingManifest('/api/v1/visual-qc', 'reviewer-001', 'reviewer');
+    await getVisualQcCocoDataset('/api/v1/visual-qc/', 'reviewer-001', 'reviewer');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+
+  assert.deepEqual(requests.map((request) => request.url), [
+    '/api/v1/visual-qc/datasets/training-manifest',
+    '/api/v1/visual-qc/datasets/coco',
+  ]);
+  assert.ok(requests.every(
+    (request) => request.options.headers['X-Actor-Role'] === 'reviewer',
+  ));
 });
 
 test('automatic result remains a draft candidate until server review succeeds', () => {

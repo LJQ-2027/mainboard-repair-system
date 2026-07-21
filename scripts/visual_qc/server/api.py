@@ -377,6 +377,22 @@ def create_app(settings: VisualQcServerSettings | None = None) -> FastAPI:
         except VisualQcServiceError as exc:
             service_error(exc)
 
+    @app.get("/api/v1/visual-qc/datasets/coco")
+    def training_coco(
+        x_actor_id: str | None = Header(None, alias="X-Actor-Id"),
+        x_actor_role: str | None = Header(None, alias="X-Actor-Role"),
+    ):
+        actor_id(x_actor_id)
+        if x_actor_role != "reviewer":
+            raise HTTPException(
+                status_code=403,
+                detail={
+                    "code": "reviewer_role_required",
+                    "message": "COCO dataset export requires the reviewer role.",
+                },
+            )
+        return service.training_coco()
+
     return app
 
 

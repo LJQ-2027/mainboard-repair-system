@@ -187,6 +187,20 @@ export function getVisualQcIdentity(apiBase, actorId, actorRole = null) {
   });
 }
 
+export function getVisualQcTrainingManifest(apiBase, actorId, actorRole = 'reviewer') {
+  return jsonRequest(`${apiBase.replace(/\/$/, '')}/datasets/training-manifest`, {
+    actorId,
+    actorRole,
+  });
+}
+
+export function getVisualQcCocoDataset(apiBase, actorId, actorRole = 'reviewer') {
+  return jsonRequest(`${apiBase.replace(/\/$/, '')}/datasets/coco`, {
+    actorId,
+    actorRole,
+  });
+}
+
 export function getVisualQcJob(apiBase, actorId, jobId) {
   return jsonRequest(`${apiBase.replace(/\/$/, '')}/jobs/${encodeURIComponent(jobId)}`, {
     actorId,

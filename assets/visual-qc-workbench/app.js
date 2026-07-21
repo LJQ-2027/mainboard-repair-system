@@ -47,7 +47,9 @@ import {
   createServerSyncState,
   getActiveGoldenSample,
   getVisualQcCaptureSession,
+  getVisualQcCocoDataset,
   getVisualQcIdentity,
+  getVisualQcTrainingManifest,
   getVisualQcArtifact,
   getVisualQcJob,
   normalizeServerCaptureSession,
@@ -176,6 +178,14 @@ const elements = {
   defectCategory: byId('defectCategory'),
   annotationList: byId('annotationList'),
   finalizeQcButton: byId('finalizeQcButton'),
+  trainingDatasetSection: byId('trainingDatasetSection'),
+  trainingCaseCount: byId('trainingCaseCount'),
+  trainingAnnotationCount: byId('trainingAnnotationCount'),
+  trainingCategoryCount: byId('trainingCategoryCount'),
+  trainingDatasetSummary: byId('trainingDatasetSummary'),
+  refreshTrainingDatasetButton: byId('refreshTrainingDatasetButton'),
+  downloadTrainingManifestButton: byId('downloadTrainingManifestButton'),
+  downloadTrainingCocoButton: byId('downloadTrainingCocoButton'),
   qcResultTitle: byId('qcResultTitle'),
   qcResultBadge: byId('qcResultBadge'),
   exportJsonButton: byId('exportJsonButton'),
@@ -223,6 +233,9 @@ const state = {
   heatmapArtifactId: null,
   heatmapLoadingArtifactId: null,
   captureSessionDraft: null,
+  trainingManifest: null,
+  trainingDatasetBusy: false,
+  trainingDatasetError: null,
 };
 
 const QUALITY_GUIDANCE_COPY = Object.freeze({
@@ -1152,6 +1165,7 @@ async function finalizeVisualQc() {
     });
     commitCase(applyFinalQcReview(currentCase(), review));
     elements.interactionPrompt.textContent = `人工 QC 已同步为服务器审核版本 ${review.version}`;
+    if (VISUAL_QC_ACTOR_ROLE === 'reviewer') void refreshTrainingDataset({ quiet: true });
   } catch (error) {
     elements.interactionPrompt.textContent = error.message;
   } finally {
@@ -1828,6 +1842,62 @@ function renderQcResult() {
   elements.exportPngButton.disabled = !currentCase() || !state.photoImage;
 }
 
+function renderTrainingDataset() {
+  const reviewer = VISUAL_QC_ACTOR_ROLE === 'reviewer';
+  elements.trainingDatasetSection.hidden = !reviewer;
+  if (!reviewer) return;
+
+  const manifest = state.trainingManifest;
+  const caseCount = Number(manifest?.case_count || 0);
+  const annotationCount = Number(manifest?.annotation_count || 0);
+  const categoryCount = Object.values(manifest?.category_counts || {})
+    .filter((count) => Number(count) > 0).length;
+  elements.trainingCaseCount.textContent = `${caseCount} 案例`;
+  elements.trainingCaseCount.className = `badge ${caseCount ? 'reviewed' : 'neutral'}`;
+  elements.trainingAnnotationCount.textContent = String(annotationCount);
+  elements.trainingCategoryCount.textContent = String(categoryCount);
+
+  if (state.trainingDatasetBusy) {
+    elements.trainingDatasetSummary.textContent = '正在读取服务器训练门禁结果。';
+  } else if (state.trainingDatasetError) {
+    elements.trainingDatasetSummary.textContent = `读取失败：${state.trainingDatasetError}`;
+  } else if (!manifest) {
+    elements.trainingDatasetSummary.textContent = '刷新后可查看服务器审核数据。';
+  } else if (!caseCount) {
+    elements.trainingDatasetSummary.textContent = '还没有通过训练门禁的实拍案例。';
+  } else {
+    elements.trainingDatasetSummary.textContent = `${caseCount} 个案例、${annotationCount} 项确认标注已通过服务器训练门禁。`;
+  }
+
+  elements.refreshTrainingDatasetButton.disabled = state.trainingDatasetBusy;
+  elements.downloadTrainingManifestButton.disabled = state.trainingDatasetBusy || !manifest;
+  elements.downloadTrainingCocoButton.disabled = state.trainingDatasetBusy || !manifest;
+}
+
+async function refreshTrainingDataset({ quiet = false } = {}) {
+  if (VISUAL_QC_ACTOR_ROLE !== 'reviewer' || state.trainingDatasetBusy) return;
+  state.trainingDatasetBusy = true;
+  state.trainingDatasetError = null;
+  renderTrainingDataset();
+  try {
+    const manifest = await getVisualQcTrainingManifest(
+      VISUAL_QC_API,
+      VISUAL_QC_ACTOR_ID,
+      VISUAL_QC_ACTOR_ROLE,
+    );
+    if (manifest?.schema_version !== 'VISUAL-QC-TRAINING-MANIFEST-V1') {
+      throw new Error('服务器训练清单版本不受支持');
+    }
+    state.trainingManifest = manifest;
+  } catch (error) {
+    state.trainingDatasetError = error.message || '服务器请求失败';
+    if (!quiet) reportUserError(error);
+  } finally {
+    state.trainingDatasetBusy = false;
+    renderTrainingDataset();
+  }
+}
+
 function renderInteractionPrompt() {
   if (!currentCase()) {
     elements.interactionPrompt.textContent = '请先导入一张主板图片';
@@ -1872,6 +1942,7 @@ function render() {
   renderComparison();
   renderAnnotations();
   renderQcResult();
+  renderTrainingDataset();
   renderInteractionPrompt();
   renderCanvases();
 }
@@ -1883,6 +1954,37 @@ function downloadBlob(blob, fileName) {
   anchor.download = fileName;
   anchor.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function downloadJsonDocument(documentValue, fileName) {
+  downloadBlob(
+    new Blob([`${JSON.stringify(documentValue, null, 2)}\n`], { type: 'application/json' }),
+    fileName,
+  );
+}
+
+async function downloadTrainingCoco() {
+  if (VISUAL_QC_ACTOR_ROLE !== 'reviewer') return;
+  state.trainingDatasetBusy = true;
+  state.trainingDatasetError = null;
+  renderTrainingDataset();
+  try {
+    const dataset = await getVisualQcCocoDataset(
+      VISUAL_QC_API,
+      VISUAL_QC_ACTOR_ID,
+      VISUAL_QC_ACTOR_ROLE,
+    );
+    if (dataset?.info?.version !== 'VISUAL-QC-COCO-V1') {
+      throw new Error('服务器 COCO 数据版本不受支持');
+    }
+    downloadJsonDocument(dataset, 'visual-qc-reviewed-dataset.coco.json');
+  } catch (error) {
+    state.trainingDatasetError = error.message || 'COCO 下载失败';
+    reportUserError(error);
+  } finally {
+    state.trainingDatasetBusy = false;
+    renderTrainingDataset();
+  }
 }
 
 function exportJson() {
@@ -2179,6 +2281,16 @@ function bindEvents() {
   }
   elements.exportJsonButton.addEventListener('click', exportJson);
   elements.exportPngButton.addEventListener('click', exportAnnotatedPng);
+  elements.refreshTrainingDatasetButton.addEventListener(
+    'click',
+    () => refreshTrainingDataset(),
+  );
+  elements.downloadTrainingManifestButton.addEventListener('click', () => {
+    if (state.trainingManifest) {
+      downloadJsonDocument(state.trainingManifest, 'visual-qc-training-manifest.json');
+    }
+  });
+  elements.downloadTrainingCocoButton.addEventListener('click', downloadTrainingCoco);
   elements.savedCasesButton.addEventListener('click', async () => {
     await renderSavedCases();
     elements.savedCasesDialog.showModal();
@@ -2237,6 +2349,7 @@ async function initialize() {
   renderBoardSelector();
   bindEvents();
   await loadBoard(state.boardKey);
+  await refreshTrainingDataset({ quiet: true });
   resizeCanvases();
 }
 

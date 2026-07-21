@@ -837,6 +837,43 @@ button:disabled {
   background: #f8faf8;
 }
 
+.training-dataset-section {
+  background: #f5f8f6;
+}
+
+.training-metrics {
+  margin: 0 0 10px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.training-metrics div {
+  min-width: 0;
+  padding: 9px 0;
+}
+
+.training-metrics div + div {
+  padding-left: 12px;
+  border-left: 1px solid var(--line);
+}
+
+.training-metrics dt {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.training-metrics dd {
+  margin: 3px 0 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.training-dataset-actions button {
+  flex: 1 1 auto;
+}
+
 dialog {
   width: min(520px, calc(100vw - 28px));
   max-height: min(640px, calc(100vh - 40px));

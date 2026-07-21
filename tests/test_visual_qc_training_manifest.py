@@ -130,6 +130,10 @@ class VisualQcTrainingManifestTests(unittest.TestCase):
             "/api/v1/visual-qc/datasets/training-manifest",
             headers={"X-Actor-Id": "technician-001"},
         )
+        coco_forbidden = self.client.get(
+            "/api/v1/visual-qc/datasets/coco",
+            headers={"X-Actor-Id": "technician-001"},
+        )
         manifest = self.client.get(
             "/api/v1/visual-qc/datasets/training-manifest",
             headers={
@@ -139,6 +143,11 @@ class VisualQcTrainingManifestTests(unittest.TestCase):
         )
 
         self.assertEqual(forbidden.status_code, 403)
+        self.assertEqual(coco_forbidden.status_code, 403)
+        self.assertEqual(
+            coco_forbidden.json()["detail"]["code"],
+            "reviewer_role_required",
+        )
         self.assertEqual(manifest.status_code, 200)
         payload = manifest.json()
         schema = json.loads(
@@ -233,9 +242,80 @@ class VisualQcTrainingManifestTests(unittest.TestCase):
             },
             headers={"X-Actor-Id": "technician-001"},
         )
-        final = self.submit_no_anomaly(case["case_id"])
+        final = self.client.post(
+            f"/api/v1/visual-qc/cases/{case['case_id']}/qc-reviews",
+            json={
+                "qc_result": "confirmed_anomaly",
+                "annotations": [
+                    {
+                        "annotation_id": "annotation-001",
+                        "category": "burn_or_heat_damage",
+                        "source": "human_annotation",
+                        "review_status": "confirmed",
+                        "component": None,
+                        "image_geometry": {
+                            "type": "rectangle",
+                            "points": [
+                                {"x": 0.1, "y": 0.2},
+                                {"x": 0.3, "y": 0.5},
+                            ],
+                        },
+                        "board_geometry": {
+                            "type": "polygon",
+                            "points": [
+                                {"x": 0.1, "y": 0.2},
+                                {"x": 0.3, "y": 0.2},
+                                {"x": 0.3, "y": 0.5},
+                                {"x": 0.1, "y": 0.5},
+                            ],
+                        },
+                        "note": "Reviewed visible damage.",
+                    }
+                ],
+                "notes": "Training export integration sample.",
+            },
+            headers={"X-Actor-Id": "technician-001"},
+        )
 
         self.assertEqual(review.status_code, 201)
         self.assertEqual(len(review.json()["check_points"]), 1)
         self.assertEqual(final.status_code, 201)
         self.assertEqual(final.json()["training_status"], "eligible")
+
+        headers = {
+            "X-Actor-Id": "reviewer-001",
+            "X-Actor-Role": "reviewer",
+        }
+        first = self.client.get(
+            "/api/v1/visual-qc/datasets/coco",
+            headers=headers,
+        )
+        second = self.client.get(
+            "/api/v1/visual-qc/datasets/coco",
+            headers=headers,
+        )
+        self.assertEqual(first.status_code, 200)
+        self.assertEqual(first.json(), second.json())
+        payload = first.json()
+        self.assertEqual(payload["info"]["version"], "VISUAL-QC-COCO-V1")
+        self.assertEqual(len(payload["images"]), 1)
+        self.assertEqual(len(payload["annotations"]), 1)
+        self.assertEqual(payload["images"][0]["case_id"], case["case_id"])
+        self.assertEqual(payload["annotations"][0]["category_id"], 1)
+        self.assertEqual(
+            payload["annotations"][0]["bbox"],
+            [
+                round(0.1 * payload["images"][0]["width"], 6),
+                round(0.2 * payload["images"][0]["height"], 6),
+                round(0.2 * payload["images"][0]["width"], 6),
+                round(0.3 * payload["images"][0]["height"], 6),
+            ],
+        )
+        schema = json.loads(
+            (
+                ROOT
+                / "knowledge-base"
+                / "visual-qc-coco-v1-schema.json"
+            ).read_text(encoding="utf-8")
+        )
+        jsonschema.validate(payload, schema)

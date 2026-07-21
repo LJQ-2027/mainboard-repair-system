@@ -20,6 +20,15 @@ test('visual QC workbench exposes one compact capture intake section', () => {
   assert.match(html, /id="captureOtherSideButton"/);
 });
 
+test('reviewer training export has one compact governed dataset section', () => {
+  assert.match(html, /id="trainingDatasetSection"/);
+  assert.match(html, /id="trainingCaseCount"/);
+  assert.match(html, /id="trainingAnnotationCount"/);
+  assert.match(html, /id="refreshTrainingDatasetButton"/);
+  assert.match(html, /id="downloadTrainingManifestButton"/);
+  assert.match(html, /id="downloadTrainingCocoButton"/);
+});
+
 test('canvas elements cannot feed their intrinsic bitmap height back into layout', () => {
   assert.match(
     css,

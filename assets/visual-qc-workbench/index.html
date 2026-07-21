@@ -235,6 +235,26 @@
           <button id="finalizeQcButton" class="primary-button full-button" type="button" disabled>完成人工 QC</button>
         </section>
 
+        <section id="trainingDatasetSection" class="panel-section training-dataset-section" hidden>
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">审核员工具</span>
+              <h2>已审核数据集</h2>
+            </div>
+            <span id="trainingCaseCount" class="badge neutral">0 案例</span>
+          </div>
+          <dl class="training-metrics">
+            <div><dt>合格标注</dt><dd id="trainingAnnotationCount">0</dd></div>
+            <div><dt>异常类别</dt><dd id="trainingCategoryCount">0</dd></div>
+          </dl>
+          <p id="trainingDatasetSummary" class="source-note">正在读取服务器训练门禁结果。</p>
+          <div class="button-row training-dataset-actions">
+            <button id="refreshTrainingDatasetButton" class="secondary-button" type="button">刷新</button>
+            <button id="downloadTrainingManifestButton" class="secondary-button" type="button" disabled>下载清单</button>
+            <button id="downloadTrainingCocoButton" class="primary-button" type="button" disabled>下载 COCO</button>
+          </div>
+        </section>
+
         <section class="panel-section export-section">
           <div class="section-heading">
             <div>

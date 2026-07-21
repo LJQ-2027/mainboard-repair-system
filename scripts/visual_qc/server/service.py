@@ -11,6 +11,7 @@ import cv2
 import numpy as np
 
 from scripts.visual_qc.registration import RegistrationConfig, register_board_image
+from scripts.export_visual_qc_coco import build_coco_from_training_manifest
 from scripts.validate_visual_qc_dataset import validate_visual_qc_case
 from scripts.visual_qc.server.catalog import BoardCatalog, CatalogError
 from scripts.visual_qc.server.config import VisualQcServerSettings
@@ -681,6 +682,9 @@ class VisualQcService:
             "category_counts": category_counts,
             "cases": cases,
         }
+
+    def training_coco(self) -> dict:
+        return build_coco_from_training_manifest(self.training_manifest())
 
     def training_image(self, image_id: str) -> dict:
         image = self.store.get_training_image(image_id)

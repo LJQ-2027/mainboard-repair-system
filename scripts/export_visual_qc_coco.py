@@ -41,6 +41,88 @@ def _coco_geometry(geometry, width, height):
     }
 
 
+def _categories():
+    return [
+        {"id": index + 1, "name": category, "supercategory": "visible_mainboard_defect"}
+        for index, category in enumerate(DEFECT_CATEGORIES)
+    ]
+
+
+def build_coco_from_training_manifest(manifest):
+    if manifest.get("schema_version") != "VISUAL-QC-TRAINING-MANIFEST-V1":
+        raise ValueError("Training manifest schema version is unsupported")
+    cases = manifest.get("cases")
+    if not isinstance(cases, list):
+        raise ValueError("Training manifest cases must be an array")
+    case_ids = [case.get("case_id") for case in cases]
+    if any(not case_id for case_id in case_ids) or len(case_ids) != len(set(case_ids)):
+        raise ValueError("Training manifest contains missing or duplicate case ids")
+
+    categories = _categories()
+    category_ids = {category["name"]: category["id"] for category in categories}
+    images = []
+    annotations = []
+    annotation_id = 1
+    for image_id, case in enumerate(sorted(cases, key=lambda item: item["case_id"]), start=1):
+        image = case["image"]
+        review = case["qc_review"]
+        images.append({
+            "id": image_id,
+            "case_id": case["case_id"],
+            "image_id": image["image_id"],
+            "file_name": image["file_name"],
+            "width": image["width"],
+            "height": image["height"],
+            "sha256": image["sha256"],
+            "board_key": case["board_key"],
+            "board_id": case["board_id"],
+            "side_id": case["side_id"],
+            "capture_stage": case["capture_stage"],
+            "qc_status": review["qc_result"],
+            "qc_review_id": review["qc_review_id"],
+            "qc_review_version": review["version"],
+        })
+        for annotation in sorted(
+            review.get("annotations", []),
+            key=lambda item: item["annotation_id"],
+        ):
+            if annotation["review_status"] != "confirmed":
+                continue
+            category = annotation["category"]
+            if category not in category_ids:
+                raise ValueError(f"Unsupported training annotation category: {category}")
+            geometry = _coco_geometry(
+                annotation["image_geometry"],
+                image["width"],
+                image["height"],
+            )
+            annotations.append({
+                "id": annotation_id,
+                "image_id": image_id,
+                "category_id": category_ids[category],
+                **geometry,
+                "iscrowd": 0,
+                "attributes": {
+                    "annotation_id": annotation["annotation_id"],
+                    "source": annotation["source"],
+                    "designator": (annotation.get("component") or {}).get("designator"),
+                    "board_geometry": annotation["board_geometry"],
+                },
+            })
+            annotation_id += 1
+    return {
+        "info": {
+            "description": "Human-reviewed mainboard visual QC dataset",
+            "version": "VISUAL-QC-COCO-V1",
+            "source_manifest": "VISUAL-QC-TRAINING-MANIFEST-V1",
+        },
+        "licenses": [],
+        "images": images,
+        "annotations": annotations,
+        "categories": categories,
+    }
+
+
 def build_coco_dataset(cases, root):
     case_ids = [visual_case.get("case_id") for visual_case in cases]
     if len(case_ids) != len(set(case_ids)):
@@ -55,10 +137,7 @@ def build_coco_dataset(cases, root):
     if errors:
         raise ValueError("Visual QC dataset is not training ready:\n" + "\n".join(errors))
 
-    categories = [
-        {"id": index + 1, "name": category, "supercategory": "visible_mainboard_defect"}
-        for index, category in enumerate(DEFECT_CATEGORIES)
-    ]
+    categories = _categories()
     category_ids = {category["name"]: category["id"] for category in categories}
     images = []
     annotations = []
