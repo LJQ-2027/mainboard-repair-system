@@ -3,18 +3,20 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>主板视觉 QC 数据工作台</title>
+  <title>主板视觉数据工作台</title>
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
   <header class="app-header">
     <div>
-      <span class="eyebrow">内部视觉 QC · 弱网草稿与服务器处理</span>
-      <h1>主板视觉 QC</h1>
+      <span class="eyebrow">内部数据管理 · 配准、标注与训练证据</span>
+      <h1>主板视觉数据工作台</h1>
     </div>
     <div class="header-status">
       <span id="saveStatus" class="status-dot">尚未建立案例</span>
+      <span id="actorRoleLabel" class="role-label">正在确认身份</span>
+      <button id="serverCasesButton" class="text-button" type="button" hidden>服务器案例</button>
       <button id="savedCasesButton" class="text-button" type="button">本机草稿</button>
     </div>
   </header>
@@ -105,7 +107,7 @@
       </div>
 
       <aside class="inspection-panel" aria-label="QC 案例详情">
-        <section class="panel-section capture-intake-section">
+        <section id="captureIntakeSection" class="panel-section capture-intake-section">
           <div class="section-heading">
             <div>
               <span class="eyebrow">实物采集</span>
@@ -135,7 +137,7 @@
           </div>
         </section>
 
-        <section class="panel-section server-sync-section">
+        <section id="serverSyncSection" class="panel-section server-sync-section">
           <div class="section-heading">
             <div>
               <span class="eyebrow">服务器处理</span>
@@ -238,7 +240,7 @@
         <section id="trainingDatasetSection" class="panel-section training-dataset-section" hidden>
           <div class="section-heading">
             <div>
-              <span class="eyebrow">审核员工具</span>
+              <span class="eyebrow">数据管理</span>
               <h2>已审核数据集</h2>
             </div>
             <span id="trainingCaseCount" class="badge neutral">0 案例</span>
@@ -262,7 +264,7 @@
           </div>
         </section>
 
-        <section class="panel-section export-section">
+        <section id="localExportSection" class="panel-section export-section">
           <div class="section-heading">
             <div>
               <span class="eyebrow">本机数据</span>
@@ -286,6 +288,55 @@
       <button id="closeSavedCasesButton" class="icon-button" type="button" aria-label="关闭">×</button>
     </div>
     <div id="savedCasesList" class="saved-cases-list"></div>
+  </dialog>
+
+  <dialog id="serverCasesDialog" class="server-cases-dialog">
+    <div class="dialog-heading">
+      <div>
+        <span class="eyebrow">数据管理</span>
+        <h2>服务器案例</h2>
+      </div>
+      <button id="closeServerCasesButton" class="icon-button" type="button" aria-label="关闭">×</button>
+    </div>
+    <div class="server-case-toolbar">
+      <label>
+        <span>主板</span>
+        <select id="serverCaseBoardFilter"></select>
+      </label>
+      <label>
+        <span>板面</span>
+        <select id="serverCaseSideFilter"></select>
+      </label>
+      <label>
+        <span>采集阶段</span>
+        <select id="serverCaseStageFilter">
+          <option value="">全部</option>
+          <option value="golden_reference">正常板基准</option>
+          <option value="before_repair">维修前</option>
+          <option value="after_repair">维修后</option>
+        </select>
+      </label>
+      <label>
+        <span>状态</span>
+        <select id="serverCaseStateFilter">
+          <option value="">全部</option>
+          <option value="processing">处理中</option>
+          <option value="processing_failed">处理失败</option>
+          <option value="manual_registration_required">需人工配准</option>
+          <option value="registration_review_required">待确认配准</option>
+          <option value="ready_for_human_qc">待人工 QC</option>
+          <option value="completed">已完成</option>
+        </select>
+      </label>
+      <button id="refreshServerCasesButton" class="secondary-button" type="button">刷新</button>
+    </div>
+    <p id="serverCasesStatus" class="server-cases-status" aria-live="polite">等待读取</p>
+    <div id="serverCasesList" class="server-cases-list"></div>
+    <div class="server-case-pagination">
+      <button id="serverCasesPreviousButton" class="secondary-button" type="button" disabled>上一页</button>
+      <span id="serverCasesPageLabel">第 1 页</span>
+      <button id="serverCasesNextButton" class="secondary-button" type="button" disabled>下一页</button>
+    </div>
   </dialog>
 
   <template id="annotationTemplate">

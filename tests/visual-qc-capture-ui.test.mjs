@@ -38,6 +38,12 @@ test('reviewer training export has one compact governed dataset section', () => 
   );
 });
 
+test('workbench uses data-management terminology instead of a reviewer workflow', () => {
+  assert.match(html, /主板视觉数据工作台/);
+  assert.match(html, /数据管理/);
+  assert.doesNotMatch(html, /审核员工具/);
+});
+
 test('canvas elements cannot feed their intrinsic bitmap height back into layout', () => {
   assert.match(
     css,

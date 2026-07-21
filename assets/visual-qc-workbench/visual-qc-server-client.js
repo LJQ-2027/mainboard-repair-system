@@ -125,6 +125,7 @@ function parseResponse(xhr) {
 export function uploadVisualQcCase({
   apiBase,
   actorId,
+  actorRole = 'reviewer',
   visualCase,
   imageBlob,
   syncState,
@@ -141,6 +142,7 @@ export function uploadVisualQcCase({
     const xhr = new XMLHttpRequestClass();
     xhr.open('POST', `${apiBase.replace(/\/$/, '')}/cases`);
     xhr.setRequestHeader('X-Actor-Id', actorId);
+    xhr.setRequestHeader('X-Actor-Role', actorRole);
     xhr.setRequestHeader('Idempotency-Key', descriptor.idempotencyKey);
     xhr.upload.addEventListener('progress', (event) => {
       if (!event.lengthComputable) return;

@@ -31,6 +31,12 @@ import {
 } from './canvas-stage.js';
 import { invertHomography, projectPoint } from '../cross-source-registration/registration-core.js';
 import {
+  ADMIN_CASE_STATE_LABELS,
+  buildVisualQcAccessState,
+  clampAdminCasePage,
+  normalizeAdminCaseFilters,
+} from './admin-catalog-state.js';
+import {
   deleteVisualQcCase,
   listVisualQcCases,
   loadVisualQcCase,
@@ -53,13 +59,17 @@ import {
   getVisualQcIdentity,
   getVisualQcTrainingManifest,
   getVisualQcArtifact,
+  getVisualQcAdminCase,
+  getVisualQcAdminCaseImage,
   getVisualQcJob,
+  listVisualQcAdminCases,
   normalizeServerCaptureSession,
   pollVisualQcJob,
   reviewDifferenceCandidate,
   retryVisualQcJob,
   reviewVisualQcCase,
   reviewVisualQcRegistration,
+  restoreAdminServerCase,
   transitionServerSync,
   uploadVisualQcCase,
 } from './visual-qc-server-client.js';
@@ -107,6 +117,8 @@ const byId = (id) => document.getElementById(id);
 const elements = {
   saveStatus: byId('saveStatus'),
   savedCasesButton: byId('savedCasesButton'),
+  actorRoleLabel: byId('actorRoleLabel'),
+  serverCasesButton: byId('serverCasesButton'),
   boardSelect: byId('boardSelect'),
   sideSelector: byId('sideSelector'),
   captureStage: byId('captureStage'),
@@ -135,6 +147,7 @@ const elements = {
   interactionPrompt: byId('interactionPrompt'),
   overlayOpacity: byId('overlayOpacity'),
   captureSessionTitle: byId('captureSessionTitle'),
+  captureIntakeSection: byId('captureIntakeSection'),
   captureSessionBadge: byId('captureSessionBadge'),
   captureSessionSummary: byId('captureSessionSummary'),
   captureChecklist: byId('captureChecklist'),
@@ -147,6 +160,7 @@ const elements = {
   qualitySharpness: byId('qualitySharpness'),
   qualityGuidance: byId('qualityGuidance'),
   serverSyncTitle: byId('serverSyncTitle'),
+  serverSyncSection: byId('serverSyncSection'),
   serverSyncBadge: byId('serverSyncBadge'),
   serverSyncProgress: byId('serverSyncProgress'),
   serverSyncDetail: byId('serverSyncDetail'),
@@ -198,9 +212,22 @@ const elements = {
   qcResultBadge: byId('qcResultBadge'),
   exportJsonButton: byId('exportJsonButton'),
   exportPngButton: byId('exportPngButton'),
+  localExportSection: byId('localExportSection'),
   savedCasesDialog: byId('savedCasesDialog'),
   closeSavedCasesButton: byId('closeSavedCasesButton'),
   savedCasesList: byId('savedCasesList'),
+  serverCasesDialog: byId('serverCasesDialog'),
+  closeServerCasesButton: byId('closeServerCasesButton'),
+  serverCaseBoardFilter: byId('serverCaseBoardFilter'),
+  serverCaseSideFilter: byId('serverCaseSideFilter'),
+  serverCaseStageFilter: byId('serverCaseStageFilter'),
+  serverCaseStateFilter: byId('serverCaseStateFilter'),
+  refreshServerCasesButton: byId('refreshServerCasesButton'),
+  serverCasesStatus: byId('serverCasesStatus'),
+  serverCasesList: byId('serverCasesList'),
+  serverCasesPreviousButton: byId('serverCasesPreviousButton'),
+  serverCasesNextButton: byId('serverCasesNextButton'),
+  serverCasesPageLabel: byId('serverCasesPageLabel'),
   annotationTemplate: byId('annotationTemplate'),
 };
 
@@ -245,6 +272,17 @@ const state = {
   trainingAudit: null,
   trainingDatasetBusy: false,
   trainingDatasetError: null,
+  adminCases: {
+    filters: normalizeAdminCaseFilters(),
+    page: 1,
+    pageSize: 20,
+    total: 0,
+    rows: [],
+    busy: false,
+    error: null,
+    openingCaseId: null,
+    rowErrors: {},
+  },
 };
 
 const QUALITY_GUIDANCE_COPY = Object.freeze({
@@ -275,6 +313,28 @@ const BOARD_SIDE_LABELS = Object.freeze({
 
 function currentCase() {
   return state.history?.current || null;
+}
+
+function dataAdminAccess() {
+  return VISUAL_QC_ACTOR_ROLE === 'reviewer';
+}
+
+function applyRoleAccess() {
+  const access = buildVisualQcAccessState(VISUAL_QC_ACTOR_ROLE);
+  elements.actorRoleLabel.textContent = access.roleLabel;
+  elements.chooseImageButton.hidden = !access.imageIntake;
+  elements.photoEmpty.hidden = Boolean(state.photoImage) || !access.imageIntake;
+  elements.proxyButton.hidden = !access.proxyLoading
+    || !state.dataset?.registration?.proxy_image;
+  elements.importCaseButton.hidden = !access.imageIntake;
+  elements.savedCasesButton.hidden = !access.imageIntake;
+  elements.serverCasesButton.hidden = !access.serverCatalog;
+  elements.captureIntakeSection.hidden = !access.imageIntake;
+  elements.serverSyncSection.hidden = !access.serverSync;
+  elements.comparisonSection.hidden = !access.goldenManagement;
+  elements.trainingDatasetSection.hidden = !access.datasetExport;
+  elements.localExportSection.hidden = !access.imageIntake;
+  elements.photoDropZone.classList.toggle('drop-disabled', !access.imageIntake);
 }
 
 function reportUserError(error) {
@@ -427,7 +487,7 @@ async function loadBoard(boardKey, requestedSide = null, resetCase = true) {
   renderSideSelector();
   elements.boardEmpty.hidden = true;
   elements.boardCanvasMeta.textContent = `${side.label} · ${geometry.components.length} 个位号`;
-  elements.proxyButton.hidden = !dataset.registration?.proxy_image;
+  elements.proxyButton.hidden = !dataAdminAccess() || !dataset.registration?.proxy_image;
   resizeCanvases();
   render();
   return true;
@@ -781,6 +841,7 @@ async function submitCandidateReview(candidate, decision, defectCategory) {
 }
 
 async function syncCurrentCaseWithServer() {
+  if (!dataAdminAccess()) return;
   if (state.serverBusy) return;
   const visualCase = currentCase();
   if (!visualCase || !state.photoBlob) return;
@@ -814,6 +875,7 @@ async function syncCurrentCaseWithServer() {
     const accepted = await uploadVisualQcCase({
       apiBase: VISUAL_QC_API,
       actorId: VISUAL_QC_ACTOR_ID,
+      actorRole: VISUAL_QC_ACTOR_ROLE,
       visualCase: next,
       imageBlob: state.photoBlob,
       syncState: next.server_sync,
@@ -864,6 +926,7 @@ async function syncCurrentCaseWithServer() {
 }
 
 async function loadPhotoBlob(blob, fileName, isProxy = false) {
+  if (!dataAdminAccess()) return;
   if (!blob.type.startsWith('image/')) throw new Error('请选择 JPEG、PNG 或 WebP 图片。');
   const image = await imageFromBlob(blob);
   const imageHash = await sha256(blob);
@@ -2012,6 +2075,7 @@ function render() {
   renderTrainingDataset();
   renderInteractionPrompt();
   renderCanvases();
+  applyRoleAccess();
 }
 
 function downloadBlob(blob, fileName) {
@@ -2122,6 +2186,7 @@ function exportAnnotatedPng() {
 }
 
 async function importCase(file) {
+  if (!dataAdminAccess()) return;
   const operationRevision = state.loadRevision;
   await flushPendingSave();
   const visualCase = JSON.parse(await file.text());
@@ -2146,6 +2211,201 @@ async function importCase(file) {
   render();
   elements.saveStatus.textContent = '案例已导入，等待原图';
   elements.interactionPrompt.textContent = '案例已导入，请重新选择原图以核对 SHA-256';
+}
+
+async function populateAdminSideFilter(boardKey = '') {
+  const selected = state.adminCases.filters.sideId;
+  elements.serverCaseSideFilter.replaceChildren();
+  const all = document.createElement('option');
+  all.value = '';
+  all.textContent = '全部';
+  elements.serverCaseSideFilter.append(all);
+  if (!boardKey) return;
+  const board = state.catalog.boards[boardKey];
+  if (!board) return;
+  const manifest = boardKey === state.boardKey && state.manifest
+    ? state.manifest
+    : await fetchJson(board.side_manifest);
+  for (const side of manifest.sides || []) {
+    const option = document.createElement('option');
+    option.value = side.side_id;
+    option.textContent = side.label;
+    elements.serverCaseSideFilter.append(option);
+  }
+  elements.serverCaseSideFilter.value = [...elements.serverCaseSideFilter.options]
+    .some((option) => option.value === selected) ? selected : '';
+}
+
+async function initializeAdminCaseFilters() {
+  const filters = state.adminCases.filters;
+  elements.serverCaseBoardFilter.replaceChildren();
+  const all = document.createElement('option');
+  all.value = '';
+  all.textContent = '全部';
+  elements.serverCaseBoardFilter.append(all);
+  for (const [boardKey, board] of Object.entries(state.catalog.boards)) {
+    const option = document.createElement('option');
+    option.value = boardKey;
+    option.textContent = board.title;
+    elements.serverCaseBoardFilter.append(option);
+  }
+  elements.serverCaseBoardFilter.value = filters.boardKey;
+  elements.serverCaseStageFilter.value = filters.captureStage;
+  elements.serverCaseStateFilter.value = filters.state;
+  await populateAdminSideFilter(filters.boardKey);
+}
+
+function selectedAdminCaseFilters() {
+  return normalizeAdminCaseFilters({
+    boardKey: elements.serverCaseBoardFilter.value,
+    sideId: elements.serverCaseSideFilter.value,
+    captureStage: elements.serverCaseStageFilter.value,
+    state: elements.serverCaseStateFilter.value,
+  });
+}
+
+function renderAdminServerCases() {
+  const catalogState = state.adminCases;
+  elements.serverCasesList.replaceChildren();
+  const maximumPage = Math.max(1, Math.ceil(catalogState.total / catalogState.pageSize));
+  elements.serverCasesPageLabel.textContent = `第 ${catalogState.page} / ${maximumPage} 页`;
+  elements.serverCasesPreviousButton.disabled = catalogState.busy || catalogState.page <= 1;
+  elements.serverCasesNextButton.disabled = catalogState.busy
+    || catalogState.page >= maximumPage;
+  elements.refreshServerCasesButton.disabled = catalogState.busy;
+  elements.serverCasesStatus.textContent = catalogState.busy
+    ? '正在读取服务器案例'
+    : catalogState.error || `共 ${catalogState.total} 个案例`;
+  if (catalogState.busy) return;
+  if (!catalogState.rows.length) {
+    const empty = document.createElement('p');
+    empty.className = 'source-note';
+    empty.textContent = catalogState.error ? '读取失败，请重试。' : '当前筛选条件下没有案例。';
+    elements.serverCasesList.append(empty);
+    return;
+  }
+  for (const item of catalogState.rows) {
+    const row = document.createElement('article');
+    row.className = 'server-case-row';
+    const identity = document.createElement('span');
+    const title = document.createElement('strong');
+    title.textContent = `${item.board_key} · ${BOARD_SIDE_LABELS[item.side_id] || item.side_id}`;
+    const file = document.createElement('small');
+    file.textContent = item.image.original_filename;
+    identity.append(title, file);
+    const stateCell = document.createElement('span');
+    const stateLabel = document.createElement('strong');
+    stateLabel.textContent = ADMIN_CASE_STATE_LABELS[item.state] || item.state;
+    const stage = document.createElement('small');
+    stage.textContent = item.capture_stage;
+    stateCell.append(stateLabel, stage);
+    const timeCell = document.createElement('span');
+    const time = document.createElement('time');
+    time.dateTime = item.created_at;
+    time.textContent = new Date(item.created_at).toLocaleString();
+    const intake = document.createElement('small');
+    intake.textContent = item.intake?.entry_id || '历史案例';
+    timeCell.append(time, intake);
+    const open = document.createElement('button');
+    open.type = 'button';
+    open.className = 'primary-button';
+    open.textContent = catalogState.openingCaseId === item.case_id ? '正在打开' : '打开';
+    open.disabled = Boolean(catalogState.openingCaseId);
+    open.addEventListener('click', () => openAdminServerCase(item.case_id));
+    row.append(identity, stateCell, timeCell, open);
+    const rowError = catalogState.rowErrors[item.case_id];
+    if (rowError) {
+      const error = document.createElement('p');
+      error.className = 'server-case-error';
+      error.textContent = rowError;
+      row.append(error);
+    }
+    elements.serverCasesList.append(row);
+  }
+}
+
+async function refreshAdminServerCases({ resetPage = false } = {}) {
+  if (!dataAdminAccess() || state.adminCases.busy) return;
+  if (resetPage) state.adminCases.page = 1;
+  state.adminCases.filters = selectedAdminCaseFilters();
+  state.adminCases.busy = true;
+  state.adminCases.error = null;
+  renderAdminServerCases();
+  try {
+    const payload = await listVisualQcAdminCases(
+      VISUAL_QC_API,
+      VISUAL_QC_ACTOR_ID,
+      VISUAL_QC_ACTOR_ROLE,
+      {
+        ...state.adminCases.filters,
+        page: state.adminCases.page,
+        pageSize: state.adminCases.pageSize,
+      },
+    );
+    if (payload?.schema_version !== 'VISUAL-QC-ADMIN-CASE-LIST-V1') {
+      throw new Error('服务器案例目录版本不受支持。');
+    }
+    state.adminCases.total = payload.total;
+    state.adminCases.page = clampAdminCasePage(
+      payload.page,
+      payload.total,
+      payload.page_size,
+    );
+    state.adminCases.rows = payload.cases || [];
+  } catch (error) {
+    state.adminCases.error = error.message || '服务器案例读取失败';
+    state.adminCases.rows = [];
+  } finally {
+    state.adminCases.busy = false;
+    renderAdminServerCases();
+  }
+}
+
+async function openAdminServerCase(caseId) {
+  if (!dataAdminAccess() || state.adminCases.openingCaseId) return;
+  state.adminCases.openingCaseId = caseId;
+  delete state.adminCases.rowErrors[caseId];
+  renderAdminServerCases();
+  try {
+    await flushPendingSave();
+    const [serverCase, imageBlob] = await Promise.all([
+      getVisualQcAdminCase(
+        VISUAL_QC_API, VISUAL_QC_ACTOR_ID, VISUAL_QC_ACTOR_ROLE, caseId,
+      ),
+      getVisualQcAdminCaseImage(
+        VISUAL_QC_API, VISUAL_QC_ACTOR_ID, VISUAL_QC_ACTOR_ROLE, caseId,
+      ),
+    ]);
+    const restored = await restoreAdminServerCase(serverCase, imageBlob);
+    const photoImage = await imageFromBlob(restored.imageBlob);
+    const loaded = await loadBoard(
+      restored.visualCase.board_key,
+      restored.visualCase.side_id,
+      false,
+    );
+    if (!loaded) throw new Error('服务器案例载入被主板切换中断。');
+    elements.boardSelect.value = restored.visualCase.board_key;
+    elements.captureStage.value = restored.visualCase.capture_stage;
+    clearHeatmap();
+    state.history = createHistory(restored.visualCase);
+    state.photoBlob = restored.imageBlob;
+    state.photoImage = photoImage;
+    state.isProxy = restored.visualCase.image.evidence_role !== 'physical_capture';
+    state.awaitingImportedImage = false;
+    syncRegistrationState();
+    await saveVisualQcCase(restored.visualCase, restored.imageBlob);
+    resizeCanvases();
+    render();
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    elements.serverCasesDialog.close();
+    elements.saveStatus.textContent = '已从服务器恢复';
+  } catch (error) {
+    state.adminCases.rowErrors[caseId] = error.message || '案例打开失败';
+    reportUserError(error);
+  } finally {
+    state.adminCases.openingCaseId = null;
+    renderAdminServerCases();
+  }
 }
 
 async function renderSavedCases() {
@@ -2233,9 +2493,16 @@ function bindEvents() {
     next.capture_stage = elements.captureStage.value;
     commitCase(next);
   });
-  elements.chooseImageButton.addEventListener('click', () => elements.imageInput.click());
-  elements.photoEmpty.addEventListener('click', () => elements.imageInput.click());
+  elements.chooseImageButton.addEventListener('click', () => {
+    if (!dataAdminAccess()) return;
+    elements.imageInput.click();
+  });
+  elements.photoEmpty.addEventListener('click', () => {
+    if (!dataAdminAccess()) return;
+    elements.imageInput.click();
+  });
   elements.imageInput.addEventListener('change', async () => {
+    if (!dataAdminAccess()) return;
     const file = elements.imageInput.files[0];
     if (!file) return;
     try {
@@ -2247,6 +2514,7 @@ function bindEvents() {
     }
   });
   elements.proxyButton.addEventListener('click', async () => {
+    if (!dataAdminAccess()) return;
     try {
       const path = state.dataset.registration.proxy_image;
       const response = await fetch(rootAsset(path));
@@ -2256,8 +2524,12 @@ function bindEvents() {
       reportUserError(error);
     }
   });
-  elements.importCaseButton.addEventListener('click', () => elements.caseImportInput.click());
+  elements.importCaseButton.addEventListener('click', () => {
+    if (!dataAdminAccess()) return;
+    elements.caseImportInput.click();
+  });
   elements.caseImportInput.addEventListener('change', async () => {
+    if (!dataAdminAccess()) return;
     const file = elements.caseImportInput.files[0];
     if (!file) return;
     try {
@@ -2384,10 +2656,49 @@ function bindEvents() {
   elements.downloadTrainingCocoButton.addEventListener('click', downloadTrainingCoco);
   elements.downloadTrainingBundleButton.addEventListener('click', downloadTrainingBundle);
   elements.savedCasesButton.addEventListener('click', async () => {
+    if (!dataAdminAccess()) return;
     await renderSavedCases();
     elements.savedCasesDialog.showModal();
   });
   elements.closeSavedCasesButton.addEventListener('click', () => elements.savedCasesDialog.close());
+  elements.serverCasesButton.addEventListener('click', async () => {
+    if (!dataAdminAccess()) return;
+    await initializeAdminCaseFilters();
+    elements.serverCasesDialog.showModal();
+    await refreshAdminServerCases();
+  });
+  elements.closeServerCasesButton.addEventListener(
+    'click',
+    () => elements.serverCasesDialog.close(),
+  );
+  elements.refreshServerCasesButton.addEventListener(
+    'click',
+    () => refreshAdminServerCases({ resetPage: true }),
+  );
+  elements.serverCaseBoardFilter.addEventListener('change', async () => {
+    state.adminCases.filters = {
+      ...state.adminCases.filters,
+      boardKey: elements.serverCaseBoardFilter.value,
+      sideId: '',
+    };
+    await populateAdminSideFilter(elements.serverCaseBoardFilter.value);
+    await refreshAdminServerCases({ resetPage: true });
+  });
+  for (const filter of [
+    elements.serverCaseSideFilter,
+    elements.serverCaseStageFilter,
+    elements.serverCaseStateFilter,
+  ]) {
+    filter.addEventListener('change', () => refreshAdminServerCases({ resetPage: true }));
+  }
+  elements.serverCasesPreviousButton.addEventListener('click', () => {
+    state.adminCases.page = Math.max(1, state.adminCases.page - 1);
+    refreshAdminServerCases();
+  });
+  elements.serverCasesNextButton.addEventListener('click', () => {
+    state.adminCases.page += 1;
+    refreshAdminServerCases();
+  });
 
   for (const eventName of ['dragenter', 'dragover']) {
     elements.photoDropZone.addEventListener(eventName, (event) => {
@@ -2402,6 +2713,7 @@ function bindEvents() {
     });
   }
   elements.photoDropZone.addEventListener('drop', async (event) => {
+    if (!dataAdminAccess()) return;
     const file = event.dataTransfer.files[0];
     if (!file) return;
     try {

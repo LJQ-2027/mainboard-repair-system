@@ -469,7 +469,7 @@ git commit -m "feat: restore server visual QC cases"
 - Modify: `tests/visual-qc-capture-ui.test.mjs`
 - Create: `tests/visual-qc-admin-catalog-ui.test.mjs`
 
-- [ ] **Step 1: Write failing UI contract tests**
+- [x] **Step 1: Write failing UI contract tests**
 
 Assert the workbench uses the approved terminology and exposes a single compact catalog dialog:
 
@@ -486,7 +486,7 @@ test('data administrator workbench exposes one server case catalog', () => {
 
 Add pure state tests for fixed state labels, filter serialization, bounded pagination, and an explicit technician access state that hides image intake, proxy loading, server synchronization, Golden, server catalog, and dataset export controls.
 
-- [ ] **Step 2: Run UI tests and verify RED**
+- [x] **Step 2: Run UI tests and verify RED**
 
 Run:
 
@@ -496,7 +496,7 @@ node --test tests/visual-qc-capture-ui.test.mjs tests/visual-qc-admin-catalog-ui
 
 Expected: new ids and terminology are absent.
 
-- [ ] **Step 3: Add the un-nested catalog dialog and role presentation**
+- [x] **Step 3: Add the un-nested catalog dialog and role presentation**
 
 Use one dialog with a compact toolbar, unframed rows, pagination controls, loading/empty/error states, and an `打开` command. Keep cards out of cards. Map backend role `reviewer` to the visible label `数据管理员`; do not rename the wire role in this increment.
 
@@ -512,7 +512,7 @@ elements.trainingDatasetSection.hidden = !dataAdmin;
 
 Also reject file input and drop actions when `dataAdmin` is false so hidden controls are not the only boundary.
 
-- [ ] **Step 4: Connect catalog loading and case restoration**
+- [x] **Step 4: Connect catalog loading and case restoration**
 
 On `打开`:
 
@@ -525,7 +525,7 @@ On `打开`:
 
 Keep catalog filters and page in memory when returning. Opening a failed or missing original leaves the dialog open with a row-level typed error.
 
-- [ ] **Step 5: Run focused and full Node suites**
+- [x] **Step 5: Run focused and full Node suites**
 
 ```powershell
 node --test tests/visual-qc-capture-ui.test.mjs tests/visual-qc-admin-catalog-ui.test.mjs tests/visual-qc-server-client.test.mjs

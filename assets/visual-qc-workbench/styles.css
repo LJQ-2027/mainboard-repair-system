@@ -116,6 +116,15 @@ button:disabled {
   font-size: 12px;
 }
 
+.role-label {
+  padding: 3px 7px;
+  color: #d8e5df;
+  border: 1px solid #5e756b;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
 .text-button {
   color: #fff;
   border-color: #82948c;
@@ -1002,6 +1011,95 @@ dialog::backdrop {
   color: var(--muted);
 }
 
+.server-cases-dialog {
+  width: min(860px, calc(100vw - 28px));
+}
+
+.server-case-toolbar {
+  padding: 10px 14px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(120px, 1fr)) auto;
+  gap: 8px;
+  align-items: end;
+  border-bottom: 1px solid var(--line);
+}
+
+.server-case-toolbar label {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.server-case-toolbar label > span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.server-case-toolbar select {
+  width: 100%;
+  min-width: 0;
+  padding: 0 24px 0 8px;
+}
+
+.server-cases-status {
+  min-height: 34px;
+  margin: 0;
+  padding: 9px 14px;
+  color: var(--muted);
+  border-bottom: 1px solid var(--line);
+  font-size: 12px;
+}
+
+.server-cases-list {
+  min-height: 220px;
+  max-height: min(430px, calc(100vh - 260px));
+  padding: 0 14px;
+  overflow: auto;
+}
+
+.server-case-row {
+  min-width: 0;
+  padding: 10px 0;
+  display: grid;
+  grid-template-columns: minmax(180px, 1.4fr) minmax(120px, 0.8fr) minmax(150px, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+}
+
+.server-case-row > span {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.server-case-row strong,
+.server-case-row small {
+  overflow-wrap: anywhere;
+}
+
+.server-case-row small,
+.server-case-row time,
+.server-case-error {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.server-case-error {
+  grid-column: 1 / -1;
+  color: var(--coral);
+}
+
+.server-case-pagination {
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  border-top: 1px solid var(--line);
+}
+
 @media (max-width: 1100px) {
   .source-bar {
     align-items: stretch;
@@ -1039,6 +1137,27 @@ dialog::backdrop {
 
   .header-status .status-dot {
     display: none;
+  }
+
+  .role-label {
+    display: none;
+  }
+
+  .server-case-toolbar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .server-case-toolbar button {
+    grid-column: 1 / -1;
+  }
+
+  .server-case-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .server-case-row > span:nth-child(2),
+  .server-case-row > span:nth-child(3) {
+    grid-column: 1;
   }
 
   .source-bar {
