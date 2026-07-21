@@ -65,7 +65,7 @@ ANTHROPIC_API_KEY=...
 ## Current Deployment
 
 - Deployed on: 2026-07-21
-- Deployed commit: `7b46333`
+- Deployed commit: `1f07b4a`
 - Internal service: `http://127.0.0.1:3010`
 - Internal visual-QC API: `http://127.0.0.1:3020`
 - External beta URL: `https://cccsat.top/mb-repair-beta/`
@@ -118,6 +118,17 @@ ANTHROPIC_API_KEY=...
   excluded board, side, case suffix, and primary blocker. Production Chrome
   verified keyboard focus, expanded desktop and 390 px states, zero overflow,
   intact download controls, and zero console warnings/errors.
+- 2026-07-21 complete-dataset increment: reviewer-only
+  `GET /datasets/bundle` returns a deterministic ZIP containing the governed
+  manifest, COCO annotations, `VISUAL-QC-DATASET-BUNDLE-V1` index, and every
+  eligible original under a stable case-derived path. Each original is checked
+  against its stored SHA-256 before packaging; the response removes its
+  temporary server file afterward. Production at `1f07b4a` returned technician
+  403 and reviewer 200, with byte-identical repeated ZIPs. The current empty
+  eligible set correctly produced three JSON entries, zero images/annotations,
+  and nine COCO categories. Headed Chrome verified the download, keyboard focus,
+  1440 px and 390 px two-column controls, no overflow, and zero console warnings
+  or errors.
 - Proxy evidence: one KM4 reviewed manual image was accepted as a proxy case,
   scored `usable`, and correctly fell back to manual four-point registration
   after ORB/AKAZE evidence failed the inlier gate. It is not physical-board
