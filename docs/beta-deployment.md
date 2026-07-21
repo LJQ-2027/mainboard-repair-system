@@ -54,8 +54,8 @@ ANTHROPIC_API_KEY=...
 
 ## Current Deployment
 
-- Deployed on: 2026-07-20
-- Deployed commit: `2a2436b`
+- Deployed on: 2026-07-21
+- Deployed commit: `5ece9c8`
 - Internal service: `http://127.0.0.1:3010`
 - Internal visual-QC API: `http://127.0.0.1:3020`
 - External beta URL: `https://cccsat.top/mb-repair-beta/`
@@ -78,6 +78,13 @@ ANTHROPIC_API_KEY=...
   transaction-level session identity protection, and Golden/training gates are
   deployed. An authenticated no-write smoke returned the expected technician
   identity and typed `capture_session_not_found` response from the new API.
+- 2026-07-21 final-QC increment: physical cases can persist append-only final
+  human QC review versions. The reviewer-only training manifest and eligible
+  original-image routes are deployed. Independent P4 checks returned page 200,
+  technician `403 reviewer_role_required`, reviewer
+  `VISUAL-QC-TRAINING-MANIFEST-V1` with zero eligible cases, and typed
+  `404 training_image_not_found` for an unknown image. The empty manifest is
+  expected because the only stored case is proxy evidence.
 - Proxy evidence: one KM4 reviewed manual image was accepted as a proxy case,
   scored `usable`, and correctly fell back to manual four-point registration
   after ORB/AKAZE evidence failed the inlier gate. It is not physical-board
