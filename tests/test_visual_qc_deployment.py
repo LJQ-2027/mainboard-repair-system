@@ -28,6 +28,7 @@ class VisualQcDeploymentContractTests(unittest.TestCase):
             "data",
             "knowledge-base",
             "scripts/visual_qc",
+            "scripts/import_visual_qc_batch.py",
             "scripts/validate_visual_qc_dataset.py",
             "scripts/maintain_visual_qc_server.py",
         ):

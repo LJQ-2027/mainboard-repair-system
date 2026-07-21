@@ -311,7 +311,7 @@ git commit -m "feat: list owner-managed visual QC cases"
 - Modify: `deploy/visual-qc-runtime-files.txt`
 - Modify: `tests/test_visual_qc_deployment.py`
 
-- [ ] **Step 1: Write failing dry-run, upload, resume, and secret-safety tests**
+- [x] **Step 1: Write failing dry-run, upload, resume, and secret-safety tests**
 
 Use an injected fake transport rather than a network mock:
 
@@ -331,7 +331,7 @@ def test_resume_uploads_only_rows_without_matching_server_ids(self):
 
 Also assert sequential stop-on-error, explicit continue-on-error, job polling state updates, no password/header in receipts or stdout, changed SHA invalidates prior server ids, and the runtime manifest includes both import modules.
 
-- [ ] **Step 2: Run intake and deployment tests and verify RED**
+- [x] **Step 2: Run intake and deployment tests and verify RED**
 
 Run:
 
@@ -341,7 +341,7 @@ Run:
 
 Expected: `run_intake` and CLI module are missing.
 
-- [ ] **Step 3: Implement transport and resumable orchestration**
+- [x] **Step 3: Implement transport and resumable orchestration**
 
 Expose:
 
@@ -362,7 +362,7 @@ def run_intake(
 
 Use `urllib.request` and standard-library multipart construction to avoid a new runtime dependency. Read credentials from an explicitly supplied JSON file or environment variables, send Basic Auth only over HTTPS unless `--allow-http-localhost` is explicitly set, and never print credentials.
 
-- [ ] **Step 4: Implement the CLI surface**
+- [x] **Step 4: Implement the CLI surface**
 
 Support:
 
@@ -380,7 +380,7 @@ python -m scripts.import_visual_qc_batch MANIFEST
 
 Default receipt path is `<manifest-name>.receipt.json`. Exit 0 only when every requested entry reaches its expected state; validation failures exit 2 and transfer/runtime failures exit 1. Output one bounded summary with counts and receipt path.
 
-- [ ] **Step 5: Run tests and a local dry-run against the committed example copy**
+- [x] **Step 5: Run tests and a local dry-run against the committed example copy**
 
 Create temporary image paths in the test fixture; do not modify the committed example with real files.
 

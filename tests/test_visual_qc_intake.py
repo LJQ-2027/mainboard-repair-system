@@ -1,5 +1,7 @@
 import copy
+from contextlib import redirect_stdout
 import hashlib
+from io import StringIO
 import json
 import tempfile
 import unittest
@@ -16,6 +18,7 @@ from scripts.visual_qc.intake import (
     validate_intake_batch,
     write_json_atomic,
 )
+from scripts.import_visual_qc_batch import VisualQcIntakeTransport, run_intake
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -29,6 +32,31 @@ def encode_jpeg(width=180, height=120, value=170):
     return encoded.tobytes()
 
 
+class FakeTransport:
+    def __init__(self, *, fail_entries=None, job_states=None):
+        self.uploads = []
+        self.job_requests = []
+        self.fail_entries = set(fail_entries or [])
+        self.job_states = list(job_states or ["succeeded"])
+
+    def upload(self, entry, *, idempotency_key):
+        self.uploads.append((entry["entry_id"], idempotency_key))
+        if entry["entry_id"] in self.fail_entries:
+            raise RuntimeError(f"upload failed for {entry['entry_id']}")
+        return {
+            "case_id": f"case-{entry['entry_id']}",
+            "job": {"job_id": f"job-{entry['entry_id']}", "status": "queued"},
+        }
+
+    def get_job(self, job_id):
+        self.job_requests.append(job_id)
+        state = self.job_states.pop(0) if len(self.job_states) > 1 else self.job_states[0]
+        payload = {"job_id": job_id, "status": state}
+        if state == "failed":
+            payload["error"] = {"code": "processing_failed", "message": "worker failed"}
+        return payload
+
+
 class VisualQcIntakeTests(unittest.TestCase):
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory()
@@ -36,6 +64,7 @@ class VisualQcIntakeTests(unittest.TestCase):
         self.image = encode_jpeg()
         (self.root / "board.jpg").write_bytes(self.image)
         self.manifest_path = self.root / "batch.json"
+        self.receipt_path = self.root / "batch.receipt.json"
         self.write_manifest()
 
     def tearDown(self):
@@ -204,6 +233,149 @@ class VisualQcIntakeTests(unittest.TestCase):
         raw = output.read_bytes()
         self.assertNotIn(b"\r\n", raw)
         self.assertEqual(json.loads(raw.decode("utf-8")), payload)
+
+    def test_dry_run_writes_validated_receipt_without_transport_calls(self):
+        transport = FakeTransport()
+
+        result = run_intake(
+            self.manifest_path,
+            self.receipt_path,
+            transport,
+            dry_run=True,
+            project_root=ROOT,
+        )
+
+        self.assertEqual(transport.uploads, [])
+        self.assertEqual(result["entries"][0]["state"], "validated")
+        self.assertEqual(json.loads(self.receipt_path.read_text(encoding="utf-8")), result)
+
+    def test_resume_uploads_only_rows_without_matching_server_ids(self):
+        transport = FakeTransport()
+
+        first = run_intake(
+            self.manifest_path, self.receipt_path, transport, project_root=ROOT
+        )
+        resumed = run_intake(
+            self.manifest_path, self.receipt_path, transport, project_root=ROOT
+        )
+
+        self.assertEqual(len(transport.uploads), 1)
+        self.assertEqual(first, resumed)
+        self.assertEqual(resumed["entries"][0]["state"], "uploaded")
+
+    def test_changed_sha_invalidates_prior_server_ids_and_uploads_again(self):
+        transport = FakeTransport()
+        first = run_intake(
+            self.manifest_path, self.receipt_path, transport, project_root=ROOT
+        )
+        self.assertIsNotNone(first["entries"][0]["server_case_id"])
+        (self.root / "board.jpg").write_bytes(encode_jpeg(value=90))
+
+        changed = run_intake(
+            self.manifest_path, self.receipt_path, transport, project_root=ROOT
+        )
+
+        self.assertEqual(len(transport.uploads), 2)
+        self.assertNotEqual(first["entries"][0]["sha256"], changed["entries"][0]["sha256"])
+
+    def test_stop_on_error_and_explicit_continue_on_error_are_sequential(self):
+        (self.root / "board-b.jpg").write_bytes(encode_jpeg(value=120))
+        entries = [
+            self.entry("first"),
+            self.entry(
+                "second",
+                file_path="board-b.jpg",
+                side_id="main_page_1",
+            ),
+        ]
+        self.write_manifest(entries=entries)
+        stopped = FakeTransport(fail_entries={"first"})
+
+        result = run_intake(
+            self.manifest_path, self.receipt_path, stopped, project_root=ROOT
+        )
+
+        self.assertEqual([entry for entry, _key in stopped.uploads], ["first"])
+        self.assertEqual(result["entries"][0]["state"], "failed")
+        self.assertEqual(result["entries"][1]["state"], "validated")
+
+        self.receipt_path.unlink()
+        continued = FakeTransport(fail_entries={"first"})
+        result = run_intake(
+            self.manifest_path,
+            self.receipt_path,
+            continued,
+            continue_on_error=True,
+            project_root=ROOT,
+        )
+        self.assertEqual([entry for entry, _key in continued.uploads], ["first", "second"])
+        self.assertEqual([row["state"] for row in result["entries"]], ["failed", "uploaded"])
+
+    def test_wait_for_jobs_records_terminal_state_and_typed_error(self):
+        succeeded = FakeTransport(job_states=["running", "succeeded"])
+        result = run_intake(
+            self.manifest_path,
+            self.receipt_path,
+            succeeded,
+            wait_for_jobs=True,
+            poll_interval_seconds=0,
+            project_root=ROOT,
+        )
+        self.assertEqual(result["entries"][0]["state"], "completed")
+        self.assertEqual(len(succeeded.job_requests), 2)
+
+        self.receipt_path.unlink()
+        failed = FakeTransport(job_states=["failed"])
+        result = run_intake(
+            self.manifest_path,
+            self.receipt_path,
+            failed,
+            wait_for_jobs=True,
+            poll_interval_seconds=0,
+            project_root=ROOT,
+        )
+        self.assertEqual(result["entries"][0]["state"], "failed")
+        self.assertEqual(result["entries"][0]["error"]["code"], "processing_failed")
+
+    def test_orchestrator_never_prints_or_persists_transport_credentials(self):
+        output = StringIO()
+        with redirect_stdout(output):
+            run_intake(
+                self.manifest_path,
+                self.receipt_path,
+                FakeTransport(),
+                project_root=ROOT,
+            )
+
+        self.assertEqual(output.getvalue(), "")
+        serialized = self.receipt_path.read_text(encoding="utf-8").lower()
+        self.assertNotIn("authorization", serialized)
+        self.assertNotIn("password", serialized)
+
+    def test_http_transport_requires_explicit_localhost_override(self):
+        with self.assertRaisesRegex(ValueError, "requires HTTPS"):
+            VisualQcIntakeTransport(
+                "http://example.test/api/v1/visual-qc",
+                actor_id="owner-001",
+                username="user",
+                password="secret",
+            )
+        with self.assertRaisesRegex(ValueError, "requires HTTPS"):
+            VisualQcIntakeTransport(
+                "http://127.0.0.1:3020/api/v1/visual-qc",
+                actor_id="owner-001",
+                username="user",
+                password="secret",
+            )
+
+        transport = VisualQcIntakeTransport(
+            "http://127.0.0.1:3020/api/v1/visual-qc",
+            actor_id="owner-001",
+            username="user",
+            password="secret",
+            allow_http_localhost=True,
+        )
+        self.assertEqual(transport.api_base, "http://127.0.0.1:3020/api/v1/visual-qc")
 
 
 if __name__ == "__main__":
