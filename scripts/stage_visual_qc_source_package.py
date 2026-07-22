@@ -70,7 +70,7 @@ def main(argv: list[str] | None = None) -> int:
             )
         )
         return 2
-    except OSError as exc:
+    except Exception as exc:
         print(
             json.dumps(
                 {"status": "failed", "message": str(exc)},

@@ -1,5 +1,8 @@
+from contextlib import redirect_stderr, redirect_stdout
 import hashlib
+from io import StringIO
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -8,7 +11,9 @@ from unittest.mock import patch
 from pathlib import Path
 
 import cv2
+import jsonschema
 import numpy as np
+import scripts.visual_qc.source_library as source_library_module
 
 from scripts.visual_qc.intake import (
     IntakeValidationError,
@@ -16,11 +21,14 @@ from scripts.visual_qc.intake import (
     write_json_atomic,
 )
 from scripts.visual_qc.source_library import (
+    ENTRY_FIELDS,
+    PACKAGE_FIELDS,
     SOURCE_PACKAGE_SCHEMA_VERSION,
     build_source_package,
     stage_source_package,
     validate_source_package,
 )
+from scripts.visual_qc.proxy_inventory import _collect_proxy_paths, known_proxy_hashes
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -45,7 +53,28 @@ class VisualQcSourcePackageTests(unittest.TestCase):
         self.back.write_bytes(encode_image(".png", value=120))
 
     def tearDown(self):
+        for link in reversed(getattr(self, "directory_links", [])):
+            if link.exists():
+                os.rmdir(link)
         self.temp_dir.cleanup()
+
+    def create_directory_link(self, link, target):
+        target.mkdir(parents=True, exist_ok=True)
+        link.parent.mkdir(parents=True, exist_ok=True)
+        if os.name == "nt":
+            result = subprocess.run(
+                ["cmd", "/c", "mklink", "/J", str(link), str(target)],
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                check=False,
+            )
+            if result.returncode != 0:
+                self.skipTest(f"Unable to create test junction: {result.stderr}")
+        else:
+            link.symlink_to(target, target_is_directory=True)
+        self.directory_links = getattr(self, "directory_links", [])
+        self.directory_links.append(link)
 
     def options(self, **overrides):
         options = {
@@ -97,6 +126,41 @@ class VisualQcSourcePackageTests(unittest.TestCase):
         )
         self.assertNotIn("source_path", json.dumps(first))
         self.assertNotIn("created_at", first)
+        self.assertRegex(first["proxy_inventory_sha256"], r"^[0-9a-f]{64}$")
+
+    def test_runtime_contract_matches_and_satisfies_json_schema(self):
+        payload = build_source_package(**self.options())
+        schema = json.loads(
+            (
+                ROOT
+                / "knowledge-base"
+                / "visual-qc-source-package-v1-schema.json"
+            ).read_text(encoding="utf-8")
+        )
+
+        jsonschema.Draft202012Validator(schema).validate(payload)
+        self.assertEqual(set(schema["required"]), PACKAGE_FIELDS)
+        self.assertEqual(
+            set(schema["properties"]["entries"]["items"]["required"]),
+            ENTRY_FIELDS,
+        )
+
+    def test_runtime_rejects_uppercase_proxy_inventory_hash(self):
+        payload = build_source_package(**self.options())
+        payload["proxy_inventory_sha256"] = payload[
+            "proxy_inventory_sha256"
+        ].upper()
+        manifest_path = self.materialize_package(payload)
+
+        with self.assertRaisesRegex(IntakeValidationError, "proxy_inventory_sha256"):
+            validate_source_package(manifest_path, ROOT, self.library)
+
+    def test_windows_equivalent_package_ids_are_rejected_before_writes(self):
+        for package_id in ("alias.", "CON", "nul.txt", "LPT1"):
+            with self.subTest(package_id=package_id):
+                with self.assertRaisesRegex(IntakeValidationError, "unsafe package_id"):
+                    stage_source_package(**self.options(package_id=package_id))
+        self.assertFalse(self.library.exists())
 
     def test_package_requires_explicit_physical_source_confirmation(self):
         with self.assertRaisesRegex(
@@ -173,6 +237,7 @@ class VisualQcSourcePackageTests(unittest.TestCase):
             destination.write_bytes(source_by_side[entry["side_id"]].read_bytes())
         manifest_path = package_dir / "source-package.json"
         write_json_atomic(manifest_path, payload)
+        (package_dir / ".complete").write_text("complete\n", encoding="ascii")
         return manifest_path
 
     def test_validate_source_package_verifies_objects_and_board_identity(self):
@@ -187,6 +252,24 @@ class VisualQcSourcePackageTests(unittest.TestCase):
             validated["entries"][0]["object_file"],
             (self.library / payload["entries"][0]["object_path"]).resolve(),
         )
+
+    def test_validate_source_package_rejects_missing_completion_marker(self):
+        payload = build_source_package(**self.options())
+        manifest_path = self.materialize_package(payload)
+        (manifest_path.parent / ".complete").unlink()
+
+        with self.assertRaisesRegex(IntakeValidationError, "incomplete"):
+            validate_source_package(manifest_path, ROOT, self.library)
+
+    def test_validate_source_package_checks_completion_marker_leaf(self):
+        payload = build_source_package(**self.options())
+        manifest_path = self.materialize_package(payload)
+        marker = manifest_path.parent / ".complete"
+        marker.unlink()
+        self.create_directory_link(marker, self.root / "outside-marker")
+
+        with self.assertRaisesRegex(IntakeValidationError, "reparse|symlink"):
+            validate_source_package(manifest_path, ROOT, self.library)
 
     def test_validate_source_package_rejects_path_escape_and_corruption(self):
         payload = build_source_package(**self.options())
@@ -203,6 +286,72 @@ class VisualQcSourcePackageTests(unittest.TestCase):
         object_path.write_bytes(b"corrupted")
         with self.assertRaisesRegex(IntakeValidationError, "object integrity"):
             validate_source_package(manifest_path, ROOT, self.library)
+
+    def test_package_validator_rejects_junction_escape(self):
+        payload = build_source_package(**self.options())
+        source_by_side = {
+            "main_page_1": self.front,
+            "main_page_2": self.back,
+        }
+        for entry in payload["entries"]:
+            destination = self.library / entry["object_path"]
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            destination.write_bytes(source_by_side[entry["side_id"]].read_bytes())
+        outside = self.root / "outside-package"
+        outside.mkdir()
+        write_json_atomic(outside / "source-package.json", payload)
+        (outside / ".complete").write_text("complete\n", encoding="ascii")
+        link = self.library / "packages" / payload["package_id"]
+        self.create_directory_link(link, outside)
+
+        with self.assertRaisesRegex(IntakeValidationError, "reparse|symlink|escape"):
+            validate_source_package(link / "source-package.json", ROOT, self.library)
+
+    def test_staging_rejects_packages_root_junction_without_external_writes(self):
+        outside = self.root / "outside-packages"
+        self.create_directory_link(self.library / "packages", outside)
+
+        with self.assertRaisesRegex(IntakeValidationError, "reparse|symlink|escape"):
+            stage_source_package(**self.options())
+
+        self.assertEqual(list(outside.iterdir()), [])
+
+    def test_staging_rejects_reparse_package_lock_leaf(self):
+        locks = self.library / "packages" / ".locks"
+        locks.mkdir(parents=True)
+        outside = self.root / "outside-lock"
+        self.create_directory_link(
+            locks / "km4-unit-001-source.lock", outside
+        )
+
+        with self.assertRaisesRegex(IntakeValidationError, "reparse|symlink|escape"):
+            stage_source_package(**self.options())
+
+        self.assertEqual(list(outside.iterdir()), [])
+
+    def test_staging_rechecks_new_object_directory_before_writing(self):
+        outside = self.root / "outside-object-prefix"
+        original_ensure = source_library_module._ensure_directory_durable
+        swapped = False
+
+        def swap_after_creation(path):
+            nonlocal swapped
+            original_ensure(path)
+            path = Path(path)
+            if not swapped and path.parent.name == "originals":
+                os.rmdir(path)
+                self.create_directory_link(path, outside)
+                swapped = True
+
+        with patch(
+            "scripts.visual_qc.source_library._ensure_directory_durable",
+            side_effect=swap_after_creation,
+        ):
+            with self.assertRaisesRegex(IntakeValidationError, "reparse|symlink|escape"):
+                stage_source_package(**self.options())
+
+        self.assertTrue(swapped)
+        self.assertEqual(list(outside.iterdir()), [])
 
     def test_stage_preserves_exact_bytes_and_creates_compatible_manifests(self):
         original_front = self.front.read_bytes()
@@ -313,6 +462,129 @@ class VisualQcSourcePackageTests(unittest.TestCase):
             (self.library / "packages" / "km4-unit-001-source").exists()
         )
 
+    def test_proxy_inventory_update_revokes_existing_package_and_intake(self):
+        result = stage_source_package(**self.options())
+        payload = json.loads(result["source_package_path"].read_text(encoding="utf-8"))
+        revoked_hash = payload["entries"][0]["sha256"]
+
+        with patch(
+            "scripts.visual_qc.source_library.known_proxy_hashes",
+            return_value=frozenset({revoked_hash}),
+        ):
+            with self.assertRaisesRegex(IntakeValidationError, "known reference|revoked"):
+                validate_source_package(
+                    result["source_package_path"], ROOT, self.library
+                )
+
+        with patch(
+            "scripts.visual_qc.intake.known_proxy_hashes",
+            return_value=frozenset({revoked_hash}),
+        ):
+            with self.assertRaisesRegex(IntakeValidationError, "known reference|revoked"):
+                validate_intake_batch(result["intake_manifest_path"], ROOT)
+
+    def test_staging_flushes_object_and_package_directory_metadata(self):
+        with patch(
+            "scripts.visual_qc.source_library._fsync_directory",
+            wraps=lambda path: None,
+        ) as flush:
+            stage_source_package(**self.options())
+
+        flushed = {Path(call.args[0]).resolve() for call in flush.call_args_list}
+        package_dir = (
+            self.library / "packages" / "km4-unit-001-source"
+        ).resolve()
+        self.assertIn(package_dir, flushed)
+        self.assertIn(package_dir.parent, flushed)
+        self.assertIn(self.library.resolve(), flushed)
+        self.assertIn((self.library / "objects").resolve(), flushed)
+        self.assertIn((self.library / "objects" / "originals").resolve(), flushed)
+        payload = build_source_package(**self.options())
+        for entry in payload["entries"]:
+            self.assertIn((self.library / entry["object_path"]).parent.resolve(), flushed)
+
+    def test_package_directory_is_flushed_before_and_after_completion_marker(self):
+        events = []
+
+        def record_marker(path):
+            path = Path(path)
+            path.write_text("complete\n", encoding="ascii")
+            events.append(("marker", path.resolve()))
+
+        with patch(
+            "scripts.visual_qc.source_library._fsync_directory",
+            side_effect=lambda path: events.append(("flush", Path(path).resolve())),
+        ), patch(
+            "scripts.visual_qc.source_library._write_completion_marker",
+            side_effect=record_marker,
+        ):
+            stage_source_package(**self.options())
+
+        package_dir = (self.library / "packages" / "km4-unit-001-source").resolve()
+        marker_index = events.index(("marker", package_dir / ".complete"))
+        self.assertIn(("flush", package_dir), events[:marker_index])
+        self.assertIn(("flush", package_dir), events[marker_index + 1 :])
+
+    def test_proxy_inventory_fails_closed_for_missing_or_replaced_source(self):
+        proxy = self.root / "proxy.jpg"
+        proxy.write_bytes(b"approved-proxy")
+        inventory = self.root / "knowledge-base" / "visual-qc-proxy-inventory-v1.json"
+        inventory.parent.mkdir()
+        inventory.write_text(
+            json.dumps(
+                {
+                    "schema_version": "VISUAL-QC-PROXY-INVENTORY-V1",
+                    "entries": [
+                        {
+                            "path": "proxy.jpg",
+                            "sha256": hashlib.sha256(proxy.read_bytes()).hexdigest(),
+                        }
+                    ],
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        with patch(
+            "scripts.visual_qc.proxy_inventory._configured_proxy_paths",
+            return_value={proxy},
+        ):
+            self.assertEqual(len(known_proxy_hashes(self.root)), 1)
+            proxy.unlink()
+            with self.assertRaisesRegex(ValueError, "missing"):
+                known_proxy_hashes(self.root)
+            proxy.write_bytes(b"replaced")
+            with self.assertRaisesRegex(ValueError, "mismatch"):
+                known_proxy_hashes(self.root)
+
+    def test_proxy_path_collection_keeps_declared_missing_sources(self):
+        missing = self.root / "assets" / "missing-proxy.jpg"
+        paths = set()
+
+        _collect_proxy_paths(
+            {
+                "assets": {
+                    "assets/missing-proxy.jpg": {"review_status": "approved"}
+                }
+            },
+            self.root.resolve(),
+            paths,
+        )
+
+        self.assertEqual(paths, {missing.resolve()})
+
+    def test_proxy_path_collection_rejects_repository_escape(self):
+        with self.assertRaisesRegex(ValueError, "escapes project root"):
+            _collect_proxy_paths(
+                {
+                    "assets": {
+                        "../outside-proxy.jpg": {"review_status": "approved"}
+                    }
+                },
+                self.root.resolve(),
+                set(),
+            )
+
 
 class VisualQcSourcePackageCliTests(unittest.TestCase):
     def setUp(self):
@@ -420,6 +692,29 @@ class VisualQcSourcePackageCliTests(unittest.TestCase):
                 )
                 self.assertEqual(result.stderr, "")
                 self.assertFalse(self.library.exists())
+
+    def test_unexpected_catalog_json_error_is_still_machine_readable(self):
+        from scripts import stage_visual_qc_source_package as command_module
+
+        stdout = StringIO()
+        stderr = StringIO()
+        with patch.object(
+            command_module,
+            "stage_source_package",
+            side_effect=json.JSONDecodeError("broken catalog", "{", 1),
+        ), redirect_stdout(stdout), redirect_stderr(stderr):
+            exit_code = command_module.main(
+                self.command(
+                    "--confirm-milo-physical-source",
+                    "--confirm-capture-checklist",
+                )[2:]
+            )
+
+        self.assertEqual(exit_code, 1)
+        payload = json.loads(stdout.getvalue())
+        self.assertEqual(payload["status"], "failed")
+        self.assertIn("broken catalog", payload["message"])
+        self.assertEqual(stderr.getvalue(), "")
 
 
 if __name__ == "__main__":

@@ -17,7 +17,7 @@
 - Create: `scripts/visual_qc/source_library.py`
 - Create: `tests/test_visual_qc_source_library.py`
 
-- [ ] **Step 1: Write failing tests for deterministic source-package construction**
+- [x] **Step 1: Write failing tests for deterministic source-package construction**
 
 Create two temporary JPEG/PNG inputs outside the repository and assert:
 
@@ -39,13 +39,13 @@ payload = build_source_package(
 
 Assert schema version, fixed source origin, canonical board id, sorted sides, original filename, MIME-derived relative object path, dimensions, byte size, and SHA-256. Add failures for missing physical-source confirmation, repository-contained library root, duplicate sides/paths, malformed image, and copied known proxy bytes.
 
-- [ ] **Step 2: Run focused tests and verify RED**
+- [x] **Step 2: Run focused tests and verify RED**
 
 Run: `.\.venv\Scripts\python.exe -m unittest tests.test_visual_qc_source_library -v`
 
 Expected: import failure because `scripts.visual_qc.source_library` does not exist.
 
-- [ ] **Step 3: Implement deterministic package construction**
+- [x] **Step 3: Implement deterministic package construction**
 
 Expose:
 
@@ -58,13 +58,13 @@ def validate_source_package(package_path: Path, project_root: Path, library_root
 
 Call `build_intake_manifest` first so board identity, explicit side assignment, capture checklist, image evidence, repository separation, and known-proxy fingerprints retain one implementation. Build library-relative paths from detected MIME and SHA-256. Validate the committed package root, exact required fields, safe identifiers, object containment, object existence, MIME/dimensions/size/hash, side uniqueness, and canonical board identity.
 
-- [ ] **Step 4: Run focused tests and verify GREEN**
+- [x] **Step 4: Run focused tests and verify GREEN**
 
 Run: `.\.venv\Scripts\python.exe -m unittest tests.test_visual_qc_source_library -v`
 
 Expected: package-construction and validation tests PASS.
 
-- [ ] **Step 5: Commit the contract and core**
+- [x] **Step 5: Commit the contract and core**
 
 ```bash
 git add knowledge-base/visual-qc-source-package-v1-schema.json scripts/visual_qc/source_library.py tests/test_visual_qc_source_library.py
@@ -77,7 +77,7 @@ git commit -m "feat: define visual QC controlled source packages"
 - Modify: `scripts/visual_qc/source_library.py`
 - Modify: `tests/test_visual_qc_source_library.py`
 
-- [ ] **Step 1: Write failing storage and package-publication tests**
+- [x] **Step 1: Write failing storage and package-publication tests**
 
 Assert `stage_source_package(...)`:
 
@@ -90,13 +90,13 @@ Assert `stage_source_package(...)`:
 - does not publish a partial package when intake creation fails;
 - never modifies the incoming files.
 
-- [ ] **Step 2: Run focused tests and verify RED**
+- [x] **Step 2: Run focused tests and verify RED**
 
 Run: `.\.venv\Scripts\python.exe -m unittest tests.test_visual_qc_source_library -v`
 
 Expected: FAIL because staging behavior is absent.
 
-- [ ] **Step 3: Implement no-clobber object and package publication**
+- [x] **Step 3: Implement no-clobber object and package publication**
 
 Expose:
 
@@ -104,15 +104,15 @@ Expose:
 def stage_source_package(*, project_root: Path, library_root: Path, **options: object) -> dict: ...
 ```
 
-Validate the complete requested package before creating library paths. Copy each source through a same-directory temporary file, fsync it, verify SHA-256, and publish via no-clobber hard link. Reuse an existing object only after integrity verification. Build the intake manifest from archived object paths. Write both manifests in a temporary package directory and rename it to the final safe package id. Existing packages are reusable only after exact manifest and object validation; all other reuse is a typed conflict.
+Validate the complete requested package before creating library paths. Copy each source through a same-directory temporary file, fsync it, verify SHA-256, and publish via no-clobber hard link. Reuse an existing object only after integrity verification. Build the intake manifest from archived object paths. Reject controlled child paths containing symlinks or Windows reparse points. Serialize package publication with a per-package file lock, create the final directory exclusively, and publish `.complete` only after both manifests are durable and deterministic. Existing packages are reusable only after completion-marker, exact-manifest, current-proxy-inventory, and object validation; all other reuse is a typed conflict.
 
-- [ ] **Step 4: Run focused tests and verify GREEN**
+- [x] **Step 4: Run focused tests and verify GREEN**
 
 Run: `.\.venv\Scripts\python.exe -m unittest tests.test_visual_qc_source_library -v`
 
 Expected: all staging and idempotency tests PASS.
 
-- [ ] **Step 5: Commit staging**
+- [x] **Step 5: Commit staging**
 
 ```bash
 git add scripts/visual_qc/source_library.py tests/test_visual_qc_source_library.py
@@ -128,29 +128,29 @@ git commit -m "feat: stage immutable visual QC source packages"
 - Modify: `docs/visual-qc-capture-intake-spec-2026-07-20.md`
 - Modify: `docs/superpowers/plans/2026-07-22-visual-qc-controlled-source-library.md`
 
-- [ ] **Step 1: Write failing direct-invocation CLI tests**
+- [x] **Step 1: Write failing direct-invocation CLI tests**
 
 Run the script from outside the repository. Verify success JSON includes package manifest, intake manifest, entry count and `created/reused`; parser and validation errors return exit code 2 with JSON and no stderr; no command path performs upload.
 
-- [ ] **Step 2: Run CLI tests and verify RED**
+- [x] **Step 2: Run CLI tests and verify RED**
 
 Run: `.\.venv\Scripts\python.exe -m unittest tests.test_visual_qc_source_library -v`
 
 Expected: FAIL because the CLI does not exist.
 
-- [ ] **Step 3: Implement the thin CLI**
+- [x] **Step 3: Implement the thin CLI**
 
 Add required `--library-root`, `--package-id`, `--batch-id`, board/session/stage parameters, repeatable `--image`, `--confirm-milo-physical-source`, and `--confirm-capture-checklist`. Use the existing validation-argument-parser pattern and print one JSON object.
 
-- [ ] **Step 4: Run a real local plumbing acceptance**
+- [x] **Step 4: Run a real local plumbing acceptance**
 
 Generate temporary images outside the repository, stage them into a temporary library, run the resulting intake manifest through `scripts/import_visual_qc_batch.py --dry-run`, and confirm two validated entries. Copy a known manual proxy to an external path and confirm staging rejects it. Do not upload or retain the synthetic package as evidence.
 
-- [ ] **Step 5: Document the single-command owner workflow**
+- [x] **Step 5: Document the single-command owner workflow**
 
 Replace direct temporary-photo examples with source staging first, followed by optional importer dry-run and controlled upload. State the exact-hash proxy limitation and canonical inventory requirement.
 
-- [ ] **Step 6: Run full verification**
+- [x] **Step 6: Run full verification**
 
 Run:
 
@@ -163,7 +163,7 @@ git diff --check
 
 Expected: all suites pass and both worktrees remain clean after commits.
 
-- [ ] **Step 7: Commit documentation and closeout**
+- [x] **Step 7: Commit documentation and closeout**
 
 ```bash
 git add scripts/stage_visual_qc_source_package.py tests/test_visual_qc_source_library.py README.md docs/visual-qc-capture-intake-spec-2026-07-20.md docs/superpowers/plans/2026-07-22-visual-qc-controlled-source-library.md

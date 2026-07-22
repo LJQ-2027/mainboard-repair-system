@@ -12,7 +12,7 @@
 
 当前实现遵循服务器主导的 Web 架构：照片先按 `VISUAL-QC-INTAKE-BATCH-V1` 在本地验证，再由数据管理员批量导入受控 FastAPI 服务；OpenCV 异步处理，自动失败回退人工四点配准，Golden Sample、候选决策和训练出口集中保存，浏览器保留工作草稿。权威设计见 `docs/superpowers/specs/2026-07-20-visual-qc-server-architecture-design.md`。
 
-照片到达后不再手写批次 JSON。数据管理员使用 `scripts/create_visual_qc_intake_batch.py` 显式绑定主板、板面和原图，工具自动计算 SHA-256、验证图片并输出可直接交给 importer 的标准清单。它不根据文件名或画面猜机型/板面，也不上传或修改原图。完整命令见 `docs/visual-qc-capture-intake-spec-2026-07-20.md`。
+照片到达后不再手工复制或编写批次 JSON。数据管理员使用 `scripts/stage_visual_qc_source_package.py` 把 Milo 提供的临时附件逐字节保存到仓库外的内容寻址原片库，并同时生成 `VISUAL-QC-SOURCE-PACKAGE-V1` 来源回执和可直接交给 importer 的标准 intake manifest。工具不根据文件名或画面猜机型/板面，不修改来件，也不自动上传；`knowledge-base/visual-qc-proxy-inventory-v1.json` 固化所有已知点位图和手册代理图的审核哈希，缺失、替换或遗漏登记均锁死入库。低层 `create_visual_qc_intake_batch.py` 仅用于已经处于受控存储中的原片。完整命令见 `docs/visual-qc-capture-intake-spec-2026-07-20.md`。
 
 数据管理员工作台已接入受控服务器 QC 服务：支持批量导入回执、服务器案例目录、断点续传、原图恢复、任务轮询、自动候选叠图确认、人工四点回退、Golden Sample、差异热图和候选确认/驳回/暂缓。服务器侧包含批次与案例溯源、采集身份防污染、确定性合成透视、ORB/AKAZE 特征、RANSAC 单应性、结构化失败原因、持久化人工结论、磁盘压力健康状态和受控留存清理。受控试点部署在 `https://cccsat.top/mb-repair-beta/`；操作与数据边界见 `docs/visual-qc-capture-intake-spec-2026-07-20.md`、`docs/visual-qc-workbench-2026-07-17.md` 和 `docs/visual-qc-server-api-2026-07-20.md`。
 

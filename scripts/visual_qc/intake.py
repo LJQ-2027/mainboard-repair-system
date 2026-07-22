@@ -12,6 +12,7 @@ import cv2
 import numpy as np
 
 from scripts.visual_qc.server.catalog import BoardCatalog, CatalogError
+from scripts.visual_qc.proxy_inventory import known_proxy_hashes
 from scripts.visual_qc.server.storage import MIME_EXTENSIONS, detect_image_mime_type
 
 
@@ -25,6 +26,11 @@ CHECKLIST_ITEMS = {
 }
 SAFE_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 SHA256 = re.compile(r"^[0-9a-fA-F]{64}$")
+WINDOWS_RESERVED_NAMES = {
+    "CON", "PRN", "AUX", "NUL", "CLOCK$",
+    *(f"COM{index}" for index in range(1, 10)),
+    *(f"LPT{index}" for index in range(1, 10)),
+}
 EXTENSION_MIME = {
     ".jpg": "image/jpeg",
     ".jpeg": "image/jpeg",
@@ -41,7 +47,12 @@ class IntakeValidationError(ValueError):
 
 
 def _require_safe_id(value: object, field: str) -> str:
-    if not isinstance(value, str) or not SAFE_ID.fullmatch(value):
+    if (
+        not isinstance(value, str)
+        or not SAFE_ID.fullmatch(value)
+        or value.endswith(".")
+        or value.split(".", 1)[0].upper() in WINDOWS_RESERVED_NAMES
+    ):
         raise IntakeValidationError(f"unsafe {field}")
     return value
 
@@ -102,6 +113,10 @@ def validate_intake_batch(manifest_path: Path, project_root: Path) -> dict:
         raise IntakeValidationError("entries exceeds the batch limit")
 
     catalog = BoardCatalog(Path(project_root))
+    try:
+        proxy_hashes = known_proxy_hashes(project_root)
+    except (OSError, ValueError, KeyError) as exc:
+        raise IntakeValidationError(f"invalid proxy inventory: {exc}") from exc
     normalized_entries = []
     entry_ids: set[str] = set()
     paths: set[Path] = set()
@@ -155,6 +170,10 @@ def validate_intake_batch(manifest_path: Path, project_root: Path) -> dict:
             raise IntakeValidationError(f"incomplete capture checklist: {entry_id}")
 
         evidence = _image_evidence(path)
+        if evidence["sha256"] in proxy_hashes:
+            raise IntakeValidationError(
+                f"known reference or proxy image cannot enter physical intake: {entry_id}"
+            )
         expected_sha256 = raw_entry.get("expected_sha256")
         if expected_sha256 is not None:
             if not isinstance(expected_sha256, str) or not SHA256.fullmatch(expected_sha256):

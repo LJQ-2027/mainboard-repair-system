@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-from functools import lru_cache
-import hashlib
-import json
 import os
 from pathlib import Path
 import tempfile
@@ -17,6 +14,7 @@ from scripts.visual_qc.intake import (
     write_json_atomic,
 )
 from scripts.visual_qc.server.catalog import BoardCatalog, CatalogError
+from scripts.visual_qc.proxy_inventory import known_proxy_hashes
 
 
 CONFIRMED_CAPTURE_CHECKLIST = {
@@ -24,64 +22,6 @@ CONFIRMED_CAPTURE_CHECKLIST = {
     "focus_and_lens_confirmed": True,
     "lighting_and_occlusion_confirmed": True,
 }
-
-
-def _hash_file(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
-
-
-def _collect_proxy_paths(value: object, project_root: Path, result: set[Path]) -> None:
-    if isinstance(value, dict):
-        for key, item in value.items():
-            if key == "assets" and isinstance(item, dict):
-                for asset_path, annotation in item.items():
-                    if (
-                        isinstance(asset_path, str)
-                        and isinstance(annotation, dict)
-                        and annotation.get("review_status") == "approved"
-                    ):
-                        candidate = (project_root / asset_path).resolve()
-                        if project_root in candidate.parents and candidate.is_file():
-                            result.add(candidate)
-            elif key in {"asset_path", "proxy_image"} and isinstance(item, str):
-                candidate = (project_root / item).resolve()
-                if project_root in candidate.parents and candidate.is_file():
-                    result.add(candidate)
-            else:
-                _collect_proxy_paths(item, project_root, result)
-    elif isinstance(value, list):
-        for item in value:
-            _collect_proxy_paths(item, project_root, result)
-
-
-@lru_cache(maxsize=4)
-def _known_proxy_hashes(project_root_text: str) -> frozenset[str]:
-    project_root = Path(project_root_text)
-    catalog = BoardCatalog(project_root)
-    paths: set[Path] = set()
-    for board_key in catalog.catalog.get("boards", {}):
-        board = catalog.resolve_board(board_key)
-        for side_id in board["side_ids"]:
-            paths.add(catalog.resolve_side(board_key, side_id)["reference_path"])
-
-    review_path = project_root / "knowledge-base" / "vision-reference-review.json"
-    if review_path.is_file():
-        _collect_proxy_paths(
-            json.loads(review_path.read_text(encoding="utf-8")), project_root, paths
-        )
-    for registration_path in (project_root / "knowledge-base").glob(
-        "*-cross-source-registration.json"
-    ):
-        _collect_proxy_paths(
-            json.loads(registration_path.read_text(encoding="utf-8")),
-            project_root,
-            paths,
-        )
-    return frozenset(_hash_file(path) for path in paths)
 
 
 def parse_image_assignment(raw: str) -> tuple[str, Path]:
@@ -125,6 +65,10 @@ def build_intake_manifest(
         catalog.resolve_board(board_key)
     except CatalogError as exc:
         raise IntakeValidationError(str(exc)) from exc
+    try:
+        proxy_hashes = known_proxy_hashes(project_root)
+    except (OSError, ValueError, KeyError) as exc:
+        raise IntakeValidationError(f"invalid proxy inventory: {exc}") from exc
 
     seen_sides: set[str] = set()
     seen_paths: set[Path] = set()
@@ -151,7 +95,7 @@ def build_intake_manifest(
                 "project reference or proxy image cannot enter physical intake"
             )
         evidence = _image_evidence(path)
-        if evidence["sha256"] in _known_proxy_hashes(str(project_root)):
+        if evidence["sha256"] in proxy_hashes:
             raise IntakeValidationError(
                 "known reference or proxy image cannot enter physical intake"
             )

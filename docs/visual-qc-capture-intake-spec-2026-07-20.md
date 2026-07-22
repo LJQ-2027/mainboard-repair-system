@@ -32,7 +32,7 @@ The pilot accepts JPEG, PNG, and WebP up to its configured 20 MB limit. The hard
 
 ## Batch Manifest
 
-Create `VISUAL-QC-INTAKE-BATCH-V1` with `scripts/create_visual_qc_intake_batch.py`. `knowledge-base/visual-qc-intake-batch.example.json` remains a contract example, not the normal authoring path. Each entry contains:
+The normal path starts with `scripts/stage_visual_qc_source_package.py`. It preserves the incoming bytes in a repository-external content-addressed library, writes `VISUAL-QC-SOURCE-PACKAGE-V1`, and creates `VISUAL-QC-INTAKE-BATCH-V1` from the archived objects. `scripts/create_visual_qc_intake_batch.py` remains the lower-level command for originals that are already in controlled storage. `knowledge-base/visual-qc-intake-batch.example.json` is a contract example, not the normal authoring path. Each intake entry contains:
 
 - `entry_id` and `file_path`;
 - `board_key` and `side_id` from the five-board catalog;
@@ -43,7 +43,11 @@ Create `VISUAL-QC-INTAKE-BATCH-V1` with `scripts/create_visual_qc_intake_batch.p
 
 The validator rejects the complete batch before upload when it finds an unsafe id, duplicate entry/path/session-side, unknown board/side, mixed session identity, incomplete checklist, unsupported signature, extension/MIME mismatch, decode failure, dimensions outside bounds, or hash mismatch. It never infers model or side from image content.
 
-The builder requires every board side to be assigned explicitly as `side_id=path`, leaves the source file unchanged, computes `expected_sha256` from the current bytes, and validates the completed manifest before publishing it. Physical source photos must be stored outside the Git repository; project assets, point maps, and manual proxy images are rejected so they cannot become `physical_capture`. Known engineering and reviewed manual-proxy SHA-256 fingerprints remain rejected after copy or rename. A batch may contain one side when photos arrive incrementally. Existing output is protected unless `--force` is supplied, and even forced output can never replace a source image.
+The staging command requires every board side to be assigned explicitly as `side_id=path`, leaves the incoming file unchanged, stores exact bytes under a canonical MIME-derived object path, computes `expected_sha256`, and validates the completed source package and intake manifest before publishing the immutable package directory. The library root must be supplied explicitly and resolve outside the Git repository. Controlled child paths containing symbolic links or Windows reparse points are rejected. Package publication is serialized by a local file lock; `.complete` is written only after both manifests are durable, so interrupted or partial packages cannot be consumed. Project assets, point maps, and manual proxy images are rejected so they cannot become `physical_capture`; known engineering and reviewed manual-proxy SHA-256 fingerprints remain rejected after exact copy or rename. A batch may contain one side when photos arrive incrementally.
+
+The canonical `knowledge-base/visual-qc-proxy-inventory-v1.json` stores the reviewed path and SHA-256 for every configured point map and approved manual proxy. Missing files, changed bytes, unregistered configured proxies, malformed hashes, and path mismatches fail closed. The source package records `proxy_inventory_sha256`, but validation does not trust that historical snapshot alone. Package validation and intake import re-read the current canonical proxy inventory, so an older package is immediately revoked if one of its object hashes is later classified as proxy material. The fingerprint gate is exact-byte protection, not image forensics. Recompression, cropping, editing, or screenshots change the SHA-256 and therefore still require Codex to verify that Milo supplied a physical photo. Every newly approved proxy asset must be deliberately added to the canonical inventory with its reviewed hash. Server evidence-role, Golden, and training gates remain authoritative.
+
+The source library is an integrity-preserving operator workflow, not a sandbox against a hostile local administrator. It rejects existing reparse/symlink paths and rechecks newly created object/package paths immediately before publication; the library root must also be protected by normal Windows account and filesystem permissions.
 
 ## Capture Identity
 
@@ -53,36 +57,38 @@ The builder requires every board side to be assigned explicitly as `side_id=path
 
 ## Intake Procedure
 
-Create the manifest after Codex has checked the stated board/side, focus and lens cleanliness, and lighting/occlusion conditions:
+Preserve the source package after Codex has confirmed that Milo supplied the physical photos and checked the stated board/side, focus and lens cleanliness, and lighting/occlusion conditions:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\create_visual_qc_intake_batch.py `
-  --batch-id km4-physical-001 `
+.\.venv\Scripts\python.exe scripts\stage_visual_qc_source_package.py `
+  --library-root D:\Visual-QC-Controlled-Source `
+  --package-id km4-physical-001-source `
+  --batch-id km4-physical-001-batch `
   --board-key km4-f151 `
   --capture-session-id km4-unit-001 `
   --capture-stage golden_reference `
   --capture-setup-id standard-bench `
-  --image "main_page_1=C:\controlled-source\km4-front.jpg" `
-  --image "main_page_2=C:\controlled-source\km4-back.jpg" `
-  --confirm-capture-checklist `
-  --output C:\controlled-source\km4-physical-001.intake.json
+  --image "main_page_1=C:\incoming\km4-front.jpg" `
+  --image "main_page_2=C:\incoming\km4-back.jpg" `
+  --confirm-milo-physical-source `
+  --confirm-capture-checklist
 ```
 
-`--confirm-capture-checklist` records an explicit completed intake check; it is not an automatic quality score. The command does not infer which image is front/back and does not require both sides in one batch. Use the source-declared `side_id` values from the board catalog.
+The command returns the committed `source-package.json` and intake-manifest paths. An identical rerun returns `reused`; the same package id with different content or metadata fails as a conflict. `--confirm-milo-physical-source` records operator-confirmed provenance, while `--confirm-capture-checklist` records the completed intake check; neither is an automatic classifier or quality score. The command does not infer which image is front/back and does not require both sides in one batch. Use the source-declared `side_id` values from the board catalog.
 
 Run validation without network writes:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\import_visual_qc_batch.py C:\controlled-source\km4-physical-001.intake.json `
-  --receipt C:\controlled-source\km4-physical-001.receipt.json `
+.\.venv\Scripts\python.exe scripts\import_visual_qc_batch.py D:\Visual-QC-Controlled-Source\packages\km4-physical-001-source\km4-physical-001-batch.intake.json `
+  --receipt D:\Visual-QC-Controlled-Source\packages\km4-physical-001-source\km4-physical-001-batch.receipt.json `
   --dry-run
 ```
 
 Then import through the controlled HTTPS API:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\import_visual_qc_batch.py C:\controlled-source\km4-physical-001.intake.json `
-  --receipt C:\controlled-source\km4-physical-001.receipt.json `
+.\.venv\Scripts\python.exe scripts\import_visual_qc_batch.py D:\Visual-QC-Controlled-Source\packages\km4-physical-001-source\km4-physical-001-batch.intake.json `
+  --receipt D:\Visual-QC-Controlled-Source\packages\km4-physical-001-source\km4-physical-001-batch.receipt.json `
   --api-base https://cccsat.top/mb-repair-beta/api/v1/visual-qc `
   --credential-file C:\secure\visual-qc-credential.json `
   --actor-id OWNER_ID `
