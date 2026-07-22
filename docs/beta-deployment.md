@@ -68,8 +68,8 @@ ANTHROPIC_API_KEY=...
 
 ## Current Deployment
 
-- Deployed on: 2026-07-21
-- Deployed commit: `1f07b4a`
+- Deployed on: 2026-07-22
+- Deployed commit: `f278061`
 - Internal service: `http://127.0.0.1:3010`
 - Internal visual-QC API: `http://127.0.0.1:3020`
 - External beta URL: `https://cccsat.top/mb-repair-beta/`
@@ -82,6 +82,29 @@ ANTHROPIC_API_KEY=...
 - Nginx config touched: `/etc/nginx/sites-available/sikayetvar`
 - Nginx config backup: `/etc/nginx/sites-available/sikayetvar.before-mb-repair-20260622_095918`
 - Current AI status: service is reachable, but `.env` still has no valid `ANTHROPIC_API_KEY`, so AI features are not enabled yet.
+- 2026-07-22 owner-managed intake increment: Milo is the sole source of real
+  visual photos and Codex operates the data-administrator path. Production now
+  enforces data-administrator-only multipart intake before parsing, accepts
+  validated batch/entry provenance, exposes the actor-scoped admin case
+  catalog/detail/original routes, and restores a server case into the existing
+  canvas workflow. The internal workbench hides every intake, Golden, catalog,
+  local export, and dataset control from the restricted role; the API returned
+  `403 data_admin_role_required` for a restricted multipart request.
+- Production P4 at `f278061` reports one worker, one preserved succeeded proxy
+  case, zero Golden Samples, and normal storage pressure. The legacy KM4 manual
+  proxy was transactionally reassigned from the historical restricted actor to
+  the current data administrator after a SQLite backup at
+  `/opt/motherboard-repair-beta/data/visual-qc/visual-qc.sqlite3.before-owner-admin-actor-migration-20260722_104119`.
+  Its evidence remains `service_manual_proxy`, registration remains
+  `manual_registration_required`, and both intake provenance fields remain
+  null. Dataset audit remains `0` eligible, `1` excluded, with
+  `non_physical_evidence: 1`; repeated dataset ZIPs remain byte-identical.
+- Production headed-Chrome QA at 1440x1000 and 390x844 restored the proxy
+  original from the server catalog, rendered both canvases, and reported no
+  horizontal overflow or console warnings/errors. The restricted production
+  identity displayed the read-only surface with all visual-data controls
+  hidden. Screenshots are retained locally under
+  `output/playwright/owner-managed-intake/` and are not deployment inputs.
 - Latest P4 evidence: desktop and 390px workbench paths render with no fresh
   console errors or horizontal overflow; restricted/data-administrator wire roles pass through
   the HTTPS gateway; forged actor headers are overwritten; PM2 restart retains

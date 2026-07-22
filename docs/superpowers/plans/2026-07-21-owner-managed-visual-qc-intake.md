@@ -115,7 +115,7 @@ Get-Content knowledge-base/visual-qc-intake-receipt-v1-schema.json -Raw -Encodin
 
 Expected: all intake tests pass and both schemas parse.
 
-- [ ] **Step 6: Commit Task 1**
+- [x] **Step 6: Commit Task 1**
 
 ```powershell
 git add knowledge-base/visual-qc-intake-batch-v1-schema.json knowledge-base/visual-qc-intake-receipt-v1-schema.json knowledge-base/visual-qc-intake-batch.example.json scripts/visual_qc/intake.py tests/test_visual_qc_intake.py
@@ -207,7 +207,7 @@ Run:
 
 Expected: technician upload is 403, data-admin upload is accepted, old databases migrate without data loss, and deployment contracts remain green.
 
-- [ ] **Step 6: Commit Task 2**
+- [x] **Step 6: Commit Task 2**
 
 ```powershell
 git add scripts/visual_qc/server/api.py scripts/visual_qc/server/service.py scripts/visual_qc/server/store.py tests/test_visual_qc_server.py tests/test_visual_qc_deployment.py
@@ -295,7 +295,7 @@ Run:
 
 Expected: catalog module and all visual-QC server tests pass.
 
-- [ ] **Step 6: Commit Task 3**
+- [x] **Step 6: Commit Task 3**
 
 ```powershell
 git add scripts/visual_qc/server/api.py scripts/visual_qc/server/service.py scripts/visual_qc/server/store.py knowledge-base/visual-qc-admin-case-list-v1-schema.json tests/test_visual_qc_admin_cases.py
@@ -391,7 +391,7 @@ Create temporary image paths in the test fixture; do not modify the committed ex
 
 Expected: all tests pass and help documents every bounded option.
 
-- [ ] **Step 6: Commit Task 4**
+- [x] **Step 6: Commit Task 4**
 
 ```powershell
 git add scripts/visual_qc/intake.py scripts/import_visual_qc_batch.py tests/test_visual_qc_intake.py deploy/visual-qc-runtime-files.txt tests/test_visual_qc_deployment.py
@@ -453,7 +453,7 @@ node --test tests/visual-qc-server-client.test.mjs tests/visual-qc-state.test.mj
 
 Expected: all selected Node tests pass.
 
-- [ ] **Step 5: Commit Task 5**
+- [x] **Step 5: Commit Task 5**
 
 ```powershell
 git add assets/visual-qc-workbench/visual-qc-server-client.js tests/visual-qc-server-client.test.mjs
@@ -534,7 +534,7 @@ node --test tests/*.test.mjs
 
 Expected: focused tests and the complete Node suite pass.
 
-- [ ] **Step 6: Commit Task 6**
+- [x] **Step 6: Commit Task 6**
 
 ```powershell
 git add assets/visual-qc-workbench/index.html assets/visual-qc-workbench/styles.css assets/visual-qc-workbench/app.js tests/visual-qc-capture-ui.test.mjs tests/visual-qc-admin-catalog-ui.test.mjs
@@ -556,7 +556,7 @@ git commit -m "feat: browse owner-managed visual QC cases"
 - Modify: `C:/Users/Mercurluto/OneDrive/AI/02_Projects/Programming/Mainboard Repair Enablement/Risks.md`
 - Modify: `C:/Users/Mercurluto/OneDrive/AI/90_Meta/System Checks/2026-07-21 Daily Architecture Check.md`
 
-- [ ] **Step 1: Replace stale current-architecture wording**
+- [x] **Step 1: Replace stale current-architecture wording**
 
 Current summaries must state:
 
@@ -566,7 +566,7 @@ Milo is the only source of real visual photos. Codex operates the data-administr
 
 Keep historical records intact but mark superseded technician-upload assumptions as historical. Document manifest/receipt commands and the first-real-batch acceptance procedure.
 
-- [ ] **Step 2: Run P0-P2 complete verification**
+- [x] **Step 2: Run P0-P2 complete verification**
 
 ```powershell
 node --test tests/*.test.mjs
@@ -577,7 +577,7 @@ git diff --check
 
 Parse every changed JSON file with strict UTF-8, scan all changed code/docs plus Vault/ledger for U+FFFD, and run the existing dataset and deployment contract checks included in the suites.
 
-- [ ] **Step 3: Perform local P3 visual and interaction QA**
+- [x] **Step 3: Perform local P3 visual and interaction QA**
 
 Use the Chrome extension path when available; otherwise document the installed headed-Chrome Playwright fallback. Check desktop 1440x1000 and mobile 390x844:
 
@@ -590,14 +590,14 @@ Use the Chrome extension path when available; otherwise document the installed h
 
 Save ignored screenshots under `output/playwright/owner-managed-intake/`.
 
-- [ ] **Step 4: Commit implementation documentation**
+- [x] **Step 4: Commit implementation documentation**
 
 ```powershell
 git add README.md docs/visual-qc-server-api-2026-07-20.md docs/visual-qc-capture-intake-spec-2026-07-20.md docs/visual-qc-workbench-2026-07-17.md docs/superpowers/specs/2026-07-20-visual-qc-server-architecture-design.md docs/beta-deployment.md
 git commit -m "docs: adopt owner-managed visual QC intake"
 ```
 
-- [ ] **Step 5: Deploy with the existing controlled script and run P4**
+- [x] **Step 5: Deploy with the existing controlled script and run P4**
 
 Run the committed `scripts/deploy-visual-qc-pilot.ps1` with credentials loaded from the external sensitive directory. Verify:
 
@@ -610,7 +610,7 @@ Run the committed `scripts/deploy-visual-qc-pilot.ps1` with credentials loaded f
 - the legacy case has null intake provenance and no migration loss;
 - no fake physical case is uploaded.
 
-- [ ] **Step 6: Run production P3 and write fact sources**
+- [x] **Step 6: Run production P3 and write fact sources**
 
 Repeat the desktop/mobile browser matrix against the authenticated production route. Update deployment facts, coordination ledger, Vault overview/task/risk cards, and the daily architecture check with actual commit ids and evidence. Commit the coordination ledger separately.
 
