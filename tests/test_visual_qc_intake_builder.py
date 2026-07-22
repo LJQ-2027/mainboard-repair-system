@@ -1,5 +1,7 @@
 import hashlib
 import json
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -161,6 +163,124 @@ class VisualQcIntakeBuilderTests(unittest.TestCase):
             **self.options(),
         )
         self.assertEqual(result["manifest"]["batch_id"], "km4-physical-001")
+
+
+class VisualQcIntakeBuilderCliTests(unittest.TestCase):
+    def setUp(self):
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.root = Path(self.temp_dir.name)
+        self.front = self.root / "front.jpg"
+        self.front.write_bytes(encode_jpeg(value=160))
+        self.script = ROOT / "scripts" / "create_visual_qc_intake_batch.py"
+
+    def tearDown(self):
+        self.temp_dir.cleanup()
+
+    def command(self, *extra):
+        return [
+            sys.executable,
+            str(self.script),
+            "--batch-id",
+            "km4-cli-batch",
+            "--board-key",
+            "km4-f151",
+            "--capture-session-id",
+            "km4-cli-unit",
+            "--capture-stage",
+            "before_repair",
+            "--image",
+            f"main_page_1={self.front}",
+            *extra,
+        ]
+
+    def run_cli(self, *extra):
+        return subprocess.run(
+            self.command(*extra),
+            cwd=self.root,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            check=False,
+        )
+
+    def test_direct_invocation_writes_default_manifest_and_json_summary(self):
+        result = self.run_cli("--confirm-capture-checklist")
+
+        self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
+        summary = json.loads(result.stdout)
+        output = self.root / "km4-cli-batch.intake.json"
+        self.assertEqual(summary["status"], "ok")
+        self.assertEqual(summary["batch_id"], "km4-cli-batch")
+        self.assertEqual(summary["manifest"], str(output.resolve()))
+        self.assertEqual(summary["entry_count"], 1)
+        self.assertEqual(summary["entries"][0]["side_id"], "main_page_1")
+        self.assertEqual(summary["entries"][0]["width"], 180)
+        self.assertEqual(summary["entries"][0]["height"], 120)
+        self.assertEqual(
+            summary["entries"][0]["sha256"],
+            hashlib.sha256(self.front.read_bytes()).hexdigest(),
+        )
+        self.assertTrue(output.is_file())
+
+    def test_cli_requires_explicit_checklist_confirmation(self):
+        result = self.run_cli()
+
+        self.assertEqual(result.returncode, 2)
+        self.assertEqual(json.loads(result.stdout)["status"], "validation_failed")
+        self.assertIn("confirmation is required", result.stdout)
+        self.assertFalse((self.root / "km4-cli-batch.intake.json").exists())
+
+    def test_cli_reports_bad_assignment_unknown_side_and_invalid_image(self):
+        cases = [
+            (["--image", "not-an-assignment"], "side_id=path"),
+            (
+                ["--image", f"unknown_side={self.front}"],
+                "does not belong",
+            ),
+        ]
+        broken = self.root / "broken.jpg"
+        broken.write_bytes(b"bad-image")
+        cases.append(
+            (["--image", f"main_page_2={broken}"], "image signature")
+        )
+
+        for replacement, message in cases:
+            with self.subTest(message=message):
+                command = self.command("--confirm-capture-checklist")
+                image_index = command.index("--image")
+                command[image_index : image_index + 2] = replacement
+                result = subprocess.run(
+                    command,
+                    cwd=self.root,
+                    capture_output=True,
+                    text=True,
+                    encoding="utf-8",
+                    check=False,
+                )
+                self.assertEqual(result.returncode, 2)
+                self.assertIn(message, json.loads(result.stdout)["message"])
+
+    def test_cli_protects_existing_output_and_force_replaces_it(self):
+        output = self.root / "custom.json"
+        output.write_text('{"keep": true}\n', encoding="utf-8")
+
+        blocked = self.run_cli(
+            "--confirm-capture-checklist", "--output", str(output)
+        )
+        self.assertEqual(blocked.returncode, 2)
+        self.assertEqual(json.loads(output.read_text(encoding="utf-8")), {"keep": True})
+
+        replaced = self.run_cli(
+            "--confirm-capture-checklist",
+            "--output",
+            str(output),
+            "--force",
+        )
+        self.assertEqual(replaced.returncode, 0, replaced.stderr or replaced.stdout)
+        self.assertEqual(
+            json.loads(output.read_text(encoding="utf-8"))["batch_id"],
+            "km4-cli-batch",
+        )
 
 
 if __name__ == "__main__":
