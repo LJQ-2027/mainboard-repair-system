@@ -1,136 +1,103 @@
-# Visual QC Capture And Intake Specification
+# Visual QC Owner-Managed Capture And Intake Specification
 
-## Purpose
+## Current Ownership
 
-This specification gives global repair sites one repeatable way to collect board images that can be registered, compared, audited, and later used as reviewed training evidence. It does not require the technician to identify the board model: model, board version, and board side are inherited from the repair session.
+Milo is the only source of real visual photos. Codex is the data administrator that validates, imports, registers, labels, and packages the evidence. Overseas technicians do not take part in photo upload and do not use the internal visual data workbench.
 
-## Required Capture Set
+The server role string `reviewer` is retained only as a compatibility identifier for data-administrator permissions. It is not a second-person review or approval workflow.
 
-For a new board-side baseline:
+## Required Photo Package
 
-1. Select the known model, board version, and board side in the repair workbench.
-2. Remove the board from the device when the repair procedure permits it.
-3. Capture the complete first side.
-4. Turn the board over without changing the camera setup and capture the complete second side.
-5. Keep both sides in one `capture_session_id` and record the stable `capture_setup_id`.
-6. Confirm complete-board framing, focus/lens cleanliness, and even unobstructed lighting for each image.
-7. Upload each side as `golden_reference`.
-8. A reviewer checks image quality, registration, and normal-board status before activation.
+For each physical board supplied to Codex:
 
-For a repair case:
+1. State the known model, board version, and board side for every file.
+2. Prefer a bare board with the full outline visible.
+3. Capture both source-declared sides without changing the optical setup.
+4. Use one `capture_session_id` for the same board/stage/setup.
+5. Select `golden_reference`, `before_repair`, or `after_repair` explicitly.
+6. Confirm full-board framing, focus/lens cleanliness, and even unobstructed lighting.
+7. Keep the originals unchanged; do not pre-crop, annotate, or recompress them for intake.
 
-1. Capture `before_repair` before component action.
-2. Keep the same board side and capture setup.
-3. Capture `after_repair` after the action and cleaning.
-4. Confirm or reject every retained difference candidate.
-5. Continue the source-backed electrical and functional verification path.
+Recommended capture conditions:
 
-## Physical Setup
+- stable stand or fixed camera;
+- main rear camera at native resolution, without digital zoom or portrait filters;
+- short edge at least 2,000 pixels where practical;
+- matte contrasting background;
+- diffuse lighting from multiple directions;
+- camera approximately perpendicular to the board;
+- no hands, tools, labels, loose parts, or unrelated objects over the board.
 
-- Use a stable phone stand or fixed camera where available.
-- Use the main rear camera at its native resolution; avoid digital zoom and portrait filters.
-- Prefer a source image whose short edge is at least 2,000 pixels.
-- Keep the complete board outline visible with a small margin on every side.
-- Let the board occupy most of the frame without clipping connectors or corners.
-- Use a plain, matte background that contrasts with the PCB.
-- Use diffuse light from more than one direction when possible.
-- Move direct reflections away from shields, connectors, and solder joints.
-- Keep the camera approximately perpendicular to the board.
-- Remove hands, tools, loose screws, labels, and unrelated parts from the board area.
-- Clean only according to the approved repair process; do not alter evidence merely to improve the photograph.
+The pilot accepts JPEG, PNG, and WebP up to its configured 20 MB limit. The hard 64 px minimum only rejects invalid thumbnails and is not the target quality.
 
-The service accepts JPEG, PNG, and WebP up to the configured 20 MB pilot limit. The hard minimum dimension protects against thumbnails; it is not the recommended field capture quality.
+## Batch Manifest
 
-## Capture Setup Identity
+Create `VISUAL-QC-INTAKE-BATCH-V1` from `knowledge-base/visual-qc-intake-batch.example.json`. Each entry contains:
 
-`capture_setup_id` identifies a repeatable optical arrangement, not a technician or country. Use a stable site-defined id such as:
+- `entry_id` and `file_path`;
+- `board_key` and `side_id` from the five-board catalog;
+- `capture_stage`;
+- `capture_session_id` and `capture_setup_id`;
+- all three true capture-checklist booleans;
+- optional expected SHA-256.
 
-`NBO-RC01-BENCH-A-PHONE01-1X-DIFFUSE`
+The validator rejects the complete batch before upload when it finds an unsafe id, duplicate entry/path/session-side, unknown board/side, mixed session identity, incomplete checklist, unsupported signature, extension/MIME mismatch, decode failure, dimensions outside bounds, or hash mismatch. It never infers model or side from image content.
 
-The site record behind this id should retain:
+## Capture Identity
 
-- site and bench;
-- phone or camera model;
-- selected rear lens and zoom mode;
-- stand or jig;
-- background;
-- light arrangement;
-- approximate camera distance;
-- image orientation policy;
-- date the setup was checked.
+`capture_setup_id` names one repeatable optical arrangement, including camera/lens, stand, background, light arrangement, orientation, and approximate distance. Changing that arrangement creates a new setup id.
 
-Changing the camera, lens, stand, background, or light arrangement creates a new capture setup id. Golden Samples from different setups must not be silently mixed.
+`capture_session_id` names one physical board during one capture stage. All entries in that session must retain one board identity and setup; each board side may appear at most once. `pair_complete` means all source-declared sides are present, not that quality, registration, normality, or defects have been confirmed.
 
-## Capture Session Identity
+## Intake Procedure
 
-`capture_session_id` identifies one physical board during one capture stage. The server binds it to:
+Run validation without network writes:
 
-- actor;
-- board key and board id;
-- capture stage;
-- evidence role;
-- capture setup id.
+```powershell
+python -m scripts.import_visual_qc_batch C:\controlled-source\batch.json `
+  --receipt C:\controlled-source\batch.receipt.json `
+  --dry-run
+```
 
-The first accepted side establishes that identity. Later sides must match it. The binding is checked inside the database write transaction, so concurrent uploads cannot reuse the same session for a different board, stage, evidence role, or setup.
+Then import through the controlled HTTPS API:
 
-`pair_in_progress` means at least one required side is still missing. `pair_complete` means all source-declared sides are present. Neither status confirms registration, image quality, a normal board, or a defect.
+```powershell
+python -m scripts.import_visual_qc_batch C:\controlled-source\batch.json `
+  --receipt C:\controlled-source\batch.receipt.json `
+  --api-base https://cccsat.top/mb-repair-beta/api/v1/visual-qc `
+  --credential-file C:\secure\visual-qc-credential.json `
+  --actor-id OWNER_ID `
+  --wait
+```
 
-Each physical image carries three boolean capture checks:
+The importer uploads sequentially, uses a deterministic idempotency key, writes the receipt atomically after every transition, stops on the first transfer failure by default, and resumes only rows without matching server ids. `--continue-on-error` is an explicit batch-operations choice. HTTP is permitted only for localhost with `--allow-http-localhost`.
 
-- complete board is visible and the selected side is correct;
-- lens is clean and the board is in focus;
-- lighting is even and the board is unobstructed.
+The receipt stores file evidence, transfer state, server case/job ids, and typed errors. It never stores credentials or authorization headers. If source bytes change, the new SHA-256 invalidates previous server ids.
 
-The browser blocks upload until all three are confirmed. The server derives the checklist status from the booleans instead of trusting a submitted status string. Proxy evidence is always `not_applicable`.
+## Data-Administrator Procedure
 
-## Intake States
+1. Open the server case catalog in the internal workbench.
+2. Filter by board, side, capture stage, or processing state.
+3. Open the case; the browser verifies original SHA-256 and decoded dimensions.
+4. Inspect image quality and automatic registration.
+5. Accept the automatic transform or complete manual four-point registration plus an independent check point.
+6. Mark a confirmed-normal physical reference as a versioned Golden when applicable.
+7. Confirm/reject difference candidates or add human visible-defect annotations.
+8. Complete final QC evidence and inspect the dataset gate.
+9. Export the deterministic manifest/COCO/bundle only after all server gates pass.
 
-The browser creates a local draft before network transfer:
+There is no organizational approval queue. “Reviewed” fields in data contracts mean that Codex explicitly confirmed technical evidence rather than accepting an automatic candidate silently.
 
-`draft -> hashing -> uploading -> accepted -> queued -> running -> succeeded`
+## First Real Batch Acceptance
 
-Recoverable states:
+The first physical milestone is one known KM4/F151 bare-board front/back set. Codex must:
 
-- `upload_failed`: retain the local blob and retry with the same idempotency key.
-- `failed`: preserve the server job and expose explicit retry.
-- `manual_required`: keep the case and open reviewed four-point registration.
-- `retake`: retain the rejected evidence record but request a better photograph.
+- complete dry-run and import with a retained receipt;
+- verify server case/original recovery;
+- record quality metrics and any retake reason;
+- validate automatic or manual registration on both sides;
+- verify annotation projection and visible component-footprint association;
+- create a Golden only if Milo identifies the board as known-normal;
+- confirm the dataset audit distinguishes eligible physical evidence from the existing manual proxy.
 
-The server becomes authoritative only after returning HTTP `202` with the case, image, and job ids. A retry must reuse the same `Idempotency-Key` and SHA-256.
-
-## Evidence Roles
-
-- `physical_capture`: a real photographed board.
-- `reviewed_golden_reference`: a physical capture approved as normal.
-- `synthetic_proxy`: generated from an engineering reference.
-- `service_manual_proxy`: an installed-board or structural image extracted from a reviewed manual.
-
-Only a reviewed `physical_capture` may become a Golden Sample or field-accuracy sample. Proxy evidence remains useful for software validation and must retain its proxy role in exports.
-
-## Reviewer Gate
-
-A Golden Sample requires:
-
-- known board and side identity;
-- immutable SHA-256;
-- acceptable image-quality status;
-- reviewed automatic or manual registration;
-- confirmed normal-board status;
-- reviewer identity and timestamp;
-- capture setup id;
-- confirmed physical-capture checklist;
-- active version.
-
-Replacing a Golden Sample creates a new version. Historical cases continue to reference the version used when their difference job ran.
-
-## Global Network Behavior
-
-- Generate the preview and SHA-256 locally before upload.
-- Keep the original browser draft until server acceptance.
-- Show byte progress and a retry action.
-- Do not restart the repair case when upload fails.
-- Poll the persisted job rather than holding one long request.
-- Use thumbnails for list views and fetch originals or heatmaps only when opened.
-- Preserve manual registration and repair guidance when automatic processing is unavailable.
-
-This is recoverable weak-network operation, not a promise that the complete repair system works offline.
+Until this is complete, synthetic transforms and 21 Service Manual images remain proxy software evidence only. They must not be described as physical accuracy or used to train a production defect model.

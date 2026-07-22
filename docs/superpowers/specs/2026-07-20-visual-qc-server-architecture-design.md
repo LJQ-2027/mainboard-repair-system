@@ -2,207 +2,131 @@
 
 ## Status
 
-Approved by Milo on 2026-07-20. This document is the canonical target architecture for visual QC, physical-photo registration, Golden Sample management, and visual evidence feedback. Older references to a technician-installed Python service, browser-only storage, or offline inference as the primary production path are superseded.
+Approved server-led architecture, updated by Milo on 2026-07-21 for the owner-managed evidence path. This document is the canonical architecture for photo intake, registration, Golden Sample management, visible-defect annotation, and governed training export.
 
-The current `assets/visual-qc-workbench/` implementation remains a valid local data-workbench baseline. Its `local_only` storage behavior describes current code, not the approved production architecture.
+The previous proposal in which overseas technicians captured or uploaded visual photos is superseded. Milo is the only source of real visual photos. Codex operates the internal data-administrator intake and evidence-building workflow. Overseas technicians do not upload photos and do not enter `assets/visual-qc-workbench/`.
+
+The backend wire value `reviewer` remains temporarily as the compatibility identifier for data-administrator capability. It does not represent a second-person approval layer.
 
 ## Product Fit
 
-The visual capability is one subsystem of the existing overseas mainboard repair platform. It is not a separate quality-inspection product and does not add a second technician entry.
+Visual QC remains one subsystem of the overseas mainboard repair platform, not a separate technician entry. Its evidence is later consumed by the same repair flow:
 
-The technician flow remains:
+`known model and board -> known fault or initial inspection -> model highlights likely modules -> technician follows source-backed tests -> technician records result`
 
-`select known model and board -> choose known fault or initial inspection -> capture/upload board image -> register image to the board coordinate system -> review visible anomaly candidates -> continue source-backed electrical checks and repair guidance -> record outcome -> sync the case`
+The internal visual data path is separate:
 
-Visual processing finds and locates visible anomaly candidates. The point map, schematic, repair guide, 2.5D model, and reviewed SOP explain what the location represents and what test is allowed next. Model output never directly authorizes a repair action.
+`Milo supplies known-board photos -> Codex validates and batch-imports -> server quality/registration -> Codex corrects registration and labels -> Golden/defect evidence -> governed training export`
+
+Visual processing may locate visible anomaly candidates. Point maps, schematics, repair guides, the 2.5D model, and reviewed SOPs remain the source of component meaning and permitted repair checks. A model candidate never authorizes a repair action.
 
 ## Deployment Decision
 
-The production path is a server-led Web platform with asynchronous visual processing and manual fallback.
+The production path is a server-led Web platform with asynchronous CPU visual processing and manual four-point fallback.
 
-- Technicians use one responsive Web application through the existing controlled server.
-- Physical-board photos may be uploaded to the controlled server.
-- The server owns case identity, image provenance, Golden Sample review, processing jobs, candidate review, audit history, and dataset export.
-- OpenCV runs in a server-side worker for image quality, contour detection, feature registration, homography validation, and difference candidates.
-- Automatic registration failure returns the existing reviewed four-point registration workflow.
-- Browser storage is a weak-network draft and retry mechanism, not the authoritative cross-site data store.
-- PWA caching may later improve weak-network resilience, but it is not the primary architecture.
-- Training runs in a separate compute environment. The current server does not train deep models.
-
-## Current Server Boundary
-
-The controlled beta server was inspected read-only on 2026-07-20:
-
-- 4 x86_64 vCPU
-- 7.3 GB RAM and 4 GB swap
-- 19 GB free disk space on the single system volume
-- Python 3.10 and Node.js 20
-- no GPU
-- no installed OpenCV
-- no active PostgreSQL or Redis service
-- Nginx and PM2 already route the motherboard repair beta under `/mb-repair-beta/`
-
-This is sufficient for a bounded pilot with one or two CPU OpenCV workers. It is not sufficient for deep-model training, high-volume permanent image retention, or unrestricted synchronous image processing.
+- The existing controlled server hosts the same-origin static workbench and FastAPI QC service.
+- Only the data administrator can create or reopen visual cases, manage Golden Samples, or export datasets.
+- Technician identities fail closed and receive no visual intake or data-management controls.
+- The server owns case identity, image provenance, processing jobs, registration evidence, final QC evidence, Golden versions, audit history, and dataset export.
+- IndexedDB is a recoverable local working copy, not the cross-user source of truth.
+- OpenCV performs image quality, contour evidence, ORB/AKAZE matching, homography validation, and difference candidate generation.
+- Training runs in a separate compute environment after real-data audit; the pilot server does not train deep models.
 
 ## Runtime Architecture
 
-### Technician Web Application
+### Owner-Managed Intake
 
-The existing repair workbench remains the product shell. The visual flow adds:
+`VISUAL-QC-INTAKE-BATCH-V1` binds every local file to an explicit board, side, capture stage, session, setup, and completed capture checklist. The local importer validates the complete batch before network transfer, calculates SHA-256 and decoded dimensions, rejects duplicate or mixed session identities, uploads sequentially with deterministic idempotency keys, and writes `VISUAL-QC-INTAKE-RECEIPT-V1` after every state change.
 
-- image capture/upload with progress and retry;
-- known board and side identity inherited from the repair session;
-- automatic registration status and evidence;
-- manual four-point fallback;
-- Golden Sample comparison;
-- candidate heatmap review;
-- confirm, reject, or retain-for-review decisions;
-- synchronized image, point-map, schematic, and 2.5D coordinates;
-- repair result and case feedback.
+The import command is:
 
-IndexedDB stores unfinished drafts, upload state, and temporary source blobs so a refresh or weak connection does not discard work. The server becomes authoritative after upload acceptance.
+```powershell
+python -m scripts.import_visual_qc_batch C:\controlled-source\batch.json `
+  --receipt C:\controlled-source\batch.receipt.json `
+  --api-base https://cccsat.top/mb-repair-beta/api/v1/visual-qc `
+  --credential-file C:\secure\visual-qc-credential.json `
+  --actor-id OWNER_ID `
+  --wait
+```
 
-### QC API
+Run `--dry-run` first. Credentials are supplied explicitly or through environment variables and never enter the manifest or receipt.
 
-A FastAPI application will replace the current simple HTTP server for new QC routes while retaining same-origin frontend and AI access.
+### Internal Visual Data Workbench
 
-Initial responsibilities:
+The browser workbench provides:
 
-- validate board, side, capture stage, MIME type, dimensions, and hash;
-- create image and case records;
-- persist upload and processing state;
-- enqueue and expose visual jobs;
-- manage Golden Sample review and version state;
-- store model candidates separately from human labels;
-- expose review and dataset-export operations;
-- enforce authenticated, controlled access to engineering-linked assets.
+- server case catalog with board, side, stage, state, and bounded pagination;
+- verified original-image recovery;
+- image quality evidence and automatic registration candidate;
+- manual four-point registration and independent check points;
+- visible-defect rectangles/polygons and component-footprint suggestions;
+- Golden Sample and difference candidate management;
+- final human evidence and deterministic dataset exports.
+
+The catalog restores `VISUAL-QC-SERVER-CASE-V2` only after the original SHA-256 and decoded dimensions match. Registration and final QC reviews must link to the current case/job/review ids; stale evidence is rejected instead of being opened as a plausible draft.
+
+### QC API And Worker
+
+FastAPI validates identity, board/side, capture stage, MIME/signature, dimensions, hash, checklist, intake provenance, idempotency, storage reserve, and capture-session consistency. SQLite persists cases, images, jobs, reviews, Golden versions, artifacts, and audit events. One or two CPU workers process persisted jobs outside request handlers and recover interrupted work after restart.
+
+Automatic registration returns a draft candidate or a structured `manual_required` result. Difference regions remain `model_candidate` until Codex records a human decision.
 
 ### Storage
 
-The pilot uses an explicit storage adapter:
+- SQLite for structured state and append-only evidence.
+- Dedicated controlled-server object directories for originals and generated artifacts.
+- SHA-256 content addressing and integrity checks.
+- Explicit disk warning/reserve thresholds and bounded retention.
+- Adapter boundaries preserve a later PostgreSQL/object-storage migration path.
 
-- SQLite for cases, jobs, review state, Golden Sample metadata, and audit events;
-- a dedicated server directory for originals, normalized derivatives, thumbnails, overlays, and heatmaps;
-- SHA-256 for integrity and deduplication;
-- retention limits and free-space checks before accepting new originals.
-
-The interfaces must permit later migration from SQLite to PostgreSQL and from server disk to controlled S3-compatible object storage without changing the browser contract.
-
-### OpenCV Worker
-
-One or two CPU workers process jobs outside request handlers:
-
-1. decode and normalize the image;
-2. calculate image-quality metrics;
-3. locate plausible board contours;
-4. attempt ORB and AKAZE feature matching against the selected board-side reference;
-5. estimate homography with RANSAC;
-6. validate inlier count, coverage, projected board shape, and transform sanity;
-7. return an automatic registration candidate or a structured fallback reason;
-8. after human registration review, align the selected Golden Sample and produce difference candidates;
-9. save artifacts and evidence without converting candidates into confirmed defects.
-
-Requests return job identifiers instead of blocking until large-image processing completes. Jobs survive process restarts through persisted state.
-
-## Evidence And Data Contract
-
-`VISUAL-QC-CASE-V1` remains the current local baseline. The server increment must version the contract rather than silently changing V1 semantics.
+## Evidence Contract
 
 Evidence roles are explicit:
 
+- `physical_capture`: a real board photo supplied by Milo;
 - `synthetic_proxy`: generated from an engineering point map;
-- `service_manual_proxy`: one of the reviewed installed-board or structure images;
-- `physical_capture`: a real photographed board;
-- `reviewed_golden_reference`: a physical capture approved as a normal reference.
+- `service_manual_proxy`: an installed-board or structure image extracted from a reviewed manual.
 
-Synthetic and Service Manual proxies may validate software and structural matching, but never count toward field accuracy. Only reviewed physical captures may become production Golden Samples or real defect-recognition evidence.
+Proxy images may validate software and structural matching but never count toward physical registration accuracy, Golden Samples, or defect-model training. Only reviewed physical captures can enter those paths.
 
-Automatic output uses `model_candidate`. A technician or reviewer must confirm or reject it before it contributes a human label. Repair guidance continues to come from reviewed point-map, schematic, repair-manual, and SOP sources.
+Training-ready evidence requires immutable image identity, confirmed capture checklist, acceptable quality, reviewed registration, legal normalized coordinates, final human QC, and matching server review linkage. Automatic output remains separate as `model_candidate`.
 
 ## Golden Sample Rules
 
-A Golden Sample is scoped to board identity, side, capture setup, and revision. It requires:
+A Golden Sample is scoped to board, side, capture setup, and version. It requires physical evidence, acceptable quality, reviewed registration, explicit normal-board confirmation, data-administrator identity/timestamp, and immutable source hash. Replacing a Golden creates a new version and retires rather than rewrites the previous one.
 
-- physical-capture evidence;
-- acceptable image-quality status;
-- reviewed registration;
-- confirmed normal-board status;
-- reviewer identity and timestamp;
-- immutable source hash;
-- explicit version and retirement state.
+## Security And Roles
 
-Proxy or synthetic images cannot become Golden Samples. Replacing a Golden Sample creates a new version and does not rewrite historical cases.
+- Nginx authenticates the controlled route and replaces client-supplied actor headers.
+- `reviewer` is the compatibility role for the single data-administrator capability.
+- `POST /cases`, admin catalog/original routes, Golden management, and dataset exports require that role.
+- Different actor ids cannot read one another's cases or originals.
+- The QC service binds to loopback and raw engineering archives remain outside the runtime package.
+- Physical photos are authorized only for this controlled owner-managed workflow, not for public distribution.
 
-## Weak-Network Behavior
+## Current Server Boundary
 
-- Save the case draft before upload.
-- Display upload progress and a retryable failure state.
-- Avoid losing annotations or manual anchors when upload fails.
-- Generate a local preview immediately.
-- Resume the case from server state after the upload is accepted.
-- Keep manual registration and source-backed repair guidance available when automatic processing fails.
+The server has 4 x86_64 vCPU, 7.3 GB RAM, 4 GB swap, a single system volume, no GPU, and no PostgreSQL/Redis service. This supports the bounded CPU pilot, not deep-model training, high-volume permanent retention, or unrestricted synchronous processing.
 
-Offline-first operation is not promised for the complete system. The supported guarantee is recoverable local drafting plus retry when the network returns.
+## Delivery State
 
-## Security Boundary
+Implemented:
 
-Physical board photos are authorized for upload to the existing controlled server. This does not authorize public distribution of schematics, point maps, Golden Sample data, repair parameters, or unreleased board information.
+1. High-resolution point-map references and deterministic transforms for all five board platforms.
+2. OpenCV contour/feature registration with structured manual fallback.
+3. A 21-image Service Manual proxy benchmark that remains explicitly non-physical evidence.
+4. Persistent FastAPI jobs, registration/QC evidence, Golden versions, difference candidates, retention and governed datasets.
+5. Owner-only batch manifest/receipt validation and resumable upload.
+6. Actor-scoped server case catalog, original integrity recovery, and data-administrator workbench.
+7. Technician upload rejection and removal of visual data-management controls.
 
-The production server must enforce authentication, role-based access, controlled download, audit logging, and separation between public code and internal data. Raw engineering materials remain in approved controlled storage and are exposed to the workbench only through the minimum derived assets required by the technician flow.
+Still open:
 
-## Delivery Sequence
+- the first known KM4/F151 bare-board front/back photo set;
+- physical-photo registration and component-link acceptance;
+- reviewed normal Golden Samples and real defect labels;
+- model training after a separate quantity/class-distribution audit;
+- production health alert delivery and retention scheduling;
+- eventual corporate SSO/OIDC replacement for pilot Basic Auth.
 
-1. Generate deterministic synthetic transforms from high-resolution point-map references.
-2. Build and benchmark server-side contour and feature registration with manual fallback.
-3. Test all 21 reviewed Service Manual images as proxy structural evidence and label every result accordingly.
-4. Add server upload, persistent jobs, Golden Sample review, difference candidates, and technician confirm/reject.
-5. Publish capture and intake specifications.
-6. Deploy the bounded pilot to the existing beta service.
-7. Re-run acceptance with a known KM4/F151 bare-board front/back photo set.
-8. Begin model training only after a separate audit confirms sufficient real labels and class distribution.
-
-## Implementation Progress
-
-The first four delivery items now have a local server implementation:
-
-- deterministic synthetic transforms cover all ten sides in the five-board catalog;
-- the CPU OpenCV core uses contour evidence, ORB with AKAZE fallback, RANSAC homography validation, and structured manual fallback;
-- `VISUAL-QC-REGISTRATION-CANDIDATE-V1` keeps automatic output in a draft candidate state;
-- the committed benchmark covers 20 synthetic cases and all 21 reviewed Service Manual proxy images.
-- FastAPI accepts controlled, idempotent multipart uploads and persists cases, images, jobs, reviews, Golden versions, artifacts, and audit events in SQLite;
-- one or two bounded workers recover interrupted jobs and return quality plus registration evidence outside request handlers;
-- reviewed automatic or manual registration is required before a physical capture can become a Golden Sample;
-- Golden Samples are versioned by board, side, and capture setup, while proxy evidence is rejected;
-- reviewed cases can produce difference heatmaps and `model_candidate` regions;
-- technician confirm/reject decisions are stored separately, and only a confirmed region receives `human_annotation`.
-- the browser workbench now persists weak-network drafts, uploads with a stable idempotency key and byte progress, polls or retries jobs, restores interrupted synchronization after refresh, and keeps every automatic transform in draft until a person confirms it;
-- automatic failure returns the operator to the existing four-point registration workflow, whose review is then persisted by the server.
-- reviewer-gated Golden Sample approval, active-version lookup, difference heatmaps, and per-candidate confirm/reject/defer decisions are available in the same workbench;
-- server-connected browser cases use `VISUAL-QC-CASE-V2`, while the local-only V1 contract retains its original meaning.
-
-The local pilot now reports disk pressure and object/job counts, rejects writes below its reserve, and supports bounded retention of terminal unreviewed drafts through a default-dry-run server maintenance command. Registration reviews, Golden versions, candidate reviews, active work, and content-addressed objects still referenced by another case are protected. Execution requires an explicit confirmation phrase and records a retention run.
-
-The controlled pilot was deployed on 2026-07-20 at commit `2659769`. The
-gateway/Nginx route, Basic Auth identity assertion, loopback-only services,
-upload and async processing, restart recovery, and proxy-case fallback have
-passed P4 checks. Alert delivery, retention scheduling, corporate SSO/OIDC, and
-physical bare-board acceptance remain open.
-
-Read-only P4 preflight on 2026-07-20 found the old beta route unprotected. The
-completed bounded-pilot deployment now uses per-user Nginx Basic Auth,
-server-side technician/reviewer mapping, loopback-only service binding, and
-gateway-owned actor headers. This pilot mechanism may later be replaced by
-corporate SSO/OIDC without changing the browser/API identity contract.
-
-## Acceptance Boundary
-
-The first server increment is accepted when:
-
-- uploads and processing jobs recover from normal retry and restart cases;
-- synthetic transforms prove homography round trips and expected failure paths;
-- the 21 reviewed images produce a committed proxy benchmark report;
-- automatic registration exposes evidence and falls back safely;
-- Golden Samples require reviewed physical evidence;
-- difference candidates can be confirmed or rejected without becoming automatic repair conclusions;
-- current server resource limits remain respected;
-- no result is described as real-board defect accuracy before physical-photo acceptance.
+No current result is a claim of real-board defect-recognition accuracy.

@@ -8,13 +8,13 @@
 
 `http://127.0.0.1:8898/assets/visual-qc-workbench/`
 
-当前覆盖图片质量检查、四锚点配准、独立检查点、人工审核、矩形/多边形缺陷标注、编译器件 footprint 建议、IndexedDB 草稿，以及版本化案例 JSON 和标注预览图导出。服务器连接案例完成最终人工 QC 后会保存不可覆盖的审核版本；数据边界和实物照片验收门禁见 `docs/visual-qc-workbench-2026-07-17.md`。
+这是内部视觉数据工作台，不是海外维修员入口。Milo 是实物照片的唯一来源，Codex 以数据管理员身份完成批量入库、配准修正、可见缺陷标注、Golden Sample 建立和训练数据导出。海外维修员不上传视觉照片，也不进入该工作台。
 
-当前实现遵循服务器主导的 Web 架构：主板照片上传受控 FastAPI 服务，OpenCV 异步处理，自动失败回退人工四点配准，Golden Sample 和候选审核集中保存，浏览器保留弱网草稿。权威设计见 `docs/superpowers/specs/2026-07-20-visual-qc-server-architecture-design.md`。
+当前实现遵循服务器主导的 Web 架构：照片先按 `VISUAL-QC-INTAKE-BATCH-V1` 在本地验证，再由数据管理员批量导入受控 FastAPI 服务；OpenCV 异步处理，自动失败回退人工四点配准，Golden Sample、候选决策和训练出口集中保存，浏览器保留工作草稿。权威设计见 `docs/superpowers/specs/2026-07-20-visual-qc-server-architecture-design.md`。
 
-浏览器工作台已接入受控服务器 QC 服务：支持同一实体板正反面采集批次、三项拍摄确认、稳定幂等上传、字节进度、任务轮询、失败重试、刷新恢复、自动候选叠图确认、人工四点回退、Golden Sample 审核、差异热图和候选确认/驳回/暂缓。服务器侧包含采集批次身份防污染、确定性合成透视、轮廓证据、ORB/AKAZE 特征、RANSAC 单应性、结构化失败原因、持久化审核、磁盘压力健康状态，以及默认只预览的旧草稿留存清理。2026-07-20 已以逐用户 Basic Auth 受控试点方式部署到 `https://cccsat.top/mb-repair-beta/`；运行方式、候选契约、运维命令和代理证据基准见 `docs/visual-qc-auto-registration-2026-07-20.md` 与 `docs/visual-qc-server-api-2026-07-20.md`。
+数据管理员工作台已接入受控服务器 QC 服务：支持批量导入回执、服务器案例目录、断点续传、原图恢复、任务轮询、自动候选叠图确认、人工四点回退、Golden Sample、差异热图和候选确认/驳回/暂缓。服务器侧包含批次与案例溯源、采集身份防污染、确定性合成透视、ORB/AKAZE 特征、RANSAC 单应性、结构化失败原因、持久化人工结论、磁盘压力健康状态和受控留存清理。受控试点部署在 `https://cccsat.top/mb-repair-beta/`；操作与数据边界见 `docs/visual-qc-capture-intake-spec-2026-07-20.md`、`docs/visual-qc-workbench-2026-07-17.md` 和 `docs/visual-qc-server-api-2026-07-20.md`。
 
-2026-07-20 的只读 P4 预检确认现有 beta 路由尚无认证，不能直接开放内部工程资料和图片上传。新的部署增量会先用逐用户 Nginx Basic Auth 保护整条 beta 路由，以网关注入的用户和角色驱动 QC API，并把 3020 绑定到回环地址；最终可在不改变 API 契约的情况下替换为公司 SSO/OIDC。部署与回滚步骤见 `docs/beta-deployment.md`。
+受控 beta 路由使用 Nginx Basic Auth，网关注入用户和权限，QC API 的 3020 端口只绑定回环地址。后端暂时沿用 `reviewer` 作为“数据管理员”权限的兼容值，不表示存在第二个人工审核角色；以后可在不改变业务数据契约的情况下替换为公司 SSO/OIDC。部署与回滚步骤见 `docs/beta-deployment.md`。
 
 ## 功能特性
 
@@ -104,9 +104,9 @@ python ai_proxy_server.py
 - **当前后端**：Python HTTP Server 代理（端口 8899）
 - **目标后端**：同域FastAPI服务、持久化QC任务、受控图片存储和CPU OpenCV Worker
 - **当前后端实现**：`visual_qc_server.py` 已提供版本化上传、SQLite任务恢复、图像质量证据、自动配准候选与人工四点回退；本地运行和部署边界见 `docs/visual-qc-server-api-2026-07-20.md`
-- **当前审核闭环**：服务器已支持配准审核、最终人工 QC 版本、Golden Sample版本化、差异热区、受控artifact以及维修员确认/驳回；全球站点拍摄与入库规范见 `docs/visual-qc-capture-intake-spec-2026-07-20.md`
-- **当前训练出口**：reviewer 可获取仅含训练合格实拍案例的 `VISUAL-QC-TRAINING-MANIFEST-V1`、对应原图和服务器即时生成的确定性 `VISUAL-QC-COCO-V1`；`VISUAL-QC-DATASET-BUNDLE-V1` 将清单、COCO、索引和原图封装为可复现 ZIP，`VISUAL-QC-DATASET-AUDIT-V1` 同时解释每个服务器案例当前被排除的首要门禁原因
-- **当前浏览器接入**：视觉 QC 工作台已支持同板正反面批次、拍摄确认门禁、本机草稿、受控上传、任务轮询、自动候选人工确认、四点回退、刷新恢复、Golden Sample 版本审核、差异热图和逐候选人工决策；审核员还可查看训练合格案例/标注/类别、排除案例和门禁原因，下钻具体板型/板面/案例，并下载清单、COCO 或完整数据包，维修员界面不显示该区
+- **当前数据闭环**：Milo 提供照片；Codex 通过批次清单验证和导入工具完成服务器入库，再在内部工作台完成配准、最终人工 QC、Golden Sample 版本化、差异候选决策和标注
+- **当前训练出口**：数据管理员可获取仅含训练合格实拍案例的 `VISUAL-QC-TRAINING-MANIFEST-V1`、对应原图和确定性 `VISUAL-QC-COCO-V1`；`VISUAL-QC-DATASET-BUNDLE-V1` 封装清单、COCO、索引和原图，`VISUAL-QC-DATASET-AUDIT-V1` 解释每个案例被排除的首要门禁原因
+- **当前浏览器接入**：内部视觉数据工作台支持服务器案例检索与恢复、任务状态、自动候选确认、四点回退、Golden Sample、差异热图和逐候选人工决策；海外维修员界面隐藏并由 API 拒绝所有照片入库和数据集工具
 - **当前案例契约**：本地历史基线保留 `VISUAL-QC-CASE-V1`；接入服务器的新案例使用 `VISUAL-QC-CASE-V2`，机器可读定义见 `knowledge-base/visual-qc-case-v2-schema.json`
 - **AI 平台**：Anthropic Claude / DeepSeek
 - **通信协议**：SSE (Server-Sent Events) 流式传输

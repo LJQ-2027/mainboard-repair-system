@@ -2,6 +2,10 @@
 
 This project is deployed as an isolated beta service on the same server used by CSAT.
 
+## Current Operating Model
+
+Milo is the only source of real visual photos. Codex is the data administrator for batch intake, registration correction, visible-defect annotation, Golden Sample management, and governed export. Overseas technicians do not upload visual photos and do not enter the internal visual data workbench. The gateway role string `reviewer` remains only as a wire-compatible identifier for data-administrator permissions.
+
 ## Isolation Rules
 
 - Remote directory: `/opt/motherboard-repair-beta`
@@ -25,7 +29,7 @@ The script packages the current Git `HEAD`, uploads it to the server, preserves 
 - PM2 process status
 
 The visual-QC pilot deploy uses `deploy/visual-qc-runtime-files.txt` as a
-reviewed runtime allowlist. It includes the technician UI, five-board assets,
+reviewed runtime allowlist. It includes the internal visual data workbench, five-board assets,
 knowledge data, API/worker code, and maintenance validators while excluding raw
 source archives, tests, reports, output, and documentation. The 2026-07-21
 archive smoke reduced the package from about 197 MB to 52.4 MB with 305 tracked
@@ -79,9 +83,11 @@ ANTHROPIC_API_KEY=...
 - Nginx config backup: `/etc/nginx/sites-available/sikayetvar.before-mb-repair-20260622_095918`
 - Current AI status: service is reachable, but `.env` still has no valid `ANTHROPIC_API_KEY`, so AI features are not enabled yet.
 - Latest P4 evidence: desktop and 390px workbench paths render with no fresh
-  console errors or horizontal overflow; technician/reviewer roles pass through
+  console errors or horizontal overflow; restricted/data-administrator wire roles pass through
   the HTTPS gateway; forged actor headers are overwritten; PM2 restart retains
   the persisted proxy case and completed registration job.
+
+The increment records below are historical deployment evidence. Their `technician` and `reviewer` labels describe the gateway wire roles tested at that time, not the current photo ownership or staffing model.
 - 2026-07-20 capture-intake increment: the authenticated production route
   exposes the compact physical-capture panel and actor-scoped capture-session
   API. Same-board front/back pairing, the three capture confirmations,
@@ -136,7 +142,7 @@ ANTHROPIC_API_KEY=...
 
 ## Approved Visual-QC Evolution
 
-The beta server remains the target technician entry for the visual-QC pilot. Physical-board photos are authorized for upload to this controlled server. The approved architecture adds a same-origin QC API, persisted image-processing jobs, controlled image storage, one or two CPU OpenCV workers, Golden Sample review, and candidate confirmation/rejection.
+The beta server remains the controlled host for the internal visual data workbench. Only the data-administrator path may upload Milo-provided physical-board photos. The approved architecture provides a same-origin QC API, persisted image-processing jobs, controlled image storage, one or two CPU OpenCV workers, Golden Sample management, and candidate confirmation/rejection.
 
 The server was inspected read-only on 2026-07-20: 4 x86_64 vCPU, 7.3 GB RAM, 4 GB swap, 19 GB free disk, Python 3.10, Node.js 20, no GPU, no installed OpenCV, and no active PostgreSQL or Redis. This supports a bounded CPU pilot, not deep-model training or unrestricted long-term image retention.
 
@@ -157,14 +163,14 @@ The bounded pilot deployment therefore adds:
 
 - per-user Nginx Basic Auth around the complete beta route;
 - `$remote_user` as the gateway-owned `X-Actor-Id`;
-- a server-owned reviewer map that fails closed to `technician`;
+- a server-owned data-administrator map that emits the compatibility role `reviewer` and otherwise fails closed to `technician`;
 - removal of client `Authorization` before proxying;
 - a loopback-only static/AI process on `127.0.0.1:3010`;
 - a loopback-only QC process on `127.0.0.1:3020`;
 - a commit-versioned QC runtime behind the stable
   `/opt/motherboard-repair-beta/venv-visual-qc` symlink;
 - persistent data outside the replaceable app directory;
-- Nginx, PM2, internal health, authenticated technician/reviewer identity,
+- Nginx, PM2, internal health, authenticated restricted/data-administrator wire identities,
   forged-header rejection, and unauthenticated-401 checks;
 - consistent SQLite backup plus automatic application, runtime, database, and
   gateway rollback on deployment failure.
@@ -177,9 +183,10 @@ Run the read-only gate first:
   -PreflightOnly
 ```
 
-Actual deployment additionally requires a local htpasswd file, reviewer-map
-file, and matching technician/reviewer credentials for the authenticated smoke
-test:
+Actual deployment additionally requires a local htpasswd file, data-administrator map,
+and matching restricted/data-administrator credentials for the authenticated smoke test.
+The PowerShell parameter names remain `TechnicianCredential` and
+`ReviewerCredential` for deployment-script compatibility:
 
 ```powershell
 $technician = Get-Credential -UserName "pilot-technician"
