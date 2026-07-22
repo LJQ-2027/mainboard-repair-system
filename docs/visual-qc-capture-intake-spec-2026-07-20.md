@@ -43,7 +43,7 @@ Create `VISUAL-QC-INTAKE-BATCH-V1` with `scripts/create_visual_qc_intake_batch.p
 
 The validator rejects the complete batch before upload when it finds an unsafe id, duplicate entry/path/session-side, unknown board/side, mixed session identity, incomplete checklist, unsupported signature, extension/MIME mismatch, decode failure, dimensions outside bounds, or hash mismatch. It never infers model or side from image content.
 
-The builder requires every board side to be assigned explicitly as `side_id=path`, leaves the source file unchanged, computes `expected_sha256` from the current bytes, and validates the completed manifest before publishing it. A batch may contain one side when photos arrive incrementally. Existing output is protected unless `--force` is supplied.
+The builder requires every board side to be assigned explicitly as `side_id=path`, leaves the source file unchanged, computes `expected_sha256` from the current bytes, and validates the completed manifest before publishing it. Physical source photos must be stored outside the Git repository; project assets, point maps, and manual proxy images are rejected so they cannot become `physical_capture`. Known engineering and reviewed manual-proxy SHA-256 fingerprints remain rejected after copy or rename. A batch may contain one side when photos arrive incrementally. Existing output is protected unless `--force` is supplied, and even forced output can never replace a source image.
 
 ## Capture Identity
 

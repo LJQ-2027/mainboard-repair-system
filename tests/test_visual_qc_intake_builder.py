@@ -137,13 +137,17 @@ class VisualQcIntakeBuilderTests(unittest.TestCase):
 
     def test_builder_rejects_repository_proxy_material(self):
         proxy = ROOT / "assets" / "board-atlas" / "km4-f151" / "main-point-map-page-1.png"
+        copied_proxy = self.root / "renamed-reference.png"
+        copied_proxy.write_bytes(proxy.read_bytes())
 
-        with self.assertRaisesRegex(
-            IntakeValidationError, "project reference or proxy image"
-        ):
-            build_intake_manifest(
-                **self.options(image_assignments=[("main_page_1", proxy)])
-            )
+        for path in (proxy, copied_proxy):
+            with self.subTest(path=path):
+                with self.assertRaisesRegex(
+                    IntakeValidationError, "reference or proxy image"
+                ):
+                    build_intake_manifest(
+                        **self.options(image_assignments=[("main_page_1", path)])
+                    )
 
     def test_create_manifest_writes_a_validator_compatible_file(self):
         output = self.root / "batch.intake.json"

@@ -53,7 +53,7 @@ def create_validated_intake_manifest(
 ) -> dict: ...
 ```
 
-Use `BoardCatalog`, `_image_evidence`, `_require_safe_id`, `CAPTURE_STAGES`, `BATCH_SCHEMA_VERSION`, `validate_intake_batch`, and `write_json_atomic` from existing modules. Reject missing confirmation, duplicates, unknown sides, and existing output unless `force=True`. Delete a newly written output if final validation fails.
+Use `BoardCatalog`, `_image_evidence`, `_require_safe_id`, `CAPTURE_STAGES`, `BATCH_SCHEMA_VERSION`, `validate_intake_batch`, and `write_json_atomic` from existing modules. Reject missing confirmation, duplicates, unknown sides, repository-contained sources, known proxy fingerprints after copy/rename, and existing output unless `force=True`. Never allow output to replace a source image. Publish without replacement when `force=False`, including when a competing target appears during validation.
 
 - [x] **Step 4: Run focused tests and verify pass**
 
@@ -76,7 +76,7 @@ git commit -m "feat: build validated visual QC intake manifests"
 
 - [x] **Step 1: Write failing direct-invocation CLI tests**
 
-Invoke the script through `subprocess` from a temporary working directory. Assert exit code `0` and a JSON summary for a valid image; assert exit code `2` and no manifest for missing checklist confirmation, malformed assignment, unknown side, invalid image, and protected existing output.
+Invoke the script through `subprocess` from a temporary working directory. Assert exit code `0` and a JSON summary for a valid image; assert exit code `2` and no manifest for parser errors, missing checklist confirmation, malformed assignment, unknown side, invalid or missing image, repository proxy material, and protected existing output.
 
 - [x] **Step 2: Run the focused tests and verify failure**
 
@@ -108,9 +108,9 @@ git commit -m "feat: add visual QC intake batch command"
 - Modify: `README.md`
 - Modify: `docs/superpowers/plans/2026-07-22-visual-qc-intake-batch-builder.md`
 
-- [x] **Step 1: Run the builder against two existing proxy images**
+- [x] **Step 1: Prove proxy rejection and build a temporary two-side plumbing batch**
 
-Use KM4's two known board-side engineering textures and write the generated manifest under a temporary directory. Do not add the generated manifest or receipt to Git.
+Assert KM4's known board-side engineering texture is rejected by the physical builder. Generate two temporary images outside the repository, write the generated manifest under a temporary directory, and do not add the generated manifest or receipt to Git.
 
 - [x] **Step 2: Run the existing importer in dry-run mode**
 
