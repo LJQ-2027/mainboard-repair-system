@@ -614,7 +614,7 @@ Run the committed `scripts/deploy-visual-qc-pilot.ps1` with credentials loaded f
 
 Repeat the desktop/mobile browser matrix against the authenticated production route. Update deployment facts, coordination ledger, Vault overview/task/risk cards, and the daily architecture check with actual commit ids and evidence. Commit the coordination ledger separately.
 
-- [ ] **Step 7: Perform Project Closeout Check**
+- [x] **Step 7: Perform Project Closeout Check**
 
 Confirm clean implementation and coordination worktrees, local commit history, no GitHub push attempt under the recorded mainland-network constraint, synchronized Vault/ledger facts, P0-P4 evidence, encoding health, and the remaining real-photo acceptance gate.
 
