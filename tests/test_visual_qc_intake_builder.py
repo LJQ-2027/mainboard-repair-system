@@ -149,6 +149,29 @@ class VisualQcIntakeBuilderTests(unittest.TestCase):
                         **self.options(image_assignments=[("main_page_1", path)])
                     )
 
+        review = json.loads(
+            (ROOT / "knowledge-base" / "vision-reference-review.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        reviewed_assets = [
+            ROOT / asset_path
+            for model in review["models"].values()
+            for asset_path, annotation in model["assets"].items()
+            if annotation["review_status"] == "approved"
+        ]
+        self.assertEqual(len(reviewed_assets), 21)
+        for index, reviewed_asset in enumerate(reviewed_assets):
+            copied = self.root / f"manual-proxy-{index:02d}{reviewed_asset.suffix}"
+            copied.write_bytes(reviewed_asset.read_bytes())
+            with self.subTest(reviewed_asset=reviewed_asset):
+                with self.assertRaisesRegex(
+                    IntakeValidationError, "known reference or proxy image"
+                ):
+                    build_intake_manifest(
+                        **self.options(image_assignments=[("main_page_1", copied)])
+                    )
+
     def test_create_manifest_writes_a_validator_compatible_file(self):
         output = self.root / "batch.intake.json"
 
@@ -356,6 +379,24 @@ class VisualQcIntakeBuilderCliTests(unittest.TestCase):
                 payload = json.loads(result.stdout)
                 self.assertEqual(payload["status"], "validation_failed")
                 self.assertEqual(result.stderr, "")
+
+    def test_invalid_batch_id_does_not_create_an_output_directory(self):
+        command = self.command("--confirm-capture-checklist")
+        batch_index = command.index("--batch-id")
+        command[batch_index + 1] = "created/by-invalid"
+
+        result = subprocess.run(
+            command,
+            cwd=self.root,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            check=False,
+        )
+
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("unsafe batch_id", json.loads(result.stdout)["message"])
+        self.assertFalse((self.root / "created").exists())
 
     def test_cli_protects_existing_output_and_force_replaces_it(self):
         output = self.root / "custom.json"

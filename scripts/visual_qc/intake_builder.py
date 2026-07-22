@@ -37,7 +37,17 @@ def _hash_file(path: Path) -> str:
 def _collect_proxy_paths(value: object, project_root: Path, result: set[Path]) -> None:
     if isinstance(value, dict):
         for key, item in value.items():
-            if key in {"asset_path", "proxy_image"} and isinstance(item, str):
+            if key == "assets" and isinstance(item, dict):
+                for asset_path, annotation in item.items():
+                    if (
+                        isinstance(asset_path, str)
+                        and isinstance(annotation, dict)
+                        and annotation.get("review_status") == "approved"
+                    ):
+                        candidate = (project_root / asset_path).resolve()
+                        if project_root in candidate.parents and candidate.is_file():
+                            result.add(candidate)
+            elif key in {"asset_path", "proxy_image"} and isinstance(item, str):
                 candidate = (project_root / item).resolve()
                 if project_root in candidate.parents and candidate.is_file():
                     result.add(candidate)
@@ -179,12 +189,19 @@ def create_validated_intake_manifest(
     output_path = Path(output_path).expanduser().resolve()
     if output_path.exists() and not force:
         raise IntakeValidationError(f"output already exists: {output_path}")
-    output_path.parent.mkdir(parents=True, exist_ok=True)
     manifest = build_intake_manifest(**builder_options)
     source_paths = {Path(entry["file_path"]).resolve() for entry in manifest["entries"]}
     if output_path in source_paths:
         raise IntakeValidationError("output path cannot replace a source image")
 
+    with tempfile.TemporaryDirectory(prefix="visual-qc-intake-validation-") as directory:
+        validation_path = Path(directory) / "manifest.json"
+        write_json_atomic(validation_path, manifest)
+        validated_batch = validate_intake_batch(
+            validation_path, Path(builder_options["project_root"])
+        )
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
     descriptor, temporary_name = tempfile.mkstemp(
         prefix=f".{output_path.name}.",
         suffix=".validation.json",
@@ -194,9 +211,6 @@ def create_validated_intake_manifest(
     temporary_path = Path(temporary_name)
     try:
         write_json_atomic(temporary_path, manifest)
-        validated_batch = validate_intake_batch(
-            temporary_path, Path(builder_options["project_root"])
-        )
         if force:
             os.replace(temporary_path, output_path)
         else:
