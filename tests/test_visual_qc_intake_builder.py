@@ -164,6 +164,20 @@ class VisualQcIntakeBuilderTests(unittest.TestCase):
         )
         self.assertEqual(result["manifest"]["batch_id"], "km4-physical-001")
 
+    def test_force_cannot_replace_a_source_image(self):
+        original = self.front.read_bytes()
+
+        with self.assertRaisesRegex(
+            IntakeValidationError, "cannot replace a source image"
+        ):
+            create_validated_intake_manifest(
+                output_path=self.front,
+                force=True,
+                **self.options(image_assignments=[("main_page_1", self.front)]),
+            )
+
+        self.assertEqual(self.front.read_bytes(), original)
+
 
 class VisualQcIntakeBuilderCliTests(unittest.TestCase):
     def setUp(self):

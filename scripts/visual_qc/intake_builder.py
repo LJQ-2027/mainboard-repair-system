@@ -119,6 +119,9 @@ def create_validated_intake_manifest(
         raise IntakeValidationError(f"output already exists: {output_path}")
     output_path.parent.mkdir(parents=True, exist_ok=True)
     manifest = build_intake_manifest(**builder_options)
+    source_paths = {Path(entry["file_path"]).resolve() for entry in manifest["entries"]}
+    if output_path in source_paths:
+        raise IntakeValidationError("output path cannot replace a source image")
 
     descriptor, temporary_name = tempfile.mkstemp(
         prefix=f".{output_path.name}.",
