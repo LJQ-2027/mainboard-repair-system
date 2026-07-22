@@ -32,7 +32,7 @@ The pilot accepts JPEG, PNG, and WebP up to its configured 20 MB limit. The hard
 
 ## Batch Manifest
 
-Create `VISUAL-QC-INTAKE-BATCH-V1` from `knowledge-base/visual-qc-intake-batch.example.json`. Each entry contains:
+Create `VISUAL-QC-INTAKE-BATCH-V1` with `scripts/create_visual_qc_intake_batch.py`. `knowledge-base/visual-qc-intake-batch.example.json` remains a contract example, not the normal authoring path. Each entry contains:
 
 - `entry_id` and `file_path`;
 - `board_key` and `side_id` from the five-board catalog;
@@ -43,6 +43,8 @@ Create `VISUAL-QC-INTAKE-BATCH-V1` from `knowledge-base/visual-qc-intake-batch.e
 
 The validator rejects the complete batch before upload when it finds an unsafe id, duplicate entry/path/session-side, unknown board/side, mixed session identity, incomplete checklist, unsupported signature, extension/MIME mismatch, decode failure, dimensions outside bounds, or hash mismatch. It never infers model or side from image content.
 
+The builder requires every board side to be assigned explicitly as `side_id=path`, leaves the source file unchanged, computes `expected_sha256` from the current bytes, and validates the completed manifest before publishing it. A batch may contain one side when photos arrive incrementally. Existing output is protected unless `--force` is supplied.
+
 ## Capture Identity
 
 `capture_setup_id` names one repeatable optical arrangement, including camera/lens, stand, background, light arrangement, orientation, and approximate distance. Changing that arrangement creates a new setup id.
@@ -51,19 +53,36 @@ The validator rejects the complete batch before upload when it finds an unsafe i
 
 ## Intake Procedure
 
+Create the manifest after Codex has checked the stated board/side, focus and lens cleanliness, and lighting/occlusion conditions:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\create_visual_qc_intake_batch.py `
+  --batch-id km4-physical-001 `
+  --board-key km4-f151 `
+  --capture-session-id km4-unit-001 `
+  --capture-stage golden_reference `
+  --capture-setup-id standard-bench `
+  --image "main_page_1=C:\controlled-source\km4-front.jpg" `
+  --image "main_page_2=C:\controlled-source\km4-back.jpg" `
+  --confirm-capture-checklist `
+  --output C:\controlled-source\km4-physical-001.intake.json
+```
+
+`--confirm-capture-checklist` records an explicit completed intake check; it is not an automatic quality score. The command does not infer which image is front/back and does not require both sides in one batch. Use the source-declared `side_id` values from the board catalog.
+
 Run validation without network writes:
 
 ```powershell
-python -m scripts.import_visual_qc_batch C:\controlled-source\batch.json `
-  --receipt C:\controlled-source\batch.receipt.json `
+.\.venv\Scripts\python.exe scripts\import_visual_qc_batch.py C:\controlled-source\km4-physical-001.intake.json `
+  --receipt C:\controlled-source\km4-physical-001.receipt.json `
   --dry-run
 ```
 
 Then import through the controlled HTTPS API:
 
 ```powershell
-python -m scripts.import_visual_qc_batch C:\controlled-source\batch.json `
-  --receipt C:\controlled-source\batch.receipt.json `
+.\.venv\Scripts\python.exe scripts\import_visual_qc_batch.py C:\controlled-source\km4-physical-001.intake.json `
+  --receipt C:\controlled-source\km4-physical-001.receipt.json `
   --api-base https://cccsat.top/mb-repair-beta/api/v1/visual-qc `
   --credential-file C:\secure\visual-qc-credential.json `
   --actor-id OWNER_ID `
