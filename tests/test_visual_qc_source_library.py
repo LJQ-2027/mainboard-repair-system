@@ -177,6 +177,9 @@ class VisualQcSourcePackageTests(unittest.TestCase):
             )
         self.assertFalse((ROOT / ".local" / "visual-source-library").exists())
 
+        with self.assertRaisesRegex(IntakeValidationError, "outside the project repository"):
+            build_source_package(**self.options(library_root=ROOT.parent))
+
     def test_existing_intake_validation_rejects_duplicates_and_invalid_images(self):
         with self.assertRaisesRegex(IntakeValidationError, "duplicate side_id"):
             build_source_package(

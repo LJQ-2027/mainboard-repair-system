@@ -28,15 +28,15 @@ Orphaned objects are informational because failed no-clobber publication may saf
 - `schema_version`;
 - `status`: `healthy`, `attention`, or `issues`;
 - `counts`: package/object totals and category totals;
-- sorted `packages`, `invalid_objects`, and `orphaned_objects` arrays.
+- sorted `packages`, `invalid_objects`, `orphaned_objects`, and `library_issues` arrays.
 
-Each package record contains only its safe directory id, status, entry count when valid, and stable error code/message when invalid. Object records use library-relative POSIX paths and stable reasons. `healthy` means no issues and no orphans; `attention` means orphan-only; `issues` means at least one invalid/incomplete package or invalid object.
+Each package record contains only its safe directory id, status, entry count when valid, and stable error code/message when invalid. Object and library-structure records use library-relative POSIX paths and stable reasons. Infrastructure findings such as unsafe lock/root paths do not inflate package or object totals. `healthy` means no issues and no orphans; `attention` means orphan-only; `issues` means at least one invalid/incomplete package, invalid object, or library-structure issue.
 
 ## Scan Rules
 
 1. Require an existing directory outside the repository and reject the library root or controlled children when a visible symlink/reparse point is encountered.
 2. Enumerate package directories deterministically, excluding the internal `.locks` directory.
-3. Require a regular, controlled `.complete` marker and `source-package.json`; then call `validate_source_package` so board identity, manifest contract, current proxy inventory, object integrity, and intake compatibility retain one authority.
+3. Require a regular, controlled `.complete` marker, `source-package.json`, and matching `<batch-id>.intake.json`; call both package and intake validators and compare the intake with its deterministic package-derived form.
 4. Count referenced objects only from valid packages.
 5. Enumerate files under `objects/originals` and require the canonical `<two-hex-prefix>/<lowercase-sha256>.<jpg|png|webp>` shape, exact SHA-256, matching prefix, valid image evidence, and no symlink/reparse path.
 6. Report a valid canonical object as orphaned when no valid package references it.

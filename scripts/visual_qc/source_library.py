@@ -222,7 +222,11 @@ def _package_lock(packages_root: Path, package_id: str):
 def _resolve_library_root(project_root: Path, library_root: Path) -> Path:
     project_root = Path(project_root).resolve()
     library_root = Path(library_root).expanduser().resolve()
-    if library_root == project_root or project_root in library_root.parents:
+    if (
+        library_root == project_root
+        or project_root in library_root.parents
+        or library_root in project_root.parents
+    ):
         raise IntakeValidationError(
             "controlled source library must be outside the project repository"
         )

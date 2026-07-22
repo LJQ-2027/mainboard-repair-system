@@ -76,6 +76,15 @@ Preserve the source package after Codex has confirmed that Milo supplied the phy
 
 The command returns the committed `source-package.json` and intake-manifest paths. An identical rerun returns `reused`; the same package id with different content or metadata fails as a conflict. `--confirm-milo-physical-source` records operator-confirmed provenance, while `--confirm-capture-checklist` records the completed intake check; neither is an automatic classifier or quality score. The command does not infer which image is front/back and does not require both sides in one batch. Use the source-declared `side_id` values from the board catalog.
 
+Run the deterministic read-only library audit before importer validation or upload:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\audit_visual_qc_source_library.py `
+  --library-root D:\Visual-QC-Controlled-Source
+```
+
+`healthy` and orphan-only `attention` return exit code `0`; integrity `issues` return `1`; invalid arguments or a missing/invalid library root return `2`. Orphaned content-addressed objects are informational because a failed no-clobber package publish may leave safe reusable bytes. The audit never deletes, repairs, uploads, or changes evidence.
+
 Run validation without network writes:
 
 ```powershell
