@@ -4,6 +4,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 import cv2
@@ -134,6 +135,16 @@ class VisualQcIntakeBuilderTests(unittest.TestCase):
                 **self.options(image_assignments=[("main_page_1", broken)])
             )
 
+    def test_builder_rejects_repository_proxy_material(self):
+        proxy = ROOT / "assets" / "board-atlas" / "km4-f151" / "main-point-map-page-1.png"
+
+        with self.assertRaisesRegex(
+            IntakeValidationError, "project reference or proxy image"
+        ):
+            build_intake_manifest(
+                **self.options(image_assignments=[("main_page_1", proxy)])
+            )
+
     def test_create_manifest_writes_a_validator_compatible_file(self):
         output = self.root / "batch.intake.json"
 
@@ -177,6 +188,29 @@ class VisualQcIntakeBuilderTests(unittest.TestCase):
             )
 
         self.assertEqual(self.front.read_bytes(), original)
+
+    def test_non_force_publish_never_overwrites_a_concurrently_created_file(self):
+        output = self.root / "race.intake.json"
+        real_validate = validate_intake_batch
+
+        def validate_after_competing_create(manifest_path, project_root):
+            validated = real_validate(manifest_path, project_root)
+            output.write_text("PROTECTED\n", encoding="utf-8")
+            return validated
+
+        with patch(
+            "scripts.visual_qc.intake_builder.validate_intake_batch",
+            side_effect=validate_after_competing_create,
+        ):
+            with self.assertRaisesRegex(
+                IntakeValidationError, "appeared while the manifest was being validated"
+            ):
+                create_validated_intake_manifest(
+                    output_path=output,
+                    **self.options(),
+                )
+
+        self.assertEqual(output.read_text(encoding="utf-8"), "PROTECTED\n")
 
 
 class VisualQcIntakeBuilderCliTests(unittest.TestCase):
@@ -273,6 +307,51 @@ class VisualQcIntakeBuilderCliTests(unittest.TestCase):
                 )
                 self.assertEqual(result.returncode, 2)
                 self.assertIn(message, json.loads(result.stdout)["message"])
+
+    def test_cli_reports_missing_image_as_validation_failure(self):
+        missing = self.root / "missing.jpg"
+        command = self.command("--confirm-capture-checklist")
+        image_index = command.index("--image")
+        command[image_index + 1] = f"main_page_1={missing}"
+
+        result = subprocess.run(
+            command,
+            cwd=self.root,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            check=False,
+        )
+
+        self.assertEqual(result.returncode, 2)
+        payload = json.loads(result.stdout)
+        self.assertEqual(payload["status"], "validation_failed")
+        self.assertIn("does not exist", payload["message"])
+
+    def test_argparse_errors_are_machine_readable_validation_failures(self):
+        cases = [
+            [sys.executable, str(self.script)],
+            [
+                *self.command("--confirm-capture-checklist"),
+                "--capture-stage",
+                "not-a-stage",
+            ],
+        ]
+
+        for command in cases:
+            with self.subTest(command=command):
+                result = subprocess.run(
+                    command,
+                    cwd=self.root,
+                    capture_output=True,
+                    text=True,
+                    encoding="utf-8",
+                    check=False,
+                )
+                self.assertEqual(result.returncode, 2)
+                payload = json.loads(result.stdout)
+                self.assertEqual(payload["status"], "validation_failed")
+                self.assertEqual(result.stderr, "")
 
     def test_cli_protects_existing_output_and_force_replaces_it(self):
         output = self.root / "custom.json"

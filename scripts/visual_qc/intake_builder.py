@@ -58,7 +58,8 @@ def build_intake_manifest(
     if not image_assignments:
         raise IntakeValidationError("at least one image assignment is required")
 
-    catalog = BoardCatalog(Path(project_root))
+    project_root = Path(project_root).resolve()
+    catalog = BoardCatalog(project_root)
     try:
         catalog.resolve_board(board_key)
     except CatalogError as exc:
@@ -82,6 +83,12 @@ def build_intake_manifest(
         if path in seen_paths:
             raise IntakeValidationError(f"duplicate resolved image path: {path}")
         seen_paths.add(path)
+        if not path.is_file():
+            raise IntakeValidationError(f"image file does not exist: {path}")
+        if path == project_root or project_root in path.parents:
+            raise IntakeValidationError(
+                "project reference or proxy image cannot enter physical intake"
+            )
         evidence = _image_evidence(path)
 
         entry_id = _require_safe_id(
@@ -135,7 +142,16 @@ def create_validated_intake_manifest(
         validated_batch = validate_intake_batch(
             temporary_path, Path(builder_options["project_root"])
         )
-        os.replace(temporary_path, output_path)
+        if force:
+            os.replace(temporary_path, output_path)
+        else:
+            try:
+                os.link(temporary_path, output_path)
+            except FileExistsError as exc:
+                raise IntakeValidationError(
+                    "output appeared while the manifest was being validated"
+                ) from exc
+            temporary_path.unlink()
     finally:
         temporary_path.unlink(missing_ok=True)
 

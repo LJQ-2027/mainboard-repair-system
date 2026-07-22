@@ -17,8 +17,13 @@ from scripts.visual_qc.intake_builder import (
 )
 
 
+class ValidationArgumentParser(argparse.ArgumentParser):
+    def error(self, message: str) -> None:
+        raise IntakeValidationError(message)
+
+
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(
+    parser = ValidationArgumentParser(
         description="Create a validated owner-managed Visual-QC intake batch."
     )
     parser.add_argument("--batch-id", required=True)
@@ -42,9 +47,11 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
-    arguments = build_parser().parse_args(argv)
-    output_path = arguments.output or Path.cwd() / f"{arguments.batch_id}.intake.json"
     try:
+        arguments = build_parser().parse_args(argv)
+        output_path = (
+            arguments.output or Path.cwd() / f"{arguments.batch_id}.intake.json"
+        )
         assignments = [parse_image_assignment(raw) for raw in arguments.image]
         result = create_validated_intake_manifest(
             output_path=output_path,
