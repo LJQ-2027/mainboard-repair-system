@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "VISUAL-QC-SOURCE-PACKAGE-V1",
+  "title": "Owner-managed visual QC controlled source package",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "package_id",
+    "batch_id",
+    "source_origin",
+    "physical_source_confirmed",
+    "board_key",
+    "board_id",
+    "capture_stage",
+    "capture_session_id",
+    "capture_setup_id",
+    "capture_checklist",
+    "entries"
+  ],
+  "properties": {
+    "schema_version": {"const": "VISUAL-QC-SOURCE-PACKAGE-V1"},
+    "package_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+    "batch_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+    "source_origin": {"const": "milo_supplied"},
+    "physical_source_confirmed": {"const": true},
+    "board_key": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+    "board_id": {"type": "string", "minLength": 1},
+    "capture_stage": {"enum": ["golden_reference", "before_repair", "after_repair"]},
+    "capture_session_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+    "capture_setup_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+    "capture_checklist": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["board_and_side_confirmed", "focus_and_lens_confirmed", "lighting_and_occlusion_confirmed"],
+      "properties": {
+        "board_and_side_confirmed": {"const": true},
+        "focus_and_lens_confirmed": {"const": true},
+        "lighting_and_occlusion_confirmed": {"const": true}
+      }
+    },
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 500,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["entry_id", "side_id", "original_filename", "object_path", "mime_type", "width", "height", "byte_size", "sha256"],
+        "properties": {
+          "entry_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+          "side_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+          "original_filename": {"type": "string", "minLength": 1},
+          "object_path": {"type": "string", "pattern": "^objects/originals/[0-9a-f]{2}/[0-9a-f]{64}\\.(jpg|png|webp)$"},
+          "mime_type": {"enum": ["image/jpeg", "image/png", "image/webp"]},
+          "width": {"type": "integer", "minimum": 64, "maximum": 20000},
+          "height": {"type": "integer", "minimum": 64, "maximum": 20000},
+          "byte_size": {"type": "integer", "minimum": 1, "maximum": 104857600},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    }
+  }
+}
