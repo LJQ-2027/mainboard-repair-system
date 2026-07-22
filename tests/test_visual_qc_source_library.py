@@ -1,5 +1,7 @@
 import hashlib
 import json
+import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -310,6 +312,114 @@ class VisualQcSourcePackageTests(unittest.TestCase):
         self.assertFalse(
             (self.library / "packages" / "km4-unit-001-source").exists()
         )
+
+
+class VisualQcSourcePackageCliTests(unittest.TestCase):
+    def setUp(self):
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.root = Path(self.temp_dir.name)
+        self.library = self.root / "library"
+        self.front = self.root / "front.jpg"
+        self.back = self.root / "back.png"
+        self.front.write_bytes(encode_image(".jpg", value=150))
+        self.back.write_bytes(encode_image(".png", value=90))
+        self.script = ROOT / "scripts" / "stage_visual_qc_source_package.py"
+
+    def tearDown(self):
+        self.temp_dir.cleanup()
+
+    def command(self, *extra):
+        return [
+            sys.executable,
+            str(self.script),
+            "--library-root",
+            str(self.library),
+            "--package-id",
+            "km4-cli-source",
+            "--batch-id",
+            "km4-cli-batch",
+            "--board-key",
+            "km4-f151",
+            "--capture-session-id",
+            "km4-cli-unit",
+            "--capture-stage",
+            "before_repair",
+            "--image",
+            f"main_page_1={self.front}",
+            "--image",
+            f"main_page_2={self.back}",
+            *extra,
+        ]
+
+    def run_cli(self, *extra):
+        return subprocess.run(
+            self.command(*extra),
+            cwd=self.root,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            check=False,
+        )
+
+    def test_direct_invocation_creates_then_reuses_the_package(self):
+        confirmations = (
+            "--confirm-milo-physical-source",
+            "--confirm-capture-checklist",
+        )
+        created = self.run_cli(*confirmations)
+
+        self.assertEqual(created.returncode, 0, created.stderr or created.stdout)
+        created_payload = json.loads(created.stdout)
+        self.assertEqual(created_payload["status"], "ok")
+        self.assertEqual(created_payload["state"], "created")
+        self.assertEqual(created_payload["package_id"], "km4-cli-source")
+        self.assertEqual(created_payload["batch_id"], "km4-cli-batch")
+        self.assertEqual(created_payload["entry_count"], 2)
+        self.assertTrue(Path(created_payload["source_package"]).is_file())
+        self.assertTrue(Path(created_payload["intake_manifest"]).is_file())
+
+        reused = self.run_cli(*confirmations)
+        self.assertEqual(reused.returncode, 0, reused.stderr or reused.stdout)
+        self.assertEqual(json.loads(reused.stdout)["state"], "reused")
+
+    def test_cli_requires_both_explicit_confirmations_without_writes(self):
+        result = self.run_cli("--confirm-capture-checklist")
+
+        self.assertEqual(result.returncode, 2)
+        payload = json.loads(result.stdout)
+        self.assertEqual(payload["status"], "validation_failed")
+        self.assertIn("Milo-supplied physical source", payload["message"])
+        self.assertEqual(result.stderr, "")
+        self.assertFalse(self.library.exists())
+
+    def test_parser_errors_are_machine_readable_and_do_not_create_library(self):
+        cases = [
+            [sys.executable, str(self.script)],
+            [
+                *self.command(
+                    "--confirm-milo-physical-source",
+                    "--confirm-capture-checklist",
+                ),
+                "--capture-stage",
+                "invalid-stage",
+            ],
+        ]
+        for command in cases:
+            with self.subTest(command=command):
+                result = subprocess.run(
+                    command,
+                    cwd=self.root,
+                    capture_output=True,
+                    text=True,
+                    encoding="utf-8",
+                    check=False,
+                )
+                self.assertEqual(result.returncode, 2)
+                self.assertEqual(
+                    json.loads(result.stdout)["status"], "validation_failed"
+                )
+                self.assertEqual(result.stderr, "")
+                self.assertFalse(self.library.exists())
 
 
 if __name__ == "__main__":
