@@ -2,15 +2,21 @@ import hashlib
 import json
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 import cv2
 import numpy as np
 
-from scripts.visual_qc.intake import IntakeValidationError, write_json_atomic
+from scripts.visual_qc.intake import (
+    IntakeValidationError,
+    validate_intake_batch,
+    write_json_atomic,
+)
 from scripts.visual_qc.source_library import (
     SOURCE_PACKAGE_SCHEMA_VERSION,
     build_source_package,
+    stage_source_package,
     validate_source_package,
 )
 
@@ -195,6 +201,115 @@ class VisualQcSourcePackageTests(unittest.TestCase):
         object_path.write_bytes(b"corrupted")
         with self.assertRaisesRegex(IntakeValidationError, "object integrity"):
             validate_source_package(manifest_path, ROOT, self.library)
+
+    def test_stage_preserves_exact_bytes_and_creates_compatible_manifests(self):
+        original_front = self.front.read_bytes()
+        original_back = self.back.read_bytes()
+
+        result = stage_source_package(**self.options())
+
+        self.assertEqual(result["state"], "created")
+        self.assertEqual(result["entry_count"], 2)
+        self.assertEqual(
+            result["source_package_path"],
+            (
+                self.library
+                / "packages"
+                / "km4-unit-001-source"
+                / "source-package.json"
+            ).resolve(),
+        )
+        self.assertEqual(
+            result["intake_manifest_path"],
+            (
+                self.library
+                / "packages"
+                / "km4-unit-001-source"
+                / "km4-unit-001-batch.intake.json"
+            ).resolve(),
+        )
+        validated_source = validate_source_package(
+            result["source_package_path"], ROOT, self.library
+        )
+        validated_intake = validate_intake_batch(result["intake_manifest_path"], ROOT)
+        self.assertEqual(len(validated_source["entries"]), 2)
+        self.assertEqual(len(validated_intake["entries"]), 2)
+        by_side = {entry["side_id"]: entry for entry in validated_source["entries"]}
+        self.assertEqual(
+            by_side["main_page_1"]["object_file"].read_bytes(), original_front
+        )
+        self.assertEqual(
+            by_side["main_page_2"]["object_file"].read_bytes(), original_back
+        )
+        self.assertEqual(self.front.read_bytes(), original_front)
+        self.assertEqual(self.back.read_bytes(), original_back)
+
+    def test_identical_stage_is_idempotently_reused(self):
+        created = stage_source_package(**self.options())
+        first_source_bytes = created["source_package_path"].read_bytes()
+        first_intake_bytes = created["intake_manifest_path"].read_bytes()
+
+        reused = stage_source_package(**self.options())
+
+        self.assertEqual(reused["state"], "reused")
+        self.assertEqual(reused["source_package_path"].read_bytes(), first_source_bytes)
+        self.assertEqual(reused["intake_manifest_path"].read_bytes(), first_intake_bytes)
+
+    def test_existing_package_rejects_changed_content_or_metadata(self):
+        created = stage_source_package(**self.options())
+        committed = created["source_package_path"].read_bytes()
+
+        changed = self.root / "changed-front.jpeg"
+        changed.write_bytes(encode_image(".jpg", value=40))
+        with self.assertRaisesRegex(IntakeValidationError, "package conflict"):
+            stage_source_package(
+                **self.options(
+                    image_assignments=[
+                        ("main_page_1", changed),
+                        ("main_page_2", self.back),
+                    ]
+                )
+            )
+        with self.assertRaisesRegex(IntakeValidationError, "package conflict"):
+            stage_source_package(
+                **self.options(capture_stage="after_repair")
+            )
+        self.assertEqual(created["source_package_path"].read_bytes(), committed)
+
+    def test_corrupted_existing_object_fails_closed(self):
+        result = stage_source_package(**self.options())
+        payload = json.loads(result["source_package_path"].read_text(encoding="utf-8"))
+        object_file = self.library / payload["entries"][0]["object_path"]
+        object_file.write_bytes(b"corrupted")
+
+        with self.assertRaisesRegex(IntakeValidationError, "object integrity"):
+            stage_source_package(**self.options())
+
+    def test_conflicting_preexisting_object_is_not_replaced(self):
+        payload = build_source_package(**self.options())
+        object_file = self.library / payload["entries"][0]["object_path"]
+        object_file.parent.mkdir(parents=True)
+        object_file.write_bytes(b"PROTECTED")
+
+        with self.assertRaisesRegex(IntakeValidationError, "object integrity"):
+            stage_source_package(**self.options())
+
+        self.assertEqual(object_file.read_bytes(), b"PROTECTED")
+        self.assertFalse(
+            (self.library / "packages" / payload["package_id"]).exists()
+        )
+
+    def test_intake_failure_does_not_publish_partial_package(self):
+        with patch(
+            "scripts.visual_qc.source_library.create_validated_intake_manifest",
+            side_effect=IntakeValidationError("injected intake failure"),
+        ):
+            with self.assertRaisesRegex(IntakeValidationError, "injected intake failure"):
+                stage_source_package(**self.options())
+
+        self.assertFalse(
+            (self.library / "packages" / "km4-unit-001-source").exists()
+        )
 
 
 if __name__ == "__main__":

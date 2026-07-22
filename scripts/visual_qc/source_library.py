@@ -1,8 +1,12 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
+import os
 from pathlib import Path
+import shutil
+import tempfile
 
 from scripts.visual_qc.intake import (
     CAPTURE_STAGES,
@@ -11,8 +15,13 @@ from scripts.visual_qc.intake import (
     SHA256,
     _image_evidence,
     _require_safe_id,
+    validate_intake_batch,
+    write_json_atomic,
 )
-from scripts.visual_qc.intake_builder import build_intake_manifest
+from scripts.visual_qc.intake_builder import (
+    build_intake_manifest,
+    create_validated_intake_manifest,
+)
 from scripts.visual_qc.server.catalog import BoardCatalog, CatalogError
 from scripts.visual_qc.server.storage import MIME_EXTENSIONS
 
@@ -246,3 +255,221 @@ def validate_source_package(
         "capture_session_id": session_id,
         "capture_setup_id": setup_id,
     }
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _assert_object_integrity(path: Path, expected_sha256: str) -> None:
+    try:
+        actual = _sha256_file(path)
+    except OSError as exc:
+        raise IntakeValidationError(f"object integrity failure: {path}") from exc
+    if actual != expected_sha256:
+        raise IntakeValidationError(f"object integrity mismatch: {path}")
+
+
+def _store_object(source: Path, destination: Path, expected_sha256: str) -> None:
+    if destination.exists():
+        _assert_object_integrity(destination, expected_sha256)
+        return
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    descriptor, temporary_name = tempfile.mkstemp(
+        prefix=f".{expected_sha256}.", suffix=".staging", dir=destination.parent
+    )
+    temporary_path = Path(temporary_name)
+    try:
+        with os.fdopen(descriptor, "wb") as target, source.open("rb") as incoming:
+            shutil.copyfileobj(incoming, target, length=1024 * 1024)
+            target.flush()
+            os.fsync(target.fileno())
+        _assert_object_integrity(temporary_path, expected_sha256)
+        try:
+            os.link(temporary_path, destination)
+        except FileExistsError:
+            _assert_object_integrity(destination, expected_sha256)
+        temporary_path.unlink()
+    finally:
+        temporary_path.unlink(missing_ok=True)
+
+
+def _archived_assignments(payload: dict, library_root: Path) -> list[tuple[str, Path]]:
+    return [
+        (entry["side_id"], library_root / entry["object_path"])
+        for entry in payload["entries"]
+    ]
+
+
+def _build_archived_intake(payload: dict, project_root: Path, library_root: Path) -> dict:
+    return build_intake_manifest(
+        project_root=project_root,
+        batch_id=payload["batch_id"],
+        board_key=payload["board_key"],
+        capture_session_id=payload["capture_session_id"],
+        capture_stage=payload["capture_stage"],
+        capture_setup_id=payload["capture_setup_id"],
+        image_assignments=_archived_assignments(payload, library_root),
+        capture_checklist_confirmed=True,
+    )
+
+
+def _result(
+    *, package_dir: Path, payload: dict, state: str, validated_source: dict
+) -> dict:
+    return {
+        "state": state,
+        "package_id": payload["package_id"],
+        "batch_id": payload["batch_id"],
+        "entry_count": len(payload["entries"]),
+        "source_package_path": (
+            package_dir / "source-package.json"
+        ).resolve(),
+        "intake_manifest_path": (
+            package_dir / f"{payload['batch_id']}.intake.json"
+        ).resolve(),
+        "validated_source_package": validated_source,
+    }
+
+
+def _reuse_existing_package(
+    *,
+    package_dir: Path,
+    requested_payload: dict,
+    project_root: Path,
+    library_root: Path,
+) -> dict:
+    source_path = package_dir / "source-package.json"
+    existing_payload = _read_package(source_path)
+    validated_source = validate_source_package(
+        source_path, project_root, library_root
+    )
+    if existing_payload != requested_payload:
+        raise IntakeValidationError(
+            f"source package conflict: {requested_payload['package_id']}"
+        )
+
+    intake_path = package_dir / f"{requested_payload['batch_id']}.intake.json"
+    expected_intake = _build_archived_intake(
+        requested_payload, project_root, library_root
+    )
+    try:
+        existing_intake = json.loads(intake_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise IntakeValidationError("source package intake manifest is invalid") from exc
+    if existing_intake != expected_intake:
+        raise IntakeValidationError(
+            f"source package conflict: {requested_payload['package_id']}"
+        )
+    validate_intake_batch(intake_path, project_root)
+    return _result(
+        package_dir=package_dir,
+        payload=requested_payload,
+        state="reused",
+        validated_source=validated_source,
+    )
+
+
+def stage_source_package(
+    *,
+    project_root: Path,
+    library_root: Path,
+    package_id: str,
+    batch_id: str,
+    board_key: str,
+    capture_session_id: str,
+    capture_stage: str,
+    capture_setup_id: str,
+    image_assignments: list[tuple[str, Path]],
+    milo_physical_source_confirmed: bool,
+    capture_checklist_confirmed: bool,
+) -> dict:
+    project_root = Path(project_root).resolve()
+    library_root = _resolve_library_root(project_root, library_root)
+    options = {
+        "project_root": project_root,
+        "library_root": library_root,
+        "package_id": package_id,
+        "batch_id": batch_id,
+        "board_key": board_key,
+        "capture_session_id": capture_session_id,
+        "capture_stage": capture_stage,
+        "capture_setup_id": capture_setup_id,
+        "image_assignments": image_assignments,
+        "milo_physical_source_confirmed": milo_physical_source_confirmed,
+        "capture_checklist_confirmed": capture_checklist_confirmed,
+    }
+    payload = build_source_package(**options)
+    package_dir = library_root / "packages" / payload["package_id"]
+    if package_dir.exists():
+        return _reuse_existing_package(
+            package_dir=package_dir,
+            requested_payload=payload,
+            project_root=project_root,
+            library_root=library_root,
+        )
+
+    sources = {
+        side_id: Path(path).expanduser().resolve()
+        for side_id, path in image_assignments
+    }
+    for entry in payload["entries"]:
+        _store_object(
+            sources[entry["side_id"]],
+            library_root / entry["object_path"],
+            entry["sha256"],
+        )
+
+    packages_root = library_root / "packages"
+    packages_root.mkdir(parents=True, exist_ok=True)
+    temporary_dir = Path(
+        tempfile.mkdtemp(prefix=f".{payload['package_id']}.", dir=packages_root)
+    )
+    try:
+        write_json_atomic(temporary_dir / "source-package.json", payload)
+        intake_result = create_validated_intake_manifest(
+            output_path=temporary_dir / f"{payload['batch_id']}.intake.json",
+            project_root=project_root,
+            batch_id=payload["batch_id"],
+            board_key=payload["board_key"],
+            capture_session_id=payload["capture_session_id"],
+            capture_stage=payload["capture_stage"],
+            capture_setup_id=payload["capture_setup_id"],
+            image_assignments=_archived_assignments(payload, library_root),
+            capture_checklist_confirmed=True,
+        )
+        if intake_result["manifest"] != _build_archived_intake(
+            payload, project_root, library_root
+        ):
+            raise IntakeValidationError("archived intake manifest is not deterministic")
+        try:
+            os.rename(temporary_dir, package_dir)
+        except OSError:
+            if not package_dir.exists():
+                raise
+            return _reuse_existing_package(
+                package_dir=package_dir,
+                requested_payload=payload,
+                project_root=project_root,
+                library_root=library_root,
+            )
+    finally:
+        if temporary_dir.exists():
+            shutil.rmtree(temporary_dir)
+
+    validated_source = validate_source_package(
+        package_dir / "source-package.json", project_root, library_root
+    )
+    validate_intake_batch(
+        package_dir / f"{payload['batch_id']}.intake.json", project_root
+    )
+    return _result(
+        package_dir=package_dir,
+        payload=payload,
+        state="created",
+        validated_source=validated_source,
+    )
