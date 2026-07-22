@@ -3,6 +3,8 @@ from contextlib import redirect_stdout
 import hashlib
 from io import StringIO
 import json
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -376,6 +378,19 @@ class VisualQcIntakeTests(unittest.TestCase):
             allow_http_localhost=True,
         )
         self.assertEqual(transport.api_base, "http://127.0.0.1:3020/api/v1/visual-qc")
+
+    def test_script_help_runs_directly_from_repository_root(self):
+        result = subprocess.run(
+            [sys.executable, "scripts/import_visual_qc_batch.py", "--help"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            check=False,
+        )
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("owner-managed Visual-QC photo batch", result.stdout)
 
 
 if __name__ == "__main__":

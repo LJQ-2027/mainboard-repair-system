@@ -6,9 +6,14 @@ from collections import Counter
 import json
 import os
 from pathlib import Path
+import sys
 import time
 from urllib import error, parse, request
 import uuid
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if __package__ in {None, ""} and str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 from scripts.visual_qc.intake import (
     IntakeValidationError,
@@ -18,7 +23,6 @@ from scripts.visual_qc.intake import (
 )
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
 class VisualQcIntakeTransportError(RuntimeError):
     def __init__(self, code: str, message: str):
         super().__init__(message)
