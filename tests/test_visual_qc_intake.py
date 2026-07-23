@@ -8,6 +8,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import cv2
 import numpy as np
@@ -20,7 +21,11 @@ from scripts.visual_qc.intake import (
     validate_intake_batch,
     write_json_atomic,
 )
-from scripts.import_visual_qc_batch import VisualQcIntakeTransport, run_intake
+from scripts.import_visual_qc_batch import (
+    VisualQcIntakeTransport,
+    VisualQcIntakeTransportError,
+    run_intake,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -53,7 +58,11 @@ class FakeTransport:
     def get_job(self, job_id):
         self.job_requests.append(job_id)
         state = self.job_states.pop(0) if len(self.job_states) > 1 else self.job_states[0]
-        payload = {"job_id": job_id, "status": state}
+        payload = {
+            "job_id": job_id,
+            "case_id": job_id.replace("job-", "case-", 1),
+            "status": state,
+        }
         if state == "failed":
             payload["error"] = {"code": "processing_failed", "message": "worker failed"}
         return payload
@@ -251,7 +260,7 @@ class VisualQcIntakeTests(unittest.TestCase):
         self.assertEqual(result["entries"][0]["state"], "validated")
         self.assertEqual(json.loads(self.receipt_path.read_text(encoding="utf-8")), result)
 
-    def test_resume_uploads_only_rows_without_matching_server_ids(self):
+    def test_resume_reconciles_existing_job_without_duplicate_upload(self):
         transport = FakeTransport()
 
         first = run_intake(
@@ -262,8 +271,9 @@ class VisualQcIntakeTests(unittest.TestCase):
         )
 
         self.assertEqual(len(transport.uploads), 1)
-        self.assertEqual(first, resumed)
-        self.assertEqual(resumed["entries"][0]["state"], "uploaded")
+        self.assertEqual(first["entries"][0]["state"], "uploaded")
+        self.assertEqual(resumed["entries"][0]["state"], "completed")
+        self.assertEqual(len(transport.job_requests), 1)
 
     def test_changed_sha_invalidates_prior_server_ids_and_uploads_again(self):
         transport = FakeTransport()
@@ -339,6 +349,87 @@ class VisualQcIntakeTests(unittest.TestCase):
         self.assertEqual(result["entries"][0]["state"], "failed")
         self.assertEqual(result["entries"][0]["error"]["code"], "processing_failed")
 
+    def test_resume_polls_existing_job_without_duplicate_upload(self):
+        uploaded = run_intake(
+            self.manifest_path,
+            self.receipt_path,
+            FakeTransport(),
+            project_root=ROOT,
+        )
+        self.assertEqual(uploaded["entries"][0]["state"], "uploaded")
+
+        resumed_transport = FakeTransport(job_states=["succeeded"])
+        resumed = run_intake(
+            self.manifest_path,
+            self.receipt_path,
+            resumed_transport,
+            wait_for_jobs=True,
+            poll_interval_seconds=0,
+            project_root=ROOT,
+        )
+
+        self.assertEqual(resumed["entries"][0]["state"], "completed")
+        self.assertEqual(resumed_transport.uploads, [])
+        self.assertEqual(len(resumed_transport.job_requests), 1)
+
+    def test_local_completed_receipt_requires_server_identity_reconciliation(self):
+        validated = self.validate()
+        forged = create_intake_receipt(validated)
+        forged["entries"][0].update(
+            {
+                "state": "completed",
+                "server_case_id": "forged-case",
+                "server_job_id": "job-other",
+            }
+        )
+        write_json_atomic(self.receipt_path, forged)
+        transport = FakeTransport(job_states=["succeeded"])
+
+        result = run_intake(
+            self.manifest_path,
+            self.receipt_path,
+            transport,
+            wait_for_jobs=True,
+            poll_interval_seconds=0,
+            project_root=ROOT,
+        )
+
+        self.assertEqual(transport.uploads, [])
+        self.assertEqual(transport.job_requests, ["job-other"])
+        self.assertEqual(result["entries"][0]["state"], "failed")
+        self.assertEqual(result["entries"][0]["error"]["code"], "job_identity_mismatch")
+
+    def test_prior_receipt_rejects_unknown_fields_before_transport(self):
+        receipt = create_intake_receipt(self.validate())
+        receipt["entries"][0]["trusted"] = True
+        write_json_atomic(self.receipt_path, receipt)
+        transport = FakeTransport()
+
+        with self.assertRaisesRegex(IntakeValidationError, "prior intake receipt"):
+            run_intake(
+                self.manifest_path,
+                self.receipt_path,
+                transport,
+                project_root=ROOT,
+            )
+
+        self.assertEqual(transport.uploads, [])
+
+    def test_expected_manifest_hash_is_checked_before_receipt_or_transport(self):
+        transport = FakeTransport()
+
+        with self.assertRaisesRegex(IntakeValidationError, "manifest.*changed"):
+            run_intake(
+                self.manifest_path,
+                self.receipt_path,
+                transport,
+                expected_manifest_sha256="0" * 64,
+                project_root=ROOT,
+            )
+
+        self.assertFalse(self.receipt_path.exists())
+        self.assertEqual(transport.uploads, [])
+
     def test_orchestrator_never_prints_or_persists_transport_credentials(self):
         output = StringIO()
         with redirect_stdout(output):
@@ -378,6 +469,41 @@ class VisualQcIntakeTests(unittest.TestCase):
             allow_http_localhost=True,
         )
         self.assertEqual(transport.api_base, "http://127.0.0.1:3020/api/v1/visual-qc")
+
+    def test_transport_rejects_source_changed_after_validation_before_request(self):
+        entry = self.validate()["entries"][0]
+        entry["intake_batch_id"] = "km4-first-physical-batch"
+        (self.root / "board.jpg").write_bytes(encode_jpeg(value=80))
+        transport = VisualQcIntakeTransport(
+            "https://example.test/api/v1/visual-qc",
+            actor_id="owner-001",
+            username="user",
+            password="secret",
+        )
+
+        with patch.object(transport, "_request_json") as request_json:
+            with self.assertRaisesRegex(
+                VisualQcIntakeTransportError, "changed after validation"
+            ):
+                transport.upload(entry, idempotency_key="intake:test")
+
+        request_json.assert_not_called()
+
+    def test_multipart_contains_the_same_bytes_verified_by_hash_and_length(self):
+        entry = self.validate()["entries"][0]
+        transport = VisualQcIntakeTransport(
+            "https://example.test/api/v1/visual-qc",
+            actor_id="owner-001",
+            username="user",
+            password="secret",
+        )
+
+        body, content_type = transport._multipart_body(entry, {"board_key": "km4-f151"})
+
+        self.assertIn(self.image, body)
+        self.assertIn("multipart/form-data; boundary=", content_type)
+        self.assertEqual(hashlib.sha256(self.image).hexdigest(), entry["sha256"])
+        self.assertEqual(len(self.image), entry["byte_size"])
 
     def test_script_help_runs_directly_from_repository_root(self):
         result = subprocess.run(

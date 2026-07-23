@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import base64
 from collections import Counter
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -19,6 +20,7 @@ from scripts.visual_qc.intake import (
     IntakeValidationError,
     merge_receipt,
     validate_intake_batch,
+    validate_intake_receipt,
     write_json_atomic,
 )
 
@@ -90,6 +92,15 @@ class VisualQcIntakeTransport:
         return self._request_json("GET", f"/jobs/{parse.quote(job_id, safe='')}")
 
     def _multipart_body(self, entry: dict, fields: dict) -> tuple[bytes, str]:
+        content = Path(entry["file_path"]).read_bytes()
+        if (
+            len(content) != entry["byte_size"]
+            or hashlib.sha256(content).hexdigest() != entry["sha256"]
+        ):
+            raise VisualQcIntakeTransportError(
+                "source_changed_after_validation",
+                "Visual-QC source changed after validation; upload was not attempted.",
+            )
         boundary = f"visual-qc-{uuid.uuid4().hex}"
         chunks: list[bytes] = []
         for name, value in fields.items():
@@ -109,7 +120,7 @@ class VisualQcIntakeTransport:
                     f'Content-Disposition: form-data; name="file"; filename="{filename}"\r\n'
                 ).encode("utf-8"),
                 f"Content-Type: {entry['mime_type']}\r\n\r\n".encode("ascii"),
-                Path(entry["file_path"]).read_bytes(),
+                content,
                 b"\r\n",
                 f"--{boundary}--\r\n".encode("ascii"),
             ]
@@ -166,6 +177,10 @@ def _read_previous_receipt(path: Path) -> dict | None:
         raise IntakeValidationError(f"invalid prior intake receipt: {exc}") from exc
     if not isinstance(payload, dict):
         raise IntakeValidationError("invalid prior intake receipt: root must be an object")
+    try:
+        validate_intake_receipt(payload)
+    except IntakeValidationError as exc:
+        raise IntakeValidationError(f"invalid prior intake receipt: {exc}") from exc
     return payload
 
 
@@ -174,6 +189,65 @@ def _typed_error(exc: BaseException) -> dict:
         "code": getattr(exc, "code", "transfer_failure"),
         "message": str(exc)[:500] or type(exc).__name__,
     }
+
+
+def _reconcile_job(
+    row: dict,
+    receipt: dict,
+    receipt_path: Path,
+    transport: VisualQcIntakeTransport,
+    *,
+    wait_for_jobs: bool,
+    poll_interval_seconds: float,
+    maximum_job_polls: int,
+) -> None:
+    attempts = maximum_job_polls if wait_for_jobs else 1
+    if attempts <= 0:
+        raise VisualQcIntakeTransportError(
+            "job_poll_timeout", "Visual-QC processing did not reach a terminal state."
+        )
+    for attempt in range(attempts):
+        job = transport.get_job(row["server_job_id"])
+        if (
+            not isinstance(job, dict)
+            or job.get("job_id") != row["server_job_id"]
+            or job.get("case_id") != row["server_case_id"]
+        ):
+            raise VisualQcIntakeTransportError(
+                "job_identity_mismatch",
+                "Visual-QC job identity does not match the recorded upload.",
+            )
+        status = job.get("status")
+        if status == "succeeded":
+            row.update({"state": "completed", "error": None})
+            return
+        if status == "failed":
+            error_payload = job.get("error") or {}
+            row.update(
+                {
+                    "state": "failed",
+                    "error": {
+                        "code": error_payload.get("code", "processing_failed"),
+                        "message": error_payload.get(
+                            "message", "Visual-QC processing failed."
+                        )[:500],
+                    },
+                }
+            )
+            return
+        if status not in {"queued", "running"}:
+            raise VisualQcIntakeTransportError(
+                "invalid_job_response", "Visual-QC job status is invalid."
+            )
+        row.update({"state": "processing", "error": None})
+        write_json_atomic(receipt_path, receipt)
+        if not wait_for_jobs:
+            return
+        if attempt + 1 < attempts:
+            time.sleep(max(0, poll_interval_seconds))
+    raise VisualQcIntakeTransportError(
+        "job_poll_timeout", "Visual-QC processing did not reach a terminal state."
+    )
 
 
 def run_intake(
@@ -185,10 +259,24 @@ def run_intake(
     wait_for_jobs: bool = False,
     continue_on_error: bool = False,
     project_root: Path = PROJECT_ROOT,
+    expected_manifest_sha256: str | None = None,
     poll_interval_seconds: float = 1,
     maximum_job_polls: int = 300,
 ) -> dict:
-    validated = validate_intake_batch(Path(manifest_path), Path(project_root))
+    manifest_path = Path(manifest_path)
+    try:
+        manifest_bytes = manifest_path.read_bytes()
+    except OSError as exc:
+        raise IntakeValidationError("intake manifest could not be read") from exc
+    manifest_sha256 = hashlib.sha256(manifest_bytes).hexdigest()
+    if (
+        expected_manifest_sha256 is not None
+        and manifest_sha256 != expected_manifest_sha256
+    ):
+        raise IntakeValidationError("intake manifest changed after validation")
+    validated = validate_intake_batch(
+        manifest_path, Path(project_root), manifest_bytes=manifest_bytes
+    )
     for entry in validated["entries"]:
         entry["intake_batch_id"] = validated["batch_id"]
     receipt_path = Path(receipt_path)
@@ -201,46 +289,37 @@ def run_intake(
 
     entries_by_id = {entry["entry_id"]: entry for entry in validated["entries"]}
     for row in receipt["entries"]:
-        if row.get("server_case_id") and row.get("server_job_id"):
-            continue
-        row.update({"state": "uploading", "error": None})
-        write_json_atomic(receipt_path, receipt)
         try:
-            response = transport.upload(
-                entries_by_id[row["entry_id"]],
-                idempotency_key=row["idempotency_key"],
-            )
-            row["server_case_id"] = response["case_id"]
-            row["server_job_id"] = response["job"]["job_id"]
-            row["state"] = "uploaded"
-            write_json_atomic(receipt_path, receipt)
-            if wait_for_jobs:
-                for _attempt in range(maximum_job_polls):
-                    job = transport.get_job(row["server_job_id"])
-                    status = job.get("status")
-                    if status == "succeeded":
-                        row.update({"state": "completed", "error": None})
-                        break
-                    if status == "failed":
-                        error_payload = job.get("error") or {}
-                        row.update(
-                            {
-                                "state": "failed",
-                                "error": {
-                                    "code": error_payload.get("code", "processing_failed"),
-                                    "message": error_payload.get(
-                                        "message", "Visual-QC processing failed."
-                                    )[:500],
-                                },
-                            }
-                        )
-                        break
-                    row["state"] = "processing"
-                    write_json_atomic(receipt_path, receipt)
-                    time.sleep(max(0, poll_interval_seconds))
-                else:
-                    raise VisualQcIntakeTransportError(
-                        "job_poll_timeout", "Visual-QC processing did not reach a terminal state."
+            if row.get("server_case_id") and row.get("server_job_id"):
+                _reconcile_job(
+                    row,
+                    receipt,
+                    receipt_path,
+                    transport,
+                    wait_for_jobs=wait_for_jobs,
+                    poll_interval_seconds=poll_interval_seconds,
+                    maximum_job_polls=maximum_job_polls,
+                )
+            else:
+                row.update({"state": "uploading", "error": None})
+                write_json_atomic(receipt_path, receipt)
+                response = transport.upload(
+                    entries_by_id[row["entry_id"]],
+                    idempotency_key=row["idempotency_key"],
+                )
+                row["server_case_id"] = response["case_id"]
+                row["server_job_id"] = response["job"]["job_id"]
+                row["state"] = "uploaded"
+                write_json_atomic(receipt_path, receipt)
+                if wait_for_jobs:
+                    _reconcile_job(
+                        row,
+                        receipt,
+                        receipt_path,
+                        transport,
+                        wait_for_jobs=True,
+                        poll_interval_seconds=poll_interval_seconds,
+                        maximum_job_polls=maximum_job_polls,
                     )
             write_json_atomic(receipt_path, receipt)
         except Exception as exc:

@@ -25,6 +25,21 @@
 
 输出目录包含 `physical-registration-run.json`、`physical-registration-run.md` 和 `artifacts/*.registration-overlay.png`。`VISUAL-QC-PHYSICAL-REGISTRATION-RUN-V1` 只区分重拍、人工四点配准和自动候选待确认；不上传、不批准配准、不判断缺陷，也不允许据此宣称实物配准精度。原图与点位图之间没有测量真值时，叠图只能作为人工检查证据。
 
+验收报告不能直接替代审核，也不能绕过后继续调用通用 importer。先执行验收合格交接器的干跑：
+
+```powershell
+.\.venv\Scripts\python.exe scripts\handoff_visual_qc_physical_package.py `
+  D:\visual-qc-source-library\packages\km4-physical-001\source-package.json `
+  D:\visual-qc-acceptance\km4-physical-001\physical-registration-run.json `
+  --library-root D:\visual-qc-source-library `
+  --handoff-root D:\visual-qc-handoffs\km4-physical-001 `
+  --dry-run
+```
+
+干跑会重新核对来源包、归档 intake、验收报告、原图和逐图叠图，并生成 `VISUAL-QC-PHYSICAL-HANDOFF-V1`。存在重拍、处理错误、哈希漂移或叠图损坏时整包阻断；`automatic_candidate_review_required` 和 `manual_registration_required` 只表示可以进入服务器继续处理，不表示配准已确认。确认干跑回执后，使用同一命令移除 `--dry-run`，增加现有 `--api-base`、`--credential-file` 和可选 `--wait` 参数完成可恢复传输。交接回执同时保存来源包、归档 intake 和验收报告的原始字节哈希；恢复已有服务器任务时会核对 job/case 身份且不会重复上传。随后仍必须在内部工作台完成配准审核。
+
+唯一操作顺序为：`stage -> source audit -> physical acceptance -> acceptance-qualified handoff dry-run -> controlled transfer -> server registration review`。Milo 仍是实物照片的唯一来源，Codex 仍是唯一数据操作员，海外维修员没有照片上传入口。
+
 数据管理员工作台已接入受控服务器 QC 服务：支持批量导入回执、服务器案例目录、断点续传、原图恢复、任务轮询、自动候选叠图确认、人工四点回退、Golden Sample、差异热图和候选确认/驳回/暂缓。服务器侧包含批次与案例溯源、采集身份防污染、确定性合成透视、ORB/AKAZE 特征、RANSAC 单应性、结构化失败原因、持久化人工结论、磁盘压力健康状态和受控留存清理。受控试点部署在 `https://cccsat.top/mb-repair-beta/`；操作与数据边界见 `docs/visual-qc-capture-intake-spec-2026-07-20.md`、`docs/visual-qc-workbench-2026-07-17.md` 和 `docs/visual-qc-server-api-2026-07-20.md`。
 
 受控 beta 路由使用 Nginx Basic Auth，网关注入用户和权限，QC API 的 3020 端口只绑定回环地址。后端暂时沿用 `reviewer` 作为“数据管理员”权限的兼容值，不表示存在第二个人工审核角色；以后可在不改变业务数据契约的情况下替换为公司 SSO/OIDC。部署与回滚步骤见 `docs/beta-deployment.md`。
@@ -117,7 +132,7 @@ python ai_proxy_server.py
 - **当前后端**：Python HTTP Server 代理（端口 8899）
 - **目标后端**：同域FastAPI服务、持久化QC任务、受控图片存储和CPU OpenCV Worker
 - **当前后端实现**：`visual_qc_server.py` 已提供版本化上传、SQLite任务恢复、图像质量证据、自动配准候选与人工四点回退；本地运行和部署边界见 `docs/visual-qc-server-api-2026-07-20.md`
-- **当前数据闭环**：Milo 提供照片；Codex 通过批次清单验证和导入工具完成服务器入库，再在内部工作台完成配准、最终人工 QC、Golden Sample 版本化、差异候选决策和标注
+- **当前数据闭环**：Milo 提供照片；Codex 依次完成来源包固化、只读审计、离线质量/配准预检和验收合格交接，再在内部工作台完成配准、最终人工 QC、Golden Sample 版本化、差异候选决策和标注
 - **当前训练出口**：数据管理员可获取仅含训练合格实拍案例的 `VISUAL-QC-TRAINING-MANIFEST-V1`、对应原图和确定性 `VISUAL-QC-COCO-V1`；`VISUAL-QC-DATASET-BUNDLE-V1` 封装清单、COCO、索引和原图，`VISUAL-QC-DATASET-AUDIT-V1` 解释每个案例被排除的首要门禁原因
 - **当前浏览器接入**：内部视觉数据工作台支持服务器案例检索与恢复、任务状态、自动候选确认、四点回退、Golden Sample、差异热图和逐候选人工决策；海外维修员界面隐藏并由 API 拒绝所有照片入库和数据集工具
 - **当前案例契约**：本地历史基线保留 `VISUAL-QC-CASE-V1`；接入服务器的新案例使用 `VISUAL-QC-CASE-V2`，机器可读定义见 `knowledge-base/visual-qc-case-v2-schema.json`

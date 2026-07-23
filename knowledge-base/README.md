@@ -12,6 +12,7 @@
 - `vision-reference-review.json`：视觉参考图的人工选片、用途分类、参考强度和标准正反面照片缺口。
 - `visual-qc-source-package-v1-schema.json`：Milo 提供的实物照片在仓库外受控原片库中的来源包契约。
 - `visual-qc-physical-registration-run-v1-schema.json`：受控实物照片逐图质量检查、配准候选、人工后续动作和叠图证据的离线验收契约；不表示配准已确认或实物精度已成立。
+- `visual-qc-physical-handoff-v1-schema.json`：将同一受控照片包、归档 intake 原始字节哈希、验收报告哈希、逐图预检动作和经服务器对账的 case/job ID 绑定起来的交接回执契约；重拍或处理错误不得进入服务器，自动候选和人工配准需求进入后仍必须人工确认。
 - `assets/vision-reference-gallery/`：七个重合机型、21 张已复核 Service Manual 参考图的本地浏览图库。
 - `assets/vision-recognition-demo/`：基于上述参考图运行的浏览器端图像质量检查与七机型相似度检索 Demo。
 - `km4-cross-source-registration.json`：KM4/F151 首批实体的归一化几何、代理照片配准、SCH证据、维修指导和2.5D视觉参数。

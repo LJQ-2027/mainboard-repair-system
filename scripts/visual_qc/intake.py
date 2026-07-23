@@ -26,6 +26,29 @@ CHECKLIST_ITEMS = {
 }
 SAFE_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 SHA256 = re.compile(r"^[0-9a-fA-F]{64}$")
+LOWER_SHA256 = re.compile(r"^[0-9a-f]{64}$")
+RECEIPT_FIELDS = {"schema_version", "batch_id", "entries"}
+RECEIPT_ENTRY_FIELDS = {
+    "entry_id",
+    "sha256",
+    "idempotency_key",
+    "mime_type",
+    "width",
+    "height",
+    "byte_size",
+    "state",
+    "server_case_id",
+    "server_job_id",
+    "error",
+}
+RECEIPT_STATES = {
+    "validated",
+    "uploading",
+    "uploaded",
+    "processing",
+    "completed",
+    "failed",
+}
 WINDOWS_RESERVED_NAMES = {
     "CON", "PRN", "AUX", "NUL", "CLOCK$",
     *(f"COM{index}" for index in range(1, 10)),
@@ -97,10 +120,13 @@ def _image_evidence(path: Path) -> dict:
     }
 
 
-def validate_intake_batch(manifest_path: Path, project_root: Path) -> dict:
+def validate_intake_batch(
+    manifest_path: Path, project_root: Path, *, manifest_bytes: bytes | None = None
+) -> dict:
     manifest_path = Path(manifest_path).resolve()
     try:
-        payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+        raw = manifest_path.read_bytes() if manifest_bytes is None else manifest_bytes
+        payload = json.loads(raw.decode("utf-8"))
     except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
         raise IntakeValidationError(f"invalid intake manifest: {exc}") from exc
     if not isinstance(payload, dict) or payload.get("schema_version") != BATCH_SCHEMA_VERSION:
@@ -234,10 +260,72 @@ def create_intake_receipt(validated_batch: dict) -> dict:
     }
 
 
+def validate_intake_receipt(receipt: dict) -> None:
+    if not isinstance(receipt, dict) or set(receipt) != RECEIPT_FIELDS:
+        raise IntakeValidationError("receipt root fields are invalid")
+    batch_id = _require_safe_id(receipt.get("batch_id"), "receipt batch_id")
+    entries = receipt.get("entries")
+    if (
+        receipt.get("schema_version") != RECEIPT_SCHEMA_VERSION
+        or not isinstance(entries, list)
+        or not entries
+        or len(entries) > 500
+    ):
+        raise IntakeValidationError("receipt root is invalid")
+    identifiers = []
+    for row in entries:
+        if not isinstance(row, dict) or set(row) != RECEIPT_ENTRY_FIELDS:
+            raise IntakeValidationError("receipt entry fields are invalid")
+        entry_id = _require_safe_id(row.get("entry_id"), "receipt entry_id")
+        sha256 = row.get("sha256")
+        state = row.get("state")
+        case_id = row.get("server_case_id")
+        job_id = row.get("server_job_id")
+        error = row.get("error")
+        valid_error = error is None or (
+            isinstance(error, dict)
+            and set(error) == {"code", "message"}
+            and isinstance(error.get("code"), str)
+            and bool(error["code"])
+            and isinstance(error.get("message"), str)
+            and bool(error["message"])
+        )
+        if (
+            not isinstance(sha256, str)
+            or not LOWER_SHA256.fullmatch(sha256)
+            or row.get("idempotency_key")
+            != intake_idempotency_key(batch_id, entry_id, sha256)
+            or row.get("mime_type") not in MIME_EXTENSIONS
+            or not isinstance(row.get("width"), int)
+            or isinstance(row.get("width"), bool)
+            or row["width"] < MIN_IMAGE_DIMENSION
+            or not isinstance(row.get("height"), int)
+            or isinstance(row.get("height"), bool)
+            or row["height"] < MIN_IMAGE_DIMENSION
+            or not isinstance(row.get("byte_size"), int)
+            or isinstance(row.get("byte_size"), bool)
+            or row["byte_size"] <= 0
+            or state not in RECEIPT_STATES
+            or (case_id is None) != (job_id is None)
+            or (case_id is not None and (not isinstance(case_id, str) or not case_id))
+            or (job_id is not None and (not isinstance(job_id, str) or not job_id))
+            or (state in {"uploaded", "processing", "completed"} and case_id is None)
+            or (state in {"validated", "uploading"} and case_id is not None)
+            or (state == "failed" and error is None)
+            or (state != "failed" and error is not None)
+            or not valid_error
+        ):
+            raise IntakeValidationError("receipt entry is invalid")
+        identifiers.append(entry_id)
+    if len(set(identifiers)) != len(identifiers):
+        raise IntakeValidationError("receipt entries are duplicated")
+
+
 def merge_receipt(previous: dict | None, validated_batch: dict) -> dict:
     current = create_intake_receipt(validated_batch)
     if not isinstance(previous, dict):
         return current
+    validate_intake_receipt(previous)
     if (
         previous.get("schema_version") != RECEIPT_SCHEMA_VERSION
         or previous.get("batch_id") != current["batch_id"]
@@ -251,8 +339,12 @@ def merge_receipt(previous: dict | None, validated_batch: dict) -> dict:
     for row in current["entries"]:
         prior = prior_rows.get(row["entry_id"])
         if prior and prior.get("sha256") == row["sha256"]:
-            for key in ("state", "server_case_id", "server_job_id", "error"):
-                row[key] = copy.deepcopy(prior.get(key))
+            row["server_case_id"] = prior["server_case_id"]
+            row["server_job_id"] = prior["server_job_id"]
+            if prior["server_case_id"] is not None:
+                row.update({"state": "uploaded", "error": None})
+            elif prior["state"] == "failed":
+                row.update({"state": "failed", "error": copy.deepcopy(prior["error"])})
     return current
 
 

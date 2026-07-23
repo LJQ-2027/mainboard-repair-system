@@ -1,0 +1,228 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "VISUAL-QC-PHYSICAL-HANDOFF-V1",
+  "title": "Physical visual-QC acceptance-qualified handoff receipt",
+  "$comment": "This schema validates portable structure and overlapping state constraints. Exact summary counts and all cross-field semantics are authoritatively enforced by validate_physical_handoff_receipt().",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "status",
+    "field_accuracy_claim_allowed",
+    "registration_review_required",
+    "source_package",
+    "acceptance",
+    "archived_intake",
+    "board",
+    "capture",
+    "summary",
+    "entries"
+  ],
+  "properties": {
+    "schema_version": {"const": "VISUAL-QC-PHYSICAL-HANDOFF-V1"},
+    "status": {"enum": ["validated", "processing", "transferred", "partial_failure", "failed"]},
+    "field_accuracy_claim_allowed": {"const": false},
+    "registration_review_required": {"const": true},
+    "source_package": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["package_id", "batch_id", "manifest_sha256"],
+      "properties": {
+        "package_id": {"$ref": "#/$defs/safe_id"},
+        "batch_id": {"$ref": "#/$defs/safe_id"},
+        "manifest_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "acceptance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["report_sha256", "source_status"],
+      "properties": {
+        "report_sha256": {"$ref": "#/$defs/sha256"},
+        "source_status": {"enum": ["review_required", "attention"]}
+      }
+    },
+    "archived_intake": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["manifest_sha256"],
+      "properties": {
+        "manifest_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "board": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["board_key", "board_id"],
+      "properties": {
+        "board_key": {"$ref": "#/$defs/safe_id"},
+        "board_id": {"type": "string", "minLength": 1}
+      }
+    },
+    "capture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stage", "session_id", "setup_id"],
+      "properties": {
+        "stage": {"enum": ["golden_reference", "before_repair", "after_repair"]},
+        "session_id": {"$ref": "#/$defs/safe_id"},
+        "setup_id": {"$ref": "#/$defs/safe_id"}
+      }
+    },
+    "summary": {
+      "type": "object",
+      "description": "Structural summary. Exact counts must also pass the runtime semantic validator.",
+      "additionalProperties": false,
+      "required": ["entry_count", "state_counts", "action_counts"],
+      "properties": {
+        "entry_count": {"type": "integer", "minimum": 1},
+        "state_counts": {
+          "type": "object",
+          "propertyNames": {"enum": ["validated", "uploading", "uploaded", "processing", "completed", "failed"]},
+          "additionalProperties": {"type": "integer", "minimum": 1}
+        },
+        "action_counts": {
+          "type": "object",
+          "propertyNames": {"enum": ["automatic_candidate_review_required", "manual_registration_required"]},
+          "additionalProperties": {"type": "integer", "minimum": 1}
+        }
+      }
+    },
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 500,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "entry_id", "side_id", "image_sha256", "acceptance_action",
+          "registration_review_required", "transfer_state", "server_case_id",
+          "server_job_id", "error"
+        ],
+        "properties": {
+          "entry_id": {"$ref": "#/$defs/safe_id"},
+          "side_id": {"$ref": "#/$defs/safe_id"},
+          "image_sha256": {"$ref": "#/$defs/sha256"},
+          "acceptance_action": {"enum": ["automatic_candidate_review_required", "manual_registration_required"]},
+          "registration_review_required": {"const": true},
+          "transfer_state": {"enum": ["validated", "uploading", "uploaded", "processing", "completed", "failed"]},
+          "server_case_id": {"type": ["string", "null"]},
+          "server_job_id": {"type": ["string", "null"]},
+          "error": {
+            "oneOf": [
+              {"type": "null"},
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["code", "message"],
+                "properties": {
+                  "code": {"type": "string", "minLength": 1},
+                  "message": {"type": "string", "minLength": 1}
+                }
+              }
+            ]
+          }
+        },
+        "oneOf": [
+          {
+            "properties": {
+              "transfer_state": {"enum": ["validated", "uploading"]},
+              "server_case_id": {"type": "null"},
+              "server_job_id": {"type": "null"},
+              "error": {"type": "null"}
+            }
+          },
+          {
+            "properties": {
+              "transfer_state": {"enum": ["uploaded", "processing", "completed"]},
+              "server_case_id": {"type": "string", "minLength": 1},
+              "server_job_id": {"type": "string", "minLength": 1},
+              "error": {"type": "null"}
+            }
+          },
+          {
+            "properties": {
+              "transfer_state": {"const": "failed"},
+              "error": {"type": "object"}
+            },
+            "oneOf": [
+              {
+                "properties": {
+                  "server_case_id": {"type": "null"},
+                  "server_job_id": {"type": "null"}
+                }
+              },
+              {
+                "properties": {
+                  "server_case_id": {"type": "string", "minLength": 1},
+                  "server_job_id": {"type": "string", "minLength": 1}
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "validated"}}},
+      "then": {
+        "properties": {
+          "entries": {"items": {"properties": {"transfer_state": {"const": "validated"}}}}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"status": {"const": "transferred"}}},
+      "then": {
+        "properties": {
+          "entries": {"items": {"properties": {"transfer_state": {"const": "completed"}}}}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"status": {"const": "processing"}}},
+      "then": {
+        "properties": {
+          "entries": {
+            "items": {"properties": {"transfer_state": {"enum": ["validated", "uploading", "uploaded", "processing", "completed"]}}},
+            "allOf": [
+              {"not": {"items": {"properties": {"transfer_state": {"const": "validated"}}}}},
+              {"not": {"items": {"properties": {"transfer_state": {"const": "completed"}}}}}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"status": {"const": "partial_failure"}}},
+      "then": {
+        "properties": {
+          "entries": {
+            "allOf": [
+              {"contains": {"properties": {"transfer_state": {"const": "failed"}}}},
+              {"contains": {"properties": {"transfer_state": {"enum": ["uploaded", "processing", "completed"]}}}}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"status": {"const": "failed"}}},
+      "then": {
+        "properties": {
+          "entries": {
+            "contains": {"properties": {"transfer_state": {"const": "failed"}}},
+            "not": {"contains": {"properties": {"transfer_state": {"enum": ["uploaded", "processing", "completed"]}}}}
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "safe_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}
