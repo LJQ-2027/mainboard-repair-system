@@ -26,6 +26,7 @@ from scripts.visual_qc.intake import (
 from scripts.visual_qc.physical_acceptance import (
     validate_physical_registration_report,
 )
+from scripts.visual_qc.server.provenance import normalize_qualified_handoff
 from scripts.visual_qc.source_library import (
     _assert_controlled_path,
     _build_archived_intake,
@@ -802,6 +803,9 @@ def _run_bound_intake(evidence: dict, *args, **kwargs) -> dict:
     kwargs["expected_manifest_sha256"] = evidence["archived_intake"][
         "manifest_sha256"
     ]
+    kwargs["qualified_handoff_by_entry"] = _qualified_handoff_by_entry(
+        evidence
+    )
     try:
         return run_intake(*args, **kwargs)
     except IntakeValidationError as exc:
@@ -813,6 +817,29 @@ def _run_bound_intake(evidence: dict, *args, **kwargs) -> dict:
         raise PhysicalHandoffError(
             "invalid_intake_receipt", "Physical handoff intake state is invalid."
         ) from exc
+
+
+def _qualified_handoff_by_entry(evidence: dict) -> dict[str, dict]:
+    common = {
+        "schema_version": "VISUAL-QC-QUALIFIED-HANDOFF-PROVENANCE-V1",
+        "handoff_schema_version": HANDOFF_SCHEMA_VERSION,
+        "source_package_manifest_sha256": evidence["package"]["manifest_sha256"],
+        "archived_intake_manifest_sha256": evidence["archived_intake"][
+            "manifest_sha256"
+        ],
+        "acceptance_report_sha256": evidence["acceptance"]["sha256"],
+        "registration_review_required": True,
+        "field_accuracy_claim_allowed": False,
+    }
+    return {
+        entry["entry_id"]: normalize_qualified_handoff(
+            {
+                **common,
+                "acceptance_action": entry["acceptance_action"],
+            }
+        )
+        for entry in evidence["entries"]
+    }
 
 
 def run_physical_handoff(

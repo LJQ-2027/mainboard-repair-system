@@ -31,6 +31,19 @@ from scripts.import_visual_qc_batch import (
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def qualified_handoff():
+    return {
+        "schema_version": "VISUAL-QC-QUALIFIED-HANDOFF-PROVENANCE-V1",
+        "handoff_schema_version": "VISUAL-QC-PHYSICAL-HANDOFF-V1",
+        "source_package_manifest_sha256": "a" * 64,
+        "archived_intake_manifest_sha256": "b" * 64,
+        "acceptance_report_sha256": "c" * 64,
+        "acceptance_action": "automatic_candidate_review_required",
+        "registration_review_required": True,
+        "field_accuracy_claim_allowed": False,
+    }
+
+
 def encode_jpeg(width=180, height=120, value=170):
     image = np.full((height, width, 3), value, dtype=np.uint8)
     ok, encoded = cv2.imencode(".jpg", image, [cv2.IMWRITE_JPEG_QUALITY, 92])
@@ -473,6 +486,7 @@ class VisualQcIntakeTests(unittest.TestCase):
     def test_transport_rejects_source_changed_after_validation_before_request(self):
         entry = self.validate()["entries"][0]
         entry["intake_batch_id"] = "km4-first-physical-batch"
+        entry["qualified_handoff"] = qualified_handoff()
         (self.root / "board.jpg").write_bytes(encode_jpeg(value=80))
         transport = VisualQcIntakeTransport(
             "https://example.test/api/v1/visual-qc",
@@ -488,6 +502,51 @@ class VisualQcIntakeTests(unittest.TestCase):
                 transport.upload(entry, idempotency_key="intake:test")
 
         request_json.assert_not_called()
+
+    def test_transport_requires_qualified_handoff_before_request(self):
+        entry = self.validate()["entries"][0]
+        entry["intake_batch_id"] = "km4-first-physical-batch"
+        transport = VisualQcIntakeTransport(
+            "https://example.test/api/v1/visual-qc",
+            actor_id="owner-001",
+            username="user",
+            password="secret",
+        )
+
+        with patch.object(transport, "_request_json") as request_json:
+            with self.assertRaises(VisualQcIntakeTransportError) as captured:
+                transport.upload(entry, idempotency_key="intake:test")
+
+        self.assertEqual(
+            captured.exception.code,
+            "physical_handoff_provenance_required",
+        )
+        request_json.assert_not_called()
+
+    def test_upload_multipart_contains_canonical_qualified_handoff(self):
+        entry = self.validate()["entries"][0]
+        entry["intake_batch_id"] = "km4-first-physical-batch"
+        entry["qualified_handoff"] = qualified_handoff()
+        transport = VisualQcIntakeTransport(
+            "https://example.test/api/v1/visual-qc",
+            actor_id="owner-001",
+            username="user",
+            password="secret",
+        )
+
+        with patch.object(
+            transport,
+            "_request_json",
+            return_value={"case_id": "case-1", "job": {"job_id": "job-1"}},
+        ) as request_json:
+            transport.upload(entry, idempotency_key="intake:test")
+
+        body = request_json.call_args.kwargs["body"]
+        expected = json.dumps(
+            qualified_handoff(), sort_keys=True, separators=(",", ":")
+        ).encode("utf-8")
+        self.assertEqual(body.count(b'name="qualified_handoff"'), 1)
+        self.assertIn(b'name="qualified_handoff"\r\n\r\n' + expected, body)
 
     def test_multipart_contains_the_same_bytes_verified_by_hash_and_length(self):
         entry = self.validate()["entries"][0]

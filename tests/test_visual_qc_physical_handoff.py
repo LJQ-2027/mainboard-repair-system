@@ -39,12 +39,14 @@ HANDOFF_SCHEMA_PATH = (
 class FakeTransport:
     def __init__(self, *, fail_entries=None, job_states=None):
         self.uploads = []
+        self.qualified_handoffs = []
         self.job_requests = []
         self.fail_entries = set(fail_entries or [])
         self.job_states = list(job_states or ["succeeded"])
 
     def upload(self, entry, *, idempotency_key):
         self.uploads.append((entry["entry_id"], idempotency_key))
+        self.qualified_handoffs.append(copy.deepcopy(entry["qualified_handoff"]))
         if entry["entry_id"] in self.fail_entries:
             raise RuntimeError("simulated transfer failure")
         return {
@@ -537,6 +539,12 @@ class PhysicalHandoffEvidenceTests(unittest.TestCase):
 
     def test_transfer_is_resumable_and_projects_server_ids(self):
         staged, acceptance_dir, _report = self.create_evidence()
+        evidence = validate_physical_handoff_evidence(
+            package_path=staged["source_package_path"],
+            acceptance_report_path=acceptance_dir / "physical-registration-run.json",
+            project_root=ROOT,
+            library_root=self.library,
+        )
         transport = FakeTransport(job_states=["running", "succeeded"])
         options = {
             "package_path": staged["source_package_path"],
@@ -555,6 +563,27 @@ class PhysicalHandoffEvidenceTests(unittest.TestCase):
         self.assertEqual(first["status"], "transferred")
         self.assertEqual(resumed, first)
         self.assertEqual(len(transport.uploads), 1)
+        self.assertEqual(
+            transport.qualified_handoffs,
+            [
+                {
+                    "schema_version": "VISUAL-QC-QUALIFIED-HANDOFF-PROVENANCE-V1",
+                    "handoff_schema_version": "VISUAL-QC-PHYSICAL-HANDOFF-V1",
+                    "source_package_manifest_sha256": evidence["package"][
+                        "manifest_sha256"
+                    ],
+                    "archived_intake_manifest_sha256": evidence["archived_intake"][
+                        "manifest_sha256"
+                    ],
+                    "acceptance_report_sha256": evidence["acceptance"]["sha256"],
+                    "acceptance_action": evidence["entries"][0][
+                        "acceptance_action"
+                    ],
+                    "registration_review_required": True,
+                    "field_accuracy_claim_allowed": False,
+                }
+            ],
+        )
         self.assertEqual(first["entries"][0]["transfer_state"], "completed")
         self.assertIsNotNone(first["entries"][0]["server_case_id"])
         self.assertIsNotNone(first["entries"][0]["server_job_id"])

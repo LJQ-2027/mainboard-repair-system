@@ -23,6 +23,11 @@ from scripts.visual_qc.intake import (
     validate_intake_receipt,
     write_json_atomic,
 )
+from scripts.visual_qc.server.provenance import (
+    QualifiedHandoffError,
+    normalize_qualified_handoff,
+    serialize_qualified_handoff,
+)
 
 
 class VisualQcIntakeTransportError(RuntimeError):
@@ -60,6 +65,20 @@ class VisualQcIntakeTransport:
         self.authorization = f"Basic {token}"
 
     def upload(self, entry: dict, *, idempotency_key: str) -> dict:
+        try:
+            qualified_handoff = normalize_qualified_handoff(
+                entry["qualified_handoff"]
+            )
+        except KeyError as exc:
+            raise VisualQcIntakeTransportError(
+                "physical_handoff_provenance_required",
+                "Physical upload requires qualified handoff provenance.",
+            ) from exc
+        except QualifiedHandoffError as exc:
+            raise VisualQcIntakeTransportError(
+                "invalid_qualified_handoff",
+                str(exc),
+            ) from exc
         checklist = {
             "status": "confirmed",
             "items": entry["capture_checklist"],
@@ -75,6 +94,9 @@ class VisualQcIntakeTransport:
             "capture_checklist": json.dumps(checklist, separators=(",", ":")),
             "intake_batch_id": entry["intake_batch_id"],
             "intake_entry_id": entry["entry_id"],
+            "qualified_handoff": serialize_qualified_handoff(
+                qualified_handoff
+            ),
             "sha256": entry["sha256"],
         }
         body, content_type = self._multipart_body(entry, fields)
@@ -260,6 +282,7 @@ def run_intake(
     continue_on_error: bool = False,
     project_root: Path = PROJECT_ROOT,
     expected_manifest_sha256: str | None = None,
+    qualified_handoff_by_entry: dict[str, dict] | None = None,
     poll_interval_seconds: float = 1,
     maximum_job_polls: int = 300,
 ) -> dict:
@@ -279,6 +302,23 @@ def run_intake(
     )
     for entry in validated["entries"]:
         entry["intake_batch_id"] = validated["batch_id"]
+    if qualified_handoff_by_entry is not None:
+        expected_entry_ids = {
+            entry["entry_id"] for entry in validated["entries"]
+        }
+        if set(qualified_handoff_by_entry) != expected_entry_ids:
+            raise IntakeValidationError(
+                "qualified handoff entries do not match the intake batch"
+            )
+        try:
+            for entry in validated["entries"]:
+                entry["qualified_handoff"] = normalize_qualified_handoff(
+                    qualified_handoff_by_entry[entry["entry_id"]]
+                )
+        except QualifiedHandoffError as exc:
+            raise IntakeValidationError(
+                "qualified handoff provenance is invalid"
+            ) from exc
     receipt_path = Path(receipt_path)
     receipt = merge_receipt(_read_previous_receipt(receipt_path), validated)
     write_json_atomic(receipt_path, receipt)
