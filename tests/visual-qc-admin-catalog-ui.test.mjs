@@ -41,6 +41,15 @@ test('data administrator workbench exposes one compact server case catalog', () 
   assert.doesNotMatch(css, /\.server-case-row\s*\{[^}]*border-radius:/s);
 });
 
+test('physical photos enter only through the controlled handoff path', () => {
+  assert.match(html, /id="serverSyncButton"[^>]*hidden/);
+  assert.doesNotMatch(html, />上传并自动配准</);
+  assert.doesNotMatch(app, /\buploadVisualQcCase\b/);
+  assert.doesNotMatch(client, /\bcreateUploadDescriptor\b/);
+  assert.doesNotMatch(client, /\buploadVisualQcCase\b/);
+  assert.match(app, /请先通过受控交接命令传输，再从服务器案例恢复/);
+});
+
 test('admin catalog state labels and filters use fixed server values', () => {
   assert.deepEqual(Object.keys(ADMIN_CASE_STATE_LABELS), [
     'processing',
@@ -88,5 +97,5 @@ test('technician access state hides every visual data intake and governance cont
   assert.equal(dataAdmin.roleLabel, '数据管理员');
   assert.match(app, /if \(!dataAdminAccess\(\)\) return;/);
   assert.match(app, /actorRole:\s*VISUAL_QC_ACTOR_ROLE/);
-  assert.match(client, /setRequestHeader\('X-Actor-Role', actorRole\)/);
+  assert.match(client, /actorRole \? \{ 'X-Actor-Role': actorRole \} : \{\}/);
 });

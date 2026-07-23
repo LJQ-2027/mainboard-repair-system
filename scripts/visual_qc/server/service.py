@@ -828,6 +828,8 @@ class VisualQcService:
         annotation_count = 0
         category_counts = {category: 0 for category in sorted(HUMAN_DEFECT_CATEGORIES)}
         for review in self.store.list_latest_case_qc_reviews():
+            if review["evidence_role"] != "physical_capture":
+                continue
             if review.get("qualified_handoff_json") is None:
                 continue
             self._stored_qualified_handoff(review["qualified_handoff_json"])
@@ -1019,29 +1021,30 @@ class VisualQcService:
         eligible_count = 0
         for record in self.store.list_dataset_audit_cases():
             quality = (record.get("job_result") or {}).get("quality") or {}
-            qualified_handoff = self._stored_qualified_handoff(
-                record.get("qualified_handoff_json")
-            )
             registration_review = self.store.get_latest_registration_review(
                 record["case_id"]
             )
             qc_review = self.store.get_latest_case_qc_review(record["case_id"])
             if record["evidence_role"] != "physical_capture":
                 reason = "non_physical_evidence"
-            elif qualified_handoff is None:
-                reason = "qualified_handoff_provenance_required"
-            elif record["capture_checklist"].get("status") != "confirmed":
-                reason = "capture_checklist_required"
-            elif record["job_status"] != "succeeded":
-                reason = "processing_incomplete"
-            elif quality.get("status") == "retake":
-                reason = "image_retake_required"
-            elif not registration_review:
-                reason = "registration_review_required"
-            elif not qc_review:
-                reason = "final_qc_review_required"
             else:
-                reason = None
+                qualified_handoff = self._stored_qualified_handoff(
+                    record.get("qualified_handoff_json")
+                )
+                if qualified_handoff is None:
+                    reason = "qualified_handoff_provenance_required"
+                elif record["capture_checklist"].get("status") != "confirmed":
+                    reason = "capture_checklist_required"
+                elif record["job_status"] != "succeeded":
+                    reason = "processing_incomplete"
+                elif quality.get("status") == "retake":
+                    reason = "image_retake_required"
+                elif not registration_review:
+                    reason = "registration_review_required"
+                elif not qc_review:
+                    reason = "final_qc_review_required"
+                else:
+                    reason = None
 
             status = "eligible" if reason is None else "excluded"
             if status == "eligible":
@@ -1082,6 +1085,7 @@ class VisualQcService:
                 "Training image was not found or is not attached to an eligible review.",
                 404,
             )
+        self._stored_qualified_handoff(image.get("qualified_handoff_json"))
         storage_path = Path(image["storage_path"])
         if not storage_path.is_file():
             raise VisualQcServiceError(

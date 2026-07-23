@@ -565,3 +565,79 @@ class VisualQcTrainingManifestTests(unittest.TestCase):
         self.assertEqual(coco["images"], [])
         self.assertEqual(bundled_manifest["cases"], [])
         self.assertEqual(training_image.status_code, 404)
+
+    def test_nonphysical_case_with_forged_provenance_is_excluded_everywhere(self):
+        case = self.create_processed_case("forged-proxy-provenance")
+        self.accept_registration(case["case_id"])
+        self.assertEqual(self.submit_no_anomaly(case["case_id"]).status_code, 201)
+        with self.app.state.visual_qc_service.store.connect() as connection:
+            connection.execute(
+                "UPDATE cases SET evidence_role = 'service_manual_proxy' "
+                "WHERE case_id = ?",
+                (case["case_id"],),
+            )
+            connection.commit()
+
+        headers = {
+            "X-Actor-Id": "reviewer-001",
+            "X-Actor-Role": "reviewer",
+        }
+        audit = self.client.get("/api/v1/visual-qc/datasets/audit", headers=headers)
+        manifest = self.client.get(
+            "/api/v1/visual-qc/datasets/training-manifest",
+            headers=headers,
+        )
+        coco = self.client.get("/api/v1/visual-qc/datasets/coco", headers=headers)
+        bundle = self.client.get("/api/v1/visual-qc/datasets/bundle", headers=headers)
+        image = self.client.get(
+            f"/api/v1/visual-qc/datasets/images/{case['image']['image_id']}",
+            headers=headers,
+        )
+
+        self.assertEqual(audit.status_code, 200)
+        audited = {
+            item["case_id"]: item for item in audit.json()["cases"]
+        }[case["case_id"]]
+        self.assertEqual(audited["blocking_reason"], "non_physical_evidence")
+        self.assertEqual(manifest.status_code, 200)
+        self.assertEqual(manifest.json()["cases"], [])
+        self.assertEqual(coco.status_code, 200)
+        self.assertEqual(coco.json()["images"], [])
+        self.assertEqual(bundle.status_code, 200)
+        with zipfile.ZipFile(io.BytesIO(bundle.content)) as archive:
+            self.assertEqual(
+                json.loads(archive.read("manifest.json"))["cases"],
+                [],
+            )
+        self.assertEqual(image.status_code, 404)
+
+    def test_malformed_physical_provenance_fails_closed_at_every_training_exit(self):
+        case = self.create_processed_case("malformed-provenance")
+        self.accept_registration(case["case_id"])
+        self.assertEqual(self.submit_no_anomaly(case["case_id"]).status_code, 201)
+        with self.app.state.visual_qc_service.store.connect() as connection:
+            connection.execute(
+                "UPDATE cases SET qualified_handoff_json = ? WHERE case_id = ?",
+                ('{"schema_version":"corrupt"}', case["case_id"]),
+            )
+            connection.commit()
+
+        headers = {
+            "X-Actor-Id": "reviewer-001",
+            "X-Actor-Role": "reviewer",
+        }
+        routes = (
+            "/api/v1/visual-qc/datasets/audit",
+            "/api/v1/visual-qc/datasets/training-manifest",
+            "/api/v1/visual-qc/datasets/coco",
+            "/api/v1/visual-qc/datasets/bundle",
+            f"/api/v1/visual-qc/datasets/images/{case['image']['image_id']}",
+        )
+        for route in routes:
+            with self.subTest(route=route):
+                response = self.client.get(route, headers=headers)
+                self.assertEqual(response.status_code, 500)
+                self.assertEqual(
+                    response.json()["detail"]["code"],
+                    "stored_qualified_handoff_invalid",
+                )

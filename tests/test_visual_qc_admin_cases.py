@@ -5,6 +5,7 @@ import unittest
 from pathlib import Path
 
 import cv2
+import jsonschema
 import numpy as np
 from fastapi.testclient import TestClient
 
@@ -168,6 +169,16 @@ class VisualQcAdminCaseTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200, response.text)
         payload = response.json()
         self.assertEqual(payload["schema_version"], "VISUAL-QC-ADMIN-CASE-LIST-V2")
+        jsonschema.validate(
+            payload,
+            json.loads(
+                (
+                    ROOT
+                    / "knowledge-base"
+                    / "visual-qc-admin-case-list-v2-schema.json"
+                ).read_text(encoding="utf-8")
+            ),
+        )
         self.assertEqual(payload["total"], 6)
         self.assertTrue(
             all(
@@ -256,6 +267,16 @@ class VisualQcAdminCaseTests(unittest.TestCase):
 
         self.assertEqual(detail.status_code, 200, detail.text)
         self.assertEqual(detail.json()["schema_version"], "VISUAL-QC-SERVER-CASE-V3")
+        jsonschema.validate(
+            detail.json(),
+            json.loads(
+                (
+                    ROOT
+                    / "knowledge-base"
+                    / "visual-qc-server-case-v3-schema.json"
+                ).read_text(encoding="utf-8")
+            ),
+        )
         self.assertEqual(detail.json()["qualified_handoff"], qualified_handoff())
         self.assertEqual(detail.json()["server_registration_review"]["review_id"], registration["review_id"])
         self.assertEqual(detail.json()["server_qc_review"]["qc_review_id"], "qc-detail")

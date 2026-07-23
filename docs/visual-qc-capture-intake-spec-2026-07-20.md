@@ -76,7 +76,7 @@ Preserve the source package after Codex has confirmed that Milo supplied the phy
 
 The command returns the committed `source-package.json` and intake-manifest paths. An identical rerun returns `reused`; the same package id with different content or metadata fails as a conflict. `--confirm-milo-physical-source` records operator-confirmed provenance, while `--confirm-capture-checklist` records the completed intake check; neither is an automatic classifier or quality score. The command does not infer which image is front/back and does not require both sides in one batch. Use the source-declared `side_id` values from the board catalog.
 
-Run the deterministic read-only library audit before importer validation or upload:
+Run the deterministic read-only library audit before physical acceptance:
 
 ```powershell
 .\.venv\Scripts\python.exe scripts\audit_visual_qc_source_library.py `
@@ -85,28 +85,37 @@ Run the deterministic read-only library audit before importer validation or uplo
 
 `healthy` and orphan-only `attention` return exit code `0`; integrity `issues` return `1`; invalid arguments or a missing/invalid library root return `2`. Orphaned content-addressed objects are informational because a failed no-clobber package publish may leave safe reusable bytes. The audit never deletes, repairs, uploads, or changes evidence.
 
-Run validation without network writes:
+Generate the physical acceptance report and overlays, then run the acceptance-qualified handoff without network writes:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\import_visual_qc_batch.py D:\Visual-QC-Controlled-Source\packages\km4-physical-001-source\km4-physical-001-batch.intake.json `
-  --receipt D:\Visual-QC-Controlled-Source\packages\km4-physical-001-source\km4-physical-001-batch.receipt.json `
+.\.venv\Scripts\python.exe scripts\run_visual_qc_physical_acceptance.py `
+  D:\Visual-QC-Controlled-Source\packages\km4-physical-001-source\source-package.json `
+  --output D:\visual-qc-acceptance\km4-physical-001
+
+.\.venv\Scripts\python.exe scripts\handoff_visual_qc_physical_package.py `
+  D:\Visual-QC-Controlled-Source\packages\km4-physical-001-source\source-package.json `
+  D:\visual-qc-acceptance\km4-physical-001\physical-registration-run.json `
+  --library-root D:\Visual-QC-Controlled-Source `
+  --handoff-root D:\visual-qc-handoffs\km4-physical-001 `
   --dry-run
 ```
 
-Then import through the controlled HTTPS API:
+Then transfer the same qualified handoff through the controlled HTTPS API:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\import_visual_qc_batch.py D:\Visual-QC-Controlled-Source\packages\km4-physical-001-source\km4-physical-001-batch.intake.json `
-  --receipt D:\Visual-QC-Controlled-Source\packages\km4-physical-001-source\km4-physical-001-batch.receipt.json `
+.\.venv\Scripts\python.exe scripts\handoff_visual_qc_physical_package.py `
+  D:\Visual-QC-Controlled-Source\packages\km4-physical-001-source\source-package.json `
+  D:\visual-qc-acceptance\km4-physical-001\physical-registration-run.json `
+  --library-root D:\Visual-QC-Controlled-Source `
+  --handoff-root D:\visual-qc-handoffs\km4-physical-001 `
   --api-base https://cccsat.top/mb-repair-beta/api/v1/visual-qc `
   --credential-file C:\secure\visual-qc-credential.json `
-  --actor-id OWNER_ID `
   --wait
 ```
 
-The importer uploads sequentially, uses a deterministic idempotency key, writes the receipt atomically after every transition, stops on the first transfer failure by default, and resumes only rows without matching server ids. `--continue-on-error` is an explicit batch-operations choice. HTTP is permitted only for localhost with `--allow-http-localhost`.
+The handoff revalidates the source package, archived intake, acceptance report, source images, and overlays before transfer. It records the three governing document hashes and the acceptance action in closed qualified-handoff provenance. Retake, processing error, hash drift, or damaged overlays block the complete handoff. Automatic candidates and manual-registration-required cases may transfer, but neither is reviewed registration.
 
-The receipt stores file evidence, transfer state, server case/job ids, and typed errors. It never stores credentials or authorization headers. If source bytes change, the new SHA-256 invalidates previous server ids.
+The low-level importer uploads sequentially under the handoff command, uses deterministic idempotency keys, writes its receipt atomically after every transition, and resumes only rows without matching server ids. It cannot create qualified provenance by itself, so direct physical import fails closed. The handoff and intake receipts store file evidence, transfer state, server case/job ids, and typed errors; neither stores credentials or authorization headers. HTTP is permitted only for localhost with the explicit development flag.
 
 ## Data-Administrator Procedure
 

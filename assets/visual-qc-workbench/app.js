@@ -71,7 +71,6 @@ import {
   reviewVisualQcRegistration,
   restoreAdminServerCase,
   transitionServerSync,
-  uploadVisualQcCase,
 } from './visual-qc-server-client.js';
 
 const CATALOG_URL = '../../knowledge-base/repair-workbench-boards.json';
@@ -844,11 +843,16 @@ async function syncCurrentCaseWithServer() {
   if (!dataAdminAccess()) return;
   if (state.serverBusy) return;
   const visualCase = currentCase();
-  if (!visualCase || !state.photoBlob) return;
+  const sync = visualCase?.server_sync;
+  if (!sync?.server_case_id || !sync?.job_id) {
+    reportUserError(new Error(
+      '请先通过受控交接命令传输，再从服务器案例恢复。',
+    ));
+    return;
+  }
   state.serverBusy = true;
   render();
   try {
-    let sync = visualCase.server_sync || createServerSyncState(visualCase);
     if (sync.status === 'failed' && sync.job_id) {
       const queued = await retryVisualQcJob(
         VISUAL_QC_API,
@@ -864,47 +868,7 @@ async function syncCurrentCaseWithServer() {
       await pollCurrentServerJob(acceptedCaseFromSync(next.server_sync));
       return;
     }
-    if (sync.server_case_id && sync.job_id) {
-      await pollCurrentServerJob(acceptedCaseFromSync(sync));
-      return;
-    }
-
-    let next = structuredClone(currentCase());
-    next.server_sync = transitionServerSync(sync, { type: 'upload_started' });
-    replaceCurrentCase(next, true);
-    const accepted = await uploadVisualQcCase({
-      apiBase: VISUAL_QC_API,
-      actorId: VISUAL_QC_ACTOR_ID,
-      actorRole: VISUAL_QC_ACTOR_ROLE,
-      visualCase: next,
-      imageBlob: state.photoBlob,
-      syncState: next.server_sync,
-      onProgress: (progress) => {
-        const active = currentCase();
-        if (!active) return;
-        const progressed = structuredClone(active);
-        progressed.server_sync = transitionServerSync(progressed.server_sync, {
-          type: 'upload_progress',
-          progress,
-        });
-        replaceCurrentCase(progressed);
-      },
-    });
-    next = structuredClone(currentCase());
-    next.server_sync = transitionServerSync(next.server_sync, {
-      type: 'upload_accepted',
-      caseId: accepted.case_id,
-      imageId: accepted.image.image_id,
-      jobId: accepted.job.job_id,
-      jobStatus: accepted.job.status,
-    });
-    if (accepted.capture_session) {
-      next.capture_session = normalizeServerCaptureSession(
-        accepted.capture_session,
-      );
-    }
-    replaceCurrentCase(next, true);
-    await pollCurrentServerJob(accepted);
+    await pollCurrentServerJob(acceptedCaseFromSync(sync));
   } catch (error) {
     const active = currentCase();
     if (active && active.server_sync?.status !== 'failed') {
@@ -1661,7 +1625,10 @@ function renderServerSync() {
   elements.serverSyncBadge.className = `badge ${status.replaceAll('_', '-')}`;
   elements.serverSyncDetail.textContent = visualCase
     ? detail
-    : '图片先保存在本机草稿，服务器接受后再成为共享案例。';
+    : '请先通过受控交接命令传输，再从服务器案例恢复。';
+  if (visualCase && !sync?.server_case_id) {
+    elements.serverSyncDetail.textContent = '请先通过受控交接命令传输，再从服务器案例恢复。';
+  }
   const captureReady = visualCase?.image?.evidence_role !== 'physical_capture'
     || visualCase?.capture_session?.checklist?.status === 'confirmed';
   if (visualCase && !captureReady && status === 'local_draft') {
@@ -1679,10 +1646,9 @@ function renderServerSync() {
     manual_required: '请完成四点配准',
     reviewed: '服务器记录已审核',
   };
-  elements.serverSyncButton.textContent = actionLabels[status] || '上传并自动配准';
-  elements.serverSyncButton.disabled = !visualCase
-    || !state.photoBlob
-    || !captureReady
+  elements.serverSyncButton.textContent = actionLabels[status] || '继续服务器处理';
+  elements.serverSyncButton.hidden = !sync?.server_case_id;
+  elements.serverSyncButton.disabled = !sync?.server_case_id
     || state.serverBusy
     || ['candidate_ready', 'manual_required', 'reviewed', 'succeeded'].includes(status);
   elements.captureStage.disabled = Boolean(visualCase);

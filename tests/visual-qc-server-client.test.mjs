@@ -12,7 +12,6 @@ import {
   createGoldenSampleDescriptor,
   createRegistrationReviewDescriptor,
   createServerSyncState,
-  createUploadDescriptor,
   getVisualQcCocoDataset,
   getVisualQcDatasetBundle,
   getVisualQcDatasetAudit,
@@ -330,30 +329,6 @@ test('server sync keeps a stable idempotency key across retry transitions', () =
   assert.equal(retrying.attempt_count, 2);
   assert.equal(retrying.status, 'uploading');
   assert.equal(retrying.last_error, null);
-});
-
-test('upload descriptor preserves known board identity and physical evidence role', () => {
-  const descriptor = createUploadDescriptor(visualCase(), createServerSyncState(visualCase()));
-
-  assert.deepEqual(descriptor.fields, {
-    board_key: 'km4-f151',
-    side_id: 'main_page_2',
-    capture_stage: 'before_repair',
-    evidence_role: 'physical_capture',
-    capture_session_id: 'capture-session-001',
-    capture_setup_id: 'standard-bench',
-    capture_checklist: JSON.stringify({
-      status: 'confirmed',
-      items: {
-        board_and_side_confirmed: true,
-        focus_and_lens_confirmed: true,
-        lighting_and_occlusion_confirmed: true,
-      },
-      confirmed_at: '2026-07-20T10:00:00.000Z',
-    }),
-    sha256: 'a'.repeat(64),
-  });
-  assert.equal(descriptor.idempotencyKey, createServerSyncState(visualCase()).idempotency_key);
 });
 
 test('server identity replaces browser hints with the gateway assertion', async () => {

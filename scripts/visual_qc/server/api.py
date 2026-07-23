@@ -449,7 +449,10 @@ def create_app(settings: VisualQcServerSettings | None = None) -> FastAPI:
                     "message": "Training dataset export requires the reviewer role.",
                 },
             )
-        return service.training_manifest()
+        try:
+            return service.training_manifest()
+        except VisualQcServiceError as exc:
+            service_error(exc)
 
     @app.get("/api/v1/visual-qc/datasets/images/{image_id}")
     def training_image(
@@ -490,7 +493,10 @@ def create_app(settings: VisualQcServerSettings | None = None) -> FastAPI:
                     "message": "COCO dataset export requires the reviewer role.",
                 },
             )
-        return service.training_coco()
+        try:
+            return service.training_coco()
+        except VisualQcServiceError as exc:
+            service_error(exc)
 
     @app.get("/api/v1/visual-qc/datasets/audit")
     def training_audit(
@@ -506,7 +512,10 @@ def create_app(settings: VisualQcServerSettings | None = None) -> FastAPI:
                     "message": "Dataset readiness audit requires the reviewer role.",
                 },
             )
-        return service.training_audit()
+        try:
+            return service.training_audit()
+        except VisualQcServiceError as exc:
+            service_error(exc)
 
     @app.get("/api/v1/visual-qc/datasets/bundle")
     def training_bundle(

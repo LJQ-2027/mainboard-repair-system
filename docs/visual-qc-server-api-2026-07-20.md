@@ -51,7 +51,7 @@ Headers:
 
 - `X-Actor-Id`: identity asserted by the authenticated gateway.
 - `X-Actor-Role`: must be the gateway-asserted data-administrator compatibility value `reviewer`.
-- `Idempotency-Key`: stable retry key generated from the validated intake entry or an internal browser draft.
+- `Idempotency-Key`: stable retry key generated from the acceptance-qualified handoff entry.
 
 Multipart fields:
 
@@ -62,8 +62,9 @@ Multipart fields:
 - `capture_session_id`: stable id for one physical board, capture stage, and setup
 - `capture_setup_id`: stable optical setup id
 - `capture_checklist`: JSON object containing the three physical-capture confirmations
-- `intake_batch_id`: optional validated owner-managed batch id
-- `intake_entry_id`: optional entry id unique within that batch
+- `intake_batch_id`: required validated batch id for `physical_capture`
+- `intake_entry_id`: required entry id unique within that batch for `physical_capture`
+- `qualified_handoff`: required closed JSON provenance object for `physical_capture`; it binds the source package, archived intake, acceptance report, and acceptance action by SHA-256
 - `sha256`: lowercase or uppercase SHA-256 of the original bytes
 - `file`: JPEG, PNG, or WebP
 
@@ -76,19 +77,33 @@ Acceptance validates:
 - configured upload size and free-space reserve;
 - idempotency ownership and request fingerprint.
 - capture-session identity consistency, including inside the database write transaction.
+- complete and semantically valid acceptance-qualified handoff provenance for every physical capture.
 
-The API rejects non-data-administrator upload attempts before multipart parsing. Accepted uploads return HTTP `202` with `VISUAL-QC-SERVER-CASE-V1`, an image record, and a persisted queued job. Originals use content-addressed storage under the configured data root. Intake provenance is retained on the case and returned by the admin detail contract.
+The API rejects non-data-administrator upload attempts before multipart parsing. It also rejects a physical capture that does not carry the exact provenance created by `handoff_visual_qc_physical_package.py`. Accepted uploads return HTTP `202` with `VISUAL-QC-SERVER-CASE-V2`, an image record, the normalized qualified-handoff provenance, and a persisted queued job. Originals use content-addressed storage under the configured data root.
 
 `GET /api/v1/visual-qc/capture-sessions/{capture_session_id}` returns the expected and captured board sides, `pair_in_progress` or `pair_complete`, and the accepted cases for the authenticated actor. A session is actor-scoped and cannot be read by another actor.
 
-Owner-managed batches are validated before upload:
+Physical captures use one controlled path. Run the acceptance-qualified handoff dry run first, inspect its receipt, and then repeat without `--dry-run` to transfer:
 
 ```powershell
-python scripts/import_visual_qc_batch.py batch.json --dry-run
-python scripts/import_visual_qc_batch.py batch.json --api-base https://cccsat.top/mb-repair-beta/api/v1/visual-qc --receipt batch.receipt.json --wait
+python scripts/handoff_visual_qc_physical_package.py `
+  source-package.json `
+  physical-registration-run.json `
+  --library-root D:\visual-qc-source-library `
+  --handoff-root D:\visual-qc-handoffs\km4-physical-001 `
+  --dry-run
+
+python scripts/handoff_visual_qc_physical_package.py `
+  source-package.json `
+  physical-registration-run.json `
+  --library-root D:\visual-qc-source-library `
+  --handoff-root D:\visual-qc-handoffs\km4-physical-001 `
+  --api-base https://cccsat.top/mb-repair-beta/api/v1/visual-qc `
+  --credential-file C:\secure\visual-qc-credential.json `
+  --wait
 ```
 
-The importer verifies the local batch, uses deterministic retry keys, records a resumable `VISUAL-QC-INTAKE-RECEIPT-V1`, and never embeds credentials in the manifest or receipt.
+The handoff tool revalidates the immutable source package, archived intake, acceptance report, source images, and overlays before it calls the low-level resumable importer. The importer remains an internal transport primitive; it cannot synthesize qualified provenance and direct physical import fails closed. Credentials are never embedded in manifests or receipts. The browser does not create new physical server cases.
 
 ## Data-Administrator Case Catalog
 
@@ -96,7 +111,7 @@ The importer verifies the local batch, uses deterministic retry keys, records a 
 - `GET /api/v1/visual-qc/admin/cases/{case_id}`
 - `GET /api/v1/visual-qc/admin/cases/{case_id}/image`
 
-These routes require the data-administrator compatibility role and remain actor-scoped. The list provides stable board, side, state, evidence-role and pagination filters. Detail responses use `VISUAL-QC-SERVER-CASE-V2`, include intake provenance and the latest processing/registration/QC evidence, and verify that the content-addressed original still matches its stored hash before image recovery. The internal workbench restores the server case into IndexedDB and then uses the existing canvas workflow.
+These routes require the data-administrator compatibility role and remain actor-scoped. List responses use `VISUAL-QC-ADMIN-CASE-LIST-V2` and provide stable board, side, state, evidence-role and pagination filters. Detail responses use `VISUAL-QC-SERVER-CASE-V3`, include qualified-handoff provenance plus the latest processing/registration/QC evidence, and verify that the content-addressed original still matches its stored hash before image recovery. The internal workbench restores the server case into IndexedDB and then uses the existing canvas workflow. Machine-readable response schemas are `knowledge-base/visual-qc-server-case-v2-schema.json`, `knowledge-base/visual-qc-server-case-v3-schema.json`, and `knowledge-base/visual-qc-admin-case-list-v2-schema.json`; V1 response documents are historical only.
 
 ## Job Contract
 
@@ -174,7 +189,7 @@ Only cases older than `VISUAL_QC_RETENTION_DAYS` are eligible, up to `VISUAL_QC_
 - `GET /api/v1/visual-qc/datasets/bundle`
 - `GET /api/v1/visual-qc/datasets/images/{image_id}`
 
-All five routes require the exact gateway-injected data-administrator compatibility role `reviewer`. The manifest uses `VISUAL-QC-TRAINING-MANIFEST-V1` and contains only the latest eligible final review for each physical case, together with immutable board identity, capture setup, source hash, QC result, and reviewed annotations. The image route serves an original only when it belongs to a case represented by an eligible latest QC review. The COCO route builds `VISUAL-QC-COCO-V1` from that server-owned manifest on each request, sorts cases and annotations deterministically, keeps the nine fixed defect categories even for an empty dataset, and includes only confirmed human annotations. The bundle route packages a deterministic manifest snapshot, COCO, `VISUAL-QC-DATASET-BUNDLE-V1` index, and all eligible originals under stable case-derived archive paths. It verifies each source object against the governed SHA-256, streams image content into a fixed-metadata ZIP, preserves the server disk reserve, and deletes the temporary archive after the response. The read-only `VISUAL-QC-DATASET-AUDIT-V1` route evaluates every server case against one ordered primary blocker. These routes are the server-owned training-data boundary; browser drafts and proxy evidence never enter the eligible export.
+All five routes require the exact gateway-injected data-administrator compatibility role `reviewer`. The manifest uses `VISUAL-QC-TRAINING-MANIFEST-V1` and contains only the latest eligible final review for each physical case with valid qualified-handoff provenance, together with immutable board identity, capture setup, source hash, QC result, and reviewed annotations. The same physical-evidence and provenance gate protects the manifest, COCO, bundle, audit classification, and direct image route; malformed provenance fails closed. The COCO route builds `VISUAL-QC-COCO-V1` from that server-owned manifest on each request, sorts cases and annotations deterministically, keeps the nine fixed defect categories even for an empty dataset, and includes only confirmed human annotations. The bundle route packages a deterministic manifest snapshot, COCO, `VISUAL-QC-DATASET-BUNDLE-V1` index, and all eligible originals under stable case-derived archive paths. It verifies each source object against the governed SHA-256, streams image content into a fixed-metadata ZIP, preserves the server disk reserve, and deletes the temporary archive after the response. The read-only `VISUAL-QC-DATASET-AUDIT-V1` route evaluates every server case against one ordered primary blocker. These routes are the server-owned training-data boundary; browser drafts and proxy evidence never enter the eligible export.
 
 Original and artifact writes hold the same data-root OS file lock from object creation through database reference commit. Retention holds that lock from its final transactional eligibility check through reference-aware object deletion. This closes the upload/cleanup race across API and CLI processes, but the operational procedure still stops the QC service before destructive maintenance.
 
@@ -192,8 +207,8 @@ Every executed run is recorded in `retention_runs` with its cutoff, candidate ID
 
 Implemented:
 
-- controlled multipart upload;
-- owner-managed batch validation, resumable CLI import, and stable intake receipts;
+- acceptance-qualified physical handoff with controlled multipart transport;
+- owner-managed batch validation, resumable low-level CLI transport, and stable intake receipts;
 - data-administrator-only upload enforcement before multipart parsing;
 - actor-scoped admin case list, detail, original recovery, filtering, and pagination;
 - SHA-256 integrity and deduplication;
@@ -204,9 +219,9 @@ Implemented:
 - explicit failed-job retry;
 - server-side image quality metrics;
 - automatic registration candidate or reviewed-manual fallback;
-- IndexedDB draft recovery before and after upload;
-- stable browser idempotency keys across retry and refresh;
-- byte-level upload progress, job polling, failed-job retry, and interrupted polling recovery;
+- IndexedDB local-draft recovery and server-case restoration;
+- stable handoff idempotency keys across retry and process restart;
+- byte-level handoff progress, job polling, failed-job retry, and interrupted polling recovery;
 - automatic candidate overlay with explicit human confirmation;
 - safe return to the existing four-point workflow when automatic registration is unavailable;
 - data-administrator Golden Sample approval and active-version lookup in the workbench;

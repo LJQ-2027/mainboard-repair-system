@@ -851,6 +851,7 @@ class VisualQcStore:
                     cases.board_id,
                     cases.side_id,
                     cases.capture_stage,
+                    cases.evidence_role,
                     cases.capture_setup_id,
                     cases.capture_session_id,
                     cases.qualified_handoff_json,
@@ -918,7 +919,10 @@ class VisualQcStore:
         with self.connect() as connection:
             row = connection.execute(
                 """
-                SELECT images.*
+                SELECT
+                    images.*,
+                    cases.evidence_role,
+                    cases.qualified_handoff_json
                 FROM images
                 JOIN cases USING(case_id)
                 JOIN case_qc_reviews USING(case_id)

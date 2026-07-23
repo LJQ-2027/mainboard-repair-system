@@ -151,6 +151,16 @@ class VisualQcServerApiTests(unittest.TestCase):
         self.assertEqual(first.json(), second.json())
         payload = first.json()
         self.assertEqual(payload["schema_version"], "VISUAL-QC-SERVER-CASE-V2")
+        jsonschema.validate(
+            payload,
+            json.loads(
+                (
+                    ROOT
+                    / "knowledge-base"
+                    / "visual-qc-server-case-v2-schema.json"
+                ).read_text(encoding="utf-8")
+            ),
+        )
         self.assertEqual(payload["qualified_handoff"], qualified_handoff())
         self.assertEqual(payload["job"]["status"], "queued")
         self.assertEqual(payload["capture_session"]["session_id"], "capture-session-001")

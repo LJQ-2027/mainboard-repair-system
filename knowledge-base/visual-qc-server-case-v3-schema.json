@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "VISUAL-QC-SERVER-CASE-V3",
+  "title": "Visual QC data-administrator case detail",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "case_id",
+    "board_key",
+    "board_id",
+    "side_id",
+    "capture_stage",
+    "evidence_role",
+    "intake",
+    "qualified_handoff",
+    "capture_session",
+    "created_at",
+    "image",
+    "job"
+  ],
+  "properties": {
+    "schema_version": {"const": "VISUAL-QC-SERVER-CASE-V3"},
+    "case_id": {"type": "string", "minLength": 1},
+    "board_key": {"type": "string", "minLength": 1},
+    "board_id": {"type": "string", "minLength": 1},
+    "side_id": {"type": "string", "minLength": 1},
+    "capture_stage": {
+      "enum": ["golden_reference", "before_repair", "after_repair"]
+    },
+    "evidence_role": {
+      "enum": ["physical_capture", "synthetic_proxy", "service_manual_proxy"]
+    },
+    "intake": {"$ref": "#/$defs/intake"},
+    "qualified_handoff": {"$ref": "#/$defs/qualifiedHandoffOrNull"},
+    "capture_session": {"type": "object"},
+    "created_at": {"type": "string", "minLength": 1},
+    "image": {"type": "object"},
+    "job": {"type": "object"},
+    "server_registration_review": {"type": "object"},
+    "server_qc_review": {"type": "object"}
+  },
+  "$defs": {
+    "intake": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["batch_id", "entry_id"],
+      "properties": {
+        "batch_id": {"type": ["string", "null"]},
+        "entry_id": {"type": ["string", "null"]}
+      }
+    },
+    "qualifiedHandoffOrNull": {
+      "anyOf": [
+        {"type": "null"},
+        {"$ref": "#/$defs/qualifiedHandoff"}
+      ]
+    },
+    "qualifiedHandoff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "handoff_schema_version",
+        "source_package_manifest_sha256",
+        "archived_intake_manifest_sha256",
+        "acceptance_report_sha256",
+        "acceptance_action",
+        "registration_review_required",
+        "field_accuracy_claim_allowed"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "VISUAL-QC-QUALIFIED-HANDOFF-PROVENANCE-V1"
+        },
+        "handoff_schema_version": {
+          "const": "VISUAL-QC-PHYSICAL-HANDOFF-V1"
+        },
+        "source_package_manifest_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "archived_intake_manifest_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "acceptance_report_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "acceptance_action": {
+          "enum": [
+            "automatic_candidate_review_required",
+            "manual_registration_required"
+          ]
+        },
+        "registration_review_required": {"const": true},
+        "field_accuracy_claim_allowed": {"const": false}
+      }
+    }
+  }
+}
