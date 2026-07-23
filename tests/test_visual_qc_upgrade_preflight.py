@@ -10,9 +10,14 @@ from scripts.visual_qc.upgrade_preflight import (
     create_read_only_snapshot,
     database_projection,
     rehearse_candidate_migration,
+    smoke_candidate_runtime,
+    smoke_rollback_runtime,
     validate_managed_objects,
 )
 from scripts.visual_qc.server.store import VisualQcStore
+
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def sha256_file(path: Path) -> str:
@@ -158,7 +163,7 @@ class VisualQcUpgradePreflightTests(unittest.TestCase):
                     "legacy-job",
                     "legacy-proxy",
                     "legacy-image",
-                    "analyze_and_register",
+                    "automatic_registration",
                     "succeeded",
                     1,
                     '{"quality":{"status":"usable"}}',
@@ -325,6 +330,156 @@ class VisualQcUpgradePreflightTests(unittest.TestCase):
         self.assertIn(
             "managed_object_path_mismatch",
             [issue["error_code"] for issue in result["issues"]],
+        )
+
+    def prepare_candidate_data_root(self, *, physical=False) -> Path:
+        source = self.create_f278061_database()
+        source_data_root = self.root / "source-data"
+        self.attach_managed_objects(source, source_data_root)
+        if physical:
+            with closing(sqlite3.connect(source)) as connection:
+                connection.execute(
+                    """
+                    UPDATE cases
+                    SET evidence_role = 'physical_capture',
+                        capture_stage = 'before_repair',
+                        capture_checklist_json =
+                            '{"status":"confirmed","items":{"board_identity":true}}'
+                    """
+                )
+                connection.execute(
+                    """
+                    UPDATE capture_sessions
+                    SET evidence_role = 'physical_capture',
+                        capture_stage = 'before_repair'
+                    """
+                )
+                connection.commit()
+        candidate_root = self.root / (
+            "candidate-physical" if physical else "candidate-proxy"
+        )
+        candidate_database = candidate_root / "visual-qc.sqlite3"
+        create_read_only_snapshot(source, candidate_database)
+        result = rehearse_candidate_migration(candidate_database, "f278061")
+        self.assertEqual(result["status"], "passed")
+        return candidate_root
+
+    def test_candidate_runtime_exposes_new_contract_and_excludes_proxy(self):
+        candidate_root = self.prepare_candidate_data_root()
+
+        result = smoke_candidate_runtime(ROOT, candidate_root)
+
+        self.assertEqual(result["status"], "passed")
+        self.assertEqual(
+            result["api_schemas"],
+            {
+                "health": "VISUAL-QC-SERVER-HEALTH-V2",
+                "admin_list": "VISUAL-QC-ADMIN-CASE-LIST-V2",
+                "admin_detail": "VISUAL-QC-SERVER-CASE-V3",
+                "dataset_audit": "VISUAL-QC-DATASET-AUDIT-V1",
+            },
+        )
+        self.assertEqual(
+            result["counts"],
+            {"database_cases": 1, "listed_cases": 1, "detailed_cases": 1},
+        )
+        self.assertEqual(result["dataset"]["eligible_case_count"], 0)
+        self.assertEqual(
+            result["dataset"]["reason_counts"],
+            {"non_physical_evidence": 1},
+        )
+
+    def test_candidate_runtime_excludes_legacy_physical_without_handoff(self):
+        candidate_root = self.prepare_candidate_data_root(physical=True)
+
+        result = smoke_candidate_runtime(ROOT, candidate_root)
+
+        self.assertEqual(result["status"], "passed")
+        self.assertEqual(result["dataset"]["eligible_case_count"], 0)
+        self.assertEqual(
+            result["dataset"]["reason_counts"],
+            {"qualified_handoff_provenance_required": 1},
+        )
+
+    def create_rollback_app(self, *, compatible=True) -> Path:
+        app_root = self.root / (
+            "rollback-compatible" if compatible else "rollback-incompatible"
+        )
+        store_path = app_root / "scripts" / "visual_qc" / "server" / "store.py"
+        store_path.parent.mkdir(parents=True)
+        (app_root / "VERSION").write_text("f278061\n", encoding="ascii")
+        rejection = """
+            columns = {
+                row[1]
+                for row in self.connection.execute("PRAGMA table_info(cases)")
+            }
+            if "qualified_handoff_json" in columns:
+                raise RuntimeError("new column rejected")
+""" if not compatible else ""
+        store_path.write_text(
+            f"""
+import sqlite3
+
+
+class VisualQcStore:
+    def __init__(self, database_path, recover_interrupted_jobs=True):
+        self.connection = sqlite3.connect(database_path)
+        self.connection.row_factory = sqlite3.Row
+{rejection}
+
+    def operational_counts(self):
+        count = self.connection.execute(
+            "SELECT COUNT(*) FROM cases"
+        ).fetchone()[0]
+        return {{"cases": {{"total": count}}}}
+
+    def get_case(self, case_id):
+        row = self.connection.execute(
+            "SELECT case_id FROM cases WHERE case_id = ?",
+            (case_id,),
+        ).fetchone()
+        return {{"case": dict(row)}} if row else None
+""".lstrip(),
+            encoding="utf-8",
+        )
+        return app_root
+
+    def test_rollback_runtime_reads_candidate_migrated_database(self):
+        candidate_root = self.prepare_candidate_data_root()
+        rollback_database = self.root / "rollback.sqlite3"
+        create_read_only_snapshot(
+            candidate_root / "visual-qc.sqlite3",
+            rollback_database,
+        )
+
+        result = smoke_rollback_runtime(
+            self.create_rollback_app(),
+            rollback_database,
+        )
+
+        self.assertEqual(result["status"], "passed")
+        self.assertEqual(result["source_version"], "f278061")
+        self.assertEqual(result["case_count"], 1)
+        self.assertEqual(result["cases_read"], 1)
+        self.assertEqual(result["issues"], [])
+
+    def test_rollback_runtime_incompatibility_fails_closed(self):
+        candidate_root = self.prepare_candidate_data_root()
+        rollback_database = self.root / "rollback.sqlite3"
+        create_read_only_snapshot(
+            candidate_root / "visual-qc.sqlite3",
+            rollback_database,
+        )
+
+        result = smoke_rollback_runtime(
+            self.create_rollback_app(compatible=False),
+            rollback_database,
+        )
+
+        self.assertEqual(result["status"], "failed")
+        self.assertEqual(
+            result["issues"][0]["error_code"],
+            "rollback_runtime_incompatible",
         )
 
 

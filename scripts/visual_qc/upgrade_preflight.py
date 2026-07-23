@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from contextlib import closing
+from dataclasses import replace
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -13,6 +15,8 @@ from scripts.visual_qc.source_library import (
     _is_reparse_or_symlink,
 )
 from scripts.visual_qc.server.store import VisualQcStore
+from scripts.visual_qc.server.config import VisualQcServerSettings
+from scripts.visual_qc.server.service import VisualQcService
 
 
 UPGRADE_PREFLIGHT_SCHEMA_VERSION = "VISUAL-QC-UPGRADE-PREFLIGHT-V1"
@@ -541,5 +545,248 @@ def validate_managed_objects(database: Path, data_root: Path) -> dict:
             "artifacts": artifacts,
             "total": len(records),
         },
+        "issues": issues,
+    }
+
+
+def smoke_candidate_runtime(project_root: Path, candidate_data_root: Path) -> dict:
+    project_root = Path(project_root).resolve()
+    candidate_data_root = Path(candidate_data_root).resolve()
+    database = candidate_data_root / "visual-qc.sqlite3"
+    issues = []
+    api_schemas = {
+        "health": None,
+        "admin_list": None,
+        "admin_detail": None,
+        "dataset_audit": None,
+    }
+    counts = {
+        "database_cases": 0,
+        "listed_cases": 0,
+        "detailed_cases": 0,
+    }
+    dataset = {
+        "eligible_case_count": 0,
+        "excluded_case_count": 0,
+        "reason_counts": {},
+    }
+    try:
+        with closing(_read_only_connection(database)) as connection:
+            case_rows = [
+                dict(row)
+                for row in connection.execute(
+                    """
+                    SELECT case_id, actor_id, evidence_role,
+                           qualified_handoff_json
+                    FROM cases
+                    ORDER BY actor_id, case_id
+                    """
+                ).fetchall()
+            ]
+        counts["database_cases"] = len(case_rows)
+        settings = VisualQcServerSettings.from_environment()
+        settings = replace(
+            settings,
+            project_root=project_root,
+            data_root=candidate_data_root,
+            minimum_free_bytes=0,
+            warning_free_bytes=0,
+            worker_count=0,
+        )
+        service = VisualQcService(settings, recover_interrupted_jobs=False)
+
+        health = service.health()
+        api_schemas["health"] = health.get("schema_version")
+        if api_schemas["health"] != "VISUAL-QC-SERVER-HEALTH-V2":
+            issues.append(
+                _finding(
+                    "candidate_health_schema_mismatch",
+                    "Candidate health schema is incompatible.",
+                )
+            )
+        if health.get("cases", {}).get("total") != len(case_rows):
+            issues.append(
+                _finding(
+                    "candidate_health_count_mismatch",
+                    "Candidate health case count does not match the database.",
+                )
+            )
+
+        case_by_actor: dict[str, list[str]] = {}
+        for row in case_rows:
+            case_by_actor.setdefault(row["actor_id"], []).append(row["case_id"])
+        for actor_id, expected_case_ids in sorted(case_by_actor.items()):
+            page = service.list_admin_cases(
+                actor_id,
+                board_key=None,
+                side_id=None,
+                capture_stage=None,
+                state=None,
+                page=1,
+                page_size=max(1, len(expected_case_ids)),
+            )
+            api_schemas["admin_list"] = page.get("schema_version")
+            if api_schemas["admin_list"] != "VISUAL-QC-ADMIN-CASE-LIST-V2":
+                issues.append(
+                    _finding(
+                        "candidate_admin_list_schema_mismatch",
+                        "Candidate admin list schema is incompatible.",
+                    )
+                )
+            listed_ids = [item["case_id"] for item in page.get("cases", [])]
+            counts["listed_cases"] += len(listed_ids)
+            if sorted(listed_ids) != sorted(expected_case_ids):
+                issues.append(
+                    _finding(
+                        "candidate_admin_list_count_mismatch",
+                        f"Candidate admin list is incomplete for actor {actor_id}.",
+                    )
+                )
+            for case_id in expected_case_ids:
+                detail = service.get_admin_case(case_id, actor_id)
+                api_schemas["admin_detail"] = detail.get("schema_version")
+                if api_schemas["admin_detail"] != "VISUAL-QC-SERVER-CASE-V3":
+                    issues.append(
+                        _finding(
+                            "candidate_admin_detail_schema_mismatch",
+                            "Candidate admin detail schema is incompatible.",
+                        )
+                    )
+                counts["detailed_cases"] += 1
+
+        audit = service.training_audit()
+        api_schemas["dataset_audit"] = audit.get("schema_version")
+        if api_schemas["dataset_audit"] != "VISUAL-QC-DATASET-AUDIT-V1":
+            issues.append(
+                _finding(
+                    "candidate_dataset_audit_schema_mismatch",
+                    "Candidate dataset audit schema is incompatible.",
+                )
+            )
+        if audit.get("total_case_count") != len(case_rows):
+            issues.append(
+                _finding(
+                    "candidate_dataset_count_mismatch",
+                    "Candidate dataset audit case count does not match the database.",
+                )
+            )
+        dataset = {
+            "eligible_case_count": audit.get("eligible_case_count", 0),
+            "excluded_case_count": audit.get("excluded_case_count", 0),
+            "reason_counts": audit.get("reason_counts", {}),
+        }
+        audit_cases = {
+            item["case_id"]: item for item in audit.get("cases", [])
+        }
+        for row in case_rows:
+            item = audit_cases.get(row["case_id"])
+            if item is None:
+                issues.append(
+                    _finding(
+                        "candidate_dataset_case_missing",
+                        f"Candidate dataset audit omitted case {row['case_id']}.",
+                    )
+                )
+                continue
+            if row["evidence_role"] != "physical_capture":
+                expected_reason = "non_physical_evidence"
+            elif row["qualified_handoff_json"] is None:
+                expected_reason = "qualified_handoff_provenance_required"
+            else:
+                expected_reason = None
+            if expected_reason and item.get("blocking_reason") != expected_reason:
+                issues.append(
+                    _finding(
+                        "candidate_dataset_gate_mismatch",
+                        f"Candidate dataset gate changed for case {row['case_id']}.",
+                    )
+                )
+    except Exception:
+        issues.append(
+            _finding(
+                "candidate_runtime_incompatible",
+                "Candidate runtime could not read the migrated database.",
+            )
+        )
+
+    return {
+        "status": "passed" if not issues else "failed",
+        "api_schemas": api_schemas,
+        "counts": counts,
+        "dataset": dataset,
+        "issues": issues,
+    }
+
+
+def smoke_rollback_runtime(
+    source_app_root: Path,
+    migrated_database: Path,
+) -> dict:
+    source_app_root = Path(source_app_root).resolve()
+    migrated_database = Path(migrated_database).resolve()
+    version_path = source_app_root / "VERSION"
+    store_path = (
+        source_app_root / "scripts" / "visual_qc" / "server" / "store.py"
+    )
+    source_version = (
+        version_path.read_text(encoding="ascii").strip()
+        if version_path.is_file()
+        else ""
+    )
+    issues = []
+    case_count = 0
+    cases_read = 0
+    try:
+        if source_version not in SUPPORTED_SOURCE_VERSIONS:
+            raise ValueError("Rollback source version is unsupported.")
+        if not store_path.is_file():
+            raise ValueError("Rollback store module is missing.")
+        with closing(_read_only_connection(migrated_database)) as connection:
+            case_ids = [
+                row["case_id"]
+                for row in connection.execute(
+                    "SELECT case_id FROM cases ORDER BY case_id"
+                ).fetchall()
+            ]
+        case_count = len(case_ids)
+        module_name = (
+            "_visual_qc_rollback_store_"
+            + hashlib.sha256(str(store_path).encode("utf-8")).hexdigest()[:16]
+        )
+        specification = importlib.util.spec_from_file_location(
+            module_name,
+            store_path,
+        )
+        if specification is None or specification.loader is None:
+            raise RuntimeError("Rollback store module cannot be loaded.")
+        module = importlib.util.module_from_spec(specification)
+        specification.loader.exec_module(module)
+        rollback_store = module.VisualQcStore(
+            migrated_database,
+            recover_interrupted_jobs=False,
+        )
+        operational = rollback_store.operational_counts()
+        if operational.get("cases", {}).get("total") != case_count:
+            raise RuntimeError("Rollback store case count changed.")
+        for case_id in case_ids:
+            if rollback_store.get_case(case_id) is None:
+                raise RuntimeError("Rollback store omitted a case.")
+            cases_read += 1
+        connection = getattr(rollback_store, "connection", None)
+        if connection is not None:
+            connection.close()
+    except Exception:
+        issues.append(
+            _finding(
+                "rollback_runtime_incompatible",
+                "Rollback runtime could not read the candidate-migrated database.",
+            )
+        )
+
+    return {
+        "status": "passed" if not issues else "failed",
+        "source_version": source_version,
+        "case_count": case_count,
+        "cases_read": cases_read,
         "issues": issues,
     }
