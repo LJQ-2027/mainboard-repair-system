@@ -18,7 +18,7 @@
 - Create: `knowledge-base/visual-qc-deployment-manifest-v1-schema.json`
 - Create: `tests/test_visual_qc_deployment_manifest.py`
 
-- [ ] **Step 1: Write failing contract tests**
+- [x] **Step 1: Write failing contract tests**
 
 Add tests that call:
 
@@ -35,7 +35,7 @@ SHA-256, normalized path count, and Schema validity. Add rejection tests for a
 short or uppercase commit, empty archive, duplicate/unsafe runtime paths, and
 extra manifest properties.
 
-- [ ] **Step 2: Run the tests and verify RED**
+- [x] **Step 2: Run the tests and verify RED**
 
 Run:
 
@@ -45,7 +45,7 @@ Run:
 
 Expected: import failure because `deployment_manifest.py` does not exist.
 
-- [ ] **Step 3: Implement the contract**
+- [x] **Step 3: Implement the contract**
 
 Implement:
 
@@ -73,11 +73,11 @@ The CLI accepts `--archive`, `--runtime-manifest`, `--commit-sha`, and
 manifest, and returns `0`; validation/publication failures print typed JSON and
 return `2`.
 
-- [ ] **Step 4: Verify GREEN**
+- [x] **Step 4: Verify GREEN**
 
 Run the Task 1 test command. Expected: all tests pass.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```powershell
 git add scripts/visual_qc/deployment_manifest.py scripts/build_visual_qc_deployment_manifest.py knowledge-base/visual-qc-deployment-manifest-v1-schema.json tests/test_visual_qc_deployment_manifest.py
