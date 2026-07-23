@@ -2,7 +2,9 @@
 
 ## Status
 
-The first server-side visual registration core is implemented locally and remains pending controlled-beta deployment. Historical local-only cases retain `VISUAL-QC-CASE-V1`; server-connected workbench drafts use `VISUAL-QC-CASE-V2` with weak-network recovery, reviewed registration, Golden state, and difference-review state.
+The first server-side visual registration core, including ORB/AKAZE processing, persisted asynchronous jobs, and reviewed manual fallback, is deployed in production revision `f278061`. Historical local-only cases retain `VISUAL-QC-CASE-V1`; server-connected workbench drafts use `VISUAL-QC-CASE-V2` with recovery, reviewed registration, Golden state, and difference-review state.
+
+Later admission hardening is local only: qualified handoff provenance, Admin List V2, Admin Detail V3, and browser physical-upload removal are not deployed. Qualified handoff must not target production until a separately approved deployment and migration verification completes.
 
 The implementation consists of:
 
@@ -56,7 +58,7 @@ A failed result has:
 - `requires_manual_registration: true`;
 - `fallback.method: reviewed_manual_four_point`.
 
-Technical thresholds are candidate-generation safeguards, not industrial quality limits. A candidate does not become a reviewed registration until a technician or reviewer accepts it.
+Technical thresholds are candidate-generation safeguards, not industrial quality limits. A candidate does not become a reviewed registration until Codex, acting as the data administrator, accepts it in the internal workbench. Overseas technicians do not enter this review path.
 
 ## Benchmark Result
 
@@ -84,6 +86,6 @@ This is expected conservative behavior. None of the 21 images counts as physical
 - Neither role may be counted as real defect-recognition or field-registration accuracy.
 - The first real acceptance gate remains one known KM4/F151 bare-board front/back physical photo set.
 
-## Next Increment
+## Current Implemented Increment
 
-Wrap this core in the versioned FastAPI job contract, persist upload and job state, and expose automatic candidates to the existing reviewed four-point UI. Golden Sample and difference-candidate work begins only after the upload/job boundary is durable.
+The registration core is wrapped in the versioned FastAPI job contract with persisted job state, automatic candidates, reviewed four-point fallback, Golden Sample versioning, difference candidates, and final QC evidence. New physical cases enter only through the acceptance-qualified handoff; the browser restores existing server cases and cannot upload a new physical capture. The remaining acceptance increment requires the first known KM4/F151 bare-board front/back photo set, independent real check points, and reviewed physical evidence.

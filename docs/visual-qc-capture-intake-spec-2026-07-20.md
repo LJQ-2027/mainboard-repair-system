@@ -89,7 +89,8 @@ Generate the physical acceptance report and overlays, then run the acceptance-qu
 
 ```powershell
 .\.venv\Scripts\python.exe scripts\run_visual_qc_physical_acceptance.py `
-  D:\Visual-QC-Controlled-Source\packages\km4-physical-001-source\source-package.json `
+  --library-root D:\Visual-QC-Controlled-Source `
+  --package D:\Visual-QC-Controlled-Source\packages\km4-physical-001-source\source-package.json `
   --output D:\visual-qc-acceptance\km4-physical-001
 
 .\.venv\Scripts\python.exe scripts\handoff_visual_qc_physical_package.py `
@@ -100,7 +101,7 @@ Generate the physical acceptance report and overlays, then run the acceptance-qu
   --dry-run
 ```
 
-Then transfer the same qualified handoff through the controlled HTTPS API:
+Production remains `f278061` and does not yet implement the qualified-handoff contract. Do not target production until a separately approved deployment and migration verification completes. For isolated local integration, transfer the same qualified handoff to the loopback API:
 
 ```powershell
 .\.venv\Scripts\python.exe scripts\handoff_visual_qc_physical_package.py `
@@ -108,8 +109,9 @@ Then transfer the same qualified handoff through the controlled HTTPS API:
   D:\visual-qc-acceptance\km4-physical-001\physical-registration-run.json `
   --library-root D:\Visual-QC-Controlled-Source `
   --handoff-root D:\visual-qc-handoffs\km4-physical-001 `
-  --api-base https://cccsat.top/mb-repair-beta/api/v1/visual-qc `
+  --api-base http://127.0.0.1:3020/api/v1/visual-qc `
   --credential-file C:\secure\visual-qc-credential.json `
+  --allow-http-localhost `
   --wait
 ```
 

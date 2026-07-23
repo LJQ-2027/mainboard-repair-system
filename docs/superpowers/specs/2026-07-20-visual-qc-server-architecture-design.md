@@ -36,20 +36,23 @@ The production path is a server-led Web platform with asynchronous CPU visual pr
 
 ### Owner-Managed Intake
 
-`VISUAL-QC-INTAKE-BATCH-V1` binds every local file to an explicit board, side, capture stage, session, setup, and completed capture checklist. The local importer validates the complete batch before network transfer, calculates SHA-256 and decoded dimensions, rejects duplicate or mixed session identities, uploads sequentially with deterministic idempotency keys, and writes `VISUAL-QC-INTAKE-RECEIPT-V1` after every state change.
+Milo is the only source of real visual photos, and Codex is the only data operator. `VISUAL-QC-SOURCE-PACKAGE-V1` and its archived `VISUAL-QC-INTAKE-BATCH-V1` bind every local file to an explicit board, side, capture stage, session, setup, checklist, and immutable SHA-256. The controlled sequence is `stage -> source audit -> physical acceptance -> acceptance-qualified handoff dry-run -> controlled transfer -> server registration review`.
 
-The import command is:
+The physical transfer command is:
 
 ```powershell
-python -m scripts.import_visual_qc_batch C:\controlled-source\batch.json `
-  --receipt C:\controlled-source\batch.receipt.json `
-  --api-base https://cccsat.top/mb-repair-beta/api/v1/visual-qc `
+python scripts/handoff_visual_qc_physical_package.py `
+  C:\controlled-source\packages\km4-physical-001\source-package.json `
+  C:\controlled-acceptance\km4-physical-001\physical-registration-run.json `
+  --library-root C:\controlled-source `
+  --handoff-root C:\controlled-handoffs\km4-physical-001 `
+  --api-base http://127.0.0.1:3020/api/v1/visual-qc `
   --credential-file C:\secure\visual-qc-credential.json `
-  --actor-id OWNER_ID `
+  --allow-http-localhost `
   --wait
 ```
 
-Run `--dry-run` first. Credentials are supplied explicitly or through environment variables and never enter the manifest or receipt.
+Run the same command with `--dry-run` first. This example is for isolated local integration. Production remains `f278061` and must not receive qualified handoff until a separately approved deployment and migration verification completes. The handoff revalidates the source package, archived intake, acceptance report, originals, and overlays, then attaches closed `VISUAL-QC-QUALIFIED-HANDOFF-PROVENANCE-V1` to each admitted physical case. The low-level importer is only an internal resumable transport and cannot synthesize provenance. Credentials never enter the source package, evidence, or receipts.
 
 ### Internal Visual Data Workbench
 
@@ -62,12 +65,13 @@ The browser workbench provides:
 - visible-defect rectangles/polygons and component-footprint suggestions;
 - Golden Sample and difference candidate management;
 - final human evidence and deterministic dataset exports.
+- no direct creation of physical server cases.
 
-The catalog restores `VISUAL-QC-SERVER-CASE-V2` only after the original SHA-256 and decoded dimensions match. Registration and final QC reviews must link to the current case/job/review ids; stale evidence is rejected instead of being opened as a plausible draft.
+The catalog list uses `VISUAL-QC-ADMIN-CASE-LIST-V2`, and detail restoration requires `VISUAL-QC-SERVER-CASE-V3` after the original SHA-256 and decoded dimensions match. Qualified handoff is preserved only as trace metadata; it never marks registration or QC as reviewed. Registration and final QC reviews must link to the current case/job/review ids; stale evidence is rejected instead of being opened as a plausible draft.
 
 ### QC API And Worker
 
-FastAPI validates identity, board/side, capture stage, MIME/signature, dimensions, hash, checklist, intake provenance, idempotency, storage reserve, and capture-session consistency. SQLite persists cases, images, jobs, reviews, Golden versions, artifacts, and audit events. One or two CPU workers process persisted jobs outside request handlers and recover interrupted work after restart.
+FastAPI validates identity, board/side, capture stage, MIME/signature, dimensions, hash, checklist, qualified handoff provenance, idempotency, storage reserve, and capture-session consistency. SQLite persists cases, images, jobs, compact provenance, reviews, Golden versions, artifacts, and audit events. One or two CPU workers process persisted jobs outside request handlers and recover interrupted work after restart.
 
 Automatic registration returns a draft candidate or a structured `manual_required` result. Difference regions remain `model_candidate` until Codex records a human decision.
 
@@ -116,9 +120,9 @@ Implemented:
 2. OpenCV contour/feature registration with structured manual fallback.
 3. A 21-image Service Manual proxy benchmark that remains explicitly non-physical evidence.
 4. Persistent FastAPI jobs, registration/QC evidence, Golden versions, difference candidates, retention and governed datasets.
-5. Owner-only batch manifest/receipt validation and resumable upload.
+5. Owner-only source staging, audit, physical acceptance, qualified handoff, and resumable controlled transfer.
 6. Actor-scoped server case catalog, original integrity recovery, and data-administrator workbench.
-7. Technician upload rejection and removal of visual data-management controls.
+7. Technician upload rejection, browser physical-upload removal, and fail-closed governed training exits.
 
 Still open:
 

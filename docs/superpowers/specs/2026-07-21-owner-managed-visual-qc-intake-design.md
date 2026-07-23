@@ -2,7 +2,7 @@
 
 ## Status
 
-Direction approved by Milo on 2026-07-21. This specification replaces the earlier assumption that overseas technicians or other colleagues upload visual-QC photos. Milo is the only source of real visual photos; Codex operates the intake, registration, annotation, Golden Sample, and dataset-building workflow. The written specification remains subject to Milo's final review before implementation.
+Historical foundation approved by Milo on 2026-07-21. This specification replaced the earlier assumption that overseas technicians or other colleagues upload visual-QC photos. Its direct generic-import transport and browser-upload details are superseded by `2026-07-23-physical-acceptance-qualified-handoff-design.md` and `2026-07-23-server-qualified-handoff-provenance-design.md`. Milo remains the only source of real visual photos; Codex operates the intake, registration, annotation, Golden Sample, and dataset-building workflow.
 
 ## Product Boundary
 
@@ -10,7 +10,7 @@ The visual-QC data path is an internal dataset-production capability, not a tech
 
 The authoritative flow is:
 
-`Milo supplies photos -> Codex prepares an intake manifest -> server validates and stores originals -> OpenCV produces quality/registration evidence -> Codex reviews or corrects registration and labels -> Codex approves Golden Samples where appropriate -> governed dataset export`
+`Milo supplies photos -> Codex stages and audits the source package -> physical acceptance -> acceptance-qualified handoff -> server validates and stores originals -> OpenCV produces quality/registration evidence -> Codex reviews or corrects registration and labels -> Codex approves Golden Samples where appropriate -> governed dataset export`
 
 Overseas technicians consume reviewed repair knowledge and future visual capabilities. They do not upload training/reference photos, approve labels, or enter the internal data workbench. A future technician-side inference device or capture policy is a separate product decision and is not implied by this intake system.
 

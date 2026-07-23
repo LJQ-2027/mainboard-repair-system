@@ -1,7 +1,9 @@
 # Visual QC Intake Batch Builder Design
 
 **Date:** 2026-07-22
-**Status:** Approved
+**Status:** Historical component; direct importer use superseded
+
+The manifest builder remains a local validation component. For physical evidence, its output may be consumed only inside the acceptance-qualified handoff chain; passing it directly to `scripts/import_visual_qc_batch.py` is no longer an approved admission path.
 
 ## Purpose
 
@@ -9,7 +11,7 @@ Provide a local, data-administrator command that turns photos supplied by Milo i
 
 ## Scope
 
-The builder accepts one known board, one capture session, one capture stage, and one or more explicit `side_id=path` image assignments. It writes a manifest that can be passed directly to `scripts/import_visual_qc_batch.py`.
+The builder accepts one known board, one capture session, one capture stage, and one or more explicit `side_id=path` image assignments. It writes a manifest for controlled source packaging and later acceptance-qualified handoff.
 
 The builder does not upload files, alter or copy source photos, infer board identity or board side from filenames, assess defects, or claim that both sides are present. Single-side batches remain valid because photos may arrive incrementally. Physical source photos must live outside the repository; repository assets, engineering references, and proxy material are rejected.
 

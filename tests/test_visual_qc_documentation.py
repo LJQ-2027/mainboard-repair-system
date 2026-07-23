@@ -1,7 +1,12 @@
 import unittest
 from pathlib import Path
 
-from scripts.handoff_visual_qc_physical_package import build_parser
+from scripts.handoff_visual_qc_physical_package import (
+    build_parser as build_handoff_parser,
+)
+from scripts.run_visual_qc_physical_acceptance import (
+    build_parser as build_acceptance_parser,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -25,6 +30,13 @@ class VisualQcDocumentationTests(unittest.TestCase):
         self.assertIn("acceptance-qualified handoff", server_api)
         self.assertIn("does not upload new physical captures", workbench)
         self.assertIn("handoff_visual_qc_physical_package.py", intake)
+        self.assertRegex(
+            intake,
+            r"run_visual_qc_physical_acceptance\.py `\s+"
+            r"--library-root [^\r\n]+ `\s+"
+            r"--package [^\r\n]+ `\s+"
+            r"--output [^\r\n]+",
+        )
         for document in (server_api, intake):
             self.assertIn("--library-root", document)
             self.assertIn("--handoff-root", document)
@@ -39,7 +51,7 @@ class VisualQcDocumentationTests(unittest.TestCase):
         )
 
     def test_documented_handoff_arguments_are_accepted_by_the_cli_parser(self):
-        arguments = build_parser().parse_args(
+        arguments = build_handoff_parser().parse_args(
             [
                 "source-package.json",
                 "physical-registration-run.json",
@@ -69,6 +81,117 @@ class VisualQcDocumentationTests(unittest.TestCase):
             Path("D:/visual-qc-handoffs/km4-physical-001"),
         )
         self.assertTrue(arguments.wait)
+
+    def test_canonical_visual_qc_documents_share_the_current_intake_boundary(self):
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        product_vision = (
+            ROOT / "docs" / "product-vision-and-requirements.md"
+        ).read_text(encoding="utf-8")
+        security = (
+            ROOT / "docs" / "security-and-data-boundary.md"
+        ).read_text(encoding="utf-8")
+        deployment = (ROOT / "docs" / "beta-deployment.md").read_text(
+            encoding="utf-8"
+        )
+        workbench = (
+            ROOT / "docs" / "visual-qc-workbench-2026-07-17.md"
+        ).read_text(encoding="utf-8")
+        architecture = (
+            ROOT
+            / "docs"
+            / "superpowers"
+            / "specs"
+            / "2026-07-20-visual-qc-server-architecture-design.md"
+        ).read_text(encoding="utf-8")
+        registration = (
+            ROOT / "docs" / "visual-qc-auto-registration-2026-07-20.md"
+        ).read_text(encoding="utf-8")
+        owner_intake = (
+            ROOT
+            / "docs"
+            / "superpowers"
+            / "specs"
+            / "2026-07-21-owner-managed-visual-qc-intake-design.md"
+        ).read_text(encoding="utf-8")
+        batch_builder = (
+            ROOT
+            / "docs"
+            / "superpowers"
+            / "specs"
+            / "2026-07-22-visual-qc-intake-batch-builder-design.md"
+        ).read_text(encoding="utf-8")
+        legacy_intake_plan = (
+            ROOT
+            / "docs"
+            / "superpowers"
+            / "plans"
+            / "2026-07-21-owner-managed-visual-qc-intake.md"
+        ).read_text(encoding="utf-8")
+        server_api = (
+            ROOT / "docs" / "visual-qc-server-api-2026-07-20.md"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn("acceptance-qualified handoff", readme)
+        self.assertIn("生产仍为 `f278061`", readme)
+        self.assertNotIn("再由数据管理员批量导入受控 FastAPI 服务", readme)
+        self.assertIn("海外维修员不上传视觉照片", product_vision)
+        self.assertNotIn("前端负责图片上传", product_vision)
+        self.assertIn("生产仍为 `f278061`", product_vision)
+        self.assertIn("不得把 qualified handoff 指向生产", product_vision)
+        self.assertIn("Milo 是实物照片的唯一来源", security)
+        self.assertIn("验收合格交接", security)
+        self.assertIn("生产仍为 `f278061`", security)
+        self.assertIn("qualified handoff 禁止指向生产", security)
+        self.assertIn("acceptance-qualified handoff CLI", deployment)
+        self.assertIn("Production remains `f278061`", workbench)
+        self.assertIn("must not be used for physical intake", workbench)
+        self.assertIn("VISUAL-QC-SERVER-CASE-V3", architecture)
+        self.assertIn("handoff_visual_qc_physical_package.py", architecture)
+        self.assertNotIn("scripts.import_visual_qc_batch", architecture)
+        self.assertIn("## Current Implemented Increment", registration)
+        self.assertNotIn("## Next Increment", registration)
+        self.assertNotIn("technician or reviewer", registration)
+        self.assertIn("data administrator", registration)
+        self.assertIn("production revision `f278061`", registration)
+        self.assertIn("Later admission hardening is local only", registration)
+        self.assertIn("direct generic-import transport", owner_intake)
+        self.assertIn("direct importer use superseded", batch_builder)
+        self.assertNotIn(
+            "passed directly to `scripts/import_visual_qc_batch.py`",
+            batch_builder,
+        )
+        self.assertIn("HISTORICAL COMPLETED PLAN", legacy_intake_plan)
+        self.assertIn("Do not execute this plan", legacy_intake_plan)
+        self.assertIn("Local HEAD contract", server_api)
+        self.assertIn("Production remains `f278061`", server_api)
+        self.assertIn("must not target production", server_api)
+
+    def test_documented_acceptance_arguments_are_accepted_by_the_cli_parser(self):
+        arguments = build_acceptance_parser().parse_args(
+            [
+                "--library-root",
+                "D:/visual-qc-source-library",
+                "--package",
+                "D:/visual-qc-source-library/packages/km4/source-package.json",
+                "--output",
+                "D:/visual-qc-acceptance/km4",
+            ]
+        )
+
+        self.assertEqual(
+            arguments.library_root,
+            Path("D:/visual-qc-source-library"),
+        )
+        self.assertEqual(
+            arguments.package,
+            Path(
+                "D:/visual-qc-source-library/packages/km4/source-package.json"
+            ),
+        )
+        self.assertEqual(
+            arguments.output,
+            Path("D:/visual-qc-acceptance/km4"),
+        )
 
 
 if __name__ == "__main__":

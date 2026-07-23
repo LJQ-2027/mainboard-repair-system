@@ -4,7 +4,9 @@
 
 `http://127.0.0.1:8898/assets/visual-qc-workbench/`
 
-This document began as the local baseline at commit `45a8613`. The workbench now implements the browser side of the approved server-led asynchronous architecture in `docs/superpowers/specs/2026-07-20-visual-qc-server-architecture-design.md`. The controlled pilot is deployed at `https://cccsat.top/mb-repair-beta/assets/visual-qc-workbench/`; this route is an authenticated pilot, not a field-accuracy claim.
+This document began as the local baseline at commit `45a8613` and now describes the **Local HEAD workbench contract** in `docs/superpowers/specs/2026-07-20-visual-qc-server-architecture-design.md`.
+
+Production remains `f278061` at `https://cccsat.top/mb-repair-beta/assets/visual-qc-workbench/`. That authenticated pilot predates qualified handoff, List V2, Detail V3, and browser physical-upload removal. The production route must not be used for physical intake under the Local HEAD procedure until a separately approved deployment and migration verification completes. Neither route is a field-accuracy claim.
 
 ## Ownership And Workflow
 

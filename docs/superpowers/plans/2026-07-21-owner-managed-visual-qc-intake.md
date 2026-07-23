@@ -1,5 +1,7 @@
 # Owner-Managed Visual QC Intake Implementation Plan
 
+> **HISTORICAL COMPLETED PLAN:** Do not execute this plan as the current intake procedure. Its direct generic-import transport, Admin List V1, and Detail V2 restoration steps were superseded by `2026-07-23-physical-acceptance-qualified-handoff.md` and `2026-07-23-server-qualified-handoff-provenance.md`. The current physical path is `stage -> source audit -> physical acceptance -> qualified handoff -> server review`.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Build a single-data-administrator, resumable photo-intake path that binds Milo-supplied images to known board metadata, prevents technician uploads, and lets Codex reopen imported server cases in the existing visual data workbench.

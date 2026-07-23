@@ -10,9 +10,9 @@
 
 这是内部视觉数据工作台，不是海外维修员入口。Milo 是实物照片的唯一来源，Codex 以数据管理员身份完成批量入库、配准修正、可见缺陷标注、Golden Sample 建立和训练数据导出。海外维修员不上传视觉照片，也不进入该工作台。
 
-当前实现遵循服务器主导的 Web 架构：照片先按 `VISUAL-QC-INTAKE-BATCH-V1` 在本地验证，再由数据管理员批量导入受控 FastAPI 服务；OpenCV 异步处理，自动失败回退人工四点配准，Golden Sample、候选决策和训练出口集中保存，浏览器保留工作草稿。权威设计见 `docs/superpowers/specs/2026-07-20-visual-qc-server-architecture-design.md`。
+当前实现遵循服务器主导的 Web 架构：照片先在仓库外固化为受控来源包，依次通过来源审计、实物验收和 acceptance-qualified handoff，才由数据管理员传输到受控 FastAPI 服务；OpenCV 异步处理，自动失败回退人工四点配准，Golden Sample、候选决策和训练出口集中保存，浏览器只保留工作草稿并恢复已有服务器案例。权威设计见 `docs/superpowers/specs/2026-07-20-visual-qc-server-architecture-design.md`。
 
-照片到达后不再手工复制或编写批次 JSON。数据管理员使用 `scripts/stage_visual_qc_source_package.py` 把 Milo 提供的临时附件逐字节保存到仓库外的内容寻址原片库，并同时生成 `VISUAL-QC-SOURCE-PACKAGE-V1` 来源回执和可直接交给 importer 的标准 intake manifest。工具不根据文件名或画面猜机型/板面，不修改来件，也不自动上传；`knowledge-base/visual-qc-proxy-inventory-v1.json` 固化所有已知点位图和手册代理图的审核哈希，缺失、替换或遗漏登记均锁死入库。`scripts/audit_visual_qc_source_library.py` 对完整包、当前代理撤销、对象完整性和孤立对象执行确定性只读巡检，不清理、不修复、不上传。低层 `create_visual_qc_intake_batch.py` 仅用于已经处于受控存储中的原片。完整命令见 `docs/visual-qc-capture-intake-spec-2026-07-20.md`。
+照片到达后不再手工复制或编写批次 JSON。数据管理员使用 `scripts/stage_visual_qc_source_package.py` 把 Milo 提供的临时附件逐字节保存到仓库外的内容寻址原片库，并同时生成 `VISUAL-QC-SOURCE-PACKAGE-V1` 来源回执和标准 intake manifest。工具不根据文件名或画面猜机型/板面，不修改来件，也不自动上传；`knowledge-base/visual-qc-proxy-inventory-v1.json` 固化所有已知点位图和手册代理图的审核哈希，缺失、替换或遗漏登记均锁死入库。`scripts/audit_visual_qc_source_library.py` 对完整包、当前代理撤销、对象完整性和孤立对象执行确定性只读巡检，不清理、不修复、不上传。低层 importer 只是 handoff 内部的可恢复传输实现，不能自行生成合格来源证明，也不是实物入库入口。完整命令见 `docs/visual-qc-capture-intake-spec-2026-07-20.md`。
 
 受控照片包建立后，先用本地验收运行器生成质量证据、自动配准候选和逐图叠图：
 
@@ -40,7 +40,9 @@
 
 唯一操作顺序为：`stage -> source audit -> physical acceptance -> acceptance-qualified handoff dry-run -> controlled transfer -> server registration review`。Milo 仍是实物照片的唯一来源，Codex 仍是唯一数据操作员，海外维修员没有照片上传入口。
 
-数据管理员工作台已接入受控服务器 QC 服务：支持批量导入回执、服务器案例目录、断点续传、原图恢复、任务轮询、自动候选叠图确认、人工四点回退、Golden Sample、差异热图和候选确认/驳回/暂缓。服务器侧包含批次与案例溯源、采集身份防污染、确定性合成透视、ORB/AKAZE 特征、RANSAC 单应性、结构化失败原因、持久化人工结论、磁盘压力健康状态和受控留存清理。受控试点部署在 `https://cccsat.top/mb-repair-beta/`；操作与数据边界见 `docs/visual-qc-capture-intake-spec-2026-07-20.md`、`docs/visual-qc-workbench-2026-07-17.md` 和 `docs/visual-qc-server-api-2026-07-20.md`。
+当前本地 HEAD 的数据管理员工作台支持服务器案例目录、原图恢复、任务轮询、自动候选叠图确认、人工四点回退、Golden Sample、差异热图和候选确认/驳回/暂缓；新实物案例只能由验收合格交接命令创建，浏览器没有直接上传入口。服务器侧包含批次与案例溯源、采集身份防污染、确定性合成透视、ORB/AKAZE 特征、RANSAC 单应性、结构化失败原因、持久化人工结论、磁盘压力健康状态和受控留存清理。
+
+生产仍为 `f278061`，地址是 `https://cccsat.top/mb-repair-beta/`。该生产版本早于 qualified handoff、List V2、Detail V3 和浏览器上传移除，不能作为当前本地 HEAD 契约的验证环境，也不能接收 qualified handoff。只有单独批准并完成部署与迁移验证后，生产才切换到本地 HEAD 口径。操作与数据边界见 `docs/visual-qc-capture-intake-spec-2026-07-20.md`、`docs/visual-qc-workbench-2026-07-17.md` 和 `docs/visual-qc-server-api-2026-07-20.md`。
 
 受控 beta 路由使用 Nginx Basic Auth，网关注入用户和权限，QC API 的 3020 端口只绑定回环地址。后端暂时沿用 `reviewer` 作为“数据管理员”权限的兼容值，不表示存在第二个人工审核角色；以后可在不改变业务数据契约的情况下替换为公司 SSO/OIDC。部署与回滚步骤见 `docs/beta-deployment.md`。
 
@@ -131,10 +133,10 @@ python ai_proxy_server.py
 - **前端**：纯 HTML/CSS/JS 页面，核心数据拆分到 `data/` 目录
 - **当前后端**：Python HTTP Server 代理（端口 8899）
 - **目标后端**：同域FastAPI服务、持久化QC任务、受控图片存储和CPU OpenCV Worker
-- **当前后端实现**：`visual_qc_server.py` 已提供版本化上传、SQLite任务恢复、图像质量证据、自动配准候选与人工四点回退；本地运行和部署边界见 `docs/visual-qc-server-api-2026-07-20.md`
+- **当前后端实现**：`visual_qc_server.py` 已提供验收合格交接接收、SQLite任务恢复、图像质量证据、自动配准候选与人工四点回退；本地运行和部署边界见 `docs/visual-qc-server-api-2026-07-20.md`
 - **当前数据闭环**：Milo 提供照片；Codex 依次完成来源包固化、只读审计、离线质量/配准预检和验收合格交接，再在内部工作台完成配准、最终人工 QC、Golden Sample 版本化、差异候选决策和标注
 - **当前训练出口**：数据管理员可获取仅含训练合格实拍案例的 `VISUAL-QC-TRAINING-MANIFEST-V1`、对应原图和确定性 `VISUAL-QC-COCO-V1`；`VISUAL-QC-DATASET-BUNDLE-V1` 封装清单、COCO、索引和原图，`VISUAL-QC-DATASET-AUDIT-V1` 解释每个案例被排除的首要门禁原因
-- **当前浏览器接入**：内部视觉数据工作台支持服务器案例检索与恢复、任务状态、自动候选确认、四点回退、Golden Sample、差异热图和逐候选人工决策；海外维修员界面隐藏并由 API 拒绝所有照片入库和数据集工具
+- **当前浏览器接入**：内部视觉数据工作台只检索和恢复受控交接产生的服务器案例，并处理任务状态、自动候选确认、四点回退、Golden Sample、差异热图和逐候选人工决策；浏览器不创建实物服务器案例，海外维修员界面隐藏并由 API 拒绝所有照片入库和数据集工具
 - **当前案例契约**：本地历史基线保留 `VISUAL-QC-CASE-V1`；接入服务器的新案例使用 `VISUAL-QC-CASE-V2`，机器可读定义见 `knowledge-base/visual-qc-case-v2-schema.json`
 - **AI 平台**：Anthropic Claude / DeepSeek
 - **通信协议**：SSE (Server-Sent Events) 流式传输

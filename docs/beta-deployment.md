@@ -165,14 +165,16 @@ The increment records below are historical deployment evidence. Their `technicia
 
 ## Approved Visual-QC Evolution
 
-The beta server remains the controlled host for the internal visual data workbench. Only the data-administrator path may upload Milo-provided physical-board photos. The approved architecture provides a same-origin QC API, persisted image-processing jobs, controlled image storage, one or two CPU OpenCV workers, Golden Sample management, and candidate confirmation/rejection.
+The beta server remains the controlled host for the internal visual data workbench. Milo is the only physical-photo source, and Codex is the only data operator. New physical cases may enter only through the acceptance-qualified handoff CLI after local source audit and physical acceptance; the browser restores existing server cases and does not upload new physical captures. The approved architecture provides a same-origin QC API, persisted image-processing jobs, controlled image storage, one or two CPU OpenCV workers, Golden Sample management, and candidate confirmation/rejection.
 
 The server was inspected read-only on 2026-07-20: 4 x86_64 vCPU, 7.3 GB RAM, 4 GB swap, 19 GB free disk, Python 3.10, Node.js 20, no GPU, no installed OpenCV, and no active PostgreSQL or Redis. This supports a bounded CPU pilot, not deep-model training or unrestricted long-term image retention.
 
-The bounded visual-QC pilot is now deployed with the approved same-origin
-architecture. Upload, async processing, manual fallback, role assertion,
+The bounded visual-QC pilot is deployed with the approved same-origin
+architecture at production revision `f278061`. Its original controlled upload,
+async processing, manual fallback, role assertion,
 loopback binding, restart recovery, storage health, and proxy-path smoke checks
-have passed. Physical bare-board photos, reviewed Golden Samples, and
+have passed. The later acceptance-qualified handoff and server-provenance
+hardening are complete locally but are not yet deployed. Physical bare-board photos, reviewed Golden Samples, and
 real-defect acceptance remain the field-readiness gate. Canonical design:
 `docs/superpowers/specs/2026-07-20-visual-qc-server-architecture-design.md`.
 

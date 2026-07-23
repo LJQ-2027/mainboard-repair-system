@@ -2,7 +2,9 @@
 
 ## Status
 
-This is the implemented server-led visual-QC architecture used by the authenticated controlled pilot. Milo is the only source of real visual photos; Codex operates intake, registration, annotation, Golden Sample management, and export as the data administrator. Overseas technicians do not upload photos and do not use the internal visual data workbench.
+This document describes the **Local HEAD contract**. Milo is the only source of real visual photos; Codex operates intake, registration, annotation, Golden Sample management, and export as the data administrator. Overseas technicians do not upload photos and do not use the internal visual data workbench.
+
+Production remains `f278061`. That deployed revision returns Create/Get `VISUAL-QC-SERVER-CASE-V1`, Admin List `VISUAL-QC-ADMIN-CASE-LIST-V1`, and Admin Detail `VISUAL-QC-SERVER-CASE-V2`; it predates qualified handoff, List V2, Detail V3, and browser physical-upload removal. The qualified-handoff CLI must not target production until a separately approved deployment and migration verification completes.
 
 ## Runtime
 
@@ -98,12 +100,13 @@ python scripts/handoff_visual_qc_physical_package.py `
   physical-registration-run.json `
   --library-root D:\visual-qc-source-library `
   --handoff-root D:\visual-qc-handoffs\km4-physical-001 `
-  --api-base https://cccsat.top/mb-repair-beta/api/v1/visual-qc `
+  --api-base http://127.0.0.1:3020/api/v1/visual-qc `
   --credential-file C:\secure\visual-qc-credential.json `
+  --allow-http-localhost `
   --wait
 ```
 
-The handoff tool revalidates the immutable source package, archived intake, acceptance report, source images, and overlays before it calls the low-level resumable importer. The importer remains an internal transport primitive; it cannot synthesize qualified provenance and direct physical import fails closed. Credentials are never embedded in manifests or receipts. The browser does not create new physical server cases.
+This example targets an isolated local integration service. Do not substitute the production URL while production remains `f278061`. The handoff tool revalidates the immutable source package, archived intake, acceptance report, source images, and overlays before it calls the low-level resumable importer. The importer remains an internal transport primitive; it cannot synthesize qualified provenance and direct physical import fails closed. Credentials are never embedded in manifests or receipts. The browser does not create new physical server cases.
 
 ## Data-Administrator Case Catalog
 

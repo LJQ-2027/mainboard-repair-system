@@ -1,10 +1,14 @@
 # Physical Registration Acceptance Run Design
 
+## Status
+
+Implemented as the offline acceptance layer. Direct server import after this run is superseded by `2026-07-23-physical-acceptance-qualified-handoff-design.md`; the report must pass through the qualified handoff before a physical server case can be created.
+
 ## Purpose
 
 Build a deterministic, offline acceptance run for the first Milo-supplied physical mainboard photo package. The run validates the controlled source package, executes the existing image-quality and automatic-registration cores for every entry, and produces reviewable evidence without uploading, mutating, or approving anything.
 
-This closes the operational gap between controlled source staging and the existing server/workbench review path. It does not replace server import, manual four-point fallback, or human registration review.
+This closes the operational gap between controlled source staging and the server/workbench review path. It does not replace the acceptance-qualified handoff, manual four-point fallback, or human registration review.
 
 ## Scope
 
