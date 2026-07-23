@@ -201,4 +201,4 @@ Expected: all subprocess contracts and direct `--help` pass.
 - [x] Run Python compilation, JSON/Schema parsing, UTF-8/U+FFFD checks, and `git diff --check`.
 - [x] Run a temporary two-side stage -> audit -> acceptance -> handoff dry-run -> fake resumable transfer, compare source/acceptance snapshots before and after, and inspect receipt identity/status.
 - [x] Request independent code review; resolve each blocking finding through a new failing test followed by the minimal fix and rerun relevant/full suites.
-- [ ] Commit implementation locally, update and commit coordination/Vault facts, run Project Closeout Check, and do not push or deploy under the current runtime constraint.
+- [x] Commit implementation locally, update and commit coordination/Vault facts, run Project Closeout Check, and do not push or deploy under the current runtime constraint.
