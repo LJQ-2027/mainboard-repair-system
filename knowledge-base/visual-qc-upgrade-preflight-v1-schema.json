@@ -1,0 +1,241 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "VISUAL-QC-UPGRADE-PREFLIGHT-V1",
+  "title": "Visual QC Upgrade Preflight",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "status",
+    "generated_at",
+    "source",
+    "target",
+    "checks",
+    "managed_objects",
+    "migration",
+    "candidate_runtime",
+    "rollback_runtime"
+  ],
+  "properties": {
+    "schema_version": {"const": "VISUAL-QC-UPGRADE-PREFLIGHT-V1"},
+    "status": {"enum": ["passed", "failed"]},
+    "generated_at": {"type": "string", "minLength": 1},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "snapshot_sha256",
+        "logical_digest",
+        "table_counts",
+        "managed_object_counts",
+        "fingerprint_digest",
+        "fingerprint_file_count"
+      ],
+      "properties": {
+        "version": {"type": "string", "minLength": 1},
+        "snapshot_sha256": {"$ref": "#/$defs/sha256"},
+        "logical_digest": {"$ref": "#/$defs/sha256"},
+        "table_counts": {"$ref": "#/$defs/countMap"},
+        "managed_object_counts": {"$ref": "#/$defs/objectCounts"},
+        "fingerprint_digest": {"$ref": "#/$defs/sha256"},
+        "fingerprint_file_count": {"type": "integer", "minimum": 1}
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version"],
+      "properties": {
+        "version": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{7,40}$"
+        }
+      }
+    },
+    "checks": {
+      "type": "array",
+      "minItems": 10,
+      "maxItems": 10,
+      "items": {"$ref": "#/$defs/check"}
+    },
+    "managed_objects": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "counts", "issues"],
+      "properties": {
+        "status": {"enum": ["passed", "failed"]},
+        "counts": {"$ref": "#/$defs/objectCounts"},
+        "issues": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/objectIssue"}
+        }
+      }
+    },
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "added_columns",
+        "before_digest",
+        "shared_digest",
+        "table_counts",
+        "issues",
+        "integrity"
+      ],
+      "properties": {
+        "status": {"enum": ["passed", "failed"]},
+        "added_columns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["table", "columns"],
+            "properties": {
+              "table": {"type": "string", "minLength": 1},
+              "columns": {
+                "type": "array",
+                "items": {"type": "string", "minLength": 1}
+              }
+            }
+          }
+        },
+        "before_digest": {"$ref": "#/$defs/sha256"},
+        "shared_digest": {"$ref": "#/$defs/sha256"},
+        "table_counts": {"$ref": "#/$defs/countMap"},
+        "issues": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/issue"}
+        },
+        "integrity": {"type": "string", "minLength": 1}
+      }
+    },
+    "candidate_runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "api_schemas", "counts", "dataset", "issues"],
+      "properties": {
+        "status": {"enum": ["passed", "failed"]},
+        "api_schemas": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["health", "admin_list", "admin_detail", "dataset_audit"],
+          "properties": {
+            "health": {"type": ["string", "null"]},
+            "admin_list": {"type": ["string", "null"]},
+            "admin_detail": {"type": ["string", "null"]},
+            "dataset_audit": {"type": ["string", "null"]}
+          }
+        },
+        "counts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "database_cases",
+            "listed_cases",
+            "detailed_cases"
+          ],
+          "properties": {
+            "database_cases": {"type": "integer", "minimum": 0},
+            "listed_cases": {"type": "integer", "minimum": 0},
+            "detailed_cases": {"type": "integer", "minimum": 0}
+          }
+        },
+        "dataset": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "eligible_case_count",
+            "excluded_case_count",
+            "reason_counts"
+          ],
+          "properties": {
+            "eligible_case_count": {"type": "integer", "minimum": 0},
+            "excluded_case_count": {"type": "integer", "minimum": 0},
+            "reason_counts": {"$ref": "#/$defs/countMap"}
+          }
+        },
+        "issues": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/issue"}
+        }
+      }
+    },
+    "rollback_runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "source_version",
+        "case_count",
+        "cases_read",
+        "issues"
+      ],
+      "properties": {
+        "status": {"enum": ["passed", "failed"]},
+        "source_version": {"type": "string"},
+        "case_count": {"type": "integer", "minimum": 0},
+        "cases_read": {"type": "integer", "minimum": 0},
+        "issues": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/issue"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "countMap": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "objectCounts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["originals", "artifacts", "total"],
+      "properties": {
+        "originals": {"type": "integer", "minimum": 0},
+        "artifacts": {"type": "integer", "minimum": 0},
+        "total": {"type": "integer", "minimum": 0}
+      }
+    },
+    "check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["check_id", "status", "error_code", "message"],
+      "properties": {
+        "check_id": {"type": "string", "minLength": 1},
+        "status": {"enum": ["passed", "failed"]},
+        "error_code": {"type": ["string", "null"]},
+        "message": {"type": "string", "minLength": 1}
+      }
+    },
+    "issue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["error_code", "message"],
+      "properties": {
+        "error_code": {"type": "string", "minLength": 1},
+        "message": {"type": "string", "minLength": 1}
+      }
+    },
+    "objectIssue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["object_kind", "object_id", "error_code", "message"],
+      "properties": {
+        "object_kind": {"enum": ["original", "artifact"]},
+        "object_id": {"type": "string", "minLength": 1},
+        "error_code": {"type": "string", "minLength": 1},
+        "message": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

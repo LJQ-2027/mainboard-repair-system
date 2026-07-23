@@ -4,8 +4,13 @@ from pathlib import Path
 import sqlite3
 import tempfile
 import unittest
+import json
+import subprocess
+import sys
 
+import jsonschema
 from scripts.visual_qc.upgrade_preflight import (
+    audit_visual_qc_upgrade,
     compare_database_projections,
     create_read_only_snapshot,
     database_projection,
@@ -221,6 +226,24 @@ class VisualQcUpgradePreflightTests(unittest.TestCase):
             database_projection(destination),
             database_projection(source),
         )
+
+    def test_read_only_snapshot_rejects_live_wal_database(self):
+        source = self.root / "live.sqlite3"
+        connection = sqlite3.connect(source)
+        try:
+            connection.execute("PRAGMA journal_mode = WAL")
+            connection.execute("CREATE TABLE cases (case_id TEXT PRIMARY KEY)")
+            connection.execute("INSERT INTO cases VALUES ('live-case')")
+            connection.commit()
+            self.assertTrue(Path(f"{source}-wal").is_file())
+
+            with self.assertRaisesRegex(ValueError, "consistent SQLite backup"):
+                create_read_only_snapshot(
+                    source,
+                    self.root / "working" / "snapshot.sqlite3",
+                )
+        finally:
+            connection.close()
 
     def test_candidate_migration_is_additive_and_preserves_legacy_rows(self):
         source = self.create_f278061_database()
@@ -481,6 +504,204 @@ class VisualQcStore:
             result["issues"][0]["error_code"],
             "rollback_runtime_incompatible",
         )
+
+    def snapshot_paths(self, database: Path, data_root: Path) -> dict:
+        paths = [database]
+        paths.extend(
+            path for path in sorted(data_root.rglob("*")) if path.is_file()
+        )
+        return {
+            (
+                "database"
+                if path == database
+                else f"data/{path.relative_to(data_root).as_posix()}"
+            ): sha256_file(path)
+            for path in paths
+        }
+
+    def test_full_upgrade_audit_passes_without_mutating_source(self):
+        source = self.create_f278061_database()
+        source_data_root = self.root / "source-data"
+        self.attach_managed_objects(source, source_data_root)
+        source_app_root = self.create_rollback_app()
+        before = self.snapshot_paths(source, source_data_root)
+
+        report = audit_visual_qc_upgrade(
+            project_root=ROOT,
+            source_database=source,
+            source_data_root=source_data_root,
+            source_app_root=source_app_root,
+            target_version="abcdef1",
+            clock=lambda: "2026-07-23T12:00:00.000Z",
+        )
+
+        self.assertEqual(report["schema_version"], "VISUAL-QC-UPGRADE-PREFLIGHT-V1")
+        self.assertEqual(report["status"], "passed")
+        self.assertEqual(report["generated_at"], "2026-07-23T12:00:00.000Z")
+        self.assertEqual(report["source"]["version"], "f278061")
+        self.assertEqual(report["target"]["version"], "abcdef1")
+        self.assertEqual(
+            [check["check_id"] for check in report["checks"]],
+            [
+                "source_version_supported",
+                "source_database_integrity",
+                "managed_objects_integrity",
+                "candidate_migration_integrity",
+                "candidate_schema_additive",
+                "candidate_rows_preserved",
+                "candidate_runtime_contract",
+                "candidate_dataset_gates",
+                "rollback_runtime_compatible",
+                "source_immutable",
+            ],
+        )
+        self.assertTrue(all(check["status"] == "passed" for check in report["checks"]))
+        self.assertEqual(
+            report["migration"]["added_columns"],
+            [{"table": "cases", "columns": ["qualified_handoff_json"]}],
+        )
+        self.assertEqual(report["candidate_runtime"]["counts"]["database_cases"], 1)
+        self.assertEqual(report["rollback_runtime"]["cases_read"], 1)
+        self.assertEqual(self.snapshot_paths(source, source_data_root), before)
+        self.assertNotIn(str(self.root), json.dumps(report))
+
+
+class VisualQcUpgradePreflightCliTests(unittest.TestCase):
+    def setUp(self):
+        self.fixture = VisualQcUpgradePreflightTests()
+        self.fixture.setUp()
+        self.root = self.fixture.root
+        self.source = self.fixture.create_f278061_database()
+        self.data_root = self.root / "source-data"
+        self.fixture.attach_managed_objects(self.source, self.data_root)
+
+    def tearDown(self):
+        self.fixture.tearDown()
+
+    def run_cli(self, *extra):
+        return subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "scripts" / "audit_visual_qc_upgrade.py"),
+                "--source-database",
+                str(self.source),
+                "--source-data-root",
+                str(self.data_root),
+                "--source-app-root",
+                str(self.fixture.create_rollback_app()),
+                "--target-version",
+                "abcdef1",
+                "--output",
+                str(self.root / "reports" / "upgrade-preflight.json"),
+                *map(str, extra),
+            ],
+            cwd=self.root,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            check=False,
+        )
+
+    def test_cli_publishes_schema_valid_passed_report(self):
+        output = self.root / "reports" / "upgrade-preflight.json"
+        before = self.fixture.snapshot_paths(self.source, self.data_root)
+
+        completed = self.run_cli()
+
+        self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
+        self.assertTrue(output.is_file())
+        report = json.loads(output.read_text(encoding="utf-8"))
+        schema = json.loads(
+            (
+                ROOT
+                / "knowledge-base"
+                / "visual-qc-upgrade-preflight-v1-schema.json"
+            ).read_text(encoding="utf-8")
+        )
+        jsonschema.Draft202012Validator(schema).validate(report)
+        self.assertEqual(report["status"], "passed")
+        self.assertEqual(
+            json.loads(completed.stdout)["schema_version"],
+            "VISUAL-QC-UPGRADE-PREFLIGHT-V1",
+        )
+        self.assertEqual(
+            self.fixture.snapshot_paths(self.source, self.data_root),
+            before,
+        )
+
+    def test_cli_does_not_overwrite_existing_report(self):
+        output = self.root / "reports" / "upgrade-preflight.json"
+        output.parent.mkdir(parents=True)
+        output.write_bytes(b"keep-existing")
+
+        completed = self.run_cli()
+
+        self.assertEqual(completed.returncode, 2)
+        self.assertEqual(output.read_bytes(), b"keep-existing")
+        self.assertEqual(json.loads(completed.stdout)["status"], "validation_failed")
+
+    def test_cli_publishes_failed_report_with_exit_one(self):
+        output = self.root / "reports" / "upgrade-preflight.json"
+        incompatible_app = self.fixture.create_rollback_app(compatible=False)
+
+        completed = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "scripts" / "audit_visual_qc_upgrade.py"),
+                "--source-database",
+                str(self.source),
+                "--source-data-root",
+                str(self.data_root),
+                "--source-app-root",
+                str(incompatible_app),
+                "--target-version",
+                "abcdef1",
+                "--output",
+                str(output),
+            ],
+            cwd=self.root,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            check=False,
+        )
+
+        self.assertEqual(completed.returncode, 1, completed.stdout + completed.stderr)
+        report = json.loads(output.read_text(encoding="utf-8"))
+        self.assertEqual(report["status"], "failed")
+        rollback_check = {
+            check["check_id"]: check for check in report["checks"]
+        }["rollback_runtime_compatible"]
+        self.assertEqual(rollback_check["status"], "failed")
+
+    def test_cli_rejects_output_inside_source_data_root(self):
+        output = self.data_root / "upgrade-preflight.json"
+
+        completed = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "scripts" / "audit_visual_qc_upgrade.py"),
+                "--source-database",
+                str(self.source),
+                "--source-data-root",
+                str(self.data_root),
+                "--source-app-root",
+                str(self.fixture.create_rollback_app()),
+                "--target-version",
+                "abcdef1",
+                "--output",
+                str(output),
+            ],
+            cwd=self.root,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            check=False,
+        )
+
+        self.assertEqual(completed.returncode, 2)
+        self.assertFalse(output.exists())
+        self.assertEqual(json.loads(completed.stdout)["status"], "validation_failed")
 
 
 if __name__ == "__main__":

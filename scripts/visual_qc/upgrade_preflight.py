@@ -9,6 +9,8 @@ import os
 from pathlib import Path
 import re
 import sqlite3
+import tempfile
+from datetime import datetime, timezone
 
 from scripts.visual_qc.source_library import (
     _absolute_lexical_path,
@@ -33,13 +35,18 @@ MANAGED_MIME_EXTENSIONS = {
     "image/webp": ".webp",
     "application/json": ".json",
 }
+TARGET_VERSION_PATTERN = re.compile(r"^[0-9a-f]{7,40}$")
 
 
 def _read_only_connection(database: Path) -> sqlite3.Connection:
     database = Path(database).resolve()
     if not database.is_file():
         raise ValueError("Source database does not exist.")
-    connection = sqlite3.connect(f"{database.as_uri()}?mode=ro", uri=True, timeout=30)
+    connection = sqlite3.connect(
+        f"{database.as_uri()}?mode=ro&immutable=1",
+        uri=True,
+        timeout=30,
+    )
     connection.row_factory = sqlite3.Row
     return connection
 
@@ -137,6 +144,13 @@ def database_projection(database: Path) -> dict:
 def create_read_only_snapshot(source_database: Path, destination: Path) -> dict:
     source_database = Path(source_database).resolve()
     destination = Path(destination).resolve()
+    if any(
+        Path(f"{source_database}{suffix}").exists()
+        for suffix in ("-wal", "-shm")
+    ):
+        raise ValueError(
+            "Source database must be a consistent SQLite backup without WAL or SHM."
+        )
     if destination.exists():
         raise ValueError("Snapshot destination already exists.")
     destination.parent.mkdir(parents=True, exist_ok=True)
@@ -789,4 +803,252 @@ def smoke_rollback_runtime(
         "case_count": case_count,
         "cases_read": cases_read,
         "issues": issues,
+    }
+
+
+def utc_now() -> str:
+    return datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace(
+        "+00:00",
+        "Z",
+    )
+
+
+def _source_fingerprint(database: Path, data_root: Path) -> dict:
+    database = Path(database).resolve()
+    data_root = _absolute_lexical_path(data_root)
+    paths = []
+    for label, path in (
+        ("database", database),
+        ("database-wal", Path(f"{database}-wal")),
+        ("database-shm", Path(f"{database}-shm")),
+    ):
+        if path.is_file():
+            paths.append((label, path))
+    objects_root = data_root / "objects"
+    if objects_root.exists():
+        if _is_reparse_or_symlink(objects_root):
+            raise ValueError("Managed objects root contains a reparse point.")
+        for path in sorted(objects_root.rglob("*")):
+            if _is_reparse_or_symlink(path):
+                raise ValueError("Managed objects contain a reparse point.")
+            if path.is_file():
+                paths.append(
+                    (
+                        "objects/" + path.relative_to(objects_root).as_posix(),
+                        path,
+                    )
+                )
+    records = [
+        {
+            "label": label,
+            "byte_size": path.stat().st_size,
+            "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+        }
+        for label, path in paths
+    ]
+    return {
+        "digest": hashlib.sha256(_canonical_json_bytes(records)).hexdigest(),
+        "file_count": len(records),
+        "records": records,
+    }
+
+
+def _check(
+    check_id: str,
+    passed: bool,
+    error_code: str,
+    passed_message: str,
+    failed_message: str,
+) -> dict:
+    return {
+        "check_id": check_id,
+        "status": "passed" if passed else "failed",
+        "error_code": None if passed else error_code,
+        "message": passed_message if passed else failed_message,
+    }
+
+
+def audit_visual_qc_upgrade(
+    *,
+    project_root: Path,
+    source_database: Path,
+    source_data_root: Path,
+    source_app_root: Path,
+    target_version: str,
+    clock=utc_now,
+) -> dict:
+    project_root = Path(project_root).resolve()
+    source_database = Path(source_database).resolve()
+    source_data_root = _absolute_lexical_path(source_data_root)
+    source_app_root = Path(source_app_root).resolve()
+    if not source_database.is_file():
+        raise ValueError("Source database does not exist.")
+    if not source_data_root.is_dir():
+        raise ValueError("Source data root does not exist.")
+    version_path = source_app_root / "VERSION"
+    if not version_path.is_file():
+        raise ValueError("Source application VERSION is missing.")
+    source_version = version_path.read_text(encoding="ascii").strip()
+    if TARGET_VERSION_PATTERN.fullmatch(target_version) is None:
+        raise ValueError("Target version must be a lowercase Git commit.")
+
+    before_fingerprint = _source_fingerprint(
+        source_database,
+        source_data_root,
+    )
+    with tempfile.TemporaryDirectory(
+        prefix="visual-qc-upgrade-preflight-"
+    ) as temporary:
+        temporary_root = Path(temporary)
+        candidate_root = temporary_root / "candidate-data"
+        candidate_database = candidate_root / "visual-qc.sqlite3"
+        snapshot = create_read_only_snapshot(
+            source_database,
+            candidate_database,
+        )
+        managed_objects = validate_managed_objects(
+            source_database,
+            source_data_root,
+        )
+        migration = rehearse_candidate_migration(
+            candidate_database,
+            source_version,
+        )
+        candidate_runtime = smoke_candidate_runtime(
+            project_root,
+            candidate_root,
+        )
+        rollback_database = temporary_root / "rollback.sqlite3"
+        create_read_only_snapshot(candidate_database, rollback_database)
+        rollback_runtime = smoke_rollback_runtime(
+            source_app_root,
+            rollback_database,
+        )
+
+    after_fingerprint = _source_fingerprint(
+        source_database,
+        source_data_root,
+    )
+    source_immutable = before_fingerprint == after_fingerprint
+    source_supported = source_version in SUPPORTED_SOURCE_VERSIONS
+    migration_schema_passed = (
+        migration["status"] == "passed"
+        and migration["added_columns"]
+        == [{"table": "cases", "columns": ["qualified_handoff_json"]}]
+    )
+    migration_rows_passed = (
+        migration["before_digest"] == migration["shared_digest"]
+    )
+    expected_schemas = {
+        "health": "VISUAL-QC-SERVER-HEALTH-V2",
+        "admin_list": "VISUAL-QC-ADMIN-CASE-LIST-V2",
+        "admin_detail": "VISUAL-QC-SERVER-CASE-V3",
+        "dataset_audit": "VISUAL-QC-DATASET-AUDIT-V1",
+    }
+    candidate_contract_passed = (
+        candidate_runtime["api_schemas"] == expected_schemas
+        and candidate_runtime["counts"]["database_cases"]
+        == candidate_runtime["counts"]["listed_cases"]
+        == candidate_runtime["counts"]["detailed_cases"]
+    )
+    candidate_dataset_passed = not any(
+        issue["error_code"].startswith("candidate_dataset_")
+        for issue in candidate_runtime["issues"]
+    )
+    checks = [
+        _check(
+            "source_version_supported",
+            source_supported,
+            "unsupported_source_version",
+            "Source application version is supported.",
+            "Source application version is not supported.",
+        ),
+        _check(
+            "source_database_integrity",
+            snapshot["integrity"] == "ok",
+            "source_database_integrity_failed",
+            "Source database integrity check passed.",
+            "Source database integrity check failed.",
+        ),
+        _check(
+            "managed_objects_integrity",
+            managed_objects["status"] == "passed",
+            "managed_objects_integrity_failed",
+            "Managed object integrity checks passed.",
+            "Managed object integrity checks failed.",
+        ),
+        _check(
+            "candidate_migration_integrity",
+            migration["integrity"] == "ok",
+            "candidate_database_integrity_failed",
+            "Candidate-migrated database integrity check passed.",
+            "Candidate-migrated database integrity check failed.",
+        ),
+        _check(
+            "candidate_schema_additive",
+            migration_schema_passed,
+            "candidate_schema_incompatible",
+            "Candidate migration is limited to reviewed additive schema.",
+            "Candidate migration changed unreviewed schema.",
+        ),
+        _check(
+            "candidate_rows_preserved",
+            migration_rows_passed,
+            "candidate_rows_changed",
+            "Candidate migration preserved every legacy row value.",
+            "Candidate migration changed legacy row values.",
+        ),
+        _check(
+            "candidate_runtime_contract",
+            candidate_contract_passed,
+            "candidate_runtime_incompatible",
+            "Candidate runtime schemas and case counts are compatible.",
+            "Candidate runtime schemas or case counts are incompatible.",
+        ),
+        _check(
+            "candidate_dataset_gates",
+            candidate_dataset_passed,
+            "candidate_dataset_gate_incompatible",
+            "Candidate runtime preserved legacy dataset exclusions.",
+            "Candidate runtime changed legacy dataset exclusions.",
+        ),
+        _check(
+            "rollback_runtime_compatible",
+            rollback_runtime["status"] == "passed",
+            "rollback_runtime_incompatible",
+            "Rollback runtime can read the candidate-migrated database.",
+            "Rollback runtime cannot read the candidate-migrated database.",
+        ),
+        _check(
+            "source_immutable",
+            source_immutable,
+            "source_mutated",
+            "Source database and managed objects remained byte-identical.",
+            "Source database or managed objects changed during preflight.",
+        ),
+    ]
+    status = (
+        "passed"
+        if all(check["status"] == "passed" for check in checks)
+        else "failed"
+    )
+    return {
+        "schema_version": UPGRADE_PREFLIGHT_SCHEMA_VERSION,
+        "status": status,
+        "generated_at": clock(),
+        "source": {
+            "version": source_version,
+            "snapshot_sha256": snapshot["snapshot_sha256"],
+            "logical_digest": snapshot["logical_digest"],
+            "table_counts": snapshot["table_counts"],
+            "managed_object_counts": managed_objects["counts"],
+            "fingerprint_digest": before_fingerprint["digest"],
+            "fingerprint_file_count": before_fingerprint["file_count"],
+        },
+        "target": {"version": target_version},
+        "checks": checks,
+        "managed_objects": managed_objects,
+        "migration": migration,
+        "candidate_runtime": candidate_runtime,
+        "rollback_runtime": rollback_runtime,
     }
