@@ -6,6 +6,24 @@ This document describes the **Local HEAD contract**. Milo is the only source of 
 
 Production remains `f278061`. That deployed revision returns Create/Get `VISUAL-QC-SERVER-CASE-V1`, Admin List `VISUAL-QC-ADMIN-CASE-LIST-V1`, and Admin Detail `VISUAL-QC-SERVER-CASE-V2`; it predates qualified handoff, List V2, Detail V3, and browser physical-upload removal. The qualified-handoff CLI must not target production until a separately approved deployment and migration verification completes.
 
+## Upgrade Preflight Boundary
+
+Local HEAD includes `VISUAL-QC-UPGRADE-PREFLIGHT-V1`; deployed `f278061` does
+not. Before a future deployment can switch the app directory or Visual-QC
+virtualenv, the candidate runtime must rehearse its migration against the
+deployment-owned consistent rollback snapshot and the persistent object root.
+
+The rehearsal verifies the exact source snapshot SHA-256, additive SQLite
+migration, shared legacy row digests, managed-object hashes, Health V2, Admin
+List V2, Admin Detail V3, Dataset Audit V1, legacy dataset exclusions, and
+old-runtime rollback readability. The deployment script fails closed unless
+the report is passed and bound to the candidate commit. See
+`docs/visual-qc-upgrade-preflight-2026-07-23.md`.
+
+This is a deployment gate, not a production deployment record. Production
+remains `f278061` until separately approved deployment and post-switch P4
+verification are complete.
+
 ## Runtime
 
 Install the pinned worker dependencies:
