@@ -1,5 +1,6 @@
 import hashlib
 from contextlib import closing
+import os
 from pathlib import Path
 import sqlite3
 import tempfile
@@ -575,9 +576,30 @@ class VisualQcUpgradePreflightCliTests(unittest.TestCase):
         self.source = self.fixture.create_f278061_database()
         self.data_root = self.root / "source-data"
         self.fixture.attach_managed_objects(self.source, self.data_root)
+        self.directory_links = []
 
     def tearDown(self):
+        for link in reversed(self.directory_links):
+            if link.exists():
+                os.rmdir(link)
         self.fixture.tearDown()
+
+    def create_directory_link(self, link: Path, target: Path) -> None:
+        target.mkdir(parents=True, exist_ok=True)
+        link.parent.mkdir(parents=True, exist_ok=True)
+        if os.name == "nt":
+            result = subprocess.run(
+                ["cmd", "/c", "mklink", "/J", str(link), str(target)],
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                check=False,
+            )
+            if result.returncode != 0:
+                self.skipTest(f"Unable to create test junction: {result.stderr}")
+        else:
+            link.symlink_to(target, target_is_directory=True)
+        self.directory_links.append(link)
 
     def run_cli(self, *extra):
         return subprocess.run(
@@ -703,6 +725,38 @@ class VisualQcUpgradePreflightCliTests(unittest.TestCase):
         self.assertEqual(completed.returncode, 2)
         self.assertFalse(output.exists())
         self.assertEqual(json.loads(completed.stdout)["status"], "validation_failed")
+
+    def test_cli_rejects_reparse_point_in_output_parent_chain(self):
+        target = self.root / "junction-target"
+        (target / "existing-child").mkdir(parents=True)
+        link = self.root / "junction-output"
+        self.create_directory_link(link, target)
+        output = link / "existing-child" / "upgrade-preflight.json"
+
+        completed = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "scripts" / "audit_visual_qc_upgrade.py"),
+                "--source-database",
+                str(self.source),
+                "--source-data-root",
+                str(self.data_root),
+                "--source-app-root",
+                str(self.fixture.create_rollback_app()),
+                "--target-version",
+                "abcdef1",
+                "--output",
+                str(output),
+            ],
+            cwd=self.root,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            check=False,
+        )
+
+        self.assertEqual(completed.returncode, 2)
+        self.assertFalse(output.exists())
 
 
 if __name__ == "__main__":

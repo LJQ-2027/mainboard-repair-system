@@ -63,16 +63,15 @@ def _assert_safe_output(output: Path, source_data_root: Path) -> Path:
     if output.exists():
         raise UpgradePreflightInputError("Output report already exists.")
     existing = output.parent
-    pending = []
     while not existing.exists() and existing != existing.parent:
-        pending.append(existing)
         existing = existing.parent
-    if _is_reparse_or_symlink(existing):
-        raise UpgradePreflightInputError(
-            "Output path contains a symlink or reparse point."
-        )
+    for path in (existing, *existing.parents):
+        if _is_reparse_or_symlink(path):
+            raise UpgradePreflightInputError(
+                "Output path contains a symlink or reparse point."
+            )
     output.parent.mkdir(parents=True, exist_ok=True)
-    for path in reversed(pending):
+    for path in (output.parent, *output.parent.parents):
         if _is_reparse_or_symlink(path):
             raise UpgradePreflightInputError(
                 "Output path contains a symlink or reparse point."
