@@ -15,6 +15,7 @@ service, or deploy the candidate.
 
 - a consistent SQLite backup with no `-wal` or `-shm` companion;
 - the persistent Visual-QC data root containing canonical managed objects;
+- the existing regular `.storage-reference.lock` in that data root;
 - the currently deployed app root containing `VERSION` and its original
   `scripts/visual_qc/server/store.py`;
 - the exact candidate Git commit;
@@ -35,7 +36,7 @@ before invoking the preflight.
   --source-database D:\visual-qc-upgrade\visual-qc.sqlite3 `
   --source-data-root D:\visual-qc-data `
   --source-app-root D:\visual-qc-current-app `
-  --target-version 908a872 `
+  --target-version abcdef1 `
   --output D:\visual-qc-upgrade\upgrade-preflight.json
 ```
 
@@ -57,7 +58,8 @@ inside the source data root or through a symlink/Windows reparse parent.
 3. every referenced original and artifact matches its canonical path, size,
    and SHA-256;
 4. migrated SQLite integrity passes;
-5. migration is limited to the reviewed additive schema;
+5. migration is limited to the reviewed additive schema, including table
+   constraints, indexes, triggers, and views;
 6. every legacy shared-column value is unchanged;
 7. Health V2, Admin List V2, Admin Detail V3, and Dataset Audit V1 are readable
    from the candidate runtime;
@@ -89,8 +91,10 @@ It does this before moving the old app directory or switching
 - `target.version` equals the candidate commit.
 
 The report remains at
-`rollback/<deploy-id>/upgrade-preflight.json`. Any failure enters the existing
-database, app, virtualenv, gateway, and service rollback path.
+`rollback/<deploy-id>/upgrade-preflight.json`. A failure before the candidate
+QC process starts restores the old service without overwriting the untouched
+live database. Once the candidate QC process may have opened the live
+database, later failures also restore the consistent database snapshot.
 
 `-PreflightOnly` remains a host-level read-only check and does not stage the
 candidate or rehearse a migration.
@@ -100,7 +104,8 @@ candidate or rehearse a migration.
 The implementation was rehearsed locally against the exact
 `f278061:scripts/visual_qc/server/store.py`, a production-shape proxy case, and
 canonical original/artifact objects. All ten checks passed, the old store read
-the candidate-migrated case, and source bytes remained unchanged.
+the candidate-migrated case, and source bytes remained unchanged. The ignored
+local report records the exact candidate commit used for the final rehearsal.
 
 The local evidence report is under
 `.local/upgrade-preflight-rehearsal/f278061-to-local-head.json` and is not a

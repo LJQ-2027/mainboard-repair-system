@@ -1,6 +1,6 @@
 # Visual QC Upgrade Preflight Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Build a deterministic read-only rehearsal that proves production `f278061` data can migrate to Local HEAD and roll back safely before any deployment switch.
 
@@ -16,14 +16,14 @@
 - Create: `tests/test_visual_qc_upgrade_preflight.py`
 - Create: `scripts/visual_qc/upgrade_preflight.py`
 
-- [ ] **Step 1: Write failing tests for a read-only source snapshot**
+- [x] **Step 1: Write failing tests for a read-only source snapshot**
 
 Create a `f278061`-shape SQLite fixture with one proxy case and canonical image
 object. Assert `audit_visual_qc_upgrade` returns
 `VISUAL-QC-UPGRADE-PREFLIGHT-V1`, records the source backup SHA-256 and logical
 digest, and leaves a recursive byte snapshot of the source root unchanged.
 
-- [ ] **Step 2: Run the targeted test and verify RED**
+- [x] **Step 2: Run the targeted test and verify RED**
 
 Run:
 
@@ -33,7 +33,7 @@ Run:
 
 Expected: import failure for missing `scripts.visual_qc.upgrade_preflight`.
 
-- [ ] **Step 3: Implement minimal snapshot helpers**
+- [x] **Step 3: Implement minimal snapshot helpers**
 
 Add:
 
@@ -62,11 +62,11 @@ def audit_visual_qc_upgrade(
 Use SQLite URI `mode=ro`, `Connection.backup`, deterministic JSON row encoding,
 and SHA-256. Do not instantiate `VisualQcStore` on the source path.
 
-- [ ] **Step 4: Run the targeted test and verify GREEN**
+- [x] **Step 4: Run the targeted test and verify GREEN**
 
 Run the Step 2 command. Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```powershell
 git add tests/test_visual_qc_upgrade_preflight.py scripts/visual_qc/upgrade_preflight.py
@@ -79,7 +79,7 @@ git commit -m "feat: bind visual qc upgrade snapshots"
 - Modify: `tests/test_visual_qc_upgrade_preflight.py`
 - Modify: `scripts/visual_qc/upgrade_preflight.py`
 
-- [ ] **Step 1: Write failing migration preservation tests**
+- [x] **Step 1: Write failing migration preservation tests**
 
 Cover:
 
@@ -89,7 +89,7 @@ Cover:
 - an unexpected candidate column or changed legacy value fails;
 - source or migrated `PRAGMA integrity_check` failure fails.
 
-- [ ] **Step 2: Run the migration tests and verify RED**
+- [x] **Step 2: Run the migration tests and verify RED**
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest tests.test_visual_qc_upgrade_preflight.VisualQcUpgradePreflightTests.test_candidate_migration_is_additive_and_preserves_legacy_rows tests.test_visual_qc_upgrade_preflight.VisualQcUpgradePreflightTests.test_unexpected_schema_drift_fails_closed -v
@@ -98,7 +98,7 @@ Cover:
 Expected: assertions fail because migration evidence and allowlist enforcement
 do not exist.
 
-- [ ] **Step 3: Implement migration comparison**
+- [x] **Step 3: Implement migration comparison**
 
 Add stable check ids:
 
@@ -118,12 +118,12 @@ Allow only:
 
 for source `f278061`.
 
-- [ ] **Step 4: Write failing object-integrity tests**
+- [x] **Step 4: Write failing object-integrity tests**
 
 Cover canonical original/artifact success plus missing, hash-mismatched,
 repository-escaping, and Windows reparse paths.
 
-- [ ] **Step 5: Implement canonical object validation and verify GREEN**
+- [x] **Step 5: Implement canonical object validation and verify GREEN**
 
 Derive managed paths from row SHA-256 and MIME type under:
 
@@ -134,7 +134,7 @@ objects/artifacts/<prefix>/<sha256>.<ext>
 
 Run the complete test module. Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```powershell
 git add tests/test_visual_qc_upgrade_preflight.py scripts/visual_qc/upgrade_preflight.py
@@ -147,7 +147,7 @@ git commit -m "feat: rehearse visual qc data migration"
 - Modify: `tests/test_visual_qc_upgrade_preflight.py`
 - Modify: `scripts/visual_qc/upgrade_preflight.py`
 
-- [ ] **Step 1: Write failing candidate-runtime tests**
+- [x] **Step 1: Write failing candidate-runtime tests**
 
 Assert the migrated temporary data root returns:
 
@@ -163,28 +163,28 @@ Assert the migrated temporary data root returns:
 Assert proxy cases remain `non_physical_evidence` and legacy physical cases
 without provenance remain `qualified_handoff_provenance_required`.
 
-- [ ] **Step 2: Run and verify RED**
+- [x] **Step 2: Run and verify RED**
 
 Run candidate-runtime tests. Expected: missing runtime evidence assertions.
 
-- [ ] **Step 3: Implement zero-worker candidate service smoke**
+- [x] **Step 3: Implement zero-worker candidate service smoke**
 
 Instantiate `VisualQcService` only against the temporary data root with
 `worker_count=0`, enumerate actors/cases from the migrated database, and compare
 health/list/detail/audit totals and schemas.
 
-- [ ] **Step 4: Write failing rollback-runtime test**
+- [x] **Step 4: Write failing rollback-runtime test**
 
 Build a source app fixture containing `VERSION` and an old `store.py`, then
 assert it initializes and reads every case from a second migrated database
 copy. Add a failing fixture that rejects the new column.
 
-- [ ] **Step 5: Implement isolated rollback store loading and verify GREEN**
+- [x] **Step 5: Implement isolated rollback store loading and verify GREEN**
 
 Load source `store.py` with `importlib.util.spec_from_file_location` under a
 unique module name. Never add `source-app-root` to `sys.path`.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```powershell
 git add tests/test_visual_qc_upgrade_preflight.py scripts/visual_qc/upgrade_preflight.py
@@ -199,13 +199,13 @@ git commit -m "feat: verify visual qc runtime rollback"
 - Modify: `tests/test_visual_qc_upgrade_preflight.py`
 - Modify: `deploy/visual-qc-runtime-files.txt`
 
-- [ ] **Step 1: Write failing CLI and Schema tests**
+- [x] **Step 1: Write failing CLI and Schema tests**
 
 Cover required arguments, source/target version mismatch, unsafe output
 placement, no-overwrite publication, deterministic check ordering, Schema
 validation, and exit codes `0`, `1`, and `2`.
 
-- [ ] **Step 2: Run and verify RED**
+- [x] **Step 2: Run and verify RED**
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest tests.test_visual_qc_upgrade_preflight.VisualQcUpgradePreflightCliTests -v
@@ -213,7 +213,7 @@ validation, and exit codes `0`, `1`, and `2`.
 
 Expected: CLI file missing.
 
-- [ ] **Step 3: Implement CLI and atomic report publication**
+- [x] **Step 3: Implement CLI and atomic report publication**
 
 The CLI calls:
 
@@ -230,16 +230,16 @@ audit_visual_qc_upgrade(
 Write UTF-8 JSON to a sibling temporary file, flush/fsync, and publish with a
 no-overwrite atomic operation.
 
-- [ ] **Step 4: Define and validate JSON Schema**
+- [x] **Step 4: Define and validate JSON Schema**
 
 Require all identity, check, migration, runtime, dataset, and rollback fields;
 disallow additional properties at contract boundaries.
 
-- [ ] **Step 5: Add the CLI to the bounded runtime manifest and verify GREEN**
+- [x] **Step 5: Add the CLI to the bounded runtime manifest and verify GREEN**
 
 Run the CLI test class and `tests.test_visual_qc_deployment`. Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```powershell
 git add scripts/audit_visual_qc_upgrade.py scripts/visual_qc/upgrade_preflight.py tests/test_visual_qc_upgrade_preflight.py knowledge-base/visual-qc-upgrade-preflight-v1-schema.json deploy/visual-qc-runtime-files.txt
@@ -253,13 +253,13 @@ git commit -m "feat: publish visual qc upgrade preflight"
 - Modify: `tests/test_visual_qc_deployment.py`
 - Modify: `docs/beta-deployment.md`
 
-- [ ] **Step 1: Write failing deployment contract tests**
+- [x] **Step 1: Write failing deployment contract tests**
 
 Assert the remote script invokes the candidate preflight after
 `DATABASE_SNAPSHOT_READY=1` and before `mv "$APP_DIR"`, verifies report status,
 snapshot SHA-256, and target version, and stores the report in `ROLLBACK_DIR`.
 
-- [ ] **Step 2: Run and verify RED**
+- [x] **Step 2: Run and verify RED**
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest tests.test_visual_qc_deployment -v
@@ -267,7 +267,7 @@ snapshot SHA-256, and target version, and stores the report in `ROLLBACK_DIR`.
 
 Expected: required preflight invocation/order assertions fail.
 
-- [ ] **Step 3: Add the fail-closed remote invocation**
+- [x] **Step 3: Add the fail-closed remote invocation**
 
 Use candidate Python and candidate source while the old app is still present:
 
@@ -283,18 +283,18 @@ Use candidate Python and candidate source while the old app is still present:
 Parse the report with candidate Python and require `status == "passed"`,
 matching snapshot SHA-256, and matching target version before switching files.
 
-- [ ] **Step 4: Verify PowerShell and deployment tests**
+- [x] **Step 4: Verify PowerShell and deployment tests**
 
 Parse the script with the PowerShell 7 parser and run
 `tests.test_visual_qc_deployment`. Expected: PASS.
 
-- [ ] **Step 5: Document the new gate**
+- [x] **Step 5: Document the new gate**
 
 State that host `-PreflightOnly` remains a non-mutating infrastructure check,
 while every actual deployment now performs a quiesced database rehearsal before
 the switch. State that this change does not deploy Local HEAD.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```powershell
 git add scripts/deploy-visual-qc-pilot.ps1 tests/test_visual_qc_deployment.py docs/beta-deployment.md
@@ -309,24 +309,24 @@ git commit -m "feat: gate visual qc deployment on rehearsal"
 - Modify: `docs/visual-qc-server-api-2026-07-20.md`
 - Modify: `docs/superpowers/plans/2026-07-23-visual-qc-upgrade-preflight.md`
 
-- [ ] **Step 1: Extract the exact rollback store**
+- [x] **Step 1: Extract the exact rollback store**
 
 Use `git archive f278061` into a temporary directory outside tracked files.
 Construct a synthetic `f278061` database with proxy and legacy physical cases
 plus canonical object files.
 
-- [ ] **Step 2: Run the standalone CLI**
+- [x] **Step 2: Run the standalone CLI**
 
 Expected: exit `0`, Schema-valid report, only
 `cases.qualified_handoff_json` added, proxy and legacy physical cases excluded,
 and rollback smoke passed.
 
-- [ ] **Step 3: Prove source immutability**
+- [x] **Step 3: Prove source immutability**
 
 Compare recursive SHA-256 snapshots before and after rehearsal. Expected:
 byte-identical database, companions, and objects.
 
-- [ ] **Step 4: Run P0-P2 and local P4-like verification**
+- [x] **Step 4: Run P0-P2 and local P4-like verification**
 
 Run:
 
@@ -340,12 +340,12 @@ git diff --check
 Validate modified JSON and UTF-8 files. P3 is not required because no browser
 or visible UI behavior changes.
 
-- [ ] **Step 5: Perform independent review and fix Important findings**
+- [x] **Step 5: Perform independent review and fix Important findings**
 
 Review safety, no-write claims, TOCTOU boundaries, rollback behavior, report
 contract, tests, and documentation against the approved design.
 
-- [ ] **Step 6: Update durable facts and commit**
+- [x] **Step 6: Update durable facts and commit**
 
 Record implementation commit, verification counts, production unchanged at
 `f278061`, and the remaining separate deployment approval gate in repository

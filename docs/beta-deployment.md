@@ -203,8 +203,9 @@ The bounded pilot deployment therefore adds:
   Visual-QC process is stopped and the rollback SQLite snapshot is complete,
   but before the application directory or virtualenv link is switched;
 - exact binding between the rollback database SHA-256, the rehearsal report,
-  and the candidate Git commit. Migration, object-integrity, Local HEAD API,
-  dataset-gate, and old-runtime rollback checks must all pass.
+and the candidate Git commit. Migration, object-integrity, Local HEAD API,
+dataset-gate, full SQLite schema, and old-runtime rollback checks must all
+pass.
 
 Run the read-only gate first:
 
@@ -226,8 +227,10 @@ root, and the still-active old application contract. The resulting
 `upgrade-preflight.json` stays in the commit-versioned rollback directory.
 The app directory and `venv-visual-qc` link are switched only after the report
 is `passed`, its `source.snapshot_sha256` matches the rollback database, and
-its target version matches the candidate commit. Any failure enters the
-existing rollback path and restarts the unchanged old service.
+its target version matches the candidate commit. A rehearsal failure restarts
+the unchanged old service without replacing the untouched live database.
+Database restoration is enabled only after the candidate QC process may have
+opened the live database.
 
 The rehearsal requires an existing Visual-QC database and a deployed
 `VERSION` file whose commit is in the candidate's reviewed source-version

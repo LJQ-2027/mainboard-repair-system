@@ -778,6 +778,27 @@ class VisualQcUpgradePreflightCliTests(unittest.TestCase):
         with self.assertRaises(jsonschema.ValidationError):
             jsonschema.Draft202012Validator(schema).validate(report)
 
+    def test_report_schema_rejects_status_that_disagrees_with_checks(self):
+        completed = self.run_cli()
+        self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
+        report = json.loads(
+            (self.root / "reports" / "upgrade-preflight.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        report["checks"][0]["status"] = "failed"
+        report["checks"][0]["error_code"] = "synthetic_failure"
+        schema = json.loads(
+            (
+                ROOT
+                / "knowledge-base"
+                / "visual-qc-upgrade-preflight-v1-schema.json"
+            ).read_text(encoding="utf-8")
+        )
+
+        with self.assertRaises(jsonschema.ValidationError):
+            jsonschema.Draft202012Validator(schema).validate(report)
+
     def test_cli_does_not_overwrite_existing_report(self):
         output = self.root / "reports" / "upgrade-preflight.json"
         output.parent.mkdir(parents=True)
