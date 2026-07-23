@@ -3,6 +3,7 @@ import json
 import sqlite3
 import tempfile
 import unittest
+from contextlib import closing
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -117,9 +118,21 @@ class VisualQcServerApiTests(unittest.TestCase):
                 '"lighting_and_occlusion_confirmed":true},'
                 '"confirmed_at":"2026-07-20T10:00:00.000Z"}'
             ),
+            "qualified_handoff": json.dumps(
+                qualified_handoff(), separators=(",", ":")
+            ),
             "sha256": hashlib.sha256(image_bytes).hexdigest(),
         }
         fields.update(overrides)
+        fields.setdefault(
+            "intake_batch_id",
+            f"{fields['capture_session_id']}-batch",
+        )
+        fields.setdefault(
+            "intake_entry_id",
+            f"{fields['capture_session_id']}-{fields['side_id']}",
+        )
+        fields = {key: value for key, value in fields.items() if value is not None}
         return self.client.post(
             "/api/v1/visual-qc/cases",
             data=fields,
@@ -137,7 +150,8 @@ class VisualQcServerApiTests(unittest.TestCase):
         self.assertEqual(second.status_code, 202)
         self.assertEqual(first.json(), second.json())
         payload = first.json()
-        self.assertEqual(payload["schema_version"], "VISUAL-QC-SERVER-CASE-V1")
+        self.assertEqual(payload["schema_version"], "VISUAL-QC-SERVER-CASE-V2")
+        self.assertEqual(payload["qualified_handoff"], qualified_handoff())
         self.assertEqual(payload["job"]["status"], "queued")
         self.assertEqual(payload["capture_session"]["session_id"], "capture-session-001")
         self.assertEqual(payload["capture_session"]["pair_status"], "pair_in_progress")
@@ -151,6 +165,99 @@ class VisualQcServerApiTests(unittest.TestCase):
         self.assertTrue((Path(self.temp_dir.name) / "visual-qc.sqlite3").exists())
         originals = list((Path(self.temp_dir.name) / "objects" / "originals").rglob("*.jpg"))
         self.assertEqual(len(originals), 1)
+
+    def test_new_physical_case_requires_intake_and_qualified_handoff(self):
+        image_bytes = encode_jpeg(np.full((120, 180, 3), 170, dtype=np.uint8))
+
+        missing = self.upload(image_bytes, qualified_handoff=None)
+
+        self.assertEqual(missing.status_code, 422)
+        self.assertEqual(
+            missing.json()["detail"]["code"],
+            "physical_handoff_provenance_required",
+        )
+
+    def test_nonphysical_case_rejects_qualified_handoff(self):
+        image_bytes = encode_jpeg(np.full((120, 180, 3), 170, dtype=np.uint8))
+
+        response = self.upload(
+            image_bytes,
+            evidence_role="service_manual_proxy",
+        )
+
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(
+            response.json()["detail"]["code"],
+            "qualified_handoff_not_allowed",
+        )
+
+    def test_qualified_handoff_round_trips_to_case_store_and_audit(self):
+        image_bytes = encode_jpeg(np.full((120, 180, 3), 170, dtype=np.uint8))
+
+        response = self.upload(image_bytes)
+
+        self.assertEqual(response.status_code, 202)
+        payload = response.json()
+        self.assertEqual(payload["qualified_handoff"], qualified_handoff())
+        database = Path(self.temp_dir.name) / "visual-qc.sqlite3"
+        with closing(sqlite3.connect(database)) as connection:
+            stored = connection.execute(
+                "SELECT qualified_handoff_json FROM cases WHERE case_id = ?",
+                (payload["case_id"],),
+            ).fetchone()[0]
+            audit = connection.execute(
+                "SELECT payload_json FROM audit_events "
+                "WHERE case_id = ? AND event_type = 'case_created'",
+                (payload["case_id"],),
+            ).fetchone()[0]
+
+        self.assertEqual(
+            stored,
+            json.dumps(qualified_handoff(), sort_keys=True, separators=(",", ":")),
+        )
+        self.assertEqual(
+            json.loads(audit)["qualified_handoff"],
+            qualified_handoff(),
+        )
+        self.assertNotIn("overlay", stored + audit)
+        self.assertNotIn("report_body", stored + audit)
+
+    def test_idempotency_rejects_qualified_handoff_hash_drift(self):
+        image_bytes = encode_jpeg(np.full((120, 180, 3), 170, dtype=np.uint8))
+        first = self.upload(image_bytes)
+        drifted = qualified_handoff(acceptance_report_sha256="d" * 64)
+
+        second = self.upload(
+            image_bytes,
+            qualified_handoff=json.dumps(drifted, separators=(",", ":")),
+        )
+
+        self.assertEqual(first.status_code, 202)
+        self.assertEqual(second.status_code, 409)
+        self.assertEqual(second.json()["detail"]["code"], "idempotency_conflict")
+
+    def test_intake_identity_deduplicates_only_an_identical_request(self):
+        image_bytes = encode_jpeg(np.full((120, 180, 3), 170, dtype=np.uint8))
+        first = self.upload(image_bytes)
+        self.headers["Idempotency-Key"] = "capture-request-retry"
+
+        identical = self.upload(image_bytes)
+        drifted = self.upload(
+            image_bytes,
+            qualified_handoff=json.dumps(
+                qualified_handoff(acceptance_report_sha256="d" * 64),
+                separators=(",", ":"),
+            ),
+        )
+
+        self.assertEqual(first.status_code, 202)
+        self.assertEqual(identical.status_code, 202)
+        self.assertEqual(identical.json()["case_id"], first.json()["case_id"])
+        self.assertEqual(drifted.status_code, 409)
+        self.assertEqual(
+            drifted.json()["detail"]["code"],
+            "intake_provenance_conflict",
+        )
 
     def test_technician_cannot_upload_visual_qc_case_before_route_handling(self):
         image_bytes = encode_jpeg(np.full((120, 180, 3), 170, dtype=np.uint8))
@@ -233,12 +340,14 @@ class VisualQcServerApiTests(unittest.TestCase):
         store = VisualQcStore(database_path, recover_interrupted_jobs=False)
         with store.connect() as connection:
             row = connection.execute(
-                "SELECT case_id, intake_batch_id, intake_entry_id FROM cases"
+                "SELECT case_id, intake_batch_id, intake_entry_id, "
+                "qualified_handoff_json FROM cases"
             ).fetchone()
 
         self.assertEqual(row["case_id"], "legacy-case")
         self.assertIsNone(row["intake_batch_id"])
         self.assertIsNone(row["intake_entry_id"])
+        self.assertIsNone(row["qualified_handoff_json"])
 
     def test_capture_session_pairs_board_sides_and_rejects_identity_pollution(self):
         first_bytes = encode_jpeg(np.full((120, 180, 3), 170, dtype=np.uint8))
@@ -301,6 +410,7 @@ class VisualQcServerApiTests(unittest.TestCase):
             polluted = self.upload(
                 encode_jpeg(np.full((120, 180, 3), 140, dtype=np.uint8)),
                 capture_stage="after_repair",
+                intake_entry_id="capture-session-001-race",
             )
 
         self.assertEqual(polluted.status_code, 409)

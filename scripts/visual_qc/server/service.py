@@ -21,6 +21,11 @@ from scripts.visual_qc.server.catalog import BoardCatalog, CatalogError
 from scripts.visual_qc.server.config import VisualQcServerSettings
 from scripts.visual_qc.server.difference import generate_difference_candidates
 from scripts.visual_qc.server.quality import analyze_image_quality
+from scripts.visual_qc.server.provenance import (
+    QualifiedHandoffError,
+    normalize_qualified_handoff,
+    serialize_qualified_handoff,
+)
 from scripts.visual_qc.server.storage import (
     LocalObjectStorage,
     MIME_EXTENSIONS,
@@ -227,6 +232,7 @@ class VisualQcService:
         capture_checklist: str = "{}",
         intake_batch_id: str | None = None,
         intake_entry_id: str | None = None,
+        qualified_handoff: str | None = None,
     ) -> dict:
         if capture_stage not in CAPTURE_STAGES:
             raise VisualQcServiceError(
@@ -282,6 +288,12 @@ class VisualQcService:
             intake_batch_id,
             intake_entry_id,
         )
+        normalized_handoff = self._normalized_qualified_handoff(
+            evidence_role=evidence_role,
+            raw=qualified_handoff,
+            intake_batch_id=intake_batch_id,
+            intake_entry_id=intake_entry_id,
+        )
         session_records = self.store.list_capture_session(actor_id, capture_session_id)
         if session_records:
             identity = session_records[0]
@@ -328,6 +340,7 @@ class VisualQcService:
                     "capture_checklist": normalized_checklist,
                     "intake_batch_id": intake_batch_id,
                     "intake_entry_id": intake_entry_id,
+                    "qualified_handoff": normalized_handoff,
                     "sha256": actual_sha256,
                 },
                 sort_keys=True,
@@ -343,6 +356,19 @@ class VisualQcService:
                     409,
                 )
             return self.get_case(existing["case_id"], actor_id)
+        existing_intake = self.store.get_case_for_intake(
+            actor_id,
+            intake_batch_id,
+            intake_entry_id,
+        )
+        if existing_intake:
+            if existing_intake["request_fingerprint"] != fingerprint:
+                raise VisualQcServiceError(
+                    "intake_provenance_conflict",
+                    "Intake entry was already admitted with different provenance.",
+                    409,
+                )
+            return self.get_case(existing_intake["case_id"], actor_id)
 
         timestamp = utc_now()
         case_id = f"vqc_{uuid.uuid4().hex}"
@@ -367,6 +393,9 @@ class VisualQcService:
             ),
             "intake_batch_id": intake_batch_id,
             "intake_entry_id": intake_entry_id,
+            "qualified_handoff_json": serialize_qualified_handoff(
+                normalized_handoff
+            ),
             "reference_path": str(side["reference_path"]),
             "created_at": timestamp,
         }
@@ -416,6 +445,19 @@ class VisualQcService:
                 existing = self.store.get_case_for_idempotency(actor_id, idempotency_key)
                 if existing and existing["request_fingerprint"] == fingerprint:
                     return self.get_case(existing["case_id"], actor_id)
+                existing_intake = self.store.get_case_for_intake(
+                    actor_id,
+                    intake_batch_id,
+                    intake_entry_id,
+                )
+                if existing_intake:
+                    if existing_intake["request_fingerprint"] != fingerprint:
+                        raise VisualQcServiceError(
+                            "intake_provenance_conflict",
+                            "Intake entry was already admitted with different provenance.",
+                            409,
+                        )
+                    return self.get_case(existing_intake["case_id"], actor_id)
                 raise
         return self.get_case(case_id, actor_id)
 
@@ -427,7 +469,7 @@ class VisualQcService:
         image = record["image"]
         job = record["job"]
         response = {
-            "schema_version": "VISUAL-QC-SERVER-CASE-V1",
+            "schema_version": "VISUAL-QC-SERVER-CASE-V2",
             "case_id": case["case_id"],
             "board_key": case["board_key"],
             "board_id": case["board_id"],
@@ -438,6 +480,9 @@ class VisualQcService:
                 "batch_id": case["intake_batch_id"],
                 "entry_id": case["intake_entry_id"],
             },
+            "qualified_handoff": self._stored_qualified_handoff(
+                case.get("qualified_handoff_json")
+            ),
             "capture_session": self._capture_session_payload(
                 case["capture_session_id"],
                 actor_id,
@@ -512,6 +557,9 @@ class VisualQcService:
                         "batch_id": row["intake_batch_id"],
                         "entry_id": row["intake_entry_id"],
                     },
+                    "qualified_handoff": self._stored_qualified_handoff(
+                        row.get("qualified_handoff_json")
+                    ),
                     "state": row["state"],
                     "created_at": row["created_at"],
                     "image": {
@@ -528,7 +576,7 @@ class VisualQcService:
                 }
             )
         return {
-            "schema_version": "VISUAL-QC-ADMIN-CASE-LIST-V1",
+            "schema_version": "VISUAL-QC-ADMIN-CASE-LIST-V2",
             "page": page,
             "page_size": page_size,
             "total": total,
@@ -537,7 +585,7 @@ class VisualQcService:
 
     def get_admin_case(self, case_id: str, actor_id: str) -> dict:
         response = self.get_case(case_id, actor_id)
-        response["schema_version"] = "VISUAL-QC-SERVER-CASE-V2"
+        response["schema_version"] = "VISUAL-QC-SERVER-CASE-V3"
         registration_review = self.store.get_latest_registration_review(case_id)
         if registration_review:
             response["server_registration_review"] = registration_review
@@ -1149,6 +1197,52 @@ class VisualQcService:
                     f"{field} must use letters, numbers, dot, dash, or underscore and be at most 128 characters.",
                 )
         return normalized_batch, normalized_entry
+
+    @staticmethod
+    def _normalized_qualified_handoff(
+        *,
+        evidence_role: str,
+        raw: str | None,
+        intake_batch_id: str | None,
+        intake_entry_id: str | None,
+    ) -> dict | None:
+        if evidence_role == "physical_capture":
+            if (
+                intake_batch_id is None
+                or intake_entry_id is None
+                or raw is None
+                or not raw.strip()
+            ):
+                raise VisualQcServiceError(
+                    "physical_handoff_provenance_required",
+                    "Physical capture requires controlled intake and qualified handoff provenance.",
+                )
+            try:
+                return normalize_qualified_handoff(raw)
+            except QualifiedHandoffError as exc:
+                raise VisualQcServiceError(
+                    "invalid_qualified_handoff",
+                    str(exc),
+                ) from exc
+        if raw is not None and raw.strip():
+            raise VisualQcServiceError(
+                "qualified_handoff_not_allowed",
+                "Qualified handoff provenance is allowed only for physical capture.",
+            )
+        return None
+
+    @staticmethod
+    def _stored_qualified_handoff(raw: str | None) -> dict | None:
+        if raw is None:
+            return None
+        try:
+            return normalize_qualified_handoff(raw)
+        except QualifiedHandoffError as exc:
+            raise VisualQcServiceError(
+                "stored_qualified_handoff_invalid",
+                "Stored qualified handoff provenance is invalid.",
+                500,
+            ) from exc
 
     @staticmethod
     def _normalized_capture_checklist(value: str, evidence_role: str) -> dict:

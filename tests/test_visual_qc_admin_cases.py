@@ -16,6 +16,19 @@ from scripts.visual_qc.server.store import utc_now
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def qualified_handoff():
+    return {
+        "schema_version": "VISUAL-QC-QUALIFIED-HANDOFF-PROVENANCE-V1",
+        "handoff_schema_version": "VISUAL-QC-PHYSICAL-HANDOFF-V1",
+        "source_package_manifest_sha256": "a" * 64,
+        "archived_intake_manifest_sha256": "b" * 64,
+        "acceptance_report_sha256": "c" * 64,
+        "acceptance_action": "automatic_candidate_review_required",
+        "registration_review_required": True,
+        "field_accuracy_claim_allowed": False,
+    }
+
+
 def encode_jpeg(value=170):
     image = np.full((120, 180, 3), value, dtype=np.uint8)
     ok, encoded = cv2.imencode(".jpg", image, [cv2.IMWRITE_JPEG_QUALITY, 92])
@@ -66,6 +79,9 @@ class VisualQcAdminCaseTests(unittest.TestCase):
                 ),
                 "intake_batch_id": "test-batch",
                 "intake_entry_id": token,
+                "qualified_handoff": json.dumps(
+                    qualified_handoff(), separators=(",", ":")
+                ),
                 "sha256": hashlib.sha256(image).hexdigest(),
             },
             files={"file": (f"{token}.jpg", image, "image/jpeg")},
@@ -151,8 +167,14 @@ class VisualQcAdminCaseTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200, response.text)
         payload = response.json()
-        self.assertEqual(payload["schema_version"], "VISUAL-QC-ADMIN-CASE-LIST-V1")
+        self.assertEqual(payload["schema_version"], "VISUAL-QC-ADMIN-CASE-LIST-V2")
         self.assertEqual(payload["total"], 6)
+        self.assertTrue(
+            all(
+                item["qualified_handoff"] == qualified_handoff()
+                for item in payload["cases"]
+            )
+        )
         self.assertEqual(
             {item["state"] for item in payload["cases"]},
             {
@@ -233,7 +255,8 @@ class VisualQcAdminCaseTests(unittest.TestCase):
         )
 
         self.assertEqual(detail.status_code, 200, detail.text)
-        self.assertEqual(detail.json()["schema_version"], "VISUAL-QC-SERVER-CASE-V2")
+        self.assertEqual(detail.json()["schema_version"], "VISUAL-QC-SERVER-CASE-V3")
+        self.assertEqual(detail.json()["qualified_handoff"], qualified_handoff())
         self.assertEqual(detail.json()["server_registration_review"]["review_id"], registration["review_id"])
         self.assertEqual(detail.json()["server_qc_review"]["qc_review_id"], "qc-detail")
         self.assertEqual(original.status_code, 200)

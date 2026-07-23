@@ -53,6 +53,7 @@ class VisualQcStore:
                     capture_checklist_json TEXT NOT NULL DEFAULT '{}',
                     intake_batch_id TEXT,
                     intake_entry_id TEXT,
+                    qualified_handoff_json TEXT,
                     reference_path TEXT NOT NULL,
                     created_at TEXT NOT NULL,
                     UNIQUE(actor_id, idempotency_key)
@@ -215,6 +216,10 @@ class VisualQcStore:
                 connection.execute("ALTER TABLE cases ADD COLUMN intake_batch_id TEXT")
             if "intake_entry_id" not in case_columns:
                 connection.execute("ALTER TABLE cases ADD COLUMN intake_entry_id TEXT")
+            if "qualified_handoff_json" not in case_columns:
+                connection.execute(
+                    "ALTER TABLE cases ADD COLUMN qualified_handoff_json TEXT"
+                )
             connection.execute(
                 "CREATE UNIQUE INDEX IF NOT EXISTS cases_actor_intake_entry "
                 "ON cases(actor_id, intake_batch_id, intake_entry_id) "
@@ -530,6 +535,20 @@ class VisualQcStore:
             ).fetchone()
         return dict(row) if row else None
 
+    def get_case_for_intake(
+        self,
+        actor_id: str,
+        intake_batch_id: str,
+        intake_entry_id: str,
+    ):
+        with self.connect() as connection:
+            row = connection.execute(
+                "SELECT case_id, request_fingerprint FROM cases "
+                "WHERE actor_id = ? AND intake_batch_id = ? AND intake_entry_id = ?",
+                (actor_id, intake_batch_id, intake_entry_id),
+            ).fetchone()
+        return dict(row) if row else None
+
     def list_capture_session(self, actor_id: str, capture_session_id: str):
         with self.connect() as connection:
             rows = connection.execute(
@@ -576,6 +595,7 @@ class VisualQcStore:
                     cases.capture_stage, cases.evidence_role,
                     cases.capture_session_id, cases.capture_setup_id,
                     cases.intake_batch_id, cases.intake_entry_id,
+                    cases.qualified_handoff_json,
                     cases.created_at,
                     images.image_id, images.original_filename, images.mime_type,
                     images.byte_size, images.width, images.height, images.sha256,
@@ -675,8 +695,9 @@ class VisualQcStore:
                     case_id, actor_id, idempotency_key, request_fingerprint,
                     board_key, board_id, side_id, capture_stage, evidence_role,
                     capture_session_id, capture_setup_id, capture_checklist_json,
-                    intake_batch_id, intake_entry_id, reference_path, created_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    intake_batch_id, intake_entry_id, qualified_handoff_json,
+                    reference_path, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 tuple(
                     case_record[key]
@@ -684,7 +705,8 @@ class VisualQcStore:
                         "case_id", "actor_id", "idempotency_key", "request_fingerprint",
                         "board_key", "board_id", "side_id", "capture_stage", "evidence_role",
                         "capture_session_id", "capture_setup_id", "capture_checklist_json",
-                        "intake_batch_id", "intake_entry_id", "reference_path", "created_at",
+                        "intake_batch_id", "intake_entry_id", "qualified_handoff_json",
+                        "reference_path", "created_at",
                     )
                 ),
             )
@@ -733,6 +755,11 @@ class VisualQcStore:
                             "job_id": job_record["job_id"],
                             "intake_batch_id": case_record["intake_batch_id"],
                             "intake_entry_id": case_record["intake_entry_id"],
+                            "qualified_handoff": (
+                                json.loads(case_record["qualified_handoff_json"])
+                                if case_record["qualified_handoff_json"]
+                                else None
+                            ),
                         },
                         separators=(",", ":"),
                     ),
