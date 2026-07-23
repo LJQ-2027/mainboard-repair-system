@@ -13,7 +13,9 @@ from unittest.mock import patch
 import cv2
 import jsonschema
 import numpy as np
+from fastapi.testclient import TestClient
 
+from scripts.import_visual_qc_batch import VisualQcIntakeTransport
 from scripts.visual_qc.physical_acceptance import publish_physical_registration_run
 from scripts.visual_qc import physical_handoff as physical_handoff_module
 from scripts.visual_qc.physical_handoff import (
@@ -22,7 +24,9 @@ from scripts.visual_qc.physical_handoff import (
     validate_physical_handoff_evidence,
     validate_physical_handoff_receipt,
 )
+from scripts.visual_qc.server.api import create_app
 from scripts.visual_qc.server.catalog import BoardCatalog
+from scripts.visual_qc.server.config import VisualQcServerSettings
 from scripts.visual_qc.source_library import stage_source_package
 from scripts.visual_qc.synthetic import (
     SyntheticTransformConfig,
@@ -68,6 +72,31 @@ class FakeTransport:
                 "message": "worker failed",
             }
         return payload
+
+
+class TestClientTransport(VisualQcIntakeTransport):
+    def __init__(self, client, service):
+        self.client = client
+        self.service = service
+        self.actor_id = "milo-visual-data-operator"
+
+    def _request_json(self, method, path, *, body=None, headers=None):
+        if method == "GET" and path.startswith("/jobs/"):
+            self.service.process_next_job()
+        response = self.client.request(
+            method,
+            f"/api/v1/visual-qc{path}",
+            content=body,
+            headers={
+                "Accept": "application/json",
+                "Authorization": "Basic local-integration-test",
+                "X-Actor-Id": self.actor_id,
+                "X-Actor-Role": "reviewer",
+                **(headers or {}),
+            },
+        )
+        response.raise_for_status()
+        return response.json()
 
 
 class PhysicalHandoffEvidenceTests(unittest.TestCase):
@@ -1048,6 +1077,93 @@ class PhysicalHandoffEvidenceTests(unittest.TestCase):
             all(entry["registration_review_required"] for entry in resumed["entries"])
         )
         self.assertFalse(resumed["field_accuracy_claim_allowed"])
+
+        server_root = root / "server-data"
+        app = create_app(
+            VisualQcServerSettings(
+                project_root=ROOT,
+                data_root=server_root,
+                maximum_upload_bytes=20 * 1024 * 1024,
+                minimum_image_dimension=64,
+                minimum_free_bytes=0,
+                warning_free_bytes=0,
+                worker_count=0,
+            )
+        )
+        with TestClient(app) as client:
+            local_transport = TestClientTransport(
+                client,
+                app.state.visual_qc_service,
+            )
+            local_receipt = run_physical_handoff(
+                package_path=staged["source_package_path"],
+                acceptance_report_path=acceptance_root
+                / "physical-registration-run.json",
+                project_root=ROOT,
+                library_root=library,
+                handoff_root=root / "local-api-handoff",
+                transport=local_transport,
+                wait_for_jobs=True,
+                poll_interval_seconds=0,
+            )
+
+            self.assertEqual(local_receipt["status"], "transferred")
+            self.assertEqual(len(local_receipt["entries"]), 2)
+            for entry in local_receipt["entries"]:
+                detail = client.get(
+                    f"/api/v1/visual-qc/admin/cases/{entry['server_case_id']}",
+                    headers={
+                        "X-Actor-Id": "milo-visual-data-operator",
+                        "X-Actor-Role": "reviewer",
+                    },
+                )
+                self.assertEqual(detail.status_code, 200, detail.text)
+                payload = detail.json()
+                self.assertEqual(
+                    payload["schema_version"],
+                    "VISUAL-QC-SERVER-CASE-V3",
+                )
+                self.assertEqual(
+                    payload["qualified_handoff"]["source_package_manifest_sha256"],
+                    local_receipt["source_package"]["manifest_sha256"],
+                )
+                self.assertEqual(
+                    payload["qualified_handoff"]["archived_intake_manifest_sha256"],
+                    local_receipt["archived_intake"]["manifest_sha256"],
+                )
+                self.assertEqual(
+                    payload["qualified_handoff"]["acceptance_report_sha256"],
+                    local_receipt["acceptance"]["report_sha256"],
+                )
+                self.assertEqual(
+                    payload["qualified_handoff"]["acceptance_action"],
+                    entry["acceptance_action"],
+                )
+                self.assertTrue(
+                    payload["qualified_handoff"]["registration_review_required"]
+                )
+                self.assertFalse(
+                    payload["qualified_handoff"]["field_accuracy_claim_allowed"]
+                )
+
+        stored_files = [
+            path.relative_to(server_root).as_posix()
+            for path in server_root.rglob("*")
+            if path.is_file()
+        ]
+        self.assertEqual(
+            len([path for path in stored_files if "/originals/" in f"/{path}"]),
+            2,
+        )
+        self.assertFalse(
+            any(
+                "physical-registration-run" in path or "overlay" in path
+                for path in stored_files
+            ),
+            stored_files,
+        )
+        self.assertEqual(snapshot_tree(library), source_snapshot)
+        self.assertEqual(snapshot_tree(acceptance_root), acceptance_snapshot)
 
     def test_handoff_cli_help_and_dry_run_emit_stable_path_free_json(self):
         help_result = subprocess.run(
