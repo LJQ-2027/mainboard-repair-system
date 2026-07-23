@@ -77,12 +77,20 @@
     "target": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["version"],
+      "required": [
+        "version",
+        "archive_sha256",
+        "archive_bytes",
+        "runtime_manifest_sha256"
+      ],
       "properties": {
         "version": {
           "type": "string",
-          "pattern": "^[0-9a-f]{7,40}$"
-        }
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "archive_sha256": {"$ref": "#/$defs/sha256"},
+        "archive_bytes": {"type": "integer", "minimum": 1},
+        "runtime_manifest_sha256": {"$ref": "#/$defs/sha256"}
       }
     },
     "checks": {

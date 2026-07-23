@@ -17,6 +17,10 @@ from scripts.visual_qc.source_library import (
     _absolute_lexical_path,
     _is_reparse_or_symlink,
 )
+from scripts.visual_qc.deployment_manifest import (
+    FULL_COMMIT_PATTERN,
+    SHA256_PATTERN as DEPLOYMENT_SHA256_PATTERN,
+)
 from scripts.visual_qc.server.store import VisualQcStore
 from scripts.visual_qc.server.config import VisualQcServerSettings
 from scripts.visual_qc.server.service import VisualQcService
@@ -44,7 +48,6 @@ MANAGED_MIME_EXTENSIONS = {
     "image/webp": ".webp",
     "application/json": ".json",
 }
-TARGET_VERSION_PATTERN = re.compile(r"^[0-9a-f]{7,40}$")
 
 
 def _read_only_connection(database: Path) -> sqlite3.Connection:
@@ -1050,6 +1053,9 @@ def audit_visual_qc_upgrade(
     source_data_root: Path,
     source_app_root: Path,
     target_version: str,
+    target_archive_sha256: str,
+    target_archive_bytes: int,
+    target_runtime_manifest_sha256: str,
     clock=utc_now,
 ) -> dict:
     project_root = Path(project_root).resolve()
@@ -1064,8 +1070,28 @@ def audit_visual_qc_upgrade(
     if not version_path.is_file():
         raise ValueError("Source application VERSION is missing.")
     source_version = version_path.read_text(encoding="ascii").strip()
-    if TARGET_VERSION_PATTERN.fullmatch(target_version) is None:
-        raise ValueError("Target version must be a lowercase Git commit.")
+    if (
+        not isinstance(target_version, str)
+        or FULL_COMMIT_PATTERN.fullmatch(target_version) is None
+    ):
+        raise ValueError(
+            "Target version must be a full 40-character lowercase Git commit."
+        )
+    for field_name, value in (
+        ("target archive SHA-256", target_archive_sha256),
+        ("target runtime manifest SHA-256", target_runtime_manifest_sha256),
+    ):
+        if (
+            not isinstance(value, str)
+            or DEPLOYMENT_SHA256_PATTERN.fullmatch(value) is None
+        ):
+            raise ValueError(f"{field_name} must be lowercase SHA-256.")
+    if (
+        isinstance(target_archive_bytes, bool)
+        or not isinstance(target_archive_bytes, int)
+        or target_archive_bytes < 1
+    ):
+        raise ValueError("Target archive byte size must be a positive integer.")
 
     with _storage_reference_lock(source_data_root):
         before_fingerprint = _source_fingerprint(
@@ -1226,7 +1252,12 @@ def audit_visual_qc_upgrade(
             "fingerprint_digest": before_fingerprint["digest"],
             "fingerprint_file_count": before_fingerprint["file_count"],
         },
-        "target": {"version": target_version},
+        "target": {
+            "version": target_version,
+            "archive_sha256": target_archive_sha256,
+            "archive_bytes": target_archive_bytes,
+            "runtime_manifest_sha256": target_runtime_manifest_sha256,
+        },
         "checks": checks,
         "managed_objects": managed_objects,
         "migration": migration,

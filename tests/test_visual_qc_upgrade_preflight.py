@@ -25,6 +25,22 @@ from scripts.visual_qc.server.store import VisualQcStore
 
 
 ROOT = Path(__file__).resolve().parents[1]
+TARGET_EVIDENCE = {
+    "target_version": "b" * 40,
+    "target_archive_sha256": "c" * 64,
+    "target_archive_bytes": 4096,
+    "target_runtime_manifest_sha256": "d" * 64,
+}
+TARGET_CLI_ARGUMENTS = [
+    "--target-version",
+    TARGET_EVIDENCE["target_version"],
+    "--target-archive-sha256",
+    TARGET_EVIDENCE["target_archive_sha256"],
+    "--target-archive-bytes",
+    str(TARGET_EVIDENCE["target_archive_bytes"]),
+    "--target-runtime-manifest-sha256",
+    TARGET_EVIDENCE["target_runtime_manifest_sha256"],
+]
 
 
 def sha256_file(path: Path) -> str:
@@ -572,7 +588,7 @@ class VisualQcStore:
             source_database=source,
             source_data_root=source_data_root,
             source_app_root=source_app_root,
-            target_version="abcdef1",
+            **TARGET_EVIDENCE,
             clock=lambda: "2026-07-23T12:00:00.000Z",
         )
 
@@ -581,7 +597,19 @@ class VisualQcStore:
         self.assertEqual(report["generated_at"], "2026-07-23T12:00:00.000Z")
         self.assertEqual(report["source"]["version"], "f278061")
         self.assertEqual(report["source"]["snapshot_sha256"], sha256_file(source))
-        self.assertEqual(report["target"]["version"], "abcdef1")
+        self.assertEqual(
+            report["target"],
+            {
+                "version": TARGET_EVIDENCE["target_version"],
+                "archive_sha256": TARGET_EVIDENCE[
+                    "target_archive_sha256"
+                ],
+                "archive_bytes": TARGET_EVIDENCE["target_archive_bytes"],
+                "runtime_manifest_sha256": TARGET_EVIDENCE[
+                    "target_runtime_manifest_sha256"
+                ],
+            },
+        )
         self.assertEqual(
             [check["check_id"] for check in report["checks"]],
             [
@@ -619,8 +647,32 @@ class VisualQcStore:
                 source_database=source,
                 source_data_root=source_data_root,
                 source_app_root=self.create_rollback_app(),
-                target_version="abcdef1",
+                **TARGET_EVIDENCE,
             )
+
+    def test_full_upgrade_audit_rejects_incomplete_target_identity(self):
+        source = self.create_f278061_database()
+        source_data_root = self.root / "source-data"
+        self.attach_managed_objects(source, source_data_root)
+        source_app_root = self.create_rollback_app()
+        invalid_values = [
+            {"target_version": "abcdef1"},
+            {"target_archive_sha256": "C" * 64},
+            {"target_archive_bytes": 0},
+            {"target_runtime_manifest_sha256": "short"},
+        ]
+
+        for override in invalid_values:
+            with self.subTest(override=override):
+                evidence = {**TARGET_EVIDENCE, **override}
+                with self.assertRaises(ValueError):
+                    audit_visual_qc_upgrade(
+                        project_root=ROOT,
+                        source_database=source,
+                        source_data_root=source_data_root,
+                        source_app_root=source_app_root,
+                        **evidence,
+                    )
 
     def test_top_level_fails_when_candidate_smoke_has_non_dataset_issue(self):
         source = self.create_f278061_database()
@@ -661,7 +713,7 @@ class VisualQcStore:
                 source_database=source,
                 source_data_root=source_data_root,
                 source_app_root=self.create_rollback_app(),
-                target_version="abcdef1",
+                **TARGET_EVIDENCE,
             )
 
         self.assertEqual(report["status"], "failed")
@@ -718,8 +770,7 @@ class VisualQcUpgradePreflightCliTests(unittest.TestCase):
                 str(self.data_root),
                 "--source-app-root",
                 str(self.fixture.create_rollback_app()),
-                "--target-version",
-                "abcdef1",
+                *TARGET_CLI_ARGUMENTS,
                 "--output",
                 str(self.root / "reports" / "upgrade-preflight.json"),
                 *map(str, extra),
@@ -824,8 +875,7 @@ class VisualQcUpgradePreflightCliTests(unittest.TestCase):
                 str(self.data_root),
                 "--source-app-root",
                 str(incompatible_app),
-                "--target-version",
-                "abcdef1",
+                *TARGET_CLI_ARGUMENTS,
                 "--output",
                 str(output),
             ],
@@ -857,8 +907,7 @@ class VisualQcUpgradePreflightCliTests(unittest.TestCase):
                 str(self.data_root),
                 "--source-app-root",
                 str(self.fixture.create_rollback_app()),
-                "--target-version",
-                "abcdef1",
+                *TARGET_CLI_ARGUMENTS,
                 "--output",
                 str(output),
             ],
@@ -890,8 +939,7 @@ class VisualQcUpgradePreflightCliTests(unittest.TestCase):
                 str(self.data_root),
                 "--source-app-root",
                 str(self.fixture.create_rollback_app()),
-                "--target-version",
-                "abcdef1",
+                *TARGET_CLI_ARGUMENTS,
                 "--output",
                 str(output),
             ],

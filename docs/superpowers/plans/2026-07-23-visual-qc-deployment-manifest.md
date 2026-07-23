@@ -92,7 +92,7 @@ git commit -m "feat: define visual qc deployment manifest"
 - Modify: `knowledge-base/visual-qc-upgrade-preflight-v1-schema.json`
 - Modify: `tests/test_visual_qc_upgrade_preflight.py`
 
-- [ ] **Step 1: Write failing upgrade-binding tests**
+- [x] **Step 1: Write failing upgrade-binding tests**
 
 Require:
 
@@ -109,7 +109,7 @@ Add CLI rejection tests for short commits, uppercase/short hashes, zero archive
 bytes, and omitted target evidence. Validate the resulting report through the
 existing V1 Schema.
 
-- [ ] **Step 2: Run tests and verify RED**
+- [x] **Step 2: Run tests and verify RED**
 
 Run:
 
@@ -119,7 +119,7 @@ Run:
 
 Expected: target evidence arguments and fields are missing.
 
-- [ ] **Step 3: Implement strict target evidence**
+- [x] **Step 3: Implement strict target evidence**
 
 Change `audit_visual_qc_upgrade` to require:
 
@@ -142,11 +142,11 @@ arguments:
 Update the report Schema target object with the four required values and no
 additional properties.
 
-- [ ] **Step 4: Verify GREEN**
+- [x] **Step 4: Verify GREEN**
 
 Run the Task 2 test command. Expected: all upgrade tests pass.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```powershell
 git add scripts/visual_qc/upgrade_preflight.py scripts/audit_visual_qc_upgrade.py knowledge-base/visual-qc-upgrade-preflight-v1-schema.json tests/test_visual_qc_upgrade_preflight.py

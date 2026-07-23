@@ -39,6 +39,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--source-data-root", required=True, type=Path)
     parser.add_argument("--source-app-root", required=True, type=Path)
     parser.add_argument("--target-version", required=True)
+    parser.add_argument("--target-archive-sha256", required=True)
+    parser.add_argument("--target-archive-bytes", required=True, type=int)
+    parser.add_argument("--target-runtime-manifest-sha256", required=True)
     parser.add_argument("--output", required=True, type=Path)
     return parser
 
@@ -129,6 +132,11 @@ def main(argv: list[str] | None = None) -> int:
             source_data_root=arguments.source_data_root,
             source_app_root=arguments.source_app_root,
             target_version=arguments.target_version,
+            target_archive_sha256=arguments.target_archive_sha256,
+            target_archive_bytes=arguments.target_archive_bytes,
+            target_runtime_manifest_sha256=(
+                arguments.target_runtime_manifest_sha256
+            ),
         )
         publish_report(output, report)
     except (UpgradePreflightInputError, ValueError, OSError) as exc:
