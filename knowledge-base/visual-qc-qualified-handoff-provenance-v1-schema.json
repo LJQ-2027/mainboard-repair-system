@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mainboard-repair.local/schemas/visual-qc-qualified-handoff-provenance-v1-schema.json",
+  "title": "Visual-QC Qualified Handoff Provenance V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "handoff_schema_version",
+    "source_package_manifest_sha256",
+    "archived_intake_manifest_sha256",
+    "acceptance_report_sha256",
+    "acceptance_action",
+    "registration_review_required",
+    "field_accuracy_claim_allowed"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "VISUAL-QC-QUALIFIED-HANDOFF-PROVENANCE-V1"
+    },
+    "handoff_schema_version": {
+      "const": "VISUAL-QC-PHYSICAL-HANDOFF-V1"
+    },
+    "source_package_manifest_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "archived_intake_manifest_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "acceptance_report_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "acceptance_action": {
+      "enum": [
+        "automatic_candidate_review_required",
+        "manual_registration_required"
+      ]
+    },
+    "registration_review_required": {
+      "const": true
+    },
+    "field_accuracy_claim_allowed": {
+      "const": false
+    }
+  }
+}

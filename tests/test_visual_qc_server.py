@@ -1,4 +1,5 @@
 import hashlib
+import json
 import sqlite3
 import tempfile
 import unittest
@@ -7,11 +8,16 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 import cv2
+import jsonschema
 import numpy as np
 from fastapi.testclient import TestClient
 
 from scripts.visual_qc.server.api import create_app
 from scripts.visual_qc.server.config import VisualQcServerSettings
+from scripts.visual_qc.server.provenance import (
+    QualifiedHandoffError,
+    normalize_qualified_handoff,
+)
 from scripts.visual_qc.server.quality import analyze_image_quality
 from scripts.visual_qc.server.storage import LocalObjectStorage, StorageError
 from scripts.visual_qc.server.store import VisualQcStore
@@ -22,6 +28,21 @@ from visual_qc_server import runtime_options
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def qualified_handoff(action="automatic_candidate_review_required", **overrides):
+    payload = {
+        "schema_version": "VISUAL-QC-QUALIFIED-HANDOFF-PROVENANCE-V1",
+        "handoff_schema_version": "VISUAL-QC-PHYSICAL-HANDOFF-V1",
+        "source_package_manifest_sha256": "a" * 64,
+        "archived_intake_manifest_sha256": "b" * 64,
+        "acceptance_report_sha256": "c" * 64,
+        "acceptance_action": action,
+        "registration_review_required": True,
+        "field_accuracy_claim_allowed": False,
+    }
+    payload.update(overrides)
+    return payload
+
+
 def encode_jpeg(image):
     ok, encoded = cv2.imencode(".jpg", image, [cv2.IMWRITE_JPEG_QUALITY, 92])
     if not ok:
@@ -30,6 +51,36 @@ def encode_jpeg(image):
 
 
 class VisualQcServerApiTests(unittest.TestCase):
+    def test_qualified_handoff_contract_is_closed_and_schema_valid(self):
+        normalized = normalize_qualified_handoff(
+            json.dumps(qualified_handoff(), separators=(",", ":"))
+        )
+
+        self.assertEqual(normalized, qualified_handoff())
+        schema = json.loads(
+            (
+                ROOT
+                / "knowledge-base"
+                / "visual-qc-qualified-handoff-provenance-v1-schema.json"
+            ).read_text(encoding="utf-8")
+        )
+        jsonschema.validate(normalized, schema)
+
+    def test_qualified_handoff_rejects_unknown_fields_and_semantic_drift(self):
+        invalid = qualified_handoff(extra="pollution")
+        with self.assertRaises(QualifiedHandoffError):
+            normalize_qualified_handoff(json.dumps(invalid))
+
+        for key, value in (
+            ("registration_review_required", False),
+            ("field_accuracy_claim_allowed", True),
+            ("source_package_manifest_sha256", "A" * 64),
+            ("acceptance_action", "reviewed"),
+        ):
+            invalid = qualified_handoff(**{key: value})
+            with self.subTest(key=key), self.assertRaises(QualifiedHandoffError):
+                normalize_qualified_handoff(json.dumps(invalid))
+
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory()
         self.settings = VisualQcServerSettings(
