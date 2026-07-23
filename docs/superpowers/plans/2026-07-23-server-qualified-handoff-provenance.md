@@ -1,6 +1,6 @@
 # Server Qualified-Handoff Provenance Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Bind every newly admitted physical Visual-QC server case to the exact locally qualified source package, archived intake manifest, and acceptance report without uploading those evidence bodies.
 
@@ -34,7 +34,7 @@
 - Create: `knowledge-base/visual-qc-qualified-handoff-provenance-v1-schema.json`
 - Modify: `tests/test_visual_qc_server.py`
 
-- [ ] **Step 1: Add failing normalizer and JSON Schema tests**
+- [x] **Step 1: Add failing normalizer and JSON Schema tests**
 
 Add a reusable test fixture and tests that exercise real normalization:
 
@@ -82,7 +82,7 @@ def test_qualified_handoff_rejects_unknown_fields_and_semantic_drift(self):
             normalize_qualified_handoff(json.dumps(invalid))
 ```
 
-- [ ] **Step 2: Run the focused tests and verify RED**
+- [x] **Step 2: Run the focused tests and verify RED**
 
 Run:
 
@@ -92,7 +92,7 @@ python -m unittest tests.test_visual_qc_server.VisualQcServerTests.test_qualifie
 
 Expected: import failure because `scripts.visual_qc.server.provenance` and the JSON Schema do not exist.
 
-- [ ] **Step 3: Implement strict normalization**
+- [x] **Step 3: Implement strict normalization**
 
 Create `provenance.py` with one public normalizer and one canonical serializer:
 
@@ -164,13 +164,13 @@ def serialize_qualified_handoff(payload: dict | None) -> str | None:
 
 Create a Draft 2020-12 JSON Schema with `additionalProperties: false`, exact constants for both semantic booleans and schema versions, the two-action enum, and lowercase `^[0-9a-f]{64}$` patterns for all three hashes.
 
-- [ ] **Step 4: Run the focused tests and verify GREEN**
+- [x] **Step 4: Run the focused tests and verify GREEN**
 
 Run the Step 2 command.
 
 Expected: both tests pass.
 
-- [ ] **Step 5: Commit the contract**
+- [x] **Step 5: Commit the contract**
 
 ```powershell
 git add scripts/visual_qc/server/provenance.py knowledge-base/visual-qc-qualified-handoff-provenance-v1-schema.json tests/test_visual_qc_server.py
@@ -186,7 +186,7 @@ git commit -m "feat: define qualified handoff provenance"
 - Modify: `tests/test_visual_qc_server.py`
 - Modify: `tests/test_visual_qc_admin_cases.py`
 
-- [ ] **Step 1: Add failing API admission tests**
+- [x] **Step 1: Add failing API admission tests**
 
 Extend the upload helper so valid physical requests include intake identity and:
 
@@ -227,11 +227,11 @@ Add a round-trip test asserting:
 - `case_created.payload_json` contains the same object;
 - no fixture path, report body, or overlay field appears.
 
-- [ ] **Step 2: Add failing migration and idempotency tests**
+- [x] **Step 2: Add failing migration and idempotency tests**
 
 Extend the legacy SQLite fixture without `qualified_handoff_json`, initialize `VisualQcStore`, and assert the migrated row remains null. Add a request that reuses the same idempotency key with one changed acceptance-report hash and assert `409 idempotency_conflict`.
 
-- [ ] **Step 3: Run the focused server tests and verify RED**
+- [x] **Step 3: Run the focused server tests and verify RED**
 
 Run:
 
@@ -241,7 +241,7 @@ python -m unittest tests.test_visual_qc_server -v
 
 Expected: valid uploads fail because the API ignores provenance, response remains V1, and the database lacks the new column.
 
-- [ ] **Step 4: Wire API and service admission**
+- [x] **Step 4: Wire API and service admission**
 
 In `api.py`, add:
 
@@ -287,7 +287,7 @@ return None
 
 Add `qualified_handoff` to the sorted request-fingerprint payload and canonical `qualified_handoff_json` to the case record. Return `qualified_handoff` and advance the standard case response to V2.
 
-- [ ] **Step 5: Persist, migrate, query, and audit**
+- [x] **Step 5: Persist, migrate, query, and audit**
 
 Add `qualified_handoff_json TEXT` to new databases and a nullable compatibility migration:
 
@@ -300,11 +300,11 @@ if "qualified_handoff_json" not in case_columns:
 
 Include the column in case insert/select/list/dataset queries. Decode it only through a helper that returns `None` or calls `normalize_qualified_handoff`; corrupt stored JSON must fail closed rather than be silently ignored. Add the decoded object to `case_created`.
 
-- [ ] **Step 6: Version admin list/detail responses**
+- [x] **Step 6: Version admin list/detail responses**
 
 Return `VISUAL-QC-ADMIN-CASE-LIST-V2` with `qualified_handoff` on each row. Return `VISUAL-QC-SERVER-CASE-V3` from admin detail. Update admin tests to assert both the version and exact provenance object.
 
-- [ ] **Step 7: Run server and admin tests and verify GREEN**
+- [x] **Step 7: Run server and admin tests and verify GREEN**
 
 Run:
 
@@ -314,7 +314,7 @@ python -m unittest tests.test_visual_qc_server tests.test_visual_qc_admin_cases 
 
 Expected: all tests pass.
 
-- [ ] **Step 8: Commit server persistence**
+- [x] **Step 8: Commit server persistence**
 
 ```powershell
 git add scripts/visual_qc/server/api.py scripts/visual_qc/server/service.py scripts/visual_qc/server/store.py tests/test_visual_qc_server.py tests/test_visual_qc_admin_cases.py
@@ -329,7 +329,7 @@ git commit -m "feat: persist qualified physical provenance"
 - Modify: `tests/test_visual_qc_physical_handoff.py`
 - Modify: `tests/test_visual_qc_intake.py`
 
-- [ ] **Step 1: Add failing handoff-producer tests**
+- [x] **Step 1: Add failing handoff-producer tests**
 
 Upgrade `FakeTransport.upload` to record a deep copy of `entry["qualified_handoff"]`. Assert the candidate and manual fixtures produce:
 
@@ -348,11 +348,11 @@ Upgrade `FakeTransport.upload` to record a deep copy of `entry["qualified_handof
 
 Add a resume test proving the same entry produces byte-identical canonical JSON after an interrupted upload.
 
-- [ ] **Step 2: Add failing real multipart tests**
+- [x] **Step 2: Add failing real multipart tests**
 
 Patch `_request_json`, invoke `VisualQcIntakeTransport.upload`, parse the generated multipart body, and assert the `qualified_handoff` form field exists once and equals canonical compact JSON. Add a negative test where the entry lacks provenance and assert `physical_handoff_provenance_required` before `_request_json` is called.
 
-- [ ] **Step 3: Run the focused tests and verify RED**
+- [x] **Step 3: Run the focused tests and verify RED**
 
 Run:
 
@@ -362,7 +362,7 @@ python -m unittest tests.test_visual_qc_physical_handoff tests.test_visual_qc_in
 
 Expected: fake uploads lack the new object and multipart contains no qualified-handoff field.
 
-- [ ] **Step 4: Build provenance only from validated evidence**
+- [x] **Step 4: Build provenance only from validated evidence**
 
 Add:
 
@@ -388,7 +388,7 @@ def _qualified_handoff_by_entry(evidence: dict) -> dict[str, dict]:
 
 Pass this mapping to both preflight and transfer calls through `_run_bound_intake`.
 
-- [ ] **Step 5: Carry but never synthesize provenance**
+- [x] **Step 5: Carry but never synthesize provenance**
 
 Add `qualified_handoff_by_entry: dict[str, dict] | None = None` to `run_intake`. When provided, require its keys to equal the validated entry ids and attach deep-copied normalized values to entries. When omitted, do not create values.
 
@@ -402,13 +402,13 @@ In `VisualQcIntakeTransport.upload`, require `entry["qualified_handoff"]`, norma
 
 to multipart fields. This keeps the generic dry-run validator usable while making generic physical upload fail locally without the qualified producer.
 
-- [ ] **Step 6: Run focused tests and verify GREEN**
+- [x] **Step 6: Run focused tests and verify GREEN**
 
 Run the Step 3 command.
 
 Expected: all tests pass.
 
-- [ ] **Step 7: Commit controlled transport binding**
+- [x] **Step 7: Commit controlled transport binding**
 
 ```powershell
 git add scripts/import_visual_qc_batch.py scripts/visual_qc/physical_handoff.py tests/test_visual_qc_physical_handoff.py tests/test_visual_qc_intake.py
@@ -421,7 +421,7 @@ git commit -m "feat: bind handoff provenance to upload"
 - Modify: `assets/visual-qc-workbench/visual-qc-server-client.js`
 - Modify: `tests/visual-qc-server-client.test.mjs`
 
-- [ ] **Step 1: Add failing V3 restoration tests**
+- [x] **Step 1: Add failing V3 restoration tests**
 
 Change the admin fixture to `VISUAL-QC-SERVER-CASE-V3` and include a valid `qualified_handoff`. Assert:
 
@@ -436,7 +436,7 @@ assert.equal(restored.visualCase.qc_result.status, 'needs_review');
 
 Add a regression test that a V2 admin payload is rejected with `unsupported_server_schema`, proving version changes are explicit.
 
-- [ ] **Step 2: Run the focused Node test and verify RED**
+- [x] **Step 2: Run the focused Node test and verify RED**
 
 Run:
 
@@ -446,7 +446,7 @@ node --test tests/visual-qc-server-client.test.mjs
 
 Expected: the V3 fixture is rejected and provenance is absent from restored sync metadata.
 
-- [ ] **Step 3: Implement V3 restoration**
+- [x] **Step 3: Implement V3 restoration**
 
 Require `VISUAL-QC-SERVER-CASE-V3` in `restoreAdminServerCase`. After applying the server job:
 
@@ -461,13 +461,13 @@ restored.server_sync.qualified_handoff = clone(
 
 Do not map `acceptance_action` to registration status, QC result, Golden status, annotations, or repair advice.
 
-- [ ] **Step 4: Run the focused Node test and verify GREEN**
+- [x] **Step 4: Run the focused Node test and verify GREEN**
 
 Run the Step 2 command.
 
 Expected: all tests pass.
 
-- [ ] **Step 5: Commit the client contract**
+- [x] **Step 5: Commit the client contract**
 
 ```powershell
 git add assets/visual-qc-workbench/visual-qc-server-client.js tests/visual-qc-server-client.test.mjs
@@ -482,7 +482,7 @@ git commit -m "feat: restore server handoff provenance"
 - Modify: `tests/test_visual_qc_training_manifest.py`
 - Modify: `knowledge-base/visual-qc-dataset-audit-v1-schema.json`
 
-- [ ] **Step 1: Add failing training-gate tests**
+- [x] **Step 1: Add failing training-gate tests**
 
 Create a valid reviewed physical case, then set `qualified_handoff_json = NULL` directly to represent a legacy row. Assert dataset audit reports:
 
@@ -496,7 +496,7 @@ self.assertEqual(
 
 Assert the case is absent from training manifest, COCO, and bundle outputs. Keep the existing nonphysical and registration-review reasons unchanged.
 
-- [ ] **Step 2: Run the focused tests and verify RED**
+- [x] **Step 2: Run the focused tests and verify RED**
 
 Run:
 
@@ -506,7 +506,7 @@ python -m unittest tests.test_visual_qc_training_manifest -v
 
 Expected: the null-provenance legacy row remains eligible.
 
-- [ ] **Step 3: Add the provenance gate before review gates**
+- [x] **Step 3: Add the provenance gate before review gates**
 
 Include `cases.qualified_handoff_json` in `list_dataset_audit_cases`. In `training_audit`, order reasons:
 
@@ -527,13 +527,13 @@ else:
 
 Use the same gate in training-manifest selection, not only the explanatory audit endpoint. Extend the audit schema reason enum with `qualified_handoff_provenance_required`.
 
-- [ ] **Step 4: Run the focused tests and verify GREEN**
+- [x] **Step 4: Run the focused tests and verify GREEN**
 
 Run the Step 2 command.
 
 Expected: all tests pass and the legacy row is excluded from every training artifact.
 
-- [ ] **Step 5: Commit the dataset gate**
+- [x] **Step 5: Commit the dataset gate**
 
 ```powershell
 git add scripts/visual_qc/server/service.py scripts/visual_qc/server/store.py tests/test_visual_qc_training_manifest.py knowledge-base/visual-qc-dataset-audit-v1-schema.json
@@ -551,7 +551,7 @@ git commit -m "feat: gate training on handoff provenance"
 - Modify after evidence is collected: `C:/Users/Mercurluto/OneDrive/AI/90_Meta/System Checks/2026-07-23 Daily Architecture Check.md`
 - Modify: `docs/superpowers/plans/2026-07-23-server-qualified-handoff-provenance.md`
 
-- [ ] **Step 1: Run all Python tests**
+- [x] **Step 1: Run all Python tests**
 
 Run:
 
@@ -561,7 +561,7 @@ python -m unittest discover -s tests -p "test_*.py" -v
 
 Expected: zero failures and zero errors.
 
-- [ ] **Step 2: Run all Node tests**
+- [x] **Step 2: Run all Node tests**
 
 Run:
 
@@ -571,7 +571,7 @@ node --test tests/*.test.mjs
 
 Expected: zero failures.
 
-- [ ] **Step 3: Run static and contract checks**
+- [x] **Step 3: Run static and contract checks**
 
 Run:
 
@@ -584,7 +584,7 @@ git diff --check
 
 Expected: all commands exit `0`.
 
-- [ ] **Step 4: Run a local end-to-end two-side handoff**
+- [x] **Step 4: Run a local end-to-end two-side handoff**
 
 Using temporary directories and the existing synthetic KM4 fixture:
 
@@ -599,7 +599,7 @@ Using temporary directories and the existing synthetic KM4 fixture:
 
 Expected: both cases reach server job success while registration review remains required.
 
-- [ ] **Step 5: Perform P3 browser restoration QA**
+- [x] **Step 5: Perform P3 browser restoration QA**
 
 Start the existing local workbench server, open the admin case list, and verify:
 
@@ -611,7 +611,7 @@ Start the existing local workbench server, open the admin case list, and verify:
 
 Capture screenshots and record the route, viewport, and interaction evidence in the project ledger.
 
-- [ ] **Step 6: Review the diff against every design requirement**
+- [x] **Step 6: Review the diff against every design requirement**
 
 Explicitly verify:
 
@@ -624,11 +624,11 @@ Explicitly verify:
 - workbench preserves provenance without changing review facts;
 - no production deployment, real-photo upload, or field-accuracy claim occurred.
 
-- [ ] **Step 7: Update project facts**
+- [x] **Step 7: Update project facts**
 
 Record implementation commits, test counts, P3 evidence, production gap, and the unchanged real KM4/F151 photo gate in the coordination ledger, Vault `Overview.md`, `Task Index.md`, `Decisions.md`, `Risks.md`, and the daily architecture check. Mark all completed plan checkboxes only from command evidence.
 
-- [ ] **Step 8: Commit closeout records**
+- [x] **Step 8: Commit closeout records**
 
 ```powershell
 git add docs/superpowers/plans/2026-07-23-server-qualified-handoff-provenance.md
@@ -638,3 +638,12 @@ git -C G:/Programming/mainboard-repair-enablement commit -m "docs: record server
 ```
 
 Vault files are durable coordination facts rather than files in either Git repository; verify their UTF-8 bodies after `apply_patch` writes.
+
+## Closeout Evidence
+
+- Implementation commits: `34b7c2c` through `73ce349`.
+- Final regressions: Python `344/344`; Node `226/226`; focused provenance review suite `39/39`.
+- Static checks: Python compilation passed, 18 JSON Schemas parsed, 1,850 project text files decoded as strict UTF-8, and `git diff --check` passed.
+- P3: desktop `1600x1000` and mobile `390x844` restored the V3 server case without page overflow or console errors. Local drafts exposed no server-upload action and directed the operator to the controlled handoff.
+- Independent review: the initial training-gate, browser-upload, schema-version, audit-order, and documentation-command findings were fixed; re-review reported no remaining Important issue.
+- Evidence boundary: the browser fixture is synthetic proxy engineering evidence only. No real bare-board photo, production deployment, or field-accuracy claim was introduced.
