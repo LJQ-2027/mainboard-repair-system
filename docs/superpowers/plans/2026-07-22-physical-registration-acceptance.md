@@ -68,4 +68,4 @@
 - [x] Run `python -m py_compile` for new Python modules, JSON/Schema parsing, UTF-8/U+FFFD checks, and `git diff --check`.
 - [x] Run a local temporary-library acceptance from staging through report publication, compare source snapshots before/after, and inspect report/overlay evidence.
 - [x] Request an independent code review, fix any blocking finding with a new RED/GREEN test, and repeat targeted/full verification.
-- [ ] Commit implementation changes locally, then update and commit coordination/Vault facts without attempting GitHub push under the current network constraint.
+- [x] Commit implementation changes locally, then update and commit coordination/Vault facts without attempting GitHub push under the current network constraint.
