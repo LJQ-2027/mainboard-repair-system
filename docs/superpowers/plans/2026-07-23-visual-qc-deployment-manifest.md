@@ -265,7 +265,7 @@ git commit -m "feat: bind visual qc switch to verified runtime"
 - Modify: `docs/visual-qc-upgrade-preflight-2026-07-23.md`
 - Modify: `docs/superpowers/plans/2026-07-23-visual-qc-deployment-manifest.md`
 
-- [ ] **Step 1: Update operator and evidence documentation**
+- [x] **Step 1: Update operator and evidence documentation**
 
 Document the V1 deployment manifest, full commit, archive/runtime hashes,
 pre-extraction failure behavior, unsigned boundary, and unchanged production

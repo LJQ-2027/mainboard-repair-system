@@ -203,9 +203,14 @@ The bounded pilot deployment therefore adds:
   Visual-QC process is stopped and the rollback SQLite snapshot is complete,
   but before the application directory or virtualenv link is switched;
 - exact binding between the rollback database SHA-256, the rehearsal report,
-and the candidate Git commit. Migration, object-integrity, Local HEAD API,
-dataset-gate, full SQLite schema, and old-runtime rollback checks must all
-pass.
+  the full candidate Git commit, the uploaded runtime archive SHA-256 and byte
+  size, and the runtime path-manifest SHA-256. Migration, object-integrity,
+  Local HEAD API, dataset-gate, full SQLite schema, and old-runtime rollback
+  checks must all pass.
+- `VISUAL-QC-DEPLOYMENT-MANIFEST-V1` is built locally without timestamps or
+  workstation identity, uploaded beside `app.tar.gz`, and validated with
+  system Python before extraction. The extracted runtime manifest and every
+  declared runtime path are revalidated before the QC writer is stopped.
 
 Run the read-only gate first:
 
@@ -220,17 +225,26 @@ without uploading or changing server files. It does not rehearse the candidate
 database migration because no candidate archive has been staged.
 
 Every actual deployment performs the deeper rehearsal automatically. The
-script first stops only `motherboard-repair-visual-qc`, creates a consistent
-SQLite backup, and runs the candidate
+script first builds the bounded runtime archive and deterministic deployment
+manifest from a clean full Git commit. The server verifies the uploaded
+archive hash and byte size before extraction, then verifies the extracted
+runtime manifest hash, normalized path count, and every declared path. Only
+then does it stop `motherboard-repair-visual-qc`, create a consistent SQLite
+backup, and run the candidate
 `scripts/audit_visual_qc_upgrade.py` against that backup, the persistent object
 root, and the still-active old application contract. The resulting
-`upgrade-preflight.json` stays in the commit-versioned rollback directory.
+`deployment-manifest.json` and `upgrade-preflight.json` stay in the
+commit-versioned rollback directory.
 The app directory and `venv-visual-qc` link are switched only after the report
 is `passed`, its `source.snapshot_sha256` matches the rollback database, and
-its target version matches the candidate commit. A rehearsal failure restarts
-the unchanged old service without replacing the untouched live database.
+its target object matches the complete deployment manifest. A rehearsal
+failure restarts the unchanged old service without replacing the untouched live database.
 Database restoration is enabled only after the candidate QC process may have
 opened the live database.
+
+The V1 deployment manifest is a byte-integrity and version-binding contract,
+not a digital signature. Signing and CI provenance attestations remain
+deferred until the deployment channel moves into managed CI/CD.
 
 The rehearsal requires an existing Visual-QC database and a deployed
 `VERSION` file whose commit is in the candidate's reviewed source-version

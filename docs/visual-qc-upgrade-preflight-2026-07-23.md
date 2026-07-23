@@ -18,7 +18,9 @@ service, or deploy the candidate.
 - the existing regular `.storage-reference.lock` in that data root;
 - the currently deployed app root containing `VERSION` and its original
   `scripts/visual_qc/server/store.py`;
-- the exact candidate Git commit;
+- the exact 40-character candidate Git commit;
+- the verified candidate archive SHA-256 and byte size;
+- the verified runtime path-manifest SHA-256;
 - a new report path outside the source data root.
 
 The first reviewed source version is production `f278061`. A different source
@@ -36,7 +38,10 @@ before invoking the preflight.
   --source-database D:\visual-qc-upgrade\visual-qc.sqlite3 `
   --source-data-root D:\visual-qc-data `
   --source-app-root D:\visual-qc-current-app `
-  --target-version abcdef1 `
+  --target-version aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa `
+  --target-archive-sha256 bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb `
+  --target-archive-bytes 4096 `
+  --target-runtime-manifest-sha256 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc `
   --output D:\visual-qc-upgrade\upgrade-preflight.json
 ```
 
@@ -79,22 +84,33 @@ column.
 An actual `scripts/deploy-visual-qc-pilot.ps1` run now performs the same
 rehearsal after it has:
 
-1. staged the candidate app and isolated virtualenv;
-2. stopped `motherboard-repair-visual-qc`;
-3. created the consistent rollback SQLite snapshot.
+1. built `VISUAL-QC-DEPLOYMENT-MANIFEST-V1` from a clean full Git commit;
+2. verified uploaded archive bytes before extraction;
+3. verified the extracted runtime manifest and every declared path;
+4. staged the candidate app and isolated virtualenv;
+5. stopped `motherboard-repair-visual-qc`;
+6. created the consistent rollback SQLite snapshot.
 
 It does this before moving the old app directory or switching
 `venv-visual-qc`. Deployment continues only when:
 
 - report status is `passed`;
 - `source.snapshot_sha256` equals the exact rollback database SHA-256;
-- `target.version` equals the candidate commit.
+- `target.version` equals the full candidate commit;
+- `target.archive_sha256` and `target.archive_bytes` equal the uploaded
+  archive evidence;
+- `target.runtime_manifest_sha256` equals the extracted runtime boundary.
 
-The report remains at
+The deployment manifest and report remain at
+`rollback/<deploy-id>/deployment-manifest.json` and
 `rollback/<deploy-id>/upgrade-preflight.json`. A failure before the candidate
 QC process starts restores the old service without overwriting the untouched
 live database. Once the candidate QC process may have opened the live
 database, later failures also restore the consistent database snapshot.
+
+The deployment manifest is unsigned. It proves consistency across local
+packaging, server receipt, extraction, and rehearsal; it does not provide a
+third-party signature or CI provenance attestation.
 
 `-PreflightOnly` remains a host-level read-only check and does not stage the
 candidate or rehearse a migration.
