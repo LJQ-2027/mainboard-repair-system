@@ -853,6 +853,7 @@ class VisualQcStore:
                     cases.capture_stage,
                     cases.capture_setup_id,
                     cases.capture_session_id,
+                    cases.qualified_handoff_json,
                     images.image_id,
                     images.original_filename,
                     images.mime_type,
@@ -886,6 +887,7 @@ class VisualQcStore:
                     cases.capture_stage,
                     cases.evidence_role,
                     cases.capture_checklist_json,
+                    cases.qualified_handoff_json,
                     cases.created_at,
                     images.image_id,
                     jobs.job_id,
@@ -918,6 +920,7 @@ class VisualQcStore:
                 """
                 SELECT images.*
                 FROM images
+                JOIN cases USING(case_id)
                 JOIN case_qc_reviews USING(case_id)
                 JOIN (
                     SELECT case_id, MAX(version) AS version
@@ -927,6 +930,8 @@ class VisualQcStore:
                   ON latest.case_id = case_qc_reviews.case_id
                  AND latest.version = case_qc_reviews.version
                 WHERE images.image_id = ?
+                  AND cases.evidence_role = 'physical_capture'
+                  AND cases.qualified_handoff_json IS NOT NULL
                 """,
                 (image_id,),
             ).fetchone()

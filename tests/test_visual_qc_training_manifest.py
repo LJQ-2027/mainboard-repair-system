@@ -18,6 +18,19 @@ from scripts.visual_qc.server.config import VisualQcServerSettings
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def qualified_handoff():
+    return {
+        "schema_version": "VISUAL-QC-QUALIFIED-HANDOFF-PROVENANCE-V1",
+        "handoff_schema_version": "VISUAL-QC-PHYSICAL-HANDOFF-V1",
+        "source_package_manifest_sha256": "a" * 64,
+        "archived_intake_manifest_sha256": "b" * 64,
+        "acceptance_report_sha256": "c" * 64,
+        "acceptance_action": "automatic_candidate_review_required",
+        "registration_review_required": True,
+        "field_accuracy_claim_allowed": False,
+    }
+
+
 class VisualQcTrainingManifestTests(unittest.TestCase):
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory()
@@ -63,18 +76,29 @@ class VisualQcTrainingManifestTests(unittest.TestCase):
             },
             "confirmed_at": "2026-07-20T10:00:00.000Z",
         }
+        data = {
+            "board_key": "km4-f151",
+            "side_id": "main_page_2",
+            "capture_stage": "before_repair",
+            "evidence_role": evidence_role,
+            "capture_session_id": f"capture-{request_id}",
+            "capture_setup_id": "bench-a",
+            "capture_checklist": json.dumps(checklist),
+            "sha256": hashlib.sha256(self.image_bytes).hexdigest(),
+        }
+        if evidence_role == "physical_capture":
+            data.update(
+                {
+                    "intake_batch_id": f"batch-{request_id}",
+                    "intake_entry_id": f"entry-{request_id}",
+                    "qualified_handoff": json.dumps(
+                        qualified_handoff(), separators=(",", ":")
+                    ),
+                }
+            )
         response = self.client.post(
             "/api/v1/visual-qc/cases",
-            data={
-                "board_key": "km4-f151",
-                "side_id": "main_page_2",
-                "capture_stage": "before_repair",
-                "evidence_role": evidence_role,
-                "capture_session_id": f"capture-{request_id}",
-                "capture_setup_id": "bench-a",
-                "capture_checklist": json.dumps(checklist),
-                "sha256": hashlib.sha256(self.image_bytes).hexdigest(),
-            },
+            data=data,
             files={"file": ("reference.jpg", self.image_bytes, "image/jpeg")},
             headers={
                 "X-Actor-Id": "technician-001",
@@ -486,3 +510,58 @@ class VisualQcTrainingManifestTests(unittest.TestCase):
         )
         self.assertEqual(cases[eligible["case_id"]]["status"], "eligible")
         self.assertIsNone(cases[eligible["case_id"]]["blocking_reason"])
+
+    def test_legacy_physical_case_without_qualified_handoff_is_never_exported(self):
+        legacy = self.create_processed_case("legacy-no-handoff")
+        self.accept_registration(legacy["case_id"])
+        self.assertEqual(
+            self.submit_no_anomaly(legacy["case_id"]).status_code,
+            201,
+        )
+        with self.app.state.visual_qc_service.store.connect() as connection:
+            connection.execute(
+                "UPDATE cases SET qualified_handoff_json = NULL WHERE case_id = ?",
+                (legacy["case_id"],),
+            )
+            connection.commit()
+
+        headers = {
+            "X-Actor-Id": "reviewer-001",
+            "X-Actor-Role": "reviewer",
+        }
+        audit = self.client.get(
+            "/api/v1/visual-qc/datasets/audit",
+            headers=headers,
+        ).json()
+        manifest = self.client.get(
+            "/api/v1/visual-qc/datasets/training-manifest",
+            headers=headers,
+        ).json()
+        coco = self.client.get(
+            "/api/v1/visual-qc/datasets/coco",
+            headers=headers,
+        ).json()
+        training_image = self.client.get(
+            f"/api/v1/visual-qc/datasets/images/{legacy['image']['image_id']}",
+            headers=headers,
+        )
+        bundle_response = self.client.get(
+            "/api/v1/visual-qc/datasets/bundle",
+            headers=headers,
+        )
+        self.assertEqual(bundle_response.status_code, 200)
+        with zipfile.ZipFile(io.BytesIO(bundle_response.content)) as archive:
+            bundled_manifest = json.loads(archive.read("manifest.json"))
+
+        audited = {
+            case["case_id"]: case for case in audit["cases"]
+        }[legacy["case_id"]]
+        self.assertEqual(audited["status"], "excluded")
+        self.assertEqual(
+            audited["blocking_reason"],
+            "qualified_handoff_provenance_required",
+        )
+        self.assertEqual(manifest["cases"], [])
+        self.assertEqual(coco["images"], [])
+        self.assertEqual(bundled_manifest["cases"], [])
+        self.assertEqual(training_image.status_code, 404)

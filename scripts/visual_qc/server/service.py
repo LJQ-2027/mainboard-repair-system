@@ -828,6 +828,9 @@ class VisualQcService:
         annotation_count = 0
         category_counts = {category: 0 for category in sorted(HUMAN_DEFECT_CATEGORIES)}
         for review in self.store.list_latest_case_qc_reviews():
+            if review.get("qualified_handoff_json") is None:
+                continue
+            self._stored_qualified_handoff(review["qualified_handoff_json"])
             confirmed = [
                 annotation
                 for annotation in review["annotations"]
@@ -1016,12 +1019,17 @@ class VisualQcService:
         eligible_count = 0
         for record in self.store.list_dataset_audit_cases():
             quality = (record.get("job_result") or {}).get("quality") or {}
+            qualified_handoff = self._stored_qualified_handoff(
+                record.get("qualified_handoff_json")
+            )
             registration_review = self.store.get_latest_registration_review(
                 record["case_id"]
             )
             qc_review = self.store.get_latest_case_qc_review(record["case_id"])
             if record["evidence_role"] != "physical_capture":
                 reason = "non_physical_evidence"
+            elif qualified_handoff is None:
+                reason = "qualified_handoff_provenance_required"
             elif record["capture_checklist"].get("status") != "confirmed":
                 reason = "capture_checklist_required"
             elif record["job_status"] != "succeeded":

@@ -22,6 +22,7 @@
       "propertyNames": {
         "enum": [
           "non_physical_evidence",
+          "qualified_handoff_provenance_required",
           "capture_checklist_required",
           "processing_incomplete",
           "image_retake_required",
@@ -69,6 +70,7 @@
             "enum": [
               null,
               "non_physical_evidence",
+              "qualified_handoff_provenance_required",
               "capture_checklist_required",
               "processing_incomplete",
               "image_retake_required",
