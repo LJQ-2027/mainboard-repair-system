@@ -138,6 +138,25 @@ class VisualQcDeploymentContractTests(unittest.TestCase):
         self.assertLess(rehearsal, report_verification)
         self.assertLess(report_verification, application_switch)
 
+    def test_preflight_failure_does_not_restore_an_untouched_database(self):
+        script = (
+            ROOT / "scripts" / "deploy-visual-qc-pilot.ps1"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn("DATABASE_MAY_BE_MUTATED=0", script)
+        self.assertIn(
+            'if [ "$DATABASE_MAY_BE_MUTATED" -ne 1 ]; then',
+            script,
+        )
+        mutation_flag = script.index("DATABASE_MAY_BE_MUTATED=1")
+        rehearsal = script.index("audit_visual_qc_upgrade.py")
+        start_qc = script.index(
+            "pm2 startOrRestart ecosystem.config.js \\\n"
+            "  --only motherboard-repair-visual-qc"
+        )
+        self.assertLess(rehearsal, mutation_flag)
+        self.assertLess(mutation_flag, start_qc)
+
     def test_pm2_qc_process_uses_loopback_and_external_data_and_environment(self):
         ecosystem = (ROOT / "ecosystem.config.js").read_text(encoding="utf-8")
         requirements = (ROOT / "requirements-visual-qc.txt").read_text(encoding="utf-8")

@@ -8,6 +8,7 @@ import unittest
 import json
 import subprocess
 import sys
+from unittest.mock import patch
 
 import jsonschema
 from scripts.visual_qc.upgrade_preflight import (
@@ -135,6 +136,7 @@ class VisualQcUpgradePreflightTests(unittest.TestCase):
         )
         artifact_path.parent.mkdir(parents=True)
         artifact_path.write_bytes(artifact_bytes)
+        (data_root / ".storage-reference.lock").write_bytes(b"\0")
 
         with closing(sqlite3.connect(database)) as connection:
             connection.execute(
@@ -291,6 +293,30 @@ class VisualQcUpgradePreflightTests(unittest.TestCase):
             [issue["error_code"] for issue in comparison["issues"]],
         )
 
+    def test_candidate_schema_comparison_detects_dropped_index(self):
+        source = self.create_f278061_database()
+        working = self.root / "working" / "candidate.sqlite3"
+        create_read_only_snapshot(source, working)
+        before = database_projection(source)
+        rehearse_candidate_migration(working, "f278061")
+        expected = database_projection(working)
+        with closing(sqlite3.connect(working)) as connection:
+            connection.execute("DROP INDEX cases_actor_intake_entry")
+            connection.commit()
+
+        comparison = compare_database_projections(
+            before,
+            database_projection(working),
+            source_version="f278061",
+            expected_projection=expected,
+        )
+
+        self.assertEqual(comparison["status"], "failed")
+        self.assertIn(
+            "candidate_schema_contract_changed",
+            [issue["error_code"] for issue in comparison["issues"]],
+        )
+
     def test_managed_objects_match_canonical_paths_and_hashes(self):
         source = self.create_f278061_database()
         data_root = self.root / "visual-qc-data"
@@ -355,6 +381,20 @@ class VisualQcUpgradePreflightTests(unittest.TestCase):
             "managed_object_path_mismatch",
             [issue["error_code"] for issue in result["issues"]],
         )
+
+    def test_object_validation_hashes_from_one_open_file_handle(self):
+        source = self.create_f278061_database()
+        data_root = self.root / "visual-qc-data"
+        self.attach_managed_objects(source, data_root)
+
+        with patch.object(
+            Path,
+            "read_bytes",
+            side_effect=AssertionError("path reopened during object hashing"),
+        ):
+            result = validate_managed_objects(source, data_root)
+
+        self.assertEqual(result["status"], "passed")
 
     def prepare_candidate_data_root(self, *, physical=False) -> Path:
         source = self.create_f278061_database()
@@ -567,6 +607,72 @@ class VisualQcStore:
         self.assertEqual(self.snapshot_paths(source, source_data_root), before)
         self.assertNotIn(str(self.root), json.dumps(report))
 
+    def test_full_upgrade_audit_requires_existing_storage_reference_lock(self):
+        source = self.create_f278061_database()
+        source_data_root = self.root / "source-data"
+        self.attach_managed_objects(source, source_data_root)
+        (source_data_root / ".storage-reference.lock").unlink()
+
+        with self.assertRaisesRegex(ValueError, "storage reference lock"):
+            audit_visual_qc_upgrade(
+                project_root=ROOT,
+                source_database=source,
+                source_data_root=source_data_root,
+                source_app_root=self.create_rollback_app(),
+                target_version="abcdef1",
+            )
+
+    def test_top_level_fails_when_candidate_smoke_has_non_dataset_issue(self):
+        source = self.create_f278061_database()
+        source_data_root = self.root / "source-data"
+        self.attach_managed_objects(source, source_data_root)
+        candidate_failure = {
+            "status": "failed",
+            "api_schemas": {
+                "health": "VISUAL-QC-SERVER-HEALTH-V2",
+                "admin_list": "VISUAL-QC-ADMIN-CASE-LIST-V2",
+                "admin_detail": "VISUAL-QC-SERVER-CASE-V3",
+                "dataset_audit": "VISUAL-QC-DATASET-AUDIT-V1",
+            },
+            "counts": {
+                "database_cases": 1,
+                "listed_cases": 1,
+                "detailed_cases": 1,
+            },
+            "dataset": {
+                "eligible_case_count": 0,
+                "excluded_case_count": 1,
+                "reason_counts": {"non_physical_evidence": 1},
+            },
+            "issues": [
+                {
+                    "error_code": "candidate_admin_list_count_mismatch",
+                    "message": "Candidate list returned the wrong case identity.",
+                }
+            ],
+        }
+
+        with patch(
+            "scripts.visual_qc.upgrade_preflight.smoke_candidate_runtime",
+            return_value=candidate_failure,
+        ):
+            report = audit_visual_qc_upgrade(
+                project_root=ROOT,
+                source_database=source,
+                source_data_root=source_data_root,
+                source_app_root=self.create_rollback_app(),
+                target_version="abcdef1",
+            )
+
+        self.assertEqual(report["status"], "failed")
+        self.assertEqual(
+            {
+                check["check_id"]: check["status"]
+                for check in report["checks"]
+            }["candidate_runtime_contract"],
+            "failed",
+        )
+
 
 class VisualQcUpgradePreflightCliTests(unittest.TestCase):
     def setUp(self):
@@ -651,6 +757,26 @@ class VisualQcUpgradePreflightCliTests(unittest.TestCase):
             self.fixture.snapshot_paths(self.source, self.data_root),
             before,
         )
+
+    def test_report_schema_rejects_duplicate_or_reordered_checks(self):
+        completed = self.run_cli()
+        self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
+        report = json.loads(
+            (self.root / "reports" / "upgrade-preflight.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        report["checks"][1] = dict(report["checks"][0])
+        schema = json.loads(
+            (
+                ROOT
+                / "knowledge-base"
+                / "visual-qc-upgrade-preflight-v1-schema.json"
+            ).read_text(encoding="utf-8")
+        )
+
+        with self.assertRaises(jsonschema.ValidationError):
+            jsonschema.Draft202012Validator(schema).validate(report)
 
     def test_cli_does_not_overwrite_existing_report(self):
         output = self.root / "reports" / "upgrade-preflight.json"

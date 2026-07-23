@@ -57,7 +57,19 @@
       "type": "array",
       "minItems": 10,
       "maxItems": 10,
-      "items": {"$ref": "#/$defs/check"}
+      "prefixItems": [
+        {"$ref": "#/$defs/sourceVersionCheck"},
+        {"$ref": "#/$defs/sourceIntegrityCheck"},
+        {"$ref": "#/$defs/managedObjectsCheck"},
+        {"$ref": "#/$defs/candidateIntegrityCheck"},
+        {"$ref": "#/$defs/candidateSchemaCheck"},
+        {"$ref": "#/$defs/candidateRowsCheck"},
+        {"$ref": "#/$defs/candidateRuntimeCheck"},
+        {"$ref": "#/$defs/candidateDatasetCheck"},
+        {"$ref": "#/$defs/rollbackRuntimeCheck"},
+        {"$ref": "#/$defs/sourceImmutableCheck"}
+      ],
+      "items": false
     },
     "managed_objects": {
       "type": "object",
@@ -216,6 +228,66 @@
         "error_code": {"type": ["string", "null"]},
         "message": {"type": "string", "minLength": 1}
       }
+    },
+    "sourceVersionCheck": {
+      "allOf": [
+        {"$ref": "#/$defs/check"},
+        {"properties": {"check_id": {"const": "source_version_supported"}}}
+      ]
+    },
+    "sourceIntegrityCheck": {
+      "allOf": [
+        {"$ref": "#/$defs/check"},
+        {"properties": {"check_id": {"const": "source_database_integrity"}}}
+      ]
+    },
+    "managedObjectsCheck": {
+      "allOf": [
+        {"$ref": "#/$defs/check"},
+        {"properties": {"check_id": {"const": "managed_objects_integrity"}}}
+      ]
+    },
+    "candidateIntegrityCheck": {
+      "allOf": [
+        {"$ref": "#/$defs/check"},
+        {"properties": {"check_id": {"const": "candidate_migration_integrity"}}}
+      ]
+    },
+    "candidateSchemaCheck": {
+      "allOf": [
+        {"$ref": "#/$defs/check"},
+        {"properties": {"check_id": {"const": "candidate_schema_additive"}}}
+      ]
+    },
+    "candidateRowsCheck": {
+      "allOf": [
+        {"$ref": "#/$defs/check"},
+        {"properties": {"check_id": {"const": "candidate_rows_preserved"}}}
+      ]
+    },
+    "candidateRuntimeCheck": {
+      "allOf": [
+        {"$ref": "#/$defs/check"},
+        {"properties": {"check_id": {"const": "candidate_runtime_contract"}}}
+      ]
+    },
+    "candidateDatasetCheck": {
+      "allOf": [
+        {"$ref": "#/$defs/check"},
+        {"properties": {"check_id": {"const": "candidate_dataset_gates"}}}
+      ]
+    },
+    "rollbackRuntimeCheck": {
+      "allOf": [
+        {"$ref": "#/$defs/check"},
+        {"properties": {"check_id": {"const": "rollback_runtime_compatible"}}}
+      ]
+    },
+    "sourceImmutableCheck": {
+      "allOf": [
+        {"$ref": "#/$defs/check"},
+        {"properties": {"check_id": {"const": "source_immutable"}}}
+      ]
     },
     "issue": {
       "type": "object",

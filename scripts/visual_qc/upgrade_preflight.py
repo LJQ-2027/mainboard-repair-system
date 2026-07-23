@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from contextlib import closing
+from contextlib import closing, contextmanager
 from dataclasses import replace
 import hashlib
 import importlib.util
@@ -9,6 +9,7 @@ import os
 from pathlib import Path
 import re
 import sqlite3
+import stat
 import tempfile
 from datetime import datetime, timezone
 
@@ -19,6 +20,7 @@ from scripts.visual_qc.source_library import (
 from scripts.visual_qc.server.store import VisualQcStore
 from scripts.visual_qc.server.config import VisualQcServerSettings
 from scripts.visual_qc.server.service import VisualQcService
+from scripts.visual_qc.server.storage import LocalObjectStorage
 
 
 UPGRADE_PREFLIGHT_SCHEMA_VERSION = "VISUAL-QC-UPGRADE-PREFLIGHT-V1"
@@ -26,6 +28,13 @@ SUPPORTED_SOURCE_VERSIONS = frozenset({"f278061"})
 ALLOWED_ADDITIVE_COLUMNS = {
     "f278061": {
         "cases": {"qualified_handoff_json"},
+    }
+}
+ALLOWED_ADDITIVE_DEFINITIONS = {
+    "f278061": {
+        "cases": {
+            "qualified_handoff_json": "TEXT",
+        },
     }
 }
 SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
@@ -86,6 +95,23 @@ def _integrity_result(connection: sqlite3.Connection) -> str:
 
 def database_projection(database: Path) -> dict:
     with closing(_read_only_connection(database)) as connection:
+        schema_objects = [
+            {
+                "type": row["type"],
+                "name": row["name"],
+                "table": row["tbl_name"],
+                "sql": row["sql"],
+            }
+            for row in connection.execute(
+                """
+                SELECT type, name, tbl_name, sql
+                FROM sqlite_schema
+                WHERE type IN ('table', 'index', 'trigger', 'view')
+                  AND name NOT LIKE 'sqlite_%'
+                ORDER BY type, name
+                """
+            ).fetchall()
+        ]
         tables = [
             row["name"]
             for row in connection.execute(
@@ -101,7 +127,7 @@ def database_projection(database: Path) -> dict:
         for table in tables:
             quoted_table = _quoted_identifier(table)
             column_rows = connection.execute(
-                f"PRAGMA table_info({quoted_table})"
+                f"PRAGMA table_xinfo({quoted_table})"
             ).fetchall()
             columns = [
                 {
@@ -110,9 +136,30 @@ def database_projection(database: Path) -> dict:
                     "not_null": bool(row["notnull"]),
                     "default": row["dflt_value"],
                     "primary_key_position": row["pk"],
+                    "hidden": row["hidden"],
                 }
                 for row in column_rows
             ]
+            foreign_keys = [
+                dict(row)
+                for row in connection.execute(
+                    f"PRAGMA foreign_key_list({quoted_table})"
+                ).fetchall()
+            ]
+            indexes = []
+            for index_row in connection.execute(
+                f"PRAGMA index_list({quoted_table})"
+            ).fetchall():
+                index = dict(index_row)
+                quoted_index = _quoted_identifier(index["name"])
+                index["columns"] = [
+                    dict(row)
+                    for row in connection.execute(
+                        f"PRAGMA index_xinfo({quoted_index})"
+                    ).fetchall()
+                ]
+                indexes.append(index)
+            indexes.sort(key=lambda item: item["name"])
             names = [column["name"] for column in columns]
             select_columns = ", ".join(_quoted_identifier(name) for name in names)
             rows = [
@@ -126,18 +173,38 @@ def database_projection(database: Path) -> dict:
                 {
                     "name": table,
                     "columns": columns,
+                    "foreign_keys": foreign_keys,
+                    "indexes": indexes,
                     "rows": rows,
                     "row_count": len(rows),
                 }
             )
 
-    payload = {"tables": projected_tables}
+    payload = {
+        "tables": projected_tables,
+        "schema_objects": schema_objects,
+    }
+    schema_payload = {
+        "schema_objects": schema_objects,
+        "tables": [
+            {
+                "name": table["name"],
+                "columns": table["columns"],
+                "foreign_keys": table["foreign_keys"],
+                "indexes": table["indexes"],
+            }
+            for table in projected_tables
+        ],
+    }
     return {
         **payload,
         "table_counts": {
             table["name"]: table["row_count"] for table in projected_tables
         },
         "digest": hashlib.sha256(_canonical_json_bytes(payload)).hexdigest(),
+        "schema_digest": hashlib.sha256(
+            _canonical_json_bytes(schema_payload)
+        ).hexdigest(),
     }
 
 
@@ -197,6 +264,7 @@ def compare_database_projections(
     after: dict,
     *,
     source_version: str,
+    expected_projection: dict | None = None,
 ) -> dict:
     allowed = ALLOWED_ADDITIVE_COLUMNS.get(source_version)
     if allowed is None:
@@ -294,6 +362,8 @@ def compare_database_projections(
                 "columns": [
                     before_columns[column_name] for column_name in shared_names
                 ],
+                "foreign_keys": before_table["foreign_keys"],
+                "indexes": before_table["indexes"],
                 "rows": after_shared_rows,
                 "row_count": len(after_shared_rows),
             }
@@ -335,7 +405,10 @@ def compare_database_projections(
         elif not expected_columns:
             continue
 
-    shared_payload = {"tables": shared_tables}
+    shared_payload = {
+        "tables": shared_tables,
+        "schema_objects": before["schema_objects"],
+    }
     shared_digest = hashlib.sha256(
         _canonical_json_bytes(shared_payload)
     ).hexdigest()
@@ -352,6 +425,16 @@ def compare_database_projections(
             _finding(
                 "source_projection_changed",
                 "Candidate migration changed the legacy database projection.",
+            )
+        )
+    if (
+        expected_projection is not None
+        and after["schema_digest"] != expected_projection["schema_digest"]
+    ):
+        issues.append(
+            _finding(
+                "candidate_schema_contract_changed",
+                "Candidate schema differs from the reviewed additive migration.",
             )
         )
 
@@ -374,6 +457,25 @@ def rehearse_candidate_migration(
     snapshot_database = Path(snapshot_database).resolve()
     before = database_projection(snapshot_database)
 
+    definitions = ALLOWED_ADDITIVE_DEFINITIONS[source_version]
+    with tempfile.TemporaryDirectory(
+        prefix=".visual-qc-expected-schema-",
+        dir=snapshot_database.parent,
+    ) as expected_directory:
+        expected_database = Path(expected_directory) / "expected.sqlite3"
+        create_read_only_snapshot(snapshot_database, expected_database)
+        with closing(sqlite3.connect(expected_database)) as connection:
+            for table_name, columns in sorted(definitions.items()):
+                for column_name, declaration in sorted(columns.items()):
+                    if not table_name.isidentifier() or not column_name.isidentifier():
+                        raise ValueError("Reviewed schema identifiers are invalid.")
+                    connection.execute(
+                        f"ALTER TABLE {table_name} "
+                        f"ADD COLUMN {column_name} {declaration}"
+                    )
+            connection.commit()
+        expected_projection = database_projection(expected_database)
+
     VisualQcStore(snapshot_database, recover_interrupted_jobs=False)
 
     with closing(_read_only_connection(snapshot_database)) as connection:
@@ -383,6 +485,7 @@ def rehearse_candidate_migration(
         before,
         after,
         source_version=source_version,
+        expected_projection=expected_projection,
     )
     issues = list(comparison["issues"])
     if integrity != "ok":
@@ -436,7 +539,67 @@ def _object_issue(
     }
 
 
-def validate_managed_objects(database: Path, data_root: Path) -> dict:
+@contextmanager
+def _storage_reference_lock(data_root: Path):
+    data_root = _absolute_lexical_path(data_root)
+    lock_path = data_root / ".storage-reference.lock"
+    if not lock_path.is_file() or _is_reparse_or_symlink(lock_path):
+        raise ValueError(
+            "Existing regular storage reference lock is required."
+        )
+    with lock_path.open("r+b", buffering=0) as handle:
+        if os.fstat(handle.fileno()).st_size < 1:
+            raise ValueError("Existing storage reference lock is invalid.")
+        handle.seek(0)
+        LocalObjectStorage._lock_reference_file(handle)
+        try:
+            yield
+        finally:
+            handle.seek(0)
+            LocalObjectStorage._unlock_reference_file(handle)
+
+
+def _hash_regular_file(path: Path) -> dict:
+    flags = os.O_RDONLY | getattr(os, "O_BINARY", 0)
+    if hasattr(os, "O_NOFOLLOW"):
+        flags |= os.O_NOFOLLOW
+    descriptor = os.open(path, flags)
+    try:
+        before = os.fstat(descriptor)
+        if not stat.S_ISREG(before.st_mode):
+            raise ValueError("Managed path is not a regular file.")
+        digest = hashlib.sha256()
+        byte_size = 0
+        while True:
+            chunk = os.read(descriptor, 1024 * 1024)
+            if not chunk:
+                break
+            digest.update(chunk)
+            byte_size += len(chunk)
+        after = os.fstat(descriptor)
+        identity_before = (
+            before.st_dev,
+            before.st_ino,
+            before.st_size,
+            getattr(before, "st_mtime_ns", None),
+        )
+        identity_after = (
+            after.st_dev,
+            after.st_ino,
+            after.st_size,
+            getattr(after, "st_mtime_ns", None),
+        )
+        if identity_before != identity_after or byte_size != after.st_size:
+            raise ValueError("Managed file changed while it was being hashed.")
+        return {
+            "byte_size": byte_size,
+            "sha256": digest.hexdigest(),
+        }
+    finally:
+        os.close(descriptor)
+
+
+def _validate_managed_objects_locked(database: Path, data_root: Path) -> dict:
     data_root = _absolute_lexical_path(data_root)
     issues = []
     records = []
@@ -513,7 +676,9 @@ def validate_managed_objects(database: Path, data_root: Path) -> dict:
                 )
             )
             continue
-        if not expected.is_file():
+        try:
+            evidence = _hash_regular_file(expected)
+        except FileNotFoundError:
             issues.append(
                 _object_issue(
                     object_kind,
@@ -523,8 +688,17 @@ def validate_managed_objects(database: Path, data_root: Path) -> dict:
                 )
             )
             continue
-        content = expected.read_bytes()
-        if len(content) != record["byte_size"]:
+        except (OSError, ValueError):
+            issues.append(
+                _object_issue(
+                    object_kind,
+                    object_id,
+                    "managed_object_unstable",
+                    "Managed object could not be read as one stable regular file.",
+                )
+            )
+            continue
+        if evidence["byte_size"] != record["byte_size"]:
             issues.append(
                 _object_issue(
                     object_kind,
@@ -533,7 +707,7 @@ def validate_managed_objects(database: Path, data_root: Path) -> dict:
                     "Managed object byte size does not match the database.",
                 )
             )
-        if hashlib.sha256(content).hexdigest() != sha256:
+        if evidence["sha256"] != sha256:
             issues.append(
                 _object_issue(
                     object_kind,
@@ -561,6 +735,11 @@ def validate_managed_objects(database: Path, data_root: Path) -> dict:
         },
         "issues": issues,
     }
+
+
+def validate_managed_objects(database: Path, data_root: Path) -> dict:
+    with _storage_reference_lock(data_root):
+        return _validate_managed_objects_locked(database, data_root)
 
 
 def smoke_candidate_runtime(project_root: Path, candidate_data_root: Path) -> dict:
@@ -838,14 +1017,10 @@ def _source_fingerprint(database: Path, data_root: Path) -> dict:
                         path,
                     )
                 )
-    records = [
-        {
-            "label": label,
-            "byte_size": path.stat().st_size,
-            "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
-        }
-        for label, path in paths
-    ]
+    records = []
+    for label, path in paths:
+        evidence = _hash_regular_file(path)
+        records.append({"label": label, **evidence})
     return {
         "digest": hashlib.sha256(_canonical_json_bytes(records)).hexdigest(),
         "file_count": len(records),
@@ -892,43 +1067,47 @@ def audit_visual_qc_upgrade(
     if TARGET_VERSION_PATTERN.fullmatch(target_version) is None:
         raise ValueError("Target version must be a lowercase Git commit.")
 
-    before_fingerprint = _source_fingerprint(
-        source_database,
-        source_data_root,
-    )
-    with tempfile.TemporaryDirectory(
-        prefix="visual-qc-upgrade-preflight-"
-    ) as temporary:
-        temporary_root = Path(temporary)
-        candidate_root = temporary_root / "candidate-data"
-        candidate_database = candidate_root / "visual-qc.sqlite3"
-        snapshot = create_read_only_snapshot(
-            source_database,
-            candidate_database,
-        )
-        managed_objects = validate_managed_objects(
+    with _storage_reference_lock(source_data_root):
+        before_fingerprint = _source_fingerprint(
             source_database,
             source_data_root,
         )
-        migration = rehearse_candidate_migration(
-            candidate_database,
-            source_version,
-        )
-        candidate_runtime = smoke_candidate_runtime(
-            project_root,
-            candidate_root,
-        )
-        rollback_database = temporary_root / "rollback.sqlite3"
-        create_read_only_snapshot(candidate_database, rollback_database)
-        rollback_runtime = smoke_rollback_runtime(
-            source_app_root,
-            rollback_database,
-        )
+        with tempfile.TemporaryDirectory(
+            prefix="visual-qc-upgrade-preflight-"
+        ) as temporary:
+            temporary_root = Path(temporary)
+            candidate_root = temporary_root / "candidate-data"
+            candidate_database = candidate_root / "visual-qc.sqlite3"
+            snapshot = create_read_only_snapshot(
+                source_database,
+                candidate_database,
+            )
+            managed_objects = _validate_managed_objects_locked(
+                source_database,
+                source_data_root,
+            )
+            migration = rehearse_candidate_migration(
+                candidate_database,
+                source_version,
+            )
+            candidate_runtime = smoke_candidate_runtime(
+                project_root,
+                candidate_root,
+            )
+            rollback_database = temporary_root / "rollback.sqlite3"
+            create_read_only_snapshot(candidate_database, rollback_database)
+            rollback_runtime = smoke_rollback_runtime(
+                source_app_root,
+                rollback_database,
+            )
 
-    after_fingerprint = _source_fingerprint(
-        source_database,
-        source_data_root,
-    )
+        after_fingerprint = _source_fingerprint(
+            source_database,
+            source_data_root,
+        )
+        source_snapshot_sha256 = _hash_regular_file(
+            source_database
+        )["sha256"]
     source_immutable = before_fingerprint == after_fingerprint
     source_supported = source_version in SUPPORTED_SOURCE_VERSIONS
     migration_schema_passed = (
@@ -946,7 +1125,9 @@ def audit_visual_qc_upgrade(
         "dataset_audit": "VISUAL-QC-DATASET-AUDIT-V1",
     }
     candidate_contract_passed = (
-        candidate_runtime["api_schemas"] == expected_schemas
+        candidate_runtime["status"] == "passed"
+        and not candidate_runtime["issues"]
+        and candidate_runtime["api_schemas"] == expected_schemas
         and candidate_runtime["counts"]["database_cases"]
         == candidate_runtime["counts"]["listed_cases"]
         == candidate_runtime["counts"]["detailed_cases"]
@@ -1038,9 +1219,7 @@ def audit_visual_qc_upgrade(
         "generated_at": clock(),
         "source": {
             "version": source_version,
-            "snapshot_sha256": hashlib.sha256(
-                source_database.read_bytes()
-            ).hexdigest(),
+            "snapshot_sha256": source_snapshot_sha256,
             "logical_digest": snapshot["logical_digest"],
             "table_counts": snapshot["table_counts"],
             "managed_object_counts": managed_objects["counts"],

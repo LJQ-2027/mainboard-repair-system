@@ -186,6 +186,7 @@ VENV_LEGACY_MOVED=0
 QC_EXISTED=0
 DATABASE_EXISTED=0
 DATABASE_SNAPSHOT_READY=0
+DATABASE_MAY_BE_MUTATED=0
 SERVICE_STATE_CAPTURED=0
 OLD_VENV_TARGET=""
 
@@ -222,8 +223,12 @@ remove_staged_secrets() {
 }
 
 restore_database() {
-  if [ "$DATABASE_SNAPSHOT_READY" -ne 1 ]; then
+  if [ "$DATABASE_MAY_BE_MUTATED" -ne 1 ]; then
     return
+  fi
+  if [ "$DATABASE_SNAPSHOT_READY" -ne 1 ]; then
+    echo "Database may be mutated but no rollback snapshot is available." >&2
+    return 1
   fi
   rm -f "$DATABASE-wal" "$DATABASE-shm"
   if [ "$DATABASE_EXISTED" -eq 1 ]; then
@@ -418,6 +423,7 @@ echo "== start bounded services =="
 cd "$APP_DIR"
 pm2 startOrRestart ecosystem.config.js \
   --only motherboard-repair-beta --update-env
+DATABASE_MAY_BE_MUTATED=1
 pm2 startOrRestart ecosystem.config.js \
   --only motherboard-repair-visual-qc --update-env
 
