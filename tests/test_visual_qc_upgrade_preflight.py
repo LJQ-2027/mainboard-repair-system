@@ -539,6 +539,7 @@ class VisualQcStore:
         self.assertEqual(report["status"], "passed")
         self.assertEqual(report["generated_at"], "2026-07-23T12:00:00.000Z")
         self.assertEqual(report["source"]["version"], "f278061")
+        self.assertEqual(report["source"]["snapshot_sha256"], sha256_file(source))
         self.assertEqual(report["target"]["version"], "abcdef1")
         self.assertEqual(
             [check["check_id"] for check in report["checks"]],

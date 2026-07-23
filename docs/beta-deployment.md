@@ -199,6 +199,12 @@ The bounded pilot deployment therefore adds:
   forged-header rejection, and unauthenticated-401 checks;
 - consistent SQLite backup plus automatic application, runtime, database, and
   gateway rollback on deployment failure.
+- a candidate-owned `VISUAL-QC-UPGRADE-PREFLIGHT-V1` rehearsal after the
+  Visual-QC process is stopped and the rollback SQLite snapshot is complete,
+  but before the application directory or virtualenv link is switched;
+- exact binding between the rollback database SHA-256, the rehearsal report,
+  and the candidate Git commit. Migration, object-integrity, Local HEAD API,
+  dataset-gate, and old-runtime rollback checks must all pass.
 
 Run the read-only gate first:
 
@@ -207,6 +213,26 @@ Run the read-only gate first:
   -KeyPath "C:\Users\Mercurluto\OneDrive\AI\90_Meta\Sensitive\Milo.pem" `
   -PreflightOnly
 ```
+
+`-PreflightOnly` checks host capacity, required commands, PM2, and Nginx
+without uploading or changing server files. It does not rehearse the candidate
+database migration because no candidate archive has been staged.
+
+Every actual deployment performs the deeper rehearsal automatically. The
+script first stops only `motherboard-repair-visual-qc`, creates a consistent
+SQLite backup, and runs the candidate
+`scripts/audit_visual_qc_upgrade.py` against that backup, the persistent object
+root, and the still-active old application contract. The resulting
+`upgrade-preflight.json` stays in the commit-versioned rollback directory.
+The app directory and `venv-visual-qc` link are switched only after the report
+is `passed`, its `source.snapshot_sha256` matches the rollback database, and
+its target version matches the candidate commit. Any failure enters the
+existing rollback path and restarts the unchanged old service.
+
+The rehearsal requires an existing Visual-QC database and a deployed
+`VERSION` file whose commit is in the candidate's reviewed source-version
+allowlist. It deliberately rejects a live database carrying `-wal` or `-shm`;
+the deployment-owned SQLite backup is the accepted consistent input.
 
 Actual deployment additionally requires a local htpasswd file, data-administrator map,
 and matching restricted/data-administrator credentials for the authenticated smoke test.

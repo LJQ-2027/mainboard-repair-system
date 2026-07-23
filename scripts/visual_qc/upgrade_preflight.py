@@ -1038,7 +1038,9 @@ def audit_visual_qc_upgrade(
         "generated_at": clock(),
         "source": {
             "version": source_version,
-            "snapshot_sha256": snapshot["snapshot_sha256"],
+            "snapshot_sha256": hashlib.sha256(
+                source_database.read_bytes()
+            ).hexdigest(),
             "logical_digest": snapshot["logical_digest"],
             "table_counts": snapshot["table_counts"],
             "managed_object_counts": managed_objects["counts"],

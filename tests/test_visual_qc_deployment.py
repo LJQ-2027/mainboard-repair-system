@@ -28,6 +28,7 @@ class VisualQcDeploymentContractTests(unittest.TestCase):
             "data",
             "knowledge-base",
             "scripts/visual_qc",
+            "scripts/audit_visual_qc_upgrade.py",
             "scripts/import_visual_qc_batch.py",
             "scripts/validate_visual_qc_dataset.py",
             "scripts/maintain_visual_qc_server.py",
@@ -105,6 +106,37 @@ class VisualQcDeploymentContractTests(unittest.TestCase):
             '"__REVIEWER_AUTH__" "__REVIEWER_USER__" "reviewer"',
         ):
             self.assertIn(required, script)
+
+    def test_deploy_script_rehearses_snapshot_before_application_switch(self):
+        script = (
+            ROOT / "scripts" / "deploy-visual-qc-pilot.ps1"
+        ).read_text(encoding="utf-8")
+
+        for required in (
+            "audit_visual_qc_upgrade.py",
+            "upgrade-preflight.json",
+            "--source-database",
+            '"$ROLLBACK_DIR/visual-qc.sqlite3"',
+            "--source-data-root",
+            '"$DATA_DIR"',
+            "--source-app-root",
+            '"$APP_DIR"',
+            "--target-version",
+            '"__COMMIT__"',
+            'report["status"] != "passed"',
+            '"snapshot_sha256"',
+            "hashlib.sha256",
+            '"target"]["version"]',
+        ):
+            self.assertIn(required, script)
+
+        backup_ready = script.index("DATABASE_SNAPSHOT_READY=1")
+        rehearsal = script.index("audit_visual_qc_upgrade.py")
+        report_verification = script.index('"snapshot_sha256"')
+        application_switch = script.index('mv "$APP_DIR" "$ROLLBACK_DIR/app"')
+        self.assertLess(backup_ready, rehearsal)
+        self.assertLess(rehearsal, report_verification)
+        self.assertLess(report_verification, application_switch)
 
     def test_pm2_qc_process_uses_loopback_and_external_data_and_environment(self):
         ecosystem = (ROOT / "ecosystem.config.js").read_text(encoding="utf-8")

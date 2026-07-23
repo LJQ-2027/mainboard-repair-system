@@ -173,6 +173,7 @@ VENV_NEW="$REMOTE_DIR/venvs/visual-qc-__COMMIT__-$(date +%Y%m%d_%H%M%S)-$$"
 DATA_DIR="$REMOTE_DIR/data/visual-qc"
 DATABASE="$DATA_DIR/visual-qc.sqlite3"
 ROLLBACK_DIR="$REMOTE_DIR/rollback/$DEPLOY_ID"
+UPGRADE_PREFLIGHT_REPORT="$ROLLBACK_DIR/upgrade-preflight.json"
 DEPLOY_LOCK="$REMOTE_DIR/.visual-qc-deploy.lock"
 SITE_FILE="/etc/nginx/sites-available/sikayetvar"
 SNIPPET_FILE="/etc/nginx/snippets/mb-repair-beta.locations.conf"
@@ -325,6 +326,46 @@ finally:
 PY
 fi
 DATABASE_SNAPSHOT_READY=1
+
+echo "== rehearse database migration and runtime rollback =="
+if [ "$DATABASE_EXISTED" -ne 1 ]; then
+  echo "Visual-QC upgrade preflight requires an existing database snapshot." >&2
+  false
+fi
+"$VENV_NEW/bin/python" "$APP_NEW/scripts/audit_visual_qc_upgrade.py" \
+  --source-database "$ROLLBACK_DIR/visual-qc.sqlite3" \
+  --source-data-root "$DATA_DIR" \
+  --source-app-root "$APP_DIR" \
+  --target-version "__COMMIT__" \
+  --output "$UPGRADE_PREFLIGHT_REPORT" \
+  >"$ROLLBACK_DIR/upgrade-preflight.stdout.json"
+
+"$VENV_NEW/bin/python" - \
+  "$UPGRADE_PREFLIGHT_REPORT" \
+  "$ROLLBACK_DIR/visual-qc.sqlite3" \
+  "__COMMIT__" <<'PY'
+import hashlib
+import json
+from pathlib import Path
+import sys
+
+report_path = Path(sys.argv[1])
+snapshot_path = Path(sys.argv[2])
+target_version = sys.argv[3]
+report = json.loads(report_path.read_text(encoding="utf-8"))
+digest = hashlib.sha256()
+with snapshot_path.open("rb") as source:
+    for chunk in iter(lambda: source.read(1024 * 1024), b""):
+        digest.update(chunk)
+if report["schema_version"] != "VISUAL-QC-UPGRADE-PREFLIGHT-V1":
+    raise SystemExit("Upgrade preflight report schema is incompatible.")
+if report["status"] != "passed":
+    raise SystemExit("Upgrade preflight report did not pass.")
+if report["source"]["snapshot_sha256"] != digest.hexdigest():
+    raise SystemExit("Upgrade preflight source snapshot does not match rollback.")
+if report["target"]["version"] != target_version:
+    raise SystemExit("Upgrade preflight target version does not match candidate.")
+PY
 
 echo "== back up current application and gateway =="
 backup_optional "$SITE_FILE" "sikayetvar"
