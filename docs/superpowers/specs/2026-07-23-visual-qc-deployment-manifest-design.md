@@ -53,7 +53,8 @@ manifest verification.
 ## Server Verification
 
 Before extraction, the remote deployment script must parse the uploaded
-manifest with the staged candidate Python runtime and require:
+manifest with the server's preflight-verified system Python 3 standard library
+and require:
 
 - the exact V1 schema version;
 - exactly the six reviewed keys and no extras;
