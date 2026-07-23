@@ -79,7 +79,7 @@ class VisualQcDeploymentContractTests(unittest.TestCase):
             "git archive",
             "visual-qc-runtime-files.txt",
             "$runtimePaths",
-            "HEAD -- @runtimePaths",
+            "$commit -- @runtimePaths",
             "set -o pipefail",
             "base64 -d | bash",
             "requirements-visual-qc.txt",
@@ -96,7 +96,7 @@ class VisualQcDeploymentContractTests(unittest.TestCase):
             "DEPLOY_LOCK",
             "VENV_LEGACY_MOVED",
             "sqlite3",
-            "chmod 0600",
+            "chmod 0400",
             "rm -f \"$INPUT_DIR/.htpasswd-mb-repair-beta\"",
             "finally",
             "Authorization: Basic __TECH_AUTH__",
@@ -130,16 +130,18 @@ class VisualQcDeploymentContractTests(unittest.TestCase):
             '"__ARCHIVE_BYTES__"',
             "--target-runtime-manifest-sha256",
             '"__RUNTIME_MANIFEST_SHA256__"',
-            'report["status"] != "passed"',
-            '"snapshot_sha256"',
-            "hashlib.sha256",
-            '"target"]["version"]',
+            '"$INPUT_DIR/deployment_verifier.py" report',
+            "--schema",
+            "--snapshot",
+            "--runtime-path-count",
         ):
             self.assertIn(required, script)
 
         backup_ready = script.index("DATABASE_SNAPSHOT_READY=1")
         rehearsal = script.index("audit_visual_qc_upgrade.py")
-        report_verification = script.index('"snapshot_sha256"')
+        report_verification = script.index(
+            '"$INPUT_DIR/deployment_verifier.py" report'
+        )
         application_switch = script.index('mv "$APP_DIR" "$ROLLBACK_DIR/app"')
         self.assertLess(backup_ready, rehearsal)
         self.assertLess(rehearsal, report_verification)
@@ -153,34 +155,62 @@ class VisualQcDeploymentContractTests(unittest.TestCase):
         self.assertIn('$commit = (git rev-parse HEAD).Trim()', script)
         self.assertNotIn("git rev-parse --short HEAD", script)
         self.assertIn("$shortCommit = $commit.Substring(0, 12)", script)
+        self.assertIn('git cat-file -e "${commit}:$runtimePath"', script)
+        self.assertIn(
+            "git archive --format=tar.gz -o $artifact $commit -- @runtimePaths",
+            script,
+        )
         self.assertIn("build_visual_qc_deployment_manifest.py", script)
         self.assertIn("deployment-manifest.json", script)
         self.assertIn("$deploymentManifest", script)
         self.assertIn(
-            '"${target}:$RemoteDir/deploy-input/deployment-manifest.json"',
+            '"${target}:$remoteInputDir/deployment-manifest.json"',
             script,
         )
+
+    def test_each_deployment_uses_a_unique_private_input_directory(self):
+        script = (
+            ROOT / "scripts" / "deploy-visual-qc-pilot.ps1"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn("[Guid]::NewGuid().ToString('N')", script)
+        self.assertIn('$remoteInputDir = "$RemoteDir/deploy-input/$uploadId"', script)
+        self.assertIn('INPUT_DIR="__INPUT_DIR__"', script)
+        self.assertIn("__INPUT_DIR__", script)
+        self.assertIn("chmod 0400 '$remoteInputDir'/*", script)
+        self.assertIn("chmod 0500 '$remoteInputDir'", script)
+        self.assertIn("rm -rf '$remoteInputDir'", script)
 
     def test_remote_archive_identity_is_verified_before_extraction(self):
         script = (
             ROOT / "scripts" / "deploy-visual-qc-pilot.ps1"
         ).read_text(encoding="utf-8")
+        verifier = (
+            ROOT / "scripts" / "visual_qc" / "deployment_verifier.py"
+        ).read_text(encoding="utf-8")
 
         for required in (
-            "VISUAL-QC-DEPLOYMENT-MANIFEST-V1",
-            "Deployment manifest keys are invalid.",
-            "Runtime archive SHA-256 mismatch.",
-            "Runtime archive byte-size mismatch.",
             "__COMMIT_FULL__",
             "__ARCHIVE_SHA256__",
             "__ARCHIVE_BYTES__",
             "__RUNTIME_MANIFEST_SHA256__",
             "__RUNTIME_PATH_COUNT__",
+            "deployment_verifier.py",
+            "deployment_manifest.py",
+            " inputs ",
         ):
             self.assertIn(required, script)
+        for required in (
+            "VISUAL-QC-DEPLOYMENT-MANIFEST-V1",
+            "Runtime archive SHA-256 mismatch.",
+            "Runtime archive byte-size mismatch.",
+            "load_json_without_duplicates",
+            "_validate_tar_members",
+        ):
+            self.assertIn(required, verifier)
 
         manifest_verification = script.index(
-            "Deployment manifest keys are invalid."
+            '"$INPUT_DIR/deployment_verifier.py" inputs'
         )
         extraction = script.index('tar -xzf "$INPUT_DIR/app.tar.gz"')
         self.assertLess(manifest_verification, extraction)
@@ -189,23 +219,29 @@ class VisualQcDeploymentContractTests(unittest.TestCase):
         script = (
             ROOT / "scripts" / "deploy-visual-qc-pilot.ps1"
         ).read_text(encoding="utf-8")
+        verifier = (
+            ROOT / "scripts" / "visual_qc" / "deployment_verifier.py"
+        ).read_text(encoding="utf-8")
 
+        for required in (
+            'echo "__COMMIT_FULL__" > "$APP_NEW/VERSION"',
+            'cp -a "$DEPLOYMENT_MANIFEST" '
+            '"$ROLLBACK_DIR/deployment-manifest.json"',
+            " report ",
+        ):
+            self.assertIn(required, script)
         for required in (
             "Extracted runtime manifest SHA-256 mismatch.",
             "Extracted runtime path count mismatch.",
             "Extracted runtime path is missing:",
-            'echo "__COMMIT_FULL__" > "$APP_NEW/VERSION"',
-            'cp -a "$DEPLOYMENT_MANIFEST" '
-            '"$ROLLBACK_DIR/deployment-manifest.json"',
-            'report["target"]["archive_sha256"]',
-            'report["target"]["archive_bytes"]',
-            'report["target"]["runtime_manifest_sha256"]',
+            'report["target"] != expected_target',
+            "Draft202012Validator",
         ):
-            self.assertIn(required, script)
+            self.assertIn(required, verifier)
 
         extraction = script.index('tar -xzf "$INPUT_DIR/app.tar.gz"')
         extracted_verification = script.index(
-            "Extracted runtime manifest SHA-256 mismatch."
+            '"$INPUT_DIR/deployment_verifier.py" extracted'
         )
         rehearsal = script.index("audit_visual_qc_upgrade.py")
         application_switch = script.index('mv "$APP_DIR" "$ROLLBACK_DIR/app"')

@@ -208,9 +208,15 @@ The bounded pilot deployment therefore adds:
   Local HEAD API, dataset-gate, full SQLite schema, and old-runtime rollback
   checks must all pass.
 - `VISUAL-QC-DEPLOYMENT-MANIFEST-V1` is built locally without timestamps or
-  workstation identity, uploaded beside `app.tar.gz`, and validated with
-  system Python before extraction. The extracted runtime manifest and every
-  declared runtime path are revalidated before the QC writer is stopped.
+  workstation identity, uploaded beside `app.tar.gz` into a unique read-only
+  input directory, and validated with system Python before extraction.
+  Duplicate JSON fields, mismatched evidence, path traversal, links, and
+  special tar members fail closed. The extracted tree is then checked
+  recursively for links and special files, and the runtime manifest plus
+  every declared runtime path are revalidated before the QC writer is stopped.
+- The migration report is validated against the complete Draft 2020-12
+  Schema with the candidate virtualenv. Its database snapshot and all target
+  identity fields must match the deployment manifest before any app switch.
 
 Run the read-only gate first:
 

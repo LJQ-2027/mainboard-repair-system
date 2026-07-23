@@ -137,9 +137,9 @@ foreach ($runtimePath in $runtimePaths) {
   if ($runtimePath -match '(^/|^\.\.|\\)') {
     throw "Unsafe Visual-QC runtime path: $runtimePath"
   }
-  git cat-file -e "HEAD:$runtimePath"
+  git cat-file -e "${commit}:$runtimePath"
 }
-git archive --format=tar.gz -o $artifact HEAD -- @runtimePaths
+git archive --format=tar.gz -o $artifact $commit -- @runtimePaths
 $manifestBuilderPython = Join-Path $repoRoot ".venv\Scripts\python.exe"
 if (-not (Test-Path -LiteralPath $manifestBuilderPython -PathType Leaf)) {
   throw "Project virtualenv Python is required to build deployment evidence."
@@ -158,6 +158,20 @@ $archiveSha256 = [string]$deploymentEvidence.archive_sha256
 $archiveBytes = [long]$deploymentEvidence.archive_bytes
 $runtimeManifestSha256 = [string]$deploymentEvidence.runtime_manifest_sha256
 $runtimePathCount = [int]$deploymentEvidence.runtime_path_count
+$deploymentVerifier = Join-Path (
+  $repoRoot
+) "scripts\visual_qc\deployment_verifier.py"
+$deploymentContract = Join-Path (
+  $repoRoot
+) "scripts\visual_qc\deployment_manifest.py"
+$deploymentVerifierSha256 = (
+  Get-FileHash -LiteralPath $deploymentVerifier -Algorithm SHA256
+).Hash.ToLowerInvariant()
+$deploymentContractSha256 = (
+  Get-FileHash -LiteralPath $deploymentContract -Algorithm SHA256
+).Hash.ToLowerInvariant()
+$uploadId = "$shortCommit-$([Guid]::NewGuid().ToString('N'))"
+$remoteInputDir = "$RemoteDir/deploy-input/$uploadId"
 $artifactSizeMb = [Math]::Round(
   (Get-Item -LiteralPath $artifact).Length / 1MB,
   1
@@ -167,24 +181,29 @@ Write-Host "Runtime archive: $artifactSizeMb MB from $($runtimePaths.Count) path
 $stagingStarted = $false
 try {
   Write-Host "== upload immutable inputs =="
-  ssh @sshArguments "install -d -m 0700 '$RemoteDir/deploy-input'"
+  ssh @sshArguments "install -d -m 0700 '$remoteInputDir'"
   $stagingStarted = $true
-  scp -i $resolvedKey $artifact "${target}:$RemoteDir/deploy-input/app.tar.gz"
+  scp -i $resolvedKey $artifact "${target}:$remoteInputDir/app.tar.gz"
   scp -i $resolvedKey $deploymentManifest `
-    "${target}:$RemoteDir/deploy-input/deployment-manifest.json"
+    "${target}:$remoteInputDir/deployment-manifest.json"
+  scp -i $resolvedKey $deploymentVerifier `
+    "${target}:$remoteInputDir/deployment_verifier.py"
+  scp -i $resolvedKey $deploymentContract `
+    "${target}:$remoteInputDir/deployment_manifest.py"
   scp -i $resolvedKey `
     (Join-Path $repoRoot "deploy\nginx\mb-repair-beta.locations.conf") `
-    "${target}:$RemoteDir/deploy-input/mb-repair-beta.locations.conf"
+    "${target}:$remoteInputDir/mb-repair-beta.locations.conf"
   scp -i $resolvedKey `
     (Join-Path $repoRoot "deploy\nginx\mb-repair-beta-role-map.conf") `
-    "${target}:$RemoteDir/deploy-input/mb-repair-beta-role-map.conf"
+    "${target}:$remoteInputDir/mb-repair-beta-role-map.conf"
   scp -i $resolvedKey $resolvedReviewerMap `
-    "${target}:$RemoteDir/deploy-input/mb-repair-beta-reviewers.map"
+    "${target}:$remoteInputDir/mb-repair-beta-reviewers.map"
   scp -i $resolvedKey $resolvedHtpasswd `
-    "${target}:$RemoteDir/deploy-input/.htpasswd-mb-repair-beta"
+    "${target}:$remoteInputDir/.htpasswd-mb-repair-beta"
   ssh @sshArguments (
-    "chmod 0600 '$RemoteDir/deploy-input/.htpasswd-mb-repair-beta' " +
-    "'$RemoteDir/deploy-input/mb-repair-beta-reviewers.map'"
+    "chmod 0400 '$remoteInputDir'/* " +
+    "'$remoteInputDir/.htpasswd-mb-repair-beta' && " +
+    "chmod 0500 '$remoteInputDir'"
   )
 
   $remoteScript = @'
@@ -193,7 +212,7 @@ set -Eeuo pipefail
 REMOTE_DIR="__REMOTE_DIR__"
 APP_DIR="$REMOTE_DIR/app"
 APP_NEW="$REMOTE_DIR/app.new"
-INPUT_DIR="$REMOTE_DIR/deploy-input"
+INPUT_DIR="__INPUT_DIR__"
 VENV_LINK="$REMOTE_DIR/venv-visual-qc"
 DEPLOY_ID="__COMMIT_SHORT__-$(date +%Y%m%d_%H%M%S)-$$"
 VENV_NEW="$REMOTE_DIR/venvs/visual-qc-__COMMIT_SHORT__-$(date +%Y%m%d_%H%M%S)-$$"
@@ -320,125 +339,44 @@ trap rollback ERR
 
 echo "== verify immutable deployment inputs =="
 python3 - \
-  "$DEPLOYMENT_MANIFEST" \
-  "$INPUT_DIR/app.tar.gz" \
-  "__COMMIT_FULL__" \
-  "__ARCHIVE_SHA256__" \
-  "__ARCHIVE_BYTES__" \
-  "__RUNTIME_MANIFEST_SHA256__" \
-  "__RUNTIME_PATH_COUNT__" <<'PY'
+  "$INPUT_DIR/deployment_verifier.py" \
+  "__DEPLOYMENT_VERIFIER_SHA256__" \
+  "$INPUT_DIR/deployment_manifest.py" \
+  "__DEPLOYMENT_CONTRACT_SHA256__" <<'PY'
 import hashlib
-import json
 from pathlib import Path
-import re
 import sys
 
-manifest_path = Path(sys.argv[1])
-archive_path = Path(sys.argv[2])
-expected_commit = sys.argv[3]
-expected_archive_sha256 = sys.argv[4]
-expected_archive_bytes = int(sys.argv[5])
-expected_runtime_manifest_sha256 = sys.argv[6]
-expected_runtime_path_count = int(sys.argv[7])
-expected_keys = {
-    "schema_version",
-    "commit_sha",
-    "archive_sha256",
-    "archive_bytes",
-    "runtime_manifest_sha256",
-    "runtime_path_count",
-}
-if (
-    not manifest_path.is_file()
-    or manifest_path.is_symlink()
-    or not archive_path.is_file()
-    or archive_path.is_symlink()
-):
-    raise SystemExit("Deployment inputs must be regular files.")
-manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-if not isinstance(manifest, dict) or set(manifest) != expected_keys:
-    raise SystemExit("Deployment manifest keys are invalid.")
-if manifest["schema_version"] != "VISUAL-QC-DEPLOYMENT-MANIFEST-V1":
-    raise SystemExit("Deployment manifest schema is incompatible.")
-if re.fullmatch(r"[0-9a-f]{40}", manifest["commit_sha"]) is None:
-    raise SystemExit("Deployment manifest commit is invalid.")
-for field in ("archive_sha256", "runtime_manifest_sha256"):
-    if re.fullmatch(r"[0-9a-f]{64}", manifest[field]) is None:
-        raise SystemExit(f"Deployment manifest {field} is invalid.")
-for field in ("archive_bytes", "runtime_path_count"):
-    value = manifest[field]
-    if isinstance(value, bool) or not isinstance(value, int) or value < 1:
-        raise SystemExit(f"Deployment manifest {field} is invalid.")
-expected = {
-    "commit_sha": expected_commit,
-    "archive_sha256": expected_archive_sha256,
-    "archive_bytes": expected_archive_bytes,
-    "runtime_manifest_sha256": expected_runtime_manifest_sha256,
-    "runtime_path_count": expected_runtime_path_count,
-}
-for field, value in expected.items():
-    if manifest[field] != value:
-        raise SystemExit(f"Deployment manifest {field} mismatch.")
-if archive_path.stat().st_size != expected_archive_bytes:
-    raise SystemExit("Runtime archive byte-size mismatch.")
-digest = hashlib.sha256()
-with archive_path.open("rb") as source:
-    for chunk in iter(lambda: source.read(1024 * 1024), b""):
-        digest.update(chunk)
-if digest.hexdigest() != expected_archive_sha256:
-    raise SystemExit("Runtime archive SHA-256 mismatch.")
+for index in (1, 3):
+    path = Path(sys.argv[index])
+    expected = sys.argv[index + 1]
+    digest = hashlib.sha256()
+    with path.open("rb") as source:
+        for chunk in iter(lambda: source.read(1024 * 1024), b""):
+            digest.update(chunk)
+    if digest.hexdigest() != expected:
+        raise SystemExit(f"Deployment verifier input hash mismatch: {path.name}")
 PY
+python3 "$INPUT_DIR/deployment_verifier.py" inputs \
+  --manifest "$DEPLOYMENT_MANIFEST" \
+  --archive "$INPUT_DIR/app.tar.gz" \
+  --commit-sha "__COMMIT_FULL__" \
+  --archive-sha256 "__ARCHIVE_SHA256__" \
+  --archive-bytes "__ARCHIVE_BYTES__" \
+  --runtime-manifest-sha256 "__RUNTIME_MANIFEST_SHA256__" \
+  --runtime-path-count "__RUNTIME_PATH_COUNT__"
 
 echo "== stage application and runtime =="
 rm -rf "$APP_NEW" "$VENV_NEW"
 mkdir -p "$APP_NEW"
 tar -xzf "$INPUT_DIR/app.tar.gz" -C "$APP_NEW"
-python3 - \
-  "$APP_NEW" \
-  "__RUNTIME_MANIFEST_SHA256__" \
-  "__RUNTIME_PATH_COUNT__" <<'PY'
-import hashlib
-from pathlib import Path
-import re
-import sys
-
-app_root = Path(sys.argv[1]).resolve()
-expected_manifest_sha256 = sys.argv[2]
-expected_path_count = int(sys.argv[3])
-manifest_path = app_root / "deploy" / "visual-qc-runtime-files.txt"
-if not manifest_path.is_file() or manifest_path.is_symlink():
-    raise SystemExit("Extracted runtime manifest is missing or unsafe.")
-manifest_bytes = manifest_path.read_bytes()
-if hashlib.sha256(manifest_bytes).hexdigest() != expected_manifest_sha256:
-    raise SystemExit("Extracted runtime manifest SHA-256 mismatch.")
-try:
-    text = manifest_bytes.decode("utf-8")
-except UnicodeError as exc:
-    raise SystemExit("Extracted runtime manifest is not UTF-8.") from exc
-paths = []
-for line in text.splitlines():
-    value = line.strip()
-    if not value or value.startswith("#"):
-        continue
-    if (
-        re.fullmatch(r"[A-Za-z0-9._/-]+", value) is None
-        or value.startswith("/")
-        or "\\" in value
-        or any(part in {"", ".", ".."} for part in value.split("/"))
-    ):
-        raise SystemExit(f"Extracted runtime path is unsafe: {value}")
-    paths.append(value)
-if len(paths) != expected_path_count or len(set(paths)) != len(paths):
-    raise SystemExit("Extracted runtime path count mismatch.")
-for value in paths:
-    candidate = app_root / value
-    try:
-        candidate.resolve().relative_to(app_root)
-    except ValueError as exc:
-        raise SystemExit(f"Extracted runtime path escapes root: {value}") from exc
-    if not candidate.exists() or candidate.is_symlink():
-        raise SystemExit(f"Extracted runtime path is missing: {value}")
-PY
+python3 "$INPUT_DIR/deployment_verifier.py" extracted \
+  --app-root "$APP_NEW" \
+  --commit-sha "__COMMIT_FULL__" \
+  --archive-sha256 "__ARCHIVE_SHA256__" \
+  --archive-bytes "__ARCHIVE_BYTES__" \
+  --runtime-manifest-sha256 "__RUNTIME_MANIFEST_SHA256__" \
+  --runtime-path-count "__RUNTIME_PATH_COUNT__"
 cp -a "$DEPLOYMENT_MANIFEST" "$ROLLBACK_DIR/deployment-manifest.json"
 if [ -f "$APP_DIR/.env" ]; then
   cp "$APP_DIR/.env" "$APP_NEW/.env"
@@ -494,49 +432,15 @@ fi
   --output "$UPGRADE_PREFLIGHT_REPORT" \
   >"$ROLLBACK_DIR/upgrade-preflight.stdout.json"
 
-"$VENV_NEW/bin/python" - \
-  "$UPGRADE_PREFLIGHT_REPORT" \
-  "$ROLLBACK_DIR/visual-qc.sqlite3" \
-  "__COMMIT_FULL__" \
-  "__ARCHIVE_SHA256__" \
-  "__ARCHIVE_BYTES__" \
-  "__RUNTIME_MANIFEST_SHA256__" <<'PY'
-import hashlib
-import json
-from pathlib import Path
-import sys
-
-report_path = Path(sys.argv[1])
-snapshot_path = Path(sys.argv[2])
-target_version = sys.argv[3]
-target_archive_sha256 = sys.argv[4]
-target_archive_bytes = int(sys.argv[5])
-target_runtime_manifest_sha256 = sys.argv[6]
-report = json.loads(report_path.read_text(encoding="utf-8"))
-digest = hashlib.sha256()
-with snapshot_path.open("rb") as source:
-    for chunk in iter(lambda: source.read(1024 * 1024), b""):
-        digest.update(chunk)
-if report["schema_version"] != "VISUAL-QC-UPGRADE-PREFLIGHT-V1":
-    raise SystemExit("Upgrade preflight report schema is incompatible.")
-if report["status"] != "passed":
-    raise SystemExit("Upgrade preflight report did not pass.")
-if report["source"]["snapshot_sha256"] != digest.hexdigest():
-    raise SystemExit("Upgrade preflight source snapshot does not match rollback.")
-if report["target"]["version"] != target_version:
-    raise SystemExit("Upgrade preflight target version does not match candidate.")
-if report["target"]["archive_sha256"] != target_archive_sha256:
-    raise SystemExit("Upgrade preflight archive SHA-256 does not match candidate.")
-if report["target"]["archive_bytes"] != target_archive_bytes:
-    raise SystemExit("Upgrade preflight archive byte size does not match candidate.")
-if (
-    report["target"]["runtime_manifest_sha256"]
-    != target_runtime_manifest_sha256
-):
-    raise SystemExit(
-        "Upgrade preflight runtime manifest SHA-256 does not match candidate."
-    )
-PY
+"$VENV_NEW/bin/python" "$INPUT_DIR/deployment_verifier.py" report \
+  --report "$UPGRADE_PREFLIGHT_REPORT" \
+  --schema "$APP_NEW/knowledge-base/visual-qc-upgrade-preflight-v1-schema.json" \
+  --snapshot "$ROLLBACK_DIR/visual-qc.sqlite3" \
+  --commit-sha "__COMMIT_FULL__" \
+  --archive-sha256 "__ARCHIVE_SHA256__" \
+  --archive-bytes "__ARCHIVE_BYTES__" \
+  --runtime-manifest-sha256 "__RUNTIME_MANIFEST_SHA256__" \
+  --runtime-path-count "__RUNTIME_PATH_COUNT__"
 
 echo "== back up current application and gateway =="
 backup_optional "$SITE_FILE" "sikayetvar"
@@ -660,6 +564,7 @@ pm2 status motherboard-repair-visual-qc
 cat /tmp/mb-repair-visual-qc-health.json
 '@
   $remoteScript = $remoteScript.Replace("__REMOTE_DIR__", $RemoteDir)
+  $remoteScript = $remoteScript.Replace("__INPUT_DIR__", $remoteInputDir)
   $remoteScript = $remoteScript.Replace("__COMMIT_FULL__", $commit)
   $remoteScript = $remoteScript.Replace("__COMMIT_SHORT__", $shortCommit)
   $remoteScript = $remoteScript.Replace(
@@ -677,6 +582,14 @@ cat /tmp/mb-repair-visual-qc-health.json
   $remoteScript = $remoteScript.Replace(
     "__RUNTIME_PATH_COUNT__",
     [string]$runtimePathCount
+  )
+  $remoteScript = $remoteScript.Replace(
+    "__DEPLOYMENT_VERIFIER_SHA256__",
+    $deploymentVerifierSha256
+  )
+  $remoteScript = $remoteScript.Replace(
+    "__DEPLOYMENT_CONTRACT_SHA256__",
+    $deploymentContractSha256
   )
   $remoteScript = $remoteScript.Replace("__TECH_AUTH__", $technicianAuth)
   $remoteScript = $remoteScript.Replace(
@@ -700,10 +613,7 @@ cat /tmp/mb-repair-visual-qc-health.json
 finally {
   if ($stagingStarted) {
     try {
-      ssh @sshArguments (
-        "rm -f '$RemoteDir/deploy-input/.htpasswd-mb-repair-beta' " +
-        "'$RemoteDir/deploy-input/mb-repair-beta-reviewers.map'"
-      )
+      ssh @sshArguments "rm -rf '$remoteInputDir'"
     }
     catch {
       Write-Warning "Could not confirm removal of staged authentication inputs."

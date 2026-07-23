@@ -44,7 +44,8 @@ content is deterministic.
 6. compute the raw SHA-256 of
    `deploy/visual-qc-runtime-files.txt`;
 7. write `deployment-manifest.json` as UTF-8 without BOM;
-8. upload the archive and manifest as immutable deployment inputs.
+8. upload the archive, manifest, and byte-pinned verifier into a unique
+   per-deployment read-only input directory.
 
 The short commit may still be used in human-readable temporary directory
 names. It cannot be used as the identity in `VERSION`, the upgrade report, or
@@ -66,6 +67,8 @@ and require:
 - archive byte-size equality;
 - archive SHA-256 equality.
 
+The input parser rejects duplicate JSON fields. Tar inspection rejects path
+traversal, duplicate members, symbolic links, hard links, and special files.
 Only after those checks pass may the server extract the archive. Immediately
 after extraction it must verify:
 
@@ -97,6 +100,11 @@ The standalone CLI requires these values explicitly. The deployment script
 passes values read from the already verified deployment manifest. The
 post-report verifier requires all four values to equal the deployment
 manifest before any application or virtualenv switch.
+
+The extracted tree is scanned recursively and rejects links, junctions, and
+special files before the runtime-path boundary is accepted. The generated
+upgrade report must pass its complete Draft 2020-12 Schema and then match the
+database snapshot plus all manifest target fields.
 
 The preflight does not claim to cryptographically sign the archive. It proves
 that one locally produced manifest, one remotely received archive, one

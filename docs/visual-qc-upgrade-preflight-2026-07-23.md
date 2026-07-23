@@ -85,11 +85,14 @@ An actual `scripts/deploy-visual-qc-pilot.ps1` run now performs the same
 rehearsal after it has:
 
 1. built `VISUAL-QC-DEPLOYMENT-MANIFEST-V1` from a clean full Git commit;
-2. verified uploaded archive bytes before extraction;
-3. verified the extracted runtime manifest and every declared path;
-4. staged the candidate app and isolated virtualenv;
-5. stopped `motherboard-repair-visual-qc`;
-6. created the consistent rollback SQLite snapshot.
+2. uploaded the inputs into a unique read-only directory;
+3. rejected duplicate manifest fields, identity drift, and unsafe tar members
+   before extraction;
+4. recursively rejected links and special files after extraction, then
+   verified the runtime manifest and every declared path;
+5. staged the candidate app and isolated virtualenv;
+6. stopped `motherboard-repair-visual-qc`;
+7. created the consistent rollback SQLite snapshot.
 
 It does this before moving the old app directory or switching
 `venv-visual-qc`. Deployment continues only when:

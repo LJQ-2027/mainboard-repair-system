@@ -271,7 +271,7 @@ Document the V1 deployment manifest, full commit, archive/runtime hashes,
 pre-extraction failure behavior, unsigned boundary, and unchanged production
 state.
 
-- [ ] **Step 2: Run focused and full verification**
+- [x] **Step 2: Run focused and full verification**
 
 Run:
 
@@ -285,7 +285,7 @@ $files = rg --files tests | Where-Object { $_ -match '\.test\.mjs$' }; node --te
 Also parse modified JSON and PowerShell, run `git diff --check`, and scan
 modified durable files as strict UTF-8 without U+FFFD.
 
-- [ ] **Step 3: Run production-like local evidence**
+- [x] **Step 3: Run production-like local evidence**
 
 Build the real bounded runtime archive from final HEAD, generate and validate
 its deployment manifest, then run the exact `f278061` rollback rehearsal with
@@ -298,6 +298,11 @@ Review archive verification order, shell/Python argument safety, report
 binding, rollback mutation boundaries, no-clobber publication, tests, and
 documentation. Fix every Critical or Important issue and rerun affected
 verification.
+
+Review hardening requires a unique read-only remote input directory, Git
+archiving from the captured full commit, duplicate-key-safe JSON parsing,
+pre-extraction tar member validation, recursive extracted-tree validation,
+and complete upgrade-report Schema validation.
 
 - [ ] **Step 5: Update durable facts and commit**
 
