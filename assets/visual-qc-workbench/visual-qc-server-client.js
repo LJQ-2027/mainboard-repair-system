@@ -336,7 +336,7 @@ function pointPair(pair) {
 }
 
 export async function restoreAdminServerCase(serverCase, imageBlob) {
-  if (serverCase?.schema_version !== 'VISUAL-QC-SERVER-CASE-V2') {
+  if (serverCase?.schema_version !== 'VISUAL-QC-SERVER-CASE-V3') {
     restorationError(
       'unsupported_server_schema',
       'The server case schema is not supported by this workbench.',
@@ -394,6 +394,7 @@ export async function restoreAdminServerCase(serverCase, imageBlob) {
   });
   let restored = applyServerJobResult(visualCase, serverCase, serverCase.job);
   restored.intake = clone(serverCase.intake || { batch_id: null, entry_id: null });
+  restored.server_sync.qualified_handoff = clone(serverCase.qualified_handoff);
 
   const registrationReview = serverCase.server_registration_review;
   if (registrationReview) {

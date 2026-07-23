@@ -106,7 +106,7 @@ async function adminServerCaseFixture() {
   return {
     imageBlob,
     serverCase: {
-      schema_version: 'VISUAL-QC-SERVER-CASE-V2',
+      schema_version: 'VISUAL-QC-SERVER-CASE-V3',
       case_id: 'vqc_server_case',
       board_key: 'km4-f151',
       board_id: 'BOARD-KM4-F151-MAIN-V1.2',
@@ -114,6 +114,16 @@ async function adminServerCaseFixture() {
       capture_stage: 'before_repair',
       evidence_role: 'physical_capture',
       intake: { batch_id: 'batch-1', entry_id: 'entry-1' },
+      qualified_handoff: {
+        schema_version: 'VISUAL-QC-QUALIFIED-HANDOFF-PROVENANCE-V1',
+        handoff_schema_version: 'VISUAL-QC-PHYSICAL-HANDOFF-V1',
+        source_package_manifest_sha256: 'a'.repeat(64),
+        archived_intake_manifest_sha256: 'b'.repeat(64),
+        acceptance_report_sha256: 'c'.repeat(64),
+        acceptance_action: 'automatic_candidate_review_required',
+        registration_review_required: true,
+        field_accuracy_claim_allowed: false,
+      },
       capture_session: {
         schema_version: 'VISUAL-QC-CAPTURE-SESSION-V1',
         session_id: 'session-1',
@@ -222,6 +232,10 @@ test('server case restoration preserves reviewed registration and final QC evide
 
   assert.equal(restored.visualCase.schema_version, 'VISUAL-QC-CASE-V2');
   assert.equal(restored.visualCase.server_sync.server_case_id, 'vqc_server_case');
+  assert.deepEqual(
+    restored.visualCase.server_sync.qualified_handoff,
+    serverCase.qualified_handoff,
+  );
   assert.equal(restored.visualCase.registration.status, 'reviewed');
   assert.deepEqual(
     restored.visualCase.registration.matrix,
@@ -233,10 +247,29 @@ test('server case restoration preserves reviewed registration and final QC evide
   assert.equal(restored.imageBlob, imageBlob);
 });
 
+test('qualified handoff provenance never substitutes for registration or QC review', async () => {
+  const { serverCase, imageBlob } = await adminServerCaseFixture();
+  delete serverCase.server_registration_review;
+  delete serverCase.server_qc_review;
+
+  const restored = await restoreAdminServerCase(serverCase, imageBlob);
+
+  assert.equal(restored.visualCase.registration.status, 'draft');
+  assert.equal(restored.visualCase.qc_result.status, 'needs_review');
+  assert.equal(
+    restored.visualCase.server_sync.qualified_handoff.acceptance_action,
+    'automatic_candidate_review_required',
+  );
+});
+
 test('server restoration rejects misleading or stale evidence with typed errors', async () => {
   const fixture = await adminServerCaseFixture();
   const cases = [
-    ['unsupported_server_schema', { ...fixture.serverCase, schema_version: 'V1' }, fixture.imageBlob],
+    [
+      'unsupported_server_schema',
+      { ...fixture.serverCase, schema_version: 'VISUAL-QC-SERVER-CASE-V2' },
+      fixture.imageBlob,
+    ],
     [
       'image_hash_mismatch',
       { ...fixture.serverCase, image: { ...fixture.serverCase.image, sha256: '0'.repeat(64) } },

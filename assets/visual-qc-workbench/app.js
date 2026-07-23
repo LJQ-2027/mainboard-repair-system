@@ -2342,7 +2342,7 @@ async function refreshAdminServerCases({ resetPage = false } = {}) {
         pageSize: state.adminCases.pageSize,
       },
     );
-    if (payload?.schema_version !== 'VISUAL-QC-ADMIN-CASE-LIST-V1') {
+    if (payload?.schema_version !== 'VISUAL-QC-ADMIN-CASE-LIST-V2') {
       throw new Error('服务器案例目录版本不受支持。');
     }
     state.adminCases.total = payload.total;
