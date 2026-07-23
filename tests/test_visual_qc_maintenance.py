@@ -1,5 +1,6 @@
 import hashlib
 import io
+import json
 import tempfile
 import threading
 import unittest
@@ -25,6 +26,19 @@ from scripts.maintain_visual_qc_server import (
 ROOT = Path(__file__).resolve().parents[1]
 OLD_TIMESTAMP = "2026-05-01T00:00:00.000Z"
 NOW = datetime(2026, 7, 20, tzinfo=timezone.utc)
+
+
+def qualified_handoff():
+    return {
+        "schema_version": "VISUAL-QC-QUALIFIED-HANDOFF-PROVENANCE-V1",
+        "handoff_schema_version": "VISUAL-QC-PHYSICAL-HANDOFF-V1",
+        "source_package_manifest_sha256": "a" * 64,
+        "archived_intake_manifest_sha256": "b" * 64,
+        "acceptance_report_sha256": "c" * 64,
+        "acceptance_action": "automatic_candidate_review_required",
+        "registration_review_required": True,
+        "field_accuracy_claim_allowed": False,
+    }
 
 
 def encode_jpeg(value: int) -> bytes:
@@ -64,6 +78,11 @@ class VisualQcMaintenanceTests(unittest.TestCase):
             side_id="main_page_2",
             capture_stage="before_repair",
             evidence_role="physical_capture",
+            intake_batch_id=f"batch-{key}",
+            intake_entry_id=f"entry-{key}",
+            qualified_handoff=json.dumps(
+                qualified_handoff(), separators=(",", ":")
+            ),
             claimed_sha256=hashlib.sha256(content).hexdigest(),
             original_filename=f"{key}.jpg",
             mime_type="image/jpeg",

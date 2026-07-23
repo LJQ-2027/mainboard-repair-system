@@ -15,6 +15,19 @@ from scripts.visual_qc.server.config import VisualQcServerSettings
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def qualified_handoff(action="automatic_candidate_review_required"):
+    return {
+        "schema_version": "VISUAL-QC-QUALIFIED-HANDOFF-PROVENANCE-V1",
+        "handoff_schema_version": "VISUAL-QC-PHYSICAL-HANDOFF-V1",
+        "source_package_manifest_sha256": "a" * 64,
+        "archived_intake_manifest_sha256": "b" * 64,
+        "acceptance_report_sha256": "c" * 64,
+        "acceptance_action": action,
+        "registration_review_required": True,
+        "field_accuracy_claim_allowed": False,
+    }
+
+
 class VisualQcGoldenSampleTests(unittest.TestCase):
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory()
@@ -64,21 +77,32 @@ class VisualQcGoldenSampleTests(unittest.TestCase):
                 else None
             ),
         }
+        data = {
+            "board_key": "km4-f151",
+            "side_id": "main_page_2",
+            "capture_stage": capture_stage,
+            "evidence_role": evidence_role,
+            "capture_session_id": f"capture-{idempotency_key}",
+            "capture_setup_id": "bench-a",
+            "capture_checklist": json.dumps(
+                checklist,
+                separators=(",", ":"),
+            ),
+            "sha256": hashlib.sha256(image_bytes).hexdigest(),
+        }
+        if evidence_role == "physical_capture":
+            data.update(
+                {
+                    "intake_batch_id": f"batch-{idempotency_key}",
+                    "intake_entry_id": f"entry-{idempotency_key}",
+                    "qualified_handoff": json.dumps(
+                        qualified_handoff(), separators=(",", ":")
+                    ),
+                }
+            )
         response = self.client.post(
             "/api/v1/visual-qc/cases",
-            data={
-                "board_key": "km4-f151",
-                "side_id": "main_page_2",
-                "capture_stage": capture_stage,
-                "evidence_role": evidence_role,
-                "capture_session_id": f"capture-{idempotency_key}",
-                "capture_setup_id": "bench-a",
-                "capture_checklist": json.dumps(
-                    checklist,
-                    separators=(",", ":"),
-                ),
-                "sha256": hashlib.sha256(image_bytes).hexdigest(),
-            },
+            data=data,
             files={"file": ("reference.jpg", image_bytes, "image/jpeg")},
             headers={
                 "X-Actor-Id": "technician-001",
@@ -304,6 +328,14 @@ class VisualQcGoldenSampleTests(unittest.TestCase):
                 "side_id": "main_page_2",
                 "capture_stage": "before_repair",
                 "evidence_role": "physical_capture",
+                "capture_session_id": "capture-manual-001",
+                "capture_setup_id": "bench-a",
+                "intake_batch_id": "batch-manual-001",
+                "intake_entry_id": "entry-manual-001",
+                "qualified_handoff": json.dumps(
+                    qualified_handoff("manual_registration_required"),
+                    separators=(",", ":"),
+                ),
                 "sha256": hashlib.sha256(blank_bytes).hexdigest(),
             },
             files={"file": ("blank.jpg", blank_bytes, "image/jpeg")},
