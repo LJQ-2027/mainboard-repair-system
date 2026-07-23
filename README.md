@@ -14,6 +14,17 @@
 
 照片到达后不再手工复制或编写批次 JSON。数据管理员使用 `scripts/stage_visual_qc_source_package.py` 把 Milo 提供的临时附件逐字节保存到仓库外的内容寻址原片库，并同时生成 `VISUAL-QC-SOURCE-PACKAGE-V1` 来源回执和可直接交给 importer 的标准 intake manifest。工具不根据文件名或画面猜机型/板面，不修改来件，也不自动上传；`knowledge-base/visual-qc-proxy-inventory-v1.json` 固化所有已知点位图和手册代理图的审核哈希，缺失、替换或遗漏登记均锁死入库。`scripts/audit_visual_qc_source_library.py` 对完整包、当前代理撤销、对象完整性和孤立对象执行确定性只读巡检，不清理、不修复、不上传。低层 `create_visual_qc_intake_batch.py` 仅用于已经处于受控存储中的原片。完整命令见 `docs/visual-qc-capture-intake-spec-2026-07-20.md`。
 
+受控照片包建立后，先用本地验收运行器生成质量证据、自动配准候选和逐图叠图：
+
+```powershell
+.\.venv\Scripts\python.exe scripts\run_visual_qc_physical_acceptance.py `
+  --library-root D:\visual-qc-source-library `
+  --package D:\visual-qc-source-library\packages\km4-physical-001\source-package.json `
+  --output D:\visual-qc-acceptance\km4-physical-001
+```
+
+输出目录包含 `physical-registration-run.json`、`physical-registration-run.md` 和 `artifacts/*.registration-overlay.png`。`VISUAL-QC-PHYSICAL-REGISTRATION-RUN-V1` 只区分重拍、人工四点配准和自动候选待确认；不上传、不批准配准、不判断缺陷，也不允许据此宣称实物配准精度。原图与点位图之间没有测量真值时，叠图只能作为人工检查证据。
+
 数据管理员工作台已接入受控服务器 QC 服务：支持批量导入回执、服务器案例目录、断点续传、原图恢复、任务轮询、自动候选叠图确认、人工四点回退、Golden Sample、差异热图和候选确认/驳回/暂缓。服务器侧包含批次与案例溯源、采集身份防污染、确定性合成透视、ORB/AKAZE 特征、RANSAC 单应性、结构化失败原因、持久化人工结论、磁盘压力健康状态和受控留存清理。受控试点部署在 `https://cccsat.top/mb-repair-beta/`；操作与数据边界见 `docs/visual-qc-capture-intake-spec-2026-07-20.md`、`docs/visual-qc-workbench-2026-07-17.md` 和 `docs/visual-qc-server-api-2026-07-20.md`。
 
 受控 beta 路由使用 Nginx Basic Auth，网关注入用户和权限，QC API 的 3020 端口只绑定回环地址。后端暂时沿用 `reviewer` 作为“数据管理员”权限的兼容值，不表示存在第二个人工审核角色；以后可在不改变业务数据契约的情况下替换为公司 SSO/OIDC。部署与回滚步骤见 `docs/beta-deployment.md`。

@@ -24,7 +24,7 @@ Every run records:
 - `physical_source_confirmed: true` copied from the validated package;
 - `field_accuracy_claim_allowed: false` because no surveyed geometric ground truth exists;
 - `registration_review_status: pending` for every entry;
-- the exact source package identity, current proxy-inventory digest, board identity, image hash, image dimensions, capture stage/session/setup, quality evidence, and complete automatic-registration candidate.
+- the exact source package identity and manifest SHA-256, current proxy-inventory digest, board identity, image hash, image dimensions, capture stage/session/setup, quality evidence, and complete automatic-registration candidate.
 
 The per-entry action is derived without an industrial threshold:
 
@@ -40,13 +40,13 @@ No action means accepted, reviewed, repairable, normal, or defective.
 
 `scripts/run_visual_qc_physical_acceptance.py` owns CLI argument handling, atomic output publication, stable exit codes, and machine-readable failure output.
 
-`knowledge-base/visual-qc-physical-registration-run-v1-schema.json` defines the durable report contract. Successful runs are byte-stable for identical package, code configuration, and image bytes; reports contain no timestamps or absolute paths.
+`knowledge-base/visual-qc-physical-registration-run-v1-schema.json` defines the durable report contract and locks candidate/manual/processing states to their human-review semantics. Runtime consistency checks independently recompute summary counts, entry actions, and overall status. Successful runs are byte-stable for identical package, code configuration, and image bytes; reports contain no timestamps or absolute paths.
 
 ## Overlay Contract
 
 Each overlay uses the original capture dimensions capped at 1600 pixels on the longest edge. For an automatic candidate, the engineering reference is perspective-warped into capture space at fixed opacity and the projected reference quadrilateral is drawn. For manual fallback, the unmodified capture is shown with a fixed border and status label only. The overlay is evidence for human inspection, not a registration approval artifact.
 
-Overlay filenames are `<entry_id>.registration-overlay.png`. The report records a relative artifact path, SHA-256, MIME type, width, height, and byte size. Atomic publication writes a complete temporary output directory and renames it into place; an existing output directory is rejected to avoid ambiguous evidence replacement.
+Overlay filenames are `<entry_id>.registration-overlay.png`. The report records a relative artifact path, SHA-256, MIME type, width, height, and byte size. Each PNG and report file is flushed and file-synced before publication. Atomic publication writes a complete temporary output directory under a per-output cross-thread/process lock and renames it into place; an existing output directory is rejected, and a post-rename parent-sync failure rolls the output back.
 
 ## Status And Exit Codes
 
@@ -61,6 +61,9 @@ CLI exit codes are `0` for `review_required` or `attention`, `1` for a completed
 ## Safety Boundaries
 
 - Source objects and package manifests are opened read-only.
+- The source-package manifest SHA-256 is computed from the exact byte string parsed by package validation, not from a later path read.
+- Source image bytes are SHA-256 checked again after package validation and decoded from that same in-memory byte string, closing the validation/read race.
+- Lock and precreated publishing paths reject symlinks and Windows reparse points; the `mkdtemp` directory is populated in place instead of being deleted and recreated.
 - The controlled library must remain outside the project tree and cannot contain the project tree.
 - Output must be outside the controlled source library.
 - Current proxy-inventory validation remains mandatory, so a package is revoked if its evidence becomes known proxy material.
@@ -69,4 +72,4 @@ CLI exit codes are `0` for `review_required` or `attention`, `1` for a completed
 
 ## Verification
 
-Targeted tests cover schema validation, deterministic report and overlay bytes, quality/manual/candidate action precedence, package revocation, source immutability, output containment, and CLI exit codes. Full Python and Node regressions remain required. Because this increment has no user-visible browser change and no server deployment, P3 and production P4 are not triggered; local filesystem acceptance is the relevant P4-like boundary check.
+Targeted tests cover schema and runtime consistency, deterministic report and overlay bytes, quality/manual/candidate action precedence, package revocation, object/manifest read races, source immutability, output containment, Windows reparse paths, cross-process locking, durable publication rollback, and CLI exit codes. Full Python and Node regressions remain required. Because this increment has no user-visible browser change and no server deployment, P3 and production P4 are not triggered; local filesystem acceptance is the relevant P4-like boundary check.

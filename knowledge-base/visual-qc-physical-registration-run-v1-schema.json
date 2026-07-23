@@ -1,0 +1,354 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "VISUAL-QC-PHYSICAL-REGISTRATION-RUN-V1",
+  "title": "Physical mainboard registration acceptance run",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "status",
+    "evidence_role",
+    "physical_source_confirmed",
+    "field_accuracy_claim_allowed",
+    "source_package",
+    "board",
+    "capture",
+    "summary",
+    "entries"
+  ],
+  "properties": {
+    "schema_version": {"const": "VISUAL-QC-PHYSICAL-REGISTRATION-RUN-V1"},
+    "status": {"enum": ["review_required", "attention", "issues"]},
+    "evidence_role": {"const": "physical_capture"},
+    "physical_source_confirmed": {"const": true},
+    "field_accuracy_claim_allowed": {"const": false},
+    "source_package": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["package_id", "batch_id", "manifest_sha256", "proxy_inventory_sha256"],
+      "properties": {
+        "package_id": {"$ref": "#/$defs/safe_id"},
+        "batch_id": {"$ref": "#/$defs/safe_id"},
+        "manifest_sha256": {"$ref": "#/$defs/sha256"},
+        "proxy_inventory_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "board": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["board_key", "board_id"],
+      "properties": {
+        "board_key": {"$ref": "#/$defs/safe_id"},
+        "board_id": {"type": "string", "minLength": 1}
+      }
+    },
+    "capture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stage", "session_id", "setup_id"],
+      "properties": {
+        "stage": {"enum": ["golden_reference", "before_repair", "after_repair"]},
+        "session_id": {"$ref": "#/$defs/safe_id"},
+        "setup_id": {"$ref": "#/$defs/safe_id"}
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entry_count",
+        "automatic_candidate_count",
+        "manual_registration_count",
+        "image_retake_count",
+        "processing_issue_count",
+        "action_counts"
+      ],
+      "properties": {
+        "entry_count": {"type": "integer", "minimum": 1},
+        "automatic_candidate_count": {"type": "integer", "minimum": 0},
+        "manual_registration_count": {"type": "integer", "minimum": 0},
+        "image_retake_count": {"type": "integer", "minimum": 0},
+        "processing_issue_count": {"type": "integer", "minimum": 0},
+        "action_counts": {
+          "type": "object",
+          "propertyNames": {"enum": [
+            "automatic_candidate_review_required",
+            "manual_registration_required",
+            "image_retake_required",
+            "processing_issue"
+          ]},
+          "additionalProperties": {"type": "integer", "minimum": 1}
+        }
+      }
+    },
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 500,
+      "items": {"$ref": "#/$defs/entry"}
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "review_required"}}},
+      "then": {
+        "properties": {
+          "entries": {
+            "items": {
+              "properties": {
+                "next_action": {"const": "automatic_candidate_review_required"}
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"status": {"const": "attention"}}},
+      "then": {
+        "properties": {
+          "entries": {
+            "contains": {
+              "properties": {
+                "next_action": {
+                  "enum": ["manual_registration_required", "image_retake_required"]
+                }
+              },
+              "required": ["next_action"]
+            },
+            "minContains": 1,
+            "not": {
+              "contains": {
+                "properties": {"next_action": {"const": "processing_issue"}},
+                "required": ["next_action"]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"status": {"const": "issues"}}},
+      "then": {
+        "properties": {
+          "entries": {
+            "contains": {
+              "properties": {"next_action": {"const": "processing_issue"}},
+              "required": ["next_action"]
+            },
+            "minContains": 1
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "safe_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+    },
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "image": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["original_filename", "mime_type", "width", "height", "byte_size", "sha256"],
+      "properties": {
+        "original_filename": {"type": "string", "minLength": 1},
+        "mime_type": {"enum": ["image/jpeg", "image/png", "image/webp"]},
+        "width": {"type": "integer", "minimum": 64, "maximum": 20000},
+        "height": {"type": "integer", "minimum": 64, "maximum": 20000},
+        "byte_size": {"type": "integer", "minimum": 1, "maximum": 104857600},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "score", "status", "metrics", "guidance"],
+      "properties": {
+        "schema_version": {"const": "VISUAL-QC-IMAGE-QUALITY-V1"},
+        "score": {"type": "integer", "minimum": 0, "maximum": 100},
+        "status": {"enum": ["good", "usable", "retake"]},
+        "metrics": {"type": "object"},
+        "guidance": {"type": "array", "items": {"type": "object"}}
+      }
+    },
+    "registration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "status",
+        "method",
+        "review_status",
+        "requires_human_review",
+        "requires_manual_registration",
+        "board_to_image_matrix",
+        "evidence",
+        "failure",
+        "fallback"
+      ],
+      "properties": {
+        "schema_version": {"const": "VISUAL-QC-REGISTRATION-CANDIDATE-V1"},
+        "status": {"enum": ["candidate", "manual_required"]},
+        "method": {"type": ["string", "null"]},
+        "review_status": {"type": ["string", "null"]},
+        "requires_human_review": {"type": "boolean"},
+        "requires_manual_registration": {"type": "boolean"},
+        "board_to_image_matrix": {
+          "oneOf": [
+            {"type": "array", "minItems": 9, "maxItems": 9, "items": {"type": "number"}},
+            {"type": "null"}
+          ]
+        },
+        "evidence": {"type": "object"},
+        "failure": {"type": ["object", "null"]},
+        "fallback": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["method", "reason_code"],
+          "properties": {
+            "method": {"const": "reviewed_manual_four_point"},
+            "reason_code": {"type": ["string", "null"]}
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"status": {"const": "candidate"}}},
+          "then": {
+            "properties": {
+              "method": {"const": "automatic_feature_homography"},
+              "review_status": {"const": "draft"},
+              "requires_human_review": {"const": true},
+              "requires_manual_registration": {"const": false},
+              "board_to_image_matrix": {"type": "array"},
+              "failure": {"type": "null"}
+            }
+          },
+          "else": {
+            "properties": {
+              "method": {"type": "null"},
+              "review_status": {"type": "null"},
+              "requires_human_review": {"const": false},
+              "requires_manual_registration": {"const": true},
+              "board_to_image_matrix": {"type": "null"},
+              "failure": {"type": "object"}
+            }
+          }
+        }
+      ]
+    },
+    "overlay": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "mime_type", "width", "height", "byte_size", "sha256"],
+      "properties": {
+        "path": {"type": "string", "pattern": "^artifacts/[A-Za-z0-9._-]+\\.registration-overlay\\.png$"},
+        "mime_type": {"const": "image/png"},
+        "width": {"type": "integer", "minimum": 1, "maximum": 1600},
+        "height": {"type": "integer", "minimum": 1, "maximum": 1600},
+        "byte_size": {"type": "integer", "minimum": 1},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entry_id",
+        "side_id",
+        "image",
+        "quality",
+        "registration",
+        "registration_review_status",
+        "next_action",
+        "overlay",
+        "processing_issue"
+      ],
+      "properties": {
+        "entry_id": {"$ref": "#/$defs/safe_id"},
+        "side_id": {"$ref": "#/$defs/safe_id"},
+        "image": {"$ref": "#/$defs/image"},
+        "quality": {"oneOf": [{"$ref": "#/$defs/quality"}, {"type": "null"}]},
+        "registration": {"oneOf": [{"$ref": "#/$defs/registration"}, {"type": "null"}]},
+        "registration_review_status": {"const": "pending"},
+        "next_action": {"enum": [
+          "automatic_candidate_review_required",
+          "manual_registration_required",
+          "image_retake_required",
+          "processing_issue"
+        ]},
+        "overlay": {"oneOf": [{"$ref": "#/$defs/overlay"}, {"type": "null"}]},
+        "processing_issue": {
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["code", "message"],
+              "properties": {
+                "code": {"type": "string", "minLength": 1},
+                "message": {"type": "string", "minLength": 1}
+              }
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {"next_action": {"const": "automatic_candidate_review_required"}}
+          },
+          "then": {
+            "properties": {
+              "quality": {"properties": {"status": {"enum": ["good", "usable"]}}},
+              "registration": {"properties": {"status": {"const": "candidate"}}},
+              "overlay": {"type": "object"},
+              "processing_issue": {"type": "null"}
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {"next_action": {"const": "manual_registration_required"}}
+          },
+          "then": {
+            "properties": {
+              "quality": {"properties": {"status": {"enum": ["good", "usable"]}}},
+              "registration": {"properties": {"status": {"const": "manual_required"}}},
+              "overlay": {"type": "object"},
+              "processing_issue": {"type": "null"}
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {"next_action": {"const": "image_retake_required"}}
+          },
+          "then": {
+            "properties": {
+              "quality": {"properties": {"status": {"const": "retake"}}},
+              "registration": {"type": "object"},
+              "overlay": {"type": "object"},
+              "processing_issue": {"type": "null"}
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {"next_action": {"const": "processing_issue"}}
+          },
+          "then": {
+            "properties": {
+              "quality": {"type": "null"},
+              "registration": {"type": "null"},
+              "overlay": {"type": "null"},
+              "processing_issue": {"type": "object"}
+            }
+          }
+        }
+      ]
+    }
+  }
+}

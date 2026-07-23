@@ -16,10 +16,10 @@
 - Create: `knowledge-base/visual-qc-physical-registration-run-v1-schema.json`
 - Create: `tests/test_visual_qc_physical_acceptance.py`
 
-- [ ] Write a failing schema test for a minimal candidate report and the required physical-evidence boundaries.
-- [ ] Run `python -m unittest tests.test_visual_qc_physical_acceptance.PhysicalAcceptanceSchemaTests -v` and confirm failure because the schema is missing.
-- [ ] Add the strict Draft 2020-12 schema with closed top-level, summary, entry, artifact, and status fields while referencing the existing registration-candidate shape inline.
-- [ ] Re-run the schema test and confirm it passes.
+- [x] Write a failing schema test for a minimal candidate report and the required physical-evidence boundaries.
+- [x] Run `python -m unittest tests.test_visual_qc_physical_acceptance.PhysicalAcceptanceSchemaTests -v` and confirm failure because the schema is missing.
+- [x] Add the strict Draft 2020-12 schema with closed top-level, summary, entry, artifact, and status fields while referencing the existing registration-candidate shape inline.
+- [x] Re-run the schema test and confirm it passes.
 
 ### Task 2: Build reports from validated packages
 
@@ -27,10 +27,10 @@
 - Create: `scripts/visual_qc/physical_acceptance.py`
 - Modify: `tests/test_visual_qc_physical_acceptance.py`
 
-- [ ] Write failing tests that stage a temporary two-side package, run acceptance, and assert package identity, hashes, quality, registration, action precedence, physical-evidence boundaries, and no absolute paths.
-- [ ] Run the focused tests and confirm failure because `build_physical_registration_run` is missing.
-- [ ] Implement package validation, catalog/reference loading, image decoding, quality analysis, registration execution, deterministic summary counts, and stable entry ordering.
-- [ ] Re-run the focused tests and confirm they pass.
+- [x] Write failing tests that stage a temporary two-side package, run acceptance, and assert package identity, hashes, quality, registration, action precedence, physical-evidence boundaries, and no absolute paths.
+- [x] Run the focused tests and confirm failure because `build_physical_registration_run` is missing.
+- [x] Implement package validation, catalog/reference loading, image decoding, quality analysis, registration execution, deterministic summary counts, and stable entry ordering.
+- [x] Re-run the focused tests and confirm they pass.
 
 ### Task 3: Render and publish deterministic overlays
 
@@ -38,10 +38,10 @@
 - Modify: `scripts/visual_qc/physical_acceptance.py`
 - Modify: `tests/test_visual_qc_physical_acceptance.py`
 
-- [ ] Write failing tests for candidate and manual-fallback overlays, byte-identical repeated output, artifact hashes, source-tree immutability, rejected existing output, and output exclusion from the controlled library.
-- [ ] Run the focused tests and confirm the expected failures.
-- [ ] Implement fixed-size overlay rendering, artifact metadata, temporary-directory publication, fsync, and atomic rename.
-- [ ] Re-run the focused tests and confirm they pass.
+- [x] Write failing tests for candidate and manual-fallback overlays, byte-identical repeated output, artifact hashes, source-tree immutability, rejected existing output, and output exclusion from the controlled library.
+- [x] Run the focused tests and confirm the expected failures.
+- [x] Implement fixed-size overlay rendering, artifact metadata, temporary-directory publication, fsync, and atomic rename.
+- [x] Re-run the focused tests and confirm they pass.
 
 ### Task 4: Add the operator CLI and Markdown report
 
@@ -52,10 +52,10 @@
 - Modify: `README.md`
 - Modify: `knowledge-base/README.md`
 
-- [ ] Write failing subprocess tests for success/attention, invalid-package exit `2`, existing-output exit `2`, stable JSON stdout, and a Markdown boundary statement.
-- [ ] Run the CLI tests and confirm failure because the entry point is missing.
-- [ ] Implement argument parsing, stable JSON stdout/stderr, exit-code mapping, Markdown generation, and concise operator documentation.
-- [ ] Re-run the focused tests and confirm they pass.
+- [x] Write failing subprocess tests for success/attention, invalid-package exit `2`, existing-output exit `2`, stable JSON stdout, and a Markdown boundary statement.
+- [x] Run the CLI tests and confirm failure because the entry point is missing.
+- [x] Implement argument parsing, stable JSON stdout/stderr, exit-code mapping, Markdown generation, and concise operator documentation.
+- [x] Re-run the focused tests and confirm they pass.
 
 ### Task 5: Regression, acceptance, and durable state
 
@@ -63,9 +63,9 @@
 - Modify: `PROJECT_LEDGER.md` in the coordination repository
 - Modify: project Vault `Overview.md`, `Task Index.md`, `Risks.md`, and daily architecture check when facts change.
 
-- [ ] Run the complete Python suite and confirm zero failures.
-- [ ] Run the complete Node suite and confirm zero failures.
-- [ ] Run `python -m py_compile` for new Python modules, JSON/Schema parsing, UTF-8/U+FFFD checks, and `git diff --check`.
-- [ ] Run a local temporary-library acceptance from staging through report publication, compare source snapshots before/after, and inspect report/overlay evidence.
-- [ ] Request an independent code review, fix any blocking finding with a new RED/GREEN test, and repeat targeted/full verification.
+- [x] Run the complete Python suite and confirm zero failures.
+- [x] Run the complete Node suite and confirm zero failures.
+- [x] Run `python -m py_compile` for new Python modules, JSON/Schema parsing, UTF-8/U+FFFD checks, and `git diff --check`.
+- [x] Run a local temporary-library acceptance from staging through report publication, compare source snapshots before/after, and inspect report/overlay evidence.
+- [x] Request an independent code review, fix any blocking finding with a new RED/GREEN test, and repeat targeted/full verification.
 - [ ] Commit implementation changes locally, then update and commit coordination/Vault facts without attempting GitHub push under the current network constraint.

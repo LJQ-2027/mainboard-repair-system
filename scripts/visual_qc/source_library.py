@@ -309,14 +309,19 @@ def build_source_package(
     }
 
 
-def _read_package(path: Path) -> dict:
+def _read_package_evidence(path: Path) -> tuple[dict, str]:
     try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
+        content = path.read_bytes()
+        payload = json.loads(content.decode("utf-8"))
     except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
         raise IntakeValidationError(f"invalid source package: {exc}") from exc
     if not isinstance(payload, dict):
         raise IntakeValidationError("invalid source package: root must be an object")
-    return payload
+    return payload, hashlib.sha256(content).hexdigest()
+
+
+def _read_package(path: Path) -> dict:
+    return _read_package_evidence(path)[0]
 
 
 def validate_source_package(
@@ -333,7 +338,7 @@ def validate_source_package(
     )
     if not completion_marker.is_file():
         raise IntakeValidationError("source package is incomplete")
-    payload = _read_package(package_path)
+    payload, manifest_sha256 = _read_package_evidence(package_path)
     if set(payload) != PACKAGE_FIELDS:
         raise IntakeValidationError("invalid source package fields")
     if payload.get("schema_version") != SOURCE_PACKAGE_SCHEMA_VERSION:
@@ -442,6 +447,7 @@ def validate_source_package(
         **{key: copy.deepcopy(payload[key]) for key in PACKAGE_FIELDS if key != "entries"},
         "entries": normalized,
         "package_path": package_path,
+        "manifest_sha256": manifest_sha256,
         "batch_id": batch_id,
         "capture_session_id": session_id,
         "capture_setup_id": setup_id,
