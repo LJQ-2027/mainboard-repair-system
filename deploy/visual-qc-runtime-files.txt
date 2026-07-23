@@ -9,6 +9,7 @@ data
 knowledge-base
 scripts/maintain_visual_qc_server.py
 scripts/audit_visual_qc_upgrade.py
+scripts/build_visual_qc_deployment_manifest.py
 scripts/import_visual_qc_batch.py
 scripts/export_visual_qc_coco.py
 scripts/validate_visual_qc_dataset.py

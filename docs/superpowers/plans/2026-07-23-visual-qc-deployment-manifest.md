@@ -160,7 +160,7 @@ git commit -m "feat: bind upgrade report to runtime archive"
 - Modify: `tests/test_visual_qc_deployment.py`
 - Modify: `deploy/visual-qc-runtime-files.txt`
 
-- [ ] **Step 1: Write failing deployment-order tests**
+- [x] **Step 1: Write failing deployment-order tests**
 
 Assert the script:
 
@@ -172,7 +172,7 @@ Assert the script:
   Python before `tar -xzf`;
 - rejects mismatch before app staging.
 
-- [ ] **Step 2: Run tests and verify RED**
+- [x] **Step 2: Run tests and verify RED**
 
 Run:
 
@@ -183,7 +183,7 @@ Run:
 Expected: assertions fail because the manifest and remote verification are
 absent.
 
-- [ ] **Step 3: Implement local build and remote pre-extraction verification**
+- [x] **Step 3: Implement local build and remote pre-extraction verification**
 
 Use the full commit:
 
@@ -209,7 +209,7 @@ if archive_path.stat().st_size != expected_bytes:
 Stream the hash in the actual implementation rather than loading the archive
 into memory.
 
-- [ ] **Step 4: Verify GREEN and commit**
+- [x] **Step 4: Verify GREEN and commit**
 
 Run deployment tests and the PowerShell parser, then commit:
 
@@ -225,7 +225,7 @@ git commit -m "feat: verify visual qc archive before extraction"
 - Modify: `tests/test_visual_qc_deployment.py`
 - Modify: `.local/upgrade-preflight-rehearsal/run_rehearsal.py` (ignored evidence helper)
 
-- [ ] **Step 1: Write failing extracted-boundary tests**
+- [x] **Step 1: Write failing extracted-boundary tests**
 
 Assert that, after extraction and before migration rehearsal, the script:
 
@@ -235,19 +235,19 @@ Assert that, after extraction and before migration rehearsal, the script:
 - passes all target manifest evidence to the upgrade CLI;
 - verifies all report target values before `mv "$APP_DIR"`.
 
-- [ ] **Step 2: Run tests and verify RED**
+- [x] **Step 2: Run tests and verify RED**
 
 Run deployment and upgrade test modules. Expected: extracted-boundary and
 report-binding assertions fail.
 
-- [ ] **Step 3: Implement the boundary**
+- [x] **Step 3: Implement the boundary**
 
 Use system Python for extracted-path verification, candidate Python for the
 upgrade preflight, and the already validated embedded values for all CLI
 arguments and report comparisons. Copy the deployment manifest into the
 commit-versioned rollback directory before input cleanup.
 
-- [ ] **Step 4: Verify GREEN and commit**
+- [x] **Step 4: Verify GREEN and commit**
 
 Run focused tests, PowerShell parser, and one synthetic local manifest build.
 Commit:

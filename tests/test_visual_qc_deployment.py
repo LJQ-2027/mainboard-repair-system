@@ -29,6 +29,7 @@ class VisualQcDeploymentContractTests(unittest.TestCase):
             "knowledge-base",
             "scripts/visual_qc",
             "scripts/audit_visual_qc_upgrade.py",
+            "scripts/build_visual_qc_deployment_manifest.py",
             "scripts/import_visual_qc_batch.py",
             "scripts/validate_visual_qc_dataset.py",
             "scripts/maintain_visual_qc_server.py",
@@ -91,7 +92,7 @@ class VisualQcDeploymentContractTests(unittest.TestCase):
             ".htpasswd-mb-repair-beta",
             "mb-repair-beta-reviewers.map",
             "QC_EXISTED",
-            "visual-qc-__COMMIT__",
+            "visual-qc-__COMMIT_SHORT__",
             "DEPLOY_LOCK",
             "VENV_LEGACY_MOVED",
             "sqlite3",
@@ -122,7 +123,13 @@ class VisualQcDeploymentContractTests(unittest.TestCase):
             "--source-app-root",
             '"$APP_DIR"',
             "--target-version",
-            '"__COMMIT__"',
+            '"__COMMIT_FULL__"',
+            "--target-archive-sha256",
+            '"__ARCHIVE_SHA256__"',
+            "--target-archive-bytes",
+            '"__ARCHIVE_BYTES__"',
+            "--target-runtime-manifest-sha256",
+            '"__RUNTIME_MANIFEST_SHA256__"',
             'report["status"] != "passed"',
             '"snapshot_sha256"',
             "hashlib.sha256",
@@ -137,6 +144,74 @@ class VisualQcDeploymentContractTests(unittest.TestCase):
         self.assertLess(backup_ready, rehearsal)
         self.assertLess(rehearsal, report_verification)
         self.assertLess(report_verification, application_switch)
+
+    def test_deploy_script_builds_and_uploads_full_identity_manifest(self):
+        script = (
+            ROOT / "scripts" / "deploy-visual-qc-pilot.ps1"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn('$commit = (git rev-parse HEAD).Trim()', script)
+        self.assertNotIn("git rev-parse --short HEAD", script)
+        self.assertIn("$shortCommit = $commit.Substring(0, 12)", script)
+        self.assertIn("build_visual_qc_deployment_manifest.py", script)
+        self.assertIn("deployment-manifest.json", script)
+        self.assertIn("$deploymentManifest", script)
+        self.assertIn(
+            '"${target}:$RemoteDir/deploy-input/deployment-manifest.json"',
+            script,
+        )
+
+    def test_remote_archive_identity_is_verified_before_extraction(self):
+        script = (
+            ROOT / "scripts" / "deploy-visual-qc-pilot.ps1"
+        ).read_text(encoding="utf-8")
+
+        for required in (
+            "VISUAL-QC-DEPLOYMENT-MANIFEST-V1",
+            "Deployment manifest keys are invalid.",
+            "Runtime archive SHA-256 mismatch.",
+            "Runtime archive byte-size mismatch.",
+            "__COMMIT_FULL__",
+            "__ARCHIVE_SHA256__",
+            "__ARCHIVE_BYTES__",
+            "__RUNTIME_MANIFEST_SHA256__",
+            "__RUNTIME_PATH_COUNT__",
+        ):
+            self.assertIn(required, script)
+
+        manifest_verification = script.index(
+            "Deployment manifest keys are invalid."
+        )
+        extraction = script.index('tar -xzf "$INPUT_DIR/app.tar.gz"')
+        self.assertLess(manifest_verification, extraction)
+
+    def test_extracted_runtime_boundary_is_verified_before_rehearsal(self):
+        script = (
+            ROOT / "scripts" / "deploy-visual-qc-pilot.ps1"
+        ).read_text(encoding="utf-8")
+
+        for required in (
+            "Extracted runtime manifest SHA-256 mismatch.",
+            "Extracted runtime path count mismatch.",
+            "Extracted runtime path is missing:",
+            'echo "__COMMIT_FULL__" > "$APP_NEW/VERSION"',
+            'cp -a "$DEPLOYMENT_MANIFEST" '
+            '"$ROLLBACK_DIR/deployment-manifest.json"',
+            'report["target"]["archive_sha256"]',
+            'report["target"]["archive_bytes"]',
+            'report["target"]["runtime_manifest_sha256"]',
+        ):
+            self.assertIn(required, script)
+
+        extraction = script.index('tar -xzf "$INPUT_DIR/app.tar.gz"')
+        extracted_verification = script.index(
+            "Extracted runtime manifest SHA-256 mismatch."
+        )
+        rehearsal = script.index("audit_visual_qc_upgrade.py")
+        application_switch = script.index('mv "$APP_DIR" "$ROLLBACK_DIR/app"')
+        self.assertLess(extraction, extracted_verification)
+        self.assertLess(extracted_verification, rehearsal)
+        self.assertLess(rehearsal, application_switch)
 
     def test_preflight_failure_does_not_restore_an_untouched_database(self):
         script = (
