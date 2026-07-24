@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import re
 import stat
+import tarfile
 
 
 DEPLOYMENT_MANIFEST_SCHEMA_VERSION = "VISUAL-QC-DEPLOYMENT-MANIFEST-V1"
@@ -21,6 +22,7 @@ MANIFEST_KEYS = frozenset(
         "runtime_path_count",
     }
 )
+RUNTIME_MANIFEST_ARCHIVE_PATH = "deploy/visual-qc-runtime-files.txt"
 
 
 def _hash_regular_file(path: Path) -> dict:
@@ -129,6 +131,30 @@ def normalized_runtime_paths(runtime_manifest: Path) -> list[str]:
     return _parse_runtime_paths(_read_regular_file(runtime_manifest))
 
 
+def _read_archived_runtime_manifest(archive: Path) -> bytes:
+    matches = []
+    try:
+        with tarfile.open(archive, "r:gz") as bundle:
+            for member in bundle:
+                if member.name == RUNTIME_MANIFEST_ARCHIVE_PATH:
+                    matches.append(member)
+            if len(matches) != 1 or not matches[0].isfile():
+                raise ValueError(
+                    "Runtime archive must contain one regular path manifest."
+                )
+            source = bundle.extractfile(matches[0])
+            if source is None:
+                raise ValueError(
+                    "Runtime archive path manifest cannot be read."
+                )
+            content = source.read()
+    except (OSError, tarfile.TarError) as exc:
+        raise ValueError("Runtime archive must be a valid gzip tar file.") from exc
+    if len(content) != matches[0].size:
+        raise ValueError("Runtime archive path manifest changed while reading.")
+    return content
+
+
 def validate_deployment_manifest(manifest: dict) -> dict:
     if not isinstance(manifest, dict) or set(manifest) != MANIFEST_KEYS:
         raise ValueError("Deployment manifest must contain the exact V1 fields.")
@@ -163,8 +189,14 @@ def build_deployment_manifest(
     archive_evidence = _hash_regular_file(archive)
     if archive_evidence["byte_size"] == 0:
         raise ValueError("Runtime archive must not be empty.")
-    runtime_content = _read_regular_file(runtime_manifest)
-    runtime_paths = _parse_runtime_paths(runtime_content)
+    local_runtime_content = _read_regular_file(runtime_manifest)
+    local_runtime_paths = _parse_runtime_paths(local_runtime_content)
+    archived_runtime_content = _read_archived_runtime_manifest(archive)
+    archived_runtime_paths = _parse_runtime_paths(archived_runtime_content)
+    if archived_runtime_paths != local_runtime_paths:
+        raise ValueError(
+            "Archived runtime path list does not match the local manifest."
+        )
     return validate_deployment_manifest(
         {
             "schema_version": DEPLOYMENT_MANIFEST_SCHEMA_VERSION,
@@ -172,8 +204,8 @@ def build_deployment_manifest(
             "archive_sha256": archive_evidence["sha256"],
             "archive_bytes": archive_evidence["byte_size"],
             "runtime_manifest_sha256": hashlib.sha256(
-                runtime_content
+                archived_runtime_content
             ).hexdigest(),
-            "runtime_path_count": len(runtime_paths),
+            "runtime_path_count": len(archived_runtime_paths),
         }
     )

@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import hashlib
+import io
 import json
 from pathlib import Path
 import subprocess
 import sys
+import tarfile
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -30,12 +32,17 @@ class VisualQcDeploymentManifestTests(unittest.TestCase):
         )
         self.root = Path(self.temporary.name)
         self.archive = self.root / "app.tar.gz"
-        self.archive.write_bytes(b"bounded-runtime-archive")
         self.runtime_manifest = self.root / "visual-qc-runtime-files.txt"
-        self.runtime_manifest.write_text(
-            "# bounded runtime\nscripts/a.py\nREADME.md\n",
-            encoding="utf-8",
+        self.local_runtime_content = (
+            b"# bounded runtime\r\n"
+            b"deploy/visual-qc-runtime-files.txt\r\n"
+            b"scripts/a.py\r\n"
         )
+        self.archived_runtime_content = self.local_runtime_content.replace(
+            b"\r\n", b"\n"
+        )
+        self.runtime_manifest.write_bytes(self.local_runtime_content)
+        self.write_archive()
 
     def tearDown(self):
         self.temporary.cleanup()
@@ -48,6 +55,19 @@ class VisualQcDeploymentManifestTests(unittest.TestCase):
         }
         arguments.update(overrides)
         return build_deployment_manifest(**arguments)
+
+    def write_archive(self, runtime_content=None):
+        content = runtime_content or self.archived_runtime_content
+        with tarfile.open(self.archive, "w:gz") as archive:
+            runtime = tarfile.TarInfo(
+                "deploy/visual-qc-runtime-files.txt"
+            )
+            runtime.size = len(content)
+            archive.addfile(runtime, io.BytesIO(content))
+            script_content = b"print('ok')\n"
+            script = tarfile.TarInfo("scripts/a.py")
+            script.size = len(script_content)
+            archive.addfile(script, io.BytesIO(script_content))
 
     def test_manifest_binds_archive_commit_and_runtime_boundary(self):
         manifest = self.build()
@@ -62,7 +82,7 @@ class VisualQcDeploymentManifestTests(unittest.TestCase):
                 ).hexdigest(),
                 "archive_bytes": self.archive.stat().st_size,
                 "runtime_manifest_sha256": hashlib.sha256(
-                    self.runtime_manifest.read_bytes()
+                    self.archived_runtime_content
                 ).hexdigest(),
                 "runtime_path_count": 2,
             },
@@ -92,6 +112,16 @@ class VisualQcDeploymentManifestTests(unittest.TestCase):
             manifest = self.build()
 
         self.assertEqual(manifest["runtime_path_count"], 2)
+
+    def test_manifest_rejects_archive_runtime_path_drift(self):
+        self.write_archive(
+            b"# bounded runtime\n"
+            b"deploy/visual-qc-runtime-files.txt\n"
+            b"scripts/other.py\n"
+        )
+
+        with self.assertRaisesRegex(ValueError, "path list"):
+            self.build()
 
     def test_manifest_rejects_duplicate_or_unsafe_runtime_paths(self):
         invalid_values = (

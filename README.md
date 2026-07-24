@@ -44,7 +44,7 @@
 
 生产仍为 `f278061`，地址是 `https://cccsat.top/mb-repair-beta/`。该生产版本早于 qualified handoff、List V2、Detail V3 和浏览器上传移除，不能作为当前本地 HEAD 契约的验证环境，也不能接收 qualified handoff。只有单独批准并完成部署与迁移验证后，生产才切换到本地 HEAD 口径。操作与数据边界见 `docs/visual-qc-capture-intake-spec-2026-07-20.md`、`docs/visual-qc-workbench-2026-07-17.md` 和 `docs/visual-qc-server-api-2026-07-20.md`。
 
-本地 HEAD 已增加 `VISUAL-QC-UPGRADE-PREFLIGHT-V1` 升级演练门禁和 `VISUAL-QC-DEPLOYMENT-MANIFEST-V1` 部署身份清单。`scripts/audit_visual_qc_upgrade.py` 只接受一致 SQLite 备份，在临时副本上验证受控对象、加法式迁移、Health/List/Detail/Dataset 契约、legacy 训练排除和旧版回读；源库与对象保持只读。真实部署会先将完整 40 位 commit、实际归档 SHA-256/字节数和运行时清单 SHA-256 绑定为一个确定性清单，并上传到本次部署独有的只读暂存目录。服务器在解包前拒绝重复 JSON 字段、身份不一致和危险 tar 成员，解包后拒绝符号链接、硬链接、特殊文件和运行时边界漂移，最后才停服备份和执行迁移演练。app/venv 只有在完整升级报告通过 JSON Schema、数据库快照和全部候选身份复核后才会切换。使用和证据边界见 `docs/visual-qc-upgrade-preflight-2026-07-23.md`。这些能力本身不代表已经升级生产。
+本地 HEAD 已增加 `VISUAL-QC-UPGRADE-PREFLIGHT-V1` 升级演练门禁和 `VISUAL-QC-DEPLOYMENT-MANIFEST-V1` 部署身份清单。`scripts/audit_visual_qc_upgrade.py` 只接受一致 SQLite 备份，在临时副本上验证受控对象、加法式迁移、Health/List/Detail/Dataset 契约、legacy 训练排除和旧版回读；源库与对象保持只读。真实部署会先将完整 40 位 commit、实际归档 SHA-256/字节数和归档内部运行时清单的 SHA-256 绑定为一个确定性清单，并上传到本次部署独有的只读暂存目录；本地清单只用于核对路径集合，Windows CRLF 不会替代 Git 归档中的真实字节身份。服务器在解包前拒绝重复 JSON 字段、身份不一致和危险 tar 成员，解包后拒绝符号链接、硬链接、特殊文件和运行时边界漂移，最后才停服备份和执行迁移演练。app/venv 只有在完整升级报告通过 JSON Schema、数据库快照和全部候选身份复核后才会切换。使用和证据边界见 `docs/visual-qc-upgrade-preflight-2026-07-23.md`。这些能力本身不代表已经升级生产。
 
 受控 beta 路由使用 Nginx Basic Auth，网关注入用户和权限，QC API 的 3020 端口只绑定回环地址。后端暂时沿用 `reviewer` 作为“数据管理员”权限的兼容值，不表示存在第二个人工审核角色；以后可在不改变业务数据契约的情况下替换为公司 SSO/OIDC。部署与回滚步骤见 `docs/beta-deployment.md`。
 

@@ -41,8 +41,8 @@ content is deterministic.
 3. validate the bounded runtime path list;
 4. build `app.tar.gz` with `git archive`;
 5. compute the archive SHA-256 and exact byte count;
-6. compute the raw SHA-256 of
-   `deploy/visual-qc-runtime-files.txt`;
+6. read the runtime manifest from the archive, compare its normalized path
+   list with the checkout manifest, and hash the archived bytes;
 7. write `deployment-manifest.json` as UTF-8 without BOM;
 8. upload the archive, manifest, and byte-pinned verifier into a unique
    per-deployment read-only input directory.

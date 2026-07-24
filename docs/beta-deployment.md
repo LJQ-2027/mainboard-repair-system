@@ -209,7 +209,9 @@ The bounded pilot deployment therefore adds:
   checks must all pass.
 - `VISUAL-QC-DEPLOYMENT-MANIFEST-V1` is built locally without timestamps or
   workstation identity, uploaded beside `app.tar.gz` into a unique read-only
-  input directory, and validated with system Python before extraction.
+  input directory, and validated with system Python before extraction. The
+  runtime-manifest hash is computed from the actual archive member; the
+  checkout copy is used only to assert the same normalized path list.
   Duplicate JSON fields, mismatched evidence, path traversal, links, and
   special tar members fail closed. The extracted tree is then checked
   recursively for links and special files, and the runtime manifest plus
