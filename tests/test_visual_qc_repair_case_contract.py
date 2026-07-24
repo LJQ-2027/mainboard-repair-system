@@ -9,7 +9,10 @@ import jsonschema
 
 from scripts.visual_qc.repair_case_contract import (
     FIXED_FALSE_BOUNDARIES,
+    REPAIR_CASE_SCHEMA_V1,
+    REPAIR_CASE_SCHEMA_V2,
     REPAIR_CASE_SCHEMA_VERSION,
+    REPAIR_CASE_SCHEMA_VERSIONS,
     derive_completeness,
     validate_repair_case_manifest,
 )
@@ -21,6 +24,12 @@ SCHEMA_PATH = (
     / "knowledge-base"
     / "visual-qc-repair-case-source-v1-schema.json"
 )
+V2_SCHEMA_PATH = (
+    ROOT
+    / "knowledge-base"
+    / "visual-qc-repair-case-source-v2-schema.json"
+)
+CATALOG_MODELS = ["KM4", "KM4 Pro"]
 
 
 def package_link():
@@ -62,6 +71,50 @@ def canonical_payload():
         "completeness": "photos_only",
         "boundaries": copy.deepcopy(FIXED_FALSE_BOUNDARIES),
     }
+
+
+def identity_evidence_reference():
+    return {
+        "kind": "package_entry",
+        "package_id": "pkg-before",
+        "entry_id": "session-main_page_1",
+    }
+
+
+def device_identity(status="exact_catalog_match"):
+    if status == "exact_catalog_match":
+        return {
+            "reported_models": ["KM4"],
+            "catalog_models": list(CATALOG_MODELS),
+            "mapping_status": status,
+            "resolved_models": ["KM4"],
+            "resolution_note": None,
+            "evidence_refs": [],
+        }
+    identity = {
+        "reported_models": ["TECNO/KM4"],
+        "catalog_models": list(CATALOG_MODELS),
+        "mapping_status": status,
+        "resolved_models": [],
+        "resolution_note": None,
+        "evidence_refs": [identity_evidence_reference()],
+    }
+    if status == "confirmed_alias":
+        identity["resolved_models"] = ["KM4"]
+        identity["resolution_note"] = "The source record confirms the alias."
+    return identity
+
+
+def canonical_v2_payload(status="exact_catalog_match"):
+    payload = canonical_payload()
+    payload["schema_version"] = REPAIR_CASE_SCHEMA_V2
+    del payload["device_models"]
+    payload["device_identity"] = device_identity(status)
+    payload["boundaries"]["model_identity_resolved"] = status in {
+        "exact_catalog_match",
+        "confirmed_alias",
+    }
+    return payload
 
 
 def evidence_reference():
@@ -108,6 +161,24 @@ def action():
 
 
 class VisualQcRepairCaseContractTests(unittest.TestCase):
+    def test_public_version_constants_preserve_v1_compatibility(self):
+        self.assertEqual(
+            REPAIR_CASE_SCHEMA_VERSION,
+            "VISUAL-QC-REPAIR-CASE-SOURCE-V1",
+        )
+        self.assertEqual(REPAIR_CASE_SCHEMA_V1, REPAIR_CASE_SCHEMA_VERSION)
+        self.assertEqual(
+            REPAIR_CASE_SCHEMA_V2,
+            "VISUAL-QC-REPAIR-CASE-SOURCE-V2",
+        )
+        self.assertEqual(
+            REPAIR_CASE_SCHEMA_VERSIONS,
+            {
+                REPAIR_CASE_SCHEMA_V1,
+                REPAIR_CASE_SCHEMA_V2,
+            },
+        )
+
     def test_canonical_photo_only_payload_matches_python_and_schema(self):
         payload = canonical_payload()
 
@@ -118,6 +189,161 @@ class VisualQcRepairCaseContractTests(unittest.TestCase):
         self.assertEqual(derive_completeness(payload), "photos_only")
         schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
         jsonschema.Draft202012Validator(schema).validate(payload)
+
+    def test_canonical_v2_payload_matches_python_and_schema(self):
+        payload = canonical_v2_payload()
+
+        validated = validate_repair_case_manifest(
+            payload,
+            catalog_models=CATALOG_MODELS,
+        )
+
+        self.assertEqual(validated, payload)
+        self.assertIsNot(validated, payload)
+        self.assertIsNot(validated["device_identity"], payload["device_identity"])
+        schema = json.loads(V2_SCHEMA_PATH.read_text(encoding="utf-8"))
+        jsonschema.Draft202012Validator.check_schema(schema)
+        jsonschema.Draft202012Validator(schema).validate(payload)
+
+    def test_v2_accepts_all_four_identity_states_through_full_manifest(self):
+        schema = json.loads(V2_SCHEMA_PATH.read_text(encoding="utf-8"))
+        for status in (
+            "exact_catalog_match",
+            "confirmed_alias",
+            "unresolved_alias",
+            "conflict",
+        ):
+            payload = canonical_v2_payload(status)
+            with self.subTest(status=status):
+                self.assertEqual(
+                    validate_repair_case_manifest(
+                        payload,
+                        catalog_models=CATALOG_MODELS,
+                    ),
+                    payload,
+                )
+                jsonschema.Draft202012Validator(schema).validate(payload)
+
+    def test_version_dispatch_rejects_unknown_and_identity_shape_conflicts(self):
+        unknown = canonical_payload()
+        unknown["schema_version"] = "VISUAL-QC-REPAIR-CASE-SOURCE-V99"
+        with self.assertRaisesRegex(ValueError, "schema_version"):
+            validate_repair_case_manifest(unknown)
+
+        both = canonical_v2_payload()
+        both["device_models"] = ["KM4"]
+        with self.assertRaisesRegex(ValueError, "fields"):
+            validate_repair_case_manifest(
+                both,
+                catalog_models=CATALOG_MODELS,
+            )
+
+        neither = canonical_v2_payload()
+        del neither["device_identity"]
+        with self.assertRaisesRegex(ValueError, "fields"):
+            validate_repair_case_manifest(
+                neither,
+                catalog_models=CATALOG_MODELS,
+            )
+
+        extra = canonical_v2_payload()
+        extra["unexpected"] = True
+        with self.assertRaisesRegex(ValueError, "fields"):
+            validate_repair_case_manifest(
+                extra,
+                catalog_models=CATALOG_MODELS,
+            )
+
+    def test_v1_rejects_v2_identity_and_derived_boundary_fields(self):
+        with_identity = canonical_payload()
+        with_identity["device_identity"] = device_identity()
+        with self.assertRaisesRegex(ValueError, "fields"):
+            validate_repair_case_manifest(with_identity)
+
+        with_boundary = canonical_payload()
+        with_boundary["boundaries"]["model_identity_resolved"] = True
+        with self.assertRaisesRegex(ValueError, "boundaries"):
+            validate_repair_case_manifest(with_boundary)
+
+    def test_v2_requires_canonical_catalog_in_exact_order(self):
+        payload = canonical_v2_payload()
+        with self.assertRaisesRegex(ValueError, "catalog_models"):
+            validate_repair_case_manifest(payload)
+
+        for catalog in (["KM4 Pro", "KM4"], ["KM4"]):
+            with self.subTest(catalog=catalog):
+                with self.assertRaisesRegex(ValueError, "catalog_models"):
+                    validate_repair_case_manifest(
+                        payload,
+                        catalog_models=catalog,
+                    )
+
+    def test_v2_identity_evidence_resolves_against_same_revision_targets(self):
+        payload = canonical_v2_payload("unresolved_alias")
+        validated = validate_repair_case_manifest(
+            payload,
+            catalog_models=CATALOG_MODELS,
+        )
+        self.assertEqual(
+            validated["device_identity"]["evidence_refs"],
+            [identity_evidence_reference()],
+        )
+
+        payload["device_identity"]["evidence_refs"][0]["entry_id"] = "missing"
+        with self.assertRaisesRegex(ValueError, "evidence reference"):
+            validate_repair_case_manifest(
+                payload,
+                catalog_models=CATALOG_MODELS,
+            )
+
+    def test_v2_rejects_invalid_state_dependent_identity_shapes(self):
+        cases = []
+
+        unresolved = canonical_v2_payload("unresolved_alias")
+        unresolved["device_identity"]["evidence_refs"] = []
+        cases.append((unresolved, "evidence"))
+
+        for field, value, message in (
+            ("resolved_models", [], "resolved_models"),
+            ("resolution_note", None, "resolution note"),
+            ("evidence_refs", [], "evidence"),
+        ):
+            confirmed = canonical_v2_payload("confirmed_alias")
+            confirmed["device_identity"][field] = value
+            cases.append((confirmed, message))
+
+        exact = canonical_v2_payload()
+        exact["device_identity"]["resolved_models"] = ["KM4 Pro"]
+        cases.append((exact, "identical"))
+
+        for payload, message in cases:
+            with self.subTest(message=message):
+                with self.assertRaisesRegex(ValueError, message):
+                    validate_repair_case_manifest(
+                        payload,
+                        catalog_models=CATALOG_MODELS,
+                    )
+
+    def test_v2_rejects_caller_supplied_derived_boundary_mismatch(self):
+        for status in (
+            "exact_catalog_match",
+            "confirmed_alias",
+            "unresolved_alias",
+            "conflict",
+        ):
+            payload = canonical_v2_payload(status)
+            payload["boundaries"]["model_identity_resolved"] = not payload[
+                "boundaries"
+            ]["model_identity_resolved"]
+            with self.subTest(status=status):
+                with self.assertRaisesRegex(
+                    ValueError,
+                    "model_identity_resolved",
+                ):
+                    validate_repair_case_manifest(
+                        payload,
+                        catalog_models=CATALOG_MODELS,
+                    )
 
     def test_completeness_is_derived_from_available_case_context(self):
         payload = canonical_payload()
@@ -250,6 +476,57 @@ class VisualQcRepairCaseContractTests(unittest.TestCase):
         false_completeness["completeness"] = "symptom_linked"
         with self.assertRaises(jsonschema.ValidationError):
             jsonschema.validate(false_completeness, schema)
+
+    def test_v2_schema_rejects_revision_completeness_and_state_shapes(self):
+        schema = json.loads(V2_SCHEMA_PATH.read_text(encoding="utf-8"))
+        invalid_payloads = []
+
+        revision_one_with_parent = canonical_v2_payload()
+        revision_one_with_parent["previous_manifest_sha256"] = "b" * 64
+        invalid_payloads.append(revision_one_with_parent)
+
+        later_without_parent = canonical_v2_payload()
+        later_without_parent["revision"] = 2
+        invalid_payloads.append(later_without_parent)
+
+        false_completeness = canonical_v2_payload()
+        false_completeness["completeness"] = "symptom_linked"
+        invalid_payloads.append(false_completeness)
+
+        both_identity_fields = canonical_v2_payload()
+        both_identity_fields["device_models"] = ["KM4"]
+        invalid_payloads.append(both_identity_fields)
+
+        neither_identity_field = canonical_v2_payload()
+        del neither_identity_field["device_identity"]
+        invalid_payloads.append(neither_identity_field)
+
+        false_identity_boundary = canonical_v2_payload()
+        false_identity_boundary["boundaries"]["model_identity_resolved"] = False
+        invalid_payloads.append(false_identity_boundary)
+
+        for status, field, value in (
+            ("exact_catalog_match", "resolution_note", "Not allowed."),
+            ("confirmed_alias", "resolution_note", None),
+            ("confirmed_alias", "evidence_refs", []),
+            ("unresolved_alias", "evidence_refs", []),
+            ("unresolved_alias", "resolved_models", ["KM4"]),
+            ("conflict", "resolution_note", "Tentative."),
+        ):
+            invalid = canonical_v2_payload(status)
+            invalid["device_identity"][field] = value
+            invalid_payloads.append(invalid)
+
+        for payload in invalid_payloads:
+            with self.subTest(
+                revision=payload["revision"],
+                status=payload.get("device_identity", {}).get(
+                    "mapping_status",
+                    "missing",
+                ),
+            ):
+                with self.assertRaises(jsonschema.ValidationError):
+                    jsonschema.Draft202012Validator(schema).validate(payload)
 
 
 if __name__ == "__main__":

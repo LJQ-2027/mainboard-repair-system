@@ -4,8 +4,19 @@ import copy
 from pathlib import PurePosixPath
 import re
 
+from scripts.visual_qc.repair_case_identity import (
+    derive_model_identity_resolved,
+    validate_device_identity,
+)
 
-REPAIR_CASE_SCHEMA_VERSION = "VISUAL-QC-REPAIR-CASE-SOURCE-V1"
+
+REPAIR_CASE_SCHEMA_V1 = "VISUAL-QC-REPAIR-CASE-SOURCE-V1"
+REPAIR_CASE_SCHEMA_V2 = "VISUAL-QC-REPAIR-CASE-SOURCE-V2"
+REPAIR_CASE_SCHEMA_VERSION = REPAIR_CASE_SCHEMA_V1
+REPAIR_CASE_SCHEMA_VERSIONS = {
+    REPAIR_CASE_SCHEMA_V1,
+    REPAIR_CASE_SCHEMA_V2,
+}
 SOURCE_ORIGIN = "milo_supplied"
 CASE_ROLES = {
     "before_repair",
@@ -49,7 +60,7 @@ MIME_EXTENSIONS = {
 MAX_SUPPORTING_FILE_BYTES = 100 * 1024 * 1024
 MAX_SUPPORTING_FILES = 50
 
-MANIFEST_FIELDS = {
+COMMON_MANIFEST_FIELDS = {
     "schema_version",
     "repair_case_id",
     "revision",
@@ -57,7 +68,6 @@ MANIFEST_FIELDS = {
     "source_origin",
     "board_key",
     "board_id",
-    "device_models",
     "package_links",
     "supporting_evidence",
     "reported_symptoms",
@@ -68,6 +78,9 @@ MANIFEST_FIELDS = {
     "completeness",
     "boundaries",
 }
+V1_MANIFEST_FIELDS = COMMON_MANIFEST_FIELDS | {"device_models"}
+V2_MANIFEST_FIELDS = COMMON_MANIFEST_FIELDS | {"device_identity"}
+MANIFEST_FIELDS = V1_MANIFEST_FIELDS
 PACKAGE_LINK_FIELDS = {
     "package_id",
     "source_package_manifest_sha256",
@@ -328,10 +341,23 @@ def validate_repair_case_manifest(
     payload: dict,
     *,
     historical_fact_ids: set[str] | None = None,
+    catalog_models: list[str] | None = None,
 ) -> dict:
-    manifest = _expect_object(payload, MANIFEST_FIELDS, "repair case manifest")
-    if manifest["schema_version"] != REPAIR_CASE_SCHEMA_VERSION:
+    if not isinstance(payload, dict):
+        raise ValueError("repair case manifest fields are invalid.")
+    schema_version = payload.get("schema_version")
+    if schema_version not in REPAIR_CASE_SCHEMA_VERSIONS:
         raise ValueError("schema_version is invalid.")
+    manifest_fields = (
+        V1_MANIFEST_FIELDS
+        if schema_version == REPAIR_CASE_SCHEMA_V1
+        else V2_MANIFEST_FIELDS
+    )
+    manifest = _expect_object(
+        payload,
+        manifest_fields,
+        "repair case manifest",
+    )
     _safe_id(manifest["repair_case_id"], "repair_case_id")
     revision = manifest["revision"]
     if isinstance(revision, bool) or not isinstance(revision, int) or revision < 1:
@@ -349,18 +375,33 @@ def validate_repair_case_manifest(
     _safe_id(manifest["board_key"], "board_key")
     _required_text(manifest["board_id"], "board_id")
 
-    models = manifest["device_models"]
-    if not isinstance(models, list) or not models or len(models) > 20:
-        raise ValueError("device_models must contain 1 to 20 records.")
-    seen_models: set[str] = set()
-    for model in models:
-        model = _required_text(model, "device model")
-        _unique_id(model, seen_models, "device model")
+    if schema_version == REPAIR_CASE_SCHEMA_V1:
+        models = manifest["device_models"]
+        if not isinstance(models, list) or not models or len(models) > 20:
+            raise ValueError("device_models must contain 1 to 20 records.")
+        seen_models: set[str] = set()
+        for model in models:
+            model = _required_text(model, "device model")
+            _unique_id(model, seen_models, "device model")
 
     package_targets, _ = _validate_package_links(manifest["package_links"])
     supporting_targets = _validate_supporting_evidence(
         manifest["supporting_evidence"]
     )
+    identity = None
+    if schema_version == REPAIR_CASE_SCHEMA_V2:
+        if catalog_models is None:
+            raise ValueError("catalog_models is required for V2 manifests.")
+        identity = validate_device_identity(
+            manifest["device_identity"],
+            catalog_models=catalog_models,
+            validate_evidence_refs=lambda refs: _validate_evidence_refs(
+                refs,
+                package_targets=package_targets,
+                supporting_targets=supporting_targets,
+                label="device identity",
+            ),
+        )
 
     fact_ids: set[str] = set()
     symptoms = manifest["reported_symptoms"]
@@ -483,6 +524,16 @@ def validate_repair_case_manifest(
         raise ValueError(
             f"completeness must be derived as {expected_completeness}."
         )
-    if manifest["boundaries"] != FIXED_FALSE_BOUNDARIES:
-        raise ValueError("boundaries must remain fixed false.")
+    if schema_version == REPAIR_CASE_SCHEMA_V1:
+        if manifest["boundaries"] != FIXED_FALSE_BOUNDARIES:
+            raise ValueError("boundaries must remain fixed false.")
+    else:
+        expected_boundaries = {
+            **FIXED_FALSE_BOUNDARIES,
+            "model_identity_resolved": derive_model_identity_resolved(identity),
+        }
+        if manifest["boundaries"] != expected_boundaries:
+            raise ValueError(
+                "model_identity_resolved must match derived device identity."
+            )
     return copy.deepcopy(manifest)
