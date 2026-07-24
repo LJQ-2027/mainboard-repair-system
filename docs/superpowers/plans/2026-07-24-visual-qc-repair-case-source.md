@@ -255,7 +255,7 @@ git commit -m "feat: resolve repair case evidence"
 - Modify: `scripts/visual_qc/repair_case_library.py`
 - Modify: `tests/test_visual_qc_repair_case_library.py`
 
-- [ ] **Step 1: Write failing revision-publication tests**
+- [x] **Step 1: Write failing revision-publication tests**
 
 Require:
 
@@ -282,7 +282,7 @@ cases/case-km4-0001/revisions/0001/.complete
 The result must report `created`, revision `1`, manifest SHA-256, completeness,
 package count, and supporting-evidence count.
 
-- [ ] **Step 2: Run publication tests and verify RED**
+- [x] **Step 2: Run publication tests and verify RED**
 
 Run:
 
@@ -292,7 +292,7 @@ Run:
 
 Expected: missing-function failure.
 
-- [ ] **Step 3: Implement manifest construction and atomic publication**
+- [x] **Step 3: Implement manifest construction and atomic publication**
 
 Implement these public APIs:
 
@@ -313,7 +313,7 @@ publicly named helpers extracted without changing source-package behavior.
 Publish into a temporary sibling directory, fsync files/directories, rename
 once, then create and fsync `.complete`.
 
-- [ ] **Step 4: Write and implement revision-chain tests**
+- [x] **Step 4: Write and implement revision-chain tests**
 
 Cover:
 
@@ -329,7 +329,7 @@ Cover:
 - concurrent publishers yield one created revision and one exact replay;
 - failed publication leaves no complete revision.
 
-- [ ] **Step 5: Add executable path-boundary tests**
+- [x] **Step 5: Add executable path-boundary tests**
 
 Create Windows junctions or POSIX symlinks for:
 
@@ -343,7 +343,7 @@ Create Windows junctions or POSIX symlinks for:
 Also cover special files where supported and hard-link count rejection. Every
 unsafe case must fail before modifying a completed revision.
 
-- [ ] **Step 6: Verify GREEN and commit**
+- [x] **Step 6: Verify GREEN and commit**
 
 Run:
 

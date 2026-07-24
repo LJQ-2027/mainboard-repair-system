@@ -221,7 +221,12 @@ def _package_lock(packages_root: Path, package_id: str):
 
 def _resolve_library_root(project_root: Path, library_root: Path) -> Path:
     project_root = Path(project_root).resolve()
-    library_root = Path(library_root).expanduser().resolve()
+    lexical_root = _absolute_lexical_path(library_root)
+    if _is_reparse_or_symlink(lexical_root):
+        raise IntakeValidationError(
+            f"controlled source library is a reparse point or symlink: {lexical_root}"
+        )
+    library_root = lexical_root.resolve()
     if (
         library_root == project_root
         or project_root in library_root.parents

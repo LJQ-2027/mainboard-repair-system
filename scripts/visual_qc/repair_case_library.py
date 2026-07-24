@@ -1,26 +1,41 @@
 from __future__ import annotations
 
+import copy
+from contextlib import contextmanager
 import hashlib
 import io
+import json
 import os
 from pathlib import Path
 import stat
+import shutil
 import tempfile
 import zipfile
 
-from scripts.visual_qc.intake import IntakeValidationError, _require_safe_id
+from scripts.visual_qc.intake import (
+    IntakeValidationError,
+    _require_safe_id,
+    write_json_atomic,
+)
 from scripts.visual_qc.repair_case_contract import (
+    FIXED_FALSE_BOUNDARIES,
     MAX_SUPPORTING_FILE_BYTES,
     MAX_SUPPORTING_FILES,
     MIME_EXTENSIONS,
+    REPAIR_CASE_SCHEMA_VERSION,
+    derive_completeness,
+    validate_repair_case_manifest,
 )
+from scripts.visual_qc.server.catalog import BoardCatalog, CatalogError
 from scripts.visual_qc.server.storage import detect_image_mime_type
 from scripts.visual_qc.source_library import (
     _assert_controlled_path,
     _ensure_directory_durable,
     _fsync_directory,
     _is_reparse_or_symlink,
+    _package_lock,
     _resolve_library_root,
+    _write_completion_marker,
     validate_source_package,
 )
 
@@ -29,6 +44,15 @@ ROLE_CAPTURE_STAGE = {
     "before_repair": "before_repair",
     "after_repair": "after_repair",
     "golden_reference": "golden_reference",
+}
+CASE_RECORD_FIELDS = {
+    "device_models",
+    "supporting_evidence_descriptions",
+    "reported_symptoms",
+    "findings",
+    "repair_actions",
+    "outcome",
+    "corrections",
 }
 
 
@@ -319,3 +343,522 @@ def store_supporting_evidence(
             _fsync_directory(destination.parent)
         finally:
             temporary_path.unlink(missing_ok=True)
+
+
+def _strict_json(path: Path, label: str) -> tuple[dict, str]:
+    def object_hook(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError(f"{label} contains duplicate field: {key}")
+            result[key] = value
+        return result
+
+    try:
+        content = path.read_bytes()
+        payload = json.loads(content.decode("utf-8"), object_pairs_hook=object_hook)
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
+        raise IntakeValidationError(f"invalid {label}: {exc}") from exc
+    if not isinstance(payload, dict):
+        raise IntakeValidationError(f"invalid {label}: root must be an object")
+    return payload, hashlib.sha256(content).hexdigest()
+
+
+def _catalog_board(project_root: Path, board_key: str) -> tuple[dict, set[str]]:
+    catalog = BoardCatalog(project_root)
+    try:
+        board = catalog.resolve_board(board_key)
+    except CatalogError as exc:
+        raise IntakeValidationError(str(exc)) from exc
+    raw = catalog.catalog["boards"][board_key]
+    models = raw.get("compatible_models") or [raw.get("model")]
+    allowed = {
+        model for model in models if isinstance(model, str) and model.strip()
+    }
+    if not allowed:
+        raise IntakeValidationError(
+            f"board catalog has no compatible models: {board_key}"
+        )
+    return board, allowed
+
+
+def _fact_ids(payload: dict) -> set[str]:
+    return {
+        *(item["symptom_id"] for item in payload["reported_symptoms"]),
+        *(item["finding_id"] for item in payload["findings"]),
+        *(item["action_id"] for item in payload["repair_actions"]),
+    }
+
+
+def _validate_case_record(case_record: dict) -> dict:
+    if not isinstance(case_record, dict) or set(case_record) != CASE_RECORD_FIELDS:
+        raise IntakeValidationError("repair case record fields are invalid")
+    descriptions = case_record["supporting_evidence_descriptions"]
+    if not isinstance(descriptions, dict):
+        raise IntakeValidationError(
+            "supporting_evidence_descriptions must be an object"
+        )
+    return copy.deepcopy(case_record)
+
+
+def _assert_prefix(previous: list, current: list, label: str) -> None:
+    if current[: len(previous)] != previous:
+        raise IntakeValidationError(
+            f"repair case revision changes historical {label}"
+        )
+
+
+def _manifest_content_without_revision(payload: dict) -> dict:
+    return {
+        key: copy.deepcopy(value)
+        for key, value in payload.items()
+        if key not in {"revision", "previous_manifest_sha256"}
+    }
+
+
+def _prepare_repair_case_revision(
+    *,
+    project_root: Path,
+    library_root: Path,
+    repair_case_id: str,
+    board_key: str,
+    package_assignments: list[tuple[str, Path]],
+    case_record: dict,
+    supporting_assignments: list[tuple[str, Path]],
+    previous_manifest_path: Path | None,
+) -> tuple[dict, list[dict]]:
+    project_root = Path(project_root).resolve()
+    library_root = _resolve_library_root(project_root, library_root)
+    repair_case_id = _require_safe_id(repair_case_id, "repair_case_id")
+    board_key = _require_safe_id(board_key, "board_key")
+    record = _validate_case_record(case_record)
+    board, compatible_models = _catalog_board(project_root, board_key)
+    models = record["device_models"]
+    if (
+        not isinstance(models, list)
+        or not models
+        or any(model not in compatible_models for model in models)
+    ):
+        raise IntakeValidationError(
+            f"device_models do not match board catalog: {board_key}"
+        )
+
+    previous = None
+    previous_sha256 = None
+    revision = 1
+    historical_fact_ids: set[str] = set()
+    if previous_manifest_path is not None:
+        previous = validate_repair_case_revision(
+            manifest_path=previous_manifest_path,
+            project_root=project_root,
+            library_root=library_root,
+        )
+        previous_path = Path(previous_manifest_path)
+        _, previous_sha256 = _strict_json(
+            previous_path, "previous repair case manifest"
+        )
+        if previous["repair_case_id"] != repair_case_id:
+            raise IntakeValidationError("previous manifest repair_case_id mismatch")
+        if previous["board_key"] != board_key:
+            raise IntakeValidationError("previous manifest board mismatch")
+        revision = previous["revision"] + 1
+        historical_fact_ids = _fact_ids(previous)
+
+    links = resolve_package_links(
+        project_root=project_root,
+        library_root=library_root,
+        assignments=package_assignments,
+        board_key=board_key,
+    )
+    inspected = inspect_supporting_evidence(
+        supporting_assignments,
+        record["supporting_evidence_descriptions"],
+    )
+    new_supporting = [copy.deepcopy(item["record"]) for item in inspected]
+    supporting = new_supporting
+    if previous is not None:
+        _assert_prefix(previous["package_links"], links, "package links")
+        prior_ids = {
+            item["evidence_id"] for item in previous["supporting_evidence"]
+        }
+        if any(item["evidence_id"] in prior_ids for item in new_supporting):
+            raise IntakeValidationError(
+                "new supporting evidence duplicates a historical evidence_id"
+            )
+        supporting = copy.deepcopy(previous["supporting_evidence"]) + new_supporting
+        if record["device_models"] != previous["device_models"]:
+            raise IntakeValidationError(
+                "repair case revision changes historical device_models"
+            )
+        for field in (
+            "reported_symptoms",
+            "findings",
+            "repair_actions",
+            "corrections",
+        ):
+            _assert_prefix(previous[field], record[field], field)
+
+    payload = {
+        "schema_version": REPAIR_CASE_SCHEMA_VERSION,
+        "repair_case_id": repair_case_id,
+        "revision": revision,
+        "previous_manifest_sha256": previous_sha256,
+        "source_origin": "milo_supplied",
+        "board_key": board_key,
+        "board_id": board["board_id"],
+        "device_models": copy.deepcopy(record["device_models"]),
+        "package_links": links,
+        "supporting_evidence": supporting,
+        "reported_symptoms": copy.deepcopy(record["reported_symptoms"]),
+        "findings": copy.deepcopy(record["findings"]),
+        "repair_actions": copy.deepcopy(record["repair_actions"]),
+        "outcome": copy.deepcopy(record["outcome"]),
+        "corrections": copy.deepcopy(record["corrections"]),
+        "completeness": "photos_only",
+        "boundaries": copy.deepcopy(FIXED_FALSE_BOUNDARIES),
+    }
+    payload["completeness"] = derive_completeness(payload)
+    try:
+        validated = validate_repair_case_manifest(
+            payload,
+            historical_fact_ids=historical_fact_ids,
+        )
+    except ValueError as exc:
+        raise IntakeValidationError(f"invalid repair case manifest: {exc}") from exc
+    if (
+        previous is not None
+        and _manifest_content_without_revision(validated)
+        == _manifest_content_without_revision(previous)
+    ):
+        raise IntakeValidationError("repair case revision adds no evidence or context")
+    return validated, inspected
+
+
+def build_repair_case_revision(
+    *,
+    project_root: Path,
+    library_root: Path,
+    repair_case_id: str,
+    board_key: str,
+    package_assignments: list[tuple[str, Path]],
+    case_record: dict,
+    supporting_assignments: list[tuple[str, Path]],
+    previous_manifest_path: Path | None,
+) -> dict:
+    payload, _ = _prepare_repair_case_revision(
+        project_root=project_root,
+        library_root=library_root,
+        repair_case_id=repair_case_id,
+        board_key=board_key,
+        package_assignments=package_assignments,
+        case_record=case_record,
+        supporting_assignments=supporting_assignments,
+        previous_manifest_path=previous_manifest_path,
+    )
+    return payload
+
+
+def _revision_result(
+    *,
+    state: str,
+    manifest_path: Path,
+    payload: dict,
+    manifest_sha256: str,
+) -> dict:
+    return {
+        "state": state,
+        "repair_case_id": payload["repair_case_id"],
+        "revision": payload["revision"],
+        "completeness": payload["completeness"],
+        "manifest_sha256": manifest_sha256,
+        "manifest_path": manifest_path.resolve(),
+        "package_count": len(payload["package_links"]),
+        "supporting_evidence_count": len(payload["supporting_evidence"]),
+    }
+
+
+def _validate_revision_storage_path(
+    *,
+    manifest_path: Path,
+    library_root: Path,
+    payload: dict,
+) -> None:
+    repair_case_id = payload.get("repair_case_id")
+    revision = payload.get("revision")
+    try:
+        repair_case_id = _require_safe_id(repair_case_id, "repair_case_id")
+    except (TypeError, IntakeValidationError) as exc:
+        raise IntakeValidationError(
+            "repair case manifest identity is invalid"
+        ) from exc
+    if type(revision) is not int or revision < 1:
+        raise IntakeValidationError("repair case revision is invalid")
+    expected = (
+        library_root
+        / "cases"
+        / repair_case_id
+        / "revisions"
+        / f"{revision:04d}"
+        / "repair-case.json"
+    )
+    if manifest_path != expected:
+        raise IntakeValidationError(
+            "repair case manifest path does not match case and revision"
+        )
+    marker = _assert_controlled_path(
+        library_root,
+        manifest_path.parent / ".complete",
+        "repair case completion marker",
+    )
+    if (
+        not marker.is_file()
+        or _is_reparse_or_symlink(marker)
+        or marker.read_bytes() != b"complete\n"
+    ):
+        raise IntakeValidationError("repair case revision is incomplete")
+
+
+def validate_repair_case_revision(
+    *,
+    manifest_path: Path,
+    project_root: Path,
+    library_root: Path,
+) -> dict:
+    project_root = Path(project_root).resolve()
+    library_root = _resolve_library_root(project_root, library_root)
+    manifest_path = _assert_controlled_path(
+        library_root, Path(manifest_path), "repair case manifest path"
+    )
+    if not manifest_path.is_file() or _is_reparse_or_symlink(manifest_path):
+        raise IntakeValidationError("repair case manifest is missing or unsafe")
+    payload, _ = _strict_json(manifest_path, "repair case manifest")
+    _validate_revision_storage_path(
+        manifest_path=manifest_path,
+        library_root=library_root,
+        payload=payload,
+    )
+
+    historical_fact_ids: set[str] = set()
+    previous = None
+    if payload.get("revision") != 1:
+        if not isinstance(payload.get("revision"), int):
+            raise IntakeValidationError("repair case revision is invalid")
+        previous_path = (
+            library_root
+            / "cases"
+            / payload.get("repair_case_id", "")
+            / "revisions"
+            / f"{payload['revision'] - 1:04d}"
+            / "repair-case.json"
+        )
+        previous = validate_repair_case_revision(
+            manifest_path=previous_path,
+            project_root=project_root,
+            library_root=library_root,
+        )
+        _, previous_sha256 = _strict_json(
+            previous_path, "previous repair case manifest"
+        )
+        if payload.get("previous_manifest_sha256") != previous_sha256:
+            raise IntakeValidationError(
+                "previous manifest SHA-256 does not match revision chain"
+            )
+        historical_fact_ids = _fact_ids(previous)
+
+    try:
+        validated = validate_repair_case_manifest(
+            payload,
+            historical_fact_ids=historical_fact_ids,
+        )
+    except ValueError as exc:
+        raise IntakeValidationError(f"invalid repair case manifest: {exc}") from exc
+    board, compatible_models = _catalog_board(
+        project_root, validated["board_key"]
+    )
+    if validated["board_id"] != board["board_id"]:
+        raise IntakeValidationError("repair case board_id does not match catalog")
+    if any(
+        model not in compatible_models for model in validated["device_models"]
+    ):
+        raise IntakeValidationError(
+            "repair case device_models do not match board catalog"
+        )
+
+    expected_links = resolve_package_links(
+        project_root=project_root,
+        library_root=library_root,
+        assignments=[
+            (
+                link["role"],
+                library_root
+                / "packages"
+                / link["package_id"]
+                / "source-package.json",
+            )
+            for link in validated["package_links"]
+        ],
+        board_key=validated["board_key"],
+    )
+    if validated["package_links"] != expected_links:
+        raise IntakeValidationError(
+            "repair case source package evidence does not match manifest"
+        )
+    for evidence in validated["supporting_evidence"]:
+        object_path = _assert_controlled_path(
+            library_root,
+            library_root / evidence["object_path"],
+            "supporting evidence object path",
+        )
+        _assert_stored_object(object_path, evidence["sha256"])
+        if object_path.stat().st_size != evidence["byte_size"]:
+            raise IntakeValidationError(
+                "supporting evidence object byte size mismatch"
+            )
+    if previous is not None:
+        if (
+            validated["repair_case_id"] != previous["repair_case_id"]
+            or validated["board_key"] != previous["board_key"]
+            or validated["board_id"] != previous["board_id"]
+            or validated["source_origin"] != previous["source_origin"]
+            or validated["device_models"] != previous["device_models"]
+        ):
+            raise IntakeValidationError(
+                "repair case revision changes historical identity"
+            )
+        _assert_prefix(
+            previous["package_links"],
+            validated["package_links"],
+            "package links",
+        )
+        _assert_prefix(
+            previous["supporting_evidence"],
+            validated["supporting_evidence"],
+            "supporting evidence",
+        )
+        for field in (
+            "reported_symptoms",
+            "findings",
+            "repair_actions",
+            "corrections",
+        ):
+            _assert_prefix(previous[field], validated[field], field)
+    return validated
+
+
+def stage_repair_case_revision(
+    *,
+    project_root: Path,
+    library_root: Path,
+    repair_case_id: str,
+    board_key: str,
+    package_assignments: list[tuple[str, Path]],
+    case_record: dict,
+    supporting_assignments: list[tuple[str, Path]],
+    previous_manifest_path: Path | None,
+) -> dict:
+    project_root = Path(project_root).resolve()
+    library_root = _resolve_library_root(project_root, library_root)
+    payload, inspected = _prepare_repair_case_revision(
+        project_root=project_root,
+        library_root=library_root,
+        repair_case_id=repair_case_id,
+        board_key=board_key,
+        package_assignments=package_assignments,
+        case_record=case_record,
+        supporting_assignments=supporting_assignments,
+        previous_manifest_path=previous_manifest_path,
+    )
+    _ensure_directory_durable(library_root)
+    store_supporting_evidence(
+        library_root=library_root,
+        inspected=inspected,
+    )
+    cases_root = library_root / "cases"
+    _ensure_directory_durable(cases_root)
+    case_root = cases_root / payload["repair_case_id"]
+    revisions_root = case_root / "revisions"
+    _ensure_directory_durable(revisions_root)
+    target = revisions_root / f"{payload['revision']:04d}"
+    manifest_path = target / "repair-case.json"
+
+    with _package_lock(cases_root, payload["repair_case_id"]):
+        if target.exists():
+            existing = validate_repair_case_revision(
+                manifest_path=manifest_path,
+                project_root=project_root,
+                library_root=library_root,
+            )
+            _, existing_sha256 = _strict_json(
+                manifest_path, "repair case manifest"
+            )
+            if existing != payload:
+                raise IntakeValidationError(
+                    f"repair case revision conflict: {payload['repair_case_id']}"
+                )
+            return _revision_result(
+                state="existing",
+                manifest_path=manifest_path,
+                payload=existing,
+                manifest_sha256=existing_sha256,
+            )
+
+        completed = sorted(
+            path
+            for path in revisions_root.iterdir()
+            if path.is_dir()
+            and path.name.isdigit()
+            and (path / ".complete").is_file()
+        )
+        expected_prior_count = payload["revision"] - 1
+        if len(completed) != expected_prior_count:
+            raise IntakeValidationError(
+                "repair case revision chain has a gap or fork"
+            )
+        temporary = Path(
+            tempfile.mkdtemp(
+                prefix=f".{payload['revision']:04d}.",
+                suffix=".staging",
+                dir=revisions_root,
+            )
+        )
+        published_incomplete = False
+        try:
+            write_json_atomic(temporary / "repair-case.json", payload)
+            _fsync_directory(temporary)
+            try:
+                temporary.rename(target)
+            except FileExistsError:
+                raise IntakeValidationError(
+                    f"repair case revision conflict: {payload['repair_case_id']}"
+                )
+            published_incomplete = True
+            _fsync_directory(revisions_root)
+            _write_completion_marker(target / ".complete")
+            _fsync_directory(target)
+            _fsync_directory(revisions_root)
+            published_incomplete = False
+        except Exception:
+            if (
+                published_incomplete
+                and target.exists()
+                and not (target / ".complete").exists()
+            ):
+                shutil.rmtree(target)
+                _fsync_directory(revisions_root)
+            raise
+        finally:
+            if temporary.exists():
+                shutil.rmtree(temporary, ignore_errors=True)
+
+    validated = validate_repair_case_revision(
+        manifest_path=manifest_path,
+        project_root=project_root,
+        library_root=library_root,
+    )
+    _, manifest_sha256 = _strict_json(manifest_path, "repair case manifest")
+    return _revision_result(
+        state="created",
+        manifest_path=manifest_path,
+        payload=validated,
+        manifest_sha256=manifest_sha256,
+    )
