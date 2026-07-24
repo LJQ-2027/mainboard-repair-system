@@ -43,6 +43,24 @@ class CrossSourceRegistrationTests(unittest.TestCase):
         }
         self.assertEqual(validate_dataset(data, ROOT), [])
 
+    def test_available_but_unreviewed_repair_source_remains_an_explicit_boundary(self):
+        data = json.loads((ROOT / "knowledge-base/km4-cross-source-registration.json").read_text(encoding="utf-8"))
+        data["repair_flows"] = []
+        data["repair_coverage"] = {
+            "status": "source_available_pending_review",
+            "title": "维修资料待转译",
+            "note": "维修指导书已存在，但尚未形成审核过的可执行流程。",
+            "source": "source-materials/manual.docx",
+        }
+
+        self.assertEqual(validate_dataset(data, ROOT), [])
+
+        data["repair_coverage"].pop("source")
+        self.assertTrue(any(
+            "available repair coverage source" in error
+            for error in validate_dataset(data, ROOT)
+        ))
+
     def test_repair_visual_inspection_is_explicitly_limited_to_package_entities(self):
         data = json.loads((ROOT / "knowledge-base/km4-cross-source-registration.json").read_text(encoding="utf-8"))
         inspectable = {

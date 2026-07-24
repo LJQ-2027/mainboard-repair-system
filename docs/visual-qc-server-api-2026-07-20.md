@@ -90,7 +90,7 @@ Multipart fields:
 
 Acceptance validates:
 
-- board and side identity against the five-board catalog;
+- board and side identity against the current executable board catalog;
 - declared hash against the uploaded bytes;
 - declared MIME type against the file signature;
 - decodability and minimum dimensions;

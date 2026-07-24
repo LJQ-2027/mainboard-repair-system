@@ -29,7 +29,7 @@ The script packages the current Git `HEAD`, uploads it to the server, preserves 
 - PM2 process status
 
 The visual-QC pilot deploy uses `deploy/visual-qc-runtime-files.txt` as a
-reviewed runtime allowlist. It includes the internal visual data workbench, five-board assets,
+reviewed runtime allowlist. It includes the internal visual data workbench, board-catalog assets,
 knowledge data, API/worker code, and maintenance validators while excluding raw
 source archives, tests, reports, output, and documentation. The 2026-07-21
 archive smoke reduced the package from about 197 MB to 52.4 MB with 305 tracked

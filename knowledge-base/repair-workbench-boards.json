@@ -81,6 +81,24 @@
       },
       "shield": null,
       "atlas": null
+    },
+    "bg6h-f069": {
+      "title": "BG6H · F069_MAIN_PCB_V1.2",
+      "model": "BG6H",
+      "compatible_models": [
+        "BG6H",
+        "BG6h"
+      ],
+      "board_version": "F069_MAIN_PCB_V1.2",
+      "data": "../../knowledge-base/f069-cross-source-registration.json",
+      "schematic": "../../knowledge-base/f069-schematic-compiled.json",
+      "side_manifest": "../../knowledge-base/f069-board-sides.json",
+      "geometry_by_side": {
+        "main_page_1": "../../knowledge-base/f069-board-compiled-page-1.json",
+        "main_page_2": "../../knowledge-base/f069-board-compiled-page-2.json"
+      },
+      "shield": null,
+      "atlas": null
     }
   }
 }

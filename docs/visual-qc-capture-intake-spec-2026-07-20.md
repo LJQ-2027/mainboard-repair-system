@@ -35,7 +35,7 @@ The pilot accepts JPEG, PNG, and WebP up to its configured 20 MB limit. The hard
 The normal path starts with `scripts/stage_visual_qc_source_package.py`. It preserves the incoming bytes in a repository-external content-addressed library, writes `VISUAL-QC-SOURCE-PACKAGE-V1`, and creates `VISUAL-QC-INTAKE-BATCH-V1` from the archived objects. `scripts/create_visual_qc_intake_batch.py` remains the lower-level command for originals that are already in controlled storage. `knowledge-base/visual-qc-intake-batch.example.json` is a contract example, not the normal authoring path. Each intake entry contains:
 
 - `entry_id` and `file_path`;
-- `board_key` and `side_id` from the five-board catalog;
+- `board_key` and `side_id` from the current executable board catalog;
 - `capture_stage`;
 - `capture_session_id` and `capture_setup_id`;
 - all three true capture-checklist booleans;

@@ -25,6 +25,7 @@ class BoardBatchAcceptanceTests(unittest.TestCase):
             (ROOT / "knowledge-base/repair-workbench-boards.json").read_text(encoding="utf-8")
         )
         cls.f069m_entry = catalog["boards"]["bg6m-f069m"]
+        cls.f069_entry = catalog["boards"]["bg6h-f069"]
 
     def test_reference_only_board_passes_the_shared_board_contract(self):
         result = audit_board(ROOT, "bg6m-f069m", self.f069m_entry)
@@ -41,6 +42,22 @@ class BoardBatchAcceptanceTests(unittest.TestCase):
         self.assertEqual(result["repair_coverage"], "source_unavailable")
         self.assertEqual(result["reference_mode"], "point_map_only")
         self.assertGreaterEqual(result["location_only_entities"], 2)
+
+    def test_f069_v12_passes_without_becoming_f069m_or_a_reviewed_repair_flow(self):
+        result = audit_board(ROOT, "bg6h-f069", self.f069_entry)
+
+        self.assertEqual(result["status"], "pass")
+        self.assertEqual(result["errors"], [])
+        self.assertEqual(result["board_id"], "BOARD-F069-MAIN-V1.2")
+        self.assertEqual(result["side_ids"], ["main_page_1", "main_page_2"])
+        self.assertEqual(result["accepted_designators"], 1126)
+        self.assertEqual(result["schematic_linked_designators"], 604)
+        self.assertEqual(result["schematic_occurrences"], 620)
+        self.assertEqual(result["reviewed_entities"], 12)
+        self.assertEqual(result["repair_flows"], 0)
+        self.assertEqual(result["repair_coverage"], "source_available_pending_review")
+        self.assertEqual(result["reference_mode"], "point_map_only")
+        self.assertNotEqual(result["board_id"], "BOARD-F069M-MAIN-V1.0")
 
     def test_legacy_registration_uses_its_dataset_side_when_entities_omit_it(self):
         catalog = json.loads(
@@ -61,7 +78,9 @@ class BoardBatchAcceptanceTests(unittest.TestCase):
             "cm6-h8918",
             "ck6n-h6929",
             "bg6m-f069m",
+            "bg6h-f069",
         ])
+        self.assertEqual(audit["audit_id"], "BOARD-CATALOG-BATCH-ACCEPTANCE-V2")
         self.assertTrue(all(board["status"] == "pass" for board in audit["boards"]))
         self.assertEqual(set(audit["coverage"]), {
             "minimum_board_count",
@@ -88,8 +107,9 @@ class BoardBatchAcceptanceTests(unittest.TestCase):
     def test_markdown_report_exposes_board_evidence_and_scope(self):
         report = render_markdown(audit_catalog(ROOT))
 
-        self.assertIn("# Five-Board Batch Acceptance", report)
+        self.assertIn("# Board Catalog Batch Acceptance", report)
         self.assertIn("| `bg6m-f069m` | PASS | 1,115 | 604 | 10 | 0 |", report)
+        self.assertIn("| `bg6h-f069` | PASS | 1,126 | 604 | 12 | 0 |", report)
         self.assertIn("reference-only repair coverage", report)
         self.assertIn("Visual defect recognition", report)
         self.assertIn("**Sufficient for current source-to-2.5D pipeline: YES**", report)
@@ -140,7 +160,7 @@ class BoardBatchAcceptanceTests(unittest.TestCase):
             )
 
             self.assertEqual(completed.returncode, 0, completed.stderr)
-            self.assertIn("Batch acceptance passed: 5 boards, 7 coverage gates", completed.stdout)
+            self.assertIn("Batch acceptance passed: 6 boards, 7 coverage gates", completed.stdout)
 
 
 if __name__ == "__main__":

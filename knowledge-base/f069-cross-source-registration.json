@@ -1,0 +1,896 @@
+{
+  "dataset_id": "F069-MAIN-XREG-20260724",
+  "board_id": "BOARD-F069-MAIN-V1.2",
+  "model": "BG6H",
+  "compatible_models": [
+    "BG6H",
+    "BG6h"
+  ],
+  "board_version": "F069_MAIN_PCB_V1.2",
+  "side_id": "main_page_2",
+  "coordinate_system": "normalized_board_plane",
+  "status": "source_compiled_reference_only",
+  "board_outline": [
+    {
+      "x": 0.01375,
+      "y": 0.34574
+    },
+    {
+      "x": 0.018125,
+      "y": 0.330025
+    },
+    {
+      "x": 0.024375,
+      "y": 0.321754
+    },
+    {
+      "x": 0.125,
+      "y": 0.224152
+    },
+    {
+      "x": 0.383125,
+      "y": 0.223325
+    },
+    {
+      "x": 0.39,
+      "y": 0.228288
+    },
+    {
+      "x": 0.39375,
+      "y": 0.239041
+    },
+    {
+      "x": 0.39375,
+      "y": 0.343259
+    },
+    {
+      "x": 0.399375,
+      "y": 0.358974
+    },
+    {
+      "x": 0.39875,
+      "y": 0.373863
+    },
+    {
+      "x": 0.39375,
+      "y": 0.38627
+    },
+    {
+      "x": 0.39375,
+      "y": 0.432589
+    },
+    {
+      "x": 0.399375,
+      "y": 0.442514
+    },
+    {
+      "x": 0.514375,
+      "y": 0.444169
+    },
+    {
+      "x": 0.5175,
+      "y": 0.439206
+    },
+    {
+      "x": 0.51875,
+      "y": 0.396195
+    },
+    {
+      "x": 0.529375,
+      "y": 0.396195
+    },
+    {
+      "x": 0.52375,
+      "y": 0.388751
+    },
+    {
+      "x": 0.523125,
+      "y": 0.365591
+    },
+    {
+      "x": 0.525,
+      "y": 0.358974
+    },
+    {
+      "x": 0.530625,
+      "y": 0.354012
+    },
+    {
+      "x": 0.54375,
+      "y": 0.355666
+    },
+    {
+      "x": 0.5475,
+      "y": 0.361456
+    },
+    {
+      "x": 0.548125,
+      "y": 0.373036
+    },
+    {
+      "x": 0.555,
+      "y": 0.373036
+    },
+    {
+      "x": 0.56,
+      "y": 0.377998
+    },
+    {
+      "x": 0.560625,
+      "y": 0.395368
+    },
+    {
+      "x": 0.57125,
+      "y": 0.395368
+    },
+    {
+      "x": 0.57125,
+      "y": 0.402812
+    },
+    {
+      "x": 0.57375,
+      "y": 0.406121
+    },
+    {
+      "x": 0.6025,
+      "y": 0.406121
+    },
+    {
+      "x": 0.605,
+      "y": 0.402812
+    },
+    {
+      "x": 0.605,
+      "y": 0.395368
+    },
+    {
+      "x": 0.615625,
+      "y": 0.395368
+    },
+    {
+      "x": 0.615625,
+      "y": 0.378825
+    },
+    {
+      "x": 0.619375,
+      "y": 0.373863
+    },
+    {
+      "x": 0.628125,
+      "y": 0.373036
+    },
+    {
+      "x": 0.628125,
+      "y": 0.36311
+    },
+    {
+      "x": 0.6325,
+      "y": 0.355666
+    },
+    {
+      "x": 0.646875,
+      "y": 0.354839
+    },
+    {
+      "x": 0.6525,
+      "y": 0.362283
+    },
+    {
+      "x": 0.6525,
+      "y": 0.387924
+    },
+    {
+      "x": 0.646875,
+      "y": 0.396195
+    },
+    {
+      "x": 0.656875,
+      "y": 0.396195
+    },
+    {
+      "x": 0.6625,
+      "y": 0.406121
+    },
+    {
+      "x": 0.66375,
+      "y": 0.43507
+    },
+    {
+      "x": 0.67,
+      "y": 0.436725
+    },
+    {
+      "x": 0.67,
+      "y": 0.439206
+    },
+    {
+      "x": 0.6925,
+      "y": 0.439206
+    },
+    {
+      "x": 0.69625,
+      "y": 0.434243
+    },
+    {
+      "x": 0.696875,
+      "y": 0.399504
+    },
+    {
+      "x": 0.711875,
+      "y": 0.390405
+    },
+    {
+      "x": 0.711875,
+      "y": 0.35153
+    },
+    {
+      "x": 0.708125,
+      "y": 0.346567
+    },
+    {
+      "x": 0.7,
+      "y": 0.34574
+    },
+    {
+      "x": 0.69625,
+      "y": 0.339123
+    },
+    {
+      "x": 0.69625,
+      "y": 0.258892
+    },
+    {
+      "x": 0.698125,
+      "y": 0.252275
+    },
+    {
+      "x": 0.708125,
+      "y": 0.244003
+    },
+    {
+      "x": 0.82125,
+      "y": 0.244003
+    },
+    {
+      "x": 0.828125,
+      "y": 0.247312
+    },
+    {
+      "x": 0.8525,
+      "y": 0.280397
+    },
+    {
+      "x": 0.865,
+      "y": 0.28536
+    },
+    {
+      "x": 0.87625,
+      "y": 0.29694
+    },
+    {
+      "x": 0.89125,
+      "y": 0.334988
+    },
+    {
+      "x": 0.8925,
+      "y": 0.453267
+    },
+    {
+      "x": 0.8825,
+      "y": 0.46402
+    },
+    {
+      "x": 0.88125,
+      "y": 0.477254
+    },
+    {
+      "x": 0.888125,
+      "y": 0.486352
+    },
+    {
+      "x": 0.90125,
+      "y": 0.487179
+    },
+    {
+      "x": 0.905625,
+      "y": 0.492969
+    },
+    {
+      "x": 0.905625,
+      "y": 0.783292
+    },
+    {
+      "x": 0.918125,
+      "y": 0.80397
+    },
+    {
+      "x": 0.920625,
+      "y": 0.83292
+    },
+    {
+      "x": 0.91625,
+      "y": 0.850289
+    },
+    {
+      "x": 0.91,
+      "y": 0.860215
+    },
+    {
+      "x": 0.91125,
+      "y": 0.870968
+    },
+    {
+      "x": 0.905625,
+      "y": 0.884202
+    },
+    {
+      "x": 0.90375,
+      "y": 0.907361
+    },
+    {
+      "x": 0.88625,
+      "y": 0.919768
+    },
+    {
+      "x": 0.885625,
+      "y": 0.956989
+    },
+    {
+      "x": 0.875625,
+      "y": 0.966915
+    },
+    {
+      "x": 0.740625,
+      "y": 0.966915
+    },
+    {
+      "x": 0.735625,
+      "y": 0.961952
+    },
+    {
+      "x": 0.495625,
+      "y": 0.961952
+    },
+    {
+      "x": 0.490625,
+      "y": 0.966915
+    },
+    {
+      "x": 0.45125,
+      "y": 0.966915
+    },
+    {
+      "x": 0.445,
+      "y": 0.974359
+    },
+    {
+      "x": 0.43,
+      "y": 0.980976
+    },
+    {
+      "x": 0.415625,
+      "y": 0.978495
+    },
+    {
+      "x": 0.403125,
+      "y": 0.966915
+    },
+    {
+      "x": 0.065,
+      "y": 0.966088
+    },
+    {
+      "x": 0.0575,
+      "y": 0.955335
+    },
+    {
+      "x": 0.055,
+      "y": 0.93383
+    },
+    {
+      "x": 0.021875,
+      "y": 0.931348
+    },
+    {
+      "x": 0.01625,
+      "y": 0.925558
+    },
+    {
+      "x": 0.01375,
+      "y": 0.918114
+    }
+  ],
+  "registration": {
+    "reference_mode": "point_map_only",
+    "point_map_image": "assets/board-atlas/bg6h-f069/main-point-map-page-2.png",
+    "point_map_source": "F069_MAIN_PCB_V1.2_位号图_20230823（A4）.pdf page 2",
+    "point_map_note": "点位图 · F069_MAIN_PCB_V1.2 · 第2面 · 实拍 HEIC 尚未进入受控来源包",
+    "method": "normalized_point_map_registration",
+    "confidence": "source_compiled"
+  },
+  "repair_coverage": {
+    "status": "source_available_pending_review",
+    "title": "维修资料待转译",
+    "note": "维修指导书已经入库，但本轮仅建立精确板型和来源关系；尚未形成审核过的检测步骤或维修动作。",
+    "source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/BG6H-F069/TECNO_J6563_BG6h-F069_维修操作指导书_V1.0_20231108.docx"
+  },
+  "repair_flows": [],
+  "entities": [
+    {
+      "component_id": "F069-MAIN-U1001",
+      "designator": "U1001",
+      "name": "UMS9230 main processor",
+      "category": "bga_ic",
+      "module": "Processor",
+      "side_id": "main_page_1",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.648633,
+          "y": 0.736561
+        },
+        "size": {
+          "x": 0.025,
+          "y": 0.025
+        },
+        "rotation": 0,
+        "source_status": "low"
+      },
+      "schematic_links": [
+        {
+          "source": "F069_MAIN_PCB_V1.2 维修原理图 20230804.pdf",
+          "page": "3, 4, 5",
+          "facts": [
+            "Exact schematic designator U1001"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "square",
+        "height": 0.05,
+        "engineering_dimension": false
+      }
+    },
+    {
+      "component_id": "F069-MAIN-U2001",
+      "designator": "U2001",
+      "name": "UMP510G power management IC",
+      "category": "bga_ic",
+      "module": "Power management",
+      "side_id": "main_page_2",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.469085,
+          "y": 0.534926
+        },
+        "size": {
+          "x": 0.099695,
+          "y": 0.146775
+        },
+        "rotation": 0,
+        "source_status": "high"
+      },
+      "schematic_links": [
+        {
+          "source": "F069_MAIN_PCB_V1.2 维修原理图 20230804.pdf",
+          "page": "6, 7",
+          "facts": [
+            "Exact schematic designator U2001"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "square",
+        "height": 0.05,
+        "engineering_dimension": false
+      },
+      "inspection_profile": {
+        "profile_id": "pmic-bga-v1",
+        "fidelity": "repair_visual",
+        "source_status": "category_based",
+        "visual_note": "封装外观和层高为维修识别示意；当前资料未提供实测尺寸、焊盘或内部构造。"
+      }
+    },
+    {
+      "component_id": "F069-MAIN-U4000",
+      "designator": "U4000",
+      "name": "eMMC storage",
+      "category": "bga_ic",
+      "module": "Storage",
+      "side_id": "main_page_2",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.573293,
+          "y": 0.734979
+        },
+        "size": {
+          "x": 0.025,
+          "y": 0.025
+        },
+        "rotation": 0,
+        "source_status": "low"
+      },
+      "schematic_links": [
+        {
+          "source": "F069_MAIN_PCB_V1.2 维修原理图 20230804.pdf",
+          "page": "13",
+          "facts": [
+            "Exact schematic designator U4000"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "square",
+        "height": 0.045,
+        "engineering_dimension": false
+      }
+    },
+    {
+      "component_id": "F069-MAIN-U4001",
+      "designator": "U4001",
+      "name": "LPDDR4x memory",
+      "category": "bga_ic",
+      "module": "Memory",
+      "side_id": "main_page_1",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.798727,
+          "y": 0.742199
+        },
+        "size": {
+          "x": 0.025,
+          "y": 0.025
+        },
+        "rotation": 0,
+        "source_status": "low"
+      },
+      "schematic_links": [
+        {
+          "source": "F069_MAIN_PCB_V1.2 维修原理图 20230804.pdf",
+          "page": "13",
+          "facts": [
+            "Exact schematic designator U4001"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "square",
+        "height": 0.045,
+        "engineering_dimension": false
+      }
+    },
+    {
+      "component_id": "F069-MAIN-U5002",
+      "designator": "U5002",
+      "name": "Wireless connectivity IC",
+      "category": "bga_ic",
+      "module": "Wireless connectivity",
+      "side_id": "main_page_1",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.654576,
+          "y": 0.273961
+        },
+        "size": {
+          "x": 0.072287,
+          "y": 0.102628
+        },
+        "rotation": 0,
+        "source_status": "high"
+      },
+      "schematic_links": [
+        {
+          "source": "F069_MAIN_PCB_V1.2 维修原理图 20230804.pdf",
+          "page": "14",
+          "facts": [
+            "Exact schematic designator U5002"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "square",
+        "height": 0.045,
+        "engineering_dimension": false
+      },
+      "inspection_profile": {
+        "profile_id": "connectivity-bga-v1",
+        "fidelity": "repair_visual",
+        "source_status": "category_based",
+        "visual_note": "封装外观和层高为维修识别示意；当前资料未提供实测尺寸、焊盘或内部构造。"
+      }
+    },
+    {
+      "component_id": "F069-MAIN-U0600",
+      "designator": "U0600",
+      "name": "SR3595D RF front-end IC",
+      "category": "ic",
+      "module": "RF front end",
+      "side_id": "main_page_2",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.701305,
+          "y": 0.482131
+        },
+        "size": {
+          "x": 0.060791,
+          "y": 0.089537
+        },
+        "rotation": 0,
+        "source_status": "high"
+      },
+      "schematic_links": [
+        {
+          "source": "F069_MAIN_PCB_V1.2 维修原理图 20230804.pdf",
+          "page": "10",
+          "facts": [
+            "Exact schematic designator U0600"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "square",
+        "height": 0.035,
+        "engineering_dimension": false
+      },
+      "inspection_profile": {
+        "profile_id": "rf-front-end-ic-v1",
+        "fidelity": "repair_visual",
+        "source_status": "category_based",
+        "visual_note": "封装外观和层高为维修识别示意；当前资料未提供实测尺寸、焊盘或内部构造。"
+      }
+    },
+    {
+      "component_id": "F069-MAIN-J6101",
+      "designator": "J6101",
+      "name": "LCM display connector",
+      "category": "connector",
+      "module": "Display interconnect",
+      "side_id": "main_page_2",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.651458,
+          "y": 0.906641
+        },
+        "size": {
+          "x": 0.171657,
+          "y": 0.051409
+        },
+        "rotation": 0,
+        "source_status": "high"
+      },
+      "schematic_links": [
+        {
+          "source": "F069_MAIN_PCB_V1.2 维修原理图 20230804.pdf",
+          "page": "16",
+          "facts": [
+            "Exact schematic designator J6101"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "rectangle",
+        "height": 0.022,
+        "engineering_dimension": false
+      },
+      "inspection_profile": {
+        "profile_id": "display-connector-v1",
+        "fidelity": "repair_visual",
+        "source_status": "category_based",
+        "visual_note": "封装外观和层高为维修识别示意；当前资料未提供实测尺寸、焊盘或内部构造。"
+      }
+    },
+    {
+      "component_id": "F069-MAIN-J6202",
+      "designator": "J6202",
+      "name": "Rear camera connector",
+      "category": "connector",
+      "module": "Rear camera interconnect",
+      "side_id": "main_page_1",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.631129,
+          "y": 0.457382
+        },
+        "size": {
+          "x": 0.042541,
+          "y": 0.165217
+        },
+        "rotation": 0,
+        "source_status": "high"
+      },
+      "schematic_links": [
+        {
+          "source": "F069_MAIN_PCB_V1.2 维修原理图 20230804.pdf",
+          "page": "17",
+          "facts": [
+            "Exact schematic designator J6202"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "rectangle",
+        "height": 0.022,
+        "engineering_dimension": false
+      },
+      "inspection_profile": {
+        "profile_id": "camera-connector-v1",
+        "fidelity": "repair_visual",
+        "source_status": "category_based",
+        "visual_note": "封装外观和层高为维修识别示意；当前资料未提供实测尺寸、焊盘或内部构造。"
+      }
+    },
+    {
+      "component_id": "F069-MAIN-J6250",
+      "designator": "J6250",
+      "name": "Front camera connector",
+      "category": "connector",
+      "module": "Front camera interconnect",
+      "side_id": "main_page_1",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.5,
+          "y": 0.437745
+        },
+        "size": {
+          "x": 0.113594,
+          "y": 0.064405
+        },
+        "rotation": 0,
+        "source_status": "high"
+      },
+      "schematic_links": [
+        {
+          "source": "F069_MAIN_PCB_V1.2 维修原理图 20230804.pdf",
+          "page": "18",
+          "facts": [
+            "Exact schematic designator J6250"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "rectangle",
+        "height": 0.022,
+        "engineering_dimension": false
+      },
+      "inspection_profile": {
+        "profile_id": "camera-connector-v1",
+        "fidelity": "repair_visual",
+        "source_status": "category_based",
+        "visual_note": "封装外观和层高为维修识别示意；当前资料未提供实测尺寸、焊盘或内部构造。"
+      }
+    },
+    {
+      "component_id": "F069-MAIN-X2100",
+      "designator": "X2100",
+      "name": "26 MHz crystal",
+      "category": "crystal",
+      "module": "System clock",
+      "side_id": "main_page_2",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.590862,
+          "y": 0.517105
+        },
+        "size": {
+          "x": 0.038644,
+          "y": 0.047683
+        },
+        "rotation": 0,
+        "source_status": "high"
+      },
+      "schematic_links": [
+        {
+          "source": "F069_MAIN_PCB_V1.2 维修原理图 20230804.pdf",
+          "page": "7",
+          "facts": [
+            "Exact schematic designator X2100"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "rectangle",
+        "height": 0.02,
+        "engineering_dimension": false
+      },
+      "inspection_profile": {
+        "profile_id": "crystal-package-v1",
+        "fidelity": "repair_visual",
+        "source_status": "category_based",
+        "visual_note": "封装外观和层高为维修识别示意；当前资料未提供实测尺寸、焊盘或内部构造。"
+      }
+    },
+    {
+      "component_id": "F069-MAIN-VBAT1",
+      "designator": "VBAT1",
+      "name": "Battery supply location",
+      "category": "test_point",
+      "module": "Battery power",
+      "side_id": "main_page_2",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.803273,
+          "y": 0.87291
+        },
+        "size": {
+          "x": 0.01247,
+          "y": 0.018347
+        },
+        "rotation": 0,
+        "source_status": "medium"
+      },
+      "schematic_links": [],
+      "repair_links": [
+        {
+          "source": "TECNO_J6563_BG6h-F069_维修操作指导书_V1.0_20231108.docx",
+          "page": "不开机章节（DOCX，无固定页码）",
+          "faults": [
+            "No power"
+          ],
+          "instruction": "维修指导书包含 VBAT 检查，但本轮尚未转译为审核过的可执行流程。"
+        }
+      ],
+      "visual_profile": {
+        "shape": "point",
+        "height": 0.006,
+        "engineering_dimension": false
+      },
+      "source_boundary": "point_map_and_unreviewed_guide"
+    },
+    {
+      "component_id": "F069-MAIN-VBUS1",
+      "designator": "VBUS1",
+      "name": "USB VBUS input location",
+      "category": "test_point",
+      "module": "USB power input",
+      "side_id": "main_page_2",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.7519,
+          "y": 0.879652
+        },
+        "size": {
+          "x": 0.025,
+          "y": 0.025
+        },
+        "rotation": 0,
+        "source_status": "low"
+      },
+      "schematic_links": [
+        {
+          "source": "F069_MAIN_PCB_V1.2 维修原理图 20230804.pdf",
+          "page": "16",
+          "facts": [
+            "Exact schematic designator VBUS1"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "point",
+        "height": 0.006,
+        "engineering_dimension": false
+      }
+    }
+  ]
+}

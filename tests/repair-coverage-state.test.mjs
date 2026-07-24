@@ -30,6 +30,24 @@ test('missing repair guide becomes an explicit source boundary instead of an emp
   });
 });
 
+test('available but unreviewed repair guide stays unavailable as a technician flow', () => {
+  const state = buildRepairCoverageState({
+    repair_flows: [],
+    repair_coverage: {
+      status: 'source_available_pending_review',
+      title: '维修资料待转译',
+      note: '维修指导书已存在，但尚未形成审核过的可执行流程。',
+      source: 'manual.docx',
+    },
+  });
+  assert.deepEqual(state, {
+    available: false,
+    eyebrow: '资料状态',
+    title: '维修资料待转译',
+    note: '维修指导书已存在，但尚未形成审核过的可执行流程。',
+  });
+});
+
 test('missing coverage declaration is rejected by the UI state boundary', () => {
   assert.throws(() => buildRepairCoverageState({ repair_flows: [] }), /repair coverage/i);
 });

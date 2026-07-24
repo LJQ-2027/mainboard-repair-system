@@ -201,6 +201,45 @@
           "required_designators": ["U2001", "U4000", "U0600", "J6101", "VBUS1"]
         }
       ]
+    },
+    {
+      "profile_id": "bg6h-f069",
+      "model": "BG6H",
+      "models": ["BG6H", "BG6h"],
+      "board_id": "BOARD-F069-MAIN-V1.2",
+      "board_version": "F069_MAIN_PCB_V1.2",
+      "component_prefix": "F069-MAIN",
+      "outline_method": "alpha_silhouette",
+      "point_map_source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/BG6H-F069/F069_MAIN_PCB_V1.2_位号图_20230823（A4）.pdf",
+      "schematic_source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/BG6H-F069/F069_MAIN_PCB_V1.2 维修原理图 20230804.pdf",
+      "repair_guide_source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/BG6H-F069/TECNO_J6563_BG6h-F069_维修操作指导书_V1.0_20231108.docx",
+      "default_side_id": "main_page_2",
+      "schematic_geometry_side_id": "main_page_2",
+      "side_manifest_output": "knowledge-base/f069-board-sides.json",
+      "schematic_output": "knowledge-base/f069-schematic-compiled.json",
+      "cross_source_output": "knowledge-base/f069-cross-source-registration.json",
+      "reviewed_designators": ["U1001", "U2001", "U4000", "U4001", "U5002", "U0600", "J6101", "J6202", "J6250", "X2100", "VBAT1", "VBUS1"],
+      "schematic_reviewed_designators": ["U1001", "U2001", "U4000", "U4001", "U5002", "U0600", "J6101", "J6202", "J6250", "X2100", "VBUS1"],
+      "sides": [
+        {
+          "side_id": "main_page_1",
+          "label": "第1面",
+          "source_pdf_page": 1,
+          "engineering_texture": "assets/board-atlas/bg6h-f069/main-point-map-page-1.png",
+          "compiled_data": "knowledge-base/f069-board-compiled-page-1.json",
+          "source_crop": {"x": 0.1, "y": 0.0, "width": 0.87, "height": 0.93},
+          "required_designators": ["U1001", "U4001", "U5002", "J6202", "J6250"]
+        },
+        {
+          "side_id": "main_page_2",
+          "label": "第2面",
+          "source_pdf_page": 2,
+          "engineering_texture": "assets/board-atlas/bg6h-f069/main-point-map-page-2.png",
+          "compiled_data": "knowledge-base/f069-board-compiled-page-2.json",
+          "source_crop": {"x": 0.1, "y": 0.0, "width": 0.87, "height": 0.93},
+          "required_designators": ["U2001", "U4000", "U0600", "J6101", "X2100", "VBAT1", "VBUS1"]
+        }
+      ]
     }
   ]
 }

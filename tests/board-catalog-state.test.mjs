@@ -57,6 +57,18 @@ const catalog = {
       shield: null,
       atlas: null,
     },
+    'bg6h-f069': {
+      title: 'BG6H · F069_MAIN_PCB_V1.2',
+      model: 'BG6H',
+      compatible_models: ['BG6H', 'BG6h'],
+      board_version: 'F069_MAIN_PCB_V1.2',
+      data: 'f069-data.json',
+      schematic: 'f069-schematic.json',
+      side_manifest: 'f069-sides.json',
+      geometry_by_side: { main_page_1: 'f069-p1.json', main_page_2: 'f069-p2.json' },
+      shield: null,
+      atlas: null,
+    },
   },
 };
 
@@ -91,6 +103,16 @@ test('reference-only boards use the same source-driven catalog contract', () => 
   const assets = resolveBoardAssets(catalog, 'bg6m-f069m');
   assert.equal(assets.model, 'BG6M');
   assert.deepEqual(Object.keys(assets.geometry_by_side), ['main_page_1', 'main_page_2']);
+});
+
+test('f069 v12 remains separate from the different f069m v10 board', () => {
+  const f069 = resolveBoardAssets(catalog, 'bg6h-f069');
+  const f069m = resolveBoardAssets(catalog, 'bg6m-f069m');
+  assert.equal(f069.model, 'BG6H');
+  assert.deepEqual(f069.compatible_models, ['BG6H', 'BG6h']);
+  assert.equal(f069.board_version, 'F069_MAIN_PCB_V1.2');
+  assert.notEqual(f069.data, f069m.data);
+  assert.notEqual(f069.schematic, f069m.schematic);
 });
 
 test('unknown board keys fail instead of silently opening another board', () => {

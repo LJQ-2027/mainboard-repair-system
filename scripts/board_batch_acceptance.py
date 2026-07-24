@@ -200,7 +200,7 @@ def audit_catalog(root, catalog_path="knowledge-base/repair-workbench-boards.jso
     ]
     coverage = evaluate_coverage(boards)
     return {
-        "audit_id": "FIVE-BOARD-BATCH-ACCEPTANCE-V1",
+        "audit_id": "BOARD-CATALOG-BATCH-ACCEPTANCE-V2",
         "catalog_id": catalog.get("catalog_id"),
         "boards": boards,
         "coverage": coverage,
@@ -241,7 +241,7 @@ SCOPE_LABELS = {
 
 def render_markdown(audit):
     lines = [
-        "# Five-Board Batch Acceptance",
+        "# Board Catalog Batch Acceptance",
         "",
         f"Catalog: `{audit.get('catalog_id')}`",
         "",
@@ -311,8 +311,8 @@ def publish_reports(audit, json_path, markdown_path):
 def main(argv=None):
     parser = argparse.ArgumentParser(description="Audit every source-driven repair board")
     parser.add_argument("--catalog", default="knowledge-base/repair-workbench-boards.json")
-    parser.add_argument("--json-output", default="reports/five-board-batch-acceptance.json")
-    parser.add_argument("--markdown-output", default="reports/five-board-batch-acceptance.md")
+    parser.add_argument("--json-output", default="reports/board-catalog-batch-acceptance.json")
+    parser.add_argument("--markdown-output", default="reports/board-catalog-batch-acceptance.md")
     args = parser.parse_args(argv)
     root = Path(__file__).resolve().parents[1]
     audit = audit_catalog(root, args.catalog)

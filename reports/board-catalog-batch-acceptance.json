@@ -1,0 +1,219 @@
+{
+  "audit_id": "BOARD-CATALOG-BATCH-ACCEPTANCE-V2",
+  "catalog_id": "REPAIR-WORKBENCH-BOARDS-V1",
+  "boards": [
+    {
+      "board_key": "km4-f151",
+      "board_id": "BOARD-KM4-F151-MAIN-V1.2",
+      "title": "KM4 · F151_MAIN_PCB_V1.2",
+      "compatible_models": [
+        "KM4"
+      ],
+      "status": "pass",
+      "errors": [],
+      "side_ids": [
+        "main_page_1",
+        "main_page_2"
+      ],
+      "accepted_designators": 1172,
+      "schematic_linked_designators": 672,
+      "schematic_occurrences": 676,
+      "reviewed_entities": 7,
+      "repair_flows": 3,
+      "repair_coverage": "reviewed_flows",
+      "reference_mode": "photo_proxy",
+      "point_map_source_layout": "shared_multi_page",
+      "source_named_sides": false,
+      "location_only_entities": 2
+    },
+    {
+      "board_key": "kl4-f201",
+      "board_id": "BOARD-KL4-F201-MAIN-V1.2",
+      "title": "KL4 · F201_MAIN_V1.2",
+      "compatible_models": [
+        "KL4"
+      ],
+      "status": "pass",
+      "errors": [],
+      "side_ids": [
+        "main_page_1",
+        "main_page_2"
+      ],
+      "accepted_designators": 1221,
+      "schematic_linked_designators": 710,
+      "schematic_occurrences": 731,
+      "reviewed_entities": 3,
+      "repair_flows": 1,
+      "repair_coverage": "reviewed_flows",
+      "reference_mode": "photo_proxy",
+      "point_map_source_layout": "shared_multi_page",
+      "source_named_sides": false,
+      "location_only_entities": 1
+    },
+    {
+      "board_key": "cm6-h8918",
+      "board_id": "BOARD-H8918-MAIN-V1.2",
+      "title": "CM6 / CM5 · H8918_MAIN_PCB_V1.2",
+      "compatible_models": [
+        "CM6",
+        "CM5"
+      ],
+      "status": "pass",
+      "errors": [],
+      "side_ids": [
+        "main_page_1",
+        "main_page_2"
+      ],
+      "accepted_designators": 1205,
+      "schematic_linked_designators": 500,
+      "schematic_occurrences": 516,
+      "reviewed_entities": 6,
+      "repair_flows": 3,
+      "repair_coverage": "reviewed_flows",
+      "reference_mode": "photo_proxy",
+      "point_map_source_layout": "shared_multi_page",
+      "source_named_sides": false,
+      "location_only_entities": 3
+    },
+    {
+      "board_key": "ck6n-h6929",
+      "board_id": "BOARD-H6929-MAIN-V1.1",
+      "title": "CK6N · H6929_MAIN_PCB_V1.1",
+      "compatible_models": [
+        "CK6N"
+      ],
+      "status": "pass",
+      "errors": [],
+      "side_ids": [
+        "main_top",
+        "main_bot"
+      ],
+      "accepted_designators": 1177,
+      "schematic_linked_designators": 506,
+      "schematic_occurrences": 530,
+      "reviewed_entities": 10,
+      "repair_flows": 4,
+      "repair_coverage": "reviewed_flows",
+      "reference_mode": "point_map_only",
+      "point_map_source_layout": "independent_per_side",
+      "source_named_sides": true,
+      "location_only_entities": 1
+    },
+    {
+      "board_key": "bg6m-f069m",
+      "board_id": "BOARD-F069M-MAIN-V1.0",
+      "title": "BG6M · F069M_MAIN_PCB_V1.0",
+      "compatible_models": [
+        "BG6M"
+      ],
+      "status": "pass",
+      "errors": [],
+      "side_ids": [
+        "main_page_1",
+        "main_page_2"
+      ],
+      "accepted_designators": 1115,
+      "schematic_linked_designators": 604,
+      "schematic_occurrences": 619,
+      "reviewed_entities": 10,
+      "repair_flows": 0,
+      "repair_coverage": "source_unavailable",
+      "reference_mode": "point_map_only",
+      "point_map_source_layout": "shared_multi_page",
+      "source_named_sides": false,
+      "location_only_entities": 2
+    },
+    {
+      "board_key": "bg6h-f069",
+      "board_id": "BOARD-F069-MAIN-V1.2",
+      "title": "BG6H · F069_MAIN_PCB_V1.2",
+      "compatible_models": [
+        "BG6H",
+        "BG6h"
+      ],
+      "status": "pass",
+      "errors": [],
+      "side_ids": [
+        "main_page_1",
+        "main_page_2"
+      ],
+      "accepted_designators": 1126,
+      "schematic_linked_designators": 604,
+      "schematic_occurrences": 620,
+      "reviewed_entities": 12,
+      "repair_flows": 0,
+      "repair_coverage": "source_available_pending_review",
+      "reference_mode": "point_map_only",
+      "point_map_source_layout": "shared_multi_page",
+      "source_named_sides": false,
+      "location_only_entities": 5
+    }
+  ],
+  "coverage": {
+    "minimum_board_count": {
+      "covered": true,
+      "evidence": [
+        "km4-f151",
+        "kl4-f201",
+        "cm6-h8918",
+        "ck6n-h6929",
+        "bg6m-f069m",
+        "bg6h-f069"
+      ]
+    },
+    "shared_platform_models": {
+      "covered": true,
+      "evidence": [
+        "cm6-h8918",
+        "bg6h-f069"
+      ]
+    },
+    "reference_modes": {
+      "covered": true,
+      "evidence": [
+        "photo_proxy",
+        "point_map_only"
+      ]
+    },
+    "repair_coverage_modes": {
+      "covered": true,
+      "evidence": [
+        "reviewed_flows",
+        "source_available_pending_review",
+        "source_unavailable"
+      ]
+    },
+    "point_map_source_layouts": {
+      "covered": true,
+      "evidence": [
+        "independent_per_side",
+        "shared_multi_page"
+      ]
+    },
+    "source_named_sides": {
+      "covered": true,
+      "evidence": [
+        "ck6n-h6929"
+      ]
+    },
+    "confidence_limited_locations": {
+      "covered": true,
+      "evidence": [
+        "km4-f151",
+        "kl4-f201",
+        "cm6-h8918",
+        "ck6n-h6929",
+        "bg6m-f069m",
+        "bg6h-f069"
+      ]
+    }
+  },
+  "sufficient_for_current_pipeline": true,
+  "scope_boundaries": [
+    "visual_defect_recognition",
+    "physical_photo_registration_accuracy",
+    "cad_geometry",
+    "electrical_connectivity_inference",
+    "field_repair_effectiveness"
+  ]
+}

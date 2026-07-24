@@ -8,7 +8,9 @@ export function buildRepairCoverageState(dataset = {}) {
     };
   }
   const coverage = dataset.repair_coverage;
-  if (coverage?.status !== 'source_unavailable' || !coverage.title || !coverage.note) {
+  const supportedBoundary = coverage?.status === 'source_unavailable'
+    || (coverage?.status === 'source_available_pending_review' && coverage.source);
+  if (!supportedBoundary || !coverage.title || !coverage.note) {
     throw new Error('Repair coverage boundary is required when no reviewed flow exists.');
   }
   return {

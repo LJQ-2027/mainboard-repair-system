@@ -98,11 +98,16 @@ def validate_dataset(data, root):
     repair_flows = data.get("repair_flows", [])
     if not repair_flows:
         coverage = data.get("repair_coverage", {})
-        if coverage.get("status") != "source_unavailable" or any(
+        status = coverage.get("status")
+        if status not in ("source_unavailable", "source_available_pending_review") or any(
             not isinstance(coverage.get(key), str) or not coverage[key].strip()
             for key in ("title", "note")
         ):
-            errors.append("repair coverage must declare the unavailable source boundary when no flows exist")
+            errors.append("repair coverage must declare an explicit source boundary when no flows exist")
+        elif status == "source_available_pending_review" and (
+            not isinstance(coverage.get("source"), str) or not coverage["source"].strip()
+        ):
+            errors.append("available repair coverage source is required when review is pending")
     declared_flow_ids = {flow.get("flow_id") for flow in repair_flows if flow.get("flow_id")}
     flow_ids = set()
     for flow in repair_flows:
