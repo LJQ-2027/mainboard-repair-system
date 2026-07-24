@@ -59,6 +59,11 @@ def exact_match_identity():
     }
 
 
+def with_new_evidence(identity):
+    identity["evidence_refs"].append(evidence_reference("later"))
+    return identity
+
+
 class VisualQcRepairCaseIdentityTests(unittest.TestCase):
     def validate(self, identity, *, callback=lambda refs: None):
         return validate_device_identity(
@@ -272,6 +277,8 @@ class VisualQcRepairCaseIdentityTests(unittest.TestCase):
                 "confirmed_alias": confirmed_alias_identity,
                 "conflict": conflict_identity,
             }[status]()
+            if status != "unresolved_alias":
+                with_new_evidence(current)
             with self.subTest(status=status):
                 self.assertIsNone(
                     validate_identity_transition(
@@ -293,7 +300,7 @@ class VisualQcRepairCaseIdentityTests(unittest.TestCase):
         self.assertIsNone(
             validate_identity_transition(
                 previous,
-                confirmed_alias_identity(),
+                with_new_evidence(confirmed_alias_identity()),
                 has_new_correction=True,
             )
         )
@@ -302,8 +309,32 @@ class VisualQcRepairCaseIdentityTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "correction"):
             validate_identity_transition(
                 conflict_identity(),
+                with_new_evidence(confirmed_alias_identity()),
+                has_new_correction=False,
+            )
+
+    def test_unresolved_confirmation_requires_new_evidence(self):
+        with self.assertRaisesRegex(ValueError, "new evidence"):
+            validate_identity_transition(
+                unresolved_identity(),
                 confirmed_alias_identity(),
                 has_new_correction=False,
+            )
+
+    def test_unresolved_conflict_requires_new_evidence(self):
+        with self.assertRaisesRegex(ValueError, "new evidence"):
+            validate_identity_transition(
+                unresolved_identity(),
+                conflict_identity(),
+                has_new_correction=False,
+            )
+
+    def test_conflict_confirmation_requires_new_evidence(self):
+        with self.assertRaisesRegex(ValueError, "new evidence"):
+            validate_identity_transition(
+                conflict_identity(),
+                confirmed_alias_identity(),
+                has_new_correction=True,
             )
 
     def test_resolved_identity_is_immutable_after_publication(self):

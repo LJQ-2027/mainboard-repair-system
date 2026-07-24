@@ -139,6 +139,13 @@ def validate_identity_transition(
         raise ValueError(
             "conflict resolution requires a new correction record."
         )
+    if (
+        current_status != previous_status
+        and len(current["evidence_refs"]) == len(previous_refs)
+    ):
+        raise ValueError(
+            "device identity status changes require new evidence."
+        )
     changed_names = (
         previous["reported_models"] != current["reported_models"]
         or previous["catalog_models"] != current["catalog_models"]
