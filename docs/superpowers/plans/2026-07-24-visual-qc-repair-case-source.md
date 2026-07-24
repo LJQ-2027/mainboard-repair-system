@@ -17,7 +17,7 @@
 - Create: `knowledge-base/visual-qc-repair-case-source-v1-schema.json`
 - Create: `tests/test_visual_qc_repair_case_contract.py`
 
-- [ ] **Step 1: Write failing exact-shape and completeness tests**
+- [x] **Step 1: Write failing exact-shape and completeness tests**
 
 Create a canonical payload fixture with exact fields:
 
@@ -62,7 +62,7 @@ repair_outcome_linked
 Validate the canonical payload with both the Python contract and the Draft
 2020-12 Schema.
 
-- [ ] **Step 2: Run the contract tests and verify RED**
+- [x] **Step 2: Run the contract tests and verify RED**
 
 Run:
 
@@ -72,7 +72,7 @@ Run:
 
 Expected: import failure because `repair_case_contract.py` does not exist.
 
-- [ ] **Step 3: Implement constants and exact validators**
+- [x] **Step 3: Implement constants and exact validators**
 
 Implement:
 
@@ -111,7 +111,7 @@ duplicate IDs, empty supplied text, invalid regions outside normalized
 coordinates, an outcome description on an unsupported shape, and any boundary
 value other than the fixed false object.
 
-- [ ] **Step 4: Implement evidence-reference and correction validation**
+- [x] **Step 4: Implement evidence-reference and correction validation**
 
 Accept only:
 
@@ -125,14 +125,14 @@ targets and replacement IDs to resolve across a supplied historical fact index,
 and reject correction-to-correction targets or two active corrections for one
 fact.
 
-- [ ] **Step 5: Add the JSON Schema**
+- [x] **Step 5: Add the JSON Schema**
 
 Mirror the exact Python contract with `additionalProperties: false` at every
 object level. Require fixed false boundaries and conditional completeness:
 Schema validates shape; Python remains authoritative for cross-reference and
 revision-history checks.
 
-- [ ] **Step 6: Verify GREEN and commit**
+- [x] **Step 6: Verify GREEN and commit**
 
 Run:
 

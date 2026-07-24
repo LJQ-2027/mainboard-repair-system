@@ -1,0 +1,389 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "VISUAL-QC-REPAIR-CASE-SOURCE-V1",
+  "title": "Visual QC Repair Case Source",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "repair_case_id",
+    "revision",
+    "previous_manifest_sha256",
+    "source_origin",
+    "board_key",
+    "board_id",
+    "device_models",
+    "package_links",
+    "supporting_evidence",
+    "reported_symptoms",
+    "findings",
+    "repair_actions",
+    "outcome",
+    "corrections",
+    "completeness",
+    "boundaries"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "VISUAL-QC-REPAIR-CASE-SOURCE-V1"
+    },
+    "repair_case_id": {
+      "$ref": "#/$defs/safeId"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "previous_manifest_sha256": {
+      "oneOf": [
+        {"type": "null"},
+        {"$ref": "#/$defs/sha256"}
+      ]
+    },
+    "source_origin": {
+      "const": "milo_supplied"
+    },
+    "board_key": {
+      "$ref": "#/$defs/safeId"
+    },
+    "board_id": {
+      "$ref": "#/$defs/nonEmptyString"
+    },
+    "device_models": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 20,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/nonEmptyString"
+      }
+    },
+    "package_links": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 100,
+      "items": {
+        "$ref": "#/$defs/packageLink"
+      }
+    },
+    "supporting_evidence": {
+      "type": "array",
+      "maxItems": 50,
+      "items": {
+        "$ref": "#/$defs/supportingEvidence"
+      }
+    },
+    "reported_symptoms": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "$ref": "#/$defs/symptom"
+      }
+    },
+    "findings": {
+      "type": "array",
+      "maxItems": 500,
+      "items": {
+        "$ref": "#/$defs/finding"
+      }
+    },
+    "repair_actions": {
+      "type": "array",
+      "maxItems": 500,
+      "items": {
+        "$ref": "#/$defs/repairAction"
+      }
+    },
+    "outcome": {
+      "$ref": "#/$defs/outcome"
+    },
+    "corrections": {
+      "type": "array",
+      "maxItems": 500,
+      "items": {
+        "$ref": "#/$defs/correction"
+      }
+    },
+    "completeness": {
+      "enum": [
+        "photos_only",
+        "symptom_linked",
+        "diagnosis_linked",
+        "repair_outcome_linked"
+      ]
+    },
+    "boundaries": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "visual_defect_confirmed",
+        "golden_approved",
+        "training_label_allowed",
+        "repair_instruction_allowed",
+        "field_accuracy_claim_allowed"
+      ],
+      "properties": {
+        "visual_defect_confirmed": {"const": false},
+        "golden_approved": {"const": false},
+        "training_label_allowed": {"const": false},
+        "repair_instruction_allowed": {"const": false},
+        "field_accuracy_claim_allowed": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "safeId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": ".*\\S.*"
+    },
+    "nullableString": {
+      "oneOf": [
+        {"type": "null"},
+        {"$ref": "#/$defs/nonEmptyString"}
+      ]
+    },
+    "normalizedRegion": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["x", "y", "width", "height"],
+          "properties": {
+            "x": {"type": "number", "minimum": 0, "maximum": 1},
+            "y": {"type": "number", "minimum": 0, "maximum": 1},
+            "width": {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
+            "height": {"type": "number", "exclusiveMinimum": 0, "maximum": 1}
+          }
+        }
+      ]
+    },
+    "packageLink": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "package_id",
+        "source_package_manifest_sha256",
+        "capture_stage",
+        "role",
+        "entry_ids"
+      ],
+      "properties": {
+        "package_id": {"$ref": "#/$defs/safeId"},
+        "source_package_manifest_sha256": {"$ref": "#/$defs/sha256"},
+        "capture_stage": {
+          "enum": ["before_repair", "after_repair", "golden_reference"]
+        },
+        "role": {
+          "enum": [
+            "before_repair",
+            "after_repair",
+            "golden_reference",
+            "supplemental"
+          ]
+        },
+        "entry_ids": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 500,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/safeId"}
+        }
+      }
+    },
+    "supportingEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidence_id",
+        "original_filename",
+        "object_path",
+        "mime_type",
+        "byte_size",
+        "sha256",
+        "description"
+      ],
+      "properties": {
+        "evidence_id": {"$ref": "#/$defs/safeId"},
+        "original_filename": {"$ref": "#/$defs/nonEmptyString"},
+        "object_path": {
+          "type": "string",
+          "pattern": "^objects/case-evidence/[0-9a-f]{2}/[0-9a-f]{64}\\.(pdf|txt|csv|xls|xlsx|png|jpg)$"
+        },
+        "mime_type": {
+          "enum": [
+            "application/pdf",
+            "text/plain",
+            "text/csv",
+            "application/vnd.ms-excel",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "image/png",
+            "image/jpeg"
+          ]
+        },
+        "byte_size": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 104857600
+        },
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "description": {"$ref": "#/$defs/nonEmptyString"}
+      }
+    },
+    "packageEvidenceReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "package_id", "entry_id"],
+      "properties": {
+        "kind": {"const": "package_entry"},
+        "package_id": {"$ref": "#/$defs/safeId"},
+        "entry_id": {"$ref": "#/$defs/safeId"}
+      }
+    },
+    "supportingEvidenceReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "evidence_id"],
+      "properties": {
+        "kind": {"const": "supporting_evidence"},
+        "evidence_id": {"$ref": "#/$defs/safeId"}
+      }
+    },
+    "evidenceReference": {
+      "oneOf": [
+        {"$ref": "#/$defs/packageEvidenceReference"},
+        {"$ref": "#/$defs/supportingEvidenceReference"}
+      ]
+    },
+    "evidenceReferences": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {"$ref": "#/$defs/evidenceReference"}
+    },
+    "symptom": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "symptom_id",
+        "text",
+        "source_wording",
+        "fault_code",
+        "evidence_refs"
+      ],
+      "properties": {
+        "symptom_id": {"$ref": "#/$defs/safeId"},
+        "text": {"$ref": "#/$defs/nonEmptyString"},
+        "source_wording": {"$ref": "#/$defs/nullableString"},
+        "fault_code": {"$ref": "#/$defs/nullableString"},
+        "evidence_refs": {"$ref": "#/$defs/evidenceReferences"}
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "finding_id",
+        "claim_status",
+        "description",
+        "defect_category",
+        "designator",
+        "side_id",
+        "region",
+        "evidence_refs"
+      ],
+      "properties": {
+        "finding_id": {"$ref": "#/$defs/safeId"},
+        "claim_status": {
+          "enum": ["reported", "suspected", "documented"]
+        },
+        "description": {"$ref": "#/$defs/nonEmptyString"},
+        "defect_category": {"$ref": "#/$defs/nullableString"},
+        "designator": {
+          "oneOf": [{"type": "null"}, {"$ref": "#/$defs/safeId"}]
+        },
+        "side_id": {
+          "oneOf": [{"type": "null"}, {"$ref": "#/$defs/safeId"}]
+        },
+        "region": {"$ref": "#/$defs/normalizedRegion"},
+        "evidence_refs": {"$ref": "#/$defs/evidenceReferences"}
+      }
+    },
+    "repairAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action_id",
+        "description",
+        "action_category",
+        "target_designator",
+        "side_id",
+        "region",
+        "evidence_refs"
+      ],
+      "properties": {
+        "action_id": {"$ref": "#/$defs/safeId"},
+        "description": {"$ref": "#/$defs/nonEmptyString"},
+        "action_category": {"$ref": "#/$defs/nullableString"},
+        "target_designator": {
+          "oneOf": [{"type": "null"}, {"$ref": "#/$defs/safeId"}]
+        },
+        "side_id": {
+          "oneOf": [{"type": "null"}, {"$ref": "#/$defs/safeId"}]
+        },
+        "region": {"$ref": "#/$defs/normalizedRegion"},
+        "evidence_refs": {"$ref": "#/$defs/evidenceReferences"}
+      }
+    },
+    "outcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "description",
+        "verification_description",
+        "evidence_refs"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "unknown",
+            "repair_completed",
+            "not_repaired",
+            "non_repairable",
+            "needs_followup"
+          ]
+        },
+        "description": {"$ref": "#/$defs/nullableString"},
+        "verification_description": {"$ref": "#/$defs/nullableString"},
+        "evidence_refs": {"$ref": "#/$defs/evidenceReferences"}
+      }
+    },
+    "correction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "correction_id",
+        "corrects_fact_id",
+        "description",
+        "replacement_fact_id",
+        "evidence_refs"
+      ],
+      "properties": {
+        "correction_id": {"$ref": "#/$defs/safeId"},
+        "corrects_fact_id": {"$ref": "#/$defs/safeId"},
+        "description": {"$ref": "#/$defs/nonEmptyString"},
+        "replacement_fact_id": {"$ref": "#/$defs/safeId"},
+        "evidence_refs": {"$ref": "#/$defs/evidenceReferences"}
+      }
+    }
+  }
+}
