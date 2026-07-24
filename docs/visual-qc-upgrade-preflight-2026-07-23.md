@@ -130,3 +130,19 @@ The local evidence report is under
 `.local/upgrade-preflight-rehearsal/f278061-to-local-head.json` and is not a
 production report. No SSH, server read, upload, restart, or deployment was
 performed. Production remains `f278061`.
+
+## 2026-07-24 Closure Evidence
+
+The hardened deployment boundary passed 392 Python tests, 226 Node tests,
+PowerShell parsing, Python compilation, JSON parsing, diff checks, and strict
+UTF-8/U+FFFD checks. A clean Git archive was verified before and after
+extraction, then rehearsed from exact `f278061`; all ten upgrade checks passed,
+one legacy case was read by the rollback runtime, and source evidence remained
+immutable. The same report passed again inside an isolated candidate
+environment with the pinned `jsonschema==4.25.1`.
+
+Independent closure review found no Critical or Important findings. It
+confirmed the unique read-only staging directory, captured full commit,
+pre/post extraction safety, duplicate-key rejection, and complete
+Schema/snapshot/target report binding. Production was not contacted or
+changed; deployment remains a separately approved P4 action.

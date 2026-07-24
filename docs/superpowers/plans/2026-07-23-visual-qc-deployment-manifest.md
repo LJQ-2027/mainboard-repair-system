@@ -292,7 +292,7 @@ its deployment manifest, then run the exact `f278061` rollback rehearsal with
 the same full commit/archive/runtime evidence. Require ten passed checks,
 old-store readability, and source immutability.
 
-- [ ] **Step 4: Request independent review**
+- [x] **Step 4: Request independent review**
 
 Review archive verification order, shell/Python argument safety, report
 binding, rollback mutation boundaries, no-clobber publication, tests, and
@@ -304,7 +304,7 @@ archiving from the captured full commit, duplicate-key-safe JSON parsing,
 pre-extraction tar member validation, recursive extracted-tree validation,
 and complete upgrade-report Schema validation.
 
-- [ ] **Step 5: Update durable facts and commit**
+- [x] **Step 5: Update durable facts and commit**
 
 Record final implementation commit, verification counts, independent review,
 production unchanged at `f278061`, and the remaining separately approved
