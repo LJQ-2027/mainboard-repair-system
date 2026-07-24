@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import math
 from pathlib import PurePosixPath
 import re
 
@@ -198,7 +199,15 @@ def _validate_region(value, label: str) -> None:
         number = region[field]
         if isinstance(number, bool) or not isinstance(number, (int, float)):
             raise ValueError(f"{label} must be a normalized region.")
-        values.append(float(number))
+        try:
+            normalized_number = float(number)
+        except OverflowError:
+            raise ValueError(
+                f"{label} must be a normalized region."
+            ) from None
+        if not math.isfinite(normalized_number):
+            raise ValueError(f"{label} must be a normalized region.")
+        values.append(normalized_number)
     x, y, width, height = values
     if (
         x < 0

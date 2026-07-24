@@ -465,6 +465,28 @@ class VisualQcRepairCaseContractTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "normalized region"):
                     validate_repair_case_manifest(payload)
 
+    def test_normalized_regions_reject_nonfinite_and_oversized_numbers(self):
+        invalid_numbers = (
+            ("nan", float("nan")),
+            ("positive_infinity", float("inf")),
+            ("negative_infinity", float("-inf")),
+            ("oversized_integer", 10**400),
+        )
+        for number_name, invalid_number in invalid_numbers:
+            for field in ("x", "y", "width", "height"):
+                payload = canonical_payload()
+                payload["reported_symptoms"] = [symptom()]
+                invalid_finding = finding()
+                invalid_finding["region"][field] = invalid_number
+                payload["findings"] = [invalid_finding]
+                payload["completeness"] = "diagnosis_linked"
+                with self.subTest(number=number_name, field=field):
+                    with self.assertRaisesRegex(
+                        ValueError,
+                        "normalized region",
+                    ):
+                        validate_repair_case_manifest(payload)
+
     def test_completeness_is_derived_from_available_case_context(self):
         payload = canonical_payload()
         payload["reported_symptoms"] = [symptom()]
