@@ -229,6 +229,18 @@ class VisualQcRepairCaseIdentityTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "mapping_status"):
             self.validate(identity)
 
+    def test_mapping_status_rejects_list_with_clear_validation_error(self):
+        identity = unresolved_identity()
+        identity["mapping_status"] = ["unresolved_alias"]
+        with self.assertRaisesRegex(ValueError, "mapping_status"):
+            self.validate(identity)
+
+    def test_mapping_status_rejects_dict_with_clear_validation_error(self):
+        identity = unresolved_identity()
+        identity["mapping_status"] = {"status": "unresolved_alias"}
+        with self.assertRaisesRegex(ValueError, "mapping_status"):
+            self.validate(identity)
+
     def test_evidence_validator_is_invoked_and_result_is_deep_copied(self):
         identity = unresolved_identity()
         original = copy.deepcopy(identity)

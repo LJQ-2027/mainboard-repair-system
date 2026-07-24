@@ -52,7 +52,7 @@ def validate_device_identity(
     if catalog != expected_catalog:
         raise ValueError("catalog_models do not match board catalog order.")
     status = identity["mapping_status"]
-    if status not in IDENTITY_STATUSES:
+    if not isinstance(status, str) or status not in IDENTITY_STATUSES:
         raise ValueError("mapping_status is invalid.")
     resolved = _string_list(
         identity["resolved_models"], "resolved_models", allow_empty=True
