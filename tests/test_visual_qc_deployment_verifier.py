@@ -127,6 +127,9 @@ class VisualQcDeploymentVerifierTests(unittest.TestCase):
         hardlink.type = tarfile.LNKTYPE
         hardlink.linkname = "scripts/a.py"
         unsafe_members.append(hardlink)
+        fifo = tarfile.TarInfo("scripts/pipe")
+        fifo.type = tarfile.FIFOTYPE
+        unsafe_members.append(fifo)
 
         for member in unsafe_members:
             with self.subTest(name=member.name, type=member.type):
@@ -149,15 +152,10 @@ class VisualQcDeploymentVerifierTests(unittest.TestCase):
         script.write_bytes(b"print('ok')\n")
         return app_root
 
-    def test_extracted_runtime_rejects_nested_symlink(self):
-        app_root = self.create_extracted_runtime()
-        external = self.root / "external"
-        external.mkdir()
-        (external / "outside.txt").write_bytes(b"outside")
-        nested = app_root / "scripts" / "nested-link"
+    def create_directory_link(self, link: Path, target: Path):
         if os.name == "nt":
             result = subprocess.run(
-                ["cmd", "/c", "mklink", "/J", str(nested), str(external)],
+                ["cmd", "/c", "mklink", "/J", str(link), str(target)],
                 capture_output=True,
                 text=True,
                 encoding="utf-8",
@@ -166,7 +164,22 @@ class VisualQcDeploymentVerifierTests(unittest.TestCase):
             if result.returncode != 0:
                 self.fail(f"Unable to create test junction: {result.stderr}")
         else:
-            nested.symlink_to(external, target_is_directory=True)
+            link.symlink_to(target, target_is_directory=True)
+
+    @staticmethod
+    def remove_directory_link(link: Path):
+        if os.name == "nt":
+            os.rmdir(link)
+        else:
+            link.unlink()
+
+    def test_extracted_runtime_rejects_nested_symlink(self):
+        app_root = self.create_extracted_runtime()
+        external = self.root / "external"
+        external.mkdir()
+        (external / "outside.txt").write_bytes(b"outside")
+        nested = app_root / "scripts" / "nested-link"
+        self.create_directory_link(nested, external)
         try:
             with self.assertRaisesRegex(ValueError, "symbolic link"):
                 verify_extracted_runtime(
@@ -174,10 +187,121 @@ class VisualQcDeploymentVerifierTests(unittest.TestCase):
                     expected_manifest=self.manifest,
                 )
         finally:
-            if os.name == "nt":
-                os.rmdir(nested)
-            else:
-                nested.unlink()
+            self.remove_directory_link(nested)
+
+    def test_extracted_runtime_rejects_linked_root(self):
+        app_root = self.create_extracted_runtime()
+        linked_root = self.root / "linked-app"
+        self.create_directory_link(linked_root, app_root)
+        try:
+            with self.assertRaisesRegex(ValueError, "root is missing or unsafe"):
+                verify_extracted_runtime(
+                    app_root=linked_root,
+                    expected_manifest=self.manifest,
+                )
+        finally:
+            self.remove_directory_link(linked_root)
+
+    def valid_upgrade_report(self, snapshot: Path) -> dict:
+        check_ids = (
+            "source_version_supported",
+            "source_database_integrity",
+            "managed_objects_integrity",
+            "candidate_migration_integrity",
+            "candidate_schema_additive",
+            "candidate_rows_preserved",
+            "candidate_runtime_contract",
+            "candidate_dataset_gates",
+            "rollback_runtime_compatible",
+            "source_immutable",
+        )
+        digest = "b" * 64
+        counts = {"originals": 0, "artifacts": 0, "total": 0}
+        return {
+            "schema_version": "VISUAL-QC-UPGRADE-PREFLIGHT-V1",
+            "status": "passed",
+            "generated_at": "2026-07-24T00:00:00Z",
+            "source": {
+                "version": "f278061",
+                "snapshot_sha256": self.sha256(snapshot),
+                "logical_digest": digest,
+                "table_counts": {},
+                "managed_object_counts": counts,
+                "fingerprint_digest": digest,
+                "fingerprint_file_count": 1,
+            },
+            "target": {
+                "version": self.manifest["commit_sha"],
+                "archive_sha256": self.manifest["archive_sha256"],
+                "archive_bytes": self.manifest["archive_bytes"],
+                "runtime_manifest_sha256": self.manifest[
+                    "runtime_manifest_sha256"
+                ],
+            },
+            "checks": [
+                {
+                    "check_id": check_id,
+                    "status": "passed",
+                    "error_code": None,
+                    "message": "passed",
+                }
+                for check_id in check_ids
+            ],
+            "managed_objects": {
+                "status": "passed",
+                "counts": counts,
+                "issues": [],
+            },
+            "migration": {
+                "status": "passed",
+                "added_columns": [],
+                "before_digest": digest,
+                "shared_digest": digest,
+                "table_counts": {},
+                "issues": [],
+                "integrity": "ok",
+            },
+            "candidate_runtime": {
+                "status": "passed",
+                "api_schemas": {
+                    "health": "health",
+                    "admin_list": "list",
+                    "admin_detail": "detail",
+                    "dataset_audit": "dataset",
+                },
+                "counts": {
+                    "database_cases": 0,
+                    "listed_cases": 0,
+                    "detailed_cases": 0,
+                },
+                "dataset": {
+                    "eligible_case_count": 0,
+                    "excluded_case_count": 0,
+                    "reason_counts": {},
+                },
+                "issues": [],
+            },
+            "rollback_runtime": {
+                "status": "passed",
+                "source_version": "f278061",
+                "case_count": 0,
+                "cases_read": 0,
+                "issues": [],
+            },
+        }
+
+    def write_upgrade_report(self, report: dict) -> Path:
+        path = self.root / "upgrade-preflight.json"
+        path.write_text(json.dumps(report), encoding="utf-8")
+        return path
+
+    @property
+    def upgrade_schema(self) -> Path:
+        return (
+            ROOT
+            / "knowledge-base"
+            / "visual-qc-upgrade-preflight-v1-schema.json"
+        )
 
     def test_upgrade_report_requires_complete_schema(self):
         report = self.root / "upgrade-preflight.json"
@@ -204,11 +328,49 @@ class VisualQcDeploymentVerifierTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Schema"):
             verify_upgrade_report(
                 report_path=report,
-                schema_path=(
-                    ROOT
-                    / "knowledge-base"
-                    / "visual-qc-upgrade-preflight-v1-schema.json"
-                ),
+                schema_path=self.upgrade_schema,
+                snapshot_path=snapshot,
+                expected_manifest=self.manifest,
+            )
+
+    def test_upgrade_report_accepts_complete_bound_evidence(self):
+        snapshot = self.root / "snapshot.sqlite3"
+        snapshot.write_bytes(b"snapshot")
+        report = self.write_upgrade_report(
+            self.valid_upgrade_report(snapshot)
+        )
+
+        verified = verify_upgrade_report(
+            report_path=report,
+            schema_path=self.upgrade_schema,
+            snapshot_path=snapshot,
+            expected_manifest=self.manifest,
+        )
+
+        self.assertEqual(verified["status"], "passed")
+
+    def test_upgrade_report_rejects_snapshot_or_target_drift(self):
+        snapshot = self.root / "snapshot.sqlite3"
+        snapshot.write_bytes(b"snapshot")
+        report_data = self.valid_upgrade_report(snapshot)
+        report = self.write_upgrade_report(report_data)
+        snapshot.write_bytes(b"changed snapshot")
+        with self.assertRaisesRegex(ValueError, "snapshot"):
+            verify_upgrade_report(
+                report_path=report,
+                schema_path=self.upgrade_schema,
+                snapshot_path=snapshot,
+                expected_manifest=self.manifest,
+            )
+
+        snapshot.write_bytes(b"snapshot")
+        report_data = self.valid_upgrade_report(snapshot)
+        report_data["target"]["version"] = "c" * 40
+        report = self.write_upgrade_report(report_data)
+        with self.assertRaisesRegex(ValueError, "target"):
+            verify_upgrade_report(
+                report_path=report,
+                schema_path=self.upgrade_schema,
                 snapshot_path=snapshot,
                 expected_manifest=self.manifest,
             )

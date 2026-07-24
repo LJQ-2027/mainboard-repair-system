@@ -119,9 +119,20 @@ def verify_extracted_runtime(
     expected_manifest: dict,
 ) -> dict:
     expected = validate_deployment_manifest(expected_manifest)
-    app_root = Path(app_root).resolve()
-    if not app_root.is_dir() or app_root.is_symlink() or _is_junction(app_root):
+    app_root = Path(app_root)
+    try:
+        root_mode = app_root.lstat().st_mode
+    except OSError as exc:
+        raise ValueError(
+            "Extracted application root is missing or unsafe."
+        ) from exc
+    if (
+        not stat.S_ISDIR(root_mode)
+        or app_root.is_symlink()
+        or _is_junction(app_root)
+    ):
         raise ValueError("Extracted application root is missing or unsafe.")
+    app_root = app_root.resolve(strict=True)
     _verify_regular_tree(app_root)
     runtime_manifest = app_root / "deploy" / "visual-qc-runtime-files.txt"
     content = _read_regular_file(runtime_manifest)

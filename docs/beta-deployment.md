@@ -276,8 +276,8 @@ $reviewer = Get-Credential -UserName "pilot-reviewer"
 ```
 
 Passwords and account lists remain outside Git. Uploaded authentication inputs
-are mode `0600` and removed from the staging directory after success or
-rollback. The script refuses a dirty worktree and deploys only committed
-`HEAD`.
+are mode `0400` inside a deployment-unique mode `0500` staging directory and
+are removed after success or rollback. The script refuses a dirty worktree and
+deploys only committed `HEAD`.
 
 Basic Auth is the controlled-pilot identity provider, not the final global identity architecture. A later corporate SSO/OIDC gateway may replace it while preserving the same verified `X-Actor-Id` and `X-Actor-Role` API contract.
