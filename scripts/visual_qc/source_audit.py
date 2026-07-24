@@ -10,6 +10,7 @@ from scripts.visual_qc.intake import (
     _image_evidence,
     validate_intake_batch,
 )
+from scripts.visual_qc.heic_derivative import inspect_heic_source
 from scripts.visual_qc.source_library import (
     _assert_controlled_path,
     _build_archived_intake,
@@ -19,9 +20,12 @@ from scripts.visual_qc.source_library import (
 )
 
 
-SOURCE_AUDIT_SCHEMA_VERSION = "VISUAL-QC-SOURCE-AUDIT-V1"
+SOURCE_AUDIT_SCHEMA_VERSION = "VISUAL-QC-SOURCE-AUDIT-V2"
 CANONICAL_OBJECT = re.compile(
     r"^objects/originals/([0-9a-f]{2})/([0-9a-f]{64})\.(jpg|png|webp)$"
+)
+CANONICAL_SOURCE_ORIGINAL = re.compile(
+    r"^objects/source-originals/([0-9a-f]{2})/([0-9a-f]{64})\.heic$"
 )
 
 
@@ -63,7 +67,12 @@ def _library_issue(path: str, code: str, message: str) -> dict:
     return {"path": path, "error_code": code, "message": message}
 
 
-def _scan_objects(originals_root: Path, library_root: Path) -> tuple[list[str], list[dict]]:
+def _scan_objects(
+    originals_root: Path,
+    library_root: Path,
+    *,
+    source_originals: bool = False,
+) -> tuple[list[str], list[dict]]:
     valid_objects: list[str] = []
     invalid_objects: list[dict] = []
 
@@ -94,7 +103,10 @@ def _scan_objects(originals_root: Path, library_root: Path) -> tuple[list[str], 
                     )
                 )
                 continue
-            match = CANONICAL_OBJECT.fullmatch(relative)
+            pattern = (
+                CANONICAL_SOURCE_ORIGINAL if source_originals else CANONICAL_OBJECT
+            )
+            match = pattern.fullmatch(relative)
             if match is None or match.group(1) != match.group(2)[:2]:
                 invalid_objects.append(
                     _invalid_object(
@@ -106,7 +118,11 @@ def _scan_objects(originals_root: Path, library_root: Path) -> tuple[list[str], 
                 continue
             try:
                 _assert_controlled_path(library_root, path, "source object path")
-                evidence = _image_evidence(path)
+                evidence = (
+                    inspect_heic_source(path)
+                    if source_originals
+                    else _image_evidence(path)
+                )
             except (IntakeValidationError, OSError):
                 invalid_objects.append(
                     _invalid_object(
@@ -147,7 +163,8 @@ def audit_source_library(project_root: Path, library_root: Path) -> dict:
 
     packages = []
     library_issues = []
-    referenced_objects: set[str] = set()
+    referenced_working_objects: set[str] = set()
+    referenced_source_originals: set[str] = set()
     packages_root = library_root / "packages"
     if packages_root.exists():
         if _is_reparse_or_symlink(packages_root):
@@ -259,14 +276,21 @@ def audit_source_library(project_root: Path, library_root: Path) -> dict:
                     "entry_count": len(validated["entries"]),
                 }
             )
-            referenced_objects.update(
+            referenced_working_objects.update(
                 _relative(entry["object_file"], library_root)
                 for entry in validated["entries"]
+            )
+            referenced_source_originals.update(
+                _relative(entry["source_original_file"], library_root)
+                for entry in validated["entries"]
+                if entry["source_original_file"] != entry["object_file"]
             )
 
     objects_root = library_root / "objects"
     originals_root = objects_root / "originals"
-    object_paths = []
+    source_originals_root = objects_root / "source-originals"
+    working_object_paths = []
+    source_original_paths = []
     invalid_objects = []
     if objects_root.exists() and _is_reparse_or_symlink(objects_root):
         library_issues.append(
@@ -284,28 +308,50 @@ def audit_source_library(project_root: Path, library_root: Path) -> dict:
                 "Objects root is not a directory.",
             )
         )
-    elif originals_root.exists():
-        if _is_reparse_or_symlink(originals_root):
-            library_issues.append(
-                _library_issue(
-                    "objects/originals",
-                    "unsafe_path",
-                    "Originals root contains a symlink or reparse point.",
+    elif objects_root.exists():
+        for root, relative, label, source_originals in (
+            (originals_root, "objects/originals", "Originals", False),
+            (
+                source_originals_root,
+                "objects/source-originals",
+                "Source originals",
+                True,
+            ),
+        ):
+            if not root.exists():
+                continue
+            if _is_reparse_or_symlink(root):
+                library_issues.append(
+                    _library_issue(
+                        relative,
+                        "unsafe_path",
+                        f"{label} root contains a symlink or reparse point.",
+                    )
                 )
-            )
-        elif not originals_root.is_dir():
-            library_issues.append(
-                _library_issue(
-                    "objects/originals",
-                    "invalid_structure",
-                    "Originals root is not a directory.",
+                continue
+            if not root.is_dir():
+                library_issues.append(
+                    _library_issue(
+                        relative,
+                        "invalid_structure",
+                        f"{label} root is not a directory.",
+                    )
                 )
+                continue
+            _assert_controlled_path(library_root, root, f"{label.lower()} root")
+            paths, findings = _scan_objects(
+                root,
+                library_root,
+                source_originals=source_originals,
             )
-        else:
-            _assert_controlled_path(library_root, originals_root, "originals root")
-            object_paths, invalid_objects = _scan_objects(
-                originals_root, library_root
-            )
+            if source_originals:
+                source_original_paths = paths
+            else:
+                working_object_paths = paths
+            invalid_objects.extend(findings)
+    object_paths = sorted(working_object_paths + source_original_paths)
+    invalid_objects.sort(key=lambda row: row["object_path"])
+    referenced_objects = referenced_working_objects | referenced_source_originals
     orphaned_objects = [
         {"object_path": path, "status": "orphaned"}
         for path in object_paths
@@ -329,7 +375,19 @@ def audit_source_library(project_root: Path, library_root: Path) -> dict:
             "invalid_packages": invalid_packages,
             "incomplete_packages": incomplete_packages,
             "object_total": len(object_paths) + len(invalid_objects),
+            "working_object_total": len(working_object_paths)
+            + sum(
+                row["object_path"].startswith("objects/originals/")
+                for row in invalid_objects
+            ),
+            "source_original_total": len(source_original_paths)
+            + sum(
+                row["object_path"].startswith("objects/source-originals/")
+                for row in invalid_objects
+            ),
             "referenced_objects": len(referenced_objects),
+            "referenced_working_objects": len(referenced_working_objects),
+            "referenced_source_originals": len(referenced_source_originals),
             "invalid_objects": len(invalid_objects),
             "orphaned_objects": len(orphaned_objects),
             "library_issues": len(library_issues),

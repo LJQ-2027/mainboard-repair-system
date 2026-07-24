@@ -22,7 +22,11 @@ class ValidationArgumentParser(argparse.ArgumentParser):
 
 def build_parser() -> argparse.ArgumentParser:
     parser = ValidationArgumentParser(
-        description="Preserve Milo-supplied physical photos and create a Visual-QC intake batch."
+        description=(
+            "Preserve Milo-supplied physical photos and create a Visual-QC "
+            "intake batch. HEIC originals are retained with manifest-bound "
+            "JPEG working derivatives."
+        )
     )
     parser.add_argument("--library-root", required=True, type=Path)
     parser.add_argument("--package-id", required=True)
@@ -87,6 +91,8 @@ def main(argv: list[str] | None = None) -> int:
                 "package_id": result["package_id"],
                 "batch_id": result["batch_id"],
                 "entry_count": result["entry_count"],
+                "schema_version": result["schema_version"],
+                "derived_entry_count": result["derived_entry_count"],
                 "source_package": str(result["source_package_path"]),
                 "intake_manifest": str(result["intake_manifest_path"]),
             },

@@ -43,4 +43,3 @@ that can enter the existing registration and visual-QC chain.
 - Run source-library audit, JSON, diff, strict UTF-8, and browser/runtime
   regression checks where affected.
 - Commit implementation and sync Ledger, Vault, and Feishu status wording.
-

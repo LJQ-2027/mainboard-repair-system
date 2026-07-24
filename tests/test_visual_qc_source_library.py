@@ -13,6 +13,8 @@ from pathlib import Path
 import cv2
 import jsonschema
 import numpy as np
+from PIL import Image
+from pillow_heif import from_pillow
 import scripts.visual_qc.source_library as source_library_module
 
 from scripts.visual_qc.intake import (
@@ -42,6 +44,13 @@ def encode_image(extension, *, width=180, height=120, value=170):
     return encoded.tobytes()
 
 
+def write_heic(path, *, width=180, height=120):
+    image = Image.new("RGB", (width, height), (36, 92, 168))
+    image.paste((230, 52, 44), (0, 0, width // 3, height // 2))
+    from_pillow(image).save(path, quality=90)
+    return path
+
+
 class VisualQcSourcePackageTests(unittest.TestCase):
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory()
@@ -49,8 +58,10 @@ class VisualQcSourcePackageTests(unittest.TestCase):
         self.library = self.root / "controlled-library"
         self.front = self.root / "incoming-front.jpeg"
         self.back = self.root / "incoming-back.png"
+        self.heic = self.root / "incoming-front.heic"
         self.front.write_bytes(encode_image(".jpg", value=180))
         self.back.write_bytes(encode_image(".png", value=120))
+        write_heic(self.heic)
 
     def tearDown(self):
         for link in reversed(getattr(self, "directory_links", [])):
@@ -127,6 +138,147 @@ class VisualQcSourcePackageTests(unittest.TestCase):
         self.assertNotIn("source_path", json.dumps(first))
         self.assertNotIn("created_at", first)
         self.assertRegex(first["proxy_inventory_sha256"], r"^[0-9a-f]{64}$")
+
+    def test_heic_staging_preserves_original_and_binds_working_derivative(self):
+        source_before = self.heic.read_bytes()
+        options = self.options(
+            package_id="km4-heic-source",
+            batch_id="km4-heic-batch",
+            capture_session_id="km4-heic",
+            image_assignments=[
+                ("main_page_1", self.heic),
+                ("main_page_2", self.back),
+            ],
+        )
+
+        created = stage_source_package(**options)
+        payload = json.loads(
+            created["source_package_path"].read_text(encoding="utf-8")
+        )
+        schema = json.loads(
+            (
+                ROOT
+                / "knowledge-base"
+                / "visual-qc-source-package-v2-schema.json"
+            ).read_text(encoding="utf-8")
+        )
+        jsonschema.Draft202012Validator(schema).validate(payload)
+        front = payload["entries"][0]
+        back = payload["entries"][1]
+        original_hash = hashlib.sha256(source_before).hexdigest()
+
+        self.assertEqual(payload["schema_version"], "VISUAL-QC-SOURCE-PACKAGE-V2")
+        self.assertEqual(front["source_original"]["mime_type"], "image/heic")
+        self.assertEqual(front["source_original"]["sha256"], original_hash)
+        self.assertEqual(
+            front["source_original"]["object_path"],
+            f"objects/source-originals/{original_hash[:2]}/{original_hash}.heic",
+        )
+        self.assertEqual(
+            (self.library / front["source_original"]["object_path"]).read_bytes(),
+            source_before,
+        )
+        self.assertEqual(self.heic.read_bytes(), source_before)
+        self.assertEqual(front["mime_type"], "image/jpeg")
+        self.assertNotEqual(front["sha256"], original_hash)
+        self.assertEqual(front["derivation"]["input_sha256"], original_hash)
+        self.assertEqual(front["derivation"]["output_sha256"], front["sha256"])
+        self.assertEqual(
+            front["derivation"]["operation"],
+            "heic_primary_image_to_oriented_rgb_jpeg",
+        )
+        self.assertEqual(front["derivation"]["output"]["quality"], 95)
+        self.assertEqual(front["derivation"]["output"]["subsampling"], 0)
+        self.assertRegex(front["derivation"]["decoder"]["version"], r"^\d+\.")
+        self.assertRegex(front["derivation"]["pillow_version"], r"^\d+\.")
+        self.assertEqual(back["source_original"]["sha256"], back["sha256"])
+        self.assertIsNone(back["derivation"])
+
+        invalid_schema_payload = json.loads(json.dumps(payload))
+        invalid_schema_payload["entries"][0]["derivation"] = None
+        with self.assertRaises(jsonschema.ValidationError):
+            jsonschema.Draft202012Validator(schema).validate(
+                invalid_schema_payload
+            )
+
+        validated = validate_source_package(
+            created["source_package_path"], ROOT, self.library
+        )
+        self.assertEqual(
+            validated["entries"][0]["source_original_file"],
+            (self.library / front["source_original"]["object_path"]).resolve(),
+        )
+        intake = json.loads(
+            created["intake_manifest_path"].read_text(encoding="utf-8")
+        )
+        self.assertEqual(
+            intake["entries"][0]["expected_sha256"], front["sha256"]
+        )
+
+        reused = stage_source_package(**options)
+        self.assertEqual(reused["state"], "reused")
+        self.assertEqual(
+            reused["source_package_path"].read_bytes(),
+            created["source_package_path"].read_bytes(),
+        )
+
+    def test_heic_validation_rejects_missing_derivation_and_original_corruption(self):
+        created = stage_source_package(
+            **self.options(
+                package_id="km4-heic-invalid",
+                batch_id="km4-heic-invalid-batch",
+                capture_session_id="km4-heic-invalid",
+                image_assignments=[("main_page_1", self.heic)],
+            )
+        )
+        manifest_path = created["source_package_path"]
+        valid_payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+        payload = json.loads(json.dumps(valid_payload))
+        original_path = (
+            self.library / payload["entries"][0]["source_original"]["object_path"]
+        )
+
+        payload["entries"][0]["derivation"] = None
+        write_json_atomic(manifest_path, payload)
+        with self.assertRaisesRegex(IntakeValidationError, "derivation"):
+            validate_source_package(manifest_path, ROOT, self.library)
+
+        write_json_atomic(manifest_path, valid_payload)
+        original_path.write_bytes(b"corrupted-heic")
+        with self.assertRaisesRegex(
+            IntakeValidationError, "source original integrity"
+        ):
+            validate_source_package(manifest_path, ROOT, self.library)
+
+    def test_heic_decoder_is_optional_for_v1_and_required_before_heic_writes(self):
+        with patch(
+            "scripts.visual_qc.heic_derivative._decoder_modules",
+            side_effect=IntakeValidationError(
+                "HEIC decoder dependency unavailable"
+            ),
+        ):
+            v1 = stage_source_package(**self.options())
+        self.assertEqual(v1["schema_version"], SOURCE_PACKAGE_SCHEMA_VERSION)
+
+        unavailable_library = self.root / "unavailable-heic-library"
+        with patch(
+            "scripts.visual_qc.heic_derivative._decoder_modules",
+            side_effect=IntakeValidationError(
+                "HEIC decoder dependency unavailable"
+            ),
+        ), self.assertRaisesRegex(
+            IntakeValidationError, "decoder dependency unavailable"
+        ):
+            stage_source_package(
+                **self.options(
+                    library_root=unavailable_library,
+                    package_id="km4-heic-unavailable",
+                    batch_id="km4-heic-unavailable-batch",
+                    capture_session_id="km4-heic-unavailable",
+                    image_assignments=[("main_page_1", self.heic)],
+                )
+            )
+        self.assertFalse(unavailable_library.exists())
 
     def test_runtime_contract_matches_and_satisfies_json_schema(self):
         payload = build_source_package(**self.options())
@@ -596,8 +748,10 @@ class VisualQcSourcePackageCliTests(unittest.TestCase):
         self.library = self.root / "library"
         self.front = self.root / "front.jpg"
         self.back = self.root / "back.png"
+        self.heic = self.root / "front.heic"
         self.front.write_bytes(encode_image(".jpg", value=150))
         self.back.write_bytes(encode_image(".png", value=90))
+        write_heic(self.heic)
         self.script = ROOT / "scripts" / "stage_visual_qc_source_package.py"
 
     def tearDown(self):
@@ -650,12 +804,47 @@ class VisualQcSourcePackageCliTests(unittest.TestCase):
         self.assertEqual(created_payload["package_id"], "km4-cli-source")
         self.assertEqual(created_payload["batch_id"], "km4-cli-batch")
         self.assertEqual(created_payload["entry_count"], 2)
+        self.assertEqual(
+            created_payload["schema_version"], "VISUAL-QC-SOURCE-PACKAGE-V1"
+        )
+        self.assertEqual(created_payload["derived_entry_count"], 0)
         self.assertTrue(Path(created_payload["source_package"]).is_file())
         self.assertTrue(Path(created_payload["intake_manifest"]).is_file())
 
         reused = self.run_cli(*confirmations)
         self.assertEqual(reused.returncode, 0, reused.stderr or reused.stdout)
         self.assertEqual(json.loads(reused.stdout)["state"], "reused")
+
+    def test_direct_invocation_accepts_heic_with_explicit_derivative_evidence(self):
+        command = self.command(
+            "--confirm-milo-physical-source",
+            "--confirm-capture-checklist",
+        )
+        front_index = command.index(f"main_page_1={self.front}")
+        command[front_index] = f"main_page_1={self.heic}"
+
+        result = subprocess.run(
+            command,
+            cwd=self.root,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            check=False,
+        )
+
+        self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
+        payload = json.loads(result.stdout)
+        self.assertEqual(
+            payload["schema_version"], "VISUAL-QC-SOURCE-PACKAGE-V2"
+        )
+        self.assertEqual(payload["derived_entry_count"], 1)
+        source_package = json.loads(
+            Path(payload["source_package"]).read_text(encoding="utf-8")
+        )
+        self.assertEqual(
+            source_package["entries"][0]["source_original"]["mime_type"],
+            "image/heic",
+        )
 
     def test_cli_requires_both_explicit_confirmations_without_writes(self):
         result = self.run_cli("--confirm-capture-checklist")

@@ -14,6 +14,8 @@ from unittest.mock import patch
 import cv2
 import jsonschema
 import numpy as np
+from PIL import Image
+from pillow_heif import from_pillow
 
 from scripts.visual_qc.intake import IntakeValidationError
 from scripts.visual_qc.source_audit import (
@@ -32,6 +34,13 @@ def encode_image(extension, *, width=180, height=120, value=170):
     if not ok:
         raise RuntimeError(f"Unable to encode test image: {extension}")
     return encoded.tobytes()
+
+
+def write_heic(path, *, width=180, height=120):
+    image = Image.new("RGB", (width, height), (42, 96, 172))
+    image.paste((224, 48, 40), (0, 0, width // 3, height // 2))
+    from_pillow(image).save(path, quality=90)
+    return path
 
 
 def snapshot_tree(root):
@@ -127,7 +136,11 @@ class VisualQcSourceAuditTests(unittest.TestCase):
                 "invalid_packages": 0,
                 "incomplete_packages": 0,
                 "object_total": 2,
+                "working_object_total": 2,
+                "source_original_total": 0,
                 "referenced_objects": 2,
+                "referenced_working_objects": 2,
+                "referenced_source_originals": 0,
                 "invalid_objects": 0,
                 "orphaned_objects": 0,
                 "library_issues": 0,
@@ -154,7 +167,7 @@ class VisualQcSourceAuditTests(unittest.TestCase):
             (
                 ROOT
                 / "knowledge-base"
-                / "visual-qc-source-audit-v1-schema.json"
+                / "visual-qc-source-audit-v2-schema.json"
             ).read_text(encoding="utf-8")
         )
 
@@ -164,6 +177,53 @@ class VisualQcSourceAuditTests(unittest.TestCase):
         (result["source_package_path"].parent / ".complete").unlink()
         issues = audit_source_library(ROOT, self.library)
         jsonschema.Draft202012Validator(schema).validate(issues)
+
+    def test_heic_source_original_is_audited_separately(self):
+        heic = write_heic(self.root / "incoming-front.heic")
+        result = stage_source_package(
+            project_root=ROOT,
+            library_root=self.library,
+            package_id="km4-audit-heic-source",
+            batch_id="km4-audit-heic-batch",
+            board_key="km4-f151",
+            capture_session_id="km4-audit-heic",
+            capture_stage="before_repair",
+            capture_setup_id="standard-bench",
+            image_assignments=[
+                ("main_page_1", heic),
+                ("main_page_2", self.back),
+            ],
+            milo_physical_source_confirmed=True,
+            capture_checklist_confirmed=True,
+        )
+
+        healthy = audit_source_library(ROOT, self.library)
+
+        self.assertEqual(healthy["schema_version"], "VISUAL-QC-SOURCE-AUDIT-V2")
+        self.assertEqual(healthy["status"], "healthy")
+        self.assertEqual(healthy["counts"]["working_object_total"], 2)
+        self.assertEqual(healthy["counts"]["source_original_total"], 1)
+        self.assertEqual(healthy["counts"]["object_total"], 3)
+        self.assertEqual(healthy["counts"]["referenced_working_objects"], 2)
+        self.assertEqual(healthy["counts"]["referenced_source_originals"], 1)
+        self.assertEqual(healthy["counts"]["referenced_objects"], 3)
+
+        payload = json.loads(
+            result["source_package_path"].read_text(encoding="utf-8")
+        )
+        source_original = (
+            self.library / payload["entries"][0]["source_original"]["object_path"]
+        )
+        source_original.write_bytes(b"corrupted-heic")
+
+        corrupt = audit_source_library(ROOT, self.library)
+
+        self.assertEqual(corrupt["status"], "issues")
+        self.assertEqual(corrupt["counts"]["invalid_objects"], 1)
+        self.assertEqual(
+            corrupt["invalid_objects"][0]["object_path"],
+            source_original.relative_to(self.library).as_posix(),
+        )
 
     def test_valid_unreferenced_object_is_attention_only(self):
         self.stage()

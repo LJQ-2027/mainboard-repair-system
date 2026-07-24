@@ -69,4 +69,3 @@ retaining its current package and working-object totals.
 - HEIC decoding remains an owner-side intake capability; the controlled
   server receives only the validated working image and manifest-bound
   provenance.
-
