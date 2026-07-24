@@ -45,6 +45,8 @@
 Add helpers and tests that express all four identity states:
 
 ```python
+import unittest
+
 from scripts.visual_qc.repair_case_identity import (
     derive_model_identity_resolved,
     validate_device_identity,
@@ -68,34 +70,37 @@ def unresolved_identity():
     }
 
 
-def test_unresolved_alias_is_valid_but_not_resolved():
-    identity = unresolved_identity()
-    assert validate_device_identity(
-        identity,
-        catalog_models=["BG6H", "BG6h"],
-        validate_evidence_refs=lambda refs: None,
-    ) == identity
-    assert derive_model_identity_resolved(identity) is False
-
-
-def test_unresolved_alias_rejects_resolved_models_or_missing_evidence():
-    identity = unresolved_identity()
-    identity["resolved_models"] = ["BG6H"]
-    with pytest.raises(ValueError, match="resolved_models"):
-        validate_device_identity(
+class VisualQcRepairCaseIdentityTests(unittest.TestCase):
+    def test_unresolved_alias_is_valid_but_not_resolved(self):
+        identity = unresolved_identity()
+        self.assertEqual(
+            validate_device_identity(
+                identity,
+                catalog_models=["BG6H", "BG6h"],
+                validate_evidence_refs=lambda refs: None,
+            ),
             identity,
-            catalog_models=["BG6H", "BG6h"],
-            validate_evidence_refs=lambda refs: None,
         )
+        self.assertFalse(derive_model_identity_resolved(identity))
 
-    identity = unresolved_identity()
-    identity["evidence_refs"] = []
-    with pytest.raises(ValueError, match="evidence"):
-        validate_device_identity(
-            identity,
-            catalog_models=["BG6H", "BG6h"],
-            validate_evidence_refs=lambda refs: None,
-        )
+    def test_unresolved_alias_rejects_resolved_models_or_missing_evidence(self):
+        identity = unresolved_identity()
+        identity["resolved_models"] = ["BG6H"]
+        with self.assertRaisesRegex(ValueError, "resolved_models"):
+            validate_device_identity(
+                identity,
+                catalog_models=["BG6H", "BG6h"],
+                validate_evidence_refs=lambda refs: None,
+            )
+
+        identity = unresolved_identity()
+        identity["evidence_refs"] = []
+        with self.assertRaisesRegex(ValueError, "evidence"):
+            validate_device_identity(
+                identity,
+                catalog_models=["BG6H", "BG6h"],
+                validate_evidence_refs=lambda refs: None,
+            )
 ```
 
 Also test exact-match string equality, confirmed-alias note/evidence requirements,
@@ -107,7 +112,7 @@ the allowed/forbidden transitions from the design.
 Run:
 
 ```powershell
-.\.venv\Scripts\python.exe -m pytest tests/test_visual_qc_repair_case_identity.py -q
+.\.venv\Scripts\python.exe -m unittest tests.test_visual_qc_repair_case_identity -v
 ```
 
 Expected: collection fails because `repair_case_identity` does not exist.
@@ -324,7 +329,7 @@ note.
 - [ ] **Step 2: Run the contract tests and verify RED**
 
 ```powershell
-.\.venv\Scripts\python.exe -m pytest tests/test_visual_qc_repair_case_contract.py -q
+.\.venv\Scripts\python.exe -m unittest tests.test_visual_qc_repair_case_contract -v
 ```
 
 Expected: V2 schema missing and V1-only Python validator rejects V2.
@@ -359,7 +364,7 @@ supplied value that differs.
 - [ ] **Step 5: Verify V1 and V2 GREEN**
 
 ```powershell
-.\.venv\Scripts\python.exe -m pytest tests/test_visual_qc_repair_case_contract.py tests/test_visual_qc_repair_case_identity.py -q
+.\.venv\Scripts\python.exe -m unittest tests.test_visual_qc_repair_case_contract tests.test_visual_qc_repair_case_identity -v
 ```
 
 Expected: all tests pass, including unchanged V1 Schema parity.
@@ -413,7 +418,7 @@ unresolved-to-confirmed transition, and rejected backward transition.
 - [ ] **Step 2: Run and verify RED**
 
 ```powershell
-.\.venv\Scripts\python.exe -m pytest tests/test_visual_qc_repair_case_library.py -q
+.\.venv\Scripts\python.exe -m unittest tests.test_visual_qc_repair_case_library -v
 ```
 
 Expected: the case-record field validator rejects `device_identity`.
@@ -458,7 +463,7 @@ Extend `_revision_result` with:
 - [ ] **Step 4: Run focused library and contract tests**
 
 ```powershell
-.\.venv\Scripts\python.exe -m pytest tests/test_visual_qc_repair_case_library.py tests/test_visual_qc_repair_case_contract.py tests/test_visual_qc_repair_case_identity.py -q
+.\.venv\Scripts\python.exe -m unittest tests.test_visual_qc_repair_case_library tests.test_visual_qc_repair_case_contract tests.test_visual_qc_repair_case_identity -v
 ```
 
 Expected: all pass.
@@ -497,7 +502,7 @@ case tables, Golden tables, and model-specific repair outputs.
 - [ ] **Step 2: Run and verify RED**
 
 ```powershell
-.\.venv\Scripts\python.exe -m pytest tests/test_stage_visual_qc_repair_case_cli.py tests/test_visual_qc_repair_case_boundaries.py -q
+.\.venv\Scripts\python.exe -m unittest tests.test_stage_visual_qc_repair_case_cli tests.test_visual_qc_repair_case_boundaries -v
 ```
 
 Expected: CLI omits V2 identity output and/or input shape is rejected.
@@ -683,14 +688,14 @@ board-identified repair-case intake; preserve historical dated statements.
 - [ ] **Step 4: Run focused and full verification**
 
 ```powershell
-.\.venv\Scripts\python.exe -m pytest `
-  tests/test_visual_qc_repair_case_identity.py `
-  tests/test_visual_qc_repair_case_contract.py `
-  tests/test_visual_qc_repair_case_library.py `
-  tests/test_stage_visual_qc_repair_case_cli.py `
-  tests/test_visual_qc_repair_case_boundaries.py -q
+.\.venv\Scripts\python.exe -m unittest `
+  tests.test_visual_qc_repair_case_identity `
+  tests.test_visual_qc_repair_case_contract `
+  tests.test_visual_qc_repair_case_library `
+  tests.test_stage_visual_qc_repair_case_cli `
+  tests.test_visual_qc_repair_case_boundaries -v
 
-.\.venv\Scripts\python.exe -m pytest tests -q
+.\.venv\Scripts\python.exe -m unittest discover -s tests
 node --test (Get-ChildItem tests -Filter *.test.mjs | ForEach-Object FullName)
 ```
 
