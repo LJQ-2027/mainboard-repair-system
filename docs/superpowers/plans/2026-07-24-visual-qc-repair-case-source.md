@@ -457,7 +457,7 @@ git commit -m "feat: stage visual qc repair cases"
 - Modify: `docs/superpowers/plans/2026-07-24-visual-qc-repair-case-source.md`
 - Create: `tests/test_visual_qc_repair_case_boundaries.py`
 
-- [ ] **Step 1: Write boundary and end-to-end tests**
+- [x] **Step 1: Write boundary and end-to-end tests**
 
 Build:
 
@@ -478,7 +478,7 @@ Assert that no case manifest or case object appears in:
 
 Assert every boundary stays false at every revision.
 
-- [ ] **Step 2: Document the owner-only case flow**
+- [x] **Step 2: Document the owner-only case flow**
 
 Document:
 
@@ -494,7 +494,7 @@ State explicitly that completeness is context availability, not accuracy or
 training eligibility. Milo supplies material; Codex performs IDs, package
 roles, structured transcription, and missing-field reporting.
 
-- [ ] **Step 3: Run focused and full verification**
+- [x] **Step 3: Run focused and full verification**
 
 Run:
 
@@ -508,7 +508,7 @@ $files = rg --files tests | Where-Object { $_ -match '\.test\.mjs$' }; node --te
 Also parse all modified JSON and PowerShell, run `git diff --check`, and scan
 modified durable files as strict UTF-8 without U+FFFD.
 
-- [ ] **Step 4: Run a repository-external integration rehearsal**
+- [x] **Step 4: Run a repository-external integration rehearsal**
 
 Use temporary generated images and a text supporting record to execute:
 
@@ -524,14 +524,14 @@ Require original/source/supporting object hashes unchanged, deterministic exact
 replay, and no server/network action. Mark this synthetic rehearsal as plumbing
 evidence only.
 
-- [ ] **Step 5: Request independent review**
+- [x] **Step 5: Request independent review**
 
 Review exact contract shape, reference resolution, source-package hash binding,
 supporting-file safety, revision immutability, concurrency, no-clobber
 publication, downstream non-contamination, tests, and documentation. Fix every
 Critical or Important issue and rerun affected gates.
 
-- [ ] **Step 6: Commit closeout and update durable facts**
+- [x] **Step 6: Commit closeout and update durable facts**
 
 Commit implementation closeout:
 

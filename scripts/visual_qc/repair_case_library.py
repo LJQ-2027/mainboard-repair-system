@@ -493,6 +493,13 @@ def _prepare_repair_case_revision(
             raise IntakeValidationError(
                 "repair case revision changes historical device_models"
             )
+        if (
+            previous["outcome"]["status"] != "unknown"
+            and record["outcome"] != previous["outcome"]
+        ):
+            raise IntakeValidationError(
+                "repair case revision changes historical outcome"
+            )
         for field in (
             "reported_symptoms",
             "findings",
@@ -777,15 +784,48 @@ def stage_repair_case_revision(
         inspected=inspected,
         project_root=project_root,
     )
-    cases_root = library_root / "cases"
+    cases_root = _assert_controlled_path(
+        library_root,
+        library_root / "cases",
+        "repair case library path",
+    )
     _ensure_directory_durable(cases_root)
-    case_root = cases_root / payload["repair_case_id"]
-    revisions_root = case_root / "revisions"
+    _assert_controlled_path(
+        library_root, cases_root, "repair case library path"
+    )
+    case_root = _assert_controlled_path(
+        library_root,
+        cases_root / payload["repair_case_id"],
+        "repair case path",
+    )
+    _ensure_directory_durable(case_root)
+    _assert_controlled_path(library_root, case_root, "repair case path")
+    revisions_root = _assert_controlled_path(
+        library_root,
+        case_root / "revisions",
+        "repair case revisions path",
+    )
     _ensure_directory_durable(revisions_root)
-    target = revisions_root / f"{payload['revision']:04d}"
+    _assert_controlled_path(
+        library_root, revisions_root, "repair case revisions path"
+    )
+    target = _assert_controlled_path(
+        library_root,
+        revisions_root / f"{payload['revision']:04d}",
+        "repair case revision path",
+    )
     manifest_path = target / "repair-case.json"
 
     with _package_lock(cases_root, payload["repair_case_id"]):
+        for controlled_path, label in (
+            (cases_root, "repair case library path"),
+            (case_root, "repair case path"),
+            (revisions_root, "repair case revisions path"),
+            (target, "repair case revision path"),
+        ):
+            _assert_controlled_path(
+                library_root, controlled_path, label
+            )
         if target.exists():
             existing = validate_repair_case_revision(
                 manifest_path=manifest_path,

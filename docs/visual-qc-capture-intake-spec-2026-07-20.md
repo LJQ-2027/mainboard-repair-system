@@ -49,6 +49,37 @@ The canonical `knowledge-base/visual-qc-proxy-inventory-v1.json` stores the revi
 
 The source library is an integrity-preserving operator workflow, not a sandbox against a hostile local administrator. It rejects existing reparse/symlink paths and rechecks newly created object/package paths immediately before publication; the library root must also be protected by normal Windows account and filesystem permissions.
 
+## Repair Case Source
+
+Milo-supplied repair cases are preserved as an independent `VISUAL-QC-REPAIR-CASE-SOURCE-V1` fact source. They do not extend `VISUAL-QC-CASE-V1/V2`, and their presence in the controlled library does not create a server case, annotation, QC result, Golden Sample, COCO record, training-manifest row, or governed dataset member.
+
+The owner-only sequence is:
+
+```text
+stage source package(s)
+-> audit source library
+-> stage repair case revision
+-> validate append-only case chain
+-> later run physical acceptance on selected photo package
+```
+
+Milo supplies the original material and known context. Codex assigns stable ids and package roles, transcribes only supported facts, and reports missing fields. The command never infers model, board, side, diagnosis, action, or outcome from the image. Case `completeness` reports context availability only; it is not an accuracy score, review decision, Golden approval, or training-eligibility state.
+
+Create a strict UTF-8 case-record JSON and bind it to one or more already validated source packages:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\stage_visual_qc_repair_case.py `
+  --library-root D:\Visual-QC-Controlled-Source `
+  --repair-case-id case-km4-0001 `
+  --board-key km4-f151 `
+  --case-record C:\incoming\case-km4-0001.json `
+  --source-package "before_repair=D:\Visual-QC-Controlled-Source\packages\km4-before\source-package.json" `
+  --source-package "after_repair=D:\Visual-QC-Controlled-Source\packages\km4-after\source-package.json" `
+  --supporting-file "repair-note=C:\incoming\repair-note.pdf"
+```
+
+An exact replay returns `existing`. A later revision must provide the complete cumulative case record and package list plus `--previous-manifest`; the publisher increments the revision, binds the exact prior manifest SHA-256, and rejects forks, gaps, historical mutation, unsafe paths, and conflicting replays. Supporting PDF, UTF-8 TXT/CSV, XLS/XLSX, PNG, and JPEG evidence is content-addressed and integrity checked. Corrections reference a historical fact and a current replacement instead of deleting either record.
+
 ## Capture Identity
 
 `capture_setup_id` names one repeatable optical arrangement, including camera/lens, stand, background, light arrangement, orientation, and approximate distance. Changing that arrangement creates a new setup id.

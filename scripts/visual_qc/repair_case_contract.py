@@ -453,6 +453,8 @@ def validate_repair_case_manifest(
     for index, raw in enumerate(corrections):
         item = _expect_object(raw, CORRECTION_FIELDS, f"corrections[{index}]")
         correction_id = _safe_id(item["correction_id"], "correction_id")
+        if correction_id in fact_ids:
+            raise ValueError(f"duplicate correction_id: {correction_id}")
         _unique_id(correction_id, correction_ids, "correction_id")
         target = _safe_id(item["corrects_fact_id"], "corrects_fact_id")
         replacement = _safe_id(

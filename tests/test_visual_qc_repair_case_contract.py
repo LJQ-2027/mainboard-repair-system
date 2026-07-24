@@ -210,6 +210,47 @@ class VisualQcRepairCaseContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "correction target"):
             validate_repair_case_manifest(payload, historical_fact_ids=set())
 
+    def test_correction_id_cannot_collide_with_a_fact_id(self):
+        payload = canonical_payload()
+        payload["revision"] = 2
+        payload["previous_manifest_sha256"] = "b" * 64
+        payload["reported_symptoms"] = [symptom()]
+        payload["findings"] = [finding(finding_id="finding-2")]
+        payload["corrections"] = [
+            {
+                "correction_id": "finding-2",
+                "corrects_fact_id": "finding-1",
+                "description": "Later record supersedes the initial finding.",
+                "replacement_fact_id": "finding-2",
+                "evidence_refs": [evidence_reference()],
+            }
+        ]
+        payload["completeness"] = "diagnosis_linked"
+
+        with self.assertRaisesRegex(ValueError, "duplicate correction_id"):
+            validate_repair_case_manifest(
+                payload,
+                historical_fact_ids={"finding-1"},
+            )
+
+    def test_schema_enforces_revision_chain_and_derived_completeness(self):
+        schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
+
+        revision_one_with_parent = canonical_payload()
+        revision_one_with_parent["previous_manifest_sha256"] = "b" * 64
+        with self.assertRaises(jsonschema.ValidationError):
+            jsonschema.validate(revision_one_with_parent, schema)
+
+        later_without_parent = canonical_payload()
+        later_without_parent["revision"] = 2
+        with self.assertRaises(jsonschema.ValidationError):
+            jsonschema.validate(later_without_parent, schema)
+
+        false_completeness = canonical_payload()
+        false_completeness["completeness"] = "symptom_linked"
+        with self.assertRaises(jsonschema.ValidationError):
+            jsonschema.validate(false_completeness, schema)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -606,6 +606,77 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
                 library_root=self.library,
             )
 
+    def test_preexisting_case_root_link_is_rejected_before_external_write(self):
+        external_case = self.root / "external-case"
+        case_root = (
+            self.library / "cases" / "case-km4-prelinked"
+        )
+        self.create_directory_link(case_root, external_case)
+
+        with self.assertRaisesRegex(IntakeValidationError, "reparse|symlink"):
+            self.stage_case(repair_case_id="case-km4-prelinked")
+
+        self.assertFalse((external_case / "revisions").exists())
+
+    def test_preexisting_cases_root_link_is_rejected_before_external_write(self):
+        external_cases = self.root / "external-cases"
+        cases_root = self.library / "cases"
+        self.create_directory_link(cases_root, external_cases)
+
+        with self.assertRaisesRegex(IntakeValidationError, "reparse|symlink"):
+            self.stage_case(repair_case_id="case-km4-linked-cases")
+
+        self.assertEqual(list(external_cases.iterdir()), [])
+
+    def test_preexisting_revisions_link_is_rejected_before_external_write(self):
+        external_revisions = self.root / "external-revisions"
+        revisions_root = (
+            self.library
+            / "cases"
+            / "case-km4-linked-revisions"
+            / "revisions"
+        )
+        self.create_directory_link(revisions_root, external_revisions)
+
+        with self.assertRaisesRegex(IntakeValidationError, "reparse|symlink"):
+            self.stage_case(repair_case_id="case-km4-linked-revisions")
+
+        self.assertEqual(list(external_revisions.iterdir()), [])
+
+    def test_known_outcome_cannot_be_rewritten_by_a_later_revision(self):
+        completed = self.case_record(
+            outcome={
+                "status": "repair_completed",
+                "description": "Phone powered on after repair.",
+                "verification_description": "Power-on test passed.",
+                "evidence_refs": [],
+            }
+        )
+        first = self.stage_case(case_record=completed)
+        rewritten = self.case_record(
+            reported_symptoms=[
+                {
+                    "symptom_id": "symptom-1",
+                    "text": "Phone does not power on.",
+                    "source_wording": None,
+                    "fault_code": None,
+                    "evidence_refs": [],
+                }
+            ],
+            outcome={
+                "status": "not_repaired",
+                "description": "Repair did not restore power.",
+                "verification_description": None,
+                "evidence_refs": [],
+            },
+        )
+
+        with self.assertRaisesRegex(IntakeValidationError, "historical outcome"):
+            self.stage_case(
+                case_record=rewritten,
+                previous_manifest_path=first["manifest_path"],
+            )
+
     def test_canonical_evidence_hardlink_is_rejected(self):
         supporting = self.root / "repair-note.txt"
         supporting.write_text("Original repair note", encoding="utf-8")

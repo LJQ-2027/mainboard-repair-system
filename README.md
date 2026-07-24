@@ -14,6 +14,10 @@
 
 照片到达后不再手工复制或编写批次 JSON。数据管理员使用 `scripts/stage_visual_qc_source_package.py` 把 Milo 提供的临时附件逐字节保存到仓库外的内容寻址原片库，并同时生成 `VISUAL-QC-SOURCE-PACKAGE-V1` 来源回执和标准 intake manifest。工具不根据文件名或画面猜机型/板面，不修改来件，也不自动上传；`knowledge-base/visual-qc-proxy-inventory-v1.json` 固化所有已知点位图和手册代理图的审核哈希，缺失、替换或遗漏登记均锁死入库。`scripts/audit_visual_qc_source_library.py` 对完整包、当前代理撤销、对象完整性和孤立对象执行确定性只读巡检，不清理、不修复、不上传。低层 importer 只是 handoff 内部的可恢复传输实现，不能自行生成合格来源证明，也不是实物入库入口。完整命令见 `docs/visual-qc-capture-intake-spec-2026-07-20.md`。
 
+Milo 提供的真实维修案例使用独立的 `VISUAL-QC-REPAIR-CASE-SOURCE-V1` 事实源。Codex 先把案例照片固化为一个或多个来源包，再用 `scripts/stage_visual_qc_repair_case.py` 将明确的机型、板号、前后维修阶段、症状、发现、动作、结果和补充文件连接成不可覆盖的修订链。后续信息通过新修订追加；历史错误通过 correction 记录纠正，不改写旧清单。`completeness` 只表示当前上下文是否齐全，不表示描述正确、缺陷已确认、Golden 已批准或样本可训练。案例库不会自动写入视觉标注、QC 结论、Golden、COCO、训练清单、受治理数据包或服务器 API。
+
+案例材料的唯一顺序为：`stage source package(s) -> source audit -> stage repair case revision -> validate append-only case chain -> later physical acceptance on selected photo package`。Milo 只需提供原始材料和已知背景；Codex 负责稳定 ID、来源包角色、结构化转录和缺失字段报告。维修案例入库不包含组织审批，也不允许根据照片猜机型、板面、故障或维修结果。
+
 受控照片包建立后，先用本地验收运行器生成质量证据、自动配准候选和逐图叠图：
 
 ```powershell
