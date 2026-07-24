@@ -170,14 +170,25 @@ There is no organizational approval queue. “Reviewed” fields in data contrac
 
 ## First Real Batch Acceptance
 
-The first physical milestone is one known KM4/F151 bare-board front/back set. Codex must:
+The first governed physical milestone was completed with F069 V1.2 CASE005
+after-repair photos on 2026-07-24:
 
-- complete dry-run and import with a retained receipt;
-- verify server case/original recovery;
-- record quality metrics and any retake reason;
-- validate automatic or manual registration on both sides;
-- verify annotation projection and visible component-footprint association;
-- create a Golden only if Milo identifies the board as known-normal;
-- confirm the dataset audit distinguishes eligible physical evidence from the existing manual proxy.
+- exact HEIC originals and deterministic JPEG derivatives were retained in a
+  `VISUAL-QC-SOURCE-PACKAGE-V2`;
+- the source-library audit was healthy and the qualified handoff transferred
+  both board sides to an isolated local server;
+- both images were usable without retake;
+- automatic point-map feature matching safely returned
+  `manual_registration_required`;
+- both sides completed reviewed manual four-point registration with an
+  independent check point and reached `ready_for_human_qc`.
 
-Until this is complete, synthetic transforms and 21 Service Manual images remain proxy software evidence only. They must not be described as physical accuracy or used to train a production defect model.
+See `docs/visual-qc-f069-first-physical-acceptance-2026-07-24.md` for exact
+case ids, board-side assignments, errors, and evidence boundaries.
+
+The remaining real-data gates are human QC conclusions tied to the collection
+case facts, annotation-to-footprint verification, a Milo-confirmed normal
+Golden Sample, and production deployment of the qualified-handoff contract.
+Synthetic transforms and 21 Service Manual images remain proxy software
+evidence only; they must not be described as physical accuracy or used to
+train a production defect model.
