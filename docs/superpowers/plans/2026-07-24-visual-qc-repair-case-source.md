@@ -156,7 +156,7 @@ git commit -m "feat: define visual qc repair case contract"
 - Create: `tests/test_visual_qc_repair_case_library.py`
 - Reuse: `scripts/visual_qc/source_library.py`
 
-- [ ] **Step 1: Write failing source-package link tests**
+- [x] **Step 1: Write failing source-package link tests**
 
 Stage real test source packages through `stage_source_package`, then require:
 
@@ -181,7 +181,7 @@ capture stage, role, and ordered entry IDs. Reject:
 - revoked/changed source package;
 - symlink, junction, reparse, or escaping package path.
 
-- [ ] **Step 2: Run package-link tests and verify RED**
+- [x] **Step 2: Run package-link tests and verify RED**
 
 Run:
 
@@ -191,7 +191,7 @@ Run:
 
 Expected: import or missing-function failure.
 
-- [ ] **Step 3: Implement package resolution**
+- [x] **Step 3: Implement package resolution**
 
 Implement `resolve_package_links(*, project_root: Path, library_root: Path,
 assignments: list[tuple[str, Path]], board_key: str) -> list[dict]`.
@@ -208,7 +208,7 @@ Call `validate_source_package` for every assignment. Use this role/stage map:
 
 `supplemental` accepts any existing capture stage but cannot alter it.
 
-- [ ] **Step 4: Write failing supporting-evidence tests**
+- [x] **Step 4: Write failing supporting-evidence tests**
 
 Cover PDF, UTF-8 TXT, CSV, XLS, XLSX, PNG, and JPEG detection; exact SHA-256,
 byte count, original filename, description, and canonical path:
@@ -221,7 +221,7 @@ Reject empty files, executable/archive/unknown formats, invalid UTF-8 text,
 files over 100 MiB, more than 50 assignments, duplicate IDs, source changes
 during hashing/copy, hard-linked inputs, and unsafe paths.
 
-- [ ] **Step 5: Implement stable evidence inspection and storage**
+- [x] **Step 5: Implement stable evidence inspection and storage**
 
 Implement `inspect_supporting_evidence(assignments: list[tuple[str, Path]],
 descriptions: dict[str, str]) -> list[dict]` and
@@ -232,7 +232,7 @@ Read/hash through stable regular-file descriptors. Store with exclusive
 creation and byte-for-byte post-copy verification. Reuse identical canonical
 objects; reject conflicting bytes and never overwrite.
 
-- [ ] **Step 6: Verify GREEN and commit**
+- [x] **Step 6: Verify GREEN and commit**
 
 Run:
 
