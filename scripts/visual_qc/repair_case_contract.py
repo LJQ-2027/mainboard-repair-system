@@ -177,6 +177,18 @@ def _unique_id(value: str, seen: set[str], label: str) -> None:
     seen.add(value)
 
 
+def _is_allowed_string(value, allowed: set[str]) -> bool:
+    return isinstance(value, str) and value in allowed
+
+
+def _has_strict_boolean_fields(value, fields: set[str]) -> bool:
+    return (
+        isinstance(value, dict)
+        and set(value) == fields
+        and all(type(value[field]) is bool for field in fields)
+    )
+
+
 def _validate_region(value, label: str) -> None:
     if value is None:
         return
@@ -214,9 +226,9 @@ def _validate_package_links(value) -> tuple[set[tuple[str, str]], set[str]]:
             link["source_package_manifest_sha256"],
             "source_package_manifest_sha256",
         )
-        if link["capture_stage"] not in CAPTURE_STAGES:
+        if not _is_allowed_string(link["capture_stage"], CAPTURE_STAGES):
             raise ValueError("capture_stage is invalid.")
-        if link["role"] not in CASE_ROLES:
+        if not _is_allowed_string(link["role"], CASE_ROLES):
             raise ValueError("package role is invalid.")
         entry_ids = link["entry_ids"]
         if (
@@ -254,9 +266,9 @@ def _validate_supporting_evidence(value) -> set[str]:
         ):
             raise ValueError("original_filename is invalid.")
         mime_type = evidence["mime_type"]
-        extension = MIME_EXTENSIONS.get(mime_type)
-        if extension is None:
+        if not isinstance(mime_type, str) or mime_type not in MIME_EXTENSIONS:
             raise ValueError("supporting evidence MIME type is invalid.")
+        extension = MIME_EXTENSIONS[mime_type]
         byte_size = evidence["byte_size"]
         if (
             isinstance(byte_size, bool)
@@ -331,7 +343,10 @@ def derive_completeness(payload: dict) -> str:
         isinstance(actions, list)
         and actions
         and isinstance(outcome, dict)
-        and outcome.get("status") in OUTCOME_STATUSES - {"unknown"}
+        and _is_allowed_string(
+            outcome.get("status"),
+            OUTCOME_STATUSES - {"unknown"},
+        )
     ):
         return "repair_outcome_linked"
     return "diagnosis_linked"
@@ -346,7 +361,10 @@ def validate_repair_case_manifest(
     if not isinstance(payload, dict):
         raise ValueError("repair case manifest fields are invalid.")
     schema_version = payload.get("schema_version")
-    if schema_version not in REPAIR_CASE_SCHEMA_VERSIONS:
+    if not _is_allowed_string(
+        schema_version,
+        REPAIR_CASE_SCHEMA_VERSIONS,
+    ):
         raise ValueError("schema_version is invalid.")
     manifest_fields = (
         V1_MANIFEST_FIELDS
@@ -430,7 +448,7 @@ def validate_repair_case_manifest(
         if fact_id in fact_ids:
             raise ValueError(f"duplicate finding_id: {fact_id}")
         fact_ids.add(fact_id)
-        if item["claim_status"] not in CLAIM_STATUSES:
+        if not _is_allowed_string(item["claim_status"], CLAIM_STATUSES):
             raise ValueError("claim_status is invalid.")
         _required_text(item["description"], "finding description")
         _optional_text(item["defect_category"], "defect_category")
@@ -470,7 +488,7 @@ def validate_repair_case_manifest(
         )
 
     outcome = _expect_object(manifest["outcome"], OUTCOME_FIELDS, "outcome")
-    if outcome["status"] not in OUTCOME_STATUSES:
+    if not _is_allowed_string(outcome["status"], OUTCOME_STATUSES):
         raise ValueError("outcome status is invalid.")
     _optional_text(outcome["description"], "outcome description")
     _optional_text(
@@ -517,7 +535,7 @@ def validate_repair_case_manifest(
         )
 
     completeness = manifest["completeness"]
-    if completeness not in COMPLETENESS_STATES:
+    if not _is_allowed_string(completeness, COMPLETENESS_STATES):
         raise ValueError("completeness is invalid.")
     expected_completeness = derive_completeness(manifest)
     if completeness != expected_completeness:
@@ -525,13 +543,24 @@ def validate_repair_case_manifest(
             f"completeness must be derived as {expected_completeness}."
         )
     if schema_version == REPAIR_CASE_SCHEMA_V1:
-        if manifest["boundaries"] != FIXED_FALSE_BOUNDARIES:
+        if (
+            not _has_strict_boolean_fields(
+                manifest["boundaries"],
+                set(FIXED_FALSE_BOUNDARIES),
+            )
+            or manifest["boundaries"] != FIXED_FALSE_BOUNDARIES
+        ):
             raise ValueError("boundaries must remain fixed false.")
     else:
         expected_boundaries = {
             **FIXED_FALSE_BOUNDARIES,
             "model_identity_resolved": derive_model_identity_resolved(identity),
         }
+        if not _has_strict_boolean_fields(
+            manifest["boundaries"],
+            set(expected_boundaries),
+        ):
+            raise ValueError("boundaries must contain strict boolean values.")
         if manifest["boundaries"] != expected_boundaries:
             raise ValueError(
                 "model_identity_resolved must match derived device identity."

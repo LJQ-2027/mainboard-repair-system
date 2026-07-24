@@ -51,6 +51,19 @@ def unknown_outcome():
     }
 
 
+def supporting_evidence():
+    digest = "c" * 64
+    return {
+        "evidence_id": "case-note",
+        "original_filename": "case-note.txt",
+        "object_path": f"objects/case-evidence/{digest[:2]}/{digest}.txt",
+        "mime_type": "text/plain",
+        "byte_size": 12,
+        "sha256": digest,
+        "description": "Same-revision case note.",
+    }
+
+
 def canonical_payload():
     return {
         "schema_version": REPAIR_CASE_SCHEMA_VERSION,
@@ -344,6 +357,113 @@ class VisualQcRepairCaseContractTests(unittest.TestCase):
                         payload,
                         catalog_models=CATALOG_MODELS,
                     )
+
+    def test_malformed_enum_like_json_values_raise_value_error(self):
+        for version in (REPAIR_CASE_SCHEMA_V1, REPAIR_CASE_SCHEMA_V2):
+            for malformed in ([version], {"version": version}):
+                payload = (
+                    canonical_payload()
+                    if version == REPAIR_CASE_SCHEMA_V1
+                    else canonical_v2_payload()
+                )
+                payload["schema_version"] = malformed
+                with self.subTest(field="schema_version", malformed=malformed):
+                    with self.assertRaisesRegex(ValueError, "schema_version"):
+                        validate_repair_case_manifest(
+                            payload,
+                            catalog_models=(
+                                None
+                                if version == REPAIR_CASE_SCHEMA_V1
+                                else CATALOG_MODELS
+                            ),
+                        )
+
+        for field, message in (
+            ("capture_stage", "capture_stage"),
+            ("role", "package role"),
+            ("mime_type", "MIME type"),
+            ("claim_status", "claim_status"),
+            ("outcome_status", "outcome status"),
+            ("completeness", "completeness"),
+        ):
+            for malformed in ([field], {"value": field}):
+                payload = canonical_payload()
+                if field in {"capture_stage", "role"}:
+                    payload["package_links"][0][field] = malformed
+                elif field == "mime_type":
+                    payload["supporting_evidence"] = [supporting_evidence()]
+                    payload["supporting_evidence"][0]["mime_type"] = malformed
+                elif field == "claim_status":
+                    payload["findings"] = [finding()]
+                    payload["findings"][0]["claim_status"] = malformed
+                elif field == "outcome_status":
+                    payload["outcome"]["status"] = malformed
+                else:
+                    payload["completeness"] = malformed
+                with self.subTest(field=field, malformed=malformed):
+                    with self.assertRaisesRegex(ValueError, message):
+                        validate_repair_case_manifest(payload)
+
+    def test_boundary_values_require_actual_booleans_not_zero_or_one(self):
+        for field in FIXED_FALSE_BOUNDARIES:
+            for integer in (0, 1):
+                payload = canonical_payload()
+                payload["boundaries"][field] = integer
+                with self.subTest(version="V1", field=field, value=integer):
+                    with self.assertRaisesRegex(ValueError, "boundaries"):
+                        validate_repair_case_manifest(payload)
+
+        for status in ("exact_catalog_match", "unresolved_alias"):
+            for field in (*FIXED_FALSE_BOUNDARIES, "model_identity_resolved"):
+                for integer in (0, 1):
+                    payload = canonical_v2_payload(status)
+                    payload["boundaries"][field] = integer
+                    with self.subTest(
+                        version="V2",
+                        status=status,
+                        field=field,
+                        value=integer,
+                    ):
+                        with self.assertRaisesRegex(ValueError, "boundar"):
+                            validate_repair_case_manifest(
+                                payload,
+                                catalog_models=CATALOG_MODELS,
+                            )
+
+    def test_python_enforces_identity_semantics_beyond_raw_json_schema(self):
+        exact_mismatch = canonical_v2_payload()
+        exact_mismatch["device_identity"]["resolved_models"] = ["KM4 Pro"]
+        with self.assertRaisesRegex(ValueError, "identical"):
+            validate_repair_case_manifest(
+                exact_mismatch,
+                catalog_models=CATALOG_MODELS,
+            )
+
+        alias_outside_catalog = canonical_v2_payload("confirmed_alias")
+        alias_outside_catalog["device_identity"]["resolved_models"] = [
+            "UNKNOWN"
+        ]
+        with self.assertRaisesRegex(ValueError, "catalog"):
+            validate_repair_case_manifest(
+                alias_outside_catalog,
+                catalog_models=CATALOG_MODELS,
+            )
+
+    def test_python_enforces_region_sums_beyond_raw_json_schema(self):
+        for axis, start_field, size_field in (
+            ("x", "x", "width"),
+            ("y", "y", "height"),
+        ):
+            payload = canonical_payload()
+            payload["reported_symptoms"] = [symptom()]
+            invalid_finding = finding()
+            invalid_finding["region"][start_field] = 0.95
+            invalid_finding["region"][size_field] = 0.1
+            payload["findings"] = [invalid_finding]
+            payload["completeness"] = "diagnosis_linked"
+            with self.subTest(axis=axis):
+                with self.assertRaisesRegex(ValueError, "normalized region"):
+                    validate_repair_case_manifest(payload)
 
     def test_completeness_is_derived_from_available_case_context(self):
         payload = canonical_payload()
