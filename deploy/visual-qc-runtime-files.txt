@@ -13,5 +13,6 @@ scripts/audit_visual_qc_upgrade.py
 scripts/build_visual_qc_deployment_manifest.py
 scripts/import_visual_qc_batch.py
 scripts/export_visual_qc_coco.py
+scripts/stage_visual_qc_repair_case.py
 scripts/validate_visual_qc_dataset.py
 scripts/visual_qc

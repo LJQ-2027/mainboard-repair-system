@@ -297,9 +297,12 @@ def store_supporting_evidence(
     *,
     library_root: Path,
     inspected: list[dict],
+    project_root: Path | None = None,
 ) -> None:
-    project_placeholder = Path.cwd()
-    library_root = _resolve_library_root(project_placeholder, library_root)
+    effective_project_root = (
+        Path.cwd() if project_root is None else Path(project_root)
+    )
+    library_root = _resolve_library_root(effective_project_root, library_root)
     _ensure_directory_durable(library_root)
     for item in inspected:
         record = item["record"]
@@ -772,6 +775,7 @@ def stage_repair_case_revision(
     store_supporting_evidence(
         library_root=library_root,
         inspected=inspected,
+        project_root=project_root,
     )
     cases_root = library_root / "cases"
     _ensure_directory_durable(cases_root)

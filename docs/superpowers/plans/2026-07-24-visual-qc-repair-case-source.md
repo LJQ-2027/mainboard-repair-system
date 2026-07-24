@@ -367,7 +367,7 @@ git commit -m "feat: publish repair case revisions"
 - Create: `tests/test_stage_visual_qc_repair_case_cli.py`
 - Modify: `deploy/visual-qc-runtime-files.txt`
 
-- [ ] **Step 1: Write failing CLI tests**
+- [x] **Step 1: Write failing CLI tests**
 
 The CLI must accept:
 
@@ -390,7 +390,7 @@ manifest are optional. Require typed compact JSON with exit codes:
 
 Assert no image/model/side inference and no network call.
 
-- [ ] **Step 2: Run CLI tests and verify RED**
+- [x] **Step 2: Run CLI tests and verify RED**
 
 Run:
 
@@ -400,7 +400,7 @@ Run:
 
 Expected: script missing.
 
-- [ ] **Step 3: Implement the CLI**
+- [x] **Step 3: Implement the CLI**
 
 Use a parser that converts argparse errors to `IntakeValidationError`. Load the
 case-record JSON as strict UTF-8 and reject duplicate JSON keys recursively.
@@ -420,7 +420,7 @@ Call only `stage_repair_case_revision`; print:
 }
 ```
 
-- [ ] **Step 4: Add the CLI and both new modules to the runtime allowlist**
+- [x] **Step 4: Add the CLI and both new modules to the runtime allowlist**
 
 Add:
 
@@ -432,7 +432,7 @@ scripts/stage_visual_qc_repair_case.py
 deployment archive rehearsal still includes the new CLI and unchanged runtime
 manifest identity semantics.
 
-- [ ] **Step 5: Verify GREEN and commit**
+- [x] **Step 5: Verify GREEN and commit**
 
 Run:
 
