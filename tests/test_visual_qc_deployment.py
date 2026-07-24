@@ -19,6 +19,7 @@ class VisualQcDeploymentContractTests(unittest.TestCase):
         for entry in entries:
             self.assertTrue((ROOT / entry).exists(), entry)
         for required in (
+            "deploy/visual-qc-runtime-files.txt",
             "ai_proxy_server.py",
             "visual_qc_server.py",
             "ecosystem.config.js",

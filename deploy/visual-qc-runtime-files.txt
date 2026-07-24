@@ -1,4 +1,5 @@
 # Controlled-server runtime. Keep source archives, tests, reports, and docs out.
+deploy/visual-qc-runtime-files.txt
 ai_proxy_server.py
 visual_qc_server.py
 ecosystem.config.js
