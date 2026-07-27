@@ -218,6 +218,21 @@ class VisualQcRepairCaseContractTests(unittest.TestCase):
         jsonschema.Draft202012Validator.check_schema(schema)
         jsonschema.Draft202012Validator(schema).validate(payload)
 
+    def test_supporting_evidence_rejects_whitespace_only_original_filename(self):
+        payload = canonical_v2_payload()
+        payload["supporting_evidence"] = [supporting_evidence()]
+        payload["supporting_evidence"][0]["original_filename"] = "   "
+
+        with self.assertRaisesRegex(ValueError, "original_filename"):
+            validate_repair_case_manifest(
+                payload,
+                catalog_models=CATALOG_MODELS,
+            )
+
+        schema = json.loads(V2_SCHEMA_PATH.read_text(encoding="utf-8"))
+        with self.assertRaises(jsonschema.ValidationError):
+            jsonschema.Draft202012Validator(schema).validate(payload)
+
     def test_v2_accepts_all_four_identity_states_through_full_manifest(self):
         schema = json.loads(V2_SCHEMA_PATH.read_text(encoding="utf-8"))
         for status in (

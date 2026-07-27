@@ -269,7 +269,7 @@ def _validate_supporting_evidence(value) -> set[str]:
         filename = evidence["original_filename"]
         if (
             not isinstance(filename, str)
-            or not filename
+            or not filename.strip()
             or PurePosixPath(filename).name != filename
             or "\\" in filename
         ):

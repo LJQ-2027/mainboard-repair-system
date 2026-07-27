@@ -6,6 +6,7 @@ import unittest
 from scripts.visual_qc.repair_case_identity import (
     IDENTITY_FIELDS,
     IDENTITY_STATUSES,
+    MAX_IDENTITY_MODELS,
     RESOLVED_IDENTITY_STATUSES,
     derive_model_identity_resolved,
     validate_device_identity,
@@ -73,6 +74,7 @@ class VisualQcRepairCaseIdentityTests(unittest.TestCase):
         )
 
     def test_public_constants_define_exact_contract(self):
+        self.assertEqual(MAX_IDENTITY_MODELS, 20)
         self.assertEqual(
             IDENTITY_FIELDS,
             {
@@ -97,6 +99,80 @@ class VisualQcRepairCaseIdentityTests(unittest.TestCase):
             RESOLVED_IDENTITY_STATUSES,
             {"exact_catalog_match", "confirmed_alias"},
         )
+
+    def test_identity_model_lists_accept_twenty_records(self):
+        twenty_reported = confirmed_alias_identity()
+        twenty_reported["reported_models"] = [
+            f"TECNO/ALIAS-{index}" for index in range(MAX_IDENTITY_MODELS)
+        ]
+        self.assertEqual(
+            self.validate(twenty_reported)["reported_models"],
+            twenty_reported["reported_models"],
+        )
+
+        twenty_catalog = [
+            f"CATALOG-{index}" for index in range(MAX_IDENTITY_MODELS)
+        ]
+        catalog_identity = confirmed_alias_identity()
+        catalog_identity["catalog_models"] = list(twenty_catalog)
+        catalog_identity["resolved_models"] = [twenty_catalog[0]]
+        self.assertEqual(
+            validate_device_identity(
+                catalog_identity,
+                catalog_models=twenty_catalog,
+                validate_evidence_refs=lambda refs: None,
+            )["catalog_models"],
+            twenty_catalog,
+        )
+
+        twenty_resolved = confirmed_alias_identity()
+        twenty_resolved["catalog_models"] = list(twenty_catalog)
+        twenty_resolved["resolved_models"] = list(twenty_catalog)
+        self.assertEqual(
+            validate_device_identity(
+                twenty_resolved,
+                catalog_models=twenty_catalog,
+                validate_evidence_refs=lambda refs: None,
+            )["resolved_models"],
+            twenty_catalog,
+        )
+
+    def test_identity_model_lists_reject_twenty_one_records(self):
+        twenty_one = MAX_IDENTITY_MODELS + 1
+
+        reported = confirmed_alias_identity()
+        reported["reported_models"] = [
+            f"TECNO/ALIAS-{index}" for index in range(twenty_one)
+        ]
+        with self.assertRaisesRegex(
+            ValueError,
+            "reported_models must contain at most 20 records",
+        ):
+            self.validate(reported)
+
+        catalog = [f"CATALOG-{index}" for index in range(twenty_one)]
+        catalog_identity = confirmed_alias_identity()
+        catalog_identity["catalog_models"] = list(catalog)
+        catalog_identity["resolved_models"] = [catalog[0]]
+        with self.assertRaisesRegex(
+            ValueError,
+            "catalog_models must contain at most 20 records",
+        ):
+            validate_device_identity(
+                catalog_identity,
+                catalog_models=catalog,
+                validate_evidence_refs=lambda refs: None,
+            )
+
+        resolved = confirmed_alias_identity()
+        resolved["resolved_models"] = [
+            f"RESOLVED-{index}" for index in range(twenty_one)
+        ]
+        with self.assertRaisesRegex(
+            ValueError,
+            "resolved_models must contain at most 20 records",
+        ):
+            self.validate(resolved)
 
     def test_all_four_identity_states_are_valid(self):
         for identity in (

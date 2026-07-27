@@ -19,11 +19,16 @@ IDENTITY_STATUSES = {
     "conflict",
 }
 RESOLVED_IDENTITY_STATUSES = {"exact_catalog_match", "confirmed_alias"}
+MAX_IDENTITY_MODELS = 20
 
 
 def _string_list(value, label: str, *, allow_empty: bool) -> list[str]:
     if not isinstance(value, list) or (not allow_empty and not value):
         raise ValueError(f"{label} is invalid.")
+    if len(value) > MAX_IDENTITY_MODELS:
+        raise ValueError(
+            f"{label} must contain at most {MAX_IDENTITY_MODELS} records."
+        )
     if any(not isinstance(item, str) or not item.strip() for item in value):
         raise ValueError(f"{label} is invalid.")
     if len(value) != len(set(value)):
