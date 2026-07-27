@@ -74,10 +74,170 @@ class VisualQcUpgradePreflightTests(unittest.TestCase):
 
     def create_f278061_database(self) -> Path:
         database = self.root / "f278061.sqlite3"
-        VisualQcStore(database, recover_interrupted_jobs=False)
         with closing(sqlite3.connect(database)) as connection:
-            connection.execute(
-                "ALTER TABLE cases DROP COLUMN qualified_handoff_json"
+            connection.executescript(
+                """
+                CREATE TABLE cases (
+                    case_id TEXT PRIMARY KEY,
+                    actor_id TEXT NOT NULL,
+                    idempotency_key TEXT NOT NULL,
+                    request_fingerprint TEXT NOT NULL,
+                    board_key TEXT NOT NULL,
+                    board_id TEXT NOT NULL,
+                    side_id TEXT NOT NULL,
+                    capture_stage TEXT NOT NULL,
+                    evidence_role TEXT NOT NULL,
+                    capture_session_id TEXT NOT NULL DEFAULT '',
+                    capture_setup_id TEXT NOT NULL DEFAULT 'standard-bench',
+                    capture_checklist_json TEXT NOT NULL DEFAULT '{}',
+                    intake_batch_id TEXT,
+                    intake_entry_id TEXT,
+                    reference_path TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    UNIQUE(actor_id, idempotency_key)
+                );
+                CREATE TABLE images (
+                    image_id TEXT PRIMARY KEY,
+                    case_id TEXT NOT NULL REFERENCES cases(case_id),
+                    original_filename TEXT NOT NULL,
+                    mime_type TEXT NOT NULL,
+                    byte_size INTEGER NOT NULL,
+                    width INTEGER NOT NULL,
+                    height INTEGER NOT NULL,
+                    sha256 TEXT NOT NULL,
+                    storage_path TEXT NOT NULL,
+                    created_at TEXT NOT NULL
+                );
+                CREATE TABLE capture_sessions (
+                    actor_id TEXT NOT NULL,
+                    capture_session_id TEXT NOT NULL,
+                    board_key TEXT NOT NULL,
+                    board_id TEXT NOT NULL,
+                    capture_stage TEXT NOT NULL,
+                    evidence_role TEXT NOT NULL,
+                    capture_setup_id TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    PRIMARY KEY(actor_id, capture_session_id)
+                );
+                CREATE TABLE jobs (
+                    job_id TEXT PRIMARY KEY,
+                    case_id TEXT NOT NULL REFERENCES cases(case_id),
+                    image_id TEXT NOT NULL REFERENCES images(image_id),
+                    job_type TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    attempt_count INTEGER NOT NULL DEFAULT 0,
+                    result_json TEXT,
+                    error_code TEXT,
+                    error_message TEXT,
+                    input_json TEXT NOT NULL DEFAULT '{}',
+                    dedupe_key TEXT UNIQUE,
+                    created_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL
+                );
+                CREATE TABLE audit_events (
+                    event_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    case_id TEXT NOT NULL REFERENCES cases(case_id),
+                    actor_id TEXT NOT NULL,
+                    event_type TEXT NOT NULL,
+                    payload_json TEXT NOT NULL,
+                    created_at TEXT NOT NULL
+                );
+                CREATE TABLE registration_reviews (
+                    review_id TEXT PRIMARY KEY,
+                    case_id TEXT NOT NULL REFERENCES cases(case_id),
+                    job_id TEXT NOT NULL REFERENCES jobs(job_id),
+                    reviewer_id TEXT NOT NULL,
+                    decision TEXT NOT NULL,
+                    method TEXT NOT NULL,
+                    matrix_json TEXT NOT NULL,
+                    anchors_json TEXT NOT NULL DEFAULT '[]',
+                    check_points_json TEXT NOT NULL DEFAULT '[]',
+                    error_json TEXT NOT NULL DEFAULT '{"count":0,"rms":null,"maximum":null}',
+                    notes TEXT NOT NULL,
+                    created_at TEXT NOT NULL
+                );
+                CREATE TABLE golden_samples (
+                    golden_sample_id TEXT PRIMARY KEY,
+                    case_id TEXT NOT NULL REFERENCES cases(case_id),
+                    registration_review_id TEXT NOT NULL REFERENCES registration_reviews(review_id),
+                    board_key TEXT NOT NULL,
+                    board_id TEXT NOT NULL,
+                    side_id TEXT NOT NULL,
+                    capture_setup_id TEXT NOT NULL,
+                    version INTEGER NOT NULL,
+                    status TEXT NOT NULL,
+                    source_sha256 TEXT NOT NULL,
+                    reviewer_id TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    retired_at TEXT,
+                    UNIQUE(board_key, side_id, capture_setup_id, version)
+                );
+                CREATE TABLE artifacts (
+                    artifact_id TEXT PRIMARY KEY,
+                    case_id TEXT NOT NULL REFERENCES cases(case_id),
+                    job_id TEXT NOT NULL REFERENCES jobs(job_id),
+                    kind TEXT NOT NULL,
+                    mime_type TEXT NOT NULL,
+                    sha256 TEXT NOT NULL,
+                    byte_size INTEGER NOT NULL,
+                    storage_path TEXT NOT NULL,
+                    created_at TEXT NOT NULL
+                );
+                CREATE TABLE candidate_reviews (
+                    candidate_review_id TEXT PRIMARY KEY,
+                    case_id TEXT NOT NULL REFERENCES cases(case_id),
+                    job_id TEXT NOT NULL REFERENCES jobs(job_id),
+                    candidate_id TEXT NOT NULL,
+                    reviewer_id TEXT NOT NULL,
+                    decision TEXT NOT NULL,
+                    defect_category TEXT,
+                    label_source TEXT NOT NULL,
+                    candidate_json TEXT NOT NULL,
+                    notes TEXT NOT NULL,
+                    created_at TEXT NOT NULL
+                );
+                CREATE TABLE case_qc_reviews (
+                    qc_review_id TEXT PRIMARY KEY,
+                    case_id TEXT NOT NULL REFERENCES cases(case_id),
+                    registration_review_id TEXT NOT NULL REFERENCES registration_reviews(review_id),
+                    reviewer_id TEXT NOT NULL,
+                    version INTEGER NOT NULL,
+                    qc_result TEXT NOT NULL,
+                    annotations_json TEXT NOT NULL,
+                    notes TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    UNIQUE(case_id, version)
+                );
+                CREATE TABLE retention_runs (
+                    run_id TEXT PRIMARY KEY,
+                    status TEXT NOT NULL,
+                    cutoff_at TEXT NOT NULL,
+                    candidate_count INTEGER NOT NULL,
+                    deleted_cases INTEGER NOT NULL DEFAULT 0,
+                    deleted_objects INTEGER NOT NULL DEFAULT 0,
+                    deleted_bytes INTEGER NOT NULL DEFAULT 0,
+                    payload_json TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    completed_at TEXT,
+                    error_message TEXT
+                );
+                CREATE INDEX jobs_status_created ON jobs(status, created_at);
+                CREATE INDEX registration_reviews_case_created
+                    ON registration_reviews(case_id, created_at);
+                CREATE INDEX golden_samples_scope_status
+                    ON golden_samples(board_key, side_id, capture_setup_id, status);
+                CREATE INDEX candidate_reviews_job_candidate
+                    ON candidate_reviews(job_id, candidate_id, created_at);
+                CREATE INDEX case_qc_reviews_case_version
+                    ON case_qc_reviews(case_id, version);
+                CREATE UNIQUE INDEX cases_actor_intake_entry
+                    ON cases(actor_id, intake_batch_id, intake_entry_id)
+                    WHERE intake_batch_id IS NOT NULL AND intake_entry_id IS NOT NULL;
+                CREATE INDEX cases_capture_session
+                    ON cases(actor_id, capture_session_id, created_at);
+                CREATE UNIQUE INDEX jobs_dedupe_key
+                    ON jobs(dedupe_key) WHERE dedupe_key IS NOT NULL;
+                """
             )
             connection.execute(
                 """
@@ -285,7 +445,30 @@ class VisualQcUpgradePreflightTests(unittest.TestCase):
             row = connection.execute(
                 "SELECT case_id, qualified_handoff_json FROM cases"
             ).fetchone()
+            task5_tables = {
+                item[0]
+                for item in connection.execute(
+                    "SELECT name FROM sqlite_master "
+                    "WHERE type='table' AND name LIKE 'repair_evidence_link_%'"
+                )
+            }
+            task5_index = connection.execute(
+                "SELECT sql FROM sqlite_master WHERE type='index' "
+                "AND name='repair_evidence_link_cases_server_case'"
+            ).fetchone()
         self.assertEqual(row, ("legacy-proxy", None))
+        self.assertEqual(
+            task5_tables,
+            {
+                "repair_evidence_link_revisions",
+                "repair_evidence_link_cases",
+            },
+        )
+        self.assertIsNotNone(task5_index)
+        self.assertIn(
+            "(server_case_id, link_set_id, revision)",
+            task5_index[0],
+        )
 
     def test_unexpected_schema_drift_fails_closed(self):
         source = self.create_f278061_database()
@@ -294,7 +477,9 @@ class VisualQcUpgradePreflightTests(unittest.TestCase):
         before = database_projection(source)
         rehearse_candidate_migration(working, "f278061")
         with closing(sqlite3.connect(working)) as connection:
-            connection.execute("ALTER TABLE cases ADD COLUMN unreviewed_data TEXT")
+            connection.execute(
+                "CREATE TABLE unreviewed_task5_shadow (value TEXT)"
+            )
             connection.commit()
 
         comparison = compare_database_projections(

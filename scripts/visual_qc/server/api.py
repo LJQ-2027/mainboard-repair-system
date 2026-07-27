@@ -50,6 +50,11 @@ class FinalQcReviewRequest(BaseModel):
     notes: str = Field(default="", max_length=1000)
 
 
+class RepairEvidenceLinkImportRequest(BaseModel):
+    manifest: dict
+    manifest_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
 def create_app(settings: VisualQcServerSettings | None = None) -> FastAPI:
     settings = settings or VisualQcServerSettings.from_environment()
     service = VisualQcService(settings)
@@ -264,6 +269,59 @@ def create_app(settings: VisualQcServerSettings | None = None) -> FastAPI:
                 media_type=original["mime_type"],
                 filename=original["original_filename"],
             )
+        except VisualQcServiceError as exc:
+            service_error(exc)
+
+    @app.post(
+        "/api/v1/visual-qc/admin/repair-evidence-links",
+        status_code=201,
+    )
+    def import_repair_evidence_link(
+        request: RepairEvidenceLinkImportRequest,
+        x_actor_id: str | None = Header(None, alias="X-Actor-Id"),
+        x_actor_role: str | None = Header(None, alias="X-Actor-Role"),
+    ):
+        require_data_admin(x_actor_role)
+        try:
+            return service.import_repair_evidence_link(
+                manifest=request.manifest,
+                manifest_sha256=request.manifest_sha256,
+                actor_id=actor_id(x_actor_id),
+            )
+        except VisualQcServiceError as exc:
+            service_error(exc)
+
+    @app.get("/api/v1/visual-qc/admin/repair-evidence-links")
+    def list_repair_evidence_links(
+        server_case_id: str | None = None,
+        repair_case_id: str | None = None,
+        x_actor_id: str | None = Header(None, alias="X-Actor-Id"),
+        x_actor_role: str | None = Header(None, alias="X-Actor-Role"),
+    ):
+        require_data_admin(x_actor_role)
+        actor_id(x_actor_id)
+        try:
+            return service.list_repair_evidence_links(
+                server_case_id=server_case_id,
+                repair_case_id=repair_case_id,
+            )
+        except VisualQcServiceError as exc:
+            service_error(exc)
+
+    @app.get(
+        "/api/v1/visual-qc/admin/repair-evidence-links/"
+        "{link_set_id}/revisions/{revision}"
+    )
+    def get_repair_evidence_link(
+        link_set_id: str,
+        revision: int,
+        x_actor_id: str | None = Header(None, alias="X-Actor-Id"),
+        x_actor_role: str | None = Header(None, alias="X-Actor-Role"),
+    ):
+        require_data_admin(x_actor_role)
+        actor_id(x_actor_id)
+        try:
+            return service.get_repair_evidence_link(link_set_id, revision)
         except VisualQcServiceError as exc:
             service_error(exc)
 

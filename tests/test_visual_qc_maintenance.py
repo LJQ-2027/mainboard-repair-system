@@ -1,6 +1,7 @@
 import hashlib
 import io
 import json
+import sqlite3
 import tempfile
 import threading
 import unittest
@@ -17,6 +18,8 @@ from fastapi.testclient import TestClient
 from scripts.visual_qc.server.api import create_app
 from scripts.visual_qc.server.config import VisualQcServerSettings
 from scripts.visual_qc.server.storage import LocalObjectStorage, StorageCleanupError
+from scripts.visual_qc.repair_evidence_link_contract import canonical_sha256
+from tests.test_visual_qc_repair_evidence_link_contract import link_manifest
 from scripts.maintain_visual_qc_server import (
     main as maintenance_main,
     validate_execution_confirmation,
@@ -124,6 +127,64 @@ class VisualQcMaintenanceTests(unittest.TestCase):
                 "created_at": OLD_TIMESTAMP,
             }
         )
+
+    def _insert_retention_projection(self, case_id: str):
+        manifest = link_manifest()
+        evidence = manifest["physical_evidence"][0]
+        evidence["server_case_id"] = case_id
+        evidence["physical_evidence_snapshot_sha256"] = canonical_sha256(
+            {
+                key: value
+                for key, value in evidence.items()
+                if key != "physical_evidence_snapshot_sha256"
+            }
+        )
+        manifest_sha256 = canonical_sha256(manifest)
+        repair_case_id = manifest["repair_case_references"][0][
+            "repair_case_id"
+        ]
+        with self.service.store.connect() as connection:
+            connection.execute(
+                """
+                INSERT INTO repair_evidence_link_revisions (
+                    link_set_id, revision, manifest_sha256, repair_case_id,
+                    board_key, board_id, manifest_json, import_actor_id,
+                    imported_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    manifest["link_set_id"],
+                    manifest["revision"],
+                    manifest_sha256,
+                    repair_case_id,
+                    manifest["board"]["board_key"],
+                    manifest["board"]["board_id"],
+                    json.dumps(
+                        manifest,
+                        ensure_ascii=False,
+                        sort_keys=True,
+                        separators=(",", ":"),
+                    ),
+                    "maintenance-reviewer",
+                    OLD_TIMESTAMP,
+                ),
+            )
+            connection.execute(
+                """
+                INSERT INTO repair_evidence_link_cases (
+                    link_set_id, revision, server_case_id,
+                    physical_evidence_snapshot_sha256
+                ) VALUES (?, ?, ?, ?)
+                """,
+                (
+                    manifest["link_set_id"],
+                    manifest["revision"],
+                    case_id,
+                    evidence["physical_evidence_snapshot_sha256"],
+                ),
+            )
+            connection.commit()
+        return manifest
 
     def test_health_reports_disk_pressure_and_operational_counts(self):
         self._create_case("queued-case", encode_jpeg(140))
@@ -260,6 +321,188 @@ class VisualQcMaintenanceTests(unittest.TestCase):
         plan = self.service.run_retention(dry_run=True, now=NOW)
 
         self.assertEqual(plan["candidate_case_ids"], [eligible["case_id"]])
+
+    def test_retention_excludes_linked_cases_and_reports_exact_audit_reason(self):
+        linked = self._create_case("linked-retention", encode_jpeg(154))
+        self._make_old_terminal(linked["case_id"])
+        self._insert_retention_projection(linked["case_id"])
+
+        plan = self.service.run_retention(dry_run=True, now=NOW)
+
+        self.assertNotIn(linked["case_id"], plan["candidate_case_ids"])
+        self.assertIn(
+            {
+                "case_id": linked["case_id"],
+                "reason": "repair_evidence_link_present",
+            },
+            plan["excluded_cases"],
+        )
+        self.assertIsNotNone(self.service.store.get_case(linked["case_id"]))
+
+    def test_retention_uses_manifest_when_child_projection_is_missing(self):
+        linked = self._create_case("linked-child-missing", encode_jpeg(155))
+        self._make_old_terminal(linked["case_id"])
+        manifest = self._insert_retention_projection(linked["case_id"])
+        with self.service.store.connect() as connection:
+            connection.execute(
+                "DELETE FROM repair_evidence_link_cases "
+                "WHERE link_set_id = ? AND revision = ?",
+                (manifest["link_set_id"], manifest["revision"]),
+            )
+            connection.commit()
+
+        plan = self.service.run_retention(dry_run=True, now=NOW)
+
+        self.assertEqual(plan["candidate_case_ids"], [])
+        self.assertIn(
+            {
+                "case_id": linked["case_id"],
+                "reason": "repair_evidence_link_present",
+            },
+            plan["excluded_cases"],
+        )
+        with self.assertRaisesRegex(
+            Exception, "repair_evidence_link_projection_corrupt"
+        ):
+            self.service.store.get_repair_evidence_link_revision(
+                manifest["link_set_id"], manifest["revision"]
+            )
+
+    def test_retention_fails_closed_when_link_case_child_is_orphaned(self):
+        linked = self._create_case("linked-orphaned", encode_jpeg(156))
+        unrelated = self._create_case("unrelated-orphaned", encode_jpeg(157))
+        for case in (linked, unrelated):
+            self._make_old_terminal(case["case_id"])
+        manifest = self._insert_retention_projection(linked["case_id"])
+
+        connection = sqlite3.connect(self.service.store.database_path)
+        try:
+            connection.execute("PRAGMA foreign_keys = OFF")
+            connection.execute(
+                "DELETE FROM repair_evidence_link_revisions "
+                "WHERE link_set_id = ? AND revision = ?",
+                (manifest["link_set_id"], manifest["revision"]),
+            )
+            connection.commit()
+        finally:
+            connection.close()
+
+        plan = self.service.run_retention(dry_run=True, now=NOW)
+
+        self.assertEqual(plan["candidate_case_ids"], [])
+        self.assertEqual(
+            plan["excluded_cases"],
+            [
+                {
+                    "case_id": case_id,
+                    "reason": "repair_evidence_link_authority_unavailable",
+                }
+                for case_id in sorted(
+                    (linked["case_id"], unrelated["case_id"])
+                )
+            ],
+        )
+
+        executed = self.service.run_retention(dry_run=False, now=NOW)
+
+        self.assertEqual(executed["deleted_cases"], 0)
+        self.assertIsNotNone(self.service.store.get_case(linked["case_id"]))
+        self.assertIsNotNone(self.service.store.get_case(unrelated["case_id"]))
+
+    def test_retention_records_final_protection_when_orphan_appears_before_delete(self):
+        stale = self._create_case("stale-race-orphan", encode_jpeg(158))
+        unrelated = self._create_case("unrelated-race-orphan", encode_jpeg(159))
+        for case in (stale, unrelated):
+            self._make_old_terminal(case["case_id"])
+
+        original_delete = self.service.store.delete_retention_candidates
+
+        def introduce_orphan_before_delete(candidates, cutoff_at):
+            connection = sqlite3.connect(self.service.store.database_path)
+            try:
+                connection.execute("PRAGMA foreign_keys = OFF")
+                connection.execute(
+                    """
+                    INSERT INTO repair_evidence_link_cases (
+                        link_set_id, revision, server_case_id,
+                        physical_evidence_snapshot_sha256
+                    ) VALUES (?, ?, ?, ?)
+                    """,
+                    (
+                        "race-orphan-link-set",
+                        1,
+                        stale["case_id"],
+                        "f" * 64,
+                    ),
+                )
+                connection.commit()
+            finally:
+                connection.close()
+            return original_delete(candidates, cutoff_at)
+
+        with patch.object(
+            self.service.store,
+            "delete_retention_candidates",
+            side_effect=introduce_orphan_before_delete,
+        ):
+            executed = self.service.run_retention(dry_run=False, now=NOW)
+
+        expected_exclusions = [
+            {
+                "case_id": case_id,
+                "reason": "repair_evidence_link_authority_unavailable",
+            }
+            for case_id in sorted((stale["case_id"], unrelated["case_id"]))
+        ]
+        self.assertEqual(executed["deleted_cases"], 0)
+        self.assertEqual(executed["candidate_case_ids"], [])
+        self.assertEqual(executed["candidate_count"], 0)
+        self.assertEqual(executed["excluded_cases"], expected_exclusions)
+        self.assertIsNotNone(self.service.store.get_case(stale["case_id"]))
+        self.assertIsNotNone(self.service.store.get_case(unrelated["case_id"]))
+
+        with self.service.store.connect() as connection:
+            run = connection.execute(
+                "SELECT * FROM retention_runs ORDER BY created_at DESC LIMIT 1"
+            ).fetchone()
+        payload = json.loads(run["payload_json"])
+        self.assertEqual(run["status"], "completed")
+        self.assertEqual(run["candidate_count"], 0)
+        self.assertEqual(payload["candidate_case_ids"], [])
+        self.assertEqual(payload["excluded_cases"], expected_exclusions)
+
+    def test_retention_fails_closed_when_canonical_manifest_is_corrupt(self):
+        linked = self._create_case("linked-corrupt", encode_jpeg(156))
+        unrelated = self._create_case("unrelated-corrupt", encode_jpeg(157))
+        for case in (linked, unrelated):
+            self._make_old_terminal(case["case_id"])
+        manifest = self._insert_retention_projection(linked["case_id"])
+        with self.service.store.connect() as connection:
+            connection.execute(
+                """
+                UPDATE repair_evidence_link_revisions
+                SET manifest_json = '{}'
+                WHERE link_set_id = ? AND revision = ?
+                """,
+                (manifest["link_set_id"], manifest["revision"]),
+            )
+            connection.commit()
+
+        plan = self.service.run_retention(dry_run=True, now=NOW)
+
+        self.assertEqual(plan["candidate_case_ids"], [])
+        self.assertEqual(
+            plan["excluded_cases"],
+            [
+                {
+                    "case_id": case_id,
+                    "reason": "repair_evidence_link_authority_unavailable",
+                }
+                for case_id in sorted(
+                    (linked["case_id"], unrelated["case_id"])
+                )
+            ],
+        )
 
     def test_upload_reference_commit_and_retention_object_deletion_are_serialized(self):
         shared_content = encode_jpeg(160)

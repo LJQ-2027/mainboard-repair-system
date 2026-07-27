@@ -6,12 +6,30 @@ import json
 from pathlib import Path
 import sqlite3
 
+from scripts.visual_qc.repair_evidence_link_contract import (
+    RepairEvidenceLinkContractError,
+    canonical_sha256,
+    validate_repair_evidence_link_manifest,
+)
+
+
+MAX_REPAIR_EVIDENCE_LINK_RESULTS = 100
+MAX_REPAIR_EVIDENCE_LINK_MANIFEST_BYTES = 16 * 1024 * 1024
+
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
 
 
 class CaptureSessionIdentityConflict(RuntimeError):
+    pass
+
+
+class RepairEvidenceProjectionCorrupt(RuntimeError):
+    pass
+
+
+class RepairEvidenceProjectionResultLimitExceeded(RuntimeError):
     pass
 
 
@@ -183,6 +201,29 @@ class VisualQcStore:
                     completed_at TEXT,
                     error_message TEXT
                 );
+                CREATE TABLE IF NOT EXISTS repair_evidence_link_revisions (
+                    link_set_id TEXT NOT NULL,
+                    revision INTEGER NOT NULL,
+                    manifest_sha256 TEXT NOT NULL,
+                    repair_case_id TEXT NOT NULL,
+                    board_key TEXT NOT NULL,
+                    board_id TEXT NOT NULL,
+                    manifest_json TEXT NOT NULL,
+                    import_actor_id TEXT NOT NULL,
+                    imported_at TEXT NOT NULL,
+                    PRIMARY KEY (link_set_id, revision),
+                    UNIQUE (manifest_sha256)
+                );
+                CREATE TABLE IF NOT EXISTS repair_evidence_link_cases (
+                    link_set_id TEXT NOT NULL,
+                    revision INTEGER NOT NULL,
+                    server_case_id TEXT NOT NULL,
+                    physical_evidence_snapshot_sha256 TEXT NOT NULL,
+                    PRIMARY KEY (link_set_id, revision, server_case_id),
+                    FOREIGN KEY (link_set_id, revision)
+                        REFERENCES repair_evidence_link_revisions(link_set_id, revision),
+                    FOREIGN KEY (server_case_id) REFERENCES cases(case_id)
+                );
                 CREATE INDEX IF NOT EXISTS jobs_status_created
                     ON jobs(status, created_at);
                 CREATE INDEX IF NOT EXISTS registration_reviews_case_created
@@ -193,6 +234,8 @@ class VisualQcStore:
                     ON candidate_reviews(job_id, candidate_id, created_at);
                 CREATE INDEX IF NOT EXISTS case_qc_reviews_case_version
                     ON case_qc_reviews(case_id, version);
+                CREATE INDEX IF NOT EXISTS repair_evidence_link_cases_server_case
+                    ON repair_evidence_link_cases(server_case_id, link_set_id, revision);
                 """
             )
             case_columns = {
@@ -320,10 +363,24 @@ class VisualQcStore:
             },
         }
 
-    def list_retention_candidates(self, cutoff_at: str, limit: int):
+    def list_retention_candidates(
+        self,
+        cutoff_at: str,
+        limit: int,
+        protected_case_ids=(),
+    ):
+        protected_case_ids = tuple(sorted(set(protected_case_ids)))
+        protection_clause = ""
+        protection_parameters = []
+        if protected_case_ids:
+            placeholders = ",".join("?" for _ in protected_case_ids)
+            protection_clause = (
+                f"AND cases.case_id NOT IN ({placeholders})"
+            )
+            protection_parameters.extend(protected_case_ids)
         with self.connect() as connection:
             rows = connection.execute(
-                """
+                f"""
                 SELECT cases.case_id, cases.created_at, images.storage_path
                 FROM cases
                 JOIN images USING(case_id)
@@ -349,10 +406,11 @@ class VisualQcStore:
                     SELECT 1 FROM candidate_reviews
                     WHERE candidate_reviews.case_id = cases.case_id
                   )
+                  {protection_clause}
                 ORDER BY cases.created_at, cases.case_id
                 LIMIT ?
                 """,
-                (cutoff_at, limit),
+                (cutoff_at, *protection_parameters, limit),
             ).fetchall()
             candidates = []
             for row in rows:
@@ -395,10 +453,30 @@ class VisualQcStore:
     def delete_retention_candidates(self, candidates: list[dict], cutoff_at: str):
         requested_ids = [candidate["case_id"] for candidate in candidates]
         if not requested_ids:
-            return []
-        placeholders = ",".join("?" for _ in requested_ids)
+            return {
+                "candidate_case_ids": [],
+                "excluded_cases": [],
+                "deleted_case_ids": [],
+            }
         with self.connect() as connection:
             connection.execute("BEGIN IMMEDIATE")
+            protected_cases = self._retention_link_protections(
+                connection, cutoff_at
+            )
+            protected_ids = {item["case_id"] for item in protected_cases}
+            requested_ids = [
+                case_id
+                for case_id in requested_ids
+                if case_id not in protected_ids
+            ]
+            if not requested_ids:
+                connection.commit()
+                return {
+                    "candidate_case_ids": [],
+                    "excluded_cases": protected_cases,
+                    "deleted_case_ids": [],
+                }
+            placeholders = ",".join("?" for _ in requested_ids)
             eligible_rows = connection.execute(
                 f"""
                 SELECT cases.case_id
@@ -442,7 +520,410 @@ class VisualQcStore:
                     eligible_ids,
                 )
             connection.commit()
-        return eligible_ids
+        return {
+            "candidate_case_ids": requested_ids,
+            "excluded_cases": protected_cases,
+            "deleted_case_ids": eligible_ids,
+        }
+
+    def _retention_link_protections(self, connection, cutoff_at: str):
+        revision_rows = connection.execute(
+            """
+            SELECT * FROM repair_evidence_link_revisions
+            ORDER BY link_set_id, revision
+            """
+        ).fetchall()
+        referenced_case_ids = set()
+        try:
+            orphan_link_case = connection.execute(
+                """
+                SELECT 1
+                FROM repair_evidence_link_cases AS link_cases
+                LEFT JOIN repair_evidence_link_revisions AS revisions
+                    ON revisions.link_set_id = link_cases.link_set_id
+                    AND revisions.revision = link_cases.revision
+                WHERE revisions.link_set_id IS NULL
+                LIMIT 1
+                """
+            ).fetchone()
+            if orphan_link_case is not None:
+                raise RepairEvidenceProjectionCorrupt(
+                    "repair_evidence_link_orphan_case_projection"
+                )
+            for row in revision_rows:
+                manifest = self._strict_repair_evidence_link_manifest(row)
+                referenced_case_ids.update(
+                    item["server_case_id"]
+                    for item in manifest["physical_evidence"]
+                )
+        except RepairEvidenceProjectionCorrupt:
+            rows = connection.execute(
+                """
+                SELECT case_id FROM cases
+                WHERE created_at < ?
+                ORDER BY case_id
+                """,
+                (cutoff_at,),
+            ).fetchall()
+            return [
+                {
+                    "case_id": row["case_id"],
+                    "reason": (
+                        "repair_evidence_link_authority_unavailable"
+                    ),
+                }
+                for row in rows
+            ]
+
+        if not referenced_case_ids:
+            return []
+        rows = connection.execute(
+            """
+            SELECT case_id FROM cases
+            WHERE created_at < ?
+            ORDER BY case_id
+            """,
+            (cutoff_at,),
+        ).fetchall()
+        return [
+            {
+                "case_id": row["case_id"],
+                "reason": "repair_evidence_link_present",
+            }
+            for row in rows
+            if row["case_id"] in referenced_case_ids
+        ]
+
+    def list_retention_link_protections(self, cutoff_at: str):
+        with self.connect() as connection:
+            return self._retention_link_protections(
+                connection, cutoff_at
+            )
+
+    @staticmethod
+    def _strict_repair_evidence_link_manifest(row):
+        if not row:
+            return None
+        result = dict(row)
+        manifest_json = result["manifest_json"]
+        if (
+            not isinstance(manifest_json, str)
+            or len(manifest_json.encode("utf-8"))
+            > MAX_REPAIR_EVIDENCE_LINK_MANIFEST_BYTES
+        ):
+            raise RepairEvidenceProjectionCorrupt(
+                "repair_evidence_link_projection_corrupt"
+            )
+
+        def reject_duplicates(pairs):
+            value = {}
+            for key, item in pairs:
+                if key in value:
+                    raise RepairEvidenceProjectionCorrupt(
+                        "repair_evidence_link_projection_corrupt"
+                    )
+                value[key] = item
+            return value
+
+        def reject_constant(_value):
+            raise RepairEvidenceProjectionCorrupt(
+                "repair_evidence_link_projection_corrupt"
+            )
+
+        try:
+            manifest = json.loads(
+                manifest_json,
+                object_pairs_hook=reject_duplicates,
+                parse_constant=reject_constant,
+            )
+            if not isinstance(manifest, dict):
+                raise RepairEvidenceProjectionCorrupt(
+                    "repair_evidence_link_projection_corrupt"
+                )
+            manifest = validate_repair_evidence_link_manifest(manifest)
+            if canonical_sha256(manifest) != result["manifest_sha256"]:
+                raise RepairEvidenceProjectionCorrupt(
+                    "repair_evidence_link_projection_corrupt"
+                )
+        except (
+            json.JSONDecodeError,
+            UnicodeError,
+            RepairEvidenceLinkContractError,
+            TypeError,
+            ValueError,
+        ) as exc:
+            raise RepairEvidenceProjectionCorrupt(
+                "repair_evidence_link_projection_corrupt"
+            ) from exc
+        return manifest
+
+    @classmethod
+    def _repair_evidence_link_row(cls, row, case_rows=None):
+        if not row:
+            return None
+        result = dict(row)
+        manifest = cls._strict_repair_evidence_link_manifest(row)
+
+        repair_case_ids = {
+            item["repair_case_id"]
+            for item in manifest["repair_case_references"]
+        }
+        expected_summary = {
+            "link_set_id": manifest["link_set_id"],
+            "revision": manifest["revision"],
+            "repair_case_id": (
+                next(iter(repair_case_ids))
+                if len(repair_case_ids) == 1
+                else None
+            ),
+            "board_key": manifest["board"]["board_key"],
+            "board_id": manifest["board"]["board_id"],
+            "manifest_sha256": canonical_sha256(manifest),
+        }
+        if any(
+            result.get(key) != value
+            for key, value in expected_summary.items()
+        ):
+            raise RepairEvidenceProjectionCorrupt(
+                "repair_evidence_link_projection_corrupt"
+            )
+
+        if case_rows is None:
+            raise RepairEvidenceProjectionCorrupt(
+                "repair_evidence_link_projection_corrupt"
+            )
+        expected_cases = sorted(
+            (
+                item["server_case_id"],
+                item["physical_evidence_snapshot_sha256"],
+            )
+            for item in manifest["physical_evidence"]
+        )
+        actual_cases = sorted(
+            (
+                item["server_case_id"],
+                item["physical_evidence_snapshot_sha256"],
+            )
+            for item in case_rows
+        )
+        if (
+            len(actual_cases) != len(set(actual_cases))
+            or actual_cases != expected_cases
+        ):
+            raise RepairEvidenceProjectionCorrupt(
+                "repair_evidence_link_projection_corrupt"
+            )
+        result["manifest"] = manifest
+        result["server_case_ids"] = [
+            server_case_id for server_case_id, _snapshot in actual_cases
+        ]
+        return result
+
+    @staticmethod
+    def _repair_evidence_link_case_rows(connection, link_set_id, revision):
+        return connection.execute(
+            """
+            SELECT server_case_id, physical_evidence_snapshot_sha256
+            FROM repair_evidence_link_cases
+            WHERE link_set_id = ? AND revision = ?
+            ORDER BY server_case_id
+            """,
+            (link_set_id, revision),
+        ).fetchall()
+
+    def import_repair_evidence_link_revision(
+        self,
+        *,
+        manifest: dict,
+        manifest_sha256: str,
+        actor_id: str,
+        imported_at: str,
+        validate_current=None,
+        validate_after=None,
+        on_committed=None,
+    ) -> dict:
+        manifest_json = json.dumps(
+            manifest,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+            allow_nan=False,
+        )
+        link_set_id = manifest["link_set_id"]
+        revision = manifest["revision"]
+        repair_case_ids = {
+            item["repair_case_id"] for item in manifest["repair_case_references"]
+        }
+        if len(repair_case_ids) != 1:
+            raise ValueError("projection_repair_case_conflict")
+        repair_case_id = next(iter(repair_case_ids))
+        evidence = {
+            item["server_case_id"]: item["physical_evidence_snapshot_sha256"]
+            for item in manifest["physical_evidence"]
+        }
+        if len(evidence) != len(manifest["physical_evidence"]):
+            raise ValueError("projection_case_conflict")
+        with self.connect() as connection:
+            try:
+                connection.execute("BEGIN IMMEDIATE")
+                existing = connection.execute(
+                    """
+                    SELECT * FROM repair_evidence_link_revisions
+                    WHERE link_set_id = ? AND revision = ?
+                    """,
+                    (link_set_id, revision),
+                ).fetchone()
+                if existing is None:
+                    hash_match = connection.execute(
+                        """
+                        SELECT * FROM repair_evidence_link_revisions
+                        WHERE manifest_sha256 = ?
+                        """,
+                        (manifest_sha256,),
+                    ).fetchone()
+                    if hash_match is not None:
+                        hash_case_rows = self._repair_evidence_link_case_rows(
+                            connection,
+                            hash_match["link_set_id"],
+                            hash_match["revision"],
+                        )
+                        self._repair_evidence_link_row(
+                            hash_match, hash_case_rows
+                        )
+                        raise RepairEvidenceProjectionCorrupt(
+                            "repair_evidence_link_projection_corrupt"
+                        )
+                if existing:
+                    case_rows = self._repair_evidence_link_case_rows(
+                        connection,
+                        existing["link_set_id"],
+                        existing["revision"],
+                    )
+                    existing_projection = self._repair_evidence_link_row(
+                        existing, case_rows
+                    )
+                    if validate_current is not None:
+                        validate_current(connection)
+                    if (
+                        existing["manifest_sha256"] != manifest_sha256
+                        or existing["manifest_json"] != manifest_json
+                    ):
+                        raise ValueError("projection_conflict")
+                    if validate_after is not None:
+                        validate_after(connection)
+                    connection.commit()
+                    if on_committed is not None:
+                        on_committed()
+                    return existing_projection
+                if validate_current is not None:
+                    validate_current(connection)
+                connection.execute(
+                    """
+                    INSERT INTO repair_evidence_link_revisions (
+                        link_set_id, revision, manifest_sha256, repair_case_id,
+                        board_key, board_id, manifest_json, import_actor_id,
+                        imported_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        link_set_id,
+                        revision,
+                        manifest_sha256,
+                        repair_case_id,
+                        manifest["board"]["board_key"],
+                        manifest["board"]["board_id"],
+                        manifest_json,
+                        actor_id,
+                        imported_at,
+                    ),
+                )
+                for server_case_id, snapshot_sha256 in sorted(evidence.items()):
+                    connection.execute(
+                        """
+                        INSERT INTO repair_evidence_link_cases (
+                            link_set_id, revision, server_case_id,
+                            physical_evidence_snapshot_sha256
+                        ) VALUES (?, ?, ?, ?)
+                        """,
+                        (
+                            link_set_id,
+                            revision,
+                            server_case_id,
+                            snapshot_sha256,
+                        ),
+                    )
+                if validate_after is not None:
+                    validate_after(connection)
+                connection.commit()
+                if on_committed is not None:
+                    on_committed()
+            except Exception:
+                connection.rollback()
+                raise
+        return self.get_repair_evidence_link_revision(link_set_id, revision)
+
+    def list_repair_evidence_link_revisions(
+        self,
+        *,
+        server_case_id: str | None = None,
+        repair_case_id: str | None = None,
+    ) -> list[dict]:
+        conditions = []
+        parameters = []
+        if server_case_id is not None:
+            conditions.append(
+                "EXISTS (SELECT 1 FROM repair_evidence_link_cases linked "
+                "WHERE linked.link_set_id = revisions.link_set_id "
+                "AND linked.revision = revisions.revision "
+                "AND linked.server_case_id = ?)"
+            )
+            parameters.append(server_case_id)
+        if repair_case_id is not None:
+            conditions.append("revisions.repair_case_id = ?")
+            parameters.append(repair_case_id)
+        where = f"WHERE {' AND '.join(conditions)}" if conditions else ""
+        with self.connect() as connection:
+            rows = connection.execute(
+                f"""
+                SELECT revisions.*
+                FROM repair_evidence_link_revisions revisions
+                {where}
+                ORDER BY revisions.revision DESC, revisions.link_set_id
+                LIMIT ?
+                """,
+                [*parameters, MAX_REPAIR_EVIDENCE_LINK_RESULTS + 1],
+            ).fetchall()
+            if len(rows) > MAX_REPAIR_EVIDENCE_LINK_RESULTS:
+                raise RepairEvidenceProjectionResultLimitExceeded(
+                    "repair_evidence_link_result_limit_exceeded"
+                )
+            results = []
+            for row in rows:
+                case_rows = self._repair_evidence_link_case_rows(
+                    connection, row["link_set_id"], row["revision"]
+                )
+                results.append(
+                    self._repair_evidence_link_row(row, case_rows)
+                )
+        return results
+
+    def get_repair_evidence_link_revision(
+        self, link_set_id: str, revision: int
+    ) -> dict | None:
+        with self.connect() as connection:
+            row = connection.execute(
+                """
+                SELECT * FROM repair_evidence_link_revisions
+                WHERE link_set_id = ? AND revision = ?
+                """,
+                (link_set_id, revision),
+            ).fetchone()
+            if not row:
+                return None
+            case_rows = self._repair_evidence_link_case_rows(
+                connection, row["link_set_id"], row["revision"]
+            )
+        return self._repair_evidence_link_row(row, case_rows)
 
     def storage_path_is_referenced(self, storage_path: str):
         with self.connect() as connection:
@@ -477,6 +958,35 @@ class VisualQcStore:
                     deleted_objects,
                     deleted_bytes,
                     completed_at,
+                    run_id,
+                ),
+            )
+            connection.commit()
+
+    def update_retention_run_audit(
+        self,
+        run_id: str,
+        candidate_case_ids: list[str],
+        excluded_cases: list[dict],
+        retention_days: int,
+    ):
+        with self.connect() as connection:
+            connection.execute(
+                """
+                UPDATE retention_runs
+                SET candidate_count = ?, payload_json = ?
+                WHERE run_id = ?
+                """,
+                (
+                    len(candidate_case_ids),
+                    json.dumps(
+                        {
+                            "candidate_case_ids": candidate_case_ids,
+                            "retention_days": retention_days,
+                            "excluded_cases": excluded_cases,
+                        },
+                        separators=(",", ":"),
+                    ),
                     run_id,
                 ),
             )
@@ -963,6 +1473,14 @@ class VisualQcStore:
             "job": self._job_dict(job),
         }
 
+    def get_case_identity(self, case_id: str):
+        with self.connect() as connection:
+            row = connection.execute(
+                "SELECT * FROM cases WHERE case_id = ?",
+                (case_id,),
+            ).fetchone()
+        return dict(row) if row else None
+
     def get_job(self, job_id: str):
         with self.connect() as connection:
             row = connection.execute(
@@ -977,6 +1495,14 @@ class VisualQcStore:
                 (job_id,),
             ).fetchone()
         return self._job_dict(row) if row else None
+
+    def get_image(self, image_id: str):
+        with self.connect() as connection:
+            row = connection.execute(
+                "SELECT * FROM images WHERE image_id = ?",
+                (image_id,),
+            ).fetchone()
+        return dict(row) if row else None
 
     def create_job(self, record: dict):
         with self.connect() as connection:
@@ -1019,6 +1545,14 @@ class VisualQcStore:
                 LIMIT 1
                 """,
                 (case_id,),
+            ).fetchone()
+        return self._registration_review_dict(row) if row else None
+
+    def get_registration_review(self, review_id: str):
+        with self.connect() as connection:
+            row = connection.execute(
+                "SELECT * FROM registration_reviews WHERE review_id = ?",
+                (review_id,),
             ).fetchone()
         return self._registration_review_dict(row) if row else None
 

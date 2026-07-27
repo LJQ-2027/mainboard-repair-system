@@ -5,18 +5,37 @@ import json
 from datetime import datetime, timedelta, timezone
 import os
 from pathlib import Path
+import signal
 import shutil
+import sqlite3
+import stat
+import struct
+import sys
 import tempfile
 import threading
 import uuid
 import zipfile
 
 import cv2
+from jsonschema.validators import Draft202012Validator
 import numpy as np
 
 from scripts.visual_qc.registration import RegistrationConfig, register_board_image
 from scripts.export_visual_qc_coco import build_coco_from_training_manifest
 from scripts.validate_visual_qc_dataset import validate_visual_qc_case
+from scripts.visual_qc.repair_evidence_engineering import (
+    RepairEvidenceEngineeringError,
+    resolve_board_asset_snapshot,
+)
+from scripts.visual_qc.repair_evidence_link_contract import (
+    RepairEvidenceLinkContractError,
+    canonical_sha256,
+    validate_repair_evidence_link_manifest,
+)
+from scripts.visual_qc.repair_evidence_link_library import (
+    _reference_authorities,
+)
+from scripts.visual_qc.source_library import _is_reparse_or_symlink
 from scripts.visual_qc.server.catalog import BoardCatalog, CatalogError
 from scripts.visual_qc.server.config import VisualQcServerSettings
 from scripts.visual_qc.server.difference import generate_difference_candidates
@@ -35,6 +54,8 @@ from scripts.visual_qc.server.storage import (
 )
 from scripts.visual_qc.server.store import (
     CaptureSessionIdentityConflict,
+    RepairEvidenceProjectionCorrupt,
+    RepairEvidenceProjectionResultLimitExceeded,
     VisualQcStore,
     utc_now,
 )
@@ -87,6 +108,139 @@ class VisualQcServiceError(ValueError):
         self.status_code = status_code
 
 
+class RepairEvidenceProjectionDrift(RuntimeError):
+    pass
+
+
+class _LinuxImageLeaseGuard:
+    _F_OWNER_TID = 0
+
+    def __init__(
+        self,
+        descriptors,
+        previous_signal_mask,
+        owner_thread_id,
+        *,
+        fcntl_module,
+    ):
+        self.descriptors = tuple(descriptors)
+        self.previous_signal_mask = previous_signal_mask
+        self.owner_thread_id = owner_thread_id
+        self.fcntl_module = fcntl_module
+
+    @classmethod
+    def acquire(cls, descriptors):
+        import fcntl
+
+        descriptors = tuple(descriptors)
+        if not descriptors:
+            raise RuntimeError("No verified image descriptors were provided.")
+        if not all(
+            hasattr(fcntl, name)
+            for name in ("F_SETLEASE", "F_RDLCK", "F_UNLCK")
+        ):
+            raise RuntimeError("Linux file leases are unavailable.")
+        if not all(
+            hasattr(signal, name)
+            for name in ("pthread_sigmask", "sigtimedwait", "SIG_BLOCK", "SIG_SETMASK")
+        ):
+            raise RuntimeError("Thread-scoped SIGIO handling is unavailable.")
+
+        owner_thread_id = threading.get_native_id()
+        previous_signal_mask = signal.pthread_sigmask(
+            signal.SIG_BLOCK,
+            {signal.SIGIO},
+        )
+        leased = []
+        try:
+            # F_SETOWN_EX is Linux ABI command 15. Targeting SIGIO at this
+            # blocked thread keeps the kernel lease safe in a multithreaded server.
+            set_owner_ex = getattr(fcntl, "F_SETOWN_EX", 15)
+            owner = struct.pack("ii", cls._F_OWNER_TID, owner_thread_id)
+            for descriptor in descriptors:
+                fcntl.fcntl(descriptor, set_owner_ex, owner)
+                fcntl.fcntl(
+                    descriptor,
+                    fcntl.F_SETLEASE,
+                    fcntl.F_RDLCK,
+                )
+                leased.append(descriptor)
+        except BaseException as exc:
+            cleanup_errors = cls._release_leases(leased, fcntl)
+            try:
+                cls._drain_sigio()
+            except BaseException as cleanup_exc:
+                cleanup_errors.append(cleanup_exc)
+            try:
+                signal.pthread_sigmask(
+                    signal.SIG_SETMASK,
+                    previous_signal_mask,
+                )
+            except BaseException as cleanup_exc:
+                cleanup_errors.append(cleanup_exc)
+            if cleanup_errors and hasattr(exc, "add_note"):
+                exc.add_note(
+                    f"{len(cleanup_errors)} lease-acquisition cleanup "
+                    "operation(s) also failed."
+                )
+            raise
+        return cls(
+            leased,
+            previous_signal_mask,
+            owner_thread_id,
+            fcntl_module=fcntl,
+        )
+
+    @staticmethod
+    def _release_leases(descriptors, fcntl_module):
+        errors = []
+        for descriptor in reversed(tuple(descriptors)):
+            try:
+                fcntl_module.fcntl(
+                    descriptor,
+                    fcntl_module.F_SETLEASE,
+                    fcntl_module.F_UNLCK,
+                )
+            except BaseException as exc:
+                errors.append(exc)
+        return errors
+
+    @staticmethod
+    def _drain_sigio():
+        while signal.sigtimedwait({signal.SIGIO}, 0) is not None:
+            pass
+
+    def release(self):
+        if not self.descriptors:
+            return []
+        errors = []
+        if threading.get_native_id() != self.owner_thread_id:
+            errors.append(
+                RuntimeError(
+                    "Linux image leases must be released by their acquiring thread."
+                )
+            )
+        descriptors, self.descriptors = self.descriptors, ()
+        try:
+            errors.extend(
+                self._release_leases(descriptors, self.fcntl_module)
+            )
+        except BaseException as exc:
+            errors.append(exc)
+        try:
+            self._drain_sigio()
+        except BaseException as exc:
+            errors.append(exc)
+        try:
+            signal.pthread_sigmask(
+                signal.SIG_SETMASK,
+                self.previous_signal_mask,
+            )
+        except BaseException as exc:
+            errors.append(exc)
+        return errors
+
+
 class VisualQcService:
     def __init__(
         self,
@@ -97,6 +251,14 @@ class VisualQcService:
         self.settings = settings
         self.settings.data_root.mkdir(parents=True, exist_ok=True)
         self.catalog = BoardCatalog(settings.project_root)
+        link_schema_path = (
+            settings.project_root
+            / "knowledge-base"
+            / "visual-qc-repair-evidence-link-v1-schema.json"
+        )
+        self.repair_evidence_link_validator = Draft202012Validator(
+            json.loads(link_schema_path.read_text(encoding="utf-8"))
+        )
         self.storage = LocalObjectStorage(settings.data_root, settings.minimum_free_bytes)
         self.store = VisualQcStore(
             settings.data_root / "visual-qc.sqlite3",
@@ -130,9 +292,13 @@ class VisualQcService:
             days=self.settings.retention_days
         )
         cutoff_at = cutoff.isoformat(timespec="milliseconds").replace("+00:00", "Z")
+        protected_cases = self.store.list_retention_link_protections(cutoff_at)
         candidates = self.store.list_retention_candidates(
             cutoff_at,
             self.settings.retention_batch_limit,
+            protected_case_ids=[
+                item["case_id"] for item in protected_cases
+            ],
         )
         result = {
             "schema_version": "VISUAL-QC-RETENTION-RUN-V1",
@@ -144,6 +310,7 @@ class VisualQcService:
             "deleted_cases": 0,
             "deleted_objects": 0,
             "deleted_bytes": 0,
+            "excluded_cases": protected_cases,
         }
         if dry_run:
             return result
@@ -161,22 +328,41 @@ class VisualQcService:
                 "payload": {
                     "candidate_case_ids": result["candidate_case_ids"],
                     "retention_days": self.settings.retention_days,
+                    "excluded_cases": protected_cases,
                 },
                 "created_at": timestamp,
             }
         )
-        deleted_ids = []
+        deletion_outcome = {
+            "candidate_case_ids": result["candidate_case_ids"],
+            "excluded_cases": protected_cases,
+            "deleted_case_ids": [],
+        }
         object_result = {"deleted_objects": 0, "deleted_bytes": 0}
         try:
             with self.storage.reference_transaction():
-                deleted_ids = self.store.delete_retention_candidates(
+                deletion_outcome = self.store.delete_retention_candidates(
                     candidates,
                     cutoff_at,
+                )
+                result["candidate_case_ids"] = deletion_outcome[
+                    "candidate_case_ids"
+                ]
+                result["candidate_count"] = len(
+                    deletion_outcome["candidate_case_ids"]
+                )
+                result["excluded_cases"] = deletion_outcome["excluded_cases"]
+                self.store.update_retention_run_audit(
+                    run_id,
+                    result["candidate_case_ids"],
+                    result["excluded_cases"],
+                    self.settings.retention_days,
                 )
                 deleted_paths = [
                     path
                     for candidate in candidates
-                    if candidate["case_id"] in deleted_ids
+                    if candidate["case_id"]
+                    in deletion_outcome["deleted_case_ids"]
                     for path in candidate["storage_paths"]
                 ]
                 object_result = self.storage.delete_unreferenced(
@@ -185,7 +371,7 @@ class VisualQcService:
                 )
             self.store.complete_retention_run(
                 run_id,
-                len(deleted_ids),
+                len(deletion_outcome["deleted_case_ids"]),
                 object_result["deleted_objects"],
                 object_result["deleted_bytes"],
                 utc_now(),
@@ -198,7 +384,7 @@ class VisualQcService:
                 }
             self.store.fail_retention_run(
                 run_id,
-                len(deleted_ids),
+                len(deletion_outcome["deleted_case_ids"]),
                 object_result["deleted_objects"],
                 object_result["deleted_bytes"],
                 str(exc),
@@ -208,7 +394,7 @@ class VisualQcService:
         result.update(
             {
                 "run_id": run_id,
-                "deleted_cases": len(deleted_ids),
+                "deleted_cases": len(deletion_outcome["deleted_case_ids"]),
                 **object_result,
             }
         )
@@ -590,6 +776,849 @@ class VisualQcService:
         if registration_review:
             response["server_registration_review"] = registration_review
         return response
+
+    @staticmethod
+    def _registration_snapshot(review: dict) -> dict:
+        return {
+            "method": review["method"],
+            "board_to_image_matrix": review["board_to_image_matrix"],
+            "solve_anchors": review["anchors"],
+            "independent_check_points": review["check_points"],
+            "error": review["error"],
+        }
+
+    def _case_identity(self, case_id: str, connection=None):
+        if connection is None:
+            return self.store.get_case_identity(case_id)
+        row = connection.execute(
+            "SELECT * FROM cases WHERE case_id = ?", (case_id,)
+        ).fetchone()
+        return dict(row) if row else None
+
+    def _image_identity(self, image_id: str, connection=None):
+        if connection is None:
+            return self.store.get_image(image_id)
+        row = connection.execute(
+            "SELECT * FROM images WHERE image_id = ?", (image_id,)
+        ).fetchone()
+        return dict(row) if row else None
+
+    def _job_identity(self, job_id: str, connection=None):
+        if connection is None:
+            return self.store.get_job(job_id)
+        row = connection.execute(
+            "SELECT * FROM jobs WHERE job_id = ?", (job_id,)
+        ).fetchone()
+        return dict(row) if row else None
+
+    def _review_identity(self, review_id: str, connection=None):
+        if connection is None:
+            return self.store.get_registration_review(review_id)
+        row = connection.execute(
+            "SELECT * FROM registration_reviews WHERE review_id = ?",
+            (review_id,),
+        ).fetchone()
+        if not row:
+            return None
+        result = dict(row)
+        result["board_to_image_matrix"] = json.loads(result.pop("matrix_json"))
+        result["anchors"] = json.loads(result.pop("anchors_json"))
+        result["check_points"] = json.loads(
+            result.pop("check_points_json")
+        )
+        result["error"] = json.loads(result.pop("error_json"))
+        return result
+
+    @staticmethod
+    def _file_identity(metadata):
+        # Windows denies write/delete while this handle is held. POSIX permits
+        # writes, so descriptor ctime catches same-inode rewrites with restored mtime.
+        return (
+            metadata.st_dev,
+            metadata.st_ino,
+            metadata.st_size,
+            metadata.st_nlink,
+            getattr(metadata, "st_mtime_ns", None),
+            getattr(metadata, "st_ctime_ns", None),
+        )
+
+    @staticmethod
+    def _file_locator_identity(metadata):
+        return (
+            metadata.st_dev,
+            metadata.st_ino,
+            metadata.st_size,
+            metadata.st_nlink,
+            getattr(metadata, "st_mtime_ns", None),
+        )
+
+    @staticmethod
+    def _image_file_cache_key(image: dict, evidence: dict):
+        return (
+            evidence["image_id"],
+            evidence["image_sha256"],
+            image["storage_path"],
+            image["sha256"],
+            image["byte_size"],
+            image["mime_type"],
+        )
+
+    @staticmethod
+    def _open_stable_image_descriptor(candidate: Path) -> int:
+        flags = os.O_RDONLY | getattr(os, "O_BINARY", 0)
+        if os.name != "nt":
+            if hasattr(os, "O_NOFOLLOW"):
+                flags |= os.O_NOFOLLOW
+            return os.open(candidate, flags)
+
+        import ctypes
+        import msvcrt
+
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        create_file = kernel32.CreateFileW
+        create_file.argtypes = [
+            ctypes.c_wchar_p,
+            ctypes.c_uint32,
+            ctypes.c_uint32,
+            ctypes.c_void_p,
+            ctypes.c_uint32,
+            ctypes.c_uint32,
+            ctypes.c_void_p,
+        ]
+        create_file.restype = ctypes.c_void_p
+        handle = create_file(
+            str(candidate),
+            0x80000000,  # GENERIC_READ
+            0x00000001,  # FILE_SHARE_READ; deny write and delete
+            None,
+            3,  # OPEN_EXISTING
+            0x00200000 | 0x08000000,  # OPEN_REPARSE_POINT | SEQUENTIAL_SCAN
+            None,
+        )
+        invalid_handle = ctypes.c_void_p(-1).value
+        if handle == invalid_handle:
+            raise OSError(
+                ctypes.get_last_error(),
+                "Unable to open stable image descriptor.",
+            )
+        try:
+            return msvcrt.open_osfhandle(int(handle), flags)
+        except Exception:
+            kernel32.CloseHandle(ctypes.c_void_p(handle))
+            raise
+
+    def _hash_image_descriptor(self, descriptor: int):
+        digest = hashlib.sha256()
+        total = 0
+        while True:
+            chunk = os.read(
+                descriptor,
+                min(
+                    1024 * 1024,
+                    self.settings.maximum_upload_bytes + 1 - total,
+                ),
+            )
+            if not chunk:
+                break
+            digest.update(chunk)
+            total += len(chunk)
+            if total > self.settings.maximum_upload_bytes:
+                break
+        return digest.hexdigest(), total
+
+    def _stored_image_file_proof(
+        self, image: dict, evidence: dict, *, keep_open: bool
+    ):
+        extension = MIME_EXTENSIONS.get(image["mime_type"])
+        if extension is None:
+            return "image_identity_mismatch", None
+        expected = (
+            self.storage.originals_root
+            / evidence["image_sha256"][:2]
+            / f"{evidence['image_sha256']}{extension}"
+        ).absolute()
+        candidate = Path(os.path.abspath(image["storage_path"]))
+        if candidate != expected:
+            return "image_identity_mismatch", None
+        try:
+            relative = candidate.relative_to(self.storage.data_root)
+        except ValueError:
+            return "image_identity_mismatch", None
+        current = self.storage.data_root
+        if _is_reparse_or_symlink(current):
+            return "image_identity_mismatch", None
+        for part in relative.parts:
+            current = current / part
+            if _is_reparse_or_symlink(current):
+                return "image_identity_mismatch", None
+        try:
+            metadata = candidate.lstat()
+        except (FileNotFoundError, PermissionError, OSError):
+            return "image_missing", None
+        if (
+            not stat.S_ISREG(metadata.st_mode)
+            or metadata.st_nlink != 1
+            or metadata.st_size < 1
+            or metadata.st_size > self.settings.maximum_upload_bytes
+            or metadata.st_size != image["byte_size"]
+        ):
+            return "image_identity_mismatch", None
+        try:
+            descriptor = self._open_stable_image_descriptor(candidate)
+        except (FileNotFoundError, PermissionError, OSError):
+            return "image_missing", None
+        try:
+            before = os.fstat(descriptor)
+            if _is_reparse_or_symlink(candidate):
+                return "image_identity_mismatch", None
+            digest, total = self._hash_image_descriptor(descriptor)
+            after = os.fstat(descriptor)
+            if (
+                self._file_locator_identity(metadata)
+                != self._file_locator_identity(before)
+                or _is_reparse_or_symlink(candidate)
+                or self._file_identity(before) != self._file_identity(after)
+                or total != after.st_size
+                or digest != evidence["image_sha256"]
+                or digest != image["sha256"]
+            ):
+                return "image_identity_mismatch", None
+            proof = {
+                "descriptor": descriptor,
+                "path": candidate,
+                "identity": self._file_identity(after),
+                "path_identity": self._file_locator_identity(after),
+                "image_id": image["image_id"],
+                "image_snapshot": {
+                    key: image[key]
+                    for key in (
+                        "image_id",
+                        "case_id",
+                        "mime_type",
+                        "byte_size",
+                        "sha256",
+                        "storage_path",
+                    )
+                },
+            }
+            if keep_open:
+                descriptor = None
+                return None, proof
+            return None, None
+        except OSError:
+            return "image_missing", None
+        finally:
+            if descriptor is not None:
+                os.close(descriptor)
+
+    def _stored_image_file_reason(self, image: dict, evidence: dict):
+        reason, _proof = self._stored_image_file_proof(
+            image, evidence, keep_open=False
+        )
+        return reason
+
+    def _stable_image_proofs_are_current(
+        self, proofs: dict, connection
+    ) -> bool:
+        for proof in proofs.values():
+            row = connection.execute(
+                "SELECT * FROM images WHERE image_id = ?",
+                (proof["image_id"],),
+            ).fetchone()
+            if row is None:
+                return False
+            current_image = dict(row)
+            if any(
+                current_image.get(key) != value
+                for key, value in proof["image_snapshot"].items()
+            ):
+                return False
+            try:
+                path_metadata = proof["path"].lstat()
+                descriptor_metadata = os.fstat(proof["descriptor"])
+            except (FileNotFoundError, PermissionError, OSError):
+                return False
+            if (
+                _is_reparse_or_symlink(proof["path"])
+                or not stat.S_ISREG(path_metadata.st_mode)
+                or self._file_locator_identity(path_metadata)
+                != proof["path_identity"]
+                or self._file_identity(descriptor_metadata)
+                != proof["identity"]
+            ):
+                return False
+        return True
+
+    def _acquire_kernel_image_exclusion(self, proofs: dict):
+        if sys.platform.startswith("win"):
+            return None
+        if not sys.platform.startswith("linux"):
+            raise VisualQcServiceError(
+                "repair_evidence_link_file_exclusion_unavailable",
+                "Kernel image exclusion is unavailable on this platform.",
+                503,
+            )
+        try:
+            return _LinuxImageLeaseGuard.acquire(
+                proof["descriptor"] for proof in proofs.values()
+            )
+        except Exception as exc:
+            raise VisualQcServiceError(
+                "repair_evidence_link_file_exclusion_unavailable",
+                "Kernel image exclusion is unavailable.",
+                503,
+            ) from exc
+
+    @staticmethod
+    def _cleanup_image_proofs(kernel_exclusion, stable_image_proofs):
+        errors = []
+        if kernel_exclusion is not None:
+            try:
+                lease_errors = kernel_exclusion.release()
+                if lease_errors:
+                    errors.extend(lease_errors)
+            except BaseException as exc:
+                errors.append(exc)
+        for proof in stable_image_proofs.values():
+            descriptor = proof.get("descriptor")
+            if descriptor is None:
+                continue
+            proof["descriptor"] = None
+            try:
+                os.close(descriptor)
+            except BaseException as exc:
+                errors.append(exc)
+        return errors
+
+    def _repair_evidence_link_health(
+        self,
+        manifest: dict,
+        *,
+        connection=None,
+        verification_cache=None,
+        stable_image_proofs=None,
+        verify_files=True,
+        verify_board=True,
+    ) -> dict:
+        verification_cache = (
+            verification_cache if verification_cache is not None else {}
+        )
+        reasons = []
+        for evidence in manifest["physical_evidence"]:
+            case = self._case_identity(
+                evidence["server_case_id"], connection
+            )
+            if case is None:
+                reasons.append("server_case_missing")
+                continue
+            expected_case = {
+                "board_key": evidence["board_key"],
+                "board_id": evidence["board_id"],
+                "side_id": evidence["side_id"],
+                "capture_stage": evidence["capture_stage"],
+                "evidence_role": evidence["evidence_role"],
+                "intake_batch_id": evidence["intake"]["batch_id"],
+                "intake_entry_id": evidence["intake"]["entry_id"],
+            }
+            if any(case.get(key) != value for key, value in expected_case.items()):
+                reasons.append("server_case_identity_mismatch")
+
+            image = self._image_identity(evidence["image_id"], connection)
+            if image is None:
+                reasons.append("image_missing")
+            elif (
+                image["case_id"] != evidence["server_case_id"]
+                or image["sha256"] != evidence["image_sha256"]
+            ):
+                reasons.append("image_identity_mismatch")
+            elif verify_files:
+                file_key = self._image_file_cache_key(image, evidence)
+                image_cache = verification_cache.setdefault("images", {})
+                if file_key not in image_cache:
+                    if stable_image_proofs is None:
+                        image_cache[file_key] = (
+                            self._stored_image_file_reason(image, evidence)
+                        )
+                    else:
+                        reason, proof = self._stored_image_file_proof(
+                            image, evidence, keep_open=True
+                        )
+                        image_cache[file_key] = reason
+                        if proof is not None:
+                            stable_image_proofs[file_key] = proof
+                file_reason = image_cache[file_key]
+                if file_reason is not None:
+                    reasons.append(file_reason)
+
+            try:
+                stored_handoff = json.loads(case["qualified_handoff_json"] or "null")
+            except json.JSONDecodeError:
+                stored_handoff = None
+            if (
+                stored_handoff != evidence["qualified_handoff"]
+                or canonical_sha256(stored_handoff)
+                != evidence["qualified_handoff_sha256"]
+            ):
+                reasons.append("qualified_handoff_mismatch")
+
+            job = self._job_identity(evidence["job_id"], connection)
+            if job is None:
+                reasons.append("registration_job_missing")
+            elif (
+                job["case_id"] != evidence["server_case_id"]
+                or job["image_id"] != evidence["image_id"]
+                or job["job_type"] != "automatic_registration"
+                or job["status"] != "succeeded"
+            ):
+                reasons.append("registration_job_mismatch")
+
+            review = self._review_identity(
+                evidence["registration_review_id"], connection
+            )
+            if review is None:
+                reasons.append("registration_review_missing")
+            elif (
+                review["case_id"] != evidence["server_case_id"]
+                or review["job_id"] != evidence["job_id"]
+                or review["decision"] != "accept_manual"
+                or self._registration_snapshot(review) != evidence["registration"]
+            ):
+                reasons.append("registration_review_mismatch")
+
+        if verify_board:
+            board_key = manifest["board"]["board_key"]
+            board_cache = verification_cache.setdefault("boards", {})
+            if board_key not in board_cache:
+                try:
+                    board_cache[board_key] = (
+                        "ok",
+                        resolve_board_asset_snapshot(
+                            self.settings.project_root, board_key
+                        ),
+                    )
+                except (OSError, RepairEvidenceEngineeringError):
+                    board_cache[board_key] = ("missing", None)
+            board_state, current_board = board_cache[board_key]
+            if board_state == "missing":
+                reasons.append("board_asset_missing")
+            elif current_board != manifest["board"]:
+                reasons.append("board_asset_mismatch")
+
+        ordered = [
+            reason
+            for reason in (
+                "server_case_missing",
+                "image_missing",
+                "registration_job_missing",
+                "registration_review_missing",
+                "board_asset_missing",
+                "server_case_identity_mismatch",
+                "image_identity_mismatch",
+                "qualified_handoff_mismatch",
+                "registration_job_mismatch",
+                "registration_review_mismatch",
+                "board_asset_mismatch",
+            )
+            if reason in reasons
+        ]
+        unavailable = any(reason.endswith("_missing") for reason in ordered)
+        return {
+            "state": "unavailable" if unavailable else ("stale" if ordered else "active"),
+            "reasons": ordered,
+        }
+
+    def _controlled_library_root(self) -> Path | None:
+        for candidate in (
+            self.settings.data_root / "library",
+            self.settings.data_root.parent / "library",
+        ):
+            if (
+                candidate.is_dir()
+                and not _is_reparse_or_symlink(candidate)
+                and candidate.resolve() != self.settings.project_root.resolve()
+            ):
+                return candidate.resolve()
+        return None
+
+    @staticmethod
+    def _terminal_replacement(
+        start: str, replacements: dict[str, str]
+    ) -> str | None:
+        current = start
+        seen = {start}
+        while current in replacements:
+            current = replacements[current]
+            if current in seen:
+                raise VisualQcServiceError(
+                    "repair_evidence_link_authority_unavailable",
+                    "Repair-case correction authority is unavailable.",
+                    503,
+                )
+            seen.add(current)
+        return None if current == start else current
+
+    def _repair_evidence_link_binding_states(
+        self, manifest: dict, *, verification_cache=None
+    ) -> list[dict]:
+        verification_cache = (
+            verification_cache if verification_cache is not None else {}
+        )
+        authority_key = tuple(
+            (
+                item["repair_case_reference_id"],
+                item["manifest_sha256"],
+            )
+            for item in manifest["repair_case_references"]
+        )
+        authority_cache = verification_cache.setdefault("authorities", {})
+        if authority_key in authority_cache:
+            source_replacements = authority_cache[authority_key]
+        else:
+            source_replacements = {}
+            library_root = self._controlled_library_root()
+            if library_root is None:
+                raise VisualQcServiceError(
+                    "repair_evidence_link_authority_unavailable",
+                    "Repair-case correction authority is unavailable.",
+                    503,
+                )
+            try:
+                authorities = _reference_authorities(
+                    manifest["repair_case_references"],
+                    project_root=self.settings.project_root,
+                    library_root=library_root,
+                )
+                corrections = {}
+                for reference in sorted(
+                    manifest["repair_case_references"],
+                    key=lambda item: item["revision"],
+                ):
+                    case = authorities[
+                        reference["repair_case_reference_id"]
+                    ]
+                    for correction in case["corrections"]:
+                        correction_id = correction["correction_id"]
+                        if (
+                            correction_id in corrections
+                            and corrections[correction_id] != correction
+                        ):
+                            raise ValueError(
+                                "repair case correction drift"
+                            )
+                        corrections[correction_id] = correction
+                        current = source_replacements.get(
+                            correction["corrects_fact_id"]
+                        )
+                        if (
+                            current is not None
+                            and current
+                            != correction["replacement_fact_id"]
+                        ):
+                            raise ValueError(
+                                "multiple active source corrections"
+                            )
+                        source_replacements[
+                            correction["corrects_fact_id"]
+                        ] = correction["replacement_fact_id"]
+            except (OSError, ValueError) as exc:
+                raise VisualQcServiceError(
+                    "repair_evidence_link_authority_unavailable",
+                    "Repair-case correction authority is unavailable.",
+                    503,
+                ) from exc
+            authority_cache[authority_key] = source_replacements
+
+        binding_replacements = {}
+        for item in manifest["bindings"]:
+            parent = item["supersedes_binding_id"]
+            if parent is not None:
+                binding_replacements[parent] = item["binding_id"]
+
+        states = []
+        for item in manifest["bindings"]:
+            replacement_fact_id = self._terminal_replacement(
+                item["source_fact"]["fact_id"], source_replacements
+            )
+            replacement_binding_id = self._terminal_replacement(
+                item["binding_id"], binding_replacements
+            )
+            states.append(
+                {
+                    "binding_id": item["binding_id"],
+                    "source_fact_superseded": replacement_fact_id is not None,
+                    "replacement_fact_id": replacement_fact_id,
+                    "binding_superseded": (
+                        replacement_binding_id is not None
+                    ),
+                    "replacement_binding_id": replacement_binding_id,
+                }
+            )
+        return states
+
+    @staticmethod
+    def _repair_evidence_link_counts(
+        manifest: dict, binding_states: list[dict]
+    ) -> dict:
+        association = {
+            name: 0
+            for name in (
+                "related",
+                "possibly_related",
+                "not_related",
+                "insufficient_evidence",
+            )
+        }
+        visibility = {
+            name: 0
+            for name in ("not_assessed", "visible", "not_visible", "occluded")
+        }
+        for item in manifest["bindings"]:
+            association[item["association_status"]] += 1
+            visibility[item["visibility_status"]] += 1
+        return {
+            "association": association,
+            "visibility": visibility,
+            "source_fact_superseded": sum(
+                item["source_fact_superseded"] for item in binding_states
+            ),
+            "binding_superseded": sum(
+                item["binding_superseded"] for item in binding_states
+            ),
+        }
+
+    def _repair_evidence_link_summary(
+        self,
+        row: dict,
+        binding_states: list[dict] | None = None,
+        *,
+        verification_cache=None,
+    ) -> dict:
+        manifest = row["manifest"]
+        binding_states = (
+            binding_states
+            if binding_states is not None
+            else self._repair_evidence_link_binding_states(
+                manifest, verification_cache=verification_cache
+            )
+        )
+        return {
+            "link_set_id": row["link_set_id"],
+            "revision": row["revision"],
+            "manifest_sha256": row["manifest_sha256"],
+            "repair_case_id": row["repair_case_id"],
+            "board": {
+                "board_key": row["board_key"],
+                "board_id": row["board_id"],
+            },
+            "server_case_ids": row["server_case_ids"],
+            "counts": self._repair_evidence_link_counts(
+                manifest, binding_states
+            ),
+            "health": self._repair_evidence_link_health(
+                manifest, verification_cache=verification_cache
+            ),
+            "imported_at": row["imported_at"],
+        }
+
+    def import_repair_evidence_link(
+        self, *, manifest: dict, manifest_sha256: str, actor_id: str
+    ) -> dict:
+        if next(self.repair_evidence_link_validator.iter_errors(manifest), None):
+            raise VisualQcServiceError(
+                "repair_evidence_link_invalid",
+                "Repair-evidence link manifest does not match its schema.",
+            )
+        try:
+            validated = validate_repair_evidence_link_manifest(manifest)
+        except RepairEvidenceLinkContractError as exc:
+            raise VisualQcServiceError(
+                "repair_evidence_link_invalid", str(exc)
+            ) from exc
+        if canonical_sha256(validated) != manifest_sha256:
+            raise VisualQcServiceError(
+                "repair_evidence_link_hash_mismatch",
+                "Repair-evidence link manifest hash does not match.",
+            )
+        verification_cache = {}
+        stable_image_proofs = {}
+        kernel_exclusion = None
+        projection_committed = False
+        result = None
+        failure = None
+        try:
+            self._repair_evidence_link_binding_states(
+                validated, verification_cache=verification_cache
+            )
+            health = self._repair_evidence_link_health(
+                validated,
+                verification_cache=verification_cache,
+                stable_image_proofs=stable_image_proofs,
+            )
+            if health["state"] != "active":
+                raise VisualQcServiceError(
+                    "repair_evidence_link_not_active",
+                    "Repair-evidence link projection is not active.",
+                    409,
+                )
+            kernel_exclusion = self._acquire_kernel_image_exclusion(
+                stable_image_proofs
+            )
+            with self.store.connect() as proof_connection:
+                if not self._stable_image_proofs_are_current(
+                    stable_image_proofs, proof_connection
+                ):
+                    raise RepairEvidenceProjectionDrift(health)
+
+            def validate_stable_current(connection):
+                current = self._repair_evidence_link_health(
+                    validated,
+                    connection=connection,
+                    verification_cache=verification_cache,
+                    verify_files=False,
+                    verify_board=False,
+                )
+                if (
+                    current["state"] != "active"
+                    or not self._stable_image_proofs_are_current(
+                        stable_image_proofs, connection
+                    )
+                ):
+                    raise RepairEvidenceProjectionDrift(current)
+
+            def mark_projection_committed():
+                nonlocal projection_committed
+                projection_committed = True
+
+            row = self.store.import_repair_evidence_link_revision(
+                manifest=validated,
+                manifest_sha256=manifest_sha256,
+                actor_id=actor_id,
+                imported_at=utc_now(),
+                validate_current=validate_stable_current,
+                validate_after=validate_stable_current,
+                on_committed=mark_projection_committed,
+            )
+            result = self._repair_evidence_link_detail(
+                row, verification_cache=verification_cache
+            )
+        except RepairEvidenceProjectionDrift as exc:
+            failure = VisualQcServiceError(
+                "repair_evidence_link_not_active",
+                "Repair-evidence link projection is not active.",
+                409,
+            )
+            failure.__cause__ = exc
+        except RepairEvidenceProjectionCorrupt as exc:
+            failure = VisualQcServiceError(
+                "repair_evidence_link_projection_corrupt",
+                "Stored repair-evidence link projection is corrupt.",
+                503,
+            )
+            failure.__cause__ = exc
+        except VisualQcServiceError as exc:
+            failure = exc
+        except (ValueError, sqlite3.IntegrityError) as exc:
+            failure = VisualQcServiceError(
+                "repair_evidence_link_conflict",
+                "Repair-evidence link projection conflicts with stored data.",
+                409,
+            )
+            failure.__cause__ = exc
+        except BaseException as exc:
+            failure = exc
+
+        cleanup_errors = self._cleanup_image_proofs(
+            kernel_exclusion,
+            stable_image_proofs,
+        )
+        if cleanup_errors:
+            if projection_committed:
+                raise VisualQcServiceError(
+                    "repair_evidence_link_cleanup_uncertain",
+                    "Projection may already exist; caller must replay the exact import.",
+                    503,
+                )
+            raise VisualQcServiceError(
+                "repair_evidence_link_cleanup_failed",
+                "Import failed before commit and resource cleanup was incomplete.",
+                503,
+            )
+        if failure is not None:
+            raise failure
+        return result
+
+    def list_repair_evidence_links(
+        self,
+        *,
+        server_case_id: str | None = None,
+        repair_case_id: str | None = None,
+    ) -> dict:
+        try:
+            rows = self.store.list_repair_evidence_link_revisions(
+                server_case_id=server_case_id,
+                repair_case_id=repair_case_id,
+            )
+        except RepairEvidenceProjectionResultLimitExceeded as exc:
+            raise VisualQcServiceError(
+                "repair_evidence_link_result_limit_exceeded",
+                "Repair-evidence link query exceeds the result limit.",
+                422,
+            ) from exc
+        except RepairEvidenceProjectionCorrupt as exc:
+            raise VisualQcServiceError(
+                "repair_evidence_link_projection_corrupt",
+                "Stored repair-evidence link projection is corrupt.",
+                503,
+            ) from exc
+        verification_cache = {}
+        return {
+            "schema_version": "VISUAL-QC-REPAIR-EVIDENCE-LINK-LIST-V1",
+            "links": [
+                self._repair_evidence_link_summary(
+                    row, verification_cache=verification_cache
+                )
+                for row in rows
+            ],
+        }
+
+    def _repair_evidence_link_detail(
+        self, row: dict, *, verification_cache=None
+    ) -> dict:
+        verification_cache = (
+            verification_cache if verification_cache is not None else {}
+        )
+        binding_states = self._repair_evidence_link_binding_states(
+            row["manifest"], verification_cache=verification_cache
+        )
+        return {
+            "schema_version": "VISUAL-QC-REPAIR-EVIDENCE-LINK-DETAIL-V1",
+            **self._repair_evidence_link_summary(
+                row,
+                binding_states,
+                verification_cache=verification_cache,
+            ),
+            "binding_states": binding_states,
+            "manifest": row["manifest"],
+        }
+
+    def get_repair_evidence_link(self, link_set_id: str, revision: int) -> dict:
+        try:
+            row = self.store.get_repair_evidence_link_revision(
+                link_set_id, revision
+            )
+        except RepairEvidenceProjectionCorrupt as exc:
+            raise VisualQcServiceError(
+                "repair_evidence_link_projection_corrupt",
+                "Stored repair-evidence link projection is corrupt.",
+                503,
+            ) from exc
+        if row is None:
+            raise VisualQcServiceError(
+                "repair_evidence_link_not_found",
+                "Repair-evidence link projection was not found.",
+                404,
+            )
+        return self._repair_evidence_link_detail(row)
 
     def get_admin_case_original(self, case_id: str, actor_id: str) -> dict:
         record = self.store.get_case(case_id)

@@ -34,12 +34,47 @@ ALLOWED_ADDITIVE_COLUMNS = {
         "cases": {"qualified_handoff_json"},
     }
 }
+ALLOWED_ADDITIVE_TABLES = {
+    "f278061": {
+        "repair_evidence_link_revisions",
+        "repair_evidence_link_cases",
+    }
+}
 ALLOWED_ADDITIVE_DEFINITIONS = {
     "f278061": {
         "cases": {
             "qualified_handoff_json": "TEXT",
         },
     }
+}
+ALLOWED_ADDITIVE_SCHEMA_SQL = {
+    "f278061": """
+                CREATE TABLE IF NOT EXISTS repair_evidence_link_revisions (
+                    link_set_id TEXT NOT NULL,
+                    revision INTEGER NOT NULL,
+                    manifest_sha256 TEXT NOT NULL,
+                    repair_case_id TEXT NOT NULL,
+                    board_key TEXT NOT NULL,
+                    board_id TEXT NOT NULL,
+                    manifest_json TEXT NOT NULL,
+                    import_actor_id TEXT NOT NULL,
+                    imported_at TEXT NOT NULL,
+                    PRIMARY KEY (link_set_id, revision),
+                    UNIQUE (manifest_sha256)
+                );
+                CREATE TABLE IF NOT EXISTS repair_evidence_link_cases (
+                    link_set_id TEXT NOT NULL,
+                    revision INTEGER NOT NULL,
+                    server_case_id TEXT NOT NULL,
+                    physical_evidence_snapshot_sha256 TEXT NOT NULL,
+                    PRIMARY KEY (link_set_id, revision, server_case_id),
+                    FOREIGN KEY (link_set_id, revision)
+                        REFERENCES repair_evidence_link_revisions(link_set_id, revision),
+                    FOREIGN KEY (server_case_id) REFERENCES cases(case_id)
+                );
+                CREATE INDEX IF NOT EXISTS repair_evidence_link_cases_server_case
+                    ON repair_evidence_link_cases(server_case_id, link_set_id, revision);
+    """
 }
 SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 MANAGED_MIME_EXTENSIONS = {
@@ -278,7 +313,10 @@ def compare_database_projections(
     issues = []
 
     missing_tables = sorted(set(before_tables) - set(after_tables))
-    unexpected_tables = sorted(set(after_tables) - set(before_tables))
+    added_tables = set(after_tables) - set(before_tables)
+    reviewed_tables = ALLOWED_ADDITIVE_TABLES[source_version]
+    unexpected_tables = sorted(added_tables - reviewed_tables)
+    missing_reviewed_tables = sorted(reviewed_tables - added_tables)
     if missing_tables:
         issues.append(
             _finding(
@@ -293,6 +331,14 @@ def compare_database_projections(
                 "unexpected_additive_schema",
                 "Candidate migration added unreviewed tables: "
                 + ", ".join(unexpected_tables),
+            )
+        )
+    if missing_reviewed_tables:
+        issues.append(
+            _finding(
+                "unexpected_additive_schema",
+                "Candidate migration omitted reviewed tables: "
+                + ", ".join(missing_reviewed_tables),
             )
         )
 
@@ -476,6 +522,7 @@ def rehearse_candidate_migration(
                         f"ALTER TABLE {table_name} "
                         f"ADD COLUMN {column_name} {declaration}"
                     )
+            connection.executescript(ALLOWED_ADDITIVE_SCHEMA_SQL[source_version])
             connection.commit()
         expected_projection = database_projection(expected_database)
 
