@@ -135,6 +135,26 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
             )
         return self._f069_package
 
+    def catalog_patch(self, entry, *, board_key="km4-f151"):
+        source_manifest = json.loads(
+            self.before["source_package_path"].read_text(encoding="utf-8")
+        )
+        board_id = source_manifest["board_id"]
+
+        class PatchedBoardCatalog:
+            def __init__(self, project_root):
+                self.catalog = {"boards": {board_key: entry}}
+
+            def resolve_board(self, requested_key):
+                if requested_key != board_key:
+                    raise AssertionError(f"unexpected board key: {requested_key}")
+                return {"board_id": board_id}
+
+        return mock.patch(
+            "scripts.visual_qc.repair_case_library.BoardCatalog",
+            PatchedBoardCatalog,
+        )
+
     def test_package_links_bind_exact_validated_source_packages(self):
         links = resolve_package_links(
             project_root=ROOT,
@@ -587,6 +607,102 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
                 case_record=self.v2_case_record(mismatched),
             )
 
+    def test_builder_rejects_present_malformed_catalog_models(self):
+        malformed_values = (
+            [],
+            "",
+            0,
+            None,
+            [""],
+            ["   "],
+            ["KM4", None],
+            ["KM4", "KM4"],
+        )
+        for value in malformed_values:
+            with self.subTest(compatible_models=value):
+                with self.catalog_patch(
+                    {"model": "KM4", "compatible_models": value}
+                ):
+                    with self.assertRaisesRegex(
+                        IntakeValidationError,
+                        "catalog compatible models",
+                    ):
+                        build_repair_case_revision(
+                            project_root=ROOT,
+                            library_root=self.library,
+                            repair_case_id="case-km4-malformed-catalog",
+                            board_key="km4-f151",
+                            package_assignments=[
+                                (
+                                    "before_repair",
+                                    self.before["source_package_path"],
+                                )
+                            ],
+                            case_record=self.case_record(),
+                            supporting_assignments=[],
+                            previous_manifest_path=None,
+                        )
+
+        with self.catalog_patch({"model": "KM4"}):
+            payload = build_repair_case_revision(
+                project_root=ROOT,
+                library_root=self.library,
+                repair_case_id="case-km4-model-fallback",
+                board_key="km4-f151",
+                package_assignments=[
+                    ("before_repair", self.before["source_package_path"])
+                ],
+                case_record=self.case_record(),
+                supporting_assignments=[],
+                previous_manifest_path=None,
+            )
+        self.assertEqual(payload["device_models"], ["KM4"])
+
+        with self.catalog_patch({"model": ""}):
+            with self.assertRaisesRegex(
+                IntakeValidationError,
+                "catalog compatible models",
+            ):
+                build_repair_case_revision(
+                    project_root=ROOT,
+                    library_root=self.library,
+                    repair_case_id="case-km4-invalid-model-fallback",
+                    board_key="km4-f151",
+                    package_assignments=[
+                        ("before_repair", self.before["source_package_path"])
+                    ],
+                    case_record=self.case_record(),
+                    supporting_assignments=[],
+                    previous_manifest_path=None,
+                )
+
+    def test_disk_validator_rejects_present_malformed_catalog_models(self):
+        created = self.stage_case(repair_case_id="case-km4-disk-catalog")
+        malformed_values = (
+            [],
+            "",
+            0,
+            None,
+            [""],
+            ["   "],
+            ["KM4", None],
+            ["KM4", "KM4"],
+        )
+        for value in malformed_values:
+            with self.subTest(compatible_models=value):
+                with self.catalog_patch(
+                    {"model": "KM4", "compatible_models": value}
+                ):
+                    with self.assertRaisesRegex(
+                        IntakeValidationError,
+                        "catalog compatible models",
+                    ):
+                        validate_repair_case_revision(
+                            manifest_path=created["manifest_path"],
+                            project_root=ROOT,
+                            library_root=self.library,
+                        )
+
     def test_identity_shape_errors_fail_before_cases_directory_creation(self):
         common = self.case_record()
         del common["device_models"]
@@ -936,6 +1052,29 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
                     encoding="utf-8",
                 )
                 with self.assertRaises(IntakeValidationError):
+                    validate_repair_case_revision(
+                        manifest_path=created["manifest_path"],
+                        project_root=ROOT,
+                        library_root=self.library,
+                    )
+
+    def test_disk_validator_rejects_nonstring_board_key_as_validation_error(self):
+        created = self.stage_case(repair_case_id="case-km4-board-key-tamper")
+        original = json.loads(
+            created["manifest_path"].read_text(encoding="utf-8")
+        )
+        for board_key in (["km4-f151"], {"key": "km4-f151"}, 7, None):
+            with self.subTest(board_key=board_key):
+                payload = dict(original)
+                payload["board_key"] = board_key
+                created["manifest_path"].write_text(
+                    json.dumps(payload, indent=2) + "\n",
+                    encoding="utf-8",
+                )
+                with self.assertRaisesRegex(
+                    IntakeValidationError,
+                    "board_key",
+                ):
                     validate_repair_case_revision(
                         manifest_path=created["manifest_path"],
                         project_root=ROOT,

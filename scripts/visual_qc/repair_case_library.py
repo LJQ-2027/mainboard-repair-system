@@ -380,7 +380,11 @@ def _catalog_board(project_root: Path, board_key: str) -> tuple[dict, list[str]]
     except CatalogError as exc:
         raise IntakeValidationError(str(exc)) from exc
     raw = catalog.catalog["boards"][board_key]
-    models = raw.get("compatible_models") or [raw.get("model")]
+    models = (
+        raw["compatible_models"]
+        if "compatible_models" in raw
+        else [raw.get("model")]
+    )
     if (
         not isinstance(models, list)
         or not models
@@ -806,6 +810,9 @@ def validate_repair_case_revision(
         library_root=library_root,
         payload=payload,
     )
+    manifest_board_key = _require_safe_id(
+        payload.get("board_key"), "board_key"
+    )
 
     historical_fact_ids: set[str] = set()
     previous = None
@@ -835,7 +842,7 @@ def validate_repair_case_revision(
         historical_fact_ids = _fact_ids(previous)
 
     board, catalog_models = _catalog_board(
-        project_root, payload.get("board_key", "")
+        project_root, manifest_board_key
     )
     try:
         validated = validate_repair_case_manifest(
