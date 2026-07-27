@@ -12,6 +12,11 @@ does not prove automatic cross-modal registration accuracy, visible-defect
 recognition, repair success, Golden Sample eligibility, or training
 eligibility.
 
+The independent repair-case fact source supports both
+`VISUAL-QC-REPAIR-CASE-SOURCE-V1` and
+`VISUAL-QC-REPAIR-CASE-SOURCE-V2`. Historical V1 manifests remain unchanged;
+the CASE005 publication described below is V2.
+
 ## Governed Source
 
 - Board key: `bg6h-f069`
@@ -50,6 +55,26 @@ The capture session is `pair_complete`; both cases are
 `ready_for_human_qc`. The workbench unlocked defect annotation only after
 the append-only registration reviews were stored.
 
+## Repair Case Publication
+
+CASE005's supplied text facts are now preserved independently from the two
+local registration cases:
+
+- Repair case: `case-005-bg6-f069`
+- Revision: `1`
+- Schema: `VISUAL-QC-REPAIR-CASE-SOURCE-V2`
+- Manifest SHA-256:
+  `85c8c64cb97cf1ea1e567e4d1f7fc62ec00ebf02719939c74a5e0faf46298177`
+- Identity status: `unresolved_alias`
+- Completeness: `symptom_linked`
+- Reported source model: `TECNO/BG6`
+- Catalog models: `BG6H/BG6h`
+
+The board identity is exact, but the supplied and catalog model names are not
+forced into one identity. Any later resolution must be recorded through a new
+append-only correction revision and an allowed monotonic transition; revision
+1 remains immutable.
+
 ## Evidence Boundary
 
 - The Feishu row-level side label was not trusted because other collection
@@ -58,15 +83,23 @@ the append-only registration reviews were stored.
   overlay.
 - CASE005 is not a Golden Sample.
 - No defect annotation or `no_visible_anomaly` conclusion was created.
-- The server is a local integration instance. Production revision
-  `f278061` does not yet accept the qualified-handoff contract.
+- The published repair-case manifest is not visual diagnosis evidence.
+- It is not confirmed defect evidence.
+- It is not Golden Sample evidence.
+- It is not training label evidence.
+- It is not repair causality evidence.
+- It is not field accuracy evidence.
 - Model naming remains separate from board identity: the exact physical and
-  engineering revision is F069 V1.2, while BG6/BG6H sales-model compatibility
-  still requires explicit source confirmation.
+  engineering revision is F069 V1.2, while `TECNO/BG6` and `BG6H/BG6h`
+  compatibility still requires explicit source confirmation.
+- The server cases are local integration instances. Production remains `f278061`;
+  the repair-case publication did not change production.
 
 ## Next Gate
 
-Bind CASE005's text repair facts to the two registered images before issuing
-human QC conclusions. For automatic registration, use same-modality physical
-Golden references or a deliberately evaluated cross-modal matcher; do not
-weaken ORB/AKAZE thresholds to force point-map matches.
+Keep the repair-case manifest and physical-registration evidence as separate
+fact layers until an explicit, reviewed link contract is approved. Human QC
+conclusions still require their own evidence. For automatic registration, use
+same-modality physical Golden references or a deliberately evaluated
+cross-modal matcher; do not weaken ORB/AKAZE thresholds to force point-map
+matches.

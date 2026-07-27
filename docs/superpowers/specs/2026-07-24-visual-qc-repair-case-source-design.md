@@ -1,7 +1,8 @@
 # Visual-QC Repair Case Source Design
 
 **Date:** 2026-07-24  
-**Status:** Approved direction; written-spec review pending  
+**Status:** V1 and V2 implemented locally; first V2 case published
+
 **Owner:** Milo  
 **Data operator:** Codex
 
@@ -45,6 +46,21 @@ Add `VISUAL-QC-REPAIR-CASE-SOURCE-V1` as a separate contract. One stable
 
 This avoids changing or re-hashing existing source packages and supports later
 case supplementation without overwriting history.
+
+## Implemented V2 Evolution
+
+The V1 design remains the historical baseline: V1 manifests remain immutable and readable.
+`VISUAL-QC-REPAIR-CASE-SOURCE-V2` adds explicit device identity
+without migrating or rewriting V1 bytes. A V2 revision may preserve
+`unresolved_alias` only when the catalog `board_key` and `board_id` are exact
+and complete identity evidence is present. Reported models, catalog models, and
+resolved models remain separate, so an unresolved source alias is not silently
+promoted to a confirmed catalog identity.
+
+Identity status is revision history, not mutable metadata. Any later
+resolution or conflict follows an allowed monotonic identity transition in an
+append-only correction revision that retains prior facts and binds the exact
+previous manifest SHA-256.
 
 ## Storage Layout
 
@@ -282,6 +298,30 @@ The corrected and replacement IDs must resolve across the validated revision
 chain. A correction cannot target another correction, and one fact cannot have
 two active corrections.
 
+For V2, device-identity transitions follow the same append-only rule. The
+current identity may only move through a newly published revision with required
+evidence and, when changing status, an explicit correction record. Historical
+V1 and V2 manifests are never rewritten.
+
+## First V2 Publication
+
+CASE005 is published in the repository-external controlled library as:
+
+- repair case `case-005-bg6-f069`;
+- revision `1`;
+- schema `VISUAL-QC-REPAIR-CASE-SOURCE-V2`;
+- manifest SHA-256
+  `85c8c64cb97cf1ea1e567e4d1f7fc62ec00ebf02719939c74a5e0faf46298177`;
+- identity status `unresolved_alias`;
+- completeness `symptom_linked`;
+- source-reported model `TECNO/BG6`;
+- catalog models `BG6H/BG6h`.
+
+The exact F069 V1.2 board identity is supported, but the source and catalog
+model labels are not forcibly normalized. This publication records supplied
+repair facts only. It is not visual diagnosis, confirmed-defect, Golden,
+training-label, repair-causality, or field-accuracy evidence.
+
 ## Operator Flow
 
 Add `scripts/stage_visual_qc_repair_case.py`.
@@ -313,7 +353,7 @@ fails with a typed no-clobber error.
 
 ## Downstream Boundary
 
-V1 is local only. It does not modify:
+V1 and V2 are local only. They do not modify:
 
 - `VISUAL-QC-SOURCE-PACKAGE-V1`;
 - physical acceptance reports;
@@ -325,6 +365,9 @@ V1 is local only. It does not modify:
 After the first real case is staged and audited, a separate design may bind the
 case manifest SHA-256 into physical acceptance and controlled handoff. That
 decision must be based on the actual material shape rather than proxy fixtures.
+
+Production remains `f278061`. Publishing CASE005 did not change the server,
+API, database, browser workbench, or production environment.
 
 ## Validation
 

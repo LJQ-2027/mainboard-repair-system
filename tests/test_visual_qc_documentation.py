@@ -13,6 +13,57 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class VisualQcDocumentationTests(unittest.TestCase):
+    def test_repair_case_documents_record_v2_identity_and_case005_boundaries(self):
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        acceptance = (
+            ROOT / "docs" / "visual-qc-f069-first-physical-acceptance-2026-07-24.md"
+        ).read_text(encoding="utf-8")
+        intake = (
+            ROOT / "docs" / "visual-qc-capture-intake-spec-2026-07-20.md"
+        ).read_text(encoding="utf-8")
+        source_design = (
+            ROOT
+            / "docs"
+            / "superpowers"
+            / "specs"
+            / "2026-07-24-visual-qc-repair-case-source-design.md"
+        ).read_text(encoding="utf-8")
+        documents = (readme, acceptance, intake, source_design)
+
+        for document in documents:
+            self.assertIn("VISUAL-QC-REPAIR-CASE-SOURCE-V1", document)
+            self.assertIn("VISUAL-QC-REPAIR-CASE-SOURCE-V2", document)
+            self.assertIn("unresolved_alias", document)
+            self.assertIn("case-005-bg6-f069", document)
+            self.assertIn(
+                "85c8c64cb97cf1ea1e567e4d1f7fc62ec00ebf02719939c74a5e0faf46298177",
+                document,
+            )
+            self.assertIn("symptom_linked", document)
+            self.assertIn("TECNO/BG6", document)
+            self.assertIn("BG6H/BG6h", document)
+            self.assertIn("Production remains `f278061`", document)
+
+        for document in (readme, intake, source_design):
+            self.assertRegex(
+                document,
+                r"V1[^\n]*(immutable|不可变)[^\n]*(readable|可读)"
+                r"|V1[^\n]*(readable|可读)[^\n]*(immutable|不可变)",
+            )
+        self.assertIn("append-only correction revision", source_design)
+        self.assertIn("complete identity evidence", source_design)
+        self.assertIn("monotonic identity transition", source_design)
+        self.assertNotIn("Bind CASE005's text repair facts", acceptance)
+        for forbidden_claim in (
+            "visual diagnosis evidence",
+            "confirmed defect evidence",
+            "Golden Sample evidence",
+            "training label evidence",
+            "repair causality evidence",
+            "field accuracy evidence",
+        ):
+            self.assertIn(f"not {forbidden_claim}", acceptance)
+
     def test_server_api_documents_current_contracts_and_controlled_handoff(self):
         server_api = (
             ROOT / "docs" / "visual-qc-server-api-2026-07-20.md"

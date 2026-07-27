@@ -55,7 +55,9 @@ The source library is an integrity-preserving operator workflow, not a sandbox a
 
 ## Repair Case Source
 
-Milo-supplied repair cases are preserved as an independent `VISUAL-QC-REPAIR-CASE-SOURCE-V1` fact source. They do not extend `VISUAL-QC-CASE-V1/V2`, and their presence in the controlled library does not create a server case, annotation, QC result, Golden Sample, COCO record, training-manifest row, or governed dataset member.
+Milo-supplied repair cases are preserved as an independent repair-case fact source. Historical `VISUAL-QC-REPAIR-CASE-SOURCE-V1` manifests remain immutable and readable. `VISUAL-QC-REPAIR-CASE-SOURCE-V2` is used when exact board identity is supported but device-model identity needs an explicit state such as `unresolved_alias`. Neither version extends `VISUAL-QC-CASE-V1/V2`, and its presence in the controlled library does not create a server case, annotation, QC result, Golden Sample, COCO record, training-manifest row, or governed dataset member.
+
+V2 permits `unresolved_alias` only with an exact catalog `board_key` and `board_id` plus complete identity evidence. Reported models, catalog models, and resolved models stay separate. An unresolved or conflicting identity cannot be forced into a catalog model. Identity status may change only through an allowed monotonic identity transition in a later append-only correction revision that retains prior bytes and binds the previous manifest SHA-256.
 
 The owner-only sequence is:
 
@@ -182,13 +184,24 @@ after-repair photos on 2026-07-24:
   `manual_registration_required`;
 - both sides completed reviewed manual four-point registration with an
   independent check point and reached `ready_for_human_qc`.
+- the independent repair case was published as `case-005-bg6-f069` revision
+  1, manifest SHA-256
+  `85c8c64cb97cf1ea1e567e4d1f7fc62ec00ebf02719939c74a5e0faf46298177`,
+  using `VISUAL-QC-REPAIR-CASE-SOURCE-V2`, `unresolved_alias`, and
+  `symptom_linked`;
+- the source-reported `TECNO/BG6` and catalog `BG6H/BG6h` identities remain
+  deliberately unresolved rather than forcibly normalized.
 
 See `docs/visual-qc-f069-first-physical-acceptance-2026-07-24.md` for exact
 case ids, board-side assignments, errors, and evidence boundaries.
 
-The remaining real-data gates are human QC conclusions tied to the collection
-case facts, annotation-to-footprint verification, a Milo-confirmed normal
-Golden Sample, and production deployment of the qualified-handoff contract.
+The V2 repair-case publication is not visual diagnosis, confirmed-defect,
+Golden, training-label, repair-causality, or field-accuracy evidence. The
+remaining real-data gates are human QC conclusions tied through a separately
+approved evidence link, annotation-to-footprint verification, a Milo-confirmed
+normal Golden Sample, and production deployment of the qualified-handoff
+contract. Production remains `f278061`; this local case publication did not
+modify production.
 Synthetic transforms and 21 Service Manual images remain proxy software
 evidence only; they must not be described as physical accuracy or used to
 train a production defect model.
