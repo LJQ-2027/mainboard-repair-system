@@ -16,7 +16,13 @@ import cv2
 import numpy as np
 
 from scripts.visual_qc.intake import IntakeValidationError
+from scripts.visual_qc.repair_case_contract import (
+    FIXED_FALSE_BOUNDARIES,
+    REPAIR_CASE_SCHEMA_V1,
+    REPAIR_CASE_SCHEMA_V2,
+)
 from scripts.visual_qc.repair_case_library import (
+    build_repair_case_revision,
     inspect_supporting_evidence,
     resolve_package_links,
     stage_repair_case_revision,
@@ -109,6 +115,25 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
             milo_physical_source_confirmed=True,
             capture_checklist_confirmed=True,
         )
+
+    def f069_package(self):
+        if not hasattr(self, "_f069_package"):
+            image = self.root / "f069-after.jpg"
+            image.write_bytes(encode_image(".jpg", value=200))
+            self._f069_package = stage_source_package(
+                project_root=ROOT,
+                library_root=self.library,
+                package_id="pkg-f069-after",
+                batch_id="batch-f069-after",
+                board_key="bg6h-f069",
+                capture_session_id="session-f069-after",
+                capture_stage="after_repair",
+                capture_setup_id="standard-bench",
+                image_assignments=[("main_page_1", image)],
+                milo_physical_source_confirmed=True,
+                capture_checklist_confirmed=True,
+            )
+        return self._f069_package
 
     def test_package_links_bind_exact_validated_source_packages(self):
         links = resolve_package_links(
@@ -276,6 +301,73 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
         record.update(overrides)
         return record
 
+    def v2_case_record(self, identity, **overrides):
+        record = self.case_record()
+        del record["device_models"]
+        record["device_identity"] = identity
+        record.update(overrides)
+        return record
+
+    @staticmethod
+    def exact_f069_identity():
+        return {
+            "reported_models": ["BG6H", "BG6h"],
+            "catalog_models": ["BG6H", "BG6h"],
+            "mapping_status": "exact_catalog_match",
+            "resolved_models": ["BG6H", "BG6h"],
+            "resolution_note": None,
+            "evidence_refs": [],
+        }
+
+    @staticmethod
+    def identity_reference(evidence_id):
+        return {
+            "kind": "supporting_evidence",
+            "evidence_id": evidence_id,
+        }
+
+    def unresolved_f069_identity(self, *evidence_ids):
+        return {
+            "reported_models": ["TECNO/BG6"],
+            "catalog_models": ["BG6H", "BG6h"],
+            "mapping_status": "unresolved_alias",
+            "resolved_models": [],
+            "resolution_note": None,
+            "evidence_refs": [
+                self.identity_reference(evidence_id)
+                for evidence_id in evidence_ids
+            ],
+        }
+
+    def confirmed_f069_identity(self, *evidence_ids):
+        return {
+            "reported_models": ["TECNO/BG6"],
+            "catalog_models": ["BG6H", "BG6h"],
+            "mapping_status": "confirmed_alias",
+            "resolved_models": ["BG6H"],
+            "resolution_note": "The appended evidence confirms the BG6H alias.",
+            "evidence_refs": [
+                self.identity_reference(evidence_id)
+                for evidence_id in evidence_ids
+            ],
+        }
+
+    def stage_f069_case(self, *, case_record, supporting=None, **overrides):
+        options = {
+            "project_root": ROOT,
+            "library_root": self.library,
+            "repair_case_id": "case-f069-0001",
+            "board_key": "bg6h-f069",
+            "package_assignments": [
+                ("after_repair", self.f069_package()["source_package_path"])
+            ],
+            "case_record": case_record,
+            "supporting_assignments": supporting or [],
+            "previous_manifest_path": None,
+        }
+        options.update(overrides)
+        return stage_repair_case_revision(**options)
+
     def stage_case(self, **overrides):
         options = {
             "project_root": ROOT,
@@ -321,6 +413,400 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
         replayed = self.stage_case()
         self.assertEqual(replayed["state"], "existing")
         self.assertEqual(replayed["manifest_sha256"], created["manifest_sha256"])
+
+    def test_unresolved_v2_revision_publishes_exact_shape_and_replays(self):
+        source = self.root / "f069-identity.txt"
+        source.write_text("Reported model: TECNO/BG6", encoding="utf-8")
+        record = self.v2_case_record(
+            self.unresolved_f069_identity("identity-source"),
+            supporting_evidence_descriptions={
+                "identity-source": "Milo supplied model identity record"
+            },
+        )
+
+        created = self.stage_f069_case(
+            case_record=record,
+            supporting=[("identity-source", source)],
+        )
+        replayed = self.stage_f069_case(
+            case_record=record,
+            supporting=[("identity-source", source)],
+        )
+
+        self.assertEqual(created["state"], "created")
+        self.assertEqual(replayed["state"], "existing")
+        self.assertEqual(replayed["manifest_sha256"], created["manifest_sha256"])
+        self.assertEqual(created["schema_version"], REPAIR_CASE_SCHEMA_V2)
+        self.assertEqual(created["identity_status"], "unresolved_alias")
+        payload = json.loads(created["manifest_path"].read_text(encoding="utf-8"))
+        self.assertEqual(
+            list(payload),
+            [
+                "schema_version",
+                "repair_case_id",
+                "revision",
+                "previous_manifest_sha256",
+                "source_origin",
+                "board_key",
+                "board_id",
+                "device_identity",
+                "package_links",
+                "supporting_evidence",
+                "reported_symptoms",
+                "findings",
+                "repair_actions",
+                "outcome",
+                "corrections",
+                "completeness",
+                "boundaries",
+            ],
+        )
+        self.assertEqual(payload["schema_version"], REPAIR_CASE_SCHEMA_V2)
+        self.assertIn("device_identity", payload)
+        self.assertNotIn("device_models", payload)
+        self.assertEqual(
+            payload["device_identity"],
+            self.unresolved_f069_identity("identity-source"),
+        )
+        self.assertEqual(
+            payload["boundaries"],
+            {**FIXED_FALSE_BOUNDARIES, "model_identity_resolved": False},
+        )
+
+        conflict = self.unresolved_f069_identity("identity-source")
+        conflict["mapping_status"] = "conflict"
+        with self.assertRaisesRegex(IntakeValidationError, "conflict"):
+            self.stage_f069_case(
+                case_record=self.v2_case_record(
+                    conflict,
+                    supporting_evidence_descriptions={
+                        "identity-source": "Milo supplied model identity record"
+                    },
+                ),
+                supporting=[("identity-source", source)],
+            )
+        with self.assertRaisesRegex(IntakeValidationError, "no evidence or context"):
+            self.stage_f069_case(
+                case_record=self.v2_case_record(
+                    self.unresolved_f069_identity("identity-source")
+                ),
+                previous_manifest_path=created["manifest_path"],
+            )
+        self.assertEqual(
+            hashlib.sha256(created["manifest_path"].read_bytes()).hexdigest(),
+            created["manifest_sha256"],
+        )
+
+    def test_v2_requires_exact_catalog_model_order(self):
+        valid = build_repair_case_revision(
+            project_root=ROOT,
+            library_root=self.library,
+            repair_case_id="case-f069-order",
+            board_key="bg6h-f069",
+            package_assignments=[
+                ("after_repair", self.f069_package()["source_package_path"])
+            ],
+            case_record=self.v2_case_record(self.exact_f069_identity()),
+            supporting_assignments=[],
+            previous_manifest_path=None,
+        )
+        self.assertEqual(
+            valid["device_identity"]["catalog_models"],
+            ["BG6H", "BG6h"],
+        )
+
+        mismatched = self.exact_f069_identity()
+        mismatched["reported_models"] = ["BG6h", "BG6H"]
+        mismatched["catalog_models"] = ["BG6h", "BG6H"]
+        mismatched["resolved_models"] = ["BG6h", "BG6H"]
+        with self.assertRaisesRegex(IntakeValidationError, "catalog_models"):
+            self.stage_f069_case(
+                repair_case_id="case-f069-order-mismatch",
+                case_record=self.v2_case_record(mismatched),
+            )
+
+    def test_identity_shape_errors_fail_before_cases_directory_creation(self):
+        common = self.case_record()
+        del common["device_models"]
+        both = {
+            **common,
+            "device_models": ["BG6H"],
+            "device_identity": self.exact_f069_identity(),
+        }
+        neither = dict(common)
+        extra = {**common, "device_identity": self.exact_f069_identity(), "extra": 1}
+
+        for record in (both, neither, extra):
+            with self.subTest(fields=sorted(record)):
+                with self.assertRaisesRegex(IntakeValidationError, "fields"):
+                    self.stage_f069_case(case_record=record)
+                self.assertFalse((self.library / "cases").exists())
+
+    def test_v1_publication_shape_and_result_remain_unchanged(self):
+        created = self.stage_case(repair_case_id="case-km4-v1-compat")
+        payload = json.loads(created["manifest_path"].read_text(encoding="utf-8"))
+
+        self.assertEqual(payload["schema_version"], REPAIR_CASE_SCHEMA_V1)
+        self.assertEqual(payload["device_models"], ["KM4"])
+        self.assertNotIn("device_identity", payload)
+        self.assertEqual(payload["boundaries"], FIXED_FALSE_BOUNDARIES)
+        self.assertEqual(
+            list(payload).index("device_models"),
+            list(payload).index("board_id") + 1,
+        )
+        self.assertEqual(created["schema_version"], REPAIR_CASE_SCHEMA_V1)
+        self.assertEqual(created["identity_status"], "exact_catalog_match")
+
+    def test_v1_to_v2_exact_migration_preserves_prior_bytes(self):
+        first = self.stage_f069_case(
+            case_record=self.case_record(device_models=["BG6H", "BG6h"])
+        )
+        prior_bytes = first["manifest_path"].read_bytes()
+        prior_hash = first["manifest_sha256"]
+
+        second = self.stage_f069_case(
+            case_record=self.v2_case_record(self.exact_f069_identity()),
+            previous_manifest_path=first["manifest_path"],
+        )
+
+        self.assertEqual(first["manifest_path"].read_bytes(), prior_bytes)
+        self.assertEqual(hashlib.sha256(prior_bytes).hexdigest(), prior_hash)
+        self.assertEqual(second["schema_version"], REPAIR_CASE_SCHEMA_V2)
+        self.assertEqual(second["identity_status"], "exact_catalog_match")
+        self.assertEqual(
+            json.loads(second["manifest_path"].read_text(encoding="utf-8"))[
+                "previous_manifest_sha256"
+            ],
+            prior_hash,
+        )
+
+    def test_v1_to_v2_rejects_unresolved_and_mismatched_models(self):
+        first = self.stage_f069_case(
+            case_record=self.case_record(device_models=["BG6H", "BG6h"])
+        )
+        evidence = self.root / "migration-identity.txt"
+        evidence.write_text("Reported model: TECNO/BG6", encoding="utf-8")
+        unresolved = self.v2_case_record(
+            self.unresolved_f069_identity("migration-identity"),
+            supporting_evidence_descriptions={
+                "migration-identity": "Migration identity source"
+            },
+        )
+        mismatched = self.exact_f069_identity()
+        mismatched["reported_models"] = ["BG6H"]
+        mismatched["resolved_models"] = ["BG6H"]
+
+        with self.assertRaisesRegex(IntakeValidationError, "migration|exact"):
+            self.stage_f069_case(
+                case_record=unresolved,
+                supporting=[("migration-identity", evidence)],
+                previous_manifest_path=first["manifest_path"],
+            )
+        with self.assertRaisesRegex(IntakeValidationError, "migration|models"):
+            self.stage_f069_case(
+                case_record=self.v2_case_record(mismatched),
+                previous_manifest_path=first["manifest_path"],
+            )
+        self.assertFalse(
+            (first["manifest_path"].parents[1] / "0002").exists()
+        )
+
+    def test_v2_to_v1_is_rejected(self):
+        first = self.stage_f069_case(
+            case_record=self.v2_case_record(self.exact_f069_identity())
+        )
+
+        with self.assertRaisesRegex(IntakeValidationError, "V2.*V1|downgrade"):
+            self.stage_f069_case(
+                case_record=self.case_record(device_models=["BG6H", "BG6h"]),
+                previous_manifest_path=first["manifest_path"],
+            )
+
+    def test_unresolved_confirmation_requires_appended_identity_evidence(self):
+        first_source = self.root / "identity-first.txt"
+        first_source.write_text("Reported model: TECNO/BG6", encoding="utf-8")
+        first = self.stage_f069_case(
+            case_record=self.v2_case_record(
+                self.unresolved_f069_identity("identity-first"),
+                supporting_evidence_descriptions={
+                    "identity-first": "Initial identity source"
+                },
+            ),
+            supporting=[("identity-first", first_source)],
+        )
+
+        with self.assertRaisesRegex(IntakeValidationError, "new evidence"):
+            self.stage_f069_case(
+                case_record=self.v2_case_record(
+                    self.confirmed_f069_identity("identity-first")
+                ),
+                previous_manifest_path=first["manifest_path"],
+            )
+
+        second_source = self.root / "identity-second.txt"
+        second_source.write_text("Confirmed alias: BG6H", encoding="utf-8")
+        confirmed = self.stage_f069_case(
+            case_record=self.v2_case_record(
+                self.confirmed_f069_identity(
+                    "identity-first",
+                    "identity-second",
+                ),
+                supporting_evidence_descriptions={
+                    "identity-second": "Appended identity confirmation"
+                },
+            ),
+            supporting=[("identity-second", second_source)],
+            previous_manifest_path=first["manifest_path"],
+        )
+        self.assertEqual(confirmed["identity_status"], "confirmed_alias")
+
+    def test_conflict_confirmation_requires_appended_correction_and_evidence(self):
+        first_source = self.root / "conflict-first.txt"
+        first_source.write_text("Conflicting model: TECNO/BG6", encoding="utf-8")
+        conflict_identity = self.unresolved_f069_identity("conflict-first")
+        conflict_identity["mapping_status"] = "conflict"
+        symptoms = [
+            {
+                "symptom_id": "symptom-old",
+                "text": "Initial report.",
+                "source_wording": None,
+                "fault_code": None,
+                "evidence_refs": [],
+            },
+            {
+                "symptom_id": "symptom-new",
+                "text": "Corrected report.",
+                "source_wording": None,
+                "fault_code": None,
+                "evidence_refs": [],
+            },
+            {
+                "symptom_id": "symptom-identity",
+                "text": "Identity-confirmed report.",
+                "source_wording": None,
+                "fault_code": None,
+                "evidence_refs": [],
+            },
+        ]
+        historical_correction = {
+            "correction_id": "correction-old",
+            "corrects_fact_id": "symptom-old",
+            "description": "Historical non-identity correction.",
+            "replacement_fact_id": "symptom-new",
+            "evidence_refs": [],
+        }
+        first = self.stage_f069_case(
+            case_record=self.v2_case_record(
+                conflict_identity,
+                supporting_evidence_descriptions={
+                    "conflict-first": "Initial conflicting identity source"
+                },
+                reported_symptoms=symptoms,
+                corrections=[historical_correction],
+            ),
+            supporting=[("conflict-first", first_source)],
+        )
+        second_source = self.root / "conflict-second.txt"
+        second_source.write_text("Confirmed alias: BG6H", encoding="utf-8")
+        confirmation_record = self.v2_case_record(
+            self.confirmed_f069_identity(
+                "conflict-first",
+                "conflict-second",
+            ),
+            supporting_evidence_descriptions={
+                "conflict-second": "Appended identity confirmation"
+            },
+            reported_symptoms=symptoms,
+            corrections=[historical_correction],
+        )
+
+        with self.assertRaisesRegex(IntakeValidationError, "new correction"):
+            self.stage_f069_case(
+                case_record=confirmation_record,
+                supporting=[("conflict-second", second_source)],
+                previous_manifest_path=first["manifest_path"],
+            )
+
+        appended = dict(historical_correction)
+        appended.update(
+            correction_id="correction-identity",
+            corrects_fact_id="symptom-new",
+            description="Correct the conflicting model identity.",
+            replacement_fact_id="symptom-identity",
+        )
+        confirmation_record["corrections"] = [historical_correction, appended]
+        confirmed = self.stage_f069_case(
+            case_record=confirmation_record,
+            supporting=[("conflict-second", second_source)],
+            previous_manifest_path=first["manifest_path"],
+        )
+        self.assertEqual(confirmed["identity_status"], "confirmed_alias")
+
+    def test_disk_validator_accepts_v2_and_mixed_revision_chains(self):
+        v2 = self.stage_f069_case(
+            repair_case_id="case-f069-v2-disk",
+            case_record=self.v2_case_record(self.exact_f069_identity()),
+        )
+        self.assertEqual(
+            validate_repair_case_revision(
+                manifest_path=v2["manifest_path"],
+                project_root=ROOT,
+                library_root=self.library,
+            )["schema_version"],
+            REPAIR_CASE_SCHEMA_V2,
+        )
+
+        first = self.stage_f069_case(
+            repair_case_id="case-f069-mixed-disk",
+            case_record=self.case_record(device_models=["BG6H", "BG6h"]),
+        )
+        second = self.stage_f069_case(
+            repair_case_id="case-f069-mixed-disk",
+            case_record=self.v2_case_record(self.exact_f069_identity()),
+            previous_manifest_path=first["manifest_path"],
+        )
+        validated = validate_repair_case_revision(
+            manifest_path=second["manifest_path"],
+            project_root=ROOT,
+            library_root=self.library,
+        )
+        self.assertEqual(validated["revision"], 2)
+        self.assertEqual(validated["schema_version"], REPAIR_CASE_SCHEMA_V2)
+
+    def test_disk_validator_rejects_tampered_v2_identity_boundary_and_catalog(self):
+        mutators = {
+            "identity": lambda payload: payload["device_identity"].update(
+                mapping_status="unresolved_alias",
+                resolved_models=[],
+                evidence_refs=[],
+            ),
+            "boundary": lambda payload: payload["boundaries"].update(
+                model_identity_resolved=False
+            ),
+            "catalog": lambda payload: payload["device_identity"].update(
+                catalog_models=["BG6h", "BG6H"]
+            ),
+        }
+        for label, mutate in mutators.items():
+            with self.subTest(label=label):
+                created = self.stage_f069_case(
+                    repair_case_id=f"case-f069-tampered-{label}",
+                    case_record=self.v2_case_record(self.exact_f069_identity()),
+                )
+                payload = json.loads(
+                    created["manifest_path"].read_text(encoding="utf-8")
+                )
+                mutate(payload)
+                created["manifest_path"].write_text(
+                    json.dumps(payload, indent=2) + "\n",
+                    encoding="utf-8",
+                )
+                with self.assertRaises(IntakeValidationError):
+                    validate_repair_case_revision(
+                        manifest_path=created["manifest_path"],
+                        project_root=ROOT,
+                        library_root=self.library,
+                    )
 
     def test_conflicting_first_revision_cannot_overwrite_completed_case(self):
         created = self.stage_case()

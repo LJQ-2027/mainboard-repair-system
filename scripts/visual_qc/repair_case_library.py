@@ -22,9 +22,14 @@ from scripts.visual_qc.repair_case_contract import (
     MAX_SUPPORTING_FILE_BYTES,
     MAX_SUPPORTING_FILES,
     MIME_EXTENSIONS,
-    REPAIR_CASE_SCHEMA_VERSION,
+    REPAIR_CASE_SCHEMA_V1,
+    REPAIR_CASE_SCHEMA_V2,
     derive_completeness,
     validate_repair_case_manifest,
+)
+from scripts.visual_qc.repair_case_identity import (
+    derive_model_identity_resolved,
+    validate_identity_transition,
 )
 from scripts.visual_qc.server.catalog import BoardCatalog, CatalogError
 from scripts.visual_qc.server.storage import detect_image_mime_type
@@ -45,8 +50,7 @@ ROLE_CAPTURE_STAGE = {
     "after_repair": "after_repair",
     "golden_reference": "golden_reference",
 }
-CASE_RECORD_FIELDS = {
-    "device_models",
+COMMON_CASE_RECORD_FIELDS = {
     "supporting_evidence_descriptions",
     "reported_symptoms",
     "findings",
@@ -54,6 +58,8 @@ CASE_RECORD_FIELDS = {
     "outcome",
     "corrections",
 }
+V1_CASE_RECORD_FIELDS = COMMON_CASE_RECORD_FIELDS | {"device_models"}
+V2_CASE_RECORD_FIELDS = COMMON_CASE_RECORD_FIELDS | {"device_identity"}
 
 
 def resolve_package_links(
@@ -367,7 +373,7 @@ def _strict_json(path: Path, label: str) -> tuple[dict, str]:
     return payload, hashlib.sha256(content).hexdigest()
 
 
-def _catalog_board(project_root: Path, board_key: str) -> tuple[dict, set[str]]:
+def _catalog_board(project_root: Path, board_key: str) -> tuple[dict, list[str]]:
     catalog = BoardCatalog(project_root)
     try:
         board = catalog.resolve_board(board_key)
@@ -375,14 +381,16 @@ def _catalog_board(project_root: Path, board_key: str) -> tuple[dict, set[str]]:
         raise IntakeValidationError(str(exc)) from exc
     raw = catalog.catalog["boards"][board_key]
     models = raw.get("compatible_models") or [raw.get("model")]
-    allowed = {
-        model for model in models if isinstance(model, str) and model.strip()
-    }
-    if not allowed:
+    if (
+        not isinstance(models, list)
+        or not models
+        or any(not isinstance(model, str) or not model.strip() for model in models)
+        or len(models) != len(set(models))
+    ):
         raise IntakeValidationError(
-            f"board catalog has no compatible models: {board_key}"
+            f"board catalog compatible models are invalid: {board_key}"
         )
-    return board, allowed
+    return board, list(models)
 
 
 def _fact_ids(payload: dict) -> set[str]:
@@ -393,15 +401,20 @@ def _fact_ids(payload: dict) -> set[str]:
     }
 
 
-def _validate_case_record(case_record: dict) -> dict:
-    if not isinstance(case_record, dict) or set(case_record) != CASE_RECORD_FIELDS:
+def _validate_case_record(case_record: dict) -> tuple[dict, str]:
+    fields = set(case_record) if isinstance(case_record, dict) else set()
+    if fields == V1_CASE_RECORD_FIELDS:
+        schema_version = REPAIR_CASE_SCHEMA_V1
+    elif fields == V2_CASE_RECORD_FIELDS:
+        schema_version = REPAIR_CASE_SCHEMA_V2
+    else:
         raise IntakeValidationError("repair case record fields are invalid")
     descriptions = case_record["supporting_evidence_descriptions"]
     if not isinstance(descriptions, dict):
         raise IntakeValidationError(
             "supporting_evidence_descriptions must be an object"
         )
-    return copy.deepcopy(case_record)
+    return copy.deepcopy(case_record), schema_version
 
 
 def _assert_prefix(previous: list, current: list, label: str) -> None:
@@ -419,6 +432,83 @@ def _manifest_content_without_revision(payload: dict) -> dict:
     }
 
 
+def _validate_revision_transition(
+    previous: dict,
+    current: dict,
+    *,
+    catalog_models: list[str],
+) -> None:
+    if (
+        current["repair_case_id"] != previous["repair_case_id"]
+        or current["board_key"] != previous["board_key"]
+        or current["board_id"] != previous["board_id"]
+        or current["source_origin"] != previous["source_origin"]
+    ):
+        raise IntakeValidationError(
+            "repair case revision changes historical identity"
+        )
+    _assert_prefix(
+        previous["package_links"],
+        current["package_links"],
+        "package links",
+    )
+    _assert_prefix(
+        previous["supporting_evidence"],
+        current["supporting_evidence"],
+        "supporting evidence",
+    )
+    if (
+        previous["outcome"]["status"] != "unknown"
+        and current["outcome"] != previous["outcome"]
+    ):
+        raise IntakeValidationError(
+            "repair case revision changes historical outcome"
+        )
+    for field in (
+        "reported_symptoms",
+        "findings",
+        "repair_actions",
+        "corrections",
+    ):
+        _assert_prefix(previous[field], current[field], field)
+
+    previous_version = previous["schema_version"]
+    current_version = current["schema_version"]
+    if previous_version == REPAIR_CASE_SCHEMA_V1:
+        if current_version == REPAIR_CASE_SCHEMA_V1:
+            if current["device_models"] != previous["device_models"]:
+                raise IntakeValidationError(
+                    "repair case revision changes historical device_models"
+                )
+            return
+        identity = current["device_identity"]
+        if (
+            identity["mapping_status"] != "exact_catalog_match"
+            or identity["reported_models"] != previous["device_models"]
+            or identity["resolved_models"] != previous["device_models"]
+            or identity["catalog_models"] != catalog_models
+        ):
+            raise IntakeValidationError(
+                "V1 to V2 migration requires an exact catalog identity "
+                "matching historical device models"
+            )
+        return
+    if current_version == REPAIR_CASE_SCHEMA_V1:
+        raise IntakeValidationError("V2 to V1 repair case downgrade is not allowed")
+    try:
+        validate_identity_transition(
+            previous["device_identity"],
+            current["device_identity"],
+            has_new_correction=(
+                len(current["corrections"]) > len(previous["corrections"])
+            ),
+        )
+    except ValueError as exc:
+        raise IntakeValidationError(
+            f"invalid repair case identity transition: {exc}"
+        ) from exc
+
+
 def _prepare_repair_case_revision(
     *,
     project_root: Path,
@@ -434,17 +524,18 @@ def _prepare_repair_case_revision(
     library_root = _resolve_library_root(project_root, library_root)
     repair_case_id = _require_safe_id(repair_case_id, "repair_case_id")
     board_key = _require_safe_id(board_key, "board_key")
-    record = _validate_case_record(case_record)
-    board, compatible_models = _catalog_board(project_root, board_key)
-    models = record["device_models"]
-    if (
-        not isinstance(models, list)
-        or not models
-        or any(model not in compatible_models for model in models)
-    ):
-        raise IntakeValidationError(
-            f"device_models do not match board catalog: {board_key}"
-        )
+    record, schema_version = _validate_case_record(case_record)
+    board, catalog_models = _catalog_board(project_root, board_key)
+    if schema_version == REPAIR_CASE_SCHEMA_V1:
+        models = record["device_models"]
+        if (
+            not isinstance(models, list)
+            or not models
+            or any(model not in catalog_models for model in models)
+        ):
+            raise IntakeValidationError(
+                f"device_models do not match board catalog: {board_key}"
+            )
 
     previous = None
     previous_sha256 = None
@@ -489,34 +580,38 @@ def _prepare_repair_case_revision(
                 "new supporting evidence duplicates a historical evidence_id"
             )
         supporting = copy.deepcopy(previous["supporting_evidence"]) + new_supporting
-        if record["device_models"] != previous["device_models"]:
-            raise IntakeValidationError(
-                "repair case revision changes historical device_models"
+
+    if schema_version == REPAIR_CASE_SCHEMA_V1:
+        identity_field = {
+            "device_models": copy.deepcopy(record["device_models"])
+        }
+        boundaries = copy.deepcopy(FIXED_FALSE_BOUNDARIES)
+    else:
+        try:
+            model_identity_resolved = derive_model_identity_resolved(
+                record["device_identity"]
             )
-        if (
-            previous["outcome"]["status"] != "unknown"
-            and record["outcome"] != previous["outcome"]
-        ):
+        except (KeyError, TypeError) as exc:
             raise IntakeValidationError(
-                "repair case revision changes historical outcome"
-            )
-        for field in (
-            "reported_symptoms",
-            "findings",
-            "repair_actions",
-            "corrections",
-        ):
-            _assert_prefix(previous[field], record[field], field)
+                "invalid repair case device_identity"
+            ) from exc
+        identity_field = {
+            "device_identity": copy.deepcopy(record["device_identity"])
+        }
+        boundaries = {
+            **copy.deepcopy(FIXED_FALSE_BOUNDARIES),
+            "model_identity_resolved": model_identity_resolved,
+        }
 
     payload = {
-        "schema_version": REPAIR_CASE_SCHEMA_VERSION,
+        "schema_version": schema_version,
         "repair_case_id": repair_case_id,
         "revision": revision,
         "previous_manifest_sha256": previous_sha256,
         "source_origin": "milo_supplied",
         "board_key": board_key,
         "board_id": board["board_id"],
-        "device_models": copy.deepcopy(record["device_models"]),
+        **identity_field,
         "package_links": links,
         "supporting_evidence": supporting,
         "reported_symptoms": copy.deepcopy(record["reported_symptoms"]),
@@ -525,16 +620,27 @@ def _prepare_repair_case_revision(
         "outcome": copy.deepcopy(record["outcome"]),
         "corrections": copy.deepcopy(record["corrections"]),
         "completeness": "photos_only",
-        "boundaries": copy.deepcopy(FIXED_FALSE_BOUNDARIES),
+        "boundaries": boundaries,
     }
     payload["completeness"] = derive_completeness(payload)
     try:
         validated = validate_repair_case_manifest(
             payload,
             historical_fact_ids=historical_fact_ids,
+            catalog_models=(
+                catalog_models
+                if schema_version == REPAIR_CASE_SCHEMA_V2
+                else None
+            ),
         )
     except ValueError as exc:
         raise IntakeValidationError(f"invalid repair case manifest: {exc}") from exc
+    if previous is not None:
+        _validate_revision_transition(
+            previous,
+            validated,
+            catalog_models=catalog_models,
+        )
     if (
         previous is not None
         and _manifest_content_without_revision(validated)
@@ -579,6 +685,12 @@ def _revision_result(
         "state": state,
         "repair_case_id": payload["repair_case_id"],
         "revision": payload["revision"],
+        "schema_version": payload["schema_version"],
+        "identity_status": (
+            "exact_catalog_match"
+            if payload["schema_version"] == REPAIR_CASE_SCHEMA_V1
+            else payload["device_identity"]["mapping_status"]
+        ),
         "completeness": payload["completeness"],
         "manifest_sha256": manifest_sha256,
         "manifest_path": manifest_path.resolve(),
@@ -675,20 +787,28 @@ def validate_repair_case_revision(
             )
         historical_fact_ids = _fact_ids(previous)
 
+    board, catalog_models = _catalog_board(
+        project_root, payload.get("board_key", "")
+    )
     try:
         validated = validate_repair_case_manifest(
             payload,
             historical_fact_ids=historical_fact_ids,
+            catalog_models=(
+                catalog_models
+                if payload.get("schema_version") == REPAIR_CASE_SCHEMA_V2
+                else None
+            ),
         )
     except ValueError as exc:
         raise IntakeValidationError(f"invalid repair case manifest: {exc}") from exc
-    board, compatible_models = _catalog_board(
-        project_root, validated["board_key"]
-    )
     if validated["board_id"] != board["board_id"]:
         raise IntakeValidationError("repair case board_id does not match catalog")
-    if any(
-        model not in compatible_models for model in validated["device_models"]
+    if (
+        validated["schema_version"] == REPAIR_CASE_SCHEMA_V1
+        and any(
+            model not in catalog_models for model in validated["device_models"]
+        )
     ):
         raise IntakeValidationError(
             "repair case device_models do not match board catalog"
@@ -725,33 +845,11 @@ def validate_repair_case_revision(
                 "supporting evidence object byte size mismatch"
             )
     if previous is not None:
-        if (
-            validated["repair_case_id"] != previous["repair_case_id"]
-            or validated["board_key"] != previous["board_key"]
-            or validated["board_id"] != previous["board_id"]
-            or validated["source_origin"] != previous["source_origin"]
-            or validated["device_models"] != previous["device_models"]
-        ):
-            raise IntakeValidationError(
-                "repair case revision changes historical identity"
-            )
-        _assert_prefix(
-            previous["package_links"],
-            validated["package_links"],
-            "package links",
+        _validate_revision_transition(
+            previous,
+            validated,
+            catalog_models=catalog_models,
         )
-        _assert_prefix(
-            previous["supporting_evidence"],
-            validated["supporting_evidence"],
-            "supporting evidence",
-        )
-        for field in (
-            "reported_symptoms",
-            "findings",
-            "repair_actions",
-            "corrections",
-        ):
-            _assert_prefix(previous[field], validated[field], field)
     return validated
 
 
