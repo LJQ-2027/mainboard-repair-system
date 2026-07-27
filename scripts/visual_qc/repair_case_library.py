@@ -432,6 +432,33 @@ def _manifest_content_without_revision(payload: dict) -> dict:
     }
 
 
+def _evidence_reference_target(reference: dict) -> tuple[str, ...]:
+    if reference["kind"] == "package_entry":
+        return (
+            "package_entry",
+            reference["package_id"],
+            reference["entry_id"],
+        )
+    return ("supporting_evidence", reference["evidence_id"])
+
+
+def _manifest_evidence_targets(payload: dict) -> set[tuple[str, ...]]:
+    targets = {
+        (
+            "package_entry",
+            link["package_id"],
+            entry_id,
+        )
+        for link in payload["package_links"]
+        for entry_id in link["entry_ids"]
+    }
+    targets.update(
+        ("supporting_evidence", evidence["evidence_id"])
+        for evidence in payload["supporting_evidence"]
+    )
+    return targets
+
+
 def _validate_revision_transition(
     previous: dict,
     current: dict,
@@ -496,13 +523,33 @@ def _validate_revision_transition(
     if current_version == REPAIR_CASE_SCHEMA_V1:
         raise IntakeValidationError("V2 to V1 repair case downgrade is not allowed")
     try:
+        previous_identity = previous["device_identity"]
+        current_identity = current["device_identity"]
         validate_identity_transition(
-            previous["device_identity"],
-            current["device_identity"],
+            previous_identity,
+            current_identity,
             has_new_correction=(
                 len(current["corrections"]) > len(previous["corrections"])
             ),
         )
+        requires_new_evidence = (
+            previous_identity["mapping_status"]
+            != current_identity["mapping_status"]
+            or previous_identity["reported_models"]
+            != current_identity["reported_models"]
+            or previous_identity["catalog_models"]
+            != current_identity["catalog_models"]
+        )
+        previous_ref_count = len(previous_identity["evidence_refs"])
+        appended_refs = current_identity["evidence_refs"][previous_ref_count:]
+        prior_targets = _manifest_evidence_targets(previous)
+        if requires_new_evidence and not any(
+            _evidence_reference_target(reference) not in prior_targets
+            for reference in appended_refs
+        ):
+            raise ValueError(
+                "identity transition requires newly published identity evidence."
+            )
     except ValueError as exc:
         raise IntakeValidationError(
             f"invalid repair case identity transition: {exc}"

@@ -352,6 +352,68 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
             ],
         }
 
+    def conflict_transition_fixture(self, repair_case_id):
+        first_source = self.root / f"{repair_case_id}-identity.txt"
+        first_source.write_text("Conflicting model: TECNO/BG6", encoding="utf-8")
+        unused_source = self.root / f"{repair_case_id}-unused.txt"
+        unused_source.write_text("Existing uncited identity evidence", encoding="utf-8")
+        conflict_identity = self.unresolved_f069_identity("identity-first")
+        conflict_identity["mapping_status"] = "conflict"
+        symptoms = [
+            {
+                "symptom_id": "symptom-old",
+                "text": "Initial report.",
+                "source_wording": None,
+                "fault_code": None,
+                "evidence_refs": [],
+            },
+            {
+                "symptom_id": "symptom-new",
+                "text": "Corrected report.",
+                "source_wording": None,
+                "fault_code": None,
+                "evidence_refs": [],
+            },
+            {
+                "symptom_id": "symptom-identity",
+                "text": "Identity-confirmed report.",
+                "source_wording": None,
+                "fault_code": None,
+                "evidence_refs": [],
+            },
+        ]
+        historical_correction = {
+            "correction_id": "correction-old",
+            "corrects_fact_id": "symptom-old",
+            "description": "Historical non-identity correction.",
+            "replacement_fact_id": "symptom-new",
+            "evidence_refs": [],
+        }
+        first = self.stage_f069_case(
+            repair_case_id=repair_case_id,
+            case_record=self.v2_case_record(
+                conflict_identity,
+                supporting_evidence_descriptions={
+                    "identity-first": "Initial conflicting identity source",
+                    "identity-unused": "Existing but initially uncited evidence",
+                },
+                reported_symptoms=symptoms,
+                corrections=[historical_correction],
+            ),
+            supporting=[
+                ("identity-first", first_source),
+                ("identity-unused", unused_source),
+            ],
+        )
+        appended_correction = {
+            "correction_id": "correction-identity",
+            "corrects_fact_id": "symptom-new",
+            "description": "Correct the conflicting model identity.",
+            "replacement_fact_id": "symptom-identity",
+            "evidence_refs": [],
+        }
+        return first, symptoms, historical_correction, appended_correction
+
     def stage_f069_case(self, *, case_record, supporting=None, **overrides):
         options = {
             "project_root": ROOT,
@@ -741,6 +803,78 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
             previous_manifest_path=first["manifest_path"],
         )
         self.assertEqual(confirmed["identity_status"], "confirmed_alias")
+
+    def test_identity_transition_rejects_new_citation_to_old_evidence_target(self):
+        case_id = "case-f069-old-evidence-stage"
+        first, symptoms, historical, appended = (
+            self.conflict_transition_fixture(case_id)
+        )
+        stale_evidence_record = self.v2_case_record(
+            self.confirmed_f069_identity(
+                "identity-first",
+                "identity-unused",
+            ),
+            reported_symptoms=symptoms,
+            corrections=[historical, appended],
+        )
+
+        with self.assertRaisesRegex(
+            IntakeValidationError,
+            "newly published identity evidence",
+        ):
+            self.stage_f069_case(
+                repair_case_id=case_id,
+                case_record=stale_evidence_record,
+                previous_manifest_path=first["manifest_path"],
+            )
+
+        self.assertFalse(
+            (first["manifest_path"].parents[1] / "0002").exists()
+        )
+
+    def test_disk_validator_rejects_new_citation_to_old_evidence_target(self):
+        case_id = "case-f069-old-evidence-disk"
+        first, symptoms, historical, appended = (
+            self.conflict_transition_fixture(case_id)
+        )
+        new_source = self.root / "genuinely-new-identity.txt"
+        new_source.write_text("Confirmed alias: BG6H", encoding="utf-8")
+        second = self.stage_f069_case(
+            repair_case_id=case_id,
+            case_record=self.v2_case_record(
+                self.confirmed_f069_identity(
+                    "identity-first",
+                    "identity-new",
+                ),
+                supporting_evidence_descriptions={
+                    "identity-new": "Newly published identity confirmation"
+                },
+                reported_symptoms=symptoms,
+                corrections=[historical, appended],
+            ),
+            supporting=[("identity-new", new_source)],
+            previous_manifest_path=first["manifest_path"],
+        )
+        payload = json.loads(
+            second["manifest_path"].read_text(encoding="utf-8")
+        )
+        payload["device_identity"]["evidence_refs"][-1] = (
+            self.identity_reference("identity-unused")
+        )
+        second["manifest_path"].write_text(
+            json.dumps(payload, indent=2) + "\n",
+            encoding="utf-8",
+        )
+
+        with self.assertRaisesRegex(
+            IntakeValidationError,
+            "newly published identity evidence",
+        ):
+            validate_repair_case_revision(
+                manifest_path=second["manifest_path"],
+                project_root=ROOT,
+                library_root=self.library,
+            )
 
     def test_disk_validator_accepts_v2_and_mixed_revision_chains(self):
         v2 = self.stage_f069_case(
