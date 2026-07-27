@@ -1,4 +1,5 @@
 from contextlib import redirect_stderr, redirect_stdout
+import hashlib
 import json
 from io import StringIO
 from pathlib import Path
@@ -169,10 +170,13 @@ class StageVisualQcRepairCaseCliTests(unittest.TestCase):
             capture_checklist_confirmed=True,
         )
         supporting_source = self.root / "f069-identity.txt"
-        supporting_source.write_text(
-            "Milo supplied model record: TECNO/BG6，待确认 BG6H 映射。",
-            encoding="utf-8",
-        )
+        supporting_source_bytes = (
+            "Milo supplied model record: TECNO/BG6，待确认 BG6H 映射。"
+        ).encode("utf-8")
+        supporting_source.write_bytes(supporting_source_bytes)
+        supporting_source_sha256 = hashlib.sha256(
+            supporting_source_bytes
+        ).hexdigest()
         self.case_record.write_text(
             json.dumps(
                 {
@@ -245,6 +249,8 @@ class StageVisualQcRepairCaseCliTests(unittest.TestCase):
         self.assertEqual(replayed.returncode, 0, replayed.stderr or replayed.stdout)
         created_payload = json.loads(created.stdout)
         replayed_payload = json.loads(replayed.stdout)
+        self.assertEqual(created_payload["status"], "ok")
+        self.assertEqual(replayed_payload["status"], "ok")
         self.assertEqual(created_payload["state"], "created")
         self.assertEqual(replayed_payload["state"], "existing")
         self.assertEqual(
@@ -256,12 +262,79 @@ class StageVisualQcRepairCaseCliTests(unittest.TestCase):
             REPAIR_CASE_SCHEMA_V2,
         )
         self.assertEqual(
+            replayed_payload["schema_version"],
+            REPAIR_CASE_SCHEMA_V2,
+        )
+        self.assertEqual(
             created_payload["identity_status"],
             "unresolved_alias",
         )
+        self.assertEqual(
+            replayed_payload["identity_status"],
+            "unresolved_alias",
+        )
         self.assertEqual(created_payload["completeness"], "photos_only")
+        self.assertEqual(
+            replayed_payload["completeness"],
+            created_payload["completeness"],
+        )
         self.assertEqual(created.stderr, "")
         self.assertEqual(replayed.stderr, "")
+
+        manifest = json.loads(
+            Path(created_payload["manifest_path"]).read_text(encoding="utf-8")
+        )
+        evidence = manifest["supporting_evidence"][0]
+        expected_object_path = (
+            f"objects/case-evidence/{supporting_source_sha256[:2]}/"
+            f"{supporting_source_sha256}.txt"
+        )
+        self.assertEqual(
+            evidence,
+            {
+                "evidence_id": "identity-source",
+                "original_filename": "f069-identity.txt",
+                "object_path": expected_object_path,
+                "mime_type": "text/plain",
+                "byte_size": len(supporting_source_bytes),
+                "sha256": supporting_source_sha256,
+                "description": "Milo supplied UTF-8 identity record",
+            },
+        )
+        evidence_object = self.library / evidence["object_path"]
+        self.assertEqual(evidence_object.read_bytes(), supporting_source_bytes)
+        self.assertEqual(
+            hashlib.sha256(evidence_object.read_bytes()).hexdigest(),
+            supporting_source_sha256,
+        )
+        source_manifest_bytes = Path(package["source_package_path"]).read_bytes()
+        source_manifest = json.loads(
+            source_manifest_bytes.decode("utf-8")
+        )
+        self.assertEqual(
+            manifest["package_links"][0],
+            {
+                "package_id": source_manifest["package_id"],
+                "source_package_manifest_sha256": hashlib.sha256(
+                    source_manifest_bytes
+                ).hexdigest(),
+                "capture_stage": source_manifest["capture_stage"],
+                "role": "after_repair",
+                "entry_ids": [
+                    entry["entry_id"] for entry in source_manifest["entries"]
+                ],
+            },
+        )
+        for reference in manifest["device_identity"]["evidence_refs"]:
+            self.assertEqual(reference["kind"], "supporting_evidence")
+            self.assertEqual(reference["evidence_id"], evidence["evidence_id"])
+            self.assertIn(
+                reference["evidence_id"],
+                {
+                    item["evidence_id"]
+                    for item in manifest["supporting_evidence"]
+                },
+            )
 
     def test_identity_shape_is_rejected_before_case_or_evidence_publication(self):
         supporting_source = self.root / "identity.txt"

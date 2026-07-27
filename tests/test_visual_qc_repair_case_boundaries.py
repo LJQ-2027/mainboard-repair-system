@@ -9,6 +9,7 @@ import cv2
 from fastapi.testclient import TestClient
 import numpy as np
 
+from scripts.build_f069_registration import build_dataset
 from scripts.visual_qc.repair_case_contract import FIXED_FALSE_BOUNDARIES
 from scripts.visual_qc.repair_case_library import (
     stage_repair_case_revision,
@@ -125,6 +126,13 @@ class VisualQcRepairCaseBoundaryTests(unittest.TestCase):
         )
 
     def test_case_revisions_never_enter_governed_qc_or_training_state(self):
+        registration_path = (
+            ROOT / "knowledge-base" / "f069-cross-source-registration.json"
+        )
+        registration_bytes_before = registration_path.read_bytes()
+        registration_sha256_before = hashlib.sha256(
+            registration_bytes_before
+        ).hexdigest()
         f069_image = self.root / "f069-after.jpg"
         f069_image.write_bytes(encode_image(175))
         f069_after = self.stage_package(
@@ -166,8 +174,8 @@ class VisualQcRepairCaseBoundaryTests(unittest.TestCase):
             reported_symptoms=[
                 {
                     "symptom_id": "symptom-1",
-                    "text": "Phone does not power on.",
-                    "source_wording": "Milo source wording: no power",
+                    "text": "用户反馈：设备不开机",
+                    "source_wording": "案例原话：不开机",
                     "fault_code": None,
                     "evidence_refs": [after_ref],
                 }
@@ -176,9 +184,9 @@ class VisualQcRepairCaseBoundaryTests(unittest.TestCase):
                 {
                     "finding_id": "finding-1",
                     "claim_status": "documented",
-                    "description": "Initial record identifies U2001.",
+                    "description": "案例判断：EMMC坏",
                     "defect_category": "power_management",
-                    "designator": "U2001",
+                    "designator": "U4000",
                     "side_id": "main_page_1",
                     "region": None,
                     "evidence_refs": [after_ref],
@@ -187,9 +195,9 @@ class VisualQcRepairCaseBoundaryTests(unittest.TestCase):
             repair_actions=[
                 {
                     "action_id": "action-1",
-                    "description": "Replaced U2001.",
-                    "action_category": "component_replacement",
-                    "target_designator": "U2001",
+                    "description": "案例记录：已做检测",
+                    "action_category": "diagnostic_test",
+                    "target_designator": "U4000",
                     "side_id": "main_page_1",
                     "region": None,
                     "evidence_refs": [after_ref],
@@ -214,6 +222,11 @@ class VisualQcRepairCaseBoundaryTests(unittest.TestCase):
             case_record=record,
             supporting_assignments=[("identity-source", identity_source)],
             previous_manifest_path=None,
+        )
+        self.assertEqual(registration_path.read_bytes(), registration_bytes_before)
+        self.assertEqual(
+            hashlib.sha256(registration_path.read_bytes()).hexdigest(),
+            registration_sha256_before,
         )
 
         payload = json.loads(
@@ -283,12 +296,69 @@ class VisualQcRepairCaseBoundaryTests(unittest.TestCase):
         case_manifest_sha256 = hashlib.sha256(
             revision["manifest_path"].read_bytes()
         ).hexdigest()
-        self.assertNotIn(case_manifest_sha256.encode("ascii"), content)
-        self.assertNotIn(b"TECNO/BG6", content)
-        self.assertNotIn(b"Milo source wording: no power", content)
-        self.assertNotIn(identity_source_hash.encode("ascii"), content)
-        self.assertNotIn(identity_source_bytes, content)
-        self.assertNotIn(b"Replaced U2001.", content)
+        for excluded_bundle_value in (
+            case_manifest_sha256.encode("ascii"),
+            b"identity-source",
+            identity_source_hash.encode("ascii"),
+            identity_source_bytes,
+            b"TECNO/BG6",
+            "用户反馈：设备不开机".encode("utf-8"),
+            "案例原话：不开机".encode("utf-8"),
+            "案例判断：EMMC坏".encode("utf-8"),
+            "案例记录：已做检测".encode("utf-8"),
+        ):
+            self.assertNotIn(excluded_bundle_value, content)
+
+        rebuilt_registration = build_dataset(ROOT)
+        committed_registration = json.loads(
+            registration_bytes_before.decode("utf-8")
+        )
+        self.assertEqual(rebuilt_registration, committed_registration)
+        self.assertEqual(registration_path.read_bytes(), registration_bytes_before)
+
+        def collect_values_for_key(value, target_key):
+            collected = []
+            if isinstance(value, dict):
+                for key, child in value.items():
+                    if key == target_key:
+                        collected.append(child)
+                    collected.extend(collect_values_for_key(child, target_key))
+            elif isinstance(value, list):
+                for child in value:
+                    collected.extend(collect_values_for_key(child, target_key))
+            return collected
+
+        registration_surfaces = {
+            "repair_flows": rebuilt_registration["repair_flows"],
+            "repair_links": collect_values_for_key(
+                rebuilt_registration,
+                "repair_links",
+            ),
+            "full_output": rebuilt_registration,
+        }
+        excluded_case_values = (
+            "case-f069-boundary-0001",
+            case_manifest_sha256,
+            "identity-source",
+            identity_source_hash,
+            "TECNO/BG6",
+            "用户反馈：设备不开机",
+            "案例原话：不开机",
+            "案例判断：EMMC坏",
+            "案例记录：已做检测",
+        )
+        for surface_name, surface in registration_surfaces.items():
+            serialized = json.dumps(
+                surface,
+                ensure_ascii=False,
+                sort_keys=True,
+            )
+            for excluded_value in excluded_case_values:
+                with self.subTest(
+                    surface=surface_name,
+                    excluded_value=excluded_value,
+                ):
+                    self.assertNotIn(excluded_value, serialized)
 
     def test_repository_external_two_revision_rehearsal_preserves_evidence(self):
         note = self.root / "repair-note.txt"
