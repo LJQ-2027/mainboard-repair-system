@@ -66,14 +66,16 @@ local registration cases:
 - Manifest SHA-256:
   `85c8c64cb97cf1ea1e567e4d1f7fc62ec00ebf02719939c74a5e0faf46298177`
 - Identity status: `unresolved_alias`
+- Model identity: `model_identity_resolved=false`
 - Completeness: `symptom_linked`
 - Reported source model: `TECNO/BG6`
 - Catalog models: `BG6H/BG6h`
 
 The board identity is exact, but the supplied and catalog model names are not
-forced into one identity. Any later resolution must be recorded through a new
-append-only correction revision and an allowed monotonic transition; revision
-1 remains immutable.
+forced into one identity. Identity progresses monotonically only through a
+complete revision with appended evidence. Only `conflict -> confirmed_alias`
+requires a new correction record. A resolved identity is immutable; revision 1
+remains unchanged.
 
 ## Evidence Boundary
 
