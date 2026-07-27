@@ -12,6 +12,10 @@ import cv2
 import numpy as np
 
 from scripts.visual_qc.source_library import stage_source_package
+from scripts.visual_qc.repair_case_contract import (
+    REPAIR_CASE_SCHEMA_V1,
+    REPAIR_CASE_SCHEMA_V2,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -105,10 +109,26 @@ class StageVisualQcRepairCaseCliTests(unittest.TestCase):
 
         self.assertEqual(created.returncode, 0, created.stderr or created.stdout)
         payload = json.loads(created.stdout)
+        self.assertEqual(
+            set(payload),
+            {
+                "status",
+                "state",
+                "repair_case_id",
+                "revision",
+                "schema_version",
+                "identity_status",
+                "completeness",
+                "manifest_sha256",
+                "manifest_path",
+            },
+        )
         self.assertEqual(payload["status"], "ok")
         self.assertEqual(payload["state"], "created")
         self.assertEqual(payload["repair_case_id"], "case-km4-cli-0001")
         self.assertEqual(payload["revision"], 1)
+        self.assertEqual(payload["schema_version"], REPAIR_CASE_SCHEMA_V1)
+        self.assertEqual(payload["identity_status"], "exact_catalog_match")
         self.assertEqual(payload["completeness"], "photos_only")
         self.assertEqual(len(payload["manifest_sha256"]), 64)
         self.assertTrue(Path(payload["manifest_path"]).is_file())
@@ -116,7 +136,196 @@ class StageVisualQcRepairCaseCliTests(unittest.TestCase):
 
         replayed = self.run_cli()
         self.assertEqual(replayed.returncode, 0, replayed.stdout)
-        self.assertEqual(json.loads(replayed.stdout)["state"], "existing")
+        replayed_payload = json.loads(replayed.stdout)
+        self.assertEqual(replayed_payload["state"], "existing")
+        self.assertEqual(
+            replayed_payload["manifest_sha256"],
+            payload["manifest_sha256"],
+        )
+        self.assertEqual(
+            replayed_payload["schema_version"],
+            REPAIR_CASE_SCHEMA_V1,
+        )
+        self.assertEqual(
+            replayed_payload["identity_status"],
+            "exact_catalog_match",
+        )
+        self.assertEqual(replayed.stderr, "")
+
+    def test_direct_v2_invocation_creates_then_replays_unresolved_identity(self):
+        after_image = self.root / "f069-after.jpg"
+        after_image.write_bytes(encode_image())
+        package = stage_source_package(
+            project_root=ROOT,
+            library_root=self.library,
+            package_id="pkg-f069-after",
+            batch_id="batch-f069-after",
+            board_key="bg6h-f069",
+            capture_session_id="session-f069-after",
+            capture_stage="after_repair",
+            capture_setup_id="standard-bench",
+            image_assignments=[("main_page_1", after_image)],
+            milo_physical_source_confirmed=True,
+            capture_checklist_confirmed=True,
+        )
+        supporting_source = self.root / "f069-identity.txt"
+        supporting_source.write_text(
+            "Milo supplied model record: TECNO/BG6，待确认 BG6H 映射。",
+            encoding="utf-8",
+        )
+        self.case_record.write_text(
+            json.dumps(
+                {
+                    "device_identity": {
+                        "reported_models": ["TECNO/BG6"],
+                        "catalog_models": ["BG6H", "BG6h"],
+                        "mapping_status": "unresolved_alias",
+                        "resolved_models": [],
+                        "resolution_note": None,
+                        "evidence_refs": [
+                            {
+                                "kind": "supporting_evidence",
+                                "evidence_id": "identity-source",
+                            }
+                        ],
+                    },
+                    "supporting_evidence_descriptions": {
+                        "identity-source": "Milo supplied UTF-8 identity record"
+                    },
+                    "reported_symptoms": [],
+                    "findings": [],
+                    "repair_actions": [],
+                    "outcome": {
+                        "status": "unknown",
+                        "description": None,
+                        "verification_description": None,
+                        "evidence_refs": [],
+                    },
+                    "corrections": [],
+                },
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
+        command = [
+            sys.executable,
+            str(self.script),
+            "--library-root",
+            str(self.library),
+            "--repair-case-id",
+            "case-f069-cli-0001",
+            "--board-key",
+            "bg6h-f069",
+            "--case-record",
+            str(self.case_record),
+            "--source-package",
+            f"after_repair={package['source_package_path']}",
+            "--supporting-file",
+            f"identity-source={supporting_source}",
+        ]
+
+        created = subprocess.run(
+            command,
+            cwd=self.root,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            check=False,
+        )
+        replayed = subprocess.run(
+            command,
+            cwd=self.root,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            check=False,
+        )
+
+        self.assertEqual(created.returncode, 0, created.stderr or created.stdout)
+        self.assertEqual(replayed.returncode, 0, replayed.stderr or replayed.stdout)
+        created_payload = json.loads(created.stdout)
+        replayed_payload = json.loads(replayed.stdout)
+        self.assertEqual(created_payload["state"], "created")
+        self.assertEqual(replayed_payload["state"], "existing")
+        self.assertEqual(
+            replayed_payload["manifest_sha256"],
+            created_payload["manifest_sha256"],
+        )
+        self.assertEqual(
+            created_payload["schema_version"],
+            REPAIR_CASE_SCHEMA_V2,
+        )
+        self.assertEqual(
+            created_payload["identity_status"],
+            "unresolved_alias",
+        )
+        self.assertEqual(created_payload["completeness"], "photos_only")
+        self.assertEqual(created.stderr, "")
+        self.assertEqual(replayed.stderr, "")
+
+    def test_identity_shape_is_rejected_before_case_or_evidence_publication(self):
+        supporting_source = self.root / "identity.txt"
+        supporting_source.write_text("Milo supplied identity", encoding="utf-8")
+        baseline_objects = {
+            path.relative_to(self.library)
+            for path in (self.library / "objects").rglob("*")
+            if path.is_file()
+        }
+        identity = {
+            "reported_models": ["KM4"],
+            "catalog_models": ["KM4", "F151"],
+            "mapping_status": "exact_catalog_match",
+            "resolved_models": ["KM4"],
+            "resolution_note": None,
+            "evidence_refs": [],
+        }
+
+        for identity_fields in (
+            {"device_models": ["KM4"], "device_identity": identity},
+            {},
+        ):
+            with self.subTest(identity_fields=set(identity_fields)):
+                record = {
+                    **identity_fields,
+                    "supporting_evidence_descriptions": {
+                        "identity-source": "Milo supplied identity"
+                    },
+                    "reported_symptoms": [],
+                    "findings": [],
+                    "repair_actions": [],
+                    "outcome": {
+                        "status": "unknown",
+                        "description": None,
+                        "verification_description": None,
+                        "evidence_refs": [],
+                    },
+                    "corrections": [],
+                }
+                self.case_record.write_text(
+                    json.dumps(record),
+                    encoding="utf-8",
+                )
+
+                result = self.run_cli(
+                    "--supporting-file",
+                    f"identity-source={supporting_source}",
+                )
+
+                self.assertEqual(result.returncode, 2)
+                self.assertEqual(
+                    json.loads(result.stdout)["status"],
+                    "validation_failed",
+                )
+                self.assertEqual(result.stderr, "")
+                self.assertFalse((self.library / "cases").exists())
+                self.assertEqual(
+                    {
+                        path.relative_to(self.library)
+                        for path in (self.library / "objects").rglob("*")
+                        if path.is_file()
+                    },
+                    baseline_objects,
+                )
 
     def test_duplicate_json_key_is_validation_failure_without_case_write(self):
         self.case_record.write_text(

@@ -125,6 +125,8 @@ def main(argv: list[str] | None = None) -> int:
                 "state": result["state"],
                 "repair_case_id": result["repair_case_id"],
                 "revision": result["revision"],
+                "schema_version": result["schema_version"],
+                "identity_status": result["identity_status"],
                 "completeness": result["completeness"],
                 "manifest_sha256": result["manifest_sha256"],
                 "manifest_path": str(result["manifest_path"]),

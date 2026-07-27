@@ -68,13 +68,14 @@ class VisualQcRepairCaseBoundaryTests(unittest.TestCase):
         session_id,
         capture_stage,
         image,
+        board_key="km4-f151",
     ):
         return stage_source_package(
             project_root=ROOT,
             library_root=self.library,
             package_id=package_id,
             batch_id=batch_id,
-            board_key="km4-f151",
+            board_key=board_key,
             capture_session_id=session_id,
             capture_stage=capture_stage,
             capture_setup_id="standard-bench",
@@ -124,32 +125,51 @@ class VisualQcRepairCaseBoundaryTests(unittest.TestCase):
         )
 
     def test_case_revisions_never_enter_governed_qc_or_training_state(self):
-        before_ref = {
+        f069_image = self.root / "f069-after.jpg"
+        f069_image.write_bytes(encode_image(175))
+        f069_after = self.stage_package(
+            package_id="pkg-f069-after",
+            batch_id="batch-f069-after",
+            session_id="session-f069-after",
+            capture_stage="after_repair",
+            image=f069_image,
+            board_key="bg6h-f069",
+        )
+        identity_source = self.root / "f069-identity.txt"
+        identity_source.write_text(
+            "Milo supplied model: TECNO/BG6，mapping to BG6H is unresolved.",
+            encoding="utf-8",
+        )
+        identity_source_bytes = identity_source.read_bytes()
+        identity_source_hash = hashlib.sha256(identity_source_bytes).hexdigest()
+        after_ref = {
             "kind": "package_entry",
-            "package_id": "pkg-before",
-            "entry_id": "session-before-main_page_1",
+            "package_id": "pkg-f069-after",
+            "entry_id": "session-f069-after-main_page_1",
         }
-        packages = [
-            ("before_repair", self.before["source_package_path"]),
-            ("after_repair", self.after["source_package_path"]),
-        ]
-        first = self.stage_revision(
-            record=self.record(),
-            packages=packages[:1],
-        )
-        second = self.stage_revision(
-            record=self.record(),
-            packages=packages,
-            previous=first,
-        )
-        facts = self.record(
+        identity_ref = {
+            "kind": "supporting_evidence",
+            "evidence_id": "identity-source",
+        }
+        record = self.record(
+            device_identity={
+                "reported_models": ["TECNO/BG6"],
+                "catalog_models": ["BG6H", "BG6h"],
+                "mapping_status": "unresolved_alias",
+                "resolved_models": [],
+                "resolution_note": None,
+                "evidence_refs": [identity_ref],
+            },
+            supporting_evidence_descriptions={
+                "identity-source": "Milo supplied UTF-8 identity record"
+            },
             reported_symptoms=[
                 {
                     "symptom_id": "symptom-1",
                     "text": "Phone does not power on.",
-                    "source_wording": "No power",
+                    "source_wording": "Milo source wording: no power",
                     "fault_code": None,
-                    "evidence_refs": [before_ref],
+                    "evidence_refs": [after_ref],
                 }
             ],
             findings=[
@@ -161,7 +181,7 @@ class VisualQcRepairCaseBoundaryTests(unittest.TestCase):
                     "designator": "U2001",
                     "side_id": "main_page_1",
                     "region": None,
-                    "evidence_refs": [before_ref],
+                    "evidence_refs": [after_ref],
                 }
             ],
             repair_actions=[
@@ -172,55 +192,39 @@ class VisualQcRepairCaseBoundaryTests(unittest.TestCase):
                     "target_designator": "U2001",
                     "side_id": "main_page_1",
                     "region": None,
-                    "evidence_refs": [before_ref],
+                    "evidence_refs": [after_ref],
                 }
             ],
             outcome={
                 "status": "repair_completed",
                 "description": "Phone powered on after repair.",
                 "verification_description": "Power-on test passed.",
-                "evidence_refs": [before_ref],
+                "evidence_refs": [after_ref],
             },
         )
-        third = self.stage_revision(
-            record=facts,
-            packages=packages,
-            previous=second,
-        )
-        corrected = json.loads(json.dumps(facts))
-        corrected["findings"].append(
-            {
-                "finding_id": "finding-2",
-                "claim_status": "documented",
-                "description": "Later record identifies U2002 instead.",
-                "defect_category": "power_management",
-                "designator": "U2002",
-                "side_id": "main_page_1",
-                "region": None,
-                "evidence_refs": [before_ref],
-            }
-        )
-        corrected["corrections"] = [
-            {
-                "correction_id": "correction-1",
-                "corrects_fact_id": "finding-1",
-                "description": "Later evidence supersedes the initial designator.",
-                "replacement_fact_id": "finding-2",
-                "evidence_refs": [before_ref],
-            }
-        ]
-        fourth = self.stage_revision(
-            record=corrected,
-            packages=packages,
-            previous=third,
+        del record["device_models"]
+        revision = stage_repair_case_revision(
+            project_root=ROOT,
+            library_root=self.library,
+            repair_case_id="case-f069-boundary-0001",
+            board_key="bg6h-f069",
+            package_assignments=[
+                ("after_repair", f069_after["source_package_path"])
+            ],
+            case_record=record,
+            supporting_assignments=[("identity-source", identity_source)],
+            previous_manifest_path=None,
         )
 
-        for revision in (first, second, third, fourth):
-            payload = json.loads(
-                revision["manifest_path"].read_text(encoding="utf-8")
-            )
-            self.assertEqual(payload["boundaries"], FIXED_FALSE_BOUNDARIES)
-            self.assertEqual(payload["source_origin"], "milo_supplied")
+        payload = json.loads(
+            revision["manifest_path"].read_text(encoding="utf-8")
+        )
+        self.assertEqual(
+            payload["boundaries"],
+            {**FIXED_FALSE_BOUNDARIES, "model_identity_resolved": False},
+        )
+        self.assertEqual(payload["source_origin"], "milo_supplied")
+        self.assertEqual(payload["completeness"], "repair_outcome_linked")
 
         server_root = self.library / "server-runtime"
         settings = VisualQcServerSettings(
@@ -246,15 +250,27 @@ class VisualQcRepairCaseBoundaryTests(unittest.TestCase):
             self.assertEqual(coco["images"], [])
             self.assertEqual(coco["annotations"], [])
 
-            response = client.get(
+            manifest_response = client.get(
                 "/api/v1/visual-qc/datasets/training-manifest",
                 headers={
                     "X-Actor-Id": "reviewer-001",
                     "X-Actor-Role": "reviewer",
                 },
             )
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.json()["cases"], [])
+            coco_response = client.get(
+                "/api/v1/visual-qc/datasets/coco",
+                headers={
+                    "X-Actor-Id": "reviewer-001",
+                    "X-Actor-Role": "reviewer",
+                },
+            )
+            self.assertEqual(manifest_response.status_code, 200)
+            self.assertEqual(manifest_response.json()["cases"], [])
+            self.assertEqual(manifest_response.json()["annotation_count"], 0)
+            self.assertEqual(coco_response.status_code, 200)
+            self.assertEqual(coco_response.json()["images"], [])
+            self.assertEqual(coco_response.json()["annotations"], [])
+            self.assertEqual(service.store.operational_counts()["cases"]["total"], 0)
 
         with zipfile.ZipFile(bundle) as archive:
             names = set(archive.namelist())
@@ -263,11 +279,16 @@ class VisualQcRepairCaseBoundaryTests(unittest.TestCase):
             names,
             {"manifest.json", "annotations.coco.json", "bundle-index.json"},
         )
-        self.assertNotIn(b"case-km4-boundary-0001", content)
+        self.assertNotIn(b"case-f069-boundary-0001", content)
         case_manifest_sha256 = hashlib.sha256(
-            fourth["manifest_path"].read_bytes()
+            revision["manifest_path"].read_bytes()
         ).hexdigest()
         self.assertNotIn(case_manifest_sha256.encode("ascii"), content)
+        self.assertNotIn(b"TECNO/BG6", content)
+        self.assertNotIn(b"Milo source wording: no power", content)
+        self.assertNotIn(identity_source_hash.encode("ascii"), content)
+        self.assertNotIn(identity_source_bytes, content)
+        self.assertNotIn(b"Replaced U2001.", content)
 
     def test_repository_external_two_revision_rehearsal_preserves_evidence(self):
         note = self.root / "repair-note.txt"
