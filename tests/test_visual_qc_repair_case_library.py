@@ -136,6 +136,19 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
         return self._f069_package
 
     def catalog_patch(self, entry, *, board_key="km4-f151"):
+        return self.catalog_data_patch(
+            {"boards": {board_key: entry}},
+            board_key=board_key,
+        )
+
+    def catalog_data_patch(
+        self,
+        catalog_data,
+        *,
+        board_key="km4-f151",
+        construction_error=None,
+        resolution_error=None,
+    ):
         source_manifest = json.loads(
             self.before["source_package_path"].read_text(encoding="utf-8")
         )
@@ -143,11 +156,15 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
 
         class PatchedBoardCatalog:
             def __init__(self, project_root):
-                self.catalog = {"boards": {board_key: entry}}
+                if construction_error is not None:
+                    raise construction_error
+                self.catalog = catalog_data
 
             def resolve_board(self, requested_key):
                 if requested_key != board_key:
                     raise AssertionError(f"unexpected board key: {requested_key}")
+                if resolution_error is not None:
+                    raise resolution_error
                 return {"board_id": board_id}
 
         return mock.patch(
@@ -696,6 +713,83 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
                     with self.assertRaisesRegex(
                         IntakeValidationError,
                         "catalog compatible models",
+                    ):
+                        validate_repair_case_revision(
+                            manifest_path=created["manifest_path"],
+                            project_root=ROOT,
+                            library_root=self.library,
+                        )
+
+    def test_builder_normalizes_malformed_selected_catalog_entries(self):
+        malformed_entries = (
+            ["truthy-list"],
+            "truthy-string",
+            7,
+            None,
+        )
+        for entry in malformed_entries:
+            with self.subTest(entry=entry):
+                with self.catalog_patch(entry):
+                    with self.assertRaisesRegex(
+                        IntakeValidationError,
+                        "board catalog identity",
+                    ):
+                        build_repair_case_revision(
+                            project_root=ROOT,
+                            library_root=self.library,
+                            repair_case_id="case-km4-malformed-entry",
+                            board_key="km4-f151",
+                            package_assignments=[
+                                (
+                                    "before_repair",
+                                    self.before["source_package_path"],
+                                )
+                            ],
+                            case_record=self.case_record(),
+                            supporting_assignments=[],
+                            previous_manifest_path=None,
+                        )
+
+    def test_disk_validator_normalizes_catalog_loading_and_indexing_errors(self):
+        created = self.stage_case(repair_case_id="case-km4-catalog-structure")
+        malformed_catalogs = (
+            [],
+            {},
+            {"boards": []},
+            {"boards": None},
+            {"boards": {}},
+            {"boards": "truthy-string"},
+        )
+        for catalog_data in malformed_catalogs:
+            with self.subTest(catalog_data=catalog_data):
+                with self.catalog_data_patch(catalog_data):
+                    with self.assertRaisesRegex(
+                        IntakeValidationError,
+                        "board catalog identity",
+                    ):
+                        validate_repair_case_revision(
+                            manifest_path=created["manifest_path"],
+                            project_root=ROOT,
+                            library_root=self.library,
+                        )
+
+        failure_modes = (
+            {"construction_error": OSError("catalog unreadable")},
+            {"resolution_error": KeyError("side_manifest")},
+        )
+        valid_catalog = {
+            "boards": {
+                "km4-f151": {
+                    "model": "KM4",
+                }
+            }
+        }
+        for errors in failure_modes:
+            with self.subTest(errors=errors):
+                with self.catalog_data_patch(valid_catalog, **errors):
+                    with self.assertRaisesRegex(
+                        IntakeValidationError,
+                        "board catalog identity",
                     ):
                         validate_repair_case_revision(
                             manifest_path=created["manifest_path"],

@@ -374,12 +374,28 @@ def _strict_json(path: Path, label: str) -> tuple[dict, str]:
 
 
 def _catalog_board(project_root: Path, board_key: str) -> tuple[dict, list[str]]:
-    catalog = BoardCatalog(project_root)
+    identity_error = f"board catalog identity is invalid: {board_key}"
     try:
+        catalog = BoardCatalog(project_root)
         board = catalog.resolve_board(board_key)
-    except CatalogError as exc:
-        raise IntakeValidationError(str(exc)) from exc
-    raw = catalog.catalog["boards"][board_key]
+        raw = catalog.catalog["boards"][board_key]
+    except (
+        CatalogError,
+        OSError,
+        UnicodeError,
+        json.JSONDecodeError,
+        KeyError,
+        TypeError,
+        AttributeError,
+    ) as exc:
+        raise IntakeValidationError(identity_error) from exc
+    if (
+        not isinstance(board, dict)
+        or not isinstance(board.get("board_id"), str)
+        or not board["board_id"].strip()
+        or not isinstance(raw, dict)
+    ):
+        raise IntakeValidationError(identity_error)
     models = (
         raw["compatible_models"]
         if "compatible_models" in raw
