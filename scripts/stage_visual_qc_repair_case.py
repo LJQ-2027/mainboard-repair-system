@@ -30,7 +30,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--source-package",
         action="append",
-        required=True,
+        default=[],
         metavar="ROLE=PATH",
     )
     parser.add_argument(
@@ -126,10 +126,15 @@ def main(argv: list[str] | None = None) -> int:
                 "repair_case_id": result["repair_case_id"],
                 "revision": result["revision"],
                 "schema_version": result["schema_version"],
+                "evidence_mode": result["evidence_mode"],
                 "identity_status": result["identity_status"],
                 "completeness": result["completeness"],
                 "manifest_sha256": result["manifest_sha256"],
                 "manifest_path": str(result["manifest_path"]),
+                "package_count": result["package_count"],
+                "supporting_evidence_count": result[
+                    "supporting_evidence_count"
+                ],
             },
             ensure_ascii=False,
             separators=(",", ":"),

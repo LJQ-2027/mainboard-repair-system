@@ -11,11 +11,14 @@ from unittest.mock import patch
 
 import cv2
 import numpy as np
+from PIL import Image
+from pillow_heif import from_pillow
 
 from scripts.visual_qc.source_library import stage_source_package
 from scripts.visual_qc.repair_case_contract import (
     REPAIR_CASE_SCHEMA_V1,
     REPAIR_CASE_SCHEMA_V2,
+    REPAIR_CASE_SCHEMA_V3,
 )
 
 
@@ -28,6 +31,11 @@ def encode_image():
     if not ok:
         raise RuntimeError("Unable to encode test image.")
     return encoded.tobytes()
+
+
+def write_heic(path, width=180, height=120, value=120):
+    image = Image.new("RGB", (width, height), (value, value, value))
+    from_pillow(image).save(path, quality=90)
 
 
 class StageVisualQcRepairCaseCliTests(unittest.TestCase):
@@ -105,6 +113,92 @@ class StageVisualQcRepairCaseCliTests(unittest.TestCase):
             check=False,
         )
 
+    def supporting_only_record(self, **overrides):
+        record = {
+            "device_identity": {
+                "reported_models": ["TECNO/BG6"],
+                "catalog_models": ["BG6H", "BG6h"],
+                "mapping_status": "unresolved_alias",
+                "resolved_models": [],
+                "resolution_note": None,
+                "evidence_refs": [
+                    {
+                        "kind": "supporting_evidence",
+                        "evidence_id": "repair-photo",
+                    }
+                ],
+            },
+            "evidence_mode": "supporting_only",
+            "supporting_evidence_contexts": [
+                {
+                    "evidence_id": "repair-photo",
+                    "evidence_role": "repair_in_progress_photo",
+                    "source_capture_stage": "维修中",
+                    "source_board_area": "屏蔽罩内局部",
+                }
+            ],
+            "supporting_evidence_descriptions": {
+                "repair-photo": "Milo supplied repair-in-progress photograph"
+            },
+            "reported_symptoms": [],
+            "findings": [],
+            "repair_actions": [],
+            "outcome": {
+                "status": "unknown",
+                "description": None,
+                "verification_description": None,
+                "evidence_refs": [],
+            },
+            "corrections": [],
+        }
+        record.update(overrides)
+        return record
+
+    def supporting_only_command(self, photo):
+        self.case_record.write_text(
+            json.dumps(self.supporting_only_record(), ensure_ascii=False),
+            encoding="utf-8",
+        )
+        return [
+            sys.executable,
+            str(self.script),
+            "--library-root",
+            str(self.library),
+            "--repair-case-id",
+            "case-f069-supporting-only-cli",
+            "--board-key",
+            "bg6h-f069",
+            "--case-record",
+            str(self.case_record),
+            "--supporting-file",
+            f"repair-photo={photo}",
+        ]
+
+    def run_command(self, command):
+        return subprocess.run(
+            command,
+            cwd=self.root,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            check=False,
+        )
+
+    def case_evidence_objects(self):
+        root = self.library / "objects" / "case-evidence"
+        return (
+            {
+                (
+                    path.relative_to(self.library),
+                    hashlib.sha256(path.read_bytes()).hexdigest(),
+                )
+                for path in root.rglob("*")
+                if path.is_file()
+            }
+            if root.exists()
+            else set()
+        )
+
     def test_direct_invocation_creates_then_replays_exact_case(self):
         created = self.run_cli()
 
@@ -118,10 +212,13 @@ class StageVisualQcRepairCaseCliTests(unittest.TestCase):
                 "repair_case_id",
                 "revision",
                 "schema_version",
+                "evidence_mode",
                 "identity_status",
                 "completeness",
                 "manifest_sha256",
                 "manifest_path",
+                "package_count",
+                "supporting_evidence_count",
             },
         )
         self.assertEqual(payload["status"], "ok")
@@ -129,6 +226,9 @@ class StageVisualQcRepairCaseCliTests(unittest.TestCase):
         self.assertEqual(payload["repair_case_id"], "case-km4-cli-0001")
         self.assertEqual(payload["revision"], 1)
         self.assertEqual(payload["schema_version"], REPAIR_CASE_SCHEMA_V1)
+        self.assertEqual(payload["evidence_mode"], "package_linked")
+        self.assertEqual(payload["package_count"], 1)
+        self.assertEqual(payload["supporting_evidence_count"], 0)
         self.assertEqual(payload["identity_status"], "exact_catalog_match")
         self.assertEqual(payload["completeness"], "photos_only")
         self.assertEqual(len(payload["manifest_sha256"]), 64)
@@ -152,6 +252,67 @@ class StageVisualQcRepairCaseCliTests(unittest.TestCase):
             "exact_catalog_match",
         )
         self.assertEqual(replayed.stderr, "")
+
+    def test_direct_v3_supporting_only_heic_creates_then_replays_exact_case(self):
+        photo = self.root / "repair-progress.heic"
+        write_heic(photo, value=145)
+        photo_sha256 = hashlib.sha256(photo.read_bytes()).hexdigest()
+        command = self.supporting_only_command(photo)
+
+        created = self.run_command(command)
+        replayed = self.run_command(command)
+
+        self.assertEqual(created.returncode, 0, created.stderr or created.stdout)
+        self.assertEqual(replayed.returncode, 0, replayed.stderr or replayed.stdout)
+        self.assertEqual(created.stderr, "")
+        self.assertEqual(replayed.stderr, "")
+        created_payload = json.loads(created.stdout)
+        replayed_payload = json.loads(replayed.stdout)
+        expected_manifest_path = str(
+            (
+                self.library
+                / "cases"
+                / "case-f069-supporting-only-cli"
+                / "revisions"
+                / "0001"
+                / "repair-case.json"
+            ).resolve()
+        )
+        expected_receipt = {
+            "status": "ok",
+            "state": "created",
+            "repair_case_id": "case-f069-supporting-only-cli",
+            "revision": 1,
+            "schema_version": REPAIR_CASE_SCHEMA_V3,
+            "evidence_mode": "supporting_only",
+            "identity_status": "unresolved_alias",
+            "completeness": "photos_only",
+            "manifest_sha256": created_payload["manifest_sha256"],
+            "manifest_path": expected_manifest_path,
+            "package_count": 0,
+            "supporting_evidence_count": 1,
+        }
+        self.assertEqual(created_payload, expected_receipt)
+        self.assertEqual(
+            replayed_payload,
+            {**expected_receipt, "state": "existing"},
+        )
+
+        manifest = json.loads(
+            Path(created_payload["manifest_path"]).read_text(encoding="utf-8")
+        )
+        self.assertEqual(manifest["package_links"], [])
+        self.assertEqual(
+            manifest["supporting_evidence"][0]["sha256"],
+            photo_sha256,
+        )
+        evidence_path = (
+            self.library / manifest["supporting_evidence"][0]["object_path"]
+        )
+        self.assertEqual(
+            hashlib.sha256(evidence_path.read_bytes()).hexdigest(),
+            photo_sha256,
+        )
 
     def test_direct_v2_invocation_creates_then_replays_unresolved_identity(self):
         after_image = self.root / "f069-after.jpg"
@@ -278,6 +439,12 @@ class StageVisualQcRepairCaseCliTests(unittest.TestCase):
             replayed_payload["completeness"],
             created_payload["completeness"],
         )
+        self.assertEqual(created_payload["evidence_mode"], "package_linked")
+        self.assertEqual(created_payload["package_count"], 1)
+        self.assertEqual(created_payload["supporting_evidence_count"], 1)
+        self.assertEqual(replayed_payload["evidence_mode"], "package_linked")
+        self.assertEqual(replayed_payload["package_count"], 1)
+        self.assertEqual(replayed_payload["supporting_evidence_count"], 1)
         self.assertEqual(created.stderr, "")
         self.assertEqual(replayed.stderr, "")
 
@@ -335,6 +502,164 @@ class StageVisualQcRepairCaseCliTests(unittest.TestCase):
                     for item in manifest["supporting_evidence"]
                 },
             )
+
+    def test_invalid_evidence_mode_combinations_fail_without_publication(self):
+        valid_heic = self.root / "valid-repair-progress.heic"
+        write_heic(valid_heic, value=155)
+        invalid_heic = self.root / "invalid-repair-progress.heic"
+        invalid_heic.write_bytes(b"not-a-heic")
+        f069_image = self.root / "f069-existing-package.jpg"
+        f069_image.write_bytes(encode_image())
+        f069_package = stage_source_package(
+            project_root=ROOT,
+            library_root=self.library,
+            package_id="pkg-f069-existing",
+            batch_id="batch-f069-existing",
+            board_key="bg6h-f069",
+            capture_session_id="session-f069-existing",
+            capture_stage="after_repair",
+            capture_setup_id="standard-bench",
+            image_assignments=[("main_page_1", f069_image)],
+            milo_physical_source_confirmed=True,
+            capture_checklist_confirmed=True,
+        )
+        v2_record = {
+            "device_identity": {
+                "reported_models": ["BG6H"],
+                "catalog_models": ["BG6H", "BG6h"],
+                "mapping_status": "exact_catalog_match",
+                "resolved_models": ["BG6H"],
+                "resolution_note": None,
+                "evidence_refs": [],
+            },
+            "supporting_evidence_descriptions": {},
+            "reported_symptoms": [],
+            "findings": [],
+            "repair_actions": [],
+            "outcome": {
+                "status": "unknown",
+                "description": None,
+                "verification_description": None,
+                "evidence_refs": [],
+            },
+            "corrections": [],
+        }
+        v3_package_linked = self.supporting_only_record(
+            evidence_mode="package_linked",
+            supporting_evidence_contexts=[],
+            supporting_evidence_descriptions={},
+            device_identity={
+                "reported_models": ["BG6H"],
+                "catalog_models": ["BG6H", "BG6h"],
+                "mapping_status": "exact_catalog_match",
+                "resolved_models": ["BG6H"],
+                "resolution_note": None,
+                "evidence_refs": [],
+            },
+        )
+        cases = [
+            (
+                "v1-no-package",
+                "km4-f151",
+                json.loads(self.case_record.read_text(encoding="utf-8")),
+                None,
+                False,
+            ),
+            ("v2-no-package", "bg6h-f069", v2_record, None, False),
+            (
+                "v3-package-linked-no-package",
+                "bg6h-f069",
+                v3_package_linked,
+                None,
+                False,
+            ),
+            (
+                "v3-supporting-only-no-file",
+                "bg6h-f069",
+                self.supporting_only_record(),
+                None,
+                False,
+            ),
+            (
+                "v3-supporting-only-with-package",
+                "bg6h-f069",
+                self.supporting_only_record(),
+                valid_heic,
+                True,
+            ),
+            (
+                "v3-contexts-object",
+                "bg6h-f069",
+                self.supporting_only_record(supporting_evidence_contexts={}),
+                valid_heic,
+                False,
+            ),
+            (
+                "v3-invalid-heic",
+                "bg6h-f069",
+                self.supporting_only_record(),
+                invalid_heic,
+                False,
+            ),
+        ]
+
+        for suffix, board_key, record, supporting_file, include_package in cases:
+            with self.subTest(case=suffix):
+                case_id = f"case-f069-cli-invalid-{suffix}"
+                record_path = self.root / f"{suffix}.json"
+                record_path.write_text(
+                    json.dumps(record, ensure_ascii=False),
+                    encoding="utf-8",
+                )
+                command = [
+                    sys.executable,
+                    str(self.script),
+                    "--library-root",
+                    str(self.library),
+                    "--repair-case-id",
+                    case_id,
+                    "--board-key",
+                    board_key,
+                    "--case-record",
+                    str(record_path),
+                ]
+                if include_package:
+                    command.extend(
+                        [
+                            "--source-package",
+                            (
+                                "after_repair="
+                                f"{f069_package['source_package_path']}"
+                            ),
+                        ]
+                    )
+                if supporting_file is not None:
+                    command.extend(
+                        [
+                            "--supporting-file",
+                            f"repair-photo={supporting_file}",
+                        ]
+                    )
+                baseline_objects = self.case_evidence_objects()
+
+                result = self.run_command(command)
+
+                self.assertEqual(result.returncode, 2, result.stdout)
+                self.assertEqual(
+                    json.loads(result.stdout)["status"],
+                    "validation_failed",
+                )
+                self.assertEqual(result.stderr, "")
+                revision = (
+                    self.library
+                    / "cases"
+                    / case_id
+                    / "revisions"
+                    / "0001"
+                )
+                self.assertFalse((revision / ".complete").exists())
+                self.assertFalse(revision.exists())
+                self.assertEqual(self.case_evidence_objects(), baseline_objects)
 
     def test_identity_shape_is_rejected_before_case_or_evidence_publication(self):
         supporting_source = self.root / "identity.txt"
