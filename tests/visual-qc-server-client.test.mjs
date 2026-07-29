@@ -20,6 +20,8 @@ import {
   getVisualQcAdminCaseImage,
   getVisualQcTrainingManifest,
   listVisualQcAdminCases,
+  listRepairEvidenceLinks,
+  getRepairEvidenceLinkDetail,
   normalizeServerCaptureSession,
   pollVisualQcJob,
   restoreAdminServerCase,
@@ -72,6 +74,183 @@ function visualCase() {
     qc_result: { status: 'needs_review', reviewed_at: null },
   };
 }
+
+function repairEvidenceSummary() {
+  return {
+    link_set_id: 'link-case005-f069-after', revision: 1, manifest_sha256: 'a'.repeat(64),
+    repair_case_id: 'case-005-bg6-f069',
+    board: { board_key: 'bg6h-f069', board_id: 'BOARD-F069-MAIN-V1.2' },
+    server_case_ids: ['vqc-page-2'],
+    counts: {
+      association: { related: 0, possibly_related: 1, not_related: 0, insufficient_evidence: 0 },
+      visibility: { not_assessed: 1, visible: 0, not_visible: 0, occluded: 0 },
+      source_fact_superseded: 0, binding_superseded: 0,
+    },
+    health: { state: 'active', reasons: [] }, imported_at: '2026-07-29T00:00:00Z',
+  };
+}
+
+function repairEvidenceDetail() {
+  const hash = (value) => value.repeat(64);
+  const boundaries = {
+    visual_defect_confirmed: false, qc_annotation_created: false, golden_approved: false,
+    training_label_allowed: false, repair_causality_confirmed: false,
+    repair_instruction_allowed: false, field_accuracy_claim_allowed: false,
+  };
+  return {
+    schema_version: 'VISUAL-QC-REPAIR-EVIDENCE-LINK-DETAIL-V1',
+    ...repairEvidenceSummary(),
+    binding_states: [{
+      binding_id: 'case005-emmc-u4000-page-2', source_fact_superseded: false,
+      replacement_fact_id: null, binding_superseded: false, replacement_binding_id: null,
+    }],
+    manifest: {
+      schema_version: 'VISUAL-QC-REPAIR-EVIDENCE-LINK-V1', link_set_id: 'link-case005-f069-after',
+      revision: 1, previous_manifest_sha256: null, source_origin: 'codex_operator',
+      repair_case_references: [{ repair_case_reference_id: 'case005-r1', repair_case_id: 'case-005-bg6-f069', revision: 1, schema_version: 'VISUAL-QC-REPAIR-CASE-SOURCE-V2', manifest_sha256: hash('b'), board_key: 'bg6h-f069', board_id: 'BOARD-F069-MAIN-V1.2' }],
+      board: { board_key: 'bg6h-f069', board_id: 'BOARD-F069-MAIN-V1.2', catalog_asset: { path: 'knowledge-base/repair-workbench-boards.json', sha256: hash('c'), entry_sha256: hash('d') }, compiled_sources: [{ kind: 'cross_source_dataset', path: 'knowledge-base/f069-cross-source-registration.json', sha256: hash('e') }], board_snapshot_sha256: hash('f') },
+      physical_evidence: [{
+        schema_version: 'VISUAL-QC-LINKABLE-PHYSICAL-EVIDENCE-V1', physical_evidence_id: 'case005-main-page-2', server_case_id: 'vqc-page-2', intake: { batch_id: 'batch-1', entry_id: 'entry-1' }, board_key: 'bg6h-f069', board_id: 'BOARD-F069-MAIN-V1.2', side_id: 'main_page_2', capture_stage: 'after_repair', evidence_role: 'physical_capture', qualified_handoff: { schema_version: 'VISUAL-QC-QUALIFIED-HANDOFF-PROVENANCE-V1', handoff_schema_version: 'VISUAL-QC-PHYSICAL-HANDOFF-V1', source_package_manifest_sha256: hash('1'), archived_intake_manifest_sha256: hash('2'), acceptance_report_sha256: hash('3'), acceptance_action: 'manual_registration_required', registration_review_required: true, field_accuracy_claim_allowed: false }, qualified_handoff_sha256: hash('4'), image_id: 'img-page-2', image_sha256: hash('5'), job_id: 'job-page-2', registration_review_id: 'regrev-page-2', registration: { method: 'reviewed_manual_four_point', board_to_image_matrix: [1,0,0,0,1,0,0,0,1], solve_anchors: [{ board: { x: 0, y: 0 }, image: { x: 0, y: 0 } }, { board: { x: 1, y: 0 }, image: { x: 1, y: 0 } }, { board: { x: 1, y: 1 }, image: { x: 1, y: 1 } }, { board: { x: 0, y: 1 }, image: { x: 0, y: 1 } }], independent_check_points: [{ board: { x: 0.5, y: 0.5 }, image: { x: 0.5, y: 0.5 } }], error: { count: 1, rms: 0, maximum: 0 } }, physical_evidence_snapshot_sha256: hash('6'),
+      }],
+      bindings: [{
+        binding_id: 'case005-emmc-u4000-page-2', repair_case_reference_id: 'case005-r1', source_fact: { kind: 'finding', fact_id: 'case005-reported-emmc-fault', display: { text: 'EMMC坏', claim_status: 'reported' }, fact_sha256: hash('7') },
+        target: { kind: 'designator', side_id: 'main_page_2', engineering: { component_id: 'F069-MAIN-U4000', designator: 'U4000', technician_category: 'storage', location: { kind: 'normalized_point', point: { x: 0.542, y: 0.669 } }, evidence_descriptors: ['storage'], geometry_source_status: 'low', semantic_identity_proven: false, engineering_snapshot_sha256: hash('8') } }, physical_evidence_id: 'case005-main-page-2', association_status: 'possibly_related', visibility_status: 'not_assessed', evidence_bases: [{ kind: 'repair_case_fact' }], supersedes_binding_id: null, boundaries: { ...boundaries, model_identity_resolved: false },
+      }],
+      boundaries,
+    },
+  };
+}
+
+test('repair evidence client uses reviewer-only headers and preserves list filters', async () => {
+  const originalFetch = globalThis.fetch;
+  const requests = [];
+  globalThis.fetch = async (url, options) => {
+    requests.push({ url, options });
+    return { ok: true, status: 200, json: async () => ({
+      schema_version: 'VISUAL-QC-REPAIR-EVIDENCE-LINK-LIST-V1', links: [repairEvidenceSummary()],
+    }) };
+  };
+  try {
+    const result = await listRepairEvidenceLinks('/api/v1/visual-qc/', 'owner-001', 'reviewer', {
+      serverCaseId: 'vqc/page 2', repairCaseId: 'case-005-bg6-f069',
+    });
+    assert.equal(result.links[0].server_case_ids[0], 'vqc-page-2');
+    assert.throws(
+      () => listRepairEvidenceLinks('/api', 'tech-001', 'technician'),
+      { code: 'repair_evidence_reviewer_required' },
+    );
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+  assert.equal(requests.length, 1);
+  assert.equal(
+    requests[0].url,
+    '/api/v1/visual-qc/admin/repair-evidence-links?server_case_id=vqc%2Fpage+2&repair_case_id=case-005-bg6-f069',
+  );
+  assert.equal(requests[0].options.headers['X-Actor-Role'], 'reviewer');
+});
+
+test('repair evidence detail percent-encodes segments and rejects redacted or invalid payloads', async () => {
+  const originalFetch = globalThis.fetch;
+  const requests = [];
+  globalThis.fetch = async (url, options) => {
+    requests.push({ url, options });
+    return { ok: true, status: 200, json: async () => repairEvidenceDetail() };
+  };
+  try {
+    const result = await getRepairEvidenceLinkDetail('/api/v1/visual-qc', 'owner-001', 'reviewer', 'link/set', 1);
+    assert.equal(result.manifest.bindings[0].target.side_id, 'main_page_2');
+    globalThis.fetch = async () => ({ ok: true, status: 200, json: async () => ({
+      schema_version: 'VISUAL-QC-REPAIR-EVIDENCE-LINK-LIST-V1', links: [repairEvidenceSummary()],
+    }) });
+    await assert.rejects(
+      getRepairEvidenceLinkDetail('/api', 'owner-001', 'reviewer', 'link', 1),
+      { code: 'invalid_repair_evidence_detail' },
+    );
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+  assert.equal(requests[0].url, '/api/v1/visual-qc/admin/repair-evidence-links/link%2Fset/1');
+  assert.equal(requests[0].options.headers['X-Actor-Id'], 'owner-001');
+});
+
+test('repair evidence client rejects malformed canonical manifests before the workbench can render them', async () => {
+  const originalFetch = globalThis.fetch;
+  const malformed = repairEvidenceDetail();
+  delete malformed.manifest.physical_evidence[0].registration.independent_check_points;
+  globalThis.fetch = async () => ({ ok: true, status: 200, json: async () => malformed });
+  try {
+    await assert.rejects(
+      getRepairEvidenceLinkDetail('/api', 'owner-001', 'reviewer', 'link-case005-f069-after', 1),
+      { code: 'invalid_repair_evidence_detail' },
+    );
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('repair evidence client rejects malformed nested V1 variants and summary invariants', async () => {
+  const originalFetch = globalThis.fetch;
+  const variants = [
+    (value) => { value.manifest.board.compiled_sources[0] = { kind: 'bad kind', path: 'bad path', sha256: 'x'.repeat(64) }; },
+    (value) => { value.manifest.physical_evidence[0].board_id = 'OTHER-BOARD'; },
+    (value) => { value.manifest.bindings[0].source_fact.display.claim_status = 'invented'; },
+    (value) => { value.counts.association.extra = 1; },
+    (value) => { value.health.reasons = ['invented_reason']; },
+    (value) => { value.manifest.bindings[0].evidence_bases = [{}]; },
+    (value) => { value.manifest.repair_case_references[0].board_id = 'OTHER-BOARD'; },
+    (value) => { value.manifest.bindings[0].evidence_bases = [{ kind: 'repair_case_fact' }, { kind: 'repair_case_fact' }]; },
+    (value) => { value.manifest.bindings[0].visibility_status = 'not_assessed'; value.manifest.bindings[0].evidence_bases = [{ kind: 'human_observation', observation_code: 'target_visible' }]; },
+    (value) => { value.manifest.bindings[0].visibility_status = 'visible'; value.manifest.bindings[0].evidence_bases = [{ kind: 'human_observation', observation_code: 'target_visible' }, { kind: 'human_observation', observation_code: 'target_occluded' }]; },
+  ];
+  try {
+    for (const mutate of variants) {
+      const malformed = repairEvidenceDetail();
+      mutate(malformed);
+      globalThis.fetch = async () => ({ ok: true, status: 200, json: async () => malformed });
+      await assert.rejects(
+        getRepairEvidenceLinkDetail('/api', 'owner-001', 'reviewer', 'link-case005-f069-after', 1),
+        { code: 'invalid_repair_evidence_detail' },
+      );
+    }
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('related designator requires both V1 evidence bases and proven semantic identity', async () => {
+  const originalFetch = globalThis.fetch;
+  const variants = [
+    (value) => {
+      value.manifest.bindings[0].association_status = 'related';
+      value.manifest.bindings[0].evidence_bases = [{ kind: 'repair_case_fact' }];
+      value.manifest.bindings[0].target.engineering.semantic_identity_proven = true;
+    },
+    (value) => {
+      value.manifest.bindings[0].association_status = 'related';
+      value.manifest.bindings[0].evidence_bases = [{ kind: 'repair_case_fact' }, { kind: 'engineering_identity' }];
+      value.manifest.bindings[0].target.engineering.semantic_identity_proven = false;
+    },
+  ];
+  try {
+    for (const mutate of variants) {
+      const malformed = repairEvidenceDetail();
+      mutate(malformed);
+      globalThis.fetch = async () => ({ ok: true, status: 200, json: async () => malformed });
+      await assert.rejects(
+        getRepairEvidenceLinkDetail('/api', 'owner-001', 'reviewer', 'link-case005-f069-after', 1),
+        { code: 'invalid_repair_evidence_detail' },
+      );
+    }
+    globalThis.fetch = async () => ({ ok: true, status: 200, json: async () => repairEvidenceDetail() });
+    const accepted = await getRepairEvidenceLinkDetail(
+      '/api', 'owner-001', 'reviewer', 'link-case005-f069-after', 1,
+    );
+    assert.equal(accepted.manifest.bindings[0].association_status, 'possibly_related');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
 
 async function sha256Hex(blob) {
   const digest = await globalThis.crypto.subtle.digest('SHA-256', await blob.arrayBuffer());

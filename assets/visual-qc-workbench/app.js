@@ -71,7 +71,17 @@ import {
   reviewVisualQcRegistration,
   restoreAdminServerCase,
   transitionServerSync,
+  getRepairEvidenceLinkDetail,
+  listRepairEvidenceLinks,
 } from './visual-qc-server-client.js';
+import {
+  repairEvidenceBindingsForServerCase,
+  repairEvidenceBindingView,
+  repairEvidenceLocation,
+  repairEvidenceLocationCenter,
+  repairEvidenceMarker,
+  canProjectRepairEvidenceToPhoto,
+} from './repair-evidence-links.js';
 
 const CATALOG_URL = '../../knowledge-base/repair-workbench-boards.json';
 const QUERY = new URLSearchParams(window.location.search);
@@ -173,6 +183,11 @@ const elements = {
   removeLastPairButton: byId('removeLastPairButton'),
   clearRegistrationButton: byId('clearRegistrationButton'),
   reviewRegistrationButton: byId('reviewRegistrationButton'),
+  repairEvidenceSection: byId('repairEvidenceSection'),
+  repairEvidenceTitle: byId('repairEvidenceTitle'),
+  repairEvidenceBadge: byId('repairEvidenceBadge'),
+  repairEvidenceSummary: byId('repairEvidenceSummary'),
+  repairEvidenceList: byId('repairEvidenceList'),
   comparisonSection: byId('comparisonSection'),
   comparisonTitle: byId('comparisonTitle'),
   comparisonBadge: byId('comparisonBadge'),
@@ -271,6 +286,14 @@ const state = {
   trainingAudit: null,
   trainingDatasetBusy: false,
   trainingDatasetError: null,
+  repairEvidence: {
+    caseId: null,
+    status: 'idle',
+    details: [],
+    error: null,
+    location: null,
+    crossSidePhoto: false,
+  },
   adminCases: {
     filters: normalizeAdminCaseFilters(),
     page: 1,
@@ -1412,6 +1435,27 @@ function drawGeometry(context, geometry, frame, color, selected = false, label =
   context.restore();
 }
 
+function drawRepairEvidenceMarker(context, location, frame) {
+  const marker = repairEvidenceMarker(location);
+  if (!marker) return;
+  if (marker.shape === 'point') {
+    drawMarker(context, marker.point, frame, '关', '#315f78');
+    return;
+  }
+  if (marker.shape === 'rectangle') {
+    const rectangle = marker.rectangle;
+    drawGeometry(context, {
+      type: 'rectangle',
+      points: [
+        { x: rectangle.x, y: rectangle.y },
+        { x: rectangle.x + rectangle.width, y: rectangle.y + rectangle.height },
+      ],
+    }, frame, '#315f78', true, '关联区域');
+    return;
+  }
+  drawGeometry(context, { type: 'polygon', points: marker.points }, frame, '#315f78', true, '关联区域');
+}
+
 function clearCanvas(canvas) {
   const context = canvas.getContext('2d');
   context.setTransform(1, 0, 0, 1, 0, 0);
@@ -1432,6 +1476,8 @@ function renderBoardCanvas() {
   state.boardAnchors.forEach((point, index) => drawMarker(context, point, frame, index + 1, '#b87916'));
   state.checkPoints.forEach((pair, index) => drawMarker(context, pair.board, frame, `C${index + 1}`, '#2e7b62'));
   if (state.pendingBoardPoint) drawMarker(context, state.pendingBoardPoint, frame, '•', '#315f78', true);
+  const evidenceLocation = state.repairEvidence.location;
+  drawRepairEvidenceMarker(context, evidenceLocation, frame);
   if (state.mode === 'annotation') {
     for (const annotation of currentCase()?.annotations || []) {
       const color = annotation.review_status === 'confirmed'
@@ -1458,7 +1504,8 @@ function renderPhotoCanvas() {
   }, state.photoViewport);
   drawFittedImage(context, state.photoImage, frame);
   const registration = currentCase()?.registration;
-  if (registration?.matrix && Number(elements.overlayOpacity.value) > 0) {
+  if (registration?.matrix && Number(elements.overlayOpacity.value) > 0
+    && !state.repairEvidence.crossSidePhoto) {
     drawWarpedImage(
       context,
       state.pointMapImage,
@@ -1469,6 +1516,14 @@ function renderPhotoCanvas() {
   }
   state.imageAnchors.forEach((point, index) => drawMarker(context, point, frame, index + 1, '#b87916'));
   state.checkPoints.forEach((pair, index) => drawMarker(context, pair.image, frame, `C${index + 1}`, '#2e7b62'));
+  const evidenceLocation = state.repairEvidence.location;
+  if (evidenceLocation?.mode === 'conservative_point'
+    && canProjectRepairEvidenceToPhoto(evidenceLocation, currentCase()?.side_id)) {
+    const point = currentCase()?.registration?.matrix
+      ? projectPoint(currentCase().registration.matrix, evidenceLocation.point)
+      : evidenceLocation.point;
+    drawMarker(context, point, frame, '关', '#315f78');
+  }
   for (const annotation of currentCase()?.annotations || []) {
     const color = annotation.review_status === 'confirmed'
       ? '#d6533f'
@@ -1684,6 +1739,181 @@ function renderRegistration() {
   elements.annotationModeButton.disabled = !reviewed;
   elements.overlayOpacity.disabled = !registration?.matrix;
   elements.registrationTools.querySelector('[data-registration-tool="check"]').disabled = state.boardAnchors.length !== 4;
+}
+
+function evidenceServerCaseId(detail, binding) {
+  const evidence = detail?.manifest?.physical_evidence?.find(
+    (item) => item.physical_evidence_id === binding.physical_evidence_id,
+  );
+  return evidence?.server_case_id || null;
+}
+
+function repairEvidenceStatusPresentation(status) {
+  return {
+    idle: ['等待服务器案例', '未读取', '请先从管理员案例目录恢复一张服务器图片。'],
+    loading: ['正在读取维修案例证据', '读取中', '正在加载只读关联记录。'],
+    empty: ['没有关联记录', '空', '当前服务器案例没有已投影的维修案例证据。'],
+    active: ['维修案例证据', '已就绪', '关联仅用于定位工程资料，不形成视觉缺陷、Golden 或训练结论。'],
+    stale: ['维修案例证据需复核', '待复核', '关联依据已变化；定位已保守停用。'],
+    unavailable: ['维修案例证据暂不可用', '不可用', '关联权威材料暂不可用；定位已停用。'],
+    error: ['维修案例证据读取失败', '读取失败', '服务器返回异常，当前不会使用关联进行定位。'],
+  }[status] || ['维修案例证据', '未知', '当前关联状态未知。'];
+}
+
+function renderRepairEvidence() {
+  const reviewer = dataAdminAccess();
+  elements.repairEvidenceSection.hidden = !reviewer;
+  if (!reviewer) return;
+  const evidence = state.repairEvidence;
+  const [title, badge, summary] = repairEvidenceStatusPresentation(evidence.status);
+  elements.repairEvidenceTitle.textContent = title;
+  elements.repairEvidenceBadge.textContent = badge;
+  elements.repairEvidenceBadge.className = `badge ${
+    evidence.status === 'active' ? 'reviewed' : evidence.status === 'loading' ? 'running' : 'neutral'
+  }`;
+  elements.repairEvidenceSummary.textContent = evidence.error || (
+    evidence.crossSidePhoto
+      ? '跨板面关联：仅在工程点位图显示；当前实拍照片不会叠加目标标记。'
+      : summary
+  );
+  elements.repairEvidenceList.replaceChildren();
+  for (const detail of evidence.details) {
+    for (const binding of repairEvidenceBindingsForServerCase(detail, evidence.caseId)) {
+      const view = repairEvidenceBindingView(binding, detail);
+      const item = document.createElement('article');
+      item.className = 'repair-evidence-item';
+      const body = document.createElement('div');
+      const source = document.createElement('strong');
+      source.textContent = view.sourceFactLabel;
+      const identity = document.createElement('small');
+      identity.textContent = `${detail.repair_case_id} · 修订 ${detail.revision}`;
+      body.append(source, identity);
+      const locate = document.createElement('button');
+      locate.type = 'button';
+      locate.className = 'repair-evidence-locate';
+      locate.textContent = '定位';
+      locate.setAttribute('aria-label', `定位 ${view.sourceFactLabel} 的工程关联`);
+      locate.disabled = !view.canLocate;
+      locate.addEventListener('click', () => void locateRepairEvidence(detail, binding));
+      const tags = document.createElement('div');
+      tags.className = 'repair-evidence-tags';
+      for (const text of [
+        view.sourceLabel,
+        view.associationLabel,
+        view.visibilityLabel,
+        view.conclusionLabel,
+      ]) {
+        const tag = document.createElement('span');
+        tag.className = 'repair-evidence-tag';
+        tag.textContent = text;
+        tags.append(tag);
+      }
+      item.append(body, locate, tags);
+      elements.repairEvidenceList.append(item);
+    }
+    for (const binding of repairEvidenceBindingsForServerCase(
+      detail, evidence.caseId, { includeSuperseded: true },
+    )) {
+      const view = repairEvidenceBindingView(binding, detail);
+      if (!view.sourceFactSupersededLabel && !view.bindingSupersededLabel) continue;
+      if (view.sourceFactSupersededLabel) {
+        const history = document.createElement('p');
+        history.className = 'repair-evidence-history';
+        history.textContent = `${view.sourceFactSupersededLabel}：${view.replacementFactId}`;
+        elements.repairEvidenceList.append(history);
+      }
+      if (view.bindingSupersededLabel) {
+        const history = document.createElement('p');
+        history.className = 'repair-evidence-history';
+        history.textContent = `${view.bindingSupersededLabel}：${view.replacementBindingId}`;
+        elements.repairEvidenceList.append(history);
+      }
+    }
+  }
+}
+
+async function refreshRepairEvidence() {
+  const serverCaseId = currentCase()?.server_sync?.server_case_id;
+  if (!dataAdminAccess() || !serverCaseId || state.repairEvidence.caseId === serverCaseId) return;
+  state.repairEvidence = {
+    caseId: serverCaseId, status: 'loading', details: [], error: null, location: null, crossSidePhoto: false,
+  };
+  renderRepairEvidence();
+  try {
+    const list = await listRepairEvidenceLinks(
+      VISUAL_QC_API, VISUAL_QC_ACTOR_ID, VISUAL_QC_ACTOR_ROLE, { serverCaseId },
+    );
+    const details = await Promise.all(list.links.map((item) => getRepairEvidenceLinkDetail(
+      VISUAL_QC_API, VISUAL_QC_ACTOR_ID, VISUAL_QC_ACTOR_ROLE, item.link_set_id, item.revision,
+    )));
+    if (details.some((item, index) => (
+      item.link_set_id !== list.links[index].link_set_id
+      || item.revision !== list.links[index].revision
+      || !item.manifest.physical_evidence.some((evidenceItem) => evidenceItem.server_case_id === serverCaseId)
+    ))) {
+      throw new Error('维修案例证据返回身份与当前服务器案例不一致。');
+    }
+    if (state.repairEvidence.caseId !== serverCaseId) return;
+    const health = details.some((item) => item.health.state === 'unavailable') ? 'unavailable'
+      : details.some((item) => item.health.state === 'stale') ? 'stale'
+        : details.length ? 'active' : 'empty';
+    state.repairEvidence = { ...state.repairEvidence, status: health, details };
+  } catch (error) {
+    if (state.repairEvidence.caseId !== serverCaseId) return;
+    state.repairEvidence = { ...state.repairEvidence, status: 'error', error: error.message || '服务器读取失败' };
+  }
+  renderRepairEvidence();
+}
+
+function centeredViewport(canvas, image, point, zoom = 2) {
+  const viewport = { zoom, panX: 0, panY: 0 };
+  const frame = imageFrame(canvas, { width: image.naturalWidth, height: image.naturalHeight }, viewport);
+  return {
+    ...viewport,
+    panX: canvas.width / 2 - (frame.x + point.x * frame.width),
+    panY: canvas.height / 2 - (frame.y + point.y * frame.height),
+  };
+}
+
+function centerRepairEvidenceLocation(location) {
+  const point = repairEvidenceLocationCenter(location);
+  if (state.pointMapImage) {
+    state.boardViewport = centeredViewport(elements.boardCanvas, state.pointMapImage, point);
+  }
+  if (state.photoImage && canProjectRepairEvidenceToPhoto(location, currentCase()?.side_id)) {
+    const photoPoint = currentCase()?.registration?.matrix ? projectPoint(currentCase().registration.matrix, point) : point;
+    state.photoViewport = centeredViewport(elements.photoCanvas, state.photoImage, photoPoint);
+  }
+}
+
+async function locateRepairEvidence(detail, binding) {
+  const location = repairEvidenceLocation(binding, detail);
+  const serverCaseId = evidenceServerCaseId(detail, binding);
+  if (!location || !serverCaseId || detail.health?.state !== 'active'
+    || !repairEvidenceBindingsForServerCase(detail, currentCase()?.server_sync?.server_case_id)
+      .some((item) => item.binding_id === binding.binding_id)) return;
+  try {
+    if (currentCase()?.server_sync?.server_case_id !== serverCaseId) await openAdminServerCase(serverCaseId);
+    if (state.boardKey !== location.boardKey || currentCase()?.board_id !== location.boardId) {
+      throw new Error('关联主板身份与当前工程图不一致，已停止定位。');
+    }
+    const crossSidePhoto = !canProjectRepairEvidenceToPhoto(location, currentCase()?.side_id);
+    // Prevent the target-side board overlay from appearing on the original photo during async side loading.
+    state.repairEvidence.crossSidePhoto = crossSidePhoto;
+    state.repairEvidence.location = null;
+    render();
+    if (state.sideId !== location.sideId) {
+      const loaded = await loadBoard(location.boardKey, location.sideId, false);
+      if (!loaded) throw new Error('关联板面切换未完成。');
+    }
+    state.repairEvidence.location = location;
+    state.repairEvidence.crossSidePhoto = crossSidePhoto;
+    centerRepairEvidenceLocation(location);
+    render();
+  } catch (error) {
+    state.repairEvidence.error = error.message || '关联定位失败';
+    renderRepairEvidence();
+  }
 }
 
 function renderComparison() {
@@ -2025,6 +2255,12 @@ function renderInteractionPrompt() {
 
 function render() {
   const visualCase = currentCase();
+  const serverCaseId = visualCase?.server_sync?.server_case_id;
+  if (!serverCaseId && state.repairEvidence.caseId !== null) {
+    state.repairEvidence = {
+      caseId: null, status: 'idle', details: [], error: null, location: null, crossSidePhoto: false,
+    };
+  }
   elements.photoEmpty.hidden = Boolean(state.photoImage);
   elements.photoCanvasMeta.textContent = visualCase
     ? `${visualCase.image.file_name} · ${visualCase.image.width} × ${visualCase.image.height}`
@@ -2035,6 +2271,7 @@ function render() {
   renderServerSync();
   renderQuality();
   renderRegistration();
+  renderRepairEvidence();
   renderComparison();
   renderAnnotations();
   renderQcResult();
@@ -2042,6 +2279,7 @@ function render() {
   renderInteractionPrompt();
   renderCanvases();
   applyRoleAccess();
+  if (serverCaseId && state.repairEvidence.caseId !== serverCaseId) void refreshRepairEvidence();
 }
 
 function downloadBlob(blob, fileName) {
