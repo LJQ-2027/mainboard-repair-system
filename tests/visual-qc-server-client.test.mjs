@@ -233,6 +233,53 @@ test('repair evidence client rejects malformed nested V1 variants and summary in
   }
 });
 
+test('repair evidence client rejects replacement state that is not backed by the manifest graph', async () => {
+  const originalFetch = globalThis.fetch;
+  const malformed = repairEvidenceDetail();
+  malformed.binding_states[0].binding_superseded = true;
+  malformed.binding_states[0].replacement_binding_id = 'does-not-exist';
+  malformed.counts.binding_superseded = 1;
+  globalThis.fetch = async () => ({ ok: true, status: 200, json: async () => malformed });
+  try {
+    await assert.rejects(
+      getRepairEvidenceLinkDetail('/api', 'owner-001', 'reviewer', 'link-case005-f069-after', 1),
+      { code: 'invalid_repair_evidence_detail' },
+    );
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('repair evidence client rejects supersession in revision one', async () => {
+  const originalFetch = globalThis.fetch;
+  const malformed = repairEvidenceDetail();
+  const replacement = structuredClone(malformed.manifest.bindings[0]);
+  replacement.binding_id = 'case005-emmc-u4000-page-2-replacement';
+  replacement.supersedes_binding_id = malformed.manifest.bindings[0].binding_id;
+  malformed.manifest.bindings.push(replacement);
+  malformed.binding_states[0].binding_superseded = true;
+  malformed.binding_states[0].replacement_binding_id = replacement.binding_id;
+  malformed.binding_states.push({
+    binding_id: replacement.binding_id,
+    source_fact_superseded: false,
+    replacement_fact_id: null,
+    binding_superseded: false,
+    replacement_binding_id: null,
+  });
+  malformed.counts.association.possibly_related = 2;
+  malformed.counts.visibility.not_assessed = 2;
+  malformed.counts.binding_superseded = 1;
+  globalThis.fetch = async () => ({ ok: true, status: 200, json: async () => malformed });
+  try {
+    await assert.rejects(
+      getRepairEvidenceLinkDetail('/api', 'owner-001', 'reviewer', 'link-case005-f069-after', 1),
+      { code: 'invalid_repair_evidence_detail' },
+    );
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test('related designator requires both V1 evidence bases and proven semantic identity', async () => {
   const originalFetch = globalThis.fetch;
   const variants = [

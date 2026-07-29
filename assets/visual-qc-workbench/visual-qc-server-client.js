@@ -415,6 +415,7 @@ function validManifest(value) {
       || superseded.has(item.supersedes_binding_id)) return false;
     superseded.add(item.supersedes_binding_id);
   }
+  if (value.revision === 1 && superseded.size > 0) return false;
   return true;
 }
 
@@ -502,10 +503,34 @@ function validateRepairEvidenceDetail(payload) {
   const repairCaseIds = new Set(
     payload.manifest.repair_case_references.map((item) => item.repair_case_id),
   );
+  const directBindingReplacements = new Map();
+  for (const binding of payload.manifest.bindings) {
+    if (binding.supersedes_binding_id !== null) {
+      directBindingReplacements.set(binding.supersedes_binding_id, binding.binding_id);
+    }
+  }
+  const terminalBindingReplacement = (bindingId) => {
+    let current = bindingId;
+    let replacement = null;
+    while (directBindingReplacements.has(current)) {
+      replacement = directBindingReplacements.get(current);
+      current = replacement;
+    }
+    return replacement;
+  };
+  const stateByBindingId = new Map(
+    payload.binding_states.map((item) => [item.binding_id, item]),
+  );
   const expectedCounts = expectedRepairEvidenceCounts(payload.manifest, payload.binding_states);
   if (new Set(stateIds).size !== stateIds.length
     || bindingIds.length !== stateIds.length
     || bindingIds.some((id) => !stateIds.includes(id))
+    || bindingIds.some((id) => {
+      const state = stateByBindingId.get(id);
+      const replacementId = terminalBindingReplacement(id);
+      return state.replacement_binding_id !== replacementId
+        || state.binding_superseded !== (replacementId !== null);
+    })
     || new Set(evidenceCaseIds).size !== evidenceCaseIds.length
     || evidenceCaseIds.length !== payload.server_case_ids.length
     || evidenceCaseIds.some((id) => !payload.server_case_ids.includes(id))
