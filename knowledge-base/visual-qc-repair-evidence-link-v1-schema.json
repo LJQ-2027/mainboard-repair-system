@@ -155,7 +155,8 @@
         "schema_version": {
           "enum": [
             "VISUAL-QC-REPAIR-CASE-SOURCE-V1",
-            "VISUAL-QC-REPAIR-CASE-SOURCE-V2"
+            "VISUAL-QC-REPAIR-CASE-SOURCE-V2",
+            "VISUAL-QC-REPAIR-CASE-SOURCE-V3"
           ]
         },
         "manifest_sha256": {"$ref": "#/$defs/sha256"},

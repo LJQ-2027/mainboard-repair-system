@@ -846,38 +846,36 @@ class VisualQcRepairEvidenceLinkLibraryTests(unittest.TestCase):
 
     def test_v3_package_linked_uses_v2_link_flow_and_exact_authority(self):
         package_linked = self.stage_v3_case(evidence_mode="package_linked")
-        v2_case, _ = link_library._validated_case(
-            manifest_path=self.case["manifest_path"],
+        link_set_id = "link-v3-package-linked"
+        created = self.publish(
+            link_set_id=link_set_id,
+            repair_case_manifest_path=package_linked["manifest_path"],
+        )
+        replay = self.publish(
+            link_set_id=link_set_id,
+            repair_case_manifest_path=package_linked["manifest_path"],
+        )
+        validated = link_library.validate_repair_evidence_link_revision_on_disk(
+            created["manifest_path"],
             project_root=ROOT,
             library_root=self.library,
         )
-        v3_case, _ = link_library._validated_case(
-            manifest_path=package_linked["manifest_path"],
-            project_root=ROOT,
-            library_root=self.library,
-        )
-        physical = json.loads(self.physical_path.read_text(encoding="utf-8"))
         package = self.package["validated_source_package"]
+        reference = validated["repair_case_references"][0]
+        physical = validated["physical_evidence"][0]
 
-        for case in (v2_case, v3_case):
-            link_library._validate_physical_authority(
-                physical,
-                case=case,
-                project_root=ROOT,
-                library_root=self.library,
-            )
-        board_assets = link_library.load_board_asset_context(
-            ROOT,
-            v3_case["board_key"],
+        self.assertEqual(created["state"], "created")
+        self.assertEqual(replay["state"], "existing")
+        self.assertEqual(created["manifest_sha256"], replay["manifest_sha256"])
+        self.assertEqual(
+            created["manifest_path"].read_bytes(),
+            replay["manifest_path"].read_bytes(),
         )
-        compiled = link_library._compile_binding(
-            self.binding(),
-            case=v3_case,
-            board_assets=board_assets,
-            target_cache={},
+        self.assertEqual(
+            (created["manifest_path"].parent / ".complete").read_bytes(),
+            b"complete\n",
         )
-
-        self.assertEqual(v3_case["schema_version"], REPAIR_CASE_SCHEMA_V3)
+        self.assertEqual(reference["schema_version"], REPAIR_CASE_SCHEMA_V3)
         self.assertEqual(
             physical["qualified_handoff"]["source_package_manifest_sha256"],
             package["manifest_sha256"],
@@ -886,34 +884,64 @@ class VisualQcRepairEvidenceLinkLibraryTests(unittest.TestCase):
             physical["intake"]["entry_id"],
             package["entries"][0]["entry_id"],
         )
-        self.assertTrue(compiled["boundaries"]["model_identity_resolved"])
+        self.assertTrue(
+            validated["bindings"][0]["boundaries"]["model_identity_resolved"]
+        )
 
-        forged_package = copy.deepcopy(physical)
-        forged_package["qualified_handoff"][
-            "source_package_manifest_sha256"
-        ] = "f" * 64
+        forged_package = physical_snapshot(
+            package_sha256="f" * 64,
+            image_sha256=self.package_image_sha,
+        )
+        self.physical_path.write_text(
+            json.dumps(forged_package, ensure_ascii=False),
+            encoding="utf-8",
+        )
         with self.assertRaisesRegex(
             link_library.RepairEvidenceLinkLibraryError,
             "source package is not linked",
         ):
-            link_library._validate_physical_authority(
-                forged_package,
-                case=v3_case,
-                project_root=ROOT,
-                library_root=self.library,
+            self.publish(
+                link_set_id="link-v3-forged-package",
+                repair_case_manifest_path=package_linked["manifest_path"],
             )
 
-        forged_entry = copy.deepcopy(physical)
+        forged_entry = physical_snapshot(
+            package_sha256=package["manifest_sha256"],
+            image_sha256=self.package_image_sha,
+        )
         forged_entry["intake"]["entry_id"] = "session-after-other-side"
+        forged_entry["physical_evidence_snapshot_sha256"] = canonical_sha256(
+            {
+                key: value
+                for key, value in forged_entry.items()
+                if key != "physical_evidence_snapshot_sha256"
+            }
+        )
+        self.physical_path.write_text(
+            json.dumps(forged_entry, ensure_ascii=False),
+            encoding="utf-8",
+        )
         with self.assertRaisesRegex(
             link_library.RepairEvidenceLinkLibraryError,
             "intake entry is not linked",
         ):
-            link_library._validate_physical_authority(
-                forged_entry,
-                case=v3_case,
-                project_root=ROOT,
-                library_root=self.library,
+            self.publish(
+                link_set_id="link-v3-forged-entry",
+                repair_case_manifest_path=package_linked["manifest_path"],
+            )
+        for rejected_link_set in (
+            "link-v3-forged-package",
+            "link-v3-forged-entry",
+        ):
+            revisions = (
+                self.library
+                / "repair-evidence-links"
+                / rejected_link_set
+                / "revisions"
+            )
+            self.assertEqual(
+                list(revisions.iterdir()) if revisions.exists() else [],
+                [],
             )
 
     def test_model_identity_reader_preserves_v1_and_requires_exact_v2_v3_bool(self):
