@@ -398,6 +398,61 @@ class VisualQcRepairEvidenceLinkStoreTests(unittest.TestCase):
             [first],
         )
 
+    def test_store_rejects_oversized_manifest_before_persisting(self):
+        with patch(
+            "scripts.visual_qc.server.store."
+            "MAX_REPAIR_EVIDENCE_LINK_MANIFEST_BYTES",
+            1,
+        ):
+            with self.assertRaisesRegex(
+                ValueError, "projection_manifest_too_large"
+            ):
+                self.service.store.import_repair_evidence_link_revision(
+                    manifest=self.manifest,
+                    manifest_sha256=self.manifest_sha256,
+                    actor_id="link-reviewer",
+                    imported_at=IMPORTED_AT,
+                )
+        self.assertIsNone(
+            self.service.store.get_repair_evidence_link_revision(
+                self.manifest["link_set_id"], self.manifest["revision"]
+            )
+        )
+
+    def test_store_requires_contiguous_revision_chain_and_parent_hash(self):
+        orphan = copy.deepcopy(self.manifest)
+        orphan["revision"] = 2
+        orphan["previous_manifest_sha256"] = "8" * 64
+        with self.assertRaisesRegex(ValueError, "projection_revision_gap"):
+            self.service.store.import_repair_evidence_link_revision(
+                manifest=orphan,
+                manifest_sha256=canonical_sha256(orphan),
+                actor_id="link-reviewer",
+                imported_at=IMPORTED_AT,
+            )
+
+        self.service.store.import_repair_evidence_link_revision(
+            manifest=self.manifest,
+            manifest_sha256=self.manifest_sha256,
+            actor_id="link-reviewer",
+            imported_at=IMPORTED_AT,
+        )
+        wrong_parent = copy.deepcopy(orphan)
+        with self.assertRaisesRegex(
+            ValueError, "projection_previous_manifest_mismatch"
+        ):
+            self.service.store.import_repair_evidence_link_revision(
+                manifest=wrong_parent,
+                manifest_sha256=canonical_sha256(wrong_parent),
+                actor_id="link-reviewer",
+                imported_at=IMPORTED_AT,
+            )
+        self.assertIsNone(
+            self.service.store.get_repair_evidence_link_revision(
+                self.manifest["link_set_id"], 2
+            )
+        )
+
     def test_store_list_filters_orders_latest_and_detail_is_immutable(self):
         first = self.service.store.import_repair_evidence_link_revision(
             manifest=self.manifest,
@@ -437,12 +492,44 @@ class VisualQcRepairEvidenceLinkApiTests(
     def setUp(self):
         super().setUp()
         self.client = TestClient(self.app)
+        self.link_authority_patcher = patch(
+            "scripts.visual_qc.server.service."
+            "validate_repair_evidence_link_revision_on_disk",
+            side_effect=lambda path, **_kwargs: json.loads(
+                path.read_text(encoding="utf-8")
+            ),
+        )
+        self.link_authority_patcher.start()
+        self.addCleanup(self.link_authority_patcher.stop)
 
     def tearDown(self):
         self.client.close()
         super().tearDown()
 
+    def _stage_link_authority(self, manifest, library_root=None):
+        path = (
+            (library_root or (self.settings.data_root / "library"))
+            / "repair-evidence-links"
+            / manifest["link_set_id"]
+            / "revisions"
+            / f"{manifest['revision']:04d}"
+            / "repair-evidence-link.json"
+        )
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(
+            json.dumps(
+                manifest,
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+                allow_nan=False,
+            ),
+            encoding="utf-8",
+        )
+        return path
+
     def _import(self):
+        self._stage_link_authority(self.manifest)
         return self.client.post(
             "/api/v1/visual-qc/admin/repair-evidence-links",
             headers=HEADERS,
@@ -450,6 +537,26 @@ class VisualQcRepairEvidenceLinkApiTests(
                 "manifest": self.manifest,
                 "manifest_sha256": self.manifest_sha256,
             },
+        )
+
+    def test_import_requires_published_controlled_authority(self):
+        response = self.client.post(
+            "/api/v1/visual-qc/admin/repair-evidence-links",
+            headers=HEADERS,
+            json={
+                "manifest": self.manifest,
+                "manifest_sha256": self.manifest_sha256,
+            },
+        )
+        self.assertEqual(response.status_code, 503, response.text)
+        self.assertEqual(
+            response.json()["detail"]["code"],
+            "repair_evidence_link_authority_unavailable",
+        )
+        self.assertIsNone(
+            self.service.store.get_repair_evidence_link_revision(
+                self.manifest["link_set_id"], self.manifest["revision"]
+            )
         )
 
     def test_routes_require_reviewer_and_import_active_projection(self):
@@ -1437,6 +1544,20 @@ class VisualQcRepairEvidenceLinkApiTests(
                 if key != "fact_sha256"
             }
         )
+        predecessor = copy.deepcopy(manifest)
+        predecessor["revision"] = 1
+        predecessor["previous_manifest_sha256"] = None
+        predecessor["repair_case_references"] = [
+            predecessor["repair_case_references"][0]
+        ]
+        predecessor_sha256 = canonical_sha256(predecessor)
+        self.service.store.import_repair_evidence_link_revision(
+            manifest=predecessor,
+            manifest_sha256=predecessor_sha256,
+            actor_id="link-reviewer",
+            imported_at=IMPORTED_AT,
+        )
+        manifest["previous_manifest_sha256"] = predecessor_sha256
         manifest["bindings"].append(replacement)
 
         with (
@@ -1455,6 +1576,9 @@ class VisualQcRepairEvidenceLinkApiTests(
             )
             counts = self.service._repair_evidence_link_counts(
                 manifest, states
+            )
+            self._stage_link_authority(
+                manifest, library_root=authority_fixture.library
             )
             response = self.client.post(
                 "/api/v1/visual-qc/admin/repair-evidence-links",

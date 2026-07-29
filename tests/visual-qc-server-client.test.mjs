@@ -205,6 +205,13 @@ test('repair evidence client rejects malformed nested V1 variants and summary in
     (value) => { value.manifest.bindings[0].evidence_bases = [{ kind: 'repair_case_fact' }, { kind: 'repair_case_fact' }]; },
     (value) => { value.manifest.bindings[0].visibility_status = 'not_assessed'; value.manifest.bindings[0].evidence_bases = [{ kind: 'human_observation', observation_code: 'target_visible' }]; },
     (value) => { value.manifest.bindings[0].visibility_status = 'visible'; value.manifest.bindings[0].evidence_bases = [{ kind: 'human_observation', observation_code: 'target_visible' }, { kind: 'human_observation', observation_code: 'target_occluded' }]; },
+    (value) => { value.manifest.physical_evidence.push(structuredClone(value.manifest.physical_evidence[0])); },
+    (value) => { value.manifest.bindings.push(structuredClone(value.manifest.bindings[0])); },
+    (value) => { value.manifest.bindings[0].repair_case_reference_id = 'missing-reference'; },
+    (value) => { value.manifest.bindings[0].target.side_id = 'main_page_1'; },
+    (value) => { value.binding_states[0].binding_id = 'missing-binding'; },
+    (value) => { value.counts.association.possibly_related = 0; },
+    (value) => { value.server_case_ids = ['other-case']; },
   ];
   try {
     for (const mutate of variants) {

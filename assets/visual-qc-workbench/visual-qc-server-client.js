@@ -345,11 +345,18 @@ function validManifest(value) {
     || !repositoryPath(board.catalog_asset.path)
     || !board.compiled_sources.every((item) => exactKeys(item, ['kind', 'path', 'sha256'])
       && isSafeId(item.kind) && repositoryPath(item.path) && hash(item.sha256))) return false;
-  if (!value.repair_case_references.every((item) => exactKeys(item, ['repair_case_reference_id', 'repair_case_id', 'revision', 'schema_version', 'manifest_sha256', 'board_key', 'board_id'])
+  const repairCaseReferenceIds = new Set();
+  if (!value.repair_case_references.every((item) => {
+    const good = exactKeys(item, ['repair_case_reference_id', 'repair_case_id', 'revision', 'schema_version', 'manifest_sha256', 'board_key', 'board_id'])
     && isSafeId(item.repair_case_reference_id) && isSafeId(item.repair_case_id) && Number.isInteger(item.revision) && item.revision > 0
     && item.board_key === board.board_key && item.board_id === board.board_id
-    && ['VISUAL-QC-REPAIR-CASE-SOURCE-V1', 'VISUAL-QC-REPAIR-CASE-SOURCE-V2'].includes(item.schema_version) && hash(item.manifest_sha256))) return false;
+    && ['VISUAL-QC-REPAIR-CASE-SOURCE-V1', 'VISUAL-QC-REPAIR-CASE-SOURCE-V2'].includes(item.schema_version) && hash(item.manifest_sha256)
+    && !repairCaseReferenceIds.has(item.repair_case_reference_id);
+    if (good) repairCaseReferenceIds.add(item.repair_case_reference_id);
+    return good;
+  })) return false;
   const evidenceIds = new Set();
+  const evidenceById = new Map();
   if (!value.physical_evidence.every((item) => {
     const registration = item.registration;
     const good = exactKeys(item, ['schema_version', 'physical_evidence_id', 'server_case_id', 'intake', 'board_key', 'board_id', 'side_id', 'capture_stage', 'evidence_role', 'qualified_handoff', 'qualified_handoff_sha256', 'image_id', 'image_sha256', 'job_id', 'registration_review_id', 'registration', 'physical_evidence_snapshot_sha256'])
@@ -368,16 +375,22 @@ function validManifest(value) {
       && Array.isArray(registration.solve_anchors) && registration.solve_anchors.length === 4 && registration.solve_anchors.every((pair) => exactKeys(pair, ['board', 'image']) && point(pair.board) && point(pair.image))
       && Array.isArray(registration.independent_check_points) && registration.independent_check_points.length >= 1 && registration.independent_check_points.every((pair) => exactKeys(pair, ['board', 'image']) && point(pair.board) && point(pair.image))
       && exactKeys(registration.error, ['count', 'rms', 'maximum']) && Number.isInteger(registration.error.count) && registration.error.count >= 1 && finite(registration.error.rms) && finite(registration.error.maximum);
-    if (good && !evidenceIds.has(item.physical_evidence_id)) evidenceIds.add(item.physical_evidence_id);
-    return good;
+    if (!good || evidenceIds.has(item.physical_evidence_id)) return false;
+    evidenceIds.add(item.physical_evidence_id);
+    evidenceById.set(item.physical_evidence_id, item);
+    return true;
   })) return false;
+  const bindingIds = new Set();
   return value.bindings.every((item) => {
     const target = item.target;
     const source = item.source_fact;
-    return exactKeys(item, ['binding_id', 'repair_case_reference_id', 'source_fact', 'target', 'physical_evidence_id', 'association_status', 'visibility_status', 'evidence_bases', 'supersedes_binding_id', 'boundaries'])
-      && isSafeId(item.binding_id) && isSafeId(item.repair_case_reference_id) && evidenceIds.has(item.physical_evidence_id)
+    const evidence = evidenceById.get(item.physical_evidence_id);
+    const good = exactKeys(item, ['binding_id', 'repair_case_reference_id', 'source_fact', 'target', 'physical_evidence_id', 'association_status', 'visibility_status', 'evidence_bases', 'supersedes_binding_id', 'boundaries'])
+      && isSafeId(item.binding_id) && !bindingIds.has(item.binding_id)
+      && repairCaseReferenceIds.has(item.repair_case_reference_id) && evidence
       && exactKeys(source, ['kind', 'fact_id', 'display', 'fact_sha256']) && ['reported_symptom', 'finding', 'repair_action', 'outcome'].includes(source.kind) && isSafeId(source.fact_id) && hash(source.fact_sha256) && exactKeys(source.display, ['text', 'claim_status']) && typeof source.display.text === 'string' && source.display.text.trim().length > 0 && (source.kind === 'finding' ? ['reported', 'suspected', 'documented'].includes(source.display.claim_status) : source.display.claim_status === null) && (source.kind !== 'outcome' || source.fact_id === 'outcome')
       && target && ['whole_board', 'board_region', 'designator'].includes(target.kind) && isSafeId(target.side_id)
+      && target.side_id === evidence.side_id
       && (target.kind === 'whole_board' ? exactKeys(target, ['kind', 'side_id']) : true)
       && (target.kind === 'board_region' ? exactKeys(target, ['kind', 'side_id', 'region']) : true)
       && (target.kind !== 'board_region' || validRegion(target.region))
@@ -386,7 +399,37 @@ function validManifest(value) {
       && ['not_assessed', 'visible', 'not_visible', 'occluded'].includes(item.visibility_status)
       && validEvidenceBases(item.evidence_bases, item.visibility_status, target, item.association_status)
       && (item.supersedes_binding_id === null || isSafeId(item.supersedes_binding_id)) && fixedBoundaries(item.boundaries, true);
+    if (good) bindingIds.add(item.binding_id);
+    return Boolean(good);
   });
+}
+
+function expectedRepairEvidenceCounts(manifest, bindingStates) {
+  const association = {
+    related: 0, possibly_related: 0, not_related: 0, insufficient_evidence: 0,
+  };
+  const visibility = {
+    not_assessed: 0, visible: 0, not_visible: 0, occluded: 0,
+  };
+  for (const binding of manifest.bindings) {
+    association[binding.association_status] += 1;
+    visibility[binding.visibility_status] += 1;
+  }
+  return {
+    association,
+    visibility,
+    source_fact_superseded: bindingStates.filter((item) => item.source_fact_superseded).length,
+    binding_superseded: bindingStates.filter((item) => item.binding_superseded).length,
+  };
+}
+
+function sameRepairEvidenceCounts(actual, expected) {
+  return ['related', 'possibly_related', 'not_related', 'insufficient_evidence']
+    .every((key) => actual.association[key] === expected.association[key])
+    && ['not_assessed', 'visible', 'not_visible', 'occluded']
+      .every((key) => actual.visibility[key] === expected.visibility[key])
+    && actual.source_fact_superseded === expected.source_fact_superseded
+    && actual.binding_superseded === expected.binding_superseded;
 }
 
 function validSummary(value) {
@@ -435,6 +478,25 @@ function validateRepairEvidenceDetail(payload) {
     || payload.manifest?.link_set_id !== payload.link_set_id
     || payload.manifest?.revision !== payload.revision
     || !Array.isArray(payload.manifest?.bindings)) {
+    throw new VisualQcClientError('invalid_repair_evidence_detail', 'The repair-evidence detail response is invalid.');
+  }
+  const bindingIds = payload.manifest.bindings.map((item) => item.binding_id);
+  const stateIds = payload.binding_states.map((item) => item.binding_id);
+  const evidenceCaseIds = payload.manifest.physical_evidence.map((item) => item.server_case_id);
+  const repairCaseIds = new Set(
+    payload.manifest.repair_case_references.map((item) => item.repair_case_id),
+  );
+  const expectedCounts = expectedRepairEvidenceCounts(payload.manifest, payload.binding_states);
+  if (new Set(stateIds).size !== stateIds.length
+    || bindingIds.length !== stateIds.length
+    || bindingIds.some((id) => !stateIds.includes(id))
+    || new Set(evidenceCaseIds).size !== evidenceCaseIds.length
+    || evidenceCaseIds.length !== payload.server_case_ids.length
+    || evidenceCaseIds.some((id) => !payload.server_case_ids.includes(id))
+    || repairCaseIds.size !== 1 || !repairCaseIds.has(payload.repair_case_id)
+    || payload.board.board_key !== payload.manifest.board.board_key
+    || payload.board.board_id !== payload.manifest.board.board_id
+    || !sameRepairEvidenceCounts(payload.counts, expectedCounts)) {
     throw new VisualQcClientError('invalid_repair_evidence_detail', 'The repair-evidence detail response is invalid.');
   }
   return immutable(payload);

@@ -1839,6 +1839,7 @@ async function refreshRepairEvidence() {
     caseId: serverCaseId, status: 'loading', details: [], error: null, location: null, crossSidePhoto: false,
   };
   renderRepairEvidence();
+  renderCanvases();
   try {
     const list = await listRepairEvidenceLinks(
       VISUAL_QC_API, VISUAL_QC_ACTOR_ID, VISUAL_QC_ACTOR_ROLE, { serverCaseId },
@@ -2596,6 +2597,9 @@ async function openAdminServerCase(caseId) {
     state.photoImage = photoImage;
     state.isProxy = restored.visualCase.image.evidence_role !== 'physical_capture';
     state.awaitingImportedImage = false;
+    state.repairEvidence = {
+      caseId: null, status: 'idle', details: [], error: null, location: null, crossSidePhoto: false,
+    };
     syncRegistrationState();
     await saveVisualQcCase(restored.visualCase, restored.imageBlob);
     resizeCanvases();

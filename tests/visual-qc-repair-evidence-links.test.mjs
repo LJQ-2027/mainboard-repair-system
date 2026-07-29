@@ -258,6 +258,17 @@ test('workbench renders only active bindings and separates history from current 
   assert.match(app, /repairEvidenceLocationCenter\(location\)/);
 });
 
+test('server case restore clears old evidence location and allows same-case retry', () => {
+  assert.match(
+    app,
+    /state\.repairEvidence\s*=\s*\{\s*caseId:\s*null,\s*status:\s*'idle',\s*details:\s*\[\],\s*error:\s*null,\s*location:\s*null,\s*crossSidePhoto:\s*false,\s*\};\s*syncRegistrationState\(\)/s,
+  );
+  assert.match(
+    app,
+    /state\.repairEvidence\s*=\s*\{\s*caseId:\s*serverCaseId,\s*status:\s*'loading',[\s\S]*?renderRepairEvidence\(\);\s*renderCanvases\(\);/,
+  );
+});
+
 test('repair evidence card separates its fact label from revision metadata', () => {
   assert.match(
     styles,

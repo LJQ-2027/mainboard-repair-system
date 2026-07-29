@@ -749,6 +749,11 @@ class VisualQcStore:
             separators=(",", ":"),
             allow_nan=False,
         )
+        if (
+            len(manifest_json.encode("utf-8"))
+            > MAX_REPAIR_EVIDENCE_LINK_MANIFEST_BYTES
+        ):
+            raise ValueError("projection_manifest_too_large")
         link_set_id = manifest["link_set_id"]
         revision = manifest["revision"]
         repair_case_ids = {
@@ -815,6 +820,34 @@ class VisualQcStore:
                     if on_committed is not None:
                         on_committed()
                     return existing_projection
+                latest = connection.execute(
+                    """
+                    SELECT * FROM repair_evidence_link_revisions
+                    WHERE link_set_id = ?
+                    ORDER BY revision DESC
+                    LIMIT 1
+                    """,
+                    (link_set_id,),
+                ).fetchone()
+                if revision == 1:
+                    if latest is not None:
+                        raise ValueError("projection_revision_conflict")
+                else:
+                    if latest is None or latest["revision"] != revision - 1:
+                        raise ValueError("projection_revision_gap")
+                    latest_case_rows = self._repair_evidence_link_case_rows(
+                        connection,
+                        latest["link_set_id"],
+                        latest["revision"],
+                    )
+                    self._repair_evidence_link_row(latest, latest_case_rows)
+                    if (
+                        manifest["previous_manifest_sha256"]
+                        != latest["manifest_sha256"]
+                    ):
+                        raise ValueError(
+                            "projection_previous_manifest_mismatch"
+                        )
                 if validate_current is not None:
                     validate_current(connection)
                 connection.execute(

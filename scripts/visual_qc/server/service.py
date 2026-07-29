@@ -33,7 +33,9 @@ from scripts.visual_qc.repair_evidence_link_contract import (
     validate_repair_evidence_link_manifest,
 )
 from scripts.visual_qc.repair_evidence_link_library import (
+    RepairEvidenceLinkLibraryError,
     _reference_authorities,
+    validate_repair_evidence_link_revision_on_disk,
 )
 from scripts.visual_qc.source_library import _is_reparse_or_symlink
 from scripts.visual_qc.server.catalog import BoardCatalog, CatalogError
@@ -1251,6 +1253,52 @@ class VisualQcService:
                 return candidate.resolve()
         return None
 
+    def _validate_controlled_repair_evidence_link(
+        self, manifest: dict, manifest_sha256: str
+    ) -> dict:
+        library_root = self._controlled_library_root()
+        if library_root is None:
+            raise VisualQcServiceError(
+                "repair_evidence_link_authority_unavailable",
+                "Controlled repair-evidence link authority is unavailable.",
+                503,
+            )
+        authority_path = (
+            library_root
+            / "repair-evidence-links"
+            / manifest["link_set_id"]
+            / "revisions"
+            / f"{manifest['revision']:04d}"
+            / "repair-evidence-link.json"
+        )
+        try:
+            authority = validate_repair_evidence_link_revision_on_disk(
+                authority_path,
+                project_root=self.settings.project_root,
+                library_root=library_root,
+            )
+        except (
+            OSError,
+            UnicodeError,
+            RepairEvidenceLinkContractError,
+            RepairEvidenceLinkLibraryError,
+        ) as exc:
+            raise VisualQcServiceError(
+                "repair_evidence_link_authority_unavailable",
+                "Controlled repair-evidence link authority is unavailable.",
+                503,
+            ) from exc
+        if (
+            canonical_sha256(authority) != manifest_sha256
+            or canonical_sha256(manifest) != canonical_sha256(authority)
+        ):
+            raise VisualQcServiceError(
+                "repair_evidence_link_authority_mismatch",
+                "Repair-evidence link does not match controlled authority.",
+                409,
+            )
+        return authority
+
     @staticmethod
     def _terminal_replacement(
         start: str, replacements: dict[str, str]
@@ -1450,6 +1498,9 @@ class VisualQcService:
                 "repair_evidence_link_hash_mismatch",
                 "Repair-evidence link manifest hash does not match.",
             )
+        validated = self._validate_controlled_repair_evidence_link(
+            validated, manifest_sha256
+        )
         verification_cache = {}
         stable_image_proofs = {}
         kernel_exclusion = None
