@@ -263,6 +263,7 @@ class SyncRepairEvidenceLinkCliTests(unittest.TestCase):
         )
         probe.setUp()
         self.addCleanup(probe.tearDown)
+        probe._stage_link_authority(probe.manifest)
         first = probe.client.post(
             "/api/v1/visual-qc/admin/repair-evidence-links",
             headers=server_tests.HEADERS,
