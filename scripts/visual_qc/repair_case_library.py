@@ -17,13 +17,20 @@ from scripts.visual_qc.intake import (
     _require_safe_id,
     write_json_atomic,
 )
+from scripts.visual_qc.heic_derivative import (
+    HEIC_MIME_TYPE,
+    inspect_heic_source,
+    is_heic_path,
+)
 from scripts.visual_qc.repair_case_contract import (
     FIXED_FALSE_BOUNDARIES,
     MAX_SUPPORTING_FILE_BYTES,
     MAX_SUPPORTING_FILES,
     MIME_EXTENSIONS,
+    MIME_EXTENSIONS_V3,
     REPAIR_CASE_SCHEMA_V1,
     REPAIR_CASE_SCHEMA_V2,
+    REPAIR_CASE_SCHEMA_V3,
     derive_completeness,
     validate_repair_case_manifest,
 )
@@ -60,6 +67,11 @@ COMMON_CASE_RECORD_FIELDS = {
 }
 V1_CASE_RECORD_FIELDS = COMMON_CASE_RECORD_FIELDS | {"device_models"}
 V2_CASE_RECORD_FIELDS = COMMON_CASE_RECORD_FIELDS | {"device_identity"}
+V3_CASE_RECORD_FIELDS = COMMON_CASE_RECORD_FIELDS | {
+    "device_identity",
+    "evidence_mode",
+    "supporting_evidence_contexts",
+}
 
 
 def resolve_package_links(
@@ -172,8 +184,25 @@ def _read_stable_supporting_file(path: Path) -> bytes:
         os.close(descriptor)
 
 
-def _detect_supporting_mime(path: Path, content: bytes) -> str:
+def _detect_supporting_mime(
+    path: Path,
+    content: bytes,
+    *,
+    schema_version: str,
+) -> str:
     extension = path.suffix.lower()
+    if schema_version == REPAIR_CASE_SCHEMA_V3 and is_heic_path(path):
+        inspection = inspect_heic_source(path)
+        digest = hashlib.sha256(content).hexdigest()
+        if (
+            inspection.get("sha256") != digest
+            or inspection.get("byte_size") != len(content)
+            or inspection.get("mime_type") != HEIC_MIME_TYPE
+        ):
+            raise IntakeValidationError(
+                f"HEIC inspection does not match supporting source bytes: {path}"
+            )
+        return HEIC_MIME_TYPE
     image_mime = detect_image_mime_type(content)
     if extension == ".pdf" and content.startswith(b"%PDF-"):
         return "application/pdf"
@@ -219,6 +248,8 @@ def _detect_supporting_mime(path: Path, content: bytes) -> str:
 def inspect_supporting_evidence(
     assignments: list[tuple[str, Path]],
     descriptions: dict[str, str],
+    *,
+    schema_version: str = REPAIR_CASE_SCHEMA_V1,
 ) -> list[dict]:
     if not isinstance(assignments, list) or len(assignments) > MAX_SUPPORTING_FILES:
         raise IntakeValidationError(
@@ -242,9 +273,18 @@ def inspect_supporting_evidence(
             )
         path = Path(raw_path).expanduser()
         content = _read_stable_supporting_file(path)
-        mime_type = _detect_supporting_mime(path, content)
+        mime_type = _detect_supporting_mime(
+            path,
+            content,
+            schema_version=schema_version,
+        )
         digest = hashlib.sha256(content).hexdigest()
-        extension = MIME_EXTENSIONS[mime_type]
+        mime_extensions = (
+            MIME_EXTENSIONS_V3
+            if schema_version == REPAIR_CASE_SCHEMA_V3
+            else MIME_EXTENSIONS
+        )
+        extension = mime_extensions[mime_type]
         inspected.append(
             {
                 "record": {
@@ -304,12 +344,13 @@ def store_supporting_evidence(
     library_root: Path,
     inspected: list[dict],
     project_root: Path | None = None,
-) -> None:
+) -> list[Path]:
     effective_project_root = (
         Path.cwd() if project_root is None else Path(project_root)
     )
     library_root = _resolve_library_root(effective_project_root, library_root)
     _ensure_directory_durable(library_root)
+    created = []
     for item in inspected:
         record = item["record"]
         content = item["content"]
@@ -344,6 +385,8 @@ def store_supporting_evidence(
                 os.link(temporary_path, destination)
             except FileExistsError:
                 _assert_stored_object(destination, record["sha256"])
+            else:
+                created.append(destination)
             temporary_path.unlink(missing_ok=True)
             _assert_controlled_path(
                 library_root, destination, "supporting evidence object path"
@@ -352,6 +395,7 @@ def store_supporting_evidence(
             _fsync_directory(destination.parent)
         finally:
             temporary_path.unlink(missing_ok=True)
+    return created
 
 
 def _strict_json(path: Path, label: str) -> tuple[dict, str]:
@@ -427,6 +471,8 @@ def _validate_case_record(case_record: dict) -> tuple[dict, str]:
         schema_version = REPAIR_CASE_SCHEMA_V1
     elif fields == V2_CASE_RECORD_FIELDS:
         schema_version = REPAIR_CASE_SCHEMA_V2
+    elif fields == V3_CASE_RECORD_FIELDS:
+        schema_version = REPAIR_CASE_SCHEMA_V3
     else:
         raise IntakeValidationError("repair case record fields are invalid")
     descriptions = case_record["supporting_evidence_descriptions"]
@@ -625,15 +671,32 @@ def _prepare_repair_case_revision(
         revision = previous["revision"] + 1
         historical_fact_ids = _fact_ids(previous)
 
-    links = resolve_package_links(
-        project_root=project_root,
-        library_root=library_root,
-        assignments=package_assignments,
-        board_key=board_key,
+    evidence_mode = (
+        record["evidence_mode"]
+        if schema_version == REPAIR_CASE_SCHEMA_V3
+        else "package_linked"
     )
+    if evidence_mode == "supporting_only":
+        if package_assignments:
+            raise IntakeValidationError(
+                "supporting_only forbids source package assignments"
+            )
+        links = []
+    else:
+        links = resolve_package_links(
+            project_root=project_root,
+            library_root=library_root,
+            assignments=package_assignments,
+            board_key=board_key,
+        )
+    if not links and not supporting_assignments:
+        raise IntakeValidationError(
+            "repair case requires a source package or supporting evidence"
+        )
     inspected = inspect_supporting_evidence(
         supporting_assignments,
         record["supporting_evidence_descriptions"],
+        schema_version=schema_version,
     )
     new_supporting = [copy.deepcopy(item["record"]) for item in inspected]
     supporting = new_supporting
@@ -665,6 +728,15 @@ def _prepare_repair_case_revision(
         identity_field = {
             "device_identity": copy.deepcopy(record["device_identity"])
         }
+        if schema_version == REPAIR_CASE_SCHEMA_V3:
+            identity_field.update(
+                {
+                    "evidence_mode": copy.deepcopy(record["evidence_mode"]),
+                    "supporting_evidence_contexts": copy.deepcopy(
+                        record["supporting_evidence_contexts"]
+                    ),
+                }
+            )
         boundaries = {
             **copy.deepcopy(FIXED_FALSE_BOUNDARIES),
             "model_identity_resolved": model_identity_resolved,
@@ -696,7 +768,8 @@ def _prepare_repair_case_revision(
             historical_fact_ids=historical_fact_ids,
             catalog_models=(
                 catalog_models
-                if schema_version == REPAIR_CASE_SCHEMA_V2
+                if schema_version
+                in {REPAIR_CASE_SCHEMA_V2, REPAIR_CASE_SCHEMA_V3}
                 else None
             ),
         )
@@ -753,6 +826,7 @@ def _revision_result(
         "repair_case_id": payload["repair_case_id"],
         "revision": payload["revision"],
         "schema_version": payload["schema_version"],
+        "evidence_mode": payload.get("evidence_mode", "package_linked"),
         "identity_status": (
             "exact_catalog_match"
             if payload["schema_version"] == REPAIR_CASE_SCHEMA_V1
@@ -866,7 +940,8 @@ def validate_repair_case_revision(
             historical_fact_ids=historical_fact_ids,
             catalog_models=(
                 catalog_models
-                if payload.get("schema_version") == REPAIR_CASE_SCHEMA_V2
+                if payload.get("schema_version")
+                in {REPAIR_CASE_SCHEMA_V2, REPAIR_CASE_SCHEMA_V3}
                 else None
             ),
         )
@@ -884,21 +959,27 @@ def validate_repair_case_revision(
             "repair case device_models do not match board catalog"
         )
 
-    expected_links = resolve_package_links(
-        project_root=project_root,
-        library_root=library_root,
-        assignments=[
-            (
-                link["role"],
-                library_root
-                / "packages"
-                / link["package_id"]
-                / "source-package.json",
-            )
-            for link in validated["package_links"]
-        ],
-        board_key=validated["board_key"],
-    )
+    if (
+        validated["schema_version"] == REPAIR_CASE_SCHEMA_V3
+        and validated["evidence_mode"] == "supporting_only"
+    ):
+        expected_links = []
+    else:
+        expected_links = resolve_package_links(
+            project_root=project_root,
+            library_root=library_root,
+            assignments=[
+                (
+                    link["role"],
+                    library_root
+                    / "packages"
+                    / link["package_id"]
+                    / "source-package.json",
+                )
+                for link in validated["package_links"]
+            ],
+            board_key=validated["board_key"],
+        )
     if validated["package_links"] != expected_links:
         raise IntakeValidationError(
             "repair case source package evidence does not match manifest"
@@ -947,11 +1028,6 @@ def stage_repair_case_revision(
         previous_manifest_path=previous_manifest_path,
     )
     _ensure_directory_durable(library_root)
-    store_supporting_evidence(
-        library_root=library_root,
-        inspected=inspected,
-        project_root=project_root,
-    )
     cases_root = _assert_controlled_path(
         library_root,
         library_root / "cases",
@@ -1034,8 +1110,14 @@ def stage_repair_case_revision(
             )
         )
         published_incomplete = False
+        created_objects = []
         try:
             write_json_atomic(temporary / "repair-case.json", payload)
+            created_objects = store_supporting_evidence(
+                library_root=library_root,
+                inspected=inspected,
+                project_root=project_root,
+            )
             _fsync_directory(temporary)
             try:
                 temporary.rename(target)
@@ -1050,13 +1132,12 @@ def stage_repair_case_revision(
             _fsync_directory(revisions_root)
             published_incomplete = False
         except Exception:
-            if (
-                published_incomplete
-                and target.exists()
-                and not (target / ".complete").exists()
-            ):
+            if published_incomplete and target.exists():
                 shutil.rmtree(target)
                 _fsync_directory(revisions_root)
+            for object_path in created_objects:
+                object_path.unlink(missing_ok=True)
+                _fsync_directory(object_path.parent)
             raise
         finally:
             if temporary.exists():

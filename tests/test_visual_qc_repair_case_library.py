@@ -9,17 +9,21 @@ import subprocess
 import tempfile
 import unittest
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import nullcontext
 from unittest import mock
 import zipfile
 
 import cv2
 import numpy as np
+from PIL import Image
+from pillow_heif import from_pillow
 
 from scripts.visual_qc.intake import IntakeValidationError
 from scripts.visual_qc.repair_case_contract import (
     FIXED_FALSE_BOUNDARIES,
     REPAIR_CASE_SCHEMA_V1,
     REPAIR_CASE_SCHEMA_V2,
+    REPAIR_CASE_SCHEMA_V3,
 )
 from scripts.visual_qc.repair_case_library import (
     build_repair_case_revision,
@@ -41,6 +45,11 @@ def encode_image(extension, *, value):
     if not ok:
         raise RuntimeError("Unable to encode test image.")
     return encoded.tobytes()
+
+
+def write_heic(path, width=180, height=120, value=120):
+    image = Image.new("RGB", (width, height), (value, value, value))
+    from_pillow(image).save(path, quality=90)
 
 
 class VisualQcRepairCaseLibraryTests(unittest.TestCase):
@@ -345,6 +354,44 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
         record.update(overrides)
         return record
 
+    def v3_supporting_only_record(self, evidence_id="repair-photo", **overrides):
+        evidence_ref = self.identity_reference(evidence_id)
+        record = {
+            "device_identity": self.unresolved_f069_identity(evidence_id),
+            "evidence_mode": "supporting_only",
+            "supporting_evidence_contexts": [
+                {
+                    "evidence_id": evidence_id,
+                    "evidence_role": "repair_in_progress_photo",
+                    "source_capture_stage": "维修中",
+                    "source_board_area": "屏蔽罩内局部",
+                }
+            ],
+            "supporting_evidence_descriptions": {
+                evidence_id: "Milo supplied repair-in-progress photograph"
+            },
+            "reported_symptoms": [
+                {
+                    "symptom_id": "symptom-unable-to-charge",
+                    "text": "无法充电",
+                    "source_wording": "无法充电",
+                    "fault_code": None,
+                    "evidence_refs": [evidence_ref],
+                }
+            ],
+            "findings": [],
+            "repair_actions": [],
+            "outcome": {
+                "status": "unknown",
+                "description": None,
+                "verification_description": None,
+                "evidence_refs": [],
+            },
+            "corrections": [],
+        }
+        record.update(overrides)
+        return record
+
     @staticmethod
     def exact_f069_identity():
         return {
@@ -466,6 +513,39 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
         }
         options.update(overrides)
         return stage_repair_case_revision(**options)
+
+    def stage_f069_supporting_only(
+        self,
+        *,
+        source,
+        repair_case_id="case-f069-supporting-only",
+        case_record=None,
+        **overrides,
+    ):
+        options = {
+            "project_root": ROOT,
+            "library_root": self.library,
+            "repair_case_id": repair_case_id,
+            "board_key": "bg6h-f069",
+            "package_assignments": [],
+            "case_record": (
+                self.v3_supporting_only_record()
+                if case_record is None
+                else case_record
+            ),
+            "supporting_assignments": [("repair-photo", source)],
+            "previous_manifest_path": None,
+        }
+        options.update(overrides)
+        return stage_repair_case_revision(**options)
+
+    def case_evidence_objects(self):
+        root = self.library / "objects" / "case-evidence"
+        return (
+            {path for path in root.rglob("*") if path.is_file()}
+            if root.exists()
+            else set()
+        )
 
     def stage_case(self, **overrides):
         options = {
@@ -595,6 +675,220 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
             hashlib.sha256(created["manifest_path"].read_bytes()).hexdigest(),
             created["manifest_sha256"],
         )
+
+    def test_v3_supporting_only_stages_byte_exact_heic_without_packages(self):
+        source = self.root / "repair-progress.heic"
+        write_heic(source)
+
+        created = self.stage_f069_supporting_only(source=source)
+        payload = json.loads(created["manifest_path"].read_text(encoding="utf-8"))
+        evidence = payload["supporting_evidence"][0]
+
+        self.assertEqual(created["schema_version"], REPAIR_CASE_SCHEMA_V3)
+        self.assertEqual(created["evidence_mode"], "supporting_only")
+        self.assertEqual(created["package_count"], 0)
+        self.assertEqual(payload["schema_version"], REPAIR_CASE_SCHEMA_V3)
+        self.assertEqual(payload["evidence_mode"], "supporting_only")
+        self.assertEqual(payload["package_links"], [])
+        self.assertEqual(
+            payload["supporting_evidence_contexts"],
+            self.v3_supporting_only_record()["supporting_evidence_contexts"],
+        )
+        self.assertEqual(evidence["mime_type"], "image/heic")
+        self.assertTrue(evidence["object_path"].endswith(".heic"))
+        self.assertEqual(
+            (self.library / evidence["object_path"]).read_bytes(),
+            source.read_bytes(),
+        )
+
+    def test_v2_heic_inspection_remains_rejected_and_invalid_v3_mentions_heic(self):
+        source = self.root / "v2-repair-progress.heic"
+        write_heic(source)
+        with self.assertRaisesRegex(IntakeValidationError, "unsupported"):
+            inspect_supporting_evidence(
+                [("repair-photo", source)],
+                {"repair-photo": "Repair progress photograph"},
+                schema_version=REPAIR_CASE_SCHEMA_V2,
+            )
+
+        invalid = self.root / "invalid.heic"
+        invalid.write_bytes(b"not a valid HEIC container")
+        with self.assertRaisesRegex(IntakeValidationError, "HEIC"):
+            inspect_supporting_evidence(
+                [("repair-photo", invalid)],
+                {"repair-photo": "Repair progress photograph"},
+                schema_version=REPAIR_CASE_SCHEMA_V3,
+            )
+
+    def test_supporting_only_requires_at_least_one_supporting_file(self):
+        with self.assertRaisesRegex(
+            IntakeValidationError,
+            "requires.*supporting evidence",
+        ):
+            self.stage_f069_supporting_only(
+                source=self.root / "unused.heic",
+                supporting_assignments=[],
+            )
+
+        self.assertFalse(
+            (
+                self.library
+                / "cases"
+                / "case-f069-supporting-only"
+                / "revisions"
+                / "0001"
+                / ".complete"
+            ).exists()
+        )
+        self.assertEqual(self.case_evidence_objects(), set())
+
+    def test_v3_supporting_only_replay_is_idempotent_and_corruption_is_detected(self):
+        source = self.root / "replay.heic"
+        write_heic(source, value=140)
+
+        created = self.stage_f069_supporting_only(
+            source=source,
+            repair_case_id="case-f069-supporting-replay",
+        )
+        replayed = self.stage_f069_supporting_only(
+            source=source,
+            repair_case_id="case-f069-supporting-replay",
+        )
+
+        self.assertEqual(replayed["state"], "existing")
+        self.assertEqual(replayed["manifest_sha256"], created["manifest_sha256"])
+        payload = json.loads(created["manifest_path"].read_text(encoding="utf-8"))
+        evidence_object = (
+            self.library / payload["supporting_evidence"][0]["object_path"]
+        )
+        evidence_object.write_bytes(b"corrupted HEIC evidence")
+
+        with self.assertRaisesRegex(IntakeValidationError, "integrity mismatch"):
+            validate_repair_case_revision(
+                manifest_path=created["manifest_path"],
+                project_root=ROOT,
+                library_root=self.library,
+            )
+
+    def test_v3_supporting_only_source_failures_publish_no_revision_or_object(self):
+        original = self.root / "source-safety.heic"
+        replacement = self.root / "source-safety-replacement.heic"
+        write_heic(original, value=110)
+        write_heic(replacement, value=180)
+        baseline_objects = self.case_evidence_objects()
+
+        from scripts.visual_qc.heic_derivative import inspect_heic_source
+
+        def inspect_after_mutation(path):
+            Path(path).write_bytes(replacement.read_bytes())
+            return inspect_heic_source(path)
+
+        unsafe_sources = []
+        hardlink = self.root / "source-safety-hardlink.heic"
+        os.link(original, hardlink)
+        unsafe_sources.append(("hardlink", hardlink))
+
+        junction_target = self.root / "source-safety-junction-target"
+        junction_target.mkdir()
+        junction_source = junction_target / "source.heic"
+        write_heic(junction_source)
+        junction = self.root / "source-safety-junction"
+        self.create_directory_link(junction, junction_target)
+        unsafe_sources.append(("reparse", junction / "source.heic"))
+
+        failure_cases = [
+            (
+                "mutation",
+                original,
+                mock.patch(
+                    "scripts.visual_qc.repair_case_library.inspect_heic_source",
+                    side_effect=inspect_after_mutation,
+                ),
+            ),
+            *(
+                (label, path, patcher)
+                for label, path in unsafe_sources
+                for patcher in [nullcontext()]
+            ),
+        ]
+        for label, source, patcher in failure_cases:
+            with self.subTest(label=label), patcher:
+                case_id = f"case-f069-supporting-{label}"
+                with self.assertRaises(IntakeValidationError):
+                    self.stage_f069_supporting_only(
+                        source=source,
+                        repair_case_id=case_id,
+                    )
+                self.assertFalse(
+                    (
+                        self.library
+                        / "cases"
+                        / case_id
+                        / "revisions"
+                        / "0001"
+                        / ".complete"
+                    ).exists()
+                )
+                self.assertEqual(
+                    self.case_evidence_objects(),
+                    baseline_objects,
+                )
+
+    def test_v3_supporting_only_symlink_failure_publishes_no_artifacts(self):
+        original = self.root / "source-symlink.heic"
+        write_heic(original)
+        symlink = self.root / "source-symlink-link.heic"
+        try:
+            symlink.symlink_to(original)
+        except OSError as exc:
+            self.skipTest(f"Unable to create file symlink: {exc}")
+        baseline_objects = self.case_evidence_objects()
+        case_id = "case-f069-supporting-symlink"
+
+        with self.assertRaisesRegex(IntakeValidationError, "reparse|symlink"):
+            self.stage_f069_supporting_only(
+                source=symlink,
+                repair_case_id=case_id,
+            )
+
+        self.assertFalse(
+            (
+                self.library
+                / "cases"
+                / case_id
+                / "revisions"
+                / "0001"
+                / ".complete"
+            ).exists()
+        )
+        self.assertEqual(self.case_evidence_objects(), baseline_objects)
+
+    def test_v3_supporting_only_atomic_failure_removes_new_object(self):
+        source = self.root / "atomic-failure.heic"
+        write_heic(source)
+        baseline_objects = self.case_evidence_objects()
+
+        with mock.patch(
+            "scripts.visual_qc.repair_case_library.write_json_atomic",
+            side_effect=OSError("simulated V3 write failure"),
+        ):
+            with self.assertRaisesRegex(OSError, "simulated V3 write failure"):
+                self.stage_f069_supporting_only(
+                    source=source,
+                    repair_case_id="case-f069-supporting-atomic",
+                )
+
+        self.assertFalse(
+            (
+                self.library
+                / "cases"
+                / "case-f069-supporting-atomic"
+                / "revisions"
+                / "0001"
+                / ".complete"
+            ).exists()
+        )
+        self.assertEqual(self.case_evidence_objects(), baseline_objects)
 
     def test_v2_requires_exact_catalog_model_order(self):
         valid = build_repair_case_revision(
