@@ -549,6 +549,14 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
             else set()
         )
 
+    @staticmethod
+    def v3_completion_marker_bytes(manifest_bytes):
+        return (
+            b"manifest-sha256:"
+            + hashlib.sha256(manifest_bytes).hexdigest().encode("ascii")
+            + b"\n"
+        )
+
     def assert_no_supporting_only_artifacts(self, case_id, baseline_objects):
         self.assertFalse(
             (
@@ -1373,6 +1381,149 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
         self.assertEqual(manifest_path.read_bytes(), manifest_bytes)
         self.assertEqual(evidence_object.read_bytes(), object_bytes)
 
+    def test_v3_revision_one_marker_rejects_schema_valid_manifest_mutation(self):
+        source = self.root / "revision-one-anchor.heic"
+        write_heic(source, value=182)
+        created = self.stage_f069_supporting_only(
+            source=source,
+            repair_case_id="case-f069-v3-revision-one-anchor",
+        )
+        manifest_path = created["manifest_path"]
+        marker = manifest_path.parent / ".complete"
+        manifest_bytes = manifest_path.read_bytes()
+        marker_bytes = marker.read_bytes()
+        payload = json.loads(manifest_bytes.decode("utf-8"))
+        object_path = self.library / payload["supporting_evidence"][0]["object_path"]
+        object_bytes = object_path.read_bytes()
+        payload["evidence_mode"] = "package_linked"
+        payload["package_links"] = resolve_package_links(
+            project_root=ROOT,
+            library_root=self.library,
+            assignments=[
+                ("after_repair", self.f069_package()["source_package_path"])
+            ],
+            board_key="bg6h-f069",
+        )
+        manifest_path.write_bytes(
+            (json.dumps(payload, ensure_ascii=False, indent=2) + "\n").encode(
+                "utf-8"
+            )
+        )
+
+        with self.assertRaisesRegex(
+            IntakeValidationError,
+            "completion marker|manifest SHA-256",
+        ):
+            validate_repair_case_revision(
+                manifest_path=manifest_path,
+                project_root=ROOT,
+                library_root=self.library,
+            )
+
+        self.assertEqual(
+            marker_bytes,
+            self.v3_completion_marker_bytes(manifest_bytes),
+        )
+        self.assertEqual(marker.read_bytes(), marker_bytes)
+        self.assertEqual(object_path.read_bytes(), object_bytes)
+
+    def test_v3_latest_marker_rejects_schema_valid_manifest_mutations(self):
+        source = self.root / "latest-anchor-first.heic"
+        appended_source = self.root / "latest-anchor-second.heic"
+        write_heic(source, value=183)
+        write_heic(appended_source, value=184)
+        case_id = "case-f069-v3-latest-anchor"
+        first = self.stage_f069_supporting_only(
+            source=source,
+            repair_case_id=case_id,
+        )
+        revised = copy.deepcopy(self.v3_supporting_only_record())
+        revised["supporting_evidence_contexts"].append(
+            {
+                "evidence_id": "repair-photo-2",
+                "evidence_role": "repair_in_progress_photo",
+                "source_capture_stage": "维修中",
+                "source_board_area": "主板局部",
+            }
+        )
+        revised["supporting_evidence_descriptions"] = {
+            "repair-photo-2": "Second repair-in-progress photograph"
+        }
+        second = self.stage_f069_supporting_only(
+            source=appended_source,
+            repair_case_id=case_id,
+            case_record=revised,
+            supporting_assignments=[("repair-photo-2", appended_source)],
+            previous_manifest_path=first["manifest_path"],
+        )
+        manifest_path = second["manifest_path"]
+        manifest_bytes = manifest_path.read_bytes()
+        marker = manifest_path.parent / ".complete"
+        marker_bytes = marker.read_bytes()
+        payload = json.loads(manifest_bytes.decode("utf-8"))
+        object_path = self.library / payload["supporting_evidence"][1]["object_path"]
+        object_bytes = object_path.read_bytes()
+        mutators = {
+            "new_context": lambda value: value[
+                "supporting_evidence_contexts"
+            ][-1].update(source_board_area="改写后的最新区域"),
+            "new_symptom": lambda value: value["reported_symptoms"].append(
+                {
+                    "symptom_id": "symptom-latest-mutation",
+                    "text": "Schema-valid latest mutation.",
+                    "source_wording": None,
+                    "fault_code": None,
+                    "evidence_refs": [],
+                }
+            ),
+        }
+
+        for label, mutate in mutators.items():
+            with self.subTest(label=label):
+                changed = json.loads(manifest_bytes.decode("utf-8"))
+                mutate(changed)
+                manifest_path.write_bytes(
+                    (
+                        json.dumps(changed, ensure_ascii=False, indent=2) + "\n"
+                    ).encode("utf-8")
+                )
+                with self.assertRaisesRegex(
+                    IntakeValidationError,
+                    "completion marker|manifest SHA-256",
+                ):
+                    validate_repair_case_revision(
+                        manifest_path=manifest_path,
+                        project_root=ROOT,
+                        library_root=self.library,
+                    )
+                self.assertEqual(marker.read_bytes(), marker_bytes)
+                self.assertEqual(object_path.read_bytes(), object_bytes)
+                manifest_path.write_bytes(manifest_bytes)
+
+        self.assertEqual(
+            marker_bytes,
+            self.v3_completion_marker_bytes(manifest_bytes),
+        )
+        self.assertEqual(manifest_path.read_bytes(), manifest_bytes)
+
+    def test_v1_v2_completion_markers_remain_legacy_compatible(self):
+        v1 = self.stage_case(repair_case_id="case-km4-v1-legacy-marker")
+        v2 = self.stage_f069_case(
+            repair_case_id="case-f069-v2-legacy-marker",
+            case_record=self.v2_case_record(self.exact_f069_identity()),
+        )
+
+        for created in (v1, v2):
+            with self.subTest(schema=created["schema_version"]):
+                marker = created["manifest_path"].parent / ".complete"
+                self.assertEqual(marker.read_bytes(), b"complete\n")
+                replayed = validate_repair_case_revision(
+                    manifest_path=created["manifest_path"],
+                    project_root=ROOT,
+                    library_root=self.library,
+                )
+                self.assertEqual(replayed["schema_version"], created["schema_version"])
+
     def test_marker_free_conflicting_manifest_fails_closed_unchanged(self):
         source = self.root / "marker-free-conflict.heic"
         write_heic(source, value=178)
@@ -1448,7 +1599,10 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
 
         self.assertEqual(recovered["state"], "existing")
         self.assertEqual(fsynced, ["0001", "0001", "revisions"])
-        self.assertEqual(marker.read_bytes(), b"complete\n")
+        self.assertEqual(
+            marker.read_bytes(),
+            self.v3_completion_marker_bytes(manifest_bytes),
+        )
         self.assertEqual(manifest_path.read_bytes(), manifest_bytes)
         self.assertEqual(evidence_object.read_bytes(), object_bytes)
         validated = validate_repair_case_revision(
@@ -1503,8 +1657,11 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
         )
         manifest_path = target / "repair-case.json"
         marker = target / ".complete"
-        self.assertEqual(marker.read_bytes(), b"complete\n")
         manifest_bytes = manifest_path.read_bytes()
+        self.assertEqual(
+            marker.read_bytes(),
+            self.v3_completion_marker_bytes(manifest_bytes),
+        )
         payload = json.loads(manifest_bytes.decode("utf-8"))
         evidence_object = (
             self.library / payload["supporting_evidence"][0]["object_path"]
@@ -1583,7 +1740,10 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
                 repair_case_id=case_id,
                 case_record=changed_record,
             )
-        self.assertEqual((target / ".complete").read_bytes(), b"complete\n")
+        self.assertEqual(
+            (target / ".complete").read_bytes(),
+            self.v3_completion_marker_bytes(manifest_bytes),
+        )
         self.assertEqual(manifest_path.read_bytes(), manifest_bytes)
         self.assertEqual(evidence_object.read_bytes(), object_bytes)
 
@@ -2341,6 +2501,7 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
                 prior_sha256 = hashlib.sha256(prior_bytes).hexdigest()
                 source = self.root / f"{case_id}.heic"
                 write_heic(source, value=133)
+                baseline_objects = self.case_evidence_objects()
 
                 with self.assertRaisesRegex(
                     IntakeValidationError,
@@ -2360,6 +2521,7 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
                     hashlib.sha256(first["manifest_path"].read_bytes()).hexdigest(),
                     prior_sha256,
                 )
+                self.assertEqual(self.case_evidence_objects(), baseline_objects)
 
                 upgraded = self.stage_f069_case(
                     repair_case_id=case_id,
@@ -2431,6 +2593,7 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
         evidence_path = self.library / payload["supporting_evidence"][0]["object_path"]
         evidence_bytes = evidence_path.read_bytes()
         evidence_sha256 = hashlib.sha256(evidence_bytes).hexdigest()
+        baseline_objects = self.case_evidence_objects()
         revised = copy.deepcopy(self.v3_supporting_only_record())
         revised["supporting_evidence_contexts"][0]["source_board_area"] = (
             "改写后的区域"
@@ -2470,6 +2633,7 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
             hashlib.sha256(evidence_path.read_bytes()).hexdigest(),
             evidence_sha256,
         )
+        self.assertEqual(self.case_evidence_objects(), baseline_objects)
 
     def test_v3_cannot_rewrite_mode_heic_or_context_wording(self):
         source = self.root / "rewrite-history.heic"
@@ -2501,6 +2665,7 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
             ),
         ):
             with self.subTest(field=field):
+                baseline_objects = self.case_evidence_objects()
                 changed = copy.deepcopy(self.v3_supporting_only_record())
                 changed[field] = value
                 changed["supporting_evidence_descriptions"] = {}
@@ -2543,6 +2708,7 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
                 self.assertFalse((manifest_path.parents[1] / "0002").exists())
                 self.assertEqual(manifest_path.read_bytes(), manifest_bytes)
                 self.assertEqual(evidence_path.read_bytes(), evidence_bytes)
+                self.assertEqual(self.case_evidence_objects(), baseline_objects)
 
         tampered = bytearray(evidence_bytes)
         tampered[-1] ^= 1
@@ -2562,6 +2728,56 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
             hashlib.sha256(evidence_path.read_bytes()).hexdigest(),
             evidence_sha256,
         )
+
+    def test_v3_revision_preparation_cannot_replace_historical_heic(self):
+        source = self.root / "historical-heic.heic"
+        replacement = self.root / "historical-heic-replacement.heic"
+        write_heic(source, value=141)
+        write_heic(replacement, value=142)
+        case_id = "case-f069-v3-historical-heic"
+        first = self.stage_f069_supporting_only(
+            source=source,
+            repair_case_id=case_id,
+        )
+        manifest_bytes = first["manifest_path"].read_bytes()
+        payload = json.loads(manifest_bytes.decode("utf-8"))
+        historical_path = (
+            self.library / payload["supporting_evidence"][0]["object_path"]
+        )
+        historical_bytes = historical_path.read_bytes()
+        inspected = inspect_supporting_evidence(
+            [("repair-photo", replacement)],
+            {"repair-photo": "Replacement repair photograph"},
+            schema_version=REPAIR_CASE_SCHEMA_V3,
+        )
+        replacement_path = (
+            self.library / inspected[0]["record"]["object_path"]
+        )
+        self.assertNotEqual(replacement_path, historical_path)
+        self.assertFalse(replacement_path.exists())
+        baseline_objects = self.case_evidence_objects()
+
+        with self.assertRaisesRegex(
+            IntakeValidationError,
+            "duplicates a historical evidence_id|historical supporting evidence",
+        ):
+            self.stage_f069_supporting_only(
+                source=replacement,
+                repair_case_id=case_id,
+                case_record=self.v3_supporting_only_record(
+                    supporting_evidence_descriptions={
+                        "repair-photo": "Replacement repair photograph"
+                    }
+                ),
+                supporting_assignments=[("repair-photo", replacement)],
+                previous_manifest_path=first["manifest_path"],
+            )
+
+        self.assertFalse((first["manifest_path"].parents[1] / "0002").exists())
+        self.assertFalse(replacement_path.exists())
+        self.assertEqual(self.case_evidence_objects(), baseline_objects)
+        self.assertEqual(first["manifest_path"].read_bytes(), manifest_bytes)
+        self.assertEqual(historical_path.read_bytes(), historical_bytes)
 
     def test_v3_new_context_requires_consistent_appended_evidence(self):
         source = self.root / "consistent-context.jpg"
@@ -2677,7 +2893,7 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
                 lambda value: value["supporting_evidence_contexts"][0].update(
                     source_board_area="改写区域"
                 ),
-                "historical supporting evidence contexts",
+                "completion marker|manifest SHA-256",
             ),
             (
                 lambda value: value.update(
@@ -2694,7 +2910,7 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
                         board_key="bg6h-f069",
                     ),
                 ),
-                "evidence mode",
+                "completion marker|manifest SHA-256",
             ),
         ):
             with self.subTest(error=error):

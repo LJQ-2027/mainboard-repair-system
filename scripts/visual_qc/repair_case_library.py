@@ -47,7 +47,7 @@ from scripts.visual_qc.source_library import (
     _is_reparse_or_symlink,
     _package_lock,
     _resolve_library_root,
-    _write_completion_marker,
+    _write_completion_marker as _write_legacy_completion_marker,
     validate_source_package,
 )
 
@@ -58,6 +58,7 @@ ROLE_CAPTURE_STAGE = {
     "golden_reference": "golden_reference",
 }
 CASE_EVIDENCE_PUBLICATION_LOCK_ID = ".case-evidence-publication"
+V3_COMPLETION_MARKER_PREFIX = b"manifest-sha256:"
 COMMON_CASE_RECORD_FIELDS = {
     "supporting_evidence_descriptions",
     "reported_symptoms",
@@ -456,12 +457,35 @@ def _remove_revision_directories(
     return True, failures
 
 
-def _completion_marker_state(target: Path) -> str:
-    marker = target / ".complete"
+def _expected_completion_marker_bytes(
+    schema_version: str,
+    manifest_sha256: str,
+) -> bytes:
+    if schema_version == REPAIR_CASE_SCHEMA_V3:
+        return (
+            V3_COMPLETION_MARKER_PREFIX
+            + manifest_sha256.encode("ascii")
+            + b"\n"
+        )
+    if schema_version in {REPAIR_CASE_SCHEMA_V1, REPAIR_CASE_SCHEMA_V2}:
+        return b"complete\n"
+    raise IntakeValidationError(
+        "repair case completion marker has unsupported schema"
+    )
+
+
+def _assert_completion_marker(
+    marker: Path,
+    *,
+    schema_version: str,
+    manifest_sha256: str,
+) -> None:
     try:
         metadata = marker.lstat()
-    except FileNotFoundError:
-        return "absent"
+    except FileNotFoundError as exc:
+        raise IntakeValidationError(
+            "repair case revision is incomplete"
+        ) from exc
     except OSError as exc:
         raise IntakeValidationError(
             "unable to inspect repair case completion marker"
@@ -479,10 +503,36 @@ def _completion_marker_state(target: Path) -> str:
         raise IntakeValidationError(
             "unable to read repair case completion marker"
         ) from exc
-    if content != b"complete\n":
+    expected = _expected_completion_marker_bytes(
+        schema_version,
+        manifest_sha256,
+    )
+    if content != expected:
         raise IntakeValidationError(
-            "repair case completion marker is corrupt"
+            "repair case completion marker is corrupt or does not match "
+            "manifest SHA-256"
         )
+
+
+def _completion_marker_state(target: Path) -> str:
+    marker = target / ".complete"
+    try:
+        marker.lstat()
+    except FileNotFoundError:
+        return "absent"
+    except OSError as exc:
+        raise IntakeValidationError(
+            "unable to inspect repair case completion marker"
+        ) from exc
+    payload, manifest_sha256 = _strict_json(
+        target / "repair-case.json",
+        "repair case manifest",
+    )
+    _assert_completion_marker(
+        marker,
+        schema_version=payload.get("schema_version"),
+        manifest_sha256=manifest_sha256,
+    )
     return "committed"
 
 
@@ -633,6 +683,24 @@ def _strict_json_content(
 def _strict_json(path: Path, label: str) -> tuple[dict, str]:
     payload, digest, _ = _strict_json_content(path, label)
     return payload, digest
+
+
+def _write_completion_marker(path: Path) -> None:
+    payload, manifest_sha256 = _strict_json(
+        path.parent / "repair-case.json",
+        "repair case manifest",
+    )
+    content = _expected_completion_marker_bytes(
+        payload.get("schema_version"),
+        manifest_sha256,
+    )
+    if content == b"complete\n":
+        _write_legacy_completion_marker(path)
+        return
+    with path.open("xb") as handle:
+        handle.write(content)
+        handle.flush()
+        os.fsync(handle.fileno())
 
 
 def _catalog_board(project_root: Path, board_key: str) -> tuple[dict, list[str]]:
@@ -1103,6 +1171,7 @@ def _validate_revision_storage_path(
     manifest_path: Path,
     library_root: Path,
     payload: dict,
+    manifest_sha256: str,
 ) -> None:
     repair_case_id = payload.get("repair_case_id")
     revision = payload.get("revision")
@@ -1131,12 +1200,11 @@ def _validate_revision_storage_path(
         manifest_path.parent / ".complete",
         "repair case completion marker",
     )
-    if (
-        not marker.is_file()
-        or _is_reparse_or_symlink(marker)
-        or marker.read_bytes() != b"complete\n"
-    ):
-        raise IntakeValidationError("repair case revision is incomplete")
+    _assert_completion_marker(
+        marker,
+        schema_version=payload.get("schema_version"),
+        manifest_sha256=manifest_sha256,
+    )
 
 
 def validate_repair_case_revision(
@@ -1152,11 +1220,15 @@ def validate_repair_case_revision(
     )
     if not manifest_path.is_file() or _is_reparse_or_symlink(manifest_path):
         raise IntakeValidationError("repair case manifest is missing or unsafe")
-    payload, _ = _strict_json(manifest_path, "repair case manifest")
+    payload, manifest_sha256 = _strict_json(
+        manifest_path,
+        "repair case manifest",
+    )
     _validate_revision_storage_path(
         manifest_path=manifest_path,
         library_root=library_root,
         payload=payload,
+        manifest_sha256=manifest_sha256,
     )
     manifest_board_key = _require_safe_id(
         payload.get("board_key"), "board_key"
