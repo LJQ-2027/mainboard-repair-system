@@ -16,6 +16,10 @@ const app = await readFile(
   new URL('../assets/visual-qc-workbench/app.js', import.meta.url),
   'utf8',
 );
+const styles = await readFile(
+  new URL('../assets/visual-qc-workbench/styles.css', import.meta.url),
+  'utf8',
+);
 
 function binding(overrides = {}) {
   return {
@@ -252,4 +256,11 @@ test('workbench renders only active bindings and separates history from current 
   assert.match(app, /view\.sourceFactSupersededLabel/);
   assert.match(app, /view\.bindingSupersededLabel/);
   assert.match(app, /repairEvidenceLocationCenter\(location\)/);
+});
+
+test('repair evidence card separates its fact label from revision metadata', () => {
+  assert.match(
+    styles,
+    /\.repair-evidence-item\s*>\s*div:first-child\s*\{[^}]*display:\s*grid;[^}]*gap:\s*2px;/s,
+  );
 });

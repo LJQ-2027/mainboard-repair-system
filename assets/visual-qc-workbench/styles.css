@@ -1117,6 +1117,12 @@ dialog::backdrop {
   background: #f8faf9;
 }
 
+.repair-evidence-item > div:first-child {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
 .repair-evidence-item strong,
 .repair-evidence-item small {
   overflow-wrap: anywhere;

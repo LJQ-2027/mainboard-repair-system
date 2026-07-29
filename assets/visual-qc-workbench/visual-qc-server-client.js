@@ -462,7 +462,7 @@ export function getRepairEvidenceLinkDetail(apiBase, actorId, actorRole, linkSet
     throw new VisualQcClientError('invalid_repair_evidence_identity', 'Repair-evidence link identity is invalid.');
   }
   return jsonRequest(
-    `${apiBase.replace(/\/$/, '')}/admin/repair-evidence-links/${encodeURIComponent(linkSetId)}/${encodeURIComponent(revision)}`,
+    `${apiBase.replace(/\/$/, '')}/admin/repair-evidence-links/${encodeURIComponent(linkSetId)}/revisions/${encodeURIComponent(revision)}`,
     { actorId, actorRole },
   ).then(validateRepairEvidenceDetail);
 }

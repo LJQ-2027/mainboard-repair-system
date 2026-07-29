@@ -170,7 +170,10 @@ test('repair evidence detail percent-encodes segments and rejects redacted or in
   } finally {
     globalThis.fetch = originalFetch;
   }
-  assert.equal(requests[0].url, '/api/v1/visual-qc/admin/repair-evidence-links/link%2Fset/1');
+  assert.equal(
+    requests[0].url,
+    '/api/v1/visual-qc/admin/repair-evidence-links/link%2Fset/revisions/1',
+  );
   assert.equal(requests[0].options.headers['X-Actor-Id'], 'owner-001');
 });
 
