@@ -339,63 +339,82 @@ def _assert_stored_object(path: Path, expected_sha256: str) -> None:
         )
 
 
+def _remove_created_supporting_objects(paths: list[Path]) -> None:
+    parents = set()
+    for path in reversed(paths):
+        path.unlink(missing_ok=True)
+        parents.add(path.parent)
+    for parent in parents:
+        _fsync_directory(parent)
+
+
 def store_supporting_evidence(
     *,
     library_root: Path,
     inspected: list[dict],
     project_root: Path | None = None,
+    created_objects: list[Path] | None = None,
 ) -> list[Path]:
     effective_project_root = (
         Path.cwd() if project_root is None else Path(project_root)
     )
     library_root = _resolve_library_root(effective_project_root, library_root)
     _ensure_directory_durable(library_root)
-    created = []
-    for item in inspected:
-        record = item["record"]
-        content = item["content"]
-        destination = _assert_controlled_path(
-            library_root,
-            library_root / record["object_path"],
-            "supporting evidence object path",
-        )
-        if destination.exists():
-            _assert_stored_object(destination, record["sha256"])
-            continue
-        _ensure_directory_durable(destination.parent)
-        _assert_controlled_path(
-            library_root, destination, "supporting evidence object path"
-        )
-        descriptor, temporary_name = tempfile.mkstemp(
-            prefix=f".{record['sha256']}.",
-            suffix=".staging",
-            dir=destination.parent,
-        )
-        temporary_path = Path(temporary_name)
-        try:
-            with os.fdopen(descriptor, "wb") as target:
-                target.write(content)
-                target.flush()
-                os.fsync(target.fileno())
-            if _hash_file(temporary_path) != record["sha256"]:
-                raise IntakeValidationError(
-                    "supporting evidence changed before publication"
-                )
-            try:
-                os.link(temporary_path, destination)
-            except FileExistsError:
+    creation_log = [] if created_objects is None else created_objects
+    initial_count = len(creation_log)
+    try:
+        for item in inspected:
+            record = item["record"]
+            content = item["content"]
+            destination = _assert_controlled_path(
+                library_root,
+                library_root / record["object_path"],
+                "supporting evidence object path",
+            )
+            if destination.exists():
                 _assert_stored_object(destination, record["sha256"])
-            else:
-                created.append(destination)
-            temporary_path.unlink(missing_ok=True)
+                continue
+            _ensure_directory_durable(destination.parent)
             _assert_controlled_path(
                 library_root, destination, "supporting evidence object path"
             )
-            _assert_stored_object(destination, record["sha256"])
-            _fsync_directory(destination.parent)
+            descriptor, temporary_name = tempfile.mkstemp(
+                prefix=f".{record['sha256']}.",
+                suffix=".staging",
+                dir=destination.parent,
+            )
+            temporary_path = Path(temporary_name)
+            try:
+                with os.fdopen(descriptor, "wb") as target:
+                    target.write(content)
+                    target.flush()
+                    os.fsync(target.fileno())
+                if _hash_file(temporary_path) != record["sha256"]:
+                    raise IntakeValidationError(
+                        "supporting evidence changed before publication"
+                    )
+                try:
+                    os.link(temporary_path, destination)
+                except FileExistsError:
+                    _assert_stored_object(destination, record["sha256"])
+                else:
+                    creation_log.append(destination)
+                temporary_path.unlink(missing_ok=True)
+                _assert_controlled_path(
+                    library_root, destination, "supporting evidence object path"
+                )
+                _assert_stored_object(destination, record["sha256"])
+                _fsync_directory(destination.parent)
+            finally:
+                temporary_path.unlink(missing_ok=True)
+    except Exception:
+        owned_objects = creation_log[initial_count:]
+        try:
+            _remove_created_supporting_objects(owned_objects)
         finally:
-            temporary_path.unlink(missing_ok=True)
-    return created
+            del creation_log[initial_count:]
+        raise
+    return creation_log[initial_count:]
 
 
 def _strict_json(path: Path, label: str) -> tuple[dict, str]:
@@ -1113,10 +1132,11 @@ def stage_repair_case_revision(
         created_objects = []
         try:
             write_json_atomic(temporary / "repair-case.json", payload)
-            created_objects = store_supporting_evidence(
+            store_supporting_evidence(
                 library_root=library_root,
                 inspected=inspected,
                 project_root=project_root,
+                created_objects=created_objects,
             )
             _fsync_directory(temporary)
             try:
@@ -1135,9 +1155,7 @@ def stage_repair_case_revision(
             if published_incomplete and target.exists():
                 shutil.rmtree(target)
                 _fsync_directory(revisions_root)
-            for object_path in created_objects:
-                object_path.unlink(missing_ok=True)
-                _fsync_directory(object_path.parent)
+            _remove_created_supporting_objects(created_objects)
             raise
         finally:
             if temporary.exists():

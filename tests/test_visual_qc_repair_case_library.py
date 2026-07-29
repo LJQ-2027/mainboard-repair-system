@@ -9,7 +9,6 @@ import subprocess
 import tempfile
 import unittest
 from concurrent.futures import ThreadPoolExecutor
-from contextlib import nullcontext
 from unittest import mock
 import zipfile
 
@@ -547,6 +546,19 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
             else set()
         )
 
+    def assert_no_supporting_only_artifacts(self, case_id, baseline_objects):
+        self.assertFalse(
+            (
+                self.library
+                / "cases"
+                / case_id
+                / "revisions"
+                / "0001"
+                / ".complete"
+            ).exists()
+        )
+        self.assertEqual(self.case_evidence_objects(), baseline_objects)
+
     def stage_case(self, **overrides):
         options = {
             "project_root": ROOT,
@@ -770,10 +782,12 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
                 library_root=self.library,
             )
 
-    def test_v3_supporting_only_source_failures_publish_no_revision_or_object(self):
-        original = self.root / "source-safety.heic"
-        replacement = self.root / "source-safety-replacement.heic"
-        write_heic(original, value=110)
+    def test_v3_supporting_only_mutation_calls_heic_inspection_and_publishes_nothing(
+        self,
+    ):
+        source = self.root / "source-mutation.heic"
+        replacement = self.root / "source-mutation-replacement.heic"
+        write_heic(source, value=110)
         write_heic(replacement, value=180)
         baseline_objects = self.case_evidence_objects()
 
@@ -783,56 +797,54 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
             Path(path).write_bytes(replacement.read_bytes())
             return inspect_heic_source(path)
 
-        unsafe_sources = []
-        hardlink = self.root / "source-safety-hardlink.heic"
+        case_id = "case-f069-supporting-mutation"
+        with mock.patch(
+            "scripts.visual_qc.repair_case_library.inspect_heic_source",
+            side_effect=inspect_after_mutation,
+        ) as inspection:
+            with self.assertRaisesRegex(
+                IntakeValidationError,
+                "HEIC inspection does not match",
+            ):
+                self.stage_f069_supporting_only(
+                    source=source,
+                    repair_case_id=case_id,
+                )
+        inspection.assert_called_once_with(source)
+        self.assert_no_supporting_only_artifacts(case_id, baseline_objects)
+
+    def test_v3_supporting_only_hardlink_failure_publishes_no_artifacts(self):
+        original = self.root / "source-hardlink.heic"
+        hardlink = self.root / "source-hardlink-link.heic"
+        write_heic(original)
         os.link(original, hardlink)
-        unsafe_sources.append(("hardlink", hardlink))
+        baseline_objects = self.case_evidence_objects()
+        case_id = "case-f069-supporting-hardlink"
 
-        junction_target = self.root / "source-safety-junction-target"
+        with self.assertRaisesRegex(IntakeValidationError, "hard-linked"):
+            self.stage_f069_supporting_only(
+                source=hardlink,
+                repair_case_id=case_id,
+            )
+
+        self.assert_no_supporting_only_artifacts(case_id, baseline_objects)
+
+    def test_v3_supporting_only_reparse_failure_publishes_no_artifacts(self):
+        junction_target = self.root / "source-junction-target"
         junction_target.mkdir()
-        junction_source = junction_target / "source.heic"
-        write_heic(junction_source)
-        junction = self.root / "source-safety-junction"
+        write_heic(junction_target / "source.heic")
+        junction = self.root / "source-junction"
         self.create_directory_link(junction, junction_target)
-        unsafe_sources.append(("reparse", junction / "source.heic"))
+        baseline_objects = self.case_evidence_objects()
+        case_id = "case-f069-supporting-reparse"
 
-        failure_cases = [
-            (
-                "mutation",
-                original,
-                mock.patch(
-                    "scripts.visual_qc.repair_case_library.inspect_heic_source",
-                    side_effect=inspect_after_mutation,
-                ),
-            ),
-            *(
-                (label, path, patcher)
-                for label, path in unsafe_sources
-                for patcher in [nullcontext()]
-            ),
-        ]
-        for label, source, patcher in failure_cases:
-            with self.subTest(label=label), patcher:
-                case_id = f"case-f069-supporting-{label}"
-                with self.assertRaises(IntakeValidationError):
-                    self.stage_f069_supporting_only(
-                        source=source,
-                        repair_case_id=case_id,
-                    )
-                self.assertFalse(
-                    (
-                        self.library
-                        / "cases"
-                        / case_id
-                        / "revisions"
-                        / "0001"
-                        / ".complete"
-                    ).exists()
-                )
-                self.assertEqual(
-                    self.case_evidence_objects(),
-                    baseline_objects,
-                )
+        with self.assertRaisesRegex(IntakeValidationError, "reparse|symlink"):
+            self.stage_f069_supporting_only(
+                source=junction / "source.heic",
+                repair_case_id=case_id,
+            )
+
+        self.assert_no_supporting_only_artifacts(case_id, baseline_objects)
 
     def test_v3_supporting_only_symlink_failure_publishes_no_artifacts(self):
         original = self.root / "source-symlink.heic"
@@ -851,44 +863,76 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
                 repair_case_id=case_id,
             )
 
-        self.assertFalse(
-            (
-                self.library
-                / "cases"
-                / case_id
-                / "revisions"
-                / "0001"
-                / ".complete"
-            ).exists()
-        )
-        self.assertEqual(self.case_evidence_objects(), baseline_objects)
+        self.assert_no_supporting_only_artifacts(case_id, baseline_objects)
 
-    def test_v3_supporting_only_atomic_failure_removes_new_object(self):
-        source = self.root / "atomic-failure.heic"
+    def test_v3_post_link_store_failure_removes_owned_object(self):
+        source = self.root / "post-link-failure.heic"
         write_heic(source)
         baseline_objects = self.case_evidence_objects()
+        case_id = "case-f069-supporting-post-link"
+        linked_objects = []
+
+        def fail_post_link_integrity(path, expected_sha256):
+            linked_objects.append(Path(path))
+            self.assertTrue(Path(path).is_file())
+            raise OSError("simulated post-link integrity failure")
 
         with mock.patch(
-            "scripts.visual_qc.repair_case_library.write_json_atomic",
-            side_effect=OSError("simulated V3 write failure"),
+            "scripts.visual_qc.repair_case_library._assert_stored_object",
+            side_effect=fail_post_link_integrity,
         ):
-            with self.assertRaisesRegex(OSError, "simulated V3 write failure"):
+            with self.assertRaisesRegex(
+                OSError,
+                "simulated post-link integrity failure",
+            ):
                 self.stage_f069_supporting_only(
                     source=source,
-                    repair_case_id="case-f069-supporting-atomic",
+                    repair_case_id=case_id,
                 )
 
-        self.assertFalse(
-            (
-                self.library
-                / "cases"
-                / "case-f069-supporting-atomic"
-                / "revisions"
-                / "0001"
-                / ".complete"
-            ).exists()
-        )
-        self.assertEqual(self.case_evidence_objects(), baseline_objects)
+        self.assertEqual(len(linked_objects), 1)
+        self.assert_no_supporting_only_artifacts(case_id, baseline_objects)
+
+    def test_v3_supporting_only_atomic_failure_removes_new_object(self):
+        from scripts.visual_qc import repair_case_library
+
+        source = self.root / "post-storage-failure.heic"
+        write_heic(source)
+        baseline_objects = self.case_evidence_objects()
+        case_id = "case-f069-supporting-post-storage"
+        stored_objects = []
+        original_store = repair_case_library.store_supporting_evidence
+
+        def record_store(**kwargs):
+            created = original_store(**kwargs)
+            stored_objects.extend(created)
+            self.assertEqual(len(created), 1)
+            self.assertTrue(created[0].is_file())
+            return created
+
+        with (
+            mock.patch(
+                "scripts.visual_qc.repair_case_library.store_supporting_evidence",
+                side_effect=record_store,
+            ) as store_path,
+            mock.patch.object(
+                Path,
+                "rename",
+                side_effect=OSError("simulated post-storage rename failure"),
+            ),
+        ):
+            with self.assertRaisesRegex(
+                OSError,
+                "simulated post-storage rename failure",
+            ):
+                self.stage_f069_supporting_only(
+                    source=source,
+                    repair_case_id=case_id,
+                )
+
+        store_path.assert_called_once()
+        self.assertEqual(len(stored_objects), 1)
+        self.assert_no_supporting_only_artifacts(case_id, baseline_objects)
 
     def test_v2_requires_exact_catalog_model_order(self):
         valid = build_repair_case_revision(
