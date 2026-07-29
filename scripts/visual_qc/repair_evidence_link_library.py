@@ -23,6 +23,7 @@ from scripts.visual_qc.intake import (
 from scripts.visual_qc.repair_case_contract import (
     REPAIR_CASE_SCHEMA_V1,
     REPAIR_CASE_SCHEMA_V2,
+    REPAIR_CASE_SCHEMA_V3,
 )
 from scripts.visual_qc.repair_case_library import validate_repair_case_revision
 from scripts.visual_qc.repair_evidence_engineering import (
@@ -451,7 +452,10 @@ def _case_path_for_reference(library_root: Path, reference: dict) -> Path:
 def _model_identity_resolved(case: dict) -> bool:
     if case["schema_version"] == REPAIR_CASE_SCHEMA_V1:
         return True
-    if case["schema_version"] != REPAIR_CASE_SCHEMA_V2:
+    if case["schema_version"] not in {
+        REPAIR_CASE_SCHEMA_V2,
+        REPAIR_CASE_SCHEMA_V3,
+    }:
         _error("repair case schema version is unsupported")
     value = case.get("boundaries", {}).get("model_identity_resolved")
     if type(value) is not bool:

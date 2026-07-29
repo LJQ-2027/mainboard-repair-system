@@ -8,9 +8,14 @@ import zipfile
 import cv2
 from fastapi.testclient import TestClient
 import numpy as np
+from PIL import Image
+from pillow_heif import from_pillow
 
 from scripts.build_f069_registration import build_dataset
-from scripts.visual_qc.repair_case_contract import FIXED_FALSE_BOUNDARIES
+from scripts.visual_qc.repair_case_contract import (
+    FIXED_FALSE_BOUNDARIES,
+    REPAIR_CASE_SCHEMA_V3,
+)
 from scripts.visual_qc.repair_case_library import (
     stage_repair_case_revision,
     validate_repair_case_revision,
@@ -30,6 +35,25 @@ def encode_image(value):
     if not ok:
         raise RuntimeError("Unable to encode test image.")
     return encoded.tobytes()
+
+
+def write_heic(path, value=120):
+    image = Image.new("RGB", (180, 120), (value, value, value))
+    from_pillow(image).save(path, quality=90)
+
+
+def collect_json_strings(value):
+    strings = []
+    if isinstance(value, dict):
+        for key, child in value.items():
+            strings.append(key)
+            strings.extend(collect_json_strings(child))
+    elif isinstance(value, list):
+        for child in value:
+            strings.extend(collect_json_strings(child))
+    elif isinstance(value, str):
+        strings.append(value)
+    return strings
 
 
 class VisualQcRepairCaseBoundaryTests(unittest.TestCase):
@@ -359,6 +383,155 @@ class VisualQcRepairCaseBoundaryTests(unittest.TestCase):
                     excluded_value=excluded_value,
                 ):
                     self.assertNotIn(excluded_value, serialized)
+
+    def test_v3_supporting_only_heic_never_enters_downstream_surfaces(self):
+        repair_case_id = "case-f069-supporting-only-boundary"
+        evidence_id = "repair-progress-heic"
+        symptom = "无法充电"
+        finding = "维修记录：屏蔽罩内发现异常"
+        source_capture_stage = "维修中"
+        source_board_area = "屏蔽罩内局部"
+        heic_source = self.root / "repair-progress.heic"
+        write_heic(heic_source, value=145)
+        heic_bytes = heic_source.read_bytes()
+        heic_sha256 = hashlib.sha256(heic_bytes).hexdigest()
+        evidence_ref = {
+            "kind": "supporting_evidence",
+            "evidence_id": evidence_id,
+        }
+        record = {
+            "device_identity": {
+                "reported_models": ["TECNO/BG6"],
+                "catalog_models": ["BG6H", "BG6h"],
+                "mapping_status": "unresolved_alias",
+                "resolved_models": [],
+                "resolution_note": None,
+                "evidence_refs": [evidence_ref],
+            },
+            "evidence_mode": "supporting_only",
+            "supporting_evidence_contexts": [
+                {
+                    "evidence_id": evidence_id,
+                    "evidence_role": "repair_in_progress_photo",
+                    "source_capture_stage": source_capture_stage,
+                    "source_board_area": source_board_area,
+                }
+            ],
+            "supporting_evidence_descriptions": {
+                evidence_id: "Milo supplied repair-in-progress HEIC"
+            },
+            "reported_symptoms": [
+                {
+                    "symptom_id": "symptom-unable-to-charge",
+                    "text": symptom,
+                    "source_wording": symptom,
+                    "fault_code": None,
+                    "evidence_refs": [evidence_ref],
+                }
+            ],
+            "findings": [
+                {
+                    "finding_id": "finding-shield-area",
+                    "claim_status": "reported",
+                    "description": finding,
+                    "defect_category": None,
+                    "designator": None,
+                    "side_id": None,
+                    "region": None,
+                    "evidence_refs": [evidence_ref],
+                }
+            ],
+            "repair_actions": [],
+            "outcome": {
+                "status": "unknown",
+                "description": None,
+                "verification_description": None,
+                "evidence_refs": [],
+            },
+            "corrections": [],
+        }
+        revision = stage_repair_case_revision(
+            project_root=ROOT,
+            library_root=self.library,
+            repair_case_id=repair_case_id,
+            board_key="bg6h-f069",
+            package_assignments=[],
+            case_record=record,
+            supporting_assignments=[(evidence_id, heic_source)],
+            previous_manifest_path=None,
+        )
+        payload = validate_repair_case_revision(
+            manifest_path=revision["manifest_path"],
+            project_root=ROOT,
+            library_root=self.library,
+        )
+
+        self.assertEqual(payload["schema_version"], REPAIR_CASE_SCHEMA_V3)
+        self.assertEqual(payload["package_links"], [])
+        self.assertEqual(payload["evidence_mode"], "supporting_only")
+        self.assertEqual(
+            payload["boundaries"],
+            {**FIXED_FALSE_BOUNDARIES, "model_identity_resolved": False},
+        )
+        self.assertEqual(payload["supporting_evidence"][0]["sha256"], heic_sha256)
+
+        settings = VisualQcServerSettings(
+            project_root=ROOT,
+            data_root=self.library / "supporting-only-server-runtime",
+            minimum_free_bytes=0,
+            warning_free_bytes=0,
+            worker_count=0,
+        )
+        app = create_app(settings)
+        with TestClient(app):
+            service = app.state.visual_qc_service
+            counts = service.store.operational_counts()
+            manifest = service.training_manifest()
+            coco = service.training_coco()
+            bundle = service.training_bundle()
+
+            self.assertEqual(counts["cases"]["total"], 0)
+            self.assertEqual(counts["golden_samples"]["active"], 0)
+            self.assertEqual(manifest["cases"], [])
+            self.assertEqual(coco["images"], [])
+            self.assertEqual(coco["annotations"], [])
+
+        forbidden_strings = {
+            repair_case_id,
+            heic_sha256,
+            evidence_id,
+            source_capture_stage,
+            source_board_area,
+            symptom,
+            finding,
+        }
+        with zipfile.ZipFile(bundle) as archive:
+            self.assertEqual(
+                set(archive.namelist()),
+                {"manifest.json", "annotations.coco.json", "bundle-index.json"},
+            )
+            decoded_members = {}
+            for name in sorted(archive.namelist()):
+                raw = archive.read(name)
+                decoded_members[name] = json.loads(raw.decode("utf-8"))
+                self.assertNotIn(heic_bytes, raw, name)
+                for forbidden in forbidden_strings:
+                    with self.subTest(member=name, forbidden=forbidden):
+                        self.assertNotIn(forbidden.encode("utf-8"), raw)
+
+        self.assertEqual(decoded_members["manifest.json"]["cases"], [])
+        self.assertEqual(decoded_members["annotations.coco.json"]["images"], [])
+        self.assertEqual(
+            decoded_members["annotations.coco.json"]["annotations"],
+            [],
+        )
+        for name, decoded in decoded_members.items():
+            traversed_strings = collect_json_strings(decoded)
+            for forbidden in forbidden_strings:
+                with self.subTest(decoded_member=name, forbidden=forbidden):
+                    self.assertFalse(
+                        any(forbidden in value for value in traversed_strings)
+                    )
 
     def test_repository_external_two_revision_rehearsal_preserves_evidence(self):
         note = self.root / "repair-note.txt"

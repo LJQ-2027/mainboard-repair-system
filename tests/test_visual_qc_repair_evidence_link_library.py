@@ -15,7 +15,14 @@ from unittest import mock
 
 import cv2
 import numpy as np
+from PIL import Image
+from pillow_heif import from_pillow
 
+from scripts.visual_qc.repair_case_contract import (
+    REPAIR_CASE_SCHEMA_V1,
+    REPAIR_CASE_SCHEMA_V2,
+    REPAIR_CASE_SCHEMA_V3,
+)
 from scripts.visual_qc.repair_case_library import stage_repair_case_revision
 from scripts.visual_qc.repair_evidence_link_contract import (
     canonical_sha256,
@@ -47,6 +54,11 @@ def encode_image(value: int) -> bytes:
     if not ok:
         raise RuntimeError("Unable to encode test image.")
     return encoded.tobytes()
+
+
+def write_heic(path, value=120):
+    image = Image.new("RGB", (180, 120), (value, value, value))
+    from_pillow(image).save(path, quality=90)
 
 
 def registration_point(x: float, y: float) -> dict:
@@ -687,6 +699,47 @@ class VisualQcRepairEvidenceLinkLibraryTests(unittest.TestCase):
         options.update(overrides)
         return link_library.publish_repair_evidence_link_revision(**options)
 
+    def stage_v3_case(self, *, evidence_mode):
+        record = copy.deepcopy(self.case_record)
+        record["evidence_mode"] = evidence_mode
+        record["supporting_evidence_contexts"] = []
+        package_assignments = [
+            ("after_repair", self.package["source_package_path"])
+        ]
+        supporting_assignments = []
+        if evidence_mode == "supporting_only":
+            evidence_id = "repair-progress-heic"
+            source = self.root / "repair-progress.heic"
+            write_heic(source, value=145)
+            evidence_ref = {
+                "kind": "supporting_evidence",
+                "evidence_id": evidence_id,
+            }
+            record["device_identity"]["evidence_refs"] = [evidence_ref]
+            record["supporting_evidence_contexts"] = [
+                {
+                    "evidence_id": evidence_id,
+                    "evidence_role": "repair_in_progress_photo",
+                    "source_capture_stage": "维修中",
+                    "source_board_area": "屏蔽罩内局部",
+                }
+            ]
+            record["supporting_evidence_descriptions"] = {
+                evidence_id: "Milo supplied repair-in-progress HEIC"
+            }
+            package_assignments = []
+            supporting_assignments = [(evidence_id, source)]
+        return stage_repair_case_revision(
+            project_root=ROOT,
+            library_root=self.library,
+            repair_case_id=f"case-f069-v3-{evidence_mode}",
+            board_key="bg6h-f069",
+            package_assignments=package_assignments,
+            case_record=record,
+            supporting_assignments=supporting_assignments,
+            previous_manifest_path=None,
+        )
+
     def stage_corrected_case(self):
         record = copy.deepcopy(self.case_record)
         record["corrections"] = [
@@ -767,6 +820,138 @@ class VisualQcRepairEvidenceLinkLibraryTests(unittest.TestCase):
         self.assertEqual(
             binding["target"]["engineering"]["geometry_source_status"], "low"
         )
+
+    def test_v3_supporting_only_cannot_bind_physical_evidence(self):
+        supporting_only = self.stage_v3_case(evidence_mode="supporting_only")
+        link_set_id = "link-v3-supporting-only"
+        link_root = (
+            self.library / "repair-evidence-links" / link_set_id / "revisions"
+        )
+
+        with self.assertRaisesRegex(
+            link_library.RepairEvidenceLinkLibraryError,
+            "source package is not linked",
+        ):
+            self.publish(
+                link_set_id=link_set_id,
+                repair_case_manifest_path=supporting_only["manifest_path"],
+            )
+
+        self.assertFalse(any(link_root.rglob(link_library.LINK_MANIFEST_NAME)))
+        self.assertFalse(any(link_root.rglob(".complete")))
+        self.assertEqual(
+            list(link_root.iterdir()) if link_root.exists() else [],
+            [],
+        )
+
+    def test_v3_package_linked_uses_v2_link_flow_and_exact_authority(self):
+        package_linked = self.stage_v3_case(evidence_mode="package_linked")
+        v2_case, _ = link_library._validated_case(
+            manifest_path=self.case["manifest_path"],
+            project_root=ROOT,
+            library_root=self.library,
+        )
+        v3_case, _ = link_library._validated_case(
+            manifest_path=package_linked["manifest_path"],
+            project_root=ROOT,
+            library_root=self.library,
+        )
+        physical = json.loads(self.physical_path.read_text(encoding="utf-8"))
+        package = self.package["validated_source_package"]
+
+        for case in (v2_case, v3_case):
+            link_library._validate_physical_authority(
+                physical,
+                case=case,
+                project_root=ROOT,
+                library_root=self.library,
+            )
+        board_assets = link_library.load_board_asset_context(
+            ROOT,
+            v3_case["board_key"],
+        )
+        compiled = link_library._compile_binding(
+            self.binding(),
+            case=v3_case,
+            board_assets=board_assets,
+            target_cache={},
+        )
+
+        self.assertEqual(v3_case["schema_version"], REPAIR_CASE_SCHEMA_V3)
+        self.assertEqual(
+            physical["qualified_handoff"]["source_package_manifest_sha256"],
+            package["manifest_sha256"],
+        )
+        self.assertEqual(
+            physical["intake"]["entry_id"],
+            package["entries"][0]["entry_id"],
+        )
+        self.assertTrue(compiled["boundaries"]["model_identity_resolved"])
+
+        forged_package = copy.deepcopy(physical)
+        forged_package["qualified_handoff"][
+            "source_package_manifest_sha256"
+        ] = "f" * 64
+        with self.assertRaisesRegex(
+            link_library.RepairEvidenceLinkLibraryError,
+            "source package is not linked",
+        ):
+            link_library._validate_physical_authority(
+                forged_package,
+                case=v3_case,
+                project_root=ROOT,
+                library_root=self.library,
+            )
+
+        forged_entry = copy.deepcopy(physical)
+        forged_entry["intake"]["entry_id"] = "session-after-other-side"
+        with self.assertRaisesRegex(
+            link_library.RepairEvidenceLinkLibraryError,
+            "intake entry is not linked",
+        ):
+            link_library._validate_physical_authority(
+                forged_entry,
+                case=v3_case,
+                project_root=ROOT,
+                library_root=self.library,
+            )
+
+    def test_model_identity_reader_preserves_v1_and_requires_exact_v2_v3_bool(self):
+        self.assertTrue(
+            link_library._model_identity_resolved(
+                {"schema_version": REPAIR_CASE_SCHEMA_V1}
+            )
+        )
+        for schema_version in (REPAIR_CASE_SCHEMA_V2, REPAIR_CASE_SCHEMA_V3):
+            with self.subTest(schema_version=schema_version):
+                self.assertFalse(
+                    link_library._model_identity_resolved(
+                        {
+                            "schema_version": schema_version,
+                            "boundaries": {"model_identity_resolved": False},
+                        }
+                    )
+                )
+                with self.assertRaisesRegex(
+                    link_library.RepairEvidenceLinkLibraryError,
+                    "model identity boundary is invalid",
+                ):
+                    link_library._model_identity_resolved(
+                        {
+                            "schema_version": schema_version,
+                            "boundaries": {"model_identity_resolved": 0},
+                        }
+                    )
+        with self.assertRaisesRegex(
+            link_library.RepairEvidenceLinkLibraryError,
+            "schema version is unsupported",
+        ):
+            link_library._model_identity_resolved(
+                {
+                    "schema_version": "VISUAL-QC-REPAIR-CASE-SOURCE-V999",
+                    "boundaries": {"model_identity_resolved": False},
+                }
+            )
 
     def test_append_only_revision_and_binding_supersession(self):
         first = self.publish()
