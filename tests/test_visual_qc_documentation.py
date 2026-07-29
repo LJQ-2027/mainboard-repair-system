@@ -26,9 +26,69 @@ CASE005_BOUNDARY_EQUIVALENTS = (
     ("not repair causality evidence", "不是维修因果"),
     ("not field accuracy evidence", "不是现场精度"),
 )
+REPAIR_EVIDENCE_DOCUMENTS = (
+    "README.md",
+    "docs/visual-qc-capture-intake-spec-2026-07-20.md",
+    "docs/visual-qc-server-api-2026-07-20.md",
+    "docs/visual-qc-workbench-2026-07-17.md",
+    "docs/visual-qc-f069-first-physical-acceptance-2026-07-24.md",
+)
+REPAIR_EVIDENCE_OWNER_SEQUENCE = (
+    "repair case revision",
+    "export linkable physical evidence",
+    "stage repair evidence link revision",
+    "validate/replay",
+    "sync read-only projection",
+    "inspect in internal workbench",
+)
 
 
 class VisualQcDocumentationTests(unittest.TestCase):
+    def test_canonical_documents_record_current_repair_evidence_link_boundary(self):
+        for relative_path in REPAIR_EVIDENCE_DOCUMENTS:
+            document = (ROOT / relative_path).read_text(encoding="utf-8")
+            normalized = " ".join(document.split())
+            normalized_lower = normalized.lower()
+
+            self.assertIn("2026-07-29", document, relative_path)
+            self.assertIn(
+                "controlled library is the authoritative source of truth",
+                normalized,
+                relative_path,
+            )
+            self.assertIn("read-only projection", normalized, relative_path)
+            self.assertIn("one photo per binding", normalized, relative_path)
+            self.assertIn(
+                "administrator/reviewer detail API",
+                normalized,
+                relative_path,
+            )
+            self.assertIn(
+                "technicians have no repair-evidence detail route",
+                normalized_lower,
+                relative_path,
+            )
+            self.assertIn(
+                "no annotation, QC, Golden Sample, training-label, "
+                "repair-causality, or repair-action authority",
+                normalized,
+                relative_path,
+            )
+            self.assertIn("possibly_related", normalized, relative_path)
+            self.assertIn("not_assessed", normalized, relative_path)
+            self.assertIn(
+                "no visual defect conclusion",
+                normalized,
+                relative_path,
+            )
+            self.assertIn(
+                "Production remains unchanged",
+                normalized,
+                relative_path,
+            )
+            for stage in REPAIR_EVIDENCE_OWNER_SEQUENCE:
+                self.assertIn(stage, normalized, relative_path)
+
     def test_repair_case_documents_record_v2_identity_and_case005_boundaries(self):
         documents = {
             "README.md": (ROOT / "README.md").read_text(encoding="utf-8"),

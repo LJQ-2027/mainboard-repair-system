@@ -70,3 +70,35 @@ Training-ready V2 data requires a valid image hash, a confirmed physical-capture
 The next evidence milestone is one known KM4/F151 bare mainboard photographed on both sides. That sample must be used to recheck registration quality, visible component association, and annotation projection before any visual QC accuracy claim or model training begins.
 
 Synthetic point-map transforms and the 21 reviewed Service Manual images may be used before that gate as explicit proxy evidence. They cannot become Golden Samples or field-accuracy evidence.
+
+## 2026-07-29 Current Supplement: Repair Evidence Links
+
+The controlled library is the authoritative source of truth for each immutable
+repair-evidence-link revision. The server stores only a read-only projection
+that can be rebuilt by validating and replaying that exact library revision.
+The contract enforces one photo per binding; one link revision may contain
+separate bindings for separate photos.
+
+Repair-evidence detail is exposed only through the administrator/reviewer
+detail API. Technicians have no repair-evidence detail route. A binding records
+an evidence association only and carries no annotation, QC, Golden Sample,
+training-label, repair-causality, or repair-action authority.
+
+CASE005 keeps the source-reported U4000 association as `possibly_related` and
+`not_assessed`. It has no visual defect conclusion and does not establish that
+U4000 caused the reported symptom or that any repair action is required.
+
+The owner-operated chain is:
+
+```text
+repair case revision
+-> export linkable physical evidence
+-> stage repair evidence link revision
+-> validate/replay
+-> sync read-only projection
+-> inspect in internal workbench
+```
+
+This implementation and the local CASE005 projection are local evidence only.
+Production remains unchanged at `f278061`; no production deployment, database,
+or route was changed by this work.

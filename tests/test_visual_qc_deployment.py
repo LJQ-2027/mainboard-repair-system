@@ -4,6 +4,29 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
+REPAIR_EVIDENCE_RUNTIME_PATHS = (
+    "assets/visual-qc-workbench/app.js",
+    "assets/visual-qc-workbench/index.html",
+    "assets/visual-qc-workbench/repair-evidence-links.js",
+    "assets/visual-qc-workbench/styles.css",
+    "assets/visual-qc-workbench/visual-qc-server-client.js",
+    "knowledge-base/visual-qc-linkable-physical-evidence-v1-schema.json",
+    "knowledge-base/visual-qc-repair-evidence-link-v1-schema.json",
+    "knowledge-base/visual-qc-repair-evidence-link-list-v1-schema.json",
+    "knowledge-base/visual-qc-repair-evidence-link-detail-v1-schema.json",
+    "scripts/export_visual_qc_linkable_evidence.py",
+    "scripts/stage_visual_qc_repair_evidence_link.py",
+    "scripts/sync_visual_qc_repair_evidence_link.py",
+    "scripts/visual_qc/repair_evidence_engineering.py",
+    "scripts/visual_qc/repair_evidence_export.py",
+    "scripts/visual_qc/repair_evidence_link_contract.py",
+    "scripts/visual_qc/repair_evidence_link_library.py",
+    "scripts/visual_qc/server/api.py",
+    "scripts/visual_qc/server/service.py",
+    "scripts/visual_qc/server/store.py",
+    "scripts/visual_qc/upgrade_preflight.py",
+)
+
 
 class VisualQcDeploymentContractTests(unittest.TestCase):
     def test_runtime_archive_manifest_is_bounded_and_contains_required_services(self):
@@ -41,6 +64,17 @@ class VisualQcDeploymentContractTests(unittest.TestCase):
                 any(entry == excluded or entry.startswith(f"{excluded}/") for entry in entries),
                 excluded,
             )
+
+    def test_repair_evidence_link_runtime_boundary_is_explicit(self):
+        manifest_path = ROOT / "deploy" / "visual-qc-runtime-files.txt"
+        entries = {
+            line.strip()
+            for line in manifest_path.read_text(encoding="utf-8").splitlines()
+            if line.strip() and not line.lstrip().startswith("#")
+        }
+
+        for required in REPAIR_EVIDENCE_RUNTIME_PATHS:
+            self.assertIn(required, entries)
 
     def test_nginx_template_protects_static_app_and_injects_verified_api_identity(self):
         template = (
