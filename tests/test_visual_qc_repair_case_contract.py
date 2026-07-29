@@ -11,6 +11,7 @@ from scripts.visual_qc.repair_case_contract import (
     FIXED_FALSE_BOUNDARIES,
     REPAIR_CASE_SCHEMA_V1,
     REPAIR_CASE_SCHEMA_V2,
+    REPAIR_CASE_SCHEMA_V3,
     REPAIR_CASE_SCHEMA_VERSION,
     REPAIR_CASE_SCHEMA_VERSIONS,
     derive_completeness,
@@ -28,6 +29,11 @@ V2_SCHEMA_PATH = (
     ROOT
     / "knowledge-base"
     / "visual-qc-repair-case-source-v2-schema.json"
+)
+V3_SCHEMA_PATH = (
+    ROOT
+    / "knowledge-base"
+    / "visual-qc-repair-case-source-v3-schema.json"
 )
 CATALOG_MODELS = ["KM4", "KM4 Pro"]
 
@@ -61,6 +67,28 @@ def supporting_evidence():
         "byte_size": 12,
         "sha256": digest,
         "description": "Same-revision case note.",
+    }
+
+
+def heic_supporting_evidence():
+    digest = "d" * 64
+    return {
+        "evidence_id": "repair-photo",
+        "original_filename": "repair.heic",
+        "object_path": f"objects/case-evidence/{digest[:2]}/{digest}.heic",
+        "mime_type": "image/heic",
+        "byte_size": 1024,
+        "sha256": digest,
+        "description": "Owner-supplied repair-in-progress photograph.",
+    }
+
+
+def repair_photo_context():
+    return {
+        "evidence_id": "repair-photo",
+        "evidence_role": "repair_in_progress_photo",
+        "source_capture_stage": "维修中",
+        "source_board_area": "屏蔽罩内局部",
     }
 
 
@@ -130,6 +158,22 @@ def canonical_v2_payload(status="exact_catalog_match"):
     return payload
 
 
+def canonical_v3_supporting_only_payload():
+    payload = canonical_v2_payload("unresolved_alias")
+    payload["schema_version"] = REPAIR_CASE_SCHEMA_V3
+    payload["evidence_mode"] = "supporting_only"
+    payload["package_links"] = []
+    payload["supporting_evidence"] = [heic_supporting_evidence()]
+    payload["supporting_evidence_contexts"] = [repair_photo_context()]
+    payload["device_identity"]["evidence_refs"] = [
+        {
+            "kind": "supporting_evidence",
+            "evidence_id": "repair-photo",
+        }
+    ]
+    return payload
+
+
 def evidence_reference():
     return {
         "kind": "package_entry",
@@ -185,10 +229,15 @@ class VisualQcRepairCaseContractTests(unittest.TestCase):
             "VISUAL-QC-REPAIR-CASE-SOURCE-V2",
         )
         self.assertEqual(
+            REPAIR_CASE_SCHEMA_V3,
+            "VISUAL-QC-REPAIR-CASE-SOURCE-V3",
+        )
+        self.assertEqual(
             REPAIR_CASE_SCHEMA_VERSIONS,
             {
                 REPAIR_CASE_SCHEMA_V1,
                 REPAIR_CASE_SCHEMA_V2,
+                REPAIR_CASE_SCHEMA_V3,
             },
         )
 
@@ -217,6 +266,148 @@ class VisualQcRepairCaseContractTests(unittest.TestCase):
         schema = json.loads(V2_SCHEMA_PATH.read_text(encoding="utf-8"))
         jsonschema.Draft202012Validator.check_schema(schema)
         jsonschema.Draft202012Validator(schema).validate(payload)
+
+    def test_canonical_v3_supporting_only_matches_python_and_schema(self):
+        payload = canonical_v3_supporting_only_payload()
+
+        validated = validate_repair_case_manifest(
+            payload,
+            catalog_models=CATALOG_MODELS,
+        )
+
+        self.assertEqual(validated, payload)
+        self.assertIsNot(validated, payload)
+        schema = json.loads(V3_SCHEMA_PATH.read_text(encoding="utf-8"))
+        jsonschema.Draft202012Validator.check_schema(schema)
+        jsonschema.Draft202012Validator(schema).validate(payload)
+
+    def test_v3_mode_cardinality_rules_match_python_and_schema(self):
+        schema = json.loads(V3_SCHEMA_PATH.read_text(encoding="utf-8"))
+        validator = jsonschema.Draft202012Validator(schema)
+
+        invalid_payloads = []
+
+        with_package = canonical_v3_supporting_only_payload()
+        with_package["package_links"] = [package_link()]
+        invalid_payloads.append((with_package, True))
+
+        without_evidence = canonical_v3_supporting_only_payload()
+        without_evidence["supporting_evidence"] = []
+        invalid_payloads.append((without_evidence, True))
+
+        without_context = canonical_v3_supporting_only_payload()
+        without_context["supporting_evidence_contexts"] = []
+        invalid_payloads.append((without_context, True))
+
+        duplicate_context = canonical_v3_supporting_only_payload()
+        duplicate_context["supporting_evidence_contexts"].append(
+            repair_photo_context()
+        )
+        invalid_payloads.append((duplicate_context, False))
+
+        for payload, schema_rejects in invalid_payloads:
+            with self.subTest(payload=payload):
+                with self.assertRaises(ValueError):
+                    validate_repair_case_manifest(
+                        payload,
+                        catalog_models=CATALOG_MODELS,
+                    )
+                if schema_rejects:
+                    with self.assertRaises(jsonschema.ValidationError):
+                        validator.validate(payload)
+
+        package_linked = canonical_v2_payload("unresolved_alias")
+        package_linked["schema_version"] = REPAIR_CASE_SCHEMA_V3
+        package_linked["evidence_mode"] = "package_linked"
+        package_linked["supporting_evidence_contexts"] = []
+        self.assertEqual(
+            validate_repair_case_manifest(
+                package_linked,
+                catalog_models=CATALOG_MODELS,
+            ),
+            package_linked,
+        )
+        validator.validate(package_linked)
+
+    def test_v3_rejects_context_and_mode_mutation_matrix(self):
+        schema = json.loads(V3_SCHEMA_PATH.read_text(encoding="utf-8"))
+        validator = jsonschema.Draft202012Validator(schema)
+        mutations = []
+
+        unknown_mode = canonical_v3_supporting_only_payload()
+        unknown_mode["evidence_mode"] = "unknown"
+        mutations.append((unknown_mode, True))
+
+        unknown_context_field = canonical_v3_supporting_only_payload()
+        unknown_context_field["supporting_evidence_contexts"][0][
+            "unexpected"
+        ] = True
+        mutations.append((unknown_context_field, True))
+
+        dangling_context = canonical_v3_supporting_only_payload()
+        dangling_context["supporting_evidence_contexts"][0][
+            "evidence_id"
+        ] = "missing-photo"
+        mutations.append((dangling_context, False))
+
+        duplicate_context = canonical_v3_supporting_only_payload()
+        second_context = repair_photo_context()
+        second_context["source_capture_stage"] = "维修后复核"
+        duplicate_context["supporting_evidence_contexts"].append(second_context)
+        mutations.append((duplicate_context, False))
+
+        whitespace_stage = canonical_v3_supporting_only_payload()
+        whitespace_stage["supporting_evidence_contexts"][0][
+            "source_capture_stage"
+        ] = "   "
+        mutations.append((whitespace_stage, True))
+
+        non_image_role = canonical_v3_supporting_only_payload()
+        non_image_role["supporting_evidence"] = [supporting_evidence()]
+        non_image_role["supporting_evidence"][0]["evidence_id"] = "repair-photo"
+        non_image_role["device_identity"]["evidence_refs"][0][
+            "evidence_id"
+        ] = "repair-photo"
+        mutations.append((non_image_role, False))
+
+        for payload, schema_rejects in mutations:
+            with self.subTest(
+                mode=payload["evidence_mode"],
+                context=payload["supporting_evidence_contexts"],
+            ):
+                with self.assertRaises(ValueError):
+                    validate_repair_case_manifest(
+                        payload,
+                        catalog_models=CATALOG_MODELS,
+                    )
+                if schema_rejects:
+                    with self.assertRaises(jsonschema.ValidationError):
+                        validator.validate(payload)
+
+    def test_heic_supporting_evidence_remains_v3_only(self):
+        for version, schema_path in (
+            (REPAIR_CASE_SCHEMA_V1, SCHEMA_PATH),
+            (REPAIR_CASE_SCHEMA_V2, V2_SCHEMA_PATH),
+        ):
+            payload = (
+                canonical_payload()
+                if version == REPAIR_CASE_SCHEMA_V1
+                else canonical_v2_payload()
+            )
+            payload["supporting_evidence"] = [heic_supporting_evidence()]
+            with self.subTest(version=version):
+                with self.assertRaisesRegex(ValueError, "MIME type"):
+                    validate_repair_case_manifest(
+                        payload,
+                        catalog_models=(
+                            None
+                            if version == REPAIR_CASE_SCHEMA_V1
+                            else CATALOG_MODELS
+                        ),
+                    )
+                schema = json.loads(schema_path.read_text(encoding="utf-8"))
+                with self.assertRaises(jsonschema.ValidationError):
+                    jsonschema.Draft202012Validator(schema).validate(payload)
 
     def test_supporting_evidence_rejects_whitespace_only_original_filename(self):
         payload = canonical_v2_payload()

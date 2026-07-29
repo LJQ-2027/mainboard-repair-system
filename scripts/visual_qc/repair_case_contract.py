@@ -13,12 +13,15 @@ from scripts.visual_qc.repair_case_identity import (
 
 REPAIR_CASE_SCHEMA_V1 = "VISUAL-QC-REPAIR-CASE-SOURCE-V1"
 REPAIR_CASE_SCHEMA_V2 = "VISUAL-QC-REPAIR-CASE-SOURCE-V2"
+REPAIR_CASE_SCHEMA_V3 = "VISUAL-QC-REPAIR-CASE-SOURCE-V3"
 REPAIR_CASE_SCHEMA_VERSION = REPAIR_CASE_SCHEMA_V1
 REPAIR_CASE_SCHEMA_VERSIONS = {
     REPAIR_CASE_SCHEMA_V1,
     REPAIR_CASE_SCHEMA_V2,
+    REPAIR_CASE_SCHEMA_V3,
 }
 SOURCE_ORIGIN = "milo_supplied"
+EVIDENCE_MODES = {"package_linked", "supporting_only"}
 CASE_ROLES = {
     "before_repair",
     "after_repair",
@@ -58,6 +61,10 @@ MIME_EXTENSIONS = {
     "image/png": ".png",
     "image/jpeg": ".jpg",
 }
+MIME_EXTENSIONS_V3 = {
+    **MIME_EXTENSIONS,
+    "image/heic": ".heic",
+}
 MAX_SUPPORTING_FILE_BYTES = 100 * 1024 * 1024
 MAX_SUPPORTING_FILES = 50
 
@@ -81,6 +88,10 @@ COMMON_MANIFEST_FIELDS = {
 }
 V1_MANIFEST_FIELDS = COMMON_MANIFEST_FIELDS | {"device_models"}
 V2_MANIFEST_FIELDS = COMMON_MANIFEST_FIELDS | {"device_identity"}
+V3_MANIFEST_FIELDS = V2_MANIFEST_FIELDS | {
+    "evidence_mode",
+    "supporting_evidence_contexts",
+}
 MANIFEST_FIELDS = V1_MANIFEST_FIELDS
 PACKAGE_LINK_FIELDS = {
     "package_id",
@@ -98,6 +109,13 @@ SUPPORTING_EVIDENCE_FIELDS = {
     "sha256",
     "description",
 }
+SUPPORTING_EVIDENCE_CONTEXT_FIELDS = {
+    "evidence_id",
+    "evidence_role",
+    "source_capture_stage",
+    "source_board_area",
+}
+SUPPORTING_EVIDENCE_ROLES = {"repair_in_progress_photo"}
 SYMPTOM_FIELDS = {
     "symptom_id",
     "text",
@@ -220,9 +238,20 @@ def _validate_region(value, label: str) -> None:
         raise ValueError(f"{label} must be a normalized region.")
 
 
-def _validate_package_links(value) -> tuple[set[tuple[str, str]], set[str]]:
-    if not isinstance(value, list) or not value or len(value) > 100:
-        raise ValueError("package_links must contain 1 to 100 records.")
+def _validate_package_links(
+    value,
+    *,
+    allow_empty: bool = False,
+) -> tuple[set[tuple[str, str]], set[str]]:
+    if (
+        not isinstance(value, list)
+        or (not allow_empty and not value)
+        or len(value) > 100
+    ):
+        minimum = 0 if allow_empty else 1
+        raise ValueError(
+            f"package_links must contain {minimum} to 100 records."
+        )
     targets: set[tuple[str, str]] = set()
     package_ids: set[str] = set()
     for index, raw in enumerate(value):
@@ -254,10 +283,15 @@ def _validate_package_links(value) -> tuple[set[tuple[str, str]], set[str]]:
     return targets, package_ids
 
 
-def _validate_supporting_evidence(value) -> set[str]:
+def _validate_supporting_evidence(
+    value,
+    *,
+    allowed_mime_extensions: dict[str, str] = MIME_EXTENSIONS,
+) -> tuple[set[str], dict[str, str]]:
     if not isinstance(value, list) or len(value) > MAX_SUPPORTING_FILES:
         raise ValueError("supporting_evidence exceeds its record limit.")
     evidence_ids: set[str] = set()
+    evidence_mime_types: dict[str, str] = {}
     for index, raw in enumerate(value):
         evidence = _expect_object(
             raw,
@@ -275,9 +309,12 @@ def _validate_supporting_evidence(value) -> set[str]:
         ):
             raise ValueError("original_filename is invalid.")
         mime_type = evidence["mime_type"]
-        if not isinstance(mime_type, str) or mime_type not in MIME_EXTENSIONS:
+        if (
+            not isinstance(mime_type, str)
+            or mime_type not in allowed_mime_extensions
+        ):
             raise ValueError("supporting evidence MIME type is invalid.")
-        extension = MIME_EXTENSIONS[mime_type]
+        extension = allowed_mime_extensions[mime_type]
         byte_size = evidence["byte_size"]
         if (
             isinstance(byte_size, bool)
@@ -293,7 +330,46 @@ def _validate_supporting_evidence(value) -> set[str]:
         if evidence["object_path"] != expected_path:
             raise ValueError("supporting evidence object_path is invalid.")
         _required_text(evidence["description"], "supporting evidence description")
-    return evidence_ids
+        evidence_mime_types[evidence_id] = mime_type
+    return evidence_ids, evidence_mime_types
+
+
+def _validate_supporting_evidence_contexts(
+    value,
+    *,
+    supporting_targets: set[str],
+    supporting_mime_types: dict[str, str],
+    require_complete_coverage: bool,
+) -> None:
+    if not isinstance(value, list) or len(value) > MAX_SUPPORTING_FILES:
+        raise ValueError("supporting_evidence_contexts exceeds its record limit.")
+    context_ids: set[str] = set()
+    image_mime_types = {"image/png", "image/jpeg", "image/heic"}
+    for index, raw in enumerate(value):
+        context = _expect_object(
+            raw,
+            SUPPORTING_EVIDENCE_CONTEXT_FIELDS,
+            f"supporting_evidence_contexts[{index}]",
+        )
+        evidence_id = _safe_id(context["evidence_id"], "evidence_id")
+        if evidence_id not in supporting_targets:
+            raise ValueError("supporting evidence context does not resolve.")
+        _unique_id(evidence_id, context_ids, "supporting evidence context")
+        if not _is_allowed_string(
+            context["evidence_role"],
+            SUPPORTING_EVIDENCE_ROLES,
+        ):
+            raise ValueError("supporting evidence role is invalid.")
+        _required_text(context["source_capture_stage"], "source_capture_stage")
+        _required_text(context["source_board_area"], "source_board_area")
+        if supporting_mime_types[evidence_id] not in image_mime_types:
+            raise ValueError(
+                "repair_in_progress_photo requires image supporting evidence."
+            )
+    if require_complete_coverage and context_ids != supporting_targets:
+        raise ValueError(
+            "supporting_only requires context for every supporting evidence."
+        )
 
 
 def _validate_evidence_refs(
@@ -375,11 +451,11 @@ def validate_repair_case_manifest(
         REPAIR_CASE_SCHEMA_VERSIONS,
     ):
         raise ValueError("schema_version is invalid.")
-    manifest_fields = (
-        V1_MANIFEST_FIELDS
-        if schema_version == REPAIR_CASE_SCHEMA_V1
-        else V2_MANIFEST_FIELDS
-    )
+    manifest_fields = {
+        REPAIR_CASE_SCHEMA_V1: V1_MANIFEST_FIELDS,
+        REPAIR_CASE_SCHEMA_V2: V2_MANIFEST_FIELDS,
+        REPAIR_CASE_SCHEMA_V3: V3_MANIFEST_FIELDS,
+    }[schema_version]
     manifest = _expect_object(
         payload,
         manifest_fields,
@@ -411,14 +487,47 @@ def validate_repair_case_manifest(
             model = _required_text(model, "device model")
             _unique_id(model, seen_models, "device model")
 
-    package_targets, _ = _validate_package_links(manifest["package_links"])
-    supporting_targets = _validate_supporting_evidence(
-        manifest["supporting_evidence"]
+    evidence_mode = "package_linked"
+    if schema_version == REPAIR_CASE_SCHEMA_V3:
+        evidence_mode = manifest["evidence_mode"]
+        if not _is_allowed_string(evidence_mode, EVIDENCE_MODES):
+            raise ValueError("evidence_mode is invalid.")
+
+    package_targets, _ = _validate_package_links(
+        manifest["package_links"],
+        allow_empty=evidence_mode == "supporting_only",
     )
+    supporting_targets, supporting_mime_types = _validate_supporting_evidence(
+        manifest["supporting_evidence"],
+        allowed_mime_extensions=(
+            MIME_EXTENSIONS_V3
+            if schema_version == REPAIR_CASE_SCHEMA_V3
+            else MIME_EXTENSIONS
+        ),
+    )
+    if schema_version == REPAIR_CASE_SCHEMA_V3:
+        if evidence_mode == "supporting_only":
+            if manifest["package_links"]:
+                raise ValueError("supporting_only forbids package links.")
+            if not manifest["supporting_evidence"]:
+                raise ValueError("supporting_only requires supporting evidence.")
+        _validate_supporting_evidence_contexts(
+            manifest["supporting_evidence_contexts"],
+            supporting_targets=supporting_targets,
+            supporting_mime_types=supporting_mime_types,
+            require_complete_coverage=evidence_mode == "supporting_only",
+        )
     identity = None
-    if schema_version == REPAIR_CASE_SCHEMA_V2:
+    if schema_version in {REPAIR_CASE_SCHEMA_V2, REPAIR_CASE_SCHEMA_V3}:
         if catalog_models is None:
-            raise ValueError("catalog_models is required for V2 manifests.")
+            version_label = (
+                "V2"
+                if schema_version == REPAIR_CASE_SCHEMA_V2
+                else "V3"
+            )
+            raise ValueError(
+                f"catalog_models is required for {version_label} manifests."
+            )
         identity = validate_device_identity(
             manifest["device_identity"],
             catalog_models=catalog_models,
