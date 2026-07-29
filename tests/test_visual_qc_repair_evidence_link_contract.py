@@ -1027,10 +1027,11 @@ class VisualQcRepairEvidenceLinkContractTests(unittest.TestCase):
             "invalid_revision",
         )
 
-    def test_repair_case_references_structurally_accept_publisher_derived_v1_v2(self):
+    def test_repair_case_reference_versions_have_runtime_schema_parity(self):
         for version in (
             "VISUAL-QC-REPAIR-CASE-SOURCE-V1",
             "VISUAL-QC-REPAIR-CASE-SOURCE-V2",
+            "VISUAL-QC-REPAIR-CASE-SOURCE-V3",
         ):
             payload = link_manifest()
             payload["repair_case_references"][0]["schema_version"] = version
@@ -1042,6 +1043,17 @@ class VisualQcRepairEvidenceLinkContractTests(unittest.TestCase):
                 jsonschema.Draft202012Validator(self.link_schema).validate(
                     payload
                 )
+
+        unknown = link_manifest()
+        unknown["repair_case_references"][0][
+            "schema_version"
+        ] = "VISUAL-QC-REPAIR-CASE-SOURCE-V999"
+        self.assertBothReject(
+            unknown,
+            contract.validate_repair_evidence_link_manifest,
+            self.link_schema,
+            "invalid_schema_version",
+        )
 
         duplicate = link_manifest()
         duplicate["repair_case_references"].append(

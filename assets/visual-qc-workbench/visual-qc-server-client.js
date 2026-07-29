@@ -351,7 +351,7 @@ function validManifest(value) {
     const good = exactKeys(item, ['repair_case_reference_id', 'repair_case_id', 'revision', 'schema_version', 'manifest_sha256', 'board_key', 'board_id'])
     && isSafeId(item.repair_case_reference_id) && isSafeId(item.repair_case_id) && Number.isInteger(item.revision) && item.revision > 0
     && item.board_key === board.board_key && item.board_id === board.board_id
-    && ['VISUAL-QC-REPAIR-CASE-SOURCE-V1', 'VISUAL-QC-REPAIR-CASE-SOURCE-V2'].includes(item.schema_version) && hash(item.manifest_sha256)
+    && ['VISUAL-QC-REPAIR-CASE-SOURCE-V1', 'VISUAL-QC-REPAIR-CASE-SOURCE-V2', 'VISUAL-QC-REPAIR-CASE-SOURCE-V3'].includes(item.schema_version) && hash(item.manifest_sha256)
     && !repairCaseReferenceIds.has(item.repair_case_reference_id);
     if (good) repairCaseReferenceIds.add(item.repair_case_reference_id);
     return good;

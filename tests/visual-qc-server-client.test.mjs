@@ -90,7 +90,9 @@ function repairEvidenceSummary() {
   };
 }
 
-function repairEvidenceDetail() {
+function repairEvidenceDetail(
+  repairCaseSchemaVersion = 'VISUAL-QC-REPAIR-CASE-SOURCE-V2',
+) {
   const hash = (value) => value.repeat(64);
   const boundaries = {
     visual_defect_confirmed: false, qc_annotation_created: false, golden_approved: false,
@@ -107,19 +109,68 @@ function repairEvidenceDetail() {
     manifest: {
       schema_version: 'VISUAL-QC-REPAIR-EVIDENCE-LINK-V1', link_set_id: 'link-case005-f069-after',
       revision: 1, previous_manifest_sha256: null, source_origin: 'codex_operator',
-      repair_case_references: [{ repair_case_reference_id: 'case005-r1', repair_case_id: 'case-005-bg6-f069', revision: 1, schema_version: 'VISUAL-QC-REPAIR-CASE-SOURCE-V2', manifest_sha256: hash('b'), board_key: 'bg6h-f069', board_id: 'BOARD-F069-MAIN-V1.2' }],
+      repair_case_references: [{ repair_case_reference_id: 'case005-r1', repair_case_id: 'case-005-bg6-f069', revision: 1, schema_version: repairCaseSchemaVersion, manifest_sha256: hash('b'), board_key: 'bg6h-f069', board_id: 'BOARD-F069-MAIN-V1.2' }],
       board: { board_key: 'bg6h-f069', board_id: 'BOARD-F069-MAIN-V1.2', catalog_asset: { path: 'knowledge-base/repair-workbench-boards.json', sha256: hash('c'), entry_sha256: hash('d') }, compiled_sources: [{ kind: 'cross_source_dataset', path: 'knowledge-base/f069-cross-source-registration.json', sha256: hash('e') }], board_snapshot_sha256: hash('f') },
       physical_evidence: [{
         schema_version: 'VISUAL-QC-LINKABLE-PHYSICAL-EVIDENCE-V1', physical_evidence_id: 'case005-main-page-2', server_case_id: 'vqc-page-2', intake: { batch_id: 'batch-1', entry_id: 'entry-1' }, board_key: 'bg6h-f069', board_id: 'BOARD-F069-MAIN-V1.2', side_id: 'main_page_2', capture_stage: 'after_repair', evidence_role: 'physical_capture', qualified_handoff: { schema_version: 'VISUAL-QC-QUALIFIED-HANDOFF-PROVENANCE-V1', handoff_schema_version: 'VISUAL-QC-PHYSICAL-HANDOFF-V1', source_package_manifest_sha256: hash('1'), archived_intake_manifest_sha256: hash('2'), acceptance_report_sha256: hash('3'), acceptance_action: 'manual_registration_required', registration_review_required: true, field_accuracy_claim_allowed: false }, qualified_handoff_sha256: hash('4'), image_id: 'img-page-2', image_sha256: hash('5'), job_id: 'job-page-2', registration_review_id: 'regrev-page-2', registration: { method: 'reviewed_manual_four_point', board_to_image_matrix: [1,0,0,0,1,0,0,0,1], solve_anchors: [{ board: { x: 0, y: 0 }, image: { x: 0, y: 0 } }, { board: { x: 1, y: 0 }, image: { x: 1, y: 0 } }, { board: { x: 1, y: 1 }, image: { x: 1, y: 1 } }, { board: { x: 0, y: 1 }, image: { x: 0, y: 1 } }], independent_check_points: [{ board: { x: 0.5, y: 0.5 }, image: { x: 0.5, y: 0.5 } }], error: { count: 1, rms: 0, maximum: 0 } }, physical_evidence_snapshot_sha256: hash('6'),
       }],
       bindings: [{
         binding_id: 'case005-emmc-u4000-page-2', repair_case_reference_id: 'case005-r1', source_fact: { kind: 'finding', fact_id: 'case005-reported-emmc-fault', display: { text: 'EMMC坏', claim_status: 'reported' }, fact_sha256: hash('7') },
-        target: { kind: 'designator', side_id: 'main_page_2', engineering: { component_id: 'F069-MAIN-U4000', designator: 'U4000', technician_category: 'storage', location: { kind: 'normalized_point', point: { x: 0.542, y: 0.669 } }, evidence_descriptors: ['storage'], geometry_source_status: 'low', semantic_identity_proven: false, engineering_snapshot_sha256: hash('8') } }, physical_evidence_id: 'case005-main-page-2', association_status: 'possibly_related', visibility_status: 'not_assessed', evidence_bases: [{ kind: 'repair_case_fact' }], supersedes_binding_id: null, boundaries: { ...boundaries, model_identity_resolved: false },
+        target: { kind: 'designator', side_id: 'main_page_2', engineering: { component_id: 'F069-MAIN-U4000', designator: 'U4000', technician_category: 'storage', location: { kind: 'normalized_point', point: { x: 0.542, y: 0.669 } }, evidence_descriptors: ['storage'], geometry_source_status: 'low', semantic_identity_proven: false, engineering_snapshot_sha256: hash('8') } }, physical_evidence_id: 'case005-main-page-2', association_status: 'possibly_related', visibility_status: 'not_assessed', evidence_bases: [{ kind: 'repair_case_fact' }], supersedes_binding_id: null, boundaries: { ...boundaries, model_identity_resolved: repairCaseSchemaVersion === 'VISUAL-QC-REPAIR-CASE-SOURCE-V1' },
       }],
       boundaries,
     },
   };
 }
+
+test('repair evidence detail accepts V1 V2 V3 package-linked references and rejects unknown versions', async () => {
+  const originalFetch = globalThis.fetch;
+  try {
+    for (const version of [
+      'VISUAL-QC-REPAIR-CASE-SOURCE-V1',
+      'VISUAL-QC-REPAIR-CASE-SOURCE-V2',
+      'VISUAL-QC-REPAIR-CASE-SOURCE-V3',
+    ]) {
+      globalThis.fetch = async () => ({
+        ok: true,
+        status: 200,
+        json: async () => repairEvidenceDetail(version),
+      });
+      const detail = await getRepairEvidenceLinkDetail(
+        '/api',
+        'owner-001',
+        'reviewer',
+        'link-case005-f069-after',
+        1,
+      );
+      assert.equal(
+        detail.manifest.repair_case_references[0].schema_version,
+        version,
+      );
+      assert.equal(detail.manifest.physical_evidence.length, 1);
+    }
+
+    globalThis.fetch = async () => ({
+      ok: true,
+      status: 200,
+      json: async () => repairEvidenceDetail(
+        'VISUAL-QC-REPAIR-CASE-SOURCE-V999',
+      ),
+    });
+    await assert.rejects(
+      getRepairEvidenceLinkDetail(
+        '/api',
+        'owner-001',
+        'reviewer',
+        'link-case005-f069-after',
+        1,
+      ),
+      { code: 'invalid_repair_evidence_detail' },
+    );
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
 
 test('repair evidence client uses reviewer-only headers and preserves list filters', async () => {
   const originalFetch = globalThis.fetch;
