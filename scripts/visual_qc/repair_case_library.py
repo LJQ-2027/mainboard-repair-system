@@ -758,6 +758,49 @@ def _validate_revision_transition(
         raise IntakeValidationError(
             "repair case revision changes historical identity"
         )
+    previous_version = previous["schema_version"]
+    current_version = current["schema_version"]
+    if (
+        previous_version == REPAIR_CASE_SCHEMA_V3
+        and current_version != REPAIR_CASE_SCHEMA_V3
+    ):
+        raise IntakeValidationError("V3 repair case downgrade is not allowed")
+    if (
+        current_version == REPAIR_CASE_SCHEMA_V3
+        and previous_version in {REPAIR_CASE_SCHEMA_V1, REPAIR_CASE_SCHEMA_V2}
+        and current["evidence_mode"] != "package_linked"
+    ):
+        raise IntakeValidationError(
+            "V1/V2 to V3 repair case upgrade requires package_linked "
+            "evidence mode"
+        )
+    if previous_version == REPAIR_CASE_SCHEMA_V3:
+        if current["evidence_mode"] != previous["evidence_mode"]:
+            raise IntakeValidationError(
+                "repair case revision changes historical evidence mode"
+            )
+        _assert_prefix(
+            previous["supporting_evidence_contexts"],
+            current["supporting_evidence_contexts"],
+            "supporting evidence contexts",
+        )
+        appended_evidence_ids = {
+            evidence["evidence_id"]
+            for evidence in current["supporting_evidence"][
+                len(previous["supporting_evidence"]) :
+            ]
+        }
+        appended_context_ids = {
+            context["evidence_id"]
+            for context in current["supporting_evidence_contexts"][
+                len(previous["supporting_evidence_contexts"]) :
+            ]
+        }
+        if not appended_context_ids.issubset(appended_evidence_ids):
+            raise IntakeValidationError(
+                "new supporting evidence context requires consistently "
+                "appended evidence"
+            )
     _assert_prefix(
         previous["package_links"],
         current["package_links"],
@@ -783,8 +826,6 @@ def _validate_revision_transition(
     ):
         _assert_prefix(previous[field], current[field], field)
 
-    previous_version = previous["schema_version"]
-    current_version = current["schema_version"]
     if previous_version == REPAIR_CASE_SCHEMA_V1:
         if current_version == REPAIR_CASE_SCHEMA_V1:
             if current["device_models"] != previous["device_models"]:
@@ -919,7 +960,6 @@ def _prepare_repair_case_revision(
     new_supporting = [copy.deepcopy(item["record"]) for item in inspected]
     supporting = new_supporting
     if previous is not None:
-        _assert_prefix(previous["package_links"], links, "package links")
         prior_ids = {
             item["evidence_id"] for item in previous["supporting_evidence"]
         }

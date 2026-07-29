@@ -2263,6 +2263,474 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
         self.assertEqual(validated["revision"], 2)
         self.assertEqual(validated["schema_version"], REPAIR_CASE_SCHEMA_V2)
 
+    def test_supporting_only_mode_is_immutable_across_v3_revisions(self):
+        source = self.root / "immutable-mode.heic"
+        write_heic(source, value=131)
+        case_id = "case-f069-v3-immutable-mode"
+        first = self.stage_f069_supporting_only(
+            source=source,
+            repair_case_id=case_id,
+        )
+        manifest_bytes = first["manifest_path"].read_bytes()
+        manifest_sha256 = hashlib.sha256(manifest_bytes).hexdigest()
+        payload = json.loads(manifest_bytes.decode("utf-8"))
+        evidence_path = self.library / payload["supporting_evidence"][0]["object_path"]
+        evidence_bytes = evidence_path.read_bytes()
+        evidence_sha256 = hashlib.sha256(evidence_bytes).hexdigest()
+        package_linked = copy.deepcopy(self.v3_supporting_only_record())
+        package_linked["evidence_mode"] = "package_linked"
+        package_linked["supporting_evidence_descriptions"] = {}
+
+        with self.assertRaisesRegex(IntakeValidationError, "evidence mode"):
+            self.stage_f069_supporting_only(
+                source=source,
+                repair_case_id=case_id,
+                case_record=package_linked,
+                package_assignments=[
+                    ("after_repair", self.f069_package()["source_package_path"])
+                ],
+                supporting_assignments=[],
+                previous_manifest_path=first["manifest_path"],
+            )
+
+        self.assertFalse((first["manifest_path"].parents[1] / "0002").exists())
+        self.assertEqual(first["manifest_path"].read_bytes(), manifest_bytes)
+        self.assertEqual(
+            hashlib.sha256(first["manifest_path"].read_bytes()).hexdigest(),
+            manifest_sha256,
+        )
+        self.assertEqual(evidence_path.read_bytes(), evidence_bytes)
+        self.assertEqual(
+            hashlib.sha256(evidence_path.read_bytes()).hexdigest(),
+            evidence_sha256,
+        )
+
+    def test_disk_validator_skips_package_resolution_for_supporting_only(self):
+        source = self.root / "disk-supporting-only.heic"
+        write_heic(source, value=132)
+        created = self.stage_f069_supporting_only(source=source)
+
+        with mock.patch(
+            "scripts.visual_qc.repair_case_library.resolve_package_links",
+            side_effect=AssertionError("package resolution must be skipped"),
+        ) as resolver:
+            validated = validate_repair_case_revision(
+                manifest_path=created["manifest_path"],
+                project_root=ROOT,
+                library_root=self.library,
+            )
+
+        resolver.assert_not_called()
+        self.assertEqual(validated["package_links"], [])
+        self.assertEqual(validated["evidence_mode"], "supporting_only")
+
+    def test_v1_v2_to_v3_require_package_linked(self):
+        for prior_version in (REPAIR_CASE_SCHEMA_V1, REPAIR_CASE_SCHEMA_V2):
+            with self.subTest(prior_version=prior_version):
+                case_id = f"case-f069-{prior_version[-2:].lower()}-to-v3"
+                prior_record = (
+                    self.case_record(device_models=["BG6H", "BG6h"])
+                    if prior_version == REPAIR_CASE_SCHEMA_V1
+                    else self.v2_case_record(self.exact_f069_identity())
+                )
+                first = self.stage_f069_case(
+                    repair_case_id=case_id,
+                    case_record=prior_record,
+                )
+                prior_bytes = first["manifest_path"].read_bytes()
+                prior_sha256 = hashlib.sha256(prior_bytes).hexdigest()
+                source = self.root / f"{case_id}.heic"
+                write_heic(source, value=133)
+
+                with self.assertRaisesRegex(
+                    IntakeValidationError,
+                    "package_linked|evidence mode",
+                ):
+                    self.stage_f069_supporting_only(
+                        source=source,
+                        repair_case_id=case_id,
+                        previous_manifest_path=first["manifest_path"],
+                    )
+
+                self.assertFalse(
+                    (first["manifest_path"].parents[1] / "0002").exists()
+                )
+                self.assertEqual(first["manifest_path"].read_bytes(), prior_bytes)
+                self.assertEqual(
+                    hashlib.sha256(first["manifest_path"].read_bytes()).hexdigest(),
+                    prior_sha256,
+                )
+
+                upgraded = self.stage_f069_case(
+                    repair_case_id=case_id,
+                    case_record={
+                        **self.v2_case_record(self.exact_f069_identity()),
+                        "evidence_mode": "package_linked",
+                        "supporting_evidence_contexts": [],
+                    },
+                    previous_manifest_path=first["manifest_path"],
+                )
+                self.assertEqual(upgraded["schema_version"], REPAIR_CASE_SCHEMA_V3)
+                self.assertEqual(upgraded["evidence_mode"], "package_linked")
+                self.assertEqual(first["manifest_path"].read_bytes(), prior_bytes)
+
+    def test_v3_cannot_downgrade(self):
+        case_id = "case-f069-v3-no-downgrade"
+        first = self.stage_f069_case(
+            repair_case_id=case_id,
+            case_record={
+                **self.v2_case_record(self.exact_f069_identity()),
+                "evidence_mode": "package_linked",
+                "supporting_evidence_contexts": [],
+            },
+        )
+        prior_bytes = first["manifest_path"].read_bytes()
+        prior_sha256 = hashlib.sha256(prior_bytes).hexdigest()
+
+        with self.assertRaisesRegex(
+            IntakeValidationError,
+            "V3 repair case downgrade is not allowed",
+        ):
+            self.stage_f069_case(
+                repair_case_id=case_id,
+                case_record=self.v2_case_record(
+                    self.exact_f069_identity(),
+                    reported_symptoms=[
+                        {
+                            "symptom_id": "symptom-new",
+                            "text": "New source context.",
+                            "source_wording": None,
+                            "fault_code": None,
+                            "evidence_refs": [],
+                        }
+                    ],
+                ),
+                previous_manifest_path=first["manifest_path"],
+            )
+
+        self.assertFalse((first["manifest_path"].parents[1] / "0002").exists())
+        self.assertEqual(first["manifest_path"].read_bytes(), prior_bytes)
+        self.assertEqual(
+            hashlib.sha256(first["manifest_path"].read_bytes()).hexdigest(),
+            prior_sha256,
+        )
+
+    def test_v3_contexts_are_append_only(self):
+        source = self.root / "context-first.heic"
+        appended_source = self.root / "context-second.heic"
+        write_heic(source, value=134)
+        write_heic(appended_source, value=135)
+        case_id = "case-f069-v3-context-prefix"
+        first = self.stage_f069_supporting_only(
+            source=source,
+            repair_case_id=case_id,
+        )
+        prior_bytes = first["manifest_path"].read_bytes()
+        prior_sha256 = hashlib.sha256(prior_bytes).hexdigest()
+        payload = json.loads(prior_bytes.decode("utf-8"))
+        evidence_path = self.library / payload["supporting_evidence"][0]["object_path"]
+        evidence_bytes = evidence_path.read_bytes()
+        evidence_sha256 = hashlib.sha256(evidence_bytes).hexdigest()
+        revised = copy.deepcopy(self.v3_supporting_only_record())
+        revised["supporting_evidence_contexts"][0]["source_board_area"] = (
+            "改写后的区域"
+        )
+        revised["supporting_evidence_contexts"].append(
+            {
+                "evidence_id": "repair-photo-2",
+                "evidence_role": "repair_in_progress_photo",
+                "source_capture_stage": "维修中",
+                "source_board_area": "主板局部",
+            }
+        )
+        revised["supporting_evidence_descriptions"] = {
+            "repair-photo-2": "Second repair-in-progress photograph"
+        }
+
+        with self.assertRaisesRegex(
+            IntakeValidationError,
+            "historical supporting evidence contexts",
+        ):
+            self.stage_f069_supporting_only(
+                source=appended_source,
+                repair_case_id=case_id,
+                case_record=revised,
+                supporting_assignments=[("repair-photo-2", appended_source)],
+                previous_manifest_path=first["manifest_path"],
+            )
+
+        self.assertFalse((first["manifest_path"].parents[1] / "0002").exists())
+        self.assertEqual(first["manifest_path"].read_bytes(), prior_bytes)
+        self.assertEqual(evidence_path.read_bytes(), evidence_bytes)
+        self.assertEqual(
+            hashlib.sha256(first["manifest_path"].read_bytes()).hexdigest(),
+            prior_sha256,
+        )
+        self.assertEqual(
+            hashlib.sha256(evidence_path.read_bytes()).hexdigest(),
+            evidence_sha256,
+        )
+
+    def test_v3_cannot_rewrite_mode_heic_or_context_wording(self):
+        source = self.root / "rewrite-history.heic"
+        write_heic(source, value=136)
+        case_id = "case-f069-v3-rewrite-history"
+        first = self.stage_f069_supporting_only(
+            source=source,
+            repair_case_id=case_id,
+        )
+        manifest_path = first["manifest_path"]
+        manifest_bytes = manifest_path.read_bytes()
+        manifest_sha256 = hashlib.sha256(manifest_bytes).hexdigest()
+        payload = json.loads(manifest_bytes.decode("utf-8"))
+        evidence_path = self.library / payload["supporting_evidence"][0]["object_path"]
+        evidence_bytes = evidence_path.read_bytes()
+        evidence_sha256 = hashlib.sha256(evidence_bytes).hexdigest()
+
+        for field, value, error in (
+            ("evidence_mode", "package_linked", "evidence mode"),
+            (
+                "supporting_evidence_contexts",
+                [
+                    {
+                        **payload["supporting_evidence_contexts"][0],
+                        "source_capture_stage": "改写阶段",
+                    }
+                ],
+                "supporting evidence contexts",
+            ),
+        ):
+            with self.subTest(field=field):
+                changed = copy.deepcopy(self.v3_supporting_only_record())
+                changed[field] = value
+                changed["supporting_evidence_descriptions"] = {}
+                supporting_assignments = []
+                if field == "supporting_evidence_contexts":
+                    appended_source = self.root / "rewrite-context-appended.heic"
+                    write_heic(appended_source, value=137)
+                    changed["supporting_evidence_contexts"].append(
+                        {
+                            "evidence_id": "repair-photo-2",
+                            "evidence_role": "repair_in_progress_photo",
+                            "source_capture_stage": "维修中",
+                            "source_board_area": "主板局部",
+                        }
+                    )
+                    changed["supporting_evidence_descriptions"] = {
+                        "repair-photo-2": "Appended repair photograph"
+                    }
+                    supporting_assignments = [
+                        ("repair-photo-2", appended_source)
+                    ]
+                with self.assertRaisesRegex(IntakeValidationError, error):
+                    self.stage_f069_supporting_only(
+                        source=source,
+                        repair_case_id=case_id,
+                        case_record=changed,
+                        package_assignments=(
+                            [
+                                (
+                                    "after_repair",
+                                    self.f069_package()["source_package_path"],
+                                )
+                            ]
+                            if field == "evidence_mode"
+                            else []
+                        ),
+                        supporting_assignments=supporting_assignments,
+                        previous_manifest_path=manifest_path,
+                    )
+                self.assertFalse((manifest_path.parents[1] / "0002").exists())
+                self.assertEqual(manifest_path.read_bytes(), manifest_bytes)
+                self.assertEqual(evidence_path.read_bytes(), evidence_bytes)
+
+        tampered = bytearray(evidence_bytes)
+        tampered[-1] ^= 1
+        evidence_path.write_bytes(tampered)
+        with self.assertRaisesRegex(IntakeValidationError, "integrity mismatch"):
+            validate_repair_case_revision(
+                manifest_path=manifest_path,
+                project_root=ROOT,
+                library_root=self.library,
+            )
+        evidence_path.write_bytes(evidence_bytes)
+        self.assertEqual(
+            hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
+            manifest_sha256,
+        )
+        self.assertEqual(
+            hashlib.sha256(evidence_path.read_bytes()).hexdigest(),
+            evidence_sha256,
+        )
+
+    def test_v3_new_context_requires_consistent_appended_evidence(self):
+        source = self.root / "consistent-context.jpg"
+        source.write_bytes(encode_image(".jpg", value=137))
+        case_id = "case-f069-v3-consistent-context"
+        first_record = {
+            **self.v2_case_record(
+                self.exact_f069_identity(),
+                supporting_evidence_descriptions={
+                    "historical-note": "Historical supporting evidence"
+                },
+            ),
+            "evidence_mode": "package_linked",
+            "supporting_evidence_contexts": [],
+        }
+        first = self.stage_f069_case(
+            repair_case_id=case_id,
+            case_record=first_record,
+            supporting=[("historical-note", source)],
+        )
+        prior_bytes = first["manifest_path"].read_bytes()
+        prior_sha256 = hashlib.sha256(prior_bytes).hexdigest()
+        payload = json.loads(prior_bytes.decode("utf-8"))
+        evidence_path = self.library / payload["supporting_evidence"][0]["object_path"]
+        evidence_bytes = evidence_path.read_bytes()
+        evidence_sha256 = hashlib.sha256(evidence_bytes).hexdigest()
+        changed = copy.deepcopy(first_record)
+        changed["supporting_evidence_descriptions"] = {}
+        changed["supporting_evidence_contexts"] = [
+            {
+                "evidence_id": "historical-note",
+                "evidence_role": "repair_in_progress_photo",
+                "source_capture_stage": "维修中",
+                "source_board_area": "主板局部",
+            }
+        ]
+
+        with self.assertRaisesRegex(
+            IntakeValidationError,
+            "new supporting evidence context.*appended evidence",
+        ):
+            self.stage_f069_case(
+                repair_case_id=case_id,
+                case_record=changed,
+                supporting_assignments=[],
+                previous_manifest_path=first["manifest_path"],
+            )
+
+        self.assertFalse((first["manifest_path"].parents[1] / "0002").exists())
+        self.assertEqual(first["manifest_path"].read_bytes(), prior_bytes)
+        self.assertEqual(evidence_path.read_bytes(), evidence_bytes)
+        self.assertEqual(
+            hashlib.sha256(first["manifest_path"].read_bytes()).hexdigest(),
+            prior_sha256,
+        )
+        self.assertEqual(
+            hashlib.sha256(evidence_path.read_bytes()).hexdigest(),
+            evidence_sha256,
+        )
+
+    def test_v3_disk_validation_rejects_changed_object_context_or_manifest(self):
+        source = self.root / "disk-history-first.heic"
+        appended_source = self.root / "disk-history-second.heic"
+        write_heic(source, value=138)
+        write_heic(appended_source, value=139)
+        case_id = "case-f069-v3-disk-history"
+        first = self.stage_f069_supporting_only(
+            source=source,
+            repair_case_id=case_id,
+        )
+        revised = copy.deepcopy(self.v3_supporting_only_record())
+        revised["supporting_evidence_contexts"].append(
+            {
+                "evidence_id": "repair-photo-2",
+                "evidence_role": "repair_in_progress_photo",
+                "source_capture_stage": "维修中",
+                "source_board_area": "主板局部",
+            }
+        )
+        revised["supporting_evidence_descriptions"] = {
+            "repair-photo-2": "Second repair-in-progress photograph"
+        }
+        second = self.stage_f069_supporting_only(
+            source=appended_source,
+            repair_case_id=case_id,
+            case_record=revised,
+            supporting_assignments=[("repair-photo-2", appended_source)],
+            previous_manifest_path=first["manifest_path"],
+        )
+        first_bytes = first["manifest_path"].read_bytes()
+        second_bytes = second["manifest_path"].read_bytes()
+        first_sha256 = hashlib.sha256(first_bytes).hexdigest()
+        second_sha256 = hashlib.sha256(second_bytes).hexdigest()
+        second_payload = json.loads(second_bytes.decode("utf-8"))
+        object_path = (
+            self.library
+            / second_payload["supporting_evidence"][1]["object_path"]
+        )
+        object_bytes = object_path.read_bytes()
+        object_sha256 = hashlib.sha256(object_bytes).hexdigest()
+
+        object_path.write_bytes(object_bytes + b"tamper")
+        with self.assertRaisesRegex(IntakeValidationError, "integrity mismatch"):
+            validate_repair_case_revision(
+                manifest_path=second["manifest_path"],
+                project_root=ROOT,
+                library_root=self.library,
+            )
+        object_path.write_bytes(object_bytes)
+
+        for mutation, error in (
+            (
+                lambda value: value["supporting_evidence_contexts"][0].update(
+                    source_board_area="改写区域"
+                ),
+                "historical supporting evidence contexts",
+            ),
+            (
+                lambda value: value.update(
+                    evidence_mode="package_linked",
+                    package_links=resolve_package_links(
+                        project_root=ROOT,
+                        library_root=self.library,
+                        assignments=[
+                            (
+                                "after_repair",
+                                self.f069_package()["source_package_path"],
+                            )
+                        ],
+                        board_key="bg6h-f069",
+                    ),
+                ),
+                "evidence mode",
+            ),
+        ):
+            with self.subTest(error=error):
+                changed_payload = json.loads(second_bytes.decode("utf-8"))
+                mutation(changed_payload)
+                try:
+                    second["manifest_path"].write_bytes(
+                        (json.dumps(changed_payload, indent=2) + "\n").encode(
+                            "utf-8"
+                        )
+                    )
+                    with self.assertRaisesRegex(IntakeValidationError, error):
+                        validate_repair_case_revision(
+                            manifest_path=second["manifest_path"],
+                            project_root=ROOT,
+                            library_root=self.library,
+                        )
+                finally:
+                    second["manifest_path"].write_bytes(second_bytes)
+
+        self.assertEqual(first["manifest_path"].read_bytes(), first_bytes)
+        self.assertEqual(second["manifest_path"].read_bytes(), second_bytes)
+        self.assertEqual(object_path.read_bytes(), object_bytes)
+        self.assertEqual(
+            hashlib.sha256(first["manifest_path"].read_bytes()).hexdigest(),
+            first_sha256,
+        )
+        self.assertEqual(
+            hashlib.sha256(second["manifest_path"].read_bytes()).hexdigest(),
+            second_sha256,
+        )
+        self.assertEqual(
+            hashlib.sha256(object_path.read_bytes()).hexdigest(),
+            object_sha256,
+        )
+
     def test_disk_validator_rejects_tampered_v2_identity_boundary_and_catalog(self):
         mutators = {
             "identity": lambda payload: payload["device_identity"].update(
