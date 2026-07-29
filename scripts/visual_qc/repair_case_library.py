@@ -404,6 +404,81 @@ def _retry_created_object_cleanup(
     return failures
 
 
+def _remove_revision_directories(
+    paths: list[Path],
+    *,
+    revisions_root: Path,
+) -> tuple[bool, list[tuple[str, Exception]]]:
+    candidates = list(dict.fromkeys(Path(path) for path in paths))
+    failures = []
+    for path in candidates:
+        if not path.exists():
+            continue
+        try:
+            shutil.rmtree(path)
+        except Exception as exc:
+            failures.append(
+                (f"repair case revision removal failed: {path}", exc)
+            )
+
+    if failures:
+        return False, failures
+
+    remaining = [path for path in candidates if path.exists()]
+    if remaining:
+        failures.append(
+            (
+                "repair case revision absence check failed",
+                IntakeValidationError(
+                    "repair case revision remains after removal"
+                ),
+            )
+        )
+        return False, failures
+
+    try:
+        _fsync_directory(revisions_root)
+    except Exception as exc:
+        failures.append(("repair case revisions fsync failed", exc))
+        return False, failures
+
+    remaining = [path for path in candidates if path.exists()]
+    if remaining:
+        failures.append(
+            (
+                "repair case revision durable absence check failed",
+                IntakeValidationError(
+                    "repair case revision reappeared after removal"
+                ),
+            )
+        )
+        return False, failures
+    return True, failures
+
+
+def _has_committed_completion_marker(target: Path) -> bool:
+    marker = target / ".complete"
+    try:
+        metadata = marker.lstat()
+    except FileNotFoundError:
+        return False
+    except OSError as exc:
+        raise IntakeValidationError(
+            "unable to inspect repair case completion marker"
+        ) from exc
+    if (
+        not stat.S_ISREG(metadata.st_mode)
+        or _is_reparse_or_symlink(marker)
+    ):
+        return False
+    try:
+        return marker.read_bytes() == b"complete\n"
+    except OSError as exc:
+        raise IntakeValidationError(
+            "unable to read repair case completion marker"
+        ) from exc
+
+
 def store_supporting_evidence(
     *,
     library_root: Path,
@@ -1157,7 +1232,7 @@ def stage_repair_case_revision(
             _assert_controlled_path(
                 library_root, controlled_path, label
             )
-        if target.exists():
+        if target.exists() and _has_committed_completion_marker(target):
             existing = validate_repair_case_revision(
                 manifest_path=manifest_path,
                 project_root=project_root,
@@ -1176,6 +1251,17 @@ def stage_repair_case_revision(
                 payload=existing,
                 manifest_sha256=existing_sha256,
             )
+        if target.exists():
+            recovered, recovery_failures = _remove_revision_directories(
+                [target],
+                revisions_root=revisions_root,
+            )
+            if not recovered:
+                primary = IntakeValidationError(
+                    "unable to recover incomplete repair case revision"
+                )
+                _add_cleanup_notes(primary, recovery_failures)
+                raise primary from recovery_failures[0][1]
 
         completed = sorted(
             path
@@ -1217,26 +1303,23 @@ def stage_repair_case_revision(
             _fsync_directory(target)
             _fsync_directory(revisions_root)
         except Exception as primary:
-            cleanup_failures = []
-            if target.exists():
-                try:
-                    shutil.rmtree(target)
-                except Exception as exc:
-                    cleanup_failures.append(
-                        ("repair case revision removal failed", exc)
-                    )
-                try:
-                    _fsync_directory(revisions_root)
-                except Exception as exc:
-                    cleanup_failures.append(
-                        ("repair case revisions fsync failed", exc)
-                    )
-            cleanup_failures.extend(
-                _retry_created_object_cleanup(
-                    created_objects,
-                    label="supporting evidence rollback",
-                )
+            revision_absent, cleanup_failures = _remove_revision_directories(
+                [target, temporary],
+                revisions_root=revisions_root,
             )
+            if revision_absent:
+                cleanup_failures.extend(
+                    _retry_created_object_cleanup(
+                        created_objects,
+                        label="supporting evidence rollback",
+                    )
+                )
+            elif created_objects and hasattr(primary, "add_note"):
+                primary.add_note(
+                    "supporting evidence retained because revision absence "
+                    "was not durably confirmed: "
+                    + ", ".join(str(path) for path in created_objects)
+                )
             if cleanup_failures:
                 _add_cleanup_notes(primary, cleanup_failures)
                 if created_objects and hasattr(primary, "add_note"):
