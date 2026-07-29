@@ -100,7 +100,7 @@ Production `f278061` is not targeted.
 - Create: `knowledge-base/visual-qc-linkable-physical-evidence-v1-schema.json`
 - Create: `knowledge-base/visual-qc-repair-evidence-link-v1-schema.json`
 
-- [ ] **Step 1: Write failing canonical contract tests**
+- [x] **Step 1: Write failing canonical contract tests**
 
 Create helpers with exact V1 shapes:
 
@@ -298,7 +298,7 @@ fixture must use the reserved fact ID `outcome`; any other outcome fact ID
 fails closed. Claim status is copied only when the selected source object
 contains it.
 
-- [ ] **Step 2: Run the contract tests and verify RED**
+- [x] **Step 2: Run the contract tests and verify RED**
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest `
@@ -308,7 +308,7 @@ contains it.
 Expected: import failure because `repair_evidence_link_contract` does not
 exist.
 
-- [ ] **Step 3: Implement canonical hashing and exact validators**
+- [x] **Step 3: Implement canonical hashing and exact validators**
 
 Create public functions `canonical_json_bytes(value: object) -> bytes`,
 `canonical_sha256(value: object) -> str`,
@@ -349,7 +349,7 @@ FIXED_LINK_BOUNDARIES = {
 Bindings contain the same fields plus derived
 `model_identity_resolved`.
 
-- [ ] **Step 4: Add exact Draft 2020-12 schemas**
+- [x] **Step 4: Add exact Draft 2020-12 schemas**
 
 The physical schema must close the complete qualified-handoff and physical
 snapshot objects. The link schema must encode:
@@ -370,7 +370,7 @@ with a normalized rectangle or polygon, and `designator` with the reviewed
 engineering snapshot. Do not reference mutable external schema files; copy the
 small qualified-handoff definition.
 
-- [ ] **Step 5: Verify Python and JSON Schema parity**
+- [x] **Step 5: Verify Python and JSON Schema parity**
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest `
@@ -379,7 +379,7 @@ small qualified-handoff definition.
 
 Expected: all canonical and invalid parity cases pass.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```powershell
 git add `
@@ -398,7 +398,7 @@ git commit -m "feat: define repair evidence link contract"
 - Create: `scripts/visual_qc/repair_evidence_export.py`
 - Create: `scripts/export_visual_qc_linkable_evidence.py`
 
-- [ ] **Step 1: Write failing normalization tests**
+- [x] **Step 1: Write failing normalization tests**
 
 Build one V3 admin-case fixture containing qualified handoff, image, succeeded
 job, and reviewed manual registration. Assert:
@@ -435,7 +435,7 @@ detail may contain unrelated `server_qc_review`, Golden, or candidate fields;
 the exporter must ignore them and must not copy them into the reduced physical
 snapshot.
 
-- [ ] **Step 2: Run and verify RED**
+- [x] **Step 2: Run and verify RED**
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest `
@@ -444,7 +444,7 @@ snapshot.
 
 Expected: import failure.
 
-- [ ] **Step 3: Implement the pure exporter**
+- [x] **Step 3: Implement the pure exporter**
 
 Create `build_linkable_physical_evidence(server_case: dict, *,
 physical_evidence_id: str) -> dict`. It must reject any response other than
@@ -457,7 +457,7 @@ The function must copy only the fields named by the V1 design, canonicalize the
 complete qualified-handoff object, and call
 `validate_physical_evidence_snapshot` before returning.
 
-- [ ] **Step 4: Write failing owner-CLI tests**
+- [x] **Step 4: Write failing owner-CLI tests**
 
 Patch the HTTP reader with a deterministic V3 fixture. Assert the command:
 
@@ -478,7 +478,7 @@ milo-visual-data-operator` without a credential file is accepted only with
 `--allow-http-localhost` and a loopback host; the same credentialless mode is
 rejected for non-loopback and HTTPS remote hosts.
 
-- [ ] **Step 5: Implement the CLI and verify**
+- [x] **Step 5: Implement the CLI and verify**
 
 Use the same credential JSON shape and localhost policy as the existing
 handoff/import tools. Keep HTTP code in the CLI module and evidence
@@ -492,7 +492,7 @@ normalization in `repair_evidence_export.py`.
 
 Expected: all tests pass and stderr is empty on success.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```powershell
 git add `
@@ -510,7 +510,7 @@ git commit -m "feat: export linkable physical evidence"
 - Create: `scripts/visual_qc/repair_evidence_engineering.py`
 - Create: `scripts/visual_qc/repair_evidence_link_library.py`
 
-- [ ] **Step 1: Write failing engineering snapshot tests**
+- [x] **Step 1: Write failing engineering snapshot tests**
 
 Resolve `bg6h-f069` and U4000. Assert:
 
@@ -535,7 +535,7 @@ polygon `board_region` fixtures; accept finite normalized coordinates on the
 declared side and reject out-of-range, degenerate, self-intersecting, or
 opposite-side geometry.
 
-- [ ] **Step 2: Run and verify RED**
+- [x] **Step 2: Run and verify RED**
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest `
@@ -544,7 +544,7 @@ opposite-side geometry.
 
 Expected: import failure.
 
-- [ ] **Step 3: Implement deterministic engineering resolution**
+- [x] **Step 3: Implement deterministic engineering resolution**
 
 Expose `resolve_board_asset_snapshot(project_root: Path, board_key: str) ->
 dict` and `resolve_engineering_target(*, project_root: Path, board_key: str,
@@ -561,7 +561,7 @@ source status. Derive `semantic_identity_proven` only from explicit evidence
 descriptors or an exact source-fact designator match; never from the display
 name alone.
 
-- [ ] **Step 4: Write failing library publication tests**
+- [x] **Step 4: Write failing library publication tests**
 
 Use a repository-external temporary library with:
 
@@ -590,7 +590,7 @@ and one `existing`. Repeat with conflicting bytes and assert exactly one
 revision is complete while the loser reports conflict and leaves no temporary
 or partial revision.
 
-- [ ] **Step 5: Implement the link library**
+- [x] **Step 5: Implement the link library**
 
 Create these exact public APIs:
 
@@ -625,7 +625,7 @@ existing safe publication primitives. The input binding record contains only
 selectors and statuses; the builder derives repair-case fact snapshots,
 engineering snapshots, physical snapshots, boundaries, and all hashes.
 
-- [ ] **Step 6: Run and verify**
+- [x] **Step 6: Run and verify**
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest `
@@ -635,7 +635,7 @@ engineering snapshots, physical snapshots, boundaries, and all hashes.
 
 Expected: all tests pass.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```powershell
 git add `
@@ -652,7 +652,7 @@ git commit -m "feat: publish repair evidence links"
 - Create: `tests/test_visual_qc_repair_evidence_link_boundaries.py`
 - Create: `scripts/stage_visual_qc_repair_evidence_link.py`
 
-- [ ] **Step 1: Write failing CLI tests**
+- [x] **Step 1: Write failing CLI tests**
 
 Invoke the command directly with:
 
@@ -686,7 +686,7 @@ Exact replay returns `state=existing`; duplicate JSON keys, inference flags,
 both output and error text, unsafe IDs, and incomplete arguments fail before
 creating the link root.
 
-- [ ] **Step 2: Write failing boundary tests**
+- [x] **Step 2: Write failing boundary tests**
 
 Publish a real-shaped link in a temporary library, then assert its IDs, hash,
 fact text, and manifest bytes are absent from:
@@ -700,7 +700,7 @@ fact text, and manifest bytes are absent from:
 - model-specific repair output;
 - repair-case manifest history.
 
-- [ ] **Step 3: Run and verify RED**
+- [x] **Step 3: Run and verify RED**
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest `
@@ -710,13 +710,13 @@ fact text, and manifest bytes are absent from:
 
 Expected: CLI module missing.
 
-- [ ] **Step 4: Implement the CLI**
+- [x] **Step 4: Implement the CLI**
 
 Use strict duplicate-key JSON loading and compact typed output. The CLI may
 select explicit facts and targets but must expose no model-normalization,
 defect-confirmation, annotation, QC, Golden, training, or repair-action flag.
 
-- [ ] **Step 5: Verify and commit**
+- [x] **Step 5: Verify and commit**
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest `
@@ -741,7 +741,7 @@ git commit -m "feat: stage repair evidence links"
 - Modify: `scripts/visual_qc/server/api.py`
 - Modify: `tests/test_visual_qc_maintenance.py`
 
-- [ ] **Step 1: Write failing migration and store tests**
+- [x] **Step 1: Write failing migration and store tests**
 
 Assert a new database creates:
 
@@ -776,7 +776,7 @@ Migration must be additive and old databases remain readable. Store tests must
 prove exact idempotency, conflict rejection, transaction rollback, latest
 revision listing, and linked-case retention exclusion.
 
-- [ ] **Step 2: Run and verify RED**
+- [x] **Step 2: Run and verify RED**
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest `
@@ -785,7 +785,7 @@ revision listing, and linked-case retention exclusion.
 
 Expected: missing tables/methods.
 
-- [ ] **Step 3: Implement additive storage**
+- [x] **Step 3: Implement additive storage**
 
 Add these exact store APIs:
 
@@ -805,7 +805,7 @@ Detail returns the stored immutable JSON or `None`.
 Modify retention selection to exclude every referenced server case and report
 `repair_evidence_link_present` in maintenance audit output.
 
-- [ ] **Step 4: Write failing service/API tests**
+- [x] **Step 4: Write failing service/API tests**
 
 Test exact routes:
 
@@ -830,7 +830,7 @@ Assertions:
 - no link field appears in technician case detail;
 - no link changes annotation, QC, Golden, or training counts.
 
-- [ ] **Step 5: Implement service/API and response schemas**
+- [x] **Step 5: Implement service/API and response schemas**
 
 Add Pydantic request:
 
@@ -862,7 +862,7 @@ the stored canonical JSON.
 List responses contain no source text or canonical manifest. Detail returns
 canonical content only through the admin route.
 
-- [ ] **Step 6: Run server and maintenance tests**
+- [x] **Step 6: Run server and maintenance tests**
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest `
@@ -874,7 +874,7 @@ canonical content only through the admin route.
 
 Expected: all pass.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```powershell
 git add `
@@ -894,7 +894,7 @@ git commit -m "feat: project repair evidence links"
 - Create: `tests/test_sync_visual_qc_repair_evidence_link_cli.py`
 - Create: `scripts/sync_visual_qc_repair_evidence_link.py`
 
-- [ ] **Step 1: Write failing synchronization tests**
+- [x] **Step 1: Write failing synchronization tests**
 
 Patch the HTTP transport and assert:
 
@@ -922,7 +922,7 @@ milo-visual-data-operator` without a credential file succeeds only for a
 loopback host with `--allow-http-localhost`; credentialless remote requests
 fail before network access.
 
-- [ ] **Step 2: Run and verify RED**
+- [x] **Step 2: Run and verify RED**
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest `
@@ -931,7 +931,7 @@ fail before network access.
 
 Expected: script missing.
 
-- [ ] **Step 3: Implement and verify**
+- [x] **Step 3: Implement and verify**
 
 Use standard-library HTTP and the same credential/path safety rules as the
 existing handoff tools. Print only IDs, revision, hash, and projection state.
@@ -944,7 +944,7 @@ existing handoff tools. Print only IDs, revision, hash, and projection state.
 
 Expected: all pass.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```powershell
 git add `
@@ -963,7 +963,7 @@ git commit -m "feat: sync repair evidence links"
 - Modify: `assets/visual-qc-workbench/visual-qc-server-client.js`
 - Modify: `assets/visual-qc-workbench/app.js`
 
-- [ ] **Step 1: Write failing pure presentation tests**
+- [x] **Step 1: Write failing pure presentation tests**
 
 Test:
 
@@ -987,7 +987,7 @@ Also prove:
 - selecting a binding does not mutate annotations, QC result, Golden state, or
   registration.
 
-- [ ] **Step 2: Run Node test and verify RED**
+- [x] **Step 2: Run Node test and verify RED**
 
 ```powershell
 node --test tests/visual-qc-repair-evidence-links.test.mjs
@@ -995,7 +995,7 @@ node --test tests/visual-qc-repair-evidence-links.test.mjs
 
 Expected: module missing.
 
-- [ ] **Step 3: Implement pure link presentation**
+- [x] **Step 3: Implement pure link presentation**
 
 Export `repairEvidenceBindingView(binding, detail)`,
 `activeRepairEvidenceBindings(detail)`, and
@@ -1007,7 +1007,7 @@ geometry, or `null`; it never manufactures package dimensions.
 
 Return data only; do not access DOM or app state.
 
-- [ ] **Step 4: Write failing server-client tests**
+- [x] **Step 4: Write failing server-client tests**
 
 Extend `tests/visual-qc-server-client.test.mjs` or the new module to assert:
 
@@ -1017,7 +1017,7 @@ Extend `tests/visual-qc-server-client.test.mjs` or the new module to assert:
 - redacted list cannot be used as canonical detail;
 - target case ID and side are preserved.
 
-- [ ] **Step 5: Implement client functions**
+- [x] **Step 5: Implement client functions**
 
 Add `listRepairEvidenceLinks(apiBase, actorId, actorRole, filters)` and
 `getRepairEvidenceLinkDetail(apiBase, actorId, actorRole, linkSetId,
@@ -1027,7 +1027,7 @@ return parsed immutable data. The list function accepts only
 `serverCaseId`/`repairCaseId`; the detail function percent-encodes both path
 segments.
 
-- [ ] **Step 6: Add the compact evidence panel**
+- [x] **Step 6: Add the compact evidence panel**
 
 Place `维修案例证据` after registration review and before comparison/annotation.
 It needs:
@@ -1041,7 +1041,7 @@ It needs:
 
 Do not add browser editing controls.
 
-- [ ] **Step 7: Wire location without QC mutation**
+- [x] **Step 7: Wire location without QC mutation**
 
 When a binding references another server case, reuse the existing admin-case
 restore path. After the correct case loads:
@@ -1053,7 +1053,7 @@ restore path. After the correct case loads:
 - disable location if detail health is not active or board-asset identity
   differs.
 
-- [ ] **Step 8: Run Node suites**
+- [x] **Step 8: Run Node suites**
 
 ```powershell
 node --test `
@@ -1065,7 +1065,7 @@ node --test `
 
 Expected: all pass.
 
-- [ ] **Step 9: Run headed browser QA**
+- [x] **Step 9: Run headed browser QA**
 
 Use the Chrome skill first. If the extension path is unavailable after the
 documented health check, use Playwright fallback.
@@ -1083,7 +1083,7 @@ Verify desktop `1600x1000` and mobile `390x844`:
   badges and `定位`, no overlap, no horizontal overflow, no console errors,
   and nonblank canvases.
 
-- [ ] **Step 10: Commit**
+- [x] **Step 10: Commit**
 
 ```powershell
 git add `
@@ -1109,7 +1109,7 @@ git commit -m "feat: navigate repair evidence links"
 - Publish:
   `G:/Programming/_Data/Visual-QC-Controlled-Source/library/repair-evidence-links/link-case005-f069-after/revisions/0001/repair-evidence-link.json`
 
-- [ ] **Step 1: Export both exact physical snapshots**
+- [x] **Step 1: Export both exact physical snapshots**
 
 Use the existing local integration server and exact case IDs:
 
@@ -1138,7 +1138,7 @@ Basic Auth secret. The export CLI supports this credentialless actor mode only
 when `--allow-http-localhost` is set and the host is loopback. Remote or
 production use still requires the existing external credential mechanism.
 
-- [ ] **Step 2: Reinspect visibility and create the exact binding-record input**
+- [x] **Step 2: Reinspect visibility and create the exact binding-record input**
 
 Before writing JSON, re-hash and open the exact working derivatives:
 
@@ -1232,7 +1232,7 @@ After that prerequisite, create the three-binding input:
 
 The binding record contains no narrative observation and no defect inference.
 
-- [ ] **Step 3: Publish revision 1 and replay**
+- [x] **Step 3: Publish revision 1 and replay**
 
 ```powershell
 .\.venv\Scripts\python.exe scripts\stage_visual_qc_repair_evidence_link.py `
@@ -1247,7 +1247,7 @@ The binding record contains no narrative observation and no defect inference.
 First run must return `created`; exact replay must return `existing` with the
 same SHA-256 and no modified evidence bytes.
 
-- [ ] **Step 4: Synchronize to the isolated local server**
+- [x] **Step 4: Synchronize to the isolated local server**
 
 ```powershell
 .\.venv\Scripts\python.exe scripts\sync_visual_qc_repair_evidence_link.py `
@@ -1261,7 +1261,7 @@ same SHA-256 and no modified evidence bytes.
 Replay must return existing. Re-read list/detail, validate response schemas,
 and confirm projection state `active`.
 
-- [ ] **Step 5: Verify real workbench behavior**
+- [x] **Step 5: Verify real workbench behavior**
 
 Open the local workbench, restore page 1, select the no-power binding, then
 navigate to the U4000 candidate. Confirm:
@@ -1286,7 +1286,7 @@ navigate to the U4000 candidate. Confirm:
 - Modify: `docs/visual-qc-workbench-2026-07-17.md`
 - Modify: `docs/visual-qc-f069-first-physical-acceptance-2026-07-24.md`
 
-- [ ] **Step 1: Write failing runtime/documentation assertions**
+- [x] **Step 1: Write failing runtime/documentation assertions**
 
 Require every new runtime module, script, schema, and workbench asset in the
 bounded runtime manifest. Require canonical docs to state:
@@ -1298,7 +1298,7 @@ bounded runtime manifest. Require canonical docs to state:
 - admin-only detail and no technician route;
 - production remains unchanged.
 
-- [ ] **Step 2: Run and verify RED**
+- [x] **Step 2: Run and verify RED**
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest `
@@ -1308,7 +1308,7 @@ bounded runtime manifest. Require canonical docs to state:
 
 Expected: missing runtime paths and wording.
 
-- [ ] **Step 3: Update runtime and canonical documentation**
+- [x] **Step 3: Update runtime and canonical documentation**
 
 Preserve historical dated statements. Document the new owner sequence:
 
@@ -1323,7 +1323,7 @@ repair case revision
 
 Do not describe local implementation as production deployment.
 
-- [ ] **Step 4: Run focused Python verification**
+- [x] **Step 4: Run focused Python verification**
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest `
@@ -1342,7 +1342,7 @@ Do not describe local implementation as production deployment.
 
 Expected: all pass.
 
-- [ ] **Step 5: Run full Python and Node suites**
+- [x] **Step 5: Run full Python and Node suites**
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest discover -s tests
@@ -1351,7 +1351,7 @@ node --test (Get-ChildItem tests -Filter *.test.mjs | ForEach-Object FullName)
 
 Expected: all pass.
 
-- [ ] **Step 6: Run compile, schema, encoding, and source audits**
+- [x] **Step 6: Run compile, schema, encoding, and source audits**
 
 ```powershell
 .\.venv\Scripts\python.exe -m py_compile `
@@ -1448,7 +1448,7 @@ the real link validates as revision 1, both historical hashes remain exact,
 the link hash is recorded in closeout evidence, and the controlled source
 audit reports `healthy`.
 
-- [ ] **Step 7: Final independent code and evidence review**
+- [x] **Step 7: Final independent code and evidence review**
 
 Review:
 
@@ -1461,7 +1461,7 @@ Review:
 
 Fix every Critical, Important, and applicable Minor finding before closeout.
 
-- [ ] **Step 8: Commit documentation and closeout**
+- [x] **Step 8: Commit documentation and closeout**
 
 ```powershell
 git add `
@@ -1476,7 +1476,7 @@ git add `
 git commit -m "docs: record first repair evidence link"
 ```
 
-- [ ] **Step 9: Sync durable project facts**
+- [x] **Step 9: Sync durable project facts**
 
 Update and commit
 `G:/Programming/mainboard-repair-enablement/PROJECT_LEDGER.md`, update the Vault
@@ -1485,7 +1485,7 @@ project Overview, and update only CASE005's existing Feishu
 explicit `possibly_related`, no-visual-defect, no-Golden, no-training,
 no-causality, and production-unchanged boundaries.
 
-- [ ] **Step 10: Confirm clean repositories**
+- [x] **Step 10: Confirm clean repositories**
 
 ```powershell
 git -C G:\Programming\mainboard-repair-system status --porcelain
