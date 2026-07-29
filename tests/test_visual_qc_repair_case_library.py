@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import hashlib
 import io
 import json
@@ -1144,7 +1145,7 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
             source=source,
             repair_case_id=case_id,
         )
-        self.assertEqual(recovered["state"], "created")
+        self.assertEqual(recovered["state"], "existing")
         self.assertTrue((target / ".complete").is_file())
         current_objects = self.case_evidence_objects()
         self.assertEqual(
@@ -1336,6 +1337,255 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
                     self.case_evidence_objects(),
                     baseline_objects | {evidence_object},
                 )
+
+    def test_corrupt_completion_marker_fails_closed_without_rewrite(self):
+        source = self.root / "corrupt-marker.heic"
+        write_heic(source, value=177)
+        case_id = "case-f069-corrupt-marker"
+        created = self.stage_f069_supporting_only(
+            source=source,
+            repair_case_id=case_id,
+        )
+        manifest_path = created["manifest_path"]
+        target = manifest_path.parent
+        marker = target / ".complete"
+        payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+        evidence_object = (
+            self.library / payload["supporting_evidence"][0]["object_path"]
+        )
+        manifest_bytes = manifest_path.read_bytes()
+        object_bytes = evidence_object.read_bytes()
+        marker.write_bytes(b"corrupt\n")
+        changed_record = copy.deepcopy(self.v3_supporting_only_record())
+        changed_record["reported_symptoms"][0]["text"] = "Changed symptom"
+
+        with self.assertRaisesRegex(
+            IntakeValidationError,
+            "completion marker",
+        ):
+            self.stage_f069_supporting_only(
+                source=source,
+                repair_case_id=case_id,
+                case_record=changed_record,
+            )
+
+        self.assertEqual(marker.read_bytes(), b"corrupt\n")
+        self.assertEqual(manifest_path.read_bytes(), manifest_bytes)
+        self.assertEqual(evidence_object.read_bytes(), object_bytes)
+
+    def test_marker_free_conflicting_manifest_fails_closed_unchanged(self):
+        source = self.root / "marker-free-conflict.heic"
+        write_heic(source, value=178)
+        case_id = "case-f069-marker-free-conflict"
+        created = self.stage_f069_supporting_only(
+            source=source,
+            repair_case_id=case_id,
+        )
+        manifest_path = created["manifest_path"]
+        marker = manifest_path.parent / ".complete"
+        payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+        evidence_object = (
+            self.library / payload["supporting_evidence"][0]["object_path"]
+        )
+        manifest_bytes = manifest_path.read_bytes()
+        object_bytes = evidence_object.read_bytes()
+        marker.unlink()
+        changed_record = copy.deepcopy(self.v3_supporting_only_record())
+        changed_record["reported_symptoms"][0]["text"] = "Conflicting symptom"
+
+        with self.assertRaisesRegex(
+            IntakeValidationError,
+            "conflict|incomplete",
+        ):
+            self.stage_f069_supporting_only(
+                source=source,
+                repair_case_id=case_id,
+                case_record=changed_record,
+            )
+
+        self.assertFalse(marker.exists())
+        self.assertEqual(manifest_path.read_bytes(), manifest_bytes)
+        self.assertEqual(evidence_object.read_bytes(), object_bytes)
+
+    def test_marker_free_exact_manifest_recovers_same_publication_in_place(self):
+        from scripts.visual_qc import repair_case_library
+
+        source = self.root / "marker-free-exact.heic"
+        write_heic(source, value=179)
+        case_id = "case-f069-marker-free-exact"
+        created = self.stage_f069_supporting_only(
+            source=source,
+            repair_case_id=case_id,
+        )
+        manifest_path = created["manifest_path"]
+        target = manifest_path.parent
+        revisions_root = target.parent
+        marker = target / ".complete"
+        manifest_bytes = manifest_path.read_bytes()
+        payload = json.loads(manifest_bytes.decode("utf-8"))
+        evidence_object = (
+            self.library / payload["supporting_evidence"][0]["object_path"]
+        )
+        object_bytes = evidence_object.read_bytes()
+        marker.unlink()
+        original_fsync = repair_case_library._fsync_directory
+        fsynced = []
+
+        def observe_fsync(path):
+            path = Path(path)
+            if path.name in {"0001", "revisions"}:
+                fsynced.append(path.name)
+            return original_fsync(path)
+
+        with mock.patch(
+            "scripts.visual_qc.repair_case_library._fsync_directory",
+            side_effect=observe_fsync,
+        ):
+            recovered = self.stage_f069_supporting_only(
+                source=source,
+                repair_case_id=case_id,
+            )
+
+        self.assertEqual(recovered["state"], "existing")
+        self.assertEqual(fsynced, ["0001", "0001", "revisions"])
+        self.assertEqual(marker.read_bytes(), b"complete\n")
+        self.assertEqual(manifest_path.read_bytes(), manifest_bytes)
+        self.assertEqual(evidence_object.read_bytes(), object_bytes)
+        validated = validate_repair_case_revision(
+            manifest_path=manifest_path,
+            project_root=ROOT,
+            library_root=self.library,
+        )
+        self.assertEqual(validated, payload)
+
+    def test_surviving_valid_marker_is_resynced_before_existing_retry(self):
+        from scripts.visual_qc import repair_case_library
+
+        source = self.root / "surviving-marker.heic"
+        write_heic(source, value=180)
+        case_id = "case-f069-surviving-marker"
+        original_fsync = repair_case_library._fsync_directory
+        target_fsync_failed = False
+
+        def fail_target_fsync_after_marker(path):
+            nonlocal target_fsync_failed
+            path = Path(path)
+            if (
+                path.name == "0001"
+                and (path / ".complete").is_file()
+                and not target_fsync_failed
+            ):
+                target_fsync_failed = True
+                raise OSError("simulated target fsync failure")
+            return original_fsync(path)
+
+        with (
+            mock.patch(
+                "scripts.visual_qc.repair_case_library._fsync_directory",
+                side_effect=fail_target_fsync_after_marker,
+            ),
+            mock.patch(
+                "scripts.visual_qc.repair_case_library.shutil.rmtree",
+                side_effect=OSError("simulated rollback removal failure"),
+            ),
+        ):
+            with self.assertRaisesRegex(
+                OSError,
+                "simulated target fsync failure",
+            ):
+                self.stage_f069_supporting_only(
+                    source=source,
+                    repair_case_id=case_id,
+                )
+
+        target = (
+            self.library / "cases" / case_id / "revisions" / "0001"
+        )
+        manifest_path = target / "repair-case.json"
+        marker = target / ".complete"
+        self.assertEqual(marker.read_bytes(), b"complete\n")
+        manifest_bytes = manifest_path.read_bytes()
+        payload = json.loads(manifest_bytes.decode("utf-8"))
+        evidence_object = (
+            self.library / payload["supporting_evidence"][0]["object_path"]
+        )
+        object_bytes = evidence_object.read_bytes()
+        target_resynced = False
+        parent_resynced = False
+
+        def probe_retry_fsync(path):
+            nonlocal target_resynced, parent_resynced
+            path = Path(path)
+            if path.name == "0001":
+                target_resynced = True
+            elif path.name == "revisions":
+                parent_resynced = True
+            return original_fsync(path)
+
+        with mock.patch(
+            "scripts.visual_qc.repair_case_library._fsync_directory",
+            side_effect=probe_retry_fsync,
+        ):
+            replayed = self.stage_f069_supporting_only(
+                source=source,
+                repair_case_id=case_id,
+            )
+
+        self.assertEqual(replayed["state"], "existing")
+        self.assertTrue(target_resynced)
+        self.assertTrue(parent_resynced)
+        self.assertEqual(manifest_path.read_bytes(), manifest_bytes)
+        self.assertEqual(evidence_object.read_bytes(), object_bytes)
+
+    def test_completed_revision_replay_resyncs_and_never_overwrites(self):
+        from scripts.visual_qc import repair_case_library
+
+        source = self.root / "completed-replay.heic"
+        write_heic(source, value=181)
+        case_id = "case-f069-completed-replay"
+        created = self.stage_f069_supporting_only(
+            source=source,
+            repair_case_id=case_id,
+        )
+        manifest_path = created["manifest_path"]
+        target = manifest_path.parent
+        payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+        evidence_object = (
+            self.library / payload["supporting_evidence"][0]["object_path"]
+        )
+        manifest_bytes = manifest_path.read_bytes()
+        object_bytes = evidence_object.read_bytes()
+        original_fsync = repair_case_library._fsync_directory
+        fsynced = []
+
+        def observe_fsync(path):
+            path = Path(path)
+            if path.name in {"0001", "revisions"}:
+                fsynced.append(path.name)
+            return original_fsync(path)
+
+        with mock.patch(
+            "scripts.visual_qc.repair_case_library._fsync_directory",
+            side_effect=observe_fsync,
+        ):
+            replayed = self.stage_f069_supporting_only(
+                source=source,
+                repair_case_id=case_id,
+            )
+        self.assertEqual(replayed["state"], "existing")
+        self.assertEqual(fsynced, ["0001", "revisions"])
+
+        changed_record = copy.deepcopy(self.v3_supporting_only_record())
+        changed_record["reported_symptoms"][0]["text"] = "Conflicting symptom"
+        with self.assertRaisesRegex(IntakeValidationError, "conflict"):
+            self.stage_f069_supporting_only(
+                source=source,
+                repair_case_id=case_id,
+                case_record=changed_record,
+            )
+        self.assertEqual((target / ".complete").read_bytes(), b"complete\n")
+        self.assertEqual(manifest_path.read_bytes(), manifest_bytes)
+        self.assertEqual(evidence_object.read_bytes(), object_bytes)
 
     def test_publication_cleanup_retries_unlink_and_preserves_primary_error(self):
         source = self.root / "publication-cleanup-retry.heic"

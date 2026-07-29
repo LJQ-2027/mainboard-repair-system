@@ -456,12 +456,12 @@ def _remove_revision_directories(
     return True, failures
 
 
-def _has_committed_completion_marker(target: Path) -> bool:
+def _completion_marker_state(target: Path) -> str:
     marker = target / ".complete"
     try:
         metadata = marker.lstat()
     except FileNotFoundError:
-        return False
+        return "absent"
     except OSError as exc:
         raise IntakeValidationError(
             "unable to inspect repair case completion marker"
@@ -470,13 +470,64 @@ def _has_committed_completion_marker(target: Path) -> bool:
         not stat.S_ISREG(metadata.st_mode)
         or _is_reparse_or_symlink(marker)
     ):
-        return False
+        raise IntakeValidationError(
+            "repair case completion marker is corrupt"
+        )
     try:
-        return marker.read_bytes() == b"complete\n"
+        content = marker.read_bytes()
     except OSError as exc:
         raise IntakeValidationError(
             "unable to read repair case completion marker"
         ) from exc
+    if content != b"complete\n":
+        raise IntakeValidationError(
+            "repair case completion marker is corrupt"
+        )
+    return "committed"
+
+
+def _canonical_manifest_bytes(payload: dict) -> bytes:
+    return (
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
+    ).encode("utf-8")
+
+
+def _assert_requested_residual_manifest(
+    manifest_path: Path,
+    payload: dict,
+) -> str:
+    existing, existing_sha256, content = _strict_json_content(
+        manifest_path, "repair case manifest"
+    )
+    expected = _canonical_manifest_bytes(payload)
+    expected_sha256 = hashlib.sha256(expected).hexdigest()
+    if (
+        existing != payload
+        or content != expected
+        or existing_sha256 != expected_sha256
+    ):
+        raise IntakeValidationError(
+            f"repair case revision conflict: {payload['repair_case_id']}"
+        )
+    return existing_sha256
+
+
+def _assert_payload_supporting_objects(
+    *,
+    library_root: Path,
+    payload: dict,
+) -> None:
+    for evidence in payload["supporting_evidence"]:
+        object_path = _assert_controlled_path(
+            library_root,
+            library_root / evidence["object_path"],
+            "supporting evidence object path",
+        )
+        _assert_stored_object(object_path, evidence["sha256"])
+        if object_path.stat().st_size != evidence["byte_size"]:
+            raise IntakeValidationError(
+                "supporting evidence object byte size mismatch"
+            )
 
 
 def store_supporting_evidence(
@@ -557,7 +608,10 @@ def store_supporting_evidence(
     return creation_log[initial_count:]
 
 
-def _strict_json(path: Path, label: str) -> tuple[dict, str]:
+def _strict_json_content(
+    path: Path,
+    label: str,
+) -> tuple[dict, str, bytes]:
     def object_hook(pairs):
         result = {}
         for key, value in pairs:
@@ -573,7 +627,12 @@ def _strict_json(path: Path, label: str) -> tuple[dict, str]:
         raise IntakeValidationError(f"invalid {label}: {exc}") from exc
     if not isinstance(payload, dict):
         raise IntakeValidationError(f"invalid {label}: root must be an object")
-    return payload, hashlib.sha256(content).hexdigest()
+    return payload, hashlib.sha256(content).hexdigest(), content
+
+
+def _strict_json(path: Path, label: str) -> tuple[dict, str]:
+    payload, digest, _ = _strict_json_content(path, label)
+    return payload, digest
 
 
 def _catalog_board(project_root: Path, board_key: str) -> tuple[dict, list[str]]:
@@ -1232,7 +1291,13 @@ def stage_repair_case_revision(
             _assert_controlled_path(
                 library_root, controlled_path, label
             )
-        if target.exists() and _has_committed_completion_marker(target):
+        if target.exists():
+            marker_state = _completion_marker_state(target)
+        else:
+            marker_state = None
+        if marker_state == "committed":
+            _fsync_directory(target)
+            _fsync_directory(revisions_root)
             existing = validate_repair_case_revision(
                 manifest_path=manifest_path,
                 project_root=project_root,
@@ -1251,17 +1316,30 @@ def stage_repair_case_revision(
                 payload=existing,
                 manifest_sha256=existing_sha256,
             )
-        if target.exists():
-            recovered, recovery_failures = _remove_revision_directories(
-                [target],
-                revisions_root=revisions_root,
+        if marker_state == "absent":
+            existing_sha256 = _assert_requested_residual_manifest(
+                manifest_path,
+                payload,
             )
-            if not recovered:
-                primary = IntakeValidationError(
-                    "unable to recover incomplete repair case revision"
-                )
-                _add_cleanup_notes(primary, recovery_failures)
-                raise primary from recovery_failures[0][1]
+            _assert_payload_supporting_objects(
+                library_root=library_root,
+                payload=payload,
+            )
+            _fsync_directory(target)
+            _write_completion_marker(target / ".complete")
+            _fsync_directory(target)
+            _fsync_directory(revisions_root)
+            existing = validate_repair_case_revision(
+                manifest_path=manifest_path,
+                project_root=project_root,
+                library_root=library_root,
+            )
+            return _revision_result(
+                state="existing",
+                manifest_path=manifest_path,
+                payload=existing,
+                manifest_sha256=existing_sha256,
+            )
 
         completed = sorted(
             path
