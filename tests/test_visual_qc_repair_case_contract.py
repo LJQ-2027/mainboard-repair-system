@@ -329,6 +329,71 @@ class VisualQcRepairCaseContractTests(unittest.TestCase):
         )
         validator.validate(package_linked)
 
+    def test_v3_package_linked_rejects_empty_package_links(self):
+        payload = canonical_v2_payload("unresolved_alias")
+        payload["schema_version"] = REPAIR_CASE_SCHEMA_V3
+        payload["evidence_mode"] = "package_linked"
+        payload["package_links"] = []
+        payload["supporting_evidence_contexts"] = []
+
+        with self.assertRaisesRegex(ValueError, "package_links"):
+            validate_repair_case_manifest(
+                payload,
+                catalog_models=CATALOG_MODELS,
+            )
+
+        schema = json.loads(V3_SCHEMA_PATH.read_text(encoding="utf-8"))
+        with self.assertRaises(jsonschema.ValidationError):
+            jsonschema.Draft202012Validator(schema).validate(payload)
+
+    def test_v3_rejects_malformed_evidence_mode_types(self):
+        schema = json.loads(V3_SCHEMA_PATH.read_text(encoding="utf-8"))
+        validator = jsonschema.Draft202012Validator(schema)
+        for malformed in (None, False, 1, ["supporting_only"], {"mode": "x"}):
+            payload = canonical_v3_supporting_only_payload()
+            payload["evidence_mode"] = malformed
+            with self.subTest(malformed=malformed):
+                with self.assertRaisesRegex(ValueError, "evidence_mode"):
+                    validate_repair_case_manifest(
+                        payload,
+                        catalog_models=CATALOG_MODELS,
+                    )
+                with self.assertRaises(jsonschema.ValidationError):
+                    validator.validate(payload)
+
+    def test_v3_schema_rejects_mime_and_object_path_extension_mismatches(self):
+        schema = json.loads(V3_SCHEMA_PATH.read_text(encoding="utf-8"))
+        validator = jsonschema.Draft202012Validator(schema)
+        mismatches = []
+
+        heic_with_jpg_path = canonical_v3_supporting_only_payload()
+        heic_with_jpg_path["supporting_evidence"][0][
+            "object_path"
+        ] = heic_with_jpg_path["supporting_evidence"][0][
+            "object_path"
+        ].removesuffix(".heic") + ".jpg"
+        mismatches.append(heic_with_jpg_path)
+
+        jpeg_with_heic_path = canonical_v3_supporting_only_payload()
+        evidence = jpeg_with_heic_path["supporting_evidence"][0]
+        evidence["original_filename"] = "repair.jpg"
+        evidence["mime_type"] = "image/jpeg"
+        mismatches.append(jpeg_with_heic_path)
+
+        for payload in mismatches:
+            evidence = payload["supporting_evidence"][0]
+            with self.subTest(
+                mime_type=evidence["mime_type"],
+                object_path=evidence["object_path"],
+            ):
+                with self.assertRaisesRegex(ValueError, "object_path"):
+                    validate_repair_case_manifest(
+                        payload,
+                        catalog_models=CATALOG_MODELS,
+                    )
+                with self.assertRaises(jsonschema.ValidationError):
+                    validator.validate(payload)
+
     def test_v3_rejects_context_and_mode_mutation_matrix(self):
         schema = json.loads(V3_SCHEMA_PATH.read_text(encoding="utf-8"))
         validator = jsonschema.Draft202012Validator(schema)

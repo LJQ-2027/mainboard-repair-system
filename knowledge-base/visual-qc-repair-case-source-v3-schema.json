@@ -367,7 +367,59 @@
         },
         "sha256": {"$ref": "#/$defs/sha256"},
         "description": {"$ref": "#/$defs/nonEmptyString"}
-      }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "mime_type": {"const": "application/pdf"},
+            "object_path": {"pattern": "\\.pdf$"}
+          }
+        },
+        {
+          "properties": {
+            "mime_type": {"const": "text/plain"},
+            "object_path": {"pattern": "\\.txt$"}
+          }
+        },
+        {
+          "properties": {
+            "mime_type": {"const": "text/csv"},
+            "object_path": {"pattern": "\\.csv$"}
+          }
+        },
+        {
+          "properties": {
+            "mime_type": {"const": "application/vnd.ms-excel"},
+            "object_path": {"pattern": "\\.xls$"}
+          }
+        },
+        {
+          "properties": {
+            "mime_type": {
+              "const": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            },
+            "object_path": {"pattern": "\\.xlsx$"}
+          }
+        },
+        {
+          "properties": {
+            "mime_type": {"const": "image/png"},
+            "object_path": {"pattern": "\\.png$"}
+          }
+        },
+        {
+          "properties": {
+            "mime_type": {"const": "image/jpeg"},
+            "object_path": {"pattern": "\\.jpg$"}
+          }
+        },
+        {
+          "properties": {
+            "mime_type": {"const": "image/heic"},
+            "object_path": {"pattern": "\\.heic$"}
+          }
+        }
+      ]
     },
     "supportingEvidenceContext": {
       "type": "object",
