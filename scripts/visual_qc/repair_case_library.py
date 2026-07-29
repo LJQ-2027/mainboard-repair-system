@@ -57,6 +57,7 @@ ROLE_CAPTURE_STAGE = {
     "after_repair": "after_repair",
     "golden_reference": "golden_reference",
 }
+CASE_EVIDENCE_PUBLICATION_LOCK_ID = ".case-evidence-publication"
 COMMON_CASE_RECORD_FIELDS = {
     "supporting_evidence_descriptions",
     "reported_symptoms",
@@ -340,12 +341,67 @@ def _assert_stored_object(path: Path, expected_sha256: str) -> None:
 
 
 def _remove_created_supporting_objects(paths: list[Path]) -> None:
-    parents = set()
-    for path in reversed(paths):
-        path.unlink(missing_ok=True)
-        parents.add(path.parent)
-    for parent in parents:
-        _fsync_directory(parent)
+    candidates = list(dict.fromkeys(paths))
+    unlinked = set()
+    failures = []
+    for path in reversed(candidates):
+        try:
+            path.unlink(missing_ok=True)
+        except Exception as exc:
+            failures.append(exc)
+        else:
+            unlinked.add(path)
+
+    durable_parents = set()
+    for parent in {path.parent for path in unlinked}:
+        try:
+            _fsync_directory(parent)
+        except Exception as exc:
+            failures.append(exc)
+        else:
+            durable_parents.add(parent)
+
+    completed = {
+        path for path in unlinked if path.parent in durable_parents
+    }
+    paths[:] = [path for path in paths if path not in completed]
+    if failures:
+        primary = failures[0]
+        for additional in failures[1:]:
+            if hasattr(primary, "add_note"):
+                primary.add_note(
+                    f"additional supporting evidence cleanup failure: "
+                    f"{type(additional).__name__}: {additional}"
+                )
+        raise primary
+
+
+def _add_cleanup_notes(
+    primary: Exception,
+    failures: list[tuple[str, Exception]],
+) -> None:
+    if not hasattr(primary, "add_note"):
+        return
+    for label, failure in failures:
+        primary.add_note(
+            f"{label}: {type(failure).__name__}: {failure}"
+        )
+
+
+def _retry_created_object_cleanup(
+    paths: list[Path],
+    *,
+    label: str,
+) -> list[tuple[str, Exception]]:
+    failures = []
+    for attempt in range(1, 3):
+        if not paths:
+            break
+        try:
+            _remove_created_supporting_objects(paths)
+        except Exception as exc:
+            failures.append((f"{label} attempt {attempt} failed", exc))
+    return failures
 
 
 def store_supporting_evidence(
@@ -407,12 +463,21 @@ def store_supporting_evidence(
                 _fsync_directory(destination.parent)
             finally:
                 temporary_path.unlink(missing_ok=True)
-    except Exception:
+    except Exception as primary:
         owned_objects = creation_log[initial_count:]
-        try:
-            _remove_created_supporting_objects(owned_objects)
-        finally:
-            del creation_log[initial_count:]
+        cleanup_failures = _retry_created_object_cleanup(
+            owned_objects,
+            label="supporting evidence store rollback",
+        )
+        creation_log[initial_count:] = owned_objects
+        if cleanup_failures:
+            _add_cleanup_notes(primary, cleanup_failures)
+            if owned_objects and hasattr(primary, "add_note"):
+                primary.add_note(
+                    "supporting evidence ownership remains after rollback: "
+                    + ", ".join(str(path) for path in owned_objects)
+                )
+            raise primary from cleanup_failures[0][1]
         raise
     return creation_log[initial_count:]
 
@@ -1079,7 +1144,10 @@ def stage_repair_case_revision(
     )
     manifest_path = target / "repair-case.json"
 
-    with _package_lock(cases_root, payload["repair_case_id"]):
+    with (
+        _package_lock(cases_root, CASE_EVIDENCE_PUBLICATION_LOCK_ID),
+        _package_lock(cases_root, payload["repair_case_id"]),
+    ):
         for controlled_path, label in (
             (cases_root, "repair case library path"),
             (case_root, "repair case path"),
@@ -1128,7 +1196,6 @@ def stage_repair_case_revision(
                 dir=revisions_root,
             )
         )
-        published_incomplete = False
         created_objects = []
         try:
             write_json_atomic(temporary / "repair-case.json", payload)
@@ -1145,17 +1212,39 @@ def stage_repair_case_revision(
                 raise IntakeValidationError(
                     f"repair case revision conflict: {payload['repair_case_id']}"
                 )
-            published_incomplete = True
             _fsync_directory(revisions_root)
             _write_completion_marker(target / ".complete")
             _fsync_directory(target)
             _fsync_directory(revisions_root)
-            published_incomplete = False
-        except Exception:
-            if published_incomplete and target.exists():
-                shutil.rmtree(target)
-                _fsync_directory(revisions_root)
-            _remove_created_supporting_objects(created_objects)
+        except Exception as primary:
+            cleanup_failures = []
+            if target.exists():
+                try:
+                    shutil.rmtree(target)
+                except Exception as exc:
+                    cleanup_failures.append(
+                        ("repair case revision removal failed", exc)
+                    )
+                try:
+                    _fsync_directory(revisions_root)
+                except Exception as exc:
+                    cleanup_failures.append(
+                        ("repair case revisions fsync failed", exc)
+                    )
+            cleanup_failures.extend(
+                _retry_created_object_cleanup(
+                    created_objects,
+                    label="supporting evidence rollback",
+                )
+            )
+            if cleanup_failures:
+                _add_cleanup_notes(primary, cleanup_failures)
+                if created_objects and hasattr(primary, "add_note"):
+                    primary.add_note(
+                        "supporting evidence ownership remains after rollback: "
+                        + ", ".join(str(path) for path in created_objects)
+                    )
+                raise primary from cleanup_failures[0][1]
             raise
         finally:
             if temporary.exists():

@@ -7,8 +7,10 @@ import os
 from pathlib import Path
 import subprocess
 import tempfile
+import threading
 import unittest
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import contextmanager
 from unittest import mock
 import zipfile
 
@@ -554,7 +556,6 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
                 / case_id
                 / "revisions"
                 / "0001"
-                / ".complete"
             ).exists()
         )
         self.assertEqual(self.case_evidence_objects(), baseline_objects)
@@ -749,7 +750,6 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
                 / "case-f069-supporting-only"
                 / "revisions"
                 / "0001"
-                / ".complete"
             ).exists()
         )
         self.assertEqual(self.case_evidence_objects(), set())
@@ -933,6 +933,361 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
         store_path.assert_called_once()
         self.assertEqual(len(stored_objects), 1)
         self.assert_no_supporting_only_artifacts(case_id, baseline_objects)
+
+    def test_v3_post_storage_revision_fsync_failure_removes_all_artifacts(self):
+        from scripts.visual_qc import repair_case_library
+
+        source = self.root / "post-storage-fsync.heic"
+        write_heic(source)
+        baseline_objects = self.case_evidence_objects()
+        case_id = "case-f069-supporting-post-storage-fsync"
+        stored_objects = []
+        original_store = repair_case_library.store_supporting_evidence
+        original_fsync = repair_case_library._fsync_directory
+
+        def record_store(**kwargs):
+            created = original_store(**kwargs)
+            stored_objects.extend(created)
+            return created
+
+        def fail_revision_staging_fsync(path):
+            path = Path(path)
+            if path.name.endswith(".staging") and path.parent.name == "revisions":
+                self.assertEqual(len(stored_objects), 1)
+                self.assertTrue(stored_objects[0].is_file())
+                raise OSError("simulated post-storage revision fsync failure")
+            return original_fsync(path)
+
+        with (
+            mock.patch(
+                "scripts.visual_qc.repair_case_library.store_supporting_evidence",
+                side_effect=record_store,
+            ) as store_path,
+            mock.patch(
+                "scripts.visual_qc.repair_case_library._fsync_directory",
+                side_effect=fail_revision_staging_fsync,
+            ),
+        ):
+            with self.assertRaisesRegex(
+                OSError,
+                "simulated post-storage revision fsync failure",
+            ):
+                self.stage_f069_supporting_only(
+                    source=source,
+                    repair_case_id=case_id,
+                )
+
+        store_path.assert_called_once()
+        self.assertEqual(len(stored_objects), 1)
+        self.assert_no_supporting_only_artifacts(case_id, baseline_objects)
+
+    def test_v3_completion_marker_failure_removes_revision_and_object(self):
+        from scripts.visual_qc import repair_case_library
+
+        source = self.root / "completion-marker-failure.heic"
+        write_heic(source)
+        baseline_objects = self.case_evidence_objects()
+        case_id = "case-f069-supporting-completion-marker"
+        stored_objects = []
+        original_store = repair_case_library.store_supporting_evidence
+
+        def record_store(**kwargs):
+            created = original_store(**kwargs)
+            stored_objects.extend(created)
+            return created
+
+        with (
+            mock.patch(
+                "scripts.visual_qc.repair_case_library.store_supporting_evidence",
+                side_effect=record_store,
+            ) as store_path,
+            mock.patch(
+                "scripts.visual_qc.repair_case_library._write_completion_marker",
+                side_effect=OSError("simulated completion marker failure"),
+            ),
+        ):
+            with self.assertRaisesRegex(
+                OSError,
+                "simulated completion marker failure",
+            ):
+                self.stage_f069_supporting_only(
+                    source=source,
+                    repair_case_id=case_id,
+                )
+
+        store_path.assert_called_once()
+        self.assertEqual(len(stored_objects), 1)
+        self.assert_no_supporting_only_artifacts(case_id, baseline_objects)
+
+    def test_cleanup_retains_ownership_until_unlink_and_fsync_succeed(self):
+        from scripts.visual_qc import repair_case_library
+
+        for boundary in ("unlink", "fsync"):
+            with self.subTest(boundary=boundary):
+                parent = self.root / f"cleanup-{boundary}"
+                parent.mkdir()
+                evidence = parent / "evidence.heic"
+                evidence.write_bytes(b"owned evidence")
+                second_evidence = parent / "second-evidence.heic"
+                second_evidence.write_bytes(b"second owned evidence")
+                owned = [evidence, second_evidence]
+
+                if boundary == "unlink":
+                    original_unlink = Path.unlink
+                    attempts = 0
+
+                    def fail_unlink_once(path, *args, **kwargs):
+                        nonlocal attempts
+                        if Path(path) == evidence and attempts == 0:
+                            attempts += 1
+                            raise OSError("simulated cleanup unlink failure")
+                        return original_unlink(path, *args, **kwargs)
+
+                    patcher = mock.patch.object(
+                        Path,
+                        "unlink",
+                        side_effect=fail_unlink_once,
+                        autospec=True,
+                    )
+                else:
+                    original_fsync = repair_case_library._fsync_directory
+                    attempts = 0
+
+                    def fail_fsync_once(path):
+                        nonlocal attempts
+                        if Path(path) == parent and attempts == 0:
+                            attempts += 1
+                            raise OSError("simulated cleanup fsync failure")
+                        return original_fsync(path)
+
+                    patcher = mock.patch(
+                        "scripts.visual_qc.repair_case_library._fsync_directory",
+                        side_effect=fail_fsync_once,
+                    )
+
+                with patcher:
+                    with self.assertRaisesRegex(
+                        OSError,
+                        f"simulated cleanup {boundary} failure",
+                    ):
+                        repair_case_library._remove_created_supporting_objects(
+                            owned
+                        )
+                    if boundary == "unlink":
+                        self.assertEqual(owned, [evidence])
+                        self.assertTrue(evidence.exists())
+                        self.assertFalse(second_evidence.exists())
+                    else:
+                        self.assertEqual(owned, [evidence, second_evidence])
+                        self.assertFalse(evidence.exists())
+                        self.assertFalse(second_evidence.exists())
+                    repair_case_library._remove_created_supporting_objects(owned)
+
+                self.assertEqual(owned, [])
+                self.assertFalse(evidence.exists())
+                self.assertFalse(second_evidence.exists())
+
+    def test_revision_cleanup_failure_still_attempts_owned_object_cleanup(self):
+        from scripts.visual_qc import repair_case_library
+
+        source = self.root / "revision-cleanup-failure.heic"
+        write_heic(source)
+        baseline_objects = self.case_evidence_objects()
+        case_id = "case-f069-supporting-revision-cleanup"
+        original_remove = (
+            repair_case_library._remove_created_supporting_objects
+        )
+        object_cleanup_called = threading.Event()
+
+        def observe_object_cleanup(paths):
+            object_cleanup_called.set()
+            return original_remove(paths)
+
+        with (
+            mock.patch(
+                "scripts.visual_qc.repair_case_library._write_completion_marker",
+                side_effect=OSError("primary completion marker failure"),
+            ),
+            mock.patch(
+                "scripts.visual_qc.repair_case_library.shutil.rmtree",
+                side_effect=OSError("secondary revision cleanup failure"),
+            ),
+            mock.patch(
+                "scripts.visual_qc.repair_case_library."
+                "_remove_created_supporting_objects",
+                side_effect=observe_object_cleanup,
+            ),
+        ):
+            with self.assertRaisesRegex(
+                OSError,
+                "primary completion marker failure",
+            ) as raised:
+                self.stage_f069_supporting_only(
+                    source=source,
+                    repair_case_id=case_id,
+                )
+
+        self.assertTrue(object_cleanup_called.is_set())
+        self.assertEqual(self.case_evidence_objects(), baseline_objects)
+        self.assertIn(
+            "secondary revision cleanup failure",
+            "\n".join(getattr(raised.exception, "__notes__", [])),
+        )
+
+    def test_publication_cleanup_retries_unlink_and_preserves_primary_error(self):
+        source = self.root / "publication-cleanup-retry.heic"
+        write_heic(source)
+        baseline_objects = self.case_evidence_objects()
+        case_id = "case-f069-supporting-cleanup-retry"
+        original_unlink = Path.unlink
+        cleanup_attempts = 0
+
+        def fail_evidence_unlink_once(path, *args, **kwargs):
+            nonlocal cleanup_attempts
+            path = Path(path)
+            if (
+                "case-evidence" in path.parts
+                and path.suffix == ".heic"
+                and cleanup_attempts == 0
+            ):
+                cleanup_attempts += 1
+                raise OSError("transient evidence unlink failure")
+            return original_unlink(path, *args, **kwargs)
+
+        with (
+            mock.patch.object(
+                Path,
+                "rename",
+                side_effect=OSError("primary publication rename failure"),
+                autospec=True,
+            ),
+            mock.patch.object(
+                Path,
+                "unlink",
+                side_effect=fail_evidence_unlink_once,
+                autospec=True,
+            ),
+        ):
+            with self.assertRaisesRegex(
+                OSError,
+                "primary publication rename failure",
+            ) as raised:
+                self.stage_f069_supporting_only(
+                    source=source,
+                    repair_case_id=case_id,
+                )
+
+        self.assertEqual(cleanup_attempts, 1)
+        self.assertIn(
+            "transient evidence unlink failure",
+            "\n".join(getattr(raised.exception, "__notes__", [])),
+        )
+        self.assert_no_supporting_only_artifacts(case_id, baseline_objects)
+
+    def test_cross_case_shared_object_publication_is_globally_serialized(self):
+        from scripts.visual_qc import repair_case_library
+
+        source = self.root / "shared-concurrent.heic"
+        write_heic(source)
+        original_lock = repair_case_library._package_lock
+        original_store = repair_case_library.store_supporting_evidence
+        original_rename = Path.rename
+        a_stored = threading.Event()
+        release_a = threading.Event()
+        b_global_requested = threading.Event()
+        b_store_entered = threading.Event()
+        outcomes = {}
+
+        @contextmanager
+        def observe_lock(lock_root, lock_id):
+            if (
+                threading.current_thread().name == "case-b"
+                and lock_id
+                == repair_case_library.CASE_EVIDENCE_PUBLICATION_LOCK_ID
+            ):
+                b_global_requested.set()
+            with original_lock(lock_root, lock_id):
+                yield
+
+        def observe_store(**kwargs):
+            if threading.current_thread().name == "case-b":
+                b_store_entered.set()
+            created = original_store(**kwargs)
+            if threading.current_thread().name == "case-a":
+                self.assertEqual(len(created), 1)
+                self.assertTrue(created[0].is_file())
+                a_stored.set()
+            return created
+
+        def controlled_rename(path, target):
+            if threading.current_thread().name == "case-a":
+                self.assertTrue(release_a.wait(timeout=10))
+                raise OSError("simulated case A publication failure")
+            return original_rename(path, target)
+
+        def stage_case(case_id):
+            try:
+                outcomes[case_id] = self.stage_f069_supporting_only(
+                    source=source,
+                    repair_case_id=case_id,
+                )
+            except Exception as exc:
+                outcomes[case_id] = exc
+
+        with (
+            mock.patch(
+                "scripts.visual_qc.repair_case_library._package_lock",
+                side_effect=observe_lock,
+            ),
+            mock.patch(
+                "scripts.visual_qc.repair_case_library.store_supporting_evidence",
+                side_effect=observe_store,
+            ),
+            mock.patch.object(
+                Path,
+                "rename",
+                side_effect=controlled_rename,
+                autospec=True,
+            ),
+        ):
+            case_a = threading.Thread(
+                target=stage_case,
+                args=("case-f069-concurrent-a",),
+                name="case-a",
+            )
+            case_b = threading.Thread(
+                target=stage_case,
+                args=("case-f069-concurrent-b",),
+                name="case-b",
+            )
+            case_a.start()
+            self.assertTrue(a_stored.wait(timeout=10))
+            case_b.start()
+            global_requested = b_global_requested.wait(timeout=2)
+            if global_requested:
+                self.assertFalse(b_store_entered.is_set())
+            release_a.set()
+            case_a.join(timeout=10)
+            case_b.join(timeout=10)
+
+        self.assertFalse(case_a.is_alive())
+        self.assertFalse(case_b.is_alive())
+        self.assertTrue(global_requested)
+        self.assertIsInstance(outcomes["case-f069-concurrent-a"], OSError)
+        self.assertEqual(
+            outcomes["case-f069-concurrent-b"]["state"],
+            "created",
+        )
+        self.assert_no_supporting_only_artifacts(
+            "case-f069-concurrent-a",
+            self.case_evidence_objects(),
+        )
+        validated = validate_repair_case_revision(
+            manifest_path=outcomes["case-f069-concurrent-b"]["manifest_path"],
+            project_root=ROOT,
+            library_root=self.library,
+        )
+        self.assertEqual(validated["repair_case_id"], "case-f069-concurrent-b")
 
     def test_v2_requires_exact_catalog_model_order(self):
         valid = build_repair_case_revision(
@@ -1719,7 +2074,7 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
                 library_root=self.library,
             )
 
-    def test_failed_publication_leaves_no_complete_revision(self):
+    def test_failed_publication_leaves_no_revision(self):
         with mock.patch(
             "scripts.visual_qc.repair_case_library.write_json_atomic",
             side_effect=OSError("simulated write failure"),
@@ -1733,7 +2088,7 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
             / "case-km4-failed"
             / "revisions"
         )
-        self.assertFalse((revision_root / "0001" / ".complete").exists())
+        self.assertFalse((revision_root / "0001").exists())
         self.assertEqual(
             list(revision_root.glob(".*.staging")),
             [],
