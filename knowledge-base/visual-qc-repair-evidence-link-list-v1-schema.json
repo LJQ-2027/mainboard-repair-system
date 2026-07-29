@@ -41,7 +41,9 @@
               "image_missing",
               "registration_job_missing",
               "registration_review_missing",
-              "board_asset_missing"
+              "board_asset_missing",
+              "link_authority_missing",
+              "link_authority_mismatch"
             ]
           }
         }

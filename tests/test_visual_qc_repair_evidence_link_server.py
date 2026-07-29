@@ -501,6 +501,7 @@ class VisualQcRepairEvidenceLinkApiTests(
         )
         self.link_authority_patcher.start()
         self.addCleanup(self.link_authority_patcher.stop)
+        self.authority_path = self._stage_link_authority(self.manifest)
 
     def tearDown(self):
         self.client.close()
@@ -540,6 +541,7 @@ class VisualQcRepairEvidenceLinkApiTests(
         )
 
     def test_import_requires_published_controlled_authority(self):
+        self.authority_path.unlink()
         response = self.client.post(
             "/api/v1/visual-qc/admin/repair-evidence-links",
             headers=HEADERS,
@@ -557,6 +559,25 @@ class VisualQcRepairEvidenceLinkApiTests(
             self.service.store.get_repair_evidence_link_revision(
                 self.manifest["link_set_id"], self.manifest["revision"]
             )
+        )
+
+    def test_read_health_rechecks_published_controlled_authority(self):
+        imported = self._import()
+        self.assertEqual(imported.status_code, 201, imported.text)
+        self.authority_path.unlink()
+        detail = self.client.get(
+            "/api/v1/visual-qc/admin/repair-evidence-links/"
+            f"{self.manifest['link_set_id']}/revisions/"
+            f"{self.manifest['revision']}",
+            headers=HEADERS,
+        )
+        self.assertEqual(detail.status_code, 200, detail.text)
+        self.assertEqual(
+            detail.json()["health"],
+            {
+                "state": "unavailable",
+                "reasons": ["link_authority_missing"],
+            },
         )
 
     def test_routes_require_reviewer_and_import_active_projection(self):

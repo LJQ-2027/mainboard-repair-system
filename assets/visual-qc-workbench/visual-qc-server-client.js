@@ -251,6 +251,7 @@ function validHealth(value) {
       'registration_job_mismatch', 'registration_review_mismatch', 'board_asset_mismatch',
       'server_case_missing', 'image_missing', 'registration_job_missing',
       'registration_review_missing', 'board_asset_missing',
+      'link_authority_missing', 'link_authority_mismatch',
     ]).has(reason));
 }
 
@@ -381,7 +382,7 @@ function validManifest(value) {
     return true;
   })) return false;
   const bindingIds = new Set();
-  return value.bindings.every((item) => {
+  const bindingsValid = value.bindings.every((item) => {
     const target = item.target;
     const source = item.source_fact;
     const evidence = evidenceById.get(item.physical_evidence_id);
@@ -402,6 +403,19 @@ function validManifest(value) {
     if (good) bindingIds.add(item.binding_id);
     return Boolean(good);
   });
+  if (!bindingsValid) return false;
+  const bindingIndex = new Map(
+    value.bindings.map((item, index) => [item.binding_id, index]),
+  );
+  const superseded = new Set();
+  for (const [index, item] of value.bindings.entries()) {
+    if (item.supersedes_binding_id === null) continue;
+    const targetIndex = bindingIndex.get(item.supersedes_binding_id);
+    if (targetIndex === undefined || targetIndex >= index
+      || superseded.has(item.supersedes_binding_id)) return false;
+    superseded.add(item.supersedes_binding_id);
+  }
+  return true;
 }
 
 function expectedRepairEvidenceCounts(manifest, bindingStates) {
@@ -453,8 +467,10 @@ function validBindingState(value) {
   ]) && isSafeId(value.binding_id)
     && typeof value.source_fact_superseded === 'boolean'
     && (value.replacement_fact_id === null || isSafeId(value.replacement_fact_id))
+    && value.source_fact_superseded === (value.replacement_fact_id !== null)
     && typeof value.binding_superseded === 'boolean'
-    && (value.replacement_binding_id === null || isSafeId(value.replacement_binding_id));
+    && (value.replacement_binding_id === null || isSafeId(value.replacement_binding_id))
+    && value.binding_superseded === (value.replacement_binding_id !== null);
 }
 
 function validateRepairEvidenceList(payload) {

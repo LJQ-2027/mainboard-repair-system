@@ -210,6 +210,11 @@ test('repair evidence client rejects malformed nested V1 variants and summary in
     (value) => { value.manifest.bindings[0].repair_case_reference_id = 'missing-reference'; },
     (value) => { value.manifest.bindings[0].target.side_id = 'main_page_1'; },
     (value) => { value.binding_states[0].binding_id = 'missing-binding'; },
+    (value) => { value.binding_states[0].replacement_fact_id = 'replacement-fact'; },
+    (value) => { value.binding_states[0].source_fact_superseded = true; },
+    (value) => { value.binding_states[0].replacement_binding_id = 'replacement-binding'; },
+    (value) => { value.binding_states[0].binding_superseded = true; },
+    (value) => { value.manifest.bindings[0].supersedes_binding_id = 'missing-binding'; },
     (value) => { value.counts.association.possibly_related = 0; },
     (value) => { value.server_case_ids = ['other-case']; },
   ];

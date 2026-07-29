@@ -1117,6 +1117,11 @@ class VisualQcService:
             verification_cache if verification_cache is not None else {}
         )
         reasons = []
+        authority_reason = self._controlled_repair_evidence_link_reason(
+            manifest, verification_cache=verification_cache
+        )
+        if authority_reason is not None:
+            reasons.append(authority_reason)
         for evidence in manifest["physical_evidence"]:
             case = self._case_identity(
                 evidence["server_case_id"], connection
@@ -1220,11 +1225,13 @@ class VisualQcService:
         ordered = [
             reason
             for reason in (
+                "link_authority_missing",
                 "server_case_missing",
                 "image_missing",
                 "registration_job_missing",
                 "registration_review_missing",
                 "board_asset_missing",
+                "link_authority_mismatch",
                 "server_case_identity_mismatch",
                 "image_identity_mismatch",
                 "qualified_handoff_mismatch",
@@ -1253,16 +1260,26 @@ class VisualQcService:
                 return candidate.resolve()
         return None
 
-    def _validate_controlled_repair_evidence_link(
-        self, manifest: dict, manifest_sha256: str
-    ) -> dict:
+    def _controlled_repair_evidence_link_reason(
+        self, manifest: dict, *, verification_cache=None
+    ) -> str | None:
+        verification_cache = (
+            verification_cache if verification_cache is not None else {}
+        )
+        authority_cache = verification_cache.setdefault(
+            "link_authorities", {}
+        )
+        key = (
+            manifest["link_set_id"],
+            manifest["revision"],
+            canonical_sha256(manifest),
+        )
+        if key in authority_cache:
+            return authority_cache[key]
         library_root = self._controlled_library_root()
         if library_root is None:
-            raise VisualQcServiceError(
-                "repair_evidence_link_authority_unavailable",
-                "Controlled repair-evidence link authority is unavailable.",
-                503,
-            )
+            authority_cache[key] = "link_authority_missing"
+            return authority_cache[key]
         authority_path = (
             library_root
             / "repair-evidence-links"
@@ -1271,6 +1288,9 @@ class VisualQcService:
             / f"{manifest['revision']:04d}"
             / "repair-evidence-link.json"
         )
+        if not authority_path.is_file():
+            authority_cache[key] = "link_authority_missing"
+            return authority_cache[key]
         try:
             authority = validate_repair_evidence_link_revision_on_disk(
                 authority_path,
@@ -1282,22 +1302,39 @@ class VisualQcService:
             UnicodeError,
             RepairEvidenceLinkContractError,
             RepairEvidenceLinkLibraryError,
-        ) as exc:
+        ):
+            authority_cache[key] = "link_authority_mismatch"
+            return authority_cache[key]
+        authority_cache[key] = (
+            None
+            if canonical_sha256(authority) == key[2]
+            else "link_authority_mismatch"
+        )
+        return authority_cache[key]
+
+    def _validate_controlled_repair_evidence_link(
+        self,
+        manifest: dict,
+        manifest_sha256: str,
+        *,
+        verification_cache=None,
+    ) -> dict:
+        reason = self._controlled_repair_evidence_link_reason(
+            manifest, verification_cache=verification_cache
+        )
+        if reason == "link_authority_missing":
             raise VisualQcServiceError(
                 "repair_evidence_link_authority_unavailable",
                 "Controlled repair-evidence link authority is unavailable.",
                 503,
-            ) from exc
-        if (
-            canonical_sha256(authority) != manifest_sha256
-            or canonical_sha256(manifest) != canonical_sha256(authority)
-        ):
+            )
+        if reason is not None or canonical_sha256(manifest) != manifest_sha256:
             raise VisualQcServiceError(
                 "repair_evidence_link_authority_mismatch",
                 "Repair-evidence link does not match controlled authority.",
                 409,
             )
-        return authority
+        return manifest
 
     @staticmethod
     def _terminal_replacement(
@@ -1498,10 +1535,12 @@ class VisualQcService:
                 "repair_evidence_link_hash_mismatch",
                 "Repair-evidence link manifest hash does not match.",
             )
-        validated = self._validate_controlled_repair_evidence_link(
-            validated, manifest_sha256
-        )
         verification_cache = {}
+        validated = self._validate_controlled_repair_evidence_link(
+            validated,
+            manifest_sha256,
+            verification_cache=verification_cache,
+        )
         stable_image_proofs = {}
         kernel_exclusion = None
         projection_committed = False
