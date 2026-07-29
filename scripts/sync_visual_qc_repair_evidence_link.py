@@ -204,7 +204,7 @@ def _transport_configuration(
     return normalized, resolved_actor, authorization
 
 
-def _validated_snapshot(manifest_path: Path, library_root: Path) -> tuple[dict, str]:
+def _validated_snapshot(manifest_path: Path, library_root: Path) -> tuple[dict, str, bytes]:
     manifest_path = Path(manifest_path).expanduser().absolute()
     library_root = Path(library_root).expanduser().absolute()
     before = _safe_file_bytes(
@@ -220,11 +220,15 @@ def _validated_snapshot(manifest_path: Path, library_root: Path) -> tuple[dict, 
     after = _safe_file_bytes(
         manifest_path, label="Repair-evidence link manifest", maximum=16 * 1024 * 1024
     )
-    if before != after or after != canonical:
+    # The controlled library writes human-readable JSON while the wire payload
+    # is canonicalized below.  Byte identity across the validation window is
+    # the anti-race guarantee; requiring the library's on-disk layout to be
+    # the compact wire layout would reject every normally staged revision.
+    if before != after:
         raise SyncError(
             "manifest_changed", "Repair-evidence link manifest changed during validation."
         )
-    return manifest, canonical_sha256(manifest)
+    return manifest, canonical_sha256(manifest), after
 
 
 def _load_json_object(content: bytes) -> dict:
@@ -460,7 +464,7 @@ def main(argv: list[str] | None = None) -> int:
             actor_id=arguments.actor_id,
             allow_http_localhost=arguments.allow_http_localhost,
         )
-        manifest, digest = _validated_snapshot(
+        manifest, digest, manifest_bytes = _validated_snapshot(
             arguments.manifest, arguments.library_root
         )
         # Re-read after all preflight work, immediately before the single POST.
@@ -469,7 +473,7 @@ def main(argv: list[str] | None = None) -> int:
             label="Repair-evidence link manifest",
             maximum=16 * 1024 * 1024,
         )
-        if current != canonical_json_bytes(manifest):
+        if current != manifest_bytes:
             raise SyncError("manifest_changed", "Repair-evidence link manifest changed before synchronization.")
         status, response = _post_projection(
             api_base,

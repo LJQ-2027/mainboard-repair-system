@@ -186,6 +186,33 @@ class RepairEvidenceExportTests(unittest.TestCase):
         ):
             self.assertNotIn(forbidden, rendered)
 
+    def test_normalizes_server_coordinate_pairs_without_changing_values(self):
+        payload = server_case()
+        payload["server_registration_review"]["anchors"] = [
+            {"board": [0.1, 0.1], "image": [0.1, 0.1]},
+            {"board": [0.9, 0.1], "image": [0.9, 0.1]},
+            {"board": [0.9, 0.9], "image": [0.9, 0.9]},
+            {"board": [0.1, 0.9], "image": [0.1, 0.9]},
+        ]
+        payload["server_registration_review"]["check_points"] = [
+            {"board": [0.25, 0.25], "image": [0.250003, 0.250004]},
+            {"board": [0.75, 0.6], "image": [0.750006, 0.600008]},
+        ]
+
+        result = exporter.build_linkable_physical_evidence(
+            payload,
+            physical_evidence_id="physical-case005-page-2",
+        )
+
+        self.assertEqual(
+            result["registration"]["solve_anchors"][0],
+            point(0.1, 0.1, 0.1, 0.1),
+        )
+        self.assertEqual(
+            result["registration"]["independent_check_points"][1],
+            point(0.75, 0.6, 0.750006, 0.600008),
+        )
+
     def test_unrelated_v3_fields_and_qc_presence_do_not_change_output(self):
         left = server_case()
         right = server_case()

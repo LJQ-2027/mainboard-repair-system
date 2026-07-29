@@ -195,6 +195,29 @@ class VisualQcRepairEvidenceLinkStoreTests(unittest.TestCase):
     def tearDown(self):
         self.temp_dir.cleanup()
 
+    def test_registration_snapshot_normalizes_persisted_coordinate_pairs(self):
+        snapshot = self.service._registration_snapshot(
+            {
+                "method": "reviewed_manual_four_point",
+                "board_to_image_matrix": [1, 0, 0, 0, 1, 0, 0, 0, 1],
+                "anchors": [
+                    {"board": [0.1, 0.2], "image": [0.3, 0.4]},
+                ],
+                "check_points": [
+                    {"board": [0.5, 0.6], "image": [0.7, 0.8]},
+                ],
+                "error": {"count": 1, "rms": 0.0, "maximum": 0.0},
+            }
+        )
+        self.assertEqual(
+            snapshot["solve_anchors"],
+            [{"board": {"x": 0.1, "y": 0.2}, "image": {"x": 0.3, "y": 0.4}}],
+        )
+        self.assertEqual(
+            snapshot["independent_check_points"],
+            [{"board": {"x": 0.5, "y": 0.6}, "image": {"x": 0.7, "y": 0.8}}],
+        )
+
     def _create_active_manifest(self):
         content = encode_jpeg()
         case = self.service.create_case(

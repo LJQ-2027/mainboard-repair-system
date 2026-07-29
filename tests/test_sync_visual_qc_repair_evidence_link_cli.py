@@ -166,6 +166,28 @@ class SyncRepairEvidenceLinkCliTests(unittest.TestCase):
         self.assertEqual(json.loads(stdout)["state"], "accepted")
         self.assertEqual(self.manifest_path.read_bytes(), canonical_json_bytes(self.manifest))
 
+    def test_accepts_staged_readable_json_and_posts_canonical_payload(self):
+        self.manifest_path.write_text(
+            json.dumps(self.manifest, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        sent = []
+
+        def post(_api_base, payload, **_kwargs):
+            sent.append(payload)
+            return 201, self.response()
+
+        with patch.object(
+            command,
+            "validate_repair_evidence_link_revision_on_disk",
+            return_value=copy.deepcopy(self.manifest),
+        ), patch.object(command, "_post_projection", side_effect=post):
+            result, _stdout, stderr = self.run_main()
+
+        self.assertEqual(result, 0, stderr)
+        self.assertEqual(len(sent), 1)
+        self.assertEqual(sent[0]["manifest"], self.manifest)
+
     def test_invalid_revision_prevents_network_access(self):
         with patch.object(
             command,

@@ -129,6 +129,42 @@ def _registration_review(value) -> dict:
     return review
 
 
+def _contract_registration_points(points, *, label: str) -> list[dict]:
+    """Normalize the server's persisted [x, y] coordinates for V1 export.
+
+    The server API exposes reviewed anchor coordinates as pairs, while the
+    portable evidence contract intentionally uses named x/y points.  This is
+    a representation-only conversion: values, pairing, and ordering remain
+    unchanged and the contract validator still checks their geometry.
+    """
+
+    normalized = []
+    for index, pair in enumerate(points):
+        if not isinstance(pair, dict):
+            _error(
+                "invalid_registration_review",
+                f"{label} {index} is malformed.",
+            )
+        board = pair.get("board")
+        image = pair.get("image")
+        if isinstance(board, list):
+            if len(board) != 2:
+                _error(
+                    "invalid_registration_review",
+                    f"{label} {index} board coordinate is malformed.",
+                )
+            board = {"x": board[0], "y": board[1]}
+        if isinstance(image, list):
+            if len(image) != 2:
+                _error(
+                    "invalid_registration_review",
+                    f"{label} {index} image coordinate is malformed.",
+                )
+            image = {"x": image[0], "y": image[1]}
+        normalized.append({"board": board, "image": image})
+    return normalized
+
+
 def build_linkable_physical_evidence(
     server_case: dict, *, physical_evidence_id: str
 ) -> dict:
@@ -239,9 +275,11 @@ def build_linkable_physical_evidence(
             "board_to_image_matrix": copy.deepcopy(
                 review["board_to_image_matrix"]
             ),
-            "solve_anchors": copy.deepcopy(review["anchors"]),
-            "independent_check_points": copy.deepcopy(
-                review["check_points"]
+            "solve_anchors": _contract_registration_points(
+                review["anchors"], label="solve anchor"
+            ),
+            "independent_check_points": _contract_registration_points(
+                review["check_points"], label="independent check point"
             ),
             "error": copy.deepcopy(review["error"]),
         },

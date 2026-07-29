@@ -779,11 +779,22 @@ class VisualQcService:
 
     @staticmethod
     def _registration_snapshot(review: dict) -> dict:
+        def contract_point(pair: dict) -> dict:
+            board = pair["board"]
+            image = pair["image"]
+            if isinstance(board, list):
+                board = {"x": board[0], "y": board[1]}
+            if isinstance(image, list):
+                image = {"x": image[0], "y": image[1]}
+            return {"board": board, "image": image}
+
         return {
             "method": review["method"],
             "board_to_image_matrix": review["board_to_image_matrix"],
-            "solve_anchors": review["anchors"],
-            "independent_check_points": review["check_points"],
+            "solve_anchors": [contract_point(pair) for pair in review["anchors"]],
+            "independent_check_points": [
+                contract_point(pair) for pair in review["check_points"]
+            ],
             "error": review["error"],
         }
 
