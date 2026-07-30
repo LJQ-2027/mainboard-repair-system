@@ -208,6 +208,7 @@ test('nonfinite and out-of-range normalized structure ratios are rejected', () =
   [
     ['width', 1.4],
     ['width', 0.01],
+    ['depth', 0],
     ['height', Number.POSITIVE_INFINITY],
     ['radius', Number.NaN],
   ].forEach(([key, value]) => {
@@ -373,6 +374,12 @@ test('board and isolated detail levels are required arrays of part names', () =>
   invalidIsolated.detail_levels.isolated = 'base';
   assertError(validate(invalidIsolated), 'invalid_detail_level', 'detail_levels.isolated');
 
+  ['board', 'isolated'].forEach((level) => {
+    const empty = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+    empty.detail_levels[level] = [];
+    assertError(validate(empty), 'empty_detail_level', `detail_levels.${level}`);
+  });
+
   const invalidName = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
   invalidName.detail_levels.board[0] = null;
   assertError(validate(invalidName), 'invalid_part_name', 'detail_levels.board[0]');
@@ -386,6 +393,7 @@ test('acceptance requires finite ordered normalized ratio bounds', () => {
   const cases = [
     ['ratio_min', Number.NaN],
     ['ratio_max', Number.POSITIVE_INFINITY],
+    ['ratio_min', 0],
     ['ratio_min', -0.1],
     ['ratio_max', 1.1],
   ];

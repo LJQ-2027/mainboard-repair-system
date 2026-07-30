@@ -176,7 +176,7 @@ function validateAcceptance(acceptance, errors) {
   const ratioMaximum = acceptance.ratio_max;
   let validBounds = true;
 
-  if (!Number.isFinite(ratioMinimum) || ratioMinimum < 0 || ratioMinimum > 1) {
+  if (!Number.isFinite(ratioMinimum) || ratioMinimum <= 0 || ratioMinimum > 1) {
     errors.push(validationError(
       'invalid_ratio_bounds',
       'acceptance.ratio_min',
@@ -195,12 +195,12 @@ function validateAcceptance(acceptance, errors) {
   if (
     Number.isFinite(ratioMinimum)
     && Number.isFinite(ratioMaximum)
-    && ratioMinimum >= ratioMaximum
+    && ratioMinimum > ratioMaximum
   ) {
     errors.push(validationError(
       'invalid_ratio_bounds',
       'acceptance',
-      'Minimum ratio must be lower than maximum ratio.',
+      'Minimum ratio must not exceed maximum ratio.',
     ));
     validBounds = false;
   }
@@ -375,6 +375,13 @@ function validateDetailLevels(detailLevels, declaredParts, errors) {
         `Detail level must be an array: ${level}`,
       ));
       return;
+    }
+    if (names.length === 0) {
+      errors.push(validationError(
+        'empty_detail_level',
+        `detail_levels.${level}`,
+        `Detail level must not be empty: ${level}`,
+      ));
     }
     if (new Set(names).size !== names.length) {
       errors.push(validationError(
