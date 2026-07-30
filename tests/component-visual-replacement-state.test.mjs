@@ -37,6 +37,66 @@ function object(userData = {}) {
       callback(this);
       callback(child);
     },
+    removeFromParent() {
+      this.parent?.delete(this);
+      this.parent = null;
+    },
+  };
+}
+
+function reusableDescriptor() {
+  return {
+    layer: 'body',
+    selectable: true,
+    componentVisualSpecId: 'connector-j6101-repair-visual-v1',
+  };
+}
+
+function replacementFixture(detailLevel = 'isolated') {
+  const previous = object({
+    visualSpecId: 'connector-j6101-repair-visual-v1',
+    visualDetailLevel: detailLevel === 'isolated' ? 'board' : 'isolated',
+  });
+  const next = object({
+    visualSpecId: 'connector-j6101-repair-visual-v1',
+    visualDetailLevel: detailLevel,
+  });
+  const scene = new Set([previous]);
+  previous.parent = scene;
+  const renderObjects = new Map([['connector-1', previous]]);
+  const meshes = new Map([['connector-1', previous]]);
+  const disposals = new Map();
+  const options = {
+    componentId: 'connector-1',
+    detailLevel,
+    descriptor: reusableDescriptor(),
+    previous,
+    buildVisual() {
+      return { group: next, fallbackReason: null };
+    },
+    addObject(candidate) {
+      scene.add(candidate);
+      candidate.parent = scene;
+    },
+    removeObject(candidate) {
+      candidate.removeFromParent();
+    },
+    disposeObject(candidate) {
+      disposals.set(candidate, (disposals.get(candidate) || 0) + 1);
+      candidate.removeFromParent();
+    },
+    captureMaterialState() {},
+    renderObjects,
+    meshes,
+  };
+  return {
+    disposals,
+    meshes,
+    next,
+    options,
+    previous,
+    renderObjects,
+    scene,
   };
 }
 
@@ -289,3 +349,136 @@ test('legacy inspectable visuals commit enter and exit as unchanged no-ops', asy
   assert.deepEqual(legacy.userData, originalUserData);
   assert.deepEqual(events, []);
 });
+
+test('persistent isolated build failure keeps board mode usable until a later retry', async () => {
+  const { replaceComponentVisualState } = await loadReplacementState();
+  const fixture = replacementFixture('isolated');
+  let buildFails = true;
+  let buildCalls = 0;
+  fixture.options.buildVisual = () => {
+    buildCalls += 1;
+    return buildFails
+      ? { group: null, fallbackReason: 'visual_build_error' }
+      : { group: fixture.next, fallbackReason: null };
+  };
+
+  const failedEntries = ['enter', 'exit', 'side', 'view', 'select', 'reset'].map(() => (
+    replaceComponentVisualState(fixture.options)
+  ));
+
+  failedEntries.forEach((result) => {
+    assert.equal(result.detailCommitted, false);
+    assert.equal(result.object, fixture.previous);
+    assert.equal(result.fallbackReason, 'visual_build_error');
+  });
+  assert.equal(fixture.renderObjects.get('connector-1'), fixture.previous);
+  assert.equal(fixture.meshes.get('connector-1'), fixture.previous);
+  assert.deepEqual([...fixture.scene], [fixture.previous]);
+  assert.equal(fixture.disposals.size, 0);
+
+  buildFails = false;
+  const retried = replaceComponentVisualState(fixture.options);
+  assert.equal(retried.detailCommitted, true);
+  assert.equal(retried.object, fixture.next);
+  assert.equal(buildCalls, 7);
+});
+
+for (const failure of [
+  {
+    name: 'material capture',
+    reason: 'visual_replacement_capture_failed',
+    install(fixture) {
+      fixture.options.captureMaterialState = () => {
+        throw new Error('capture failed');
+      };
+    },
+  },
+  {
+    name: 'scene add',
+    reason: 'visual_replacement_add_failed',
+    install(fixture) {
+      fixture.options.addObject = (candidate) => {
+        fixture.scene.add(candidate);
+        candidate.parent = fixture.scene;
+        throw new Error('add failed after attachment');
+      };
+    },
+  },
+  {
+    name: 'render object map commit',
+    reason: 'visual_replacement_commit_failed',
+    install(fixture) {
+      const originalSet = fixture.renderObjects.set.bind(fixture.renderObjects);
+      let failed = false;
+      fixture.renderObjects.set = (key, value) => {
+        if (!failed && value === fixture.next) {
+          failed = true;
+          originalSet(key, value);
+          throw new Error('render map failed');
+        }
+        if (failed && value === fixture.previous) {
+          throw new Error('render map rollback override failed');
+        }
+        return originalSet(key, value);
+      };
+    },
+  },
+  {
+    name: 'selectable mesh map commit',
+    reason: 'visual_replacement_commit_failed',
+    install(fixture) {
+      const originalSet = fixture.meshes.set.bind(fixture.meshes);
+      let failed = false;
+      fixture.meshes.set = (key, value) => {
+        if (!failed && value === fixture.next) {
+          failed = true;
+          originalSet(key, value);
+          throw new Error('mesh map failed');
+        }
+        return originalSet(key, value);
+      };
+    },
+  },
+  {
+    name: 'previous object disposal',
+    reason: 'visual_replacement_dispose_failed',
+    install(fixture) {
+      const baseDispose = fixture.options.disposeObject;
+      fixture.options.disposeObject = (candidate) => {
+        if (candidate === fixture.previous) throw new Error('previous disposal failed');
+        baseDispose(candidate);
+      };
+    },
+  },
+]) {
+  test(`${failure.name} failure rolls back replacement without throwing or leaking`, async () => {
+    const { replaceComponentVisualState } = await loadReplacementState();
+    const fixture = replacementFixture('isolated');
+    failure.install(fixture);
+
+    let result;
+    assert.doesNotThrow(() => {
+      result = replaceComponentVisualState(fixture.options);
+    });
+
+    assert.deepEqual({
+      object: result.object,
+      replaced: result.replaced,
+      detailCommitted: result.detailCommitted,
+      currentDetailLevel: result.currentDetailLevel,
+      fallbackReason: result.fallbackReason,
+    }, {
+      object: fixture.previous,
+      replaced: false,
+      detailCommitted: false,
+      currentDetailLevel: 'board',
+      fallbackReason: failure.reason,
+    });
+    assert.equal(fixture.renderObjects.get('connector-1'), fixture.previous);
+    assert.equal(fixture.meshes.get('connector-1'), fixture.previous);
+    assert.equal(fixture.scene.has(fixture.previous), true);
+    assert.equal(fixture.scene.has(fixture.next), false);
+    assert.equal(fixture.disposals.get(fixture.next), 1);
+    assert.equal(fixture.previous.userData.visualFallbackReason, failure.reason);
+  });
+}

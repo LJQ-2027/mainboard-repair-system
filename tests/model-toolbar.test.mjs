@@ -290,6 +290,11 @@ test('component inspection switches visual detail and restores board detail in o
     enterSource.indexOf("replaceComponentVisualDetail(componentId, 'isolated')")
       < enterSource.indexOf('this.inspectionSnapshot ='),
   );
+  assert.match(enterSource, /if \(!replacement\.detailCommitted\) return false/);
+  assert.ok(
+    enterSource.indexOf('if (!replacement.detailCommitted) return false')
+      < enterSource.indexOf('this.inspectionComponentId = componentId'),
+  );
   assert.match(exitSource, /replaceComponentVisualDetail\(componentId, 'board'\)/);
   assert.ok(
     exitSource.indexOf("replaceComponentVisualDetail(componentId, 'board')")
@@ -300,6 +305,27 @@ test('component inspection switches visual detail and restores board detail in o
     exitSource.indexOf('if (!replacement.detailCommitted) return false')
       < exitSource.indexOf('animateInspectionObject'),
   );
+});
+
+test('failed reusable inspection entry leaves every board navigation path available for retry', () => {
+  const enterRendererSource = rendererSource.slice(
+    rendererSource.indexOf('async setComponentInspection'),
+    rendererSource.indexOf('async resetComponentInspectionView'),
+  );
+  const enterAppSource = appSource.slice(
+    appSource.indexOf('async function enterCurrentComponentInspection'),
+    appSource.indexOf('async function enterSelectedComponentInspection'),
+  );
+  const resetAppSource = appSource.slice(
+    appSource.indexOf("document.querySelector('#resetModel')"),
+    appSource.indexOf("document.querySelector('#resetPointMap')"),
+  );
+
+  assert.match(enterRendererSource, /if \(!replacement\.detailCommitted\) return false/);
+  assert.match(enterAppSource, /componentInspection = entered \? next : exitComponentInspection\(\)/);
+  assert.match(resetAppSource, /if \(componentInspection\.mode === 'isolated'\)/);
+  assert.match(resetAppSource, /renderer\?\.reset\(\)/);
+  assert.doesNotMatch(enterRendererSource, /inspectionComponentId = componentId[\s\S]*if \(!replacement\.detailCommitted\)/);
 });
 
 test('component visual replacement integrates exact disposal and stable browser metadata', () => {

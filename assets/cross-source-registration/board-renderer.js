@@ -1453,6 +1453,7 @@ export class BoardRenderer {
       previous,
       buildVisual: buildComponentVisual,
       addObject: (object) => this.group.add(object),
+      removeObject: (object) => object.removeFromParent(),
       disposeObject: (object) => this.disposeObject(object),
       captureMaterialState,
       renderObjects: this.renderObjects,
@@ -1471,10 +1472,11 @@ export class BoardRenderer {
       const cleared = await this.clearComponentInspection(false);
       if (!cleared) return false;
     }
-    this.cancelCameraAnimation();
     const replacement = this.replaceComponentVisualDetail(componentId, 'isolated');
+    if (!replacement.detailCommitted) return false;
     const object = replacement.object;
     if (!object) return false;
+    this.cancelCameraAnimation();
     const narrow = this.container.clientWidth < 620;
     const transform = buildInspectionTransform(descriptor.dimensions, narrow);
     this.inspectionComponentId = componentId;
