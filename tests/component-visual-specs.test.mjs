@@ -292,7 +292,24 @@ test('material roles must be complete, known, and backed by catalog tokens', () 
 
   const invalidTokenType = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
   invalidTokenType.materials.frame = null;
-  assertError(validate(invalidTokenType), 'unknown_material', 'materials.frame');
+  assertError(validate(invalidTokenType), 'invalid_material_token', 'materials.frame');
+});
+
+test('malformed material tokens return stable errors without throwing', () => {
+  [Symbol('metal'), {}, () => 'metal', null, []].forEach((token) => {
+    const spec = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+    spec.materials.frame = token;
+    let result;
+    assert.doesNotThrow(() => {
+      result = validate(spec);
+    });
+    assert.deepEqual(result.errors[0], {
+      code: 'invalid_material_token',
+      path: 'materials.frame',
+      message: 'Material tokens must be non-empty strings.',
+    });
+    assert.equal(result.valid, false);
+  });
 });
 
 test('structure requires every supported role and rejects unknown roles', () => {
@@ -428,4 +445,70 @@ test('malformed input never throws and always returns the validation result shap
       assert.equal(Object.isFrozen(item), true);
     });
   });
+});
+
+test('required visual metadata fields cannot be omitted', () => {
+  [
+    'family',
+    'inspection_profiles',
+    'source_status',
+    'fidelity',
+    'boundary_note',
+  ].forEach((field) => {
+    const spec = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+    delete spec[field];
+    assert.deepEqual(validate(spec).errors[0], {
+      code: 'missing_required_field',
+      path: field,
+      message: `Required specification field is missing: ${field}`,
+    });
+  });
+});
+
+test('string visual metadata fields require nonempty strings', () => {
+  ['family', 'source_status', 'fidelity', 'boundary_note'].forEach((field) => {
+    [null, 42, [], '', '   '].forEach((value) => {
+      const spec = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+      spec[field] = value;
+      assertError(validate(spec), 'invalid_required_field', field);
+    });
+  });
+});
+
+test('inspection profiles require a nonempty array of unique nonempty strings', () => {
+  [null, 'j6101-connector-v1', {}, []].forEach((value) => {
+    const spec = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+    spec.inspection_profiles = value;
+    assertError(validate(spec), 'invalid_inspection_profiles', 'inspection_profiles');
+  });
+
+  [null, '', '   ', Symbol('profile')].forEach((profileId) => {
+    const spec = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+    spec.inspection_profiles = [profileId];
+    assertError(validate(spec), 'invalid_inspection_profile', 'inspection_profiles[0]');
+  });
+
+  const duplicate = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+  duplicate.inspection_profiles = ['j6101-connector-v1', 'j6101-connector-v1'];
+  assertError(
+    validate(duplicate),
+    'duplicate_inspection_profile',
+    'inspection_profiles',
+  );
+});
+
+test('claims require a nonempty array of unique nonempty strings', () => {
+  const empty = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+  empty.claims = [];
+  assertError(validate(empty), 'invalid_claims', 'claims');
+
+  [null, '', '   ', Symbol('claim')].forEach((claim) => {
+    const spec = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+    spec.claims = [claim];
+    assertError(validate(spec), 'invalid_claim', 'claims[0]');
+  });
+
+  const duplicate = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+  duplicate.claims = ['connector_silhouette', 'connector_silhouette'];
+  assertError(validate(duplicate), 'duplicate_claim', 'claims');
 });

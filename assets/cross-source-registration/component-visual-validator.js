@@ -23,6 +23,13 @@ const REQUIRED_SECTIONS = Object.freeze({
   acceptance: 'object',
 });
 
+const REQUIRED_STRING_FIELDS = Object.freeze([
+  'family',
+  'source_status',
+  'fidelity',
+  'boundary_note',
+]);
+
 const MATERIAL_ROLES = Object.freeze([
   'base',
   'opening',
@@ -112,6 +119,58 @@ function validateRequiredSections(spec, errors) {
   return validSections;
 }
 
+function validateRequiredMetadata(spec, errors) {
+  REQUIRED_STRING_FIELDS.forEach((field) => {
+    if (!hasOwn(spec, field)) {
+      errors.push(validationError(
+        'missing_required_field',
+        field,
+        `Required specification field is missing: ${field}`,
+      ));
+    } else if (typeof spec[field] !== 'string' || spec[field].trim() === '') {
+      errors.push(validationError(
+        'invalid_required_field',
+        field,
+        `Required specification field must be a non-empty string: ${field}`,
+      ));
+    }
+  });
+
+  if (!hasOwn(spec, 'inspection_profiles')) {
+    errors.push(validationError(
+      'missing_required_field',
+      'inspection_profiles',
+      'Required specification field is missing: inspection_profiles',
+    ));
+    return;
+  }
+  const profiles = spec.inspection_profiles;
+  if (!Array.isArray(profiles) || profiles.length === 0) {
+    errors.push(validationError(
+      'invalid_inspection_profiles',
+      'inspection_profiles',
+      'Inspection profiles must be a non-empty array.',
+    ));
+    return;
+  }
+  profiles.forEach((profileId, index) => {
+    if (typeof profileId !== 'string' || profileId.trim() === '') {
+      errors.push(validationError(
+        'invalid_inspection_profile',
+        `inspection_profiles[${index}]`,
+        'Inspection profile IDs must be non-empty strings.',
+      ));
+    }
+  });
+  if (new Set(profiles).size !== profiles.length) {
+    errors.push(validationError(
+      'duplicate_inspection_profile',
+      'inspection_profiles',
+      'Inspection profile IDs must be unique.',
+    ));
+  }
+}
+
 function validateAcceptance(acceptance, errors) {
   const ratioMinimum = acceptance.ratio_min;
   const ratioMaximum = acceptance.ratio_max;
@@ -195,7 +254,13 @@ function validateMaterials(materials, materialCatalog, errors) {
       return;
     }
     const token = materials[role];
-    if (!hasOwn(materialCatalog, token)) {
+    if (typeof token !== 'string' || token.trim() === '') {
+      errors.push(validationError(
+        'invalid_material_token',
+        `materials.${role}`,
+        'Material tokens must be non-empty strings.',
+      ));
+    } else if (!hasOwn(materialCatalog, token)) {
       errors.push(validationError(
         'unknown_material',
         `materials.${role}`,
@@ -378,6 +443,7 @@ export function validateComponentVisualSpec(spec, materialCatalog = {}) {
     ));
   }
 
+  validateRequiredMetadata(spec, errors);
   const validSections = validateRequiredSections(spec, errors);
   const bounds = validSections.has('acceptance')
     ? validateAcceptance(spec.acceptance, errors)
@@ -393,8 +459,22 @@ export function validateComponentVisualSpec(spec, materialCatalog = {}) {
     ? validateStructure(spec.structure, bounds, errors)
     : new Set();
   if (validSections.has('claims')) {
+    if (spec.claims.length === 0) {
+      errors.push(validationError(
+        'invalid_claims',
+        'claims',
+        'Claims must be a non-empty array.',
+      ));
+    }
+    if (new Set(spec.claims).size !== spec.claims.length) {
+      errors.push(validationError(
+        'duplicate_claim',
+        'claims',
+        'Claims must be unique.',
+      ));
+    }
     spec.claims.forEach((claim, index) => {
-      if (typeof claim !== 'string') {
+      if (typeof claim !== 'string' || claim.trim() === '') {
         errors.push(validationError(
           'invalid_claim',
           `claims[${index}]`,
