@@ -5,6 +5,7 @@ import * as THREE from '../assets/vendor/three/three.module.min.js';
 import {
   buildComponentVisual,
   componentVisualBounds,
+  disposeComponentVisual,
 } from '../assets/cross-source-registration/component-visual-builder.js';
 import {
   COMPONENT_VISUAL_MATERIALS,
@@ -285,6 +286,125 @@ test('validator failures propagate the stable first error code without throwing'
     });
   });
   assert.deepEqual(result, { group: null, fallbackReason: 'invalid_identity' });
+});
+
+test('throwing descriptor access paths fail soft with a stable build error', () => {
+  const throwingInspectionProfile = {};
+  Object.defineProperty(throwingInspectionProfile, 'inspectionProfile', {
+    get() {
+      throw new Error('inspection profile access failed');
+    },
+  });
+  const throwingProfileId = {
+    inspectionProfile: {},
+  };
+  Object.defineProperty(throwingProfileId.inspectionProfile, 'profile_id', {
+    get() {
+      throw new Error('profile ID access failed');
+    },
+  });
+
+  [throwingInspectionProfile, throwingProfileId].forEach((descriptor) => {
+    let result;
+    assert.doesNotThrow(() => {
+      result = buildComponentVisual(descriptor);
+    });
+    assert.deepEqual(result, { group: null, fallbackReason: 'visual_build_error' });
+  });
+});
+
+test('throwing resolved spec access paths fail soft with a stable build error', () => {
+  ['spec_id', 'materials', 'structure', 'detail_levels'].forEach((field) => {
+    const spec = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+    Object.defineProperty(spec, field, {
+      configurable: true,
+      get() {
+        throw new Error(`${field} access failed`);
+      },
+    });
+    let result;
+    assert.doesNotThrow(() => {
+      result = buildComponentVisual(DESCRIPTOR, 'board', {
+        resolveSpec: () => spec,
+      });
+    });
+    assert.deepEqual(result, { group: null, fallbackReason: 'visual_build_error' });
+  });
+});
+
+test('late build failure disposes every partially allocated resource and returns no group', () => {
+  const geometryDispose = THREE.BufferGeometry.prototype.dispose;
+  const materialDispose = THREE.Material.prototype.dispose;
+  let geometryDisposals = 0;
+  let materialDisposals = 0;
+  THREE.BufferGeometry.prototype.dispose = function disposeGeometry() {
+    geometryDisposals += 1;
+    return geometryDispose.call(this);
+  };
+  THREE.Material.prototype.dispose = function disposeMaterial() {
+    materialDisposals += 1;
+    return materialDispose.call(this);
+  };
+
+  try {
+    const spec = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+    let identityReads = 0;
+    Object.defineProperty(spec, 'spec_id', {
+      configurable: true,
+      get() {
+        identityReads += 1;
+        if (identityReads > 2) throw new Error('late identity access failed');
+        return J6101_CONNECTOR_VISUAL_SPEC.spec_id;
+      },
+    });
+    let result;
+    assert.doesNotThrow(() => {
+      result = buildComponentVisual(DESCRIPTOR, 'isolated', {
+        resolveSpec: () => spec,
+      });
+    });
+    assert.deepEqual(result, { group: null, fallbackReason: 'visual_build_error' });
+    assert.equal(geometryDisposals, 17);
+    assert.equal(materialDisposals, 17);
+  } finally {
+    THREE.BufferGeometry.prototype.dispose = geometryDispose;
+    THREE.Material.prototype.dispose = materialDispose;
+  }
+});
+
+test('component disposal releases each unique resource once without crossing build ownership', () => {
+  const first = build('isolated');
+  const second = build('isolated');
+  const firstResources = resources(first);
+  const secondResources = resources(second);
+  const firstEvents = new Map();
+  const secondEvents = new Map();
+
+  [...firstResources.geometries, ...firstResources.materials].forEach((resource) => {
+    firstEvents.set(resource, 0);
+    resource.addEventListener('dispose', () => {
+      firstEvents.set(resource, firstEvents.get(resource) + 1);
+    });
+  });
+  [...secondResources.geometries, ...secondResources.materials].forEach((resource) => {
+    secondEvents.set(resource, 0);
+    resource.addEventListener('dispose', () => {
+      secondEvents.set(resource, secondEvents.get(resource) + 1);
+    });
+  });
+
+  assert.deepEqual(disposeComponentVisual(first), {
+    geometries: firstResources.geometries.length,
+    materials: firstResources.materials.length,
+  });
+  firstEvents.forEach((count) => assert.equal(count, 1));
+  secondEvents.forEach((count) => assert.equal(count, 0));
+
+  assert.deepEqual(disposeComponentVisual(second), {
+    geometries: secondResources.geometries.length,
+    materials: secondResources.materials.length,
+  });
+  secondEvents.forEach((count) => assert.equal(count, 1));
 });
 
 test('componentVisualBounds returns finite Three.js Box3 dimensions', () => {

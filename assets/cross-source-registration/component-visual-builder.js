@@ -16,25 +16,44 @@ function hasValidDimensions(dimensions) {
     );
 }
 
-function materialFor(spec, role) {
+function ownResource(ownership, type, resource) {
+  ownership?.[type].add(resource);
+  return resource;
+}
+
+function disposeOwnedResources(ownership) {
+  if (!ownership) return;
+  ownership.geometries.forEach((geometry) => geometry.dispose());
+  ownership.materials.forEach((material) => material.dispose());
+}
+
+function materialFor(spec, role, ownership) {
   const token = spec.materials[role];
   const values = COMPONENT_VISUAL_MATERIALS[token];
   if (role === 'edge') {
     return {
-      material: new THREE.LineBasicMaterial({
-        color: values.color,
-        transparent: true,
-        opacity: values.opacity,
-      }),
+      material: ownResource(
+        ownership,
+        'materials',
+        new THREE.LineBasicMaterial({
+          color: values.color,
+          transparent: true,
+          opacity: values.opacity,
+        }),
+      ),
       token,
     };
   }
   return {
-    material: new THREE.MeshStandardMaterial({
-      color: values.color,
-      roughness: values.roughness,
-      metalness: values.metalness,
-    }),
+    material: ownResource(
+      ownership,
+      'materials',
+      new THREE.MeshStandardMaterial({
+        color: values.color,
+        roughness: values.roughness,
+        metalness: values.metalness,
+      }),
+    ),
     token,
   };
 }
@@ -56,7 +75,17 @@ function roundedShape(width, depth, radius) {
   return shape;
 }
 
-function roundedPart(spec, role, name, width, depth, height, radius, lift = 0) {
+function roundedPart(
+  spec,
+  role,
+  name,
+  width,
+  depth,
+  height,
+  radius,
+  lift = 0,
+  ownership,
+) {
   const safeRadius = Math.min(radius, width / 2, depth / 2);
   const bevelSize = Math.min(
     safeRadius * 0.28,
@@ -68,17 +97,21 @@ function roundedPart(spec, role, name, width, depth, height, radius, lift = 0) {
   const shapeDepth = depth - bevelSize * 2;
   const shapeRadius = Math.max(0, safeRadius - bevelSize);
   const coreHeight = height - bevelThickness * 2;
-  const geometry = new THREE.ExtrudeGeometry(
-    roundedShape(shapeWidth, shapeDepth, shapeRadius),
-    {
-      depth: coreHeight,
-      bevelEnabled: true,
-      bevelSize,
-      bevelThickness,
-      bevelSegments: 2,
-      curveSegments: 6,
-      steps: 1,
-    },
+  const geometry = ownResource(
+    ownership,
+    'geometries',
+    new THREE.ExtrudeGeometry(
+      roundedShape(shapeWidth, shapeDepth, shapeRadius),
+      {
+        depth: coreHeight,
+        bevelEnabled: true,
+        bevelSize,
+        bevelThickness,
+        bevelSegments: 2,
+        curveSegments: 6,
+        steps: 1,
+      },
+    ),
   );
   const mesh = new THREE.Mesh(geometry, null);
   mesh.name = name;
@@ -103,6 +136,7 @@ function addPart(context, name, source, role, position = {}) {
     dimensions.z * source.height,
     Math.min(dimensions.x, dimensions.y) * (source.radius || 0.02),
     dimensions.z * (source.lift || 0),
+    context.ownership,
   );
   part.position.x = dimensions.x * (position.x || 0);
   part.position.y = dimensions.y * (position.y || 0);
@@ -139,6 +173,7 @@ function addFrame(context) {
       dimensions.z * frame.height,
       sourceRadius,
       dimensions.z * frame.lift,
+      context.ownership,
     );
     part.position.x = x;
     part.position.y = y;
@@ -199,6 +234,7 @@ function material(context) {
     child.material = materialFor(
       context.spec,
       child.userData.visualMaterialRole,
+      context.ownership,
     ).material;
   });
 }
@@ -211,9 +247,17 @@ function polish(context) {
   context.group.children
     .filter((child) => /^frame-(north|south|west|east)$/.test(child.name))
     .forEach((source) => {
-      const { material: edgeMaterial, token } = materialFor(context.spec, 'edge');
+      const { material: edgeMaterial, token } = materialFor(
+        context.spec,
+        'edge',
+        context.ownership,
+      );
       const edge = new THREE.LineSegments(
-        new THREE.EdgesGeometry(source.geometry, 28),
+        ownResource(
+          context.ownership,
+          'geometries',
+          new THREE.EdgesGeometry(source.geometry, 28),
+        ),
         edgeMaterial,
       );
       edge.name = `${source.name}-edge`;
@@ -246,6 +290,30 @@ function finishMetadata(group, spec, detailLevel, stages) {
   group.userData.visualBoundaryNote = spec.boundary_note;
 }
 
+export function disposeComponentVisual(group) {
+  const ownership = {
+    geometries: new Set(),
+    materials: new Set(),
+  };
+  if (!group || typeof group.traverse !== 'function') {
+    return { geometries: 0, materials: 0 };
+  }
+  group.traverse((child) => {
+    if (child.geometry?.dispose) ownership.geometries.add(child.geometry);
+    const materials = Array.isArray(child.material)
+      ? child.material
+      : [child.material];
+    materials
+      .filter((material) => material?.dispose)
+      .forEach((material) => ownership.materials.add(material));
+  });
+  disposeOwnedResources(ownership);
+  return {
+    geometries: ownership.geometries.size,
+    materials: ownership.materials.size,
+  };
+}
+
 export function componentVisualBounds(group) {
   const box = new THREE.Box3().setFromObject(group);
   const size = new THREE.Vector3();
@@ -258,34 +326,45 @@ export function buildComponentVisual(
   detailLevel = 'board',
   dependencies = {},
 ) {
-  const resolveSpec = typeof dependencies.resolveSpec === 'function'
-    ? dependencies.resolveSpec
-    : resolveComponentVisualSpec;
-  const spec = resolveSpec(descriptor?.inspectionProfile?.profile_id);
-  if (!spec) return { group: null, fallbackReason: 'visual_spec_not_found' };
-  if (!DETAIL_LEVELS.has(detailLevel)) {
-    return { group: null, fallbackReason: 'unknown_detail_level' };
-  }
-  if (!hasValidDimensions(descriptor?.dimensions)) {
-    return { group: null, fallbackReason: 'invalid_dimensions' };
-  }
+  let ownership = null;
+  try {
+    const resolveSpec = typeof dependencies.resolveSpec === 'function'
+      ? dependencies.resolveSpec
+      : resolveComponentVisualSpec;
+    const spec = resolveSpec(descriptor?.inspectionProfile?.profile_id);
+    if (!spec) return { group: null, fallbackReason: 'visual_spec_not_found' };
+    if (!DETAIL_LEVELS.has(detailLevel)) {
+      return { group: null, fallbackReason: 'unknown_detail_level' };
+    }
+    if (!hasValidDimensions(descriptor?.dimensions)) {
+      return { group: null, fallbackReason: 'invalid_dimensions' };
+    }
 
-  const validation = validateComponentVisualSpec(spec, COMPONENT_VISUAL_MATERIALS);
-  if (!validation.valid) {
-    return { group: null, fallbackReason: validation.errors[0].code };
-  }
+    const validation = validateComponentVisualSpec(spec, COMPONENT_VISUAL_MATERIALS);
+    if (!validation.valid) {
+      return { group: null, fallbackReason: validation.errors[0].code };
+    }
 
-  const context = {
-    allowed: new Set(spec.detail_levels[detailLevel]),
-    dimensions: descriptor.dimensions,
-    group: new THREE.Group(),
-    spec,
-  };
-  const completedStages = [];
-  BUILD_STAGES.forEach(([name, buildStage]) => {
-    buildStage(context);
-    completedStages.push(name);
-  });
-  finishMetadata(context.group, spec, detailLevel, completedStages);
-  return { group: context.group, fallbackReason: null };
+    ownership = {
+      geometries: new Set(),
+      materials: new Set(),
+    };
+    const context = {
+      allowed: new Set(spec.detail_levels[detailLevel]),
+      dimensions: descriptor.dimensions,
+      group: new THREE.Group(),
+      ownership,
+      spec,
+    };
+    const completedStages = [];
+    BUILD_STAGES.forEach(([name, buildStage]) => {
+      buildStage(context);
+      completedStages.push(name);
+    });
+    finishMetadata(context.group, spec, detailLevel, completedStages);
+    return { group: context.group, fallbackReason: null };
+  } catch {
+    disposeOwnedResources(ownership);
+    return { group: null, fallbackReason: 'visual_build_error' };
+  }
 }
