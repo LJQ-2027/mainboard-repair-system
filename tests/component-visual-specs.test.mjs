@@ -248,3 +248,184 @@ test('detail-level part names must be backed by declared structural parts', () =
     message: 'Detail part is not backed by declared structure: individual-pin-1',
   });
 });
+
+test('all schema sections are required and fail with stable section errors', () => {
+  ['materials', 'structure', 'claims', 'detail_levels', 'acceptance'].forEach((section) => {
+    const spec = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+    delete spec[section];
+    assert.deepEqual(validate(spec).errors[0], {
+      code: 'missing_section',
+      path: section,
+      message: `Required specification section is missing: ${section}`,
+    });
+  });
+});
+
+test('schema sections require exact object and array container types', () => {
+  const malformedSections = [
+    ['materials', [], 'object'],
+    ['structure', [], 'object'],
+    ['claims', 'connector_silhouette', 'array'],
+    ['detail_levels', null, 'object'],
+    ['acceptance', [], 'object'],
+  ];
+
+  malformedSections.forEach(([section, value, expectedType]) => {
+    const spec = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+    spec[section] = value;
+    assert.deepEqual(validate(spec).errors[0], {
+      code: 'invalid_section_type',
+      path: section,
+      message: `Specification section must be an ${expectedType}: ${section}`,
+    });
+  });
+});
+
+test('material roles must be complete, known, and backed by catalog tokens', () => {
+  const missing = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+  delete missing.materials.contact;
+  assertError(validate(missing), 'missing_material_role', 'materials.contact');
+
+  const extra = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+  extra.materials.decorative = 'plated-metal';
+  assertError(validate(extra), 'unknown_material_role', 'materials.decorative');
+
+  const invalidTokenType = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+  invalidTokenType.materials.frame = null;
+  assertError(validate(invalidTokenType), 'unknown_material', 'materials.frame');
+});
+
+test('structure requires every supported role and rejects unknown roles', () => {
+  const missing = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+  delete missing.structure.retention;
+  const missingResult = validate(missing);
+  assertError(missingResult, 'missing_structure_role', 'structure.retention');
+  assertError(missingResult, 'undeclared_detail_part', 'detail_levels.isolated[7]');
+
+  const extra = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+  extra.structure.vendor_latch = { width: 0.2 };
+  assertError(validate(extra), 'unknown_structure_role', 'structure.vendor_latch');
+});
+
+test('each structure role requires its supported finite numeric shape', () => {
+  const missingDimension = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+  delete missingDimension.structure.frame.wall;
+  const missingDimensionResult = validate(missingDimension);
+  assertError(
+    missingDimensionResult,
+    'missing_structure_dimension',
+    'structure.frame.wall',
+  );
+  assertError(
+    missingDimensionResult,
+    'undeclared_detail_part',
+    'detail_levels.board[1]',
+  );
+
+  const extraDimension = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+  extraDimension.structure.base.vendor_radius = 0.1;
+  assertError(
+    validate(extraDimension),
+    'unknown_structure_dimension',
+    'structure.base.vendor_radius',
+  );
+
+  const invalidSection = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+  invalidSection.structure.opening = null;
+  assertError(
+    validate(invalidSection),
+    'invalid_structure_role',
+    'structure.opening',
+  );
+
+  const invalidDimension = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+  invalidDimension.structure.contact.width = '0.56';
+  assertError(
+    validate(invalidDimension),
+    'invalid_structure_dimension',
+    'structure.contact.width',
+  );
+});
+
+test('board and isolated detail levels are required arrays of part names', () => {
+  const missingBoard = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+  delete missingBoard.detail_levels.board;
+  assertError(validate(missingBoard), 'missing_detail_level', 'detail_levels.board');
+
+  const invalidIsolated = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+  invalidIsolated.detail_levels.isolated = 'base';
+  assertError(validate(invalidIsolated), 'invalid_detail_level', 'detail_levels.isolated');
+
+  const invalidName = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+  invalidName.detail_levels.board[0] = null;
+  assertError(validate(invalidName), 'invalid_part_name', 'detail_levels.board[0]');
+
+  const extraLevel = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+  extraLevel.detail_levels.preview = ['base'];
+  assertError(validate(extraLevel), 'unknown_detail_level', 'detail_levels.preview');
+});
+
+test('acceptance requires finite ordered normalized ratio bounds', () => {
+  const cases = [
+    ['ratio_min', Number.NaN],
+    ['ratio_max', Number.POSITIVE_INFINITY],
+    ['ratio_min', -0.1],
+    ['ratio_max', 1.1],
+  ];
+  cases.forEach(([field, value]) => {
+    const spec = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+    spec.acceptance[field] = value;
+    assertError(validate(spec), 'invalid_ratio_bounds', `acceptance.${field}`);
+  });
+
+  const reversed = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+  reversed.acceptance.ratio_min = 0.8;
+  reversed.acceptance.ratio_max = 0.2;
+  assertError(validate(reversed), 'invalid_ratio_bounds', 'acceptance');
+});
+
+test('acceptance requires the complete prohibited claim policy', () => {
+  const missingArray = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+  delete missingArray.acceptance.prohibited_claims;
+  assertError(
+    validate(missingArray),
+    'missing_prohibited_claims',
+    'acceptance.prohibited_claims',
+  );
+
+  const wrongType = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+  wrongType.acceptance.prohibited_claims = 'exact_pin_count';
+  assertError(
+    validate(wrongType),
+    'invalid_prohibited_claims',
+    'acceptance.prohibited_claims',
+  );
+
+  PROHIBITED_CLAIMS.forEach((claim) => {
+    const incomplete = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+    incomplete.acceptance.prohibited_claims = PROHIBITED_CLAIMS.filter(
+      (candidate) => candidate !== claim,
+    );
+    assertError(
+      validate(incomplete),
+      'incomplete_prohibited_claims',
+      'acceptance.prohibited_claims',
+    );
+  });
+});
+
+test('malformed input never throws and always returns the validation result shape', () => {
+  [null, undefined, true, 42, 'invalid', [], new Date()].forEach((spec) => {
+    let result;
+    assert.doesNotThrow(() => {
+      result = validate(spec);
+    });
+    assert.deepEqual(Object.keys(result), ['valid', 'errors']);
+    assert.equal(result.valid, false);
+    assert.ok(result.errors.length > 0);
+    result.errors.forEach((item) => {
+      assert.deepEqual(Object.keys(item), ['code', 'path', 'message']);
+      assert.equal(Object.isFrozen(item), true);
+    });
+  });
+});
