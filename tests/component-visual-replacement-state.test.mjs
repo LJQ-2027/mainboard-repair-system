@@ -237,3 +237,55 @@ test('failed board restoration stays isolated and a later retry commits board de
   assert.equal(meshes.get('connector-1'), board);
   assert.deepEqual(events, ['build-1', 'build-2', 'capture-board', 'add-board', 'dispose-isolated']);
 });
+
+test('legacy inspectable visuals commit enter and exit as unchanged no-ops', async () => {
+  const { replaceComponentVisualState } = await loadReplacementState();
+  assert.equal(typeof replaceComponentVisualState, 'function');
+  const legacy = object({
+    inspectionProfileId: 'u2001-pmic-v1',
+    legacyMaterialState: 'retained',
+  });
+  const originalUserData = { ...legacy.userData };
+  const renderObjects = new Map([['legacy-1', legacy]]);
+  const meshes = new Map([['legacy-1', legacy]]);
+  const events = [];
+  const options = {
+    componentId: 'legacy-1',
+    descriptor: {
+      layer: 'body',
+      selectable: true,
+      componentVisualSpecId: null,
+    },
+    previous: legacy,
+    buildVisual() {
+      events.push('build');
+      return { group: null, fallbackReason: 'unexpected' };
+    },
+    addObject() {
+      events.push('add');
+    },
+    disposeObject() {
+      events.push('dispose');
+    },
+    captureMaterialState() {
+      events.push('capture');
+    },
+    renderObjects,
+    meshes,
+  };
+
+  const entered = replaceComponentVisualState({ ...options, detailLevel: 'isolated' });
+  const exited = replaceComponentVisualState({ ...options, detailLevel: 'board' });
+
+  [entered, exited].forEach((result) => {
+    assert.equal(result.object, legacy);
+    assert.equal(result.replaced, false);
+    assert.equal(result.detailCommitted, true);
+    assert.equal(result.currentDetailLevel, undefined);
+    assert.equal(result.fallbackReason, null);
+  });
+  assert.equal(renderObjects.get('legacy-1'), legacy);
+  assert.equal(meshes.get('legacy-1'), legacy);
+  assert.deepEqual(legacy.userData, originalUserData);
+  assert.deepEqual(events, []);
+});

@@ -394,6 +394,20 @@ test('component inspection exposes and clears the active visual asset for browse
   assert.match(rendererSource, /delete this\.container\.dataset\.componentVisualFallback/);
 });
 
+test('legacy inspection never publishes reusable component visual detail metadata', () => {
+  const datasetSource = rendererSource.slice(
+    rendererSource.indexOf('syncComponentVisualDataset('),
+    rendererSource.indexOf('replaceComponentVisualDetail('),
+  );
+
+  assert.match(datasetSource, /if \(!descriptor\?\.componentVisualSpecId \|\| !object\)/);
+  assert.ok(
+    datasetSource.indexOf('delete this.container.dataset.componentVisualDetail')
+      < datasetSource.indexOf('this.container.dataset.componentVisualDetail ='),
+  );
+  assert.doesNotMatch(datasetSource, /inspectionProfile|visualAsset ===/);
+});
+
 test('inspection mode hides board-only controls and keeps direct manipulation tools', () => {
   assert.match(appSource, /querySelector\('\.anatomy-panel'\)\.hidden = toolbar\.boardControlsHidden/);
   assert.match(appSource, /querySelector\('\.side-panel'\)\.hidden = toolbar\.boardControlsHidden/);

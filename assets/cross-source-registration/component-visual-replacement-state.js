@@ -17,11 +17,25 @@ export function replaceComponentVisualState({
   meshes,
 }) {
   const currentDetailLevel = previous?.userData?.visualDetailLevel;
-  if (
-    !descriptor?.componentVisualSpecId
-    || descriptor.layer !== 'body'
-    || !previous
-  ) {
+  if (!previous) {
+    return {
+      object: previous,
+      replaced: false,
+      detailCommitted: false,
+      currentDetailLevel,
+      fallbackReason: null,
+    };
+  }
+  if (!descriptor?.componentVisualSpecId) {
+    return {
+      object: previous,
+      replaced: false,
+      detailCommitted: true,
+      currentDetailLevel,
+      fallbackReason: null,
+    };
+  }
+  if (descriptor.layer !== 'body') {
     return {
       object: previous,
       replaced: false,
