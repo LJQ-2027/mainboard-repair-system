@@ -76,6 +76,8 @@ test('failed component visual replacement keeps the previous object and maps ful
 
   assert.equal(result.object, previous);
   assert.equal(result.replaced, false);
+  assert.equal(result.detailCommitted, false);
+  assert.equal(result.currentDetailLevel, undefined);
   assert.equal(result.fallbackReason, 'visual_build_error');
   assert.equal(previous.userData.visualFallbackReason, 'visual_build_error');
   assert.equal(renderObjects.get('connector-1'), previous);
@@ -137,6 +139,8 @@ test('successful component visual replacement preserves transforms and swaps ato
 
   assert.equal(result.object, next);
   assert.equal(result.replaced, true);
+  assert.equal(result.detailCommitted, true);
+  assert.equal(result.currentDetailLevel, 'isolated');
   assert.equal(result.fallbackReason, null);
   assert.deepEqual(
     { x: next.position.x, y: next.position.y, z: next.position.z },
@@ -159,4 +163,77 @@ test('successful component visual replacement preserves transforms and swaps ato
   assert.equal(next.child.castShadow, true);
   assert.equal(next.child.receiveShadow, true);
   assert.deepEqual(events, ['build', 'capture', 'add', 'dispose']);
+});
+
+test('failed board restoration stays isolated and a later retry commits board detail', async () => {
+  const { replaceComponentVisualState } = await loadReplacementState();
+  assert.equal(typeof replaceComponentVisualState, 'function');
+  const isolated = object({
+    visualSpecId: 'connector-j6101-repair-visual-v1',
+    visualDetailLevel: 'isolated',
+  });
+  const board = object({
+    visualSpecId: 'connector-j6101-repair-visual-v1',
+    visualDetailLevel: 'board',
+  });
+  const renderObjects = new Map([['connector-1', isolated]]);
+  const meshes = new Map([['connector-1', isolated]]);
+  const events = [];
+  let attempts = 0;
+  const options = {
+    componentId: 'connector-1',
+    detailLevel: 'board',
+    descriptor: {
+      layer: 'body',
+      selectable: true,
+      componentVisualSpecId: 'connector-j6101-repair-visual-v1',
+    },
+    previous: isolated,
+    buildVisual() {
+      attempts += 1;
+      events.push(`build-${attempts}`);
+      return attempts === 1
+        ? { group: null, fallbackReason: 'visual_build_error' }
+        : { group: board, fallbackReason: null };
+    },
+    addObject() {
+      events.push('add-board');
+    },
+    disposeObject(disposed) {
+      events.push(`dispose-${disposed.userData.visualDetailLevel}`);
+    },
+    captureMaterialState() {
+      events.push('capture-board');
+    },
+    renderObjects,
+    meshes,
+  };
+
+  const failed = replaceComponentVisualState(options);
+  assert.deepEqual({
+    object: failed.object,
+    replaced: failed.replaced,
+    detailCommitted: failed.detailCommitted,
+    currentDetailLevel: failed.currentDetailLevel,
+    fallbackReason: failed.fallbackReason,
+  }, {
+    object: isolated,
+    replaced: false,
+    detailCommitted: false,
+    currentDetailLevel: 'isolated',
+    fallbackReason: 'visual_build_error',
+  });
+  assert.equal(renderObjects.get('connector-1'), isolated);
+  assert.equal(meshes.get('connector-1'), isolated);
+  assert.deepEqual(events, ['build-1']);
+
+  const committed = replaceComponentVisualState(options);
+  assert.equal(committed.object, board);
+  assert.equal(committed.replaced, true);
+  assert.equal(committed.detailCommitted, true);
+  assert.equal(committed.currentDetailLevel, 'board');
+  assert.equal(committed.fallbackReason, null);
+  assert.equal(renderObjects.get('connector-1'), board);
+  assert.equal(meshes.get('connector-1'), board);
+  assert.deepEqual(events, ['build-1', 'build-2', 'capture-board', 'add-board', 'dispose-isolated']);
 });

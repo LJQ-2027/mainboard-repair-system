@@ -16,12 +16,19 @@ export function replaceComponentVisualState({
   renderObjects,
   meshes,
 }) {
+  const currentDetailLevel = previous?.userData?.visualDetailLevel;
   if (
     !descriptor?.componentVisualSpecId
     || descriptor.layer !== 'body'
     || !previous
   ) {
-    return { object: previous, replaced: false, fallbackReason: null };
+    return {
+      object: previous,
+      replaced: false,
+      detailCommitted: currentDetailLevel === detailLevel,
+      currentDetailLevel,
+      fallbackReason: null,
+    };
   }
 
   const built = buildVisual(descriptor, detailLevel);
@@ -30,11 +37,25 @@ export function replaceComponentVisualState({
     return {
       object: previous,
       replaced: false,
+      detailCommitted: currentDetailLevel === detailLevel,
+      currentDetailLevel,
       fallbackReason: built.fallbackReason,
     };
   }
 
   const next = built.group;
+  const nextDetailLevel = next.userData.visualDetailLevel;
+  if (nextDetailLevel !== detailLevel) {
+    disposeObject(next);
+    previous.userData.visualFallbackReason = 'visual_detail_mismatch';
+    return {
+      object: previous,
+      replaced: false,
+      detailCommitted: currentDetailLevel === detailLevel,
+      currentDetailLevel,
+      fallbackReason: 'visual_detail_mismatch',
+    };
+  }
   const nextVisualData = { ...next.userData };
   next.position.copy(previous.position);
   next.rotation.copy(previous.rotation);
@@ -58,5 +79,11 @@ export function replaceComponentVisualState({
   renderObjects.set(componentId, next);
   if (descriptor.selectable) meshes.set(componentId, next);
   disposeObject(previous);
-  return { object: next, replaced: true, fallbackReason: null };
+  return {
+    object: next,
+    replaced: true,
+    detailCommitted: true,
+    currentDetailLevel: nextDetailLevel,
+    fallbackReason: null,
+  };
 }

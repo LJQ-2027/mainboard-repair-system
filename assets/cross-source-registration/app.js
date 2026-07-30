@@ -655,7 +655,8 @@ async function leaveComponentInspection(animate = true) {
   const transitionId = startModelTransition('inspection');
   if (transitionId === null) return false;
   try {
-    await renderer.clearComponentInspection(animate);
+    const cleared = await renderer.clearComponentInspection(animate);
+    if (!cleared) return false;
     componentInspection = exitComponentInspection(componentInspection);
     return true;
   } finally {
@@ -731,7 +732,8 @@ async function switchModelSide(sideId, animate = true) {
   if (transitionId === null) return activeSideId;
   try {
     if (componentInspection.mode === 'isolated') {
-      await renderer.clearComponentInspection(false);
+      const cleared = await renderer.clearComponentInspection(false);
+      if (!cleared) return activeSideId;
       componentInspection = exitComponentInspection(componentInspection);
     }
     await renderer.setSideData(sideDataById.get(sideId), animate);
@@ -889,11 +891,14 @@ function renderComponentGuidance(entity) {
 }
 
 async function selectEntity(componentId, options = {}) {
-  if (!canAcceptModelInteraction(modelInteraction)) return;
+  if (!canAcceptModelInteraction(modelInteraction)) return false;
   const entity = data.entities.find((item) => item.component_id === componentId);
-  if (!entity) return;
-  if (componentInspection.mode === 'isolated') await leaveComponentInspection(false);
-  if (!canAcceptModelInteraction(modelInteraction)) return;
+  if (!entity) return false;
+  if (componentInspection.mode === 'isolated') {
+    const leftInspection = await leaveComponentInspection(false);
+    if (!leftInspection) return false;
+  }
+  if (!canAcceptModelInteraction(modelInteraction)) return false;
   modelInteraction = recordSelectionIntent(modelInteraction, options.explicit !== false);
   selectedId = componentId;
   const state = buildSelectionState(entity, matrix);
@@ -921,6 +926,7 @@ async function selectEntity(componentId, options = {}) {
   if (activeView === 'model') modelInteraction = consumePendingFocus(modelInteraction);
   if (activeView === 'pointmap' && pointMapViewport) pointMapViewport.focus(state.boardPoint);
   updateInspectionUi();
+  return true;
 }
 
 async function handleModelComponentActivation(componentId) {
@@ -938,8 +944,11 @@ async function handleModelComponentActivation(componentId) {
 }
 
 async function setView(name) {
-  if (!canAcceptModelInteraction(modelInteraction)) return;
-  if (name !== 'model' && componentInspection.mode === 'isolated') await leaveComponentInspection(false);
+  if (!canAcceptModelInteraction(modelInteraction)) return false;
+  if (name !== 'model' && componentInspection.mode === 'isolated') {
+    const leftInspection = await leaveComponentInspection(false);
+    if (!leftInspection) return false;
+  }
   activeView = name;
   document.querySelectorAll('[role=tab]').forEach((button) => button.setAttribute('aria-selected', String(button.dataset.view === name)));
   Object.entries(views).forEach(([key, view]) => view.classList.toggle('active', key === name));
@@ -963,6 +972,7 @@ async function setView(name) {
   updateSideControls();
   updateSourceNote();
   updateInspectionUi();
+  return true;
 }
 
 async function init() {
@@ -1081,8 +1091,8 @@ async function init() {
     button.dataset.componentId = entity.component_id;
     button.innerHTML = `<strong>${entity.designator}</strong>${display.module}`;
     button.addEventListener('click', async () => {
-      await selectEntity(entity.component_id);
-      revealModelAfterEntityListSelection();
+      const selected = await selectEntity(entity.component_id);
+      if (selected) revealModelAfterEntityListSelection();
     });
     list.append(button);
   });

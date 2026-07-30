@@ -295,6 +295,11 @@ test('component inspection switches visual detail and restores board detail in o
     exitSource.indexOf("replaceComponentVisualDetail(componentId, 'board')")
       < exitSource.indexOf('this.inspectionComponentId = null'),
   );
+  assert.match(exitSource, /if \(!replacement\.detailCommitted\) return false/);
+  assert.ok(
+    exitSource.indexOf('if (!replacement.detailCommitted) return false')
+      < exitSource.indexOf('animateInspectionObject'),
+  );
 });
 
 test('component visual replacement integrates exact disposal and stable browser metadata', () => {
@@ -313,6 +318,66 @@ test('component visual replacement integrates exact disposal and stable browser 
   assert.match(rendererSource, /dataset\.componentVisualFallback/);
   assert.match(disposalSource, /disposeComponentVisual/);
   assert.match(disposalSource, /this\.disposeObject/);
+});
+
+test('inspection exit and navigation stop transactionally when board restoration fails', () => {
+  const leaveSource = appSource.slice(
+    appSource.indexOf('async function leaveComponentInspection'),
+    appSource.indexOf('async function enterCurrentComponentInspection'),
+  );
+  const sideSource = appSource.slice(
+    appSource.indexOf('async function switchModelSide'),
+    appSource.indexOf('function activateRepairTarget'),
+  );
+  const selectSource = appSource.slice(
+    appSource.indexOf('async function selectEntity'),
+    appSource.indexOf('async function handleModelComponentActivation'),
+  );
+  const viewSource = appSource.slice(
+    appSource.indexOf('async function setView'),
+    appSource.indexOf('async function init'),
+  );
+
+  assert.match(leaveSource, /const cleared = await renderer\.clearComponentInspection\(animate\)/);
+  assert.match(leaveSource, /if \(!cleared\) return false/);
+  assert.ok(
+    leaveSource.indexOf('if (!cleared) return false')
+      < leaveSource.indexOf('exitComponentInspection'),
+  );
+  assert.match(sideSource, /const cleared = await renderer\.clearComponentInspection\(false\)/);
+  assert.match(sideSource, /if \(!cleared\) return activeSideId/);
+  assert.ok(
+    sideSource.indexOf('if (!cleared) return activeSideId')
+      < sideSource.indexOf('renderer.setSideData'),
+  );
+  assert.match(selectSource, /const leftInspection = await leaveComponentInspection\(false\)/);
+  assert.match(selectSource, /if \(!leftInspection\) return false/);
+  assert.match(viewSource, /const leftInspection = await leaveComponentInspection\(false\)/);
+  assert.match(viewSource, /if \(!leftInspection\) return false/);
+});
+
+test('renderer direct side, selection, and reset paths cannot bypass isolated inspection', () => {
+  const sideStart = rendererSource.indexOf('setSideData(');
+  const sideSource = rendererSource.slice(
+    sideStart,
+    rendererSource.indexOf('\n  bind()', sideStart),
+  );
+  const selectStart = rendererSource.indexOf('select(componentId)');
+  const selectSource = rendererSource.slice(
+    selectStart,
+    rendererSource.indexOf('\n  setShieldMode', selectStart),
+  );
+  const resetStart = rendererSource.indexOf('reset(resetInteractionMode');
+  const resetSource = rendererSource.slice(
+    resetStart,
+    rendererSource.indexOf('\n  resize()', resetStart),
+  );
+
+  assert.match(sideSource, /if \(this\.inspectionComponentId\) return Promise\.resolve\(this\.sideId\)/);
+  assert.match(selectSource, /if \(this\.inspectionComponentId && this\.inspectionComponentId !== componentId\) return false/);
+  assert.doesNotMatch(selectSource, /clearComponentInspection/);
+  assert.match(resetSource, /if \(this\.inspectionComponentId\) return false/);
+  assert.doesNotMatch(resetSource, /clearComponentInspection/);
 });
 
 test('reviewed crystal profiles use a layered can without invented internal geometry', () => {
@@ -354,7 +419,7 @@ test('mobile model reveal belongs only to explicit entity list selection', () =>
   assert.equal(revealCalls.length, 2, 'one helper definition and one entity-list call are expected');
   assert.doesNotMatch(selectEntitySource, /revealModelAfterEntityListSelection/);
   assert.doesNotMatch(markerSource, /revealModelAfterEntityListSelection/);
-  assert.match(entityListSource, /await selectEntity\(entity\.component_id\);\s*revealModelAfterEntityListSelection\(\);/);
+  assert.match(entityListSource, /const selected = await selectEntity\(entity\.component_id\);\s*if \(selected\) revealModelAfterEntityListSelection\(\);/);
 });
 
 test('cross-view inspection serializes model view, target side, isolation, and reveal', () => {

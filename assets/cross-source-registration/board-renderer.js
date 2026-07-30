@@ -923,6 +923,7 @@ export class BoardRenderer {
   }
 
   setSideData(sideData, animate = true) {
+    if (this.inspectionComponentId) return Promise.resolve(this.sideId);
     if (this.sideTransitioning || sideData.sideId === this.sideId) return Promise.resolve(this.sideId);
     this.cancelCameraAnimation();
     if (!animate) {
@@ -1301,7 +1302,7 @@ export class BoardRenderer {
   }
 
   select(componentId) {
-    if (this.inspectionComponentId && this.inspectionComponentId !== componentId) void this.clearComponentInspection(false);
+    if (this.inspectionComponentId && this.inspectionComponentId !== componentId) return false;
     this.selectedComponentId = componentId;
     if (this.hoveredComponentId === componentId) this.updateHoverTooltipContent(componentId);
     const object = this.meshes.get(componentId);
@@ -1310,6 +1311,7 @@ export class BoardRenderer {
     if (!object || !descriptor) return this.render();
     this.updateAffordanceStyles(false);
     this.render();
+    return true;
   }
 
   setShieldMode(mode, shouldRender = true) {
@@ -1458,16 +1460,20 @@ export class BoardRenderer {
     });
     this.syncComponentVisualDataset(componentId);
     if (this.inspectionComponentId) this.setInspectionContextOpacity(this.inspectionComponentId);
-    return replacement.object;
+    return replacement;
   }
 
   async setComponentInspection(componentId, animate = true) {
     const descriptor = this.descriptors.get(componentId);
     const previous = this.renderObjects.get(componentId);
     if (!previous || !descriptor?.inspectionProfile || this.inspectionComponentId === componentId) return false;
-    if (this.inspectionComponentId) await this.clearComponentInspection(false);
+    if (this.inspectionComponentId) {
+      const cleared = await this.clearComponentInspection(false);
+      if (!cleared) return false;
+    }
     this.cancelCameraAnimation();
-    const object = this.replaceComponentVisualDetail(componentId, 'isolated');
+    const replacement = this.replaceComponentVisualDetail(componentId, 'isolated');
+    const object = replacement.object;
     if (!object) return false;
     const narrow = this.container.clientWidth < 620;
     const transform = buildInspectionTransform(descriptor.dimensions, narrow);
@@ -1542,8 +1548,10 @@ export class BoardRenderer {
   async clearComponentInspection(animate = true) {
     if (!this.inspectionComponentId || !this.inspectionSnapshot) return false;
     const componentId = this.inspectionComponentId;
-    const object = this.renderObjects.get(componentId);
     const snapshot = this.inspectionSnapshot;
+    const replacement = this.replaceComponentVisualDetail(componentId, 'board');
+    if (!replacement.detailCommitted) return false;
+    const object = replacement.object;
     if (object) {
       const target = {
         scale: snapshot.scale,
@@ -1566,7 +1574,6 @@ export class BoardRenderer {
       }
       object.traverse((child) => { child.renderOrder = 0; });
     }
-    this.replaceComponentVisualDetail(componentId, 'board');
     this.manualPanCenter = snapshot.manualPanCenter ? { ...snapshot.manualPanCenter } : null;
     this.inspectionComponentId = null;
     this.restoreInspectionContext();
@@ -1770,12 +1777,13 @@ export class BoardRenderer {
   reset(resetInteractionMode = true) {
     this.cancelCameraAnimation();
     this.cancelAngleAnimation();
-    if (this.inspectionComponentId) void this.clearComponentInspection(false);
+    if (this.inspectionComponentId) return false;
     this.boardOrientationDirty = false;
     this.group.rotation.set(TOP_VIEW_TILT, 0, this.defaultBoardRotationZ);
     this.setInspectionAngleState(false);
     if (resetInteractionMode) this.setInteractionMode('pan');
     this.clearRepairFocus(true, true);
+    return true;
   }
 
   resize() {
