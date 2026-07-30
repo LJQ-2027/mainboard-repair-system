@@ -1,3 +1,5 @@
+import { resolveComponentVisualSpec } from './component-visual-specs.js';
+
 const BOARD_WIDTH = 2;
 const BOARD_HEIGHT = 1.25;
 
@@ -78,6 +80,9 @@ export function buildRenderDescriptor(component, options = {}) {
     : (confidence === 'low' ? 'marker' : 'outline');
   const width = clamp(source.size.x * BOARD_WIDTH, profile.min[0], profile.max[0]);
   const depth = clamp(source.size.y * BOARD_HEIGHT, profile.min[1], profile.max[1]);
+  const componentVisualSpec = resolveComponentVisualSpec(
+    component.inspection_profile?.profile_id,
+  );
 
   return {
     componentId: component.component_id,
@@ -89,6 +94,7 @@ export function buildRenderDescriptor(component, options = {}) {
     selectable: Boolean(options.reviewed),
     inspectionProfile: component.inspection_profile || null,
     visualAsset: resolveInspectionVisualAsset(component.inspection_profile),
+    componentVisualSpecId: componentVisualSpec?.spec_id || null,
     normalizedCenter: { ...source.center },
     center: {
       x: source.center.x * BOARD_WIDTH - BOARD_WIDTH / 2,

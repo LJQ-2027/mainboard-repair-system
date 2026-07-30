@@ -19,6 +19,11 @@ import {
   inspectionOpacity,
   resolveInspectionKeyAction,
 } from './component-inspection-state.js';
+import {
+  buildComponentVisual,
+  disposeComponentVisual,
+} from './component-visual-builder.js';
+import { replaceComponentVisualState } from './component-visual-replacement-state.js';
 import { recordDragTravel, transformBoardCenter } from './model-interaction-state.js';
 import { isPointInFocus } from './repair-focus-state.js';
 import {
@@ -254,51 +259,6 @@ function addConnectorPackage(group, descriptor) {
   group.add(insert);
 }
 
-function addInspectionConnectorPackage(group, descriptor) {
-  const { x, y, z } = descriptor.dimensions;
-  const radius = Math.min(x, y) * 0.1;
-  const base = new THREE.Mesh(
-    new THREE.ExtrudeGeometry(roundedRectShape(x, y, radius), {
-      depth: z * 0.26,
-      bevelEnabled: true,
-      bevelSize: Math.min(radius * 0.24, 0.003),
-      bevelThickness: 0.0014,
-      bevelSegments: 2,
-    }),
-    material('dark', { color: 0x303936, roughness: 0.66, metalness: 0.14 }),
-  );
-  group.add(base);
-
-  const railMaterial = material('metal', { color: 0xb9bfbb, roughness: 0.32, metalness: 0.72 });
-  [-1, 1].forEach((side) => {
-    const rail = box(x * 0.88, y * 0.17, z * 0.54, railMaterial.clone());
-    rail.position.y = side * y * 0.34;
-    rail.position.z += z * 0.24;
-    group.add(rail);
-  });
-
-  [-1, 1].forEach((side) => {
-    const end = box(x * 0.08, y * 0.74, z * 0.62, railMaterial.clone());
-    end.position.x = side * x * 0.44;
-    end.position.z += z * 0.23;
-    group.add(end);
-  });
-
-  const channel = box(x * 0.72, y * 0.34, z * 0.13, material('black', { color: 0x111716 }));
-  channel.position.z += z * 0.27;
-  group.add(channel);
-  const contactBand = box(x * 0.66, y * 0.1, z * 0.04, material('copper', { color: 0xb78b45 }));
-  contactBand.position.z += z * 0.36;
-  group.add(contactBand);
-
-  const baseEdge = new THREE.LineSegments(
-    new THREE.EdgesGeometry(base.geometry, 24),
-    new THREE.LineBasicMaterial({ color: 0x66716c, transparent: true, opacity: 0.68 }),
-  );
-  group.add(baseEdge);
-  group.userData.inspectionProfileId = descriptor.inspectionProfile.profile_id;
-}
-
 function addCrystalPackage(group, descriptor) {
   const { x, y, z } = descriptor.dimensions;
   group.add(box(x, y, z * 0.76, material('metal', { color: 0xc8cbc7 })));
@@ -392,11 +352,13 @@ function addGenericPackage(group, descriptor) {
   group.add(box(x, y, z, material(descriptor.family === 'led' ? 'ceramic' : 'dark', descriptor.family === 'led' ? { color: 0x9fcbb5 } : {})));
 }
 
-function createPackageMesh(descriptor) {
+function createPackageMesh(descriptor, detailLevel = 'board') {
+  const refined = buildComponentVisual(descriptor, detailLevel);
+  if (refined.group) return refined.group;
+
   const group = new THREE.Group();
   if (descriptor.visualAsset === 'reviewed-pmic') addInspectionPmicPackage(group, descriptor);
   else if (descriptor.visualAsset === 'reviewed-bga') addInspectionBgaPackage(group, descriptor);
-  else if (descriptor.visualAsset === 'reviewed-connector') addInspectionConnectorPackage(group, descriptor);
   else if (descriptor.visualAsset === 'reviewed-crystal') addInspectionCrystalPackage(group, descriptor);
   else if (descriptor.family === 'passive') addPassivePackage(group, descriptor);
   else if (descriptor.family === 'ic') addIcPackage(group, descriptor);
@@ -406,6 +368,7 @@ function createPackageMesh(descriptor) {
   else if (descriptor.family === 'test-point') addTestPoint(group, descriptor);
   else if (descriptor.family === 'antenna') addFlatMetalPackage(group, descriptor);
   else addGenericPackage(group, descriptor);
+  group.userData.visualFallbackReason = refined.fallbackReason;
   return group;
 }
 
@@ -900,16 +863,24 @@ export class BoardRenderer {
     this.scene.add(fill);
   }
 
-  disposeGroup(group) {
-    group.traverse((child) => {
-      child.geometry?.dispose();
-      const materials = Array.isArray(child.material) ? child.material : [child.material];
-      materials.filter(Boolean).forEach((item) => {
-        const textures = new Set([item.map, ...Object.values(child.userData.labelTextures || {})]);
-        textures.forEach((texture) => texture?.dispose());
-        item.dispose();
+  disposeObject(object) {
+    const componentDisposal = disposeComponentVisual(object);
+    if (!componentDisposal.geometries && !componentDisposal.materials) {
+      object.traverse((child) => {
+        child.geometry?.dispose();
+        const materials = Array.isArray(child.material) ? child.material : [child.material];
+        materials.filter(Boolean).forEach((item) => {
+          const textures = new Set([item.map, ...Object.values(child.userData.labelTextures || {})]);
+          textures.forEach((texture) => texture?.dispose());
+          item.dispose();
+        });
       });
-    });
+    }
+    object.removeFromParent();
+  }
+
+  disposeGroup(group) {
+    [...group.children].forEach((object) => this.disposeObject(object));
     group.removeFromParent();
   }
 
@@ -947,6 +918,8 @@ export class BoardRenderer {
     this.build();
     this.renderer.compile(this.scene, this.camera);
     this.resize();
+    delete this.container.dataset.inspectionVisualAsset;
+    this.syncComponentVisualDataset();
   }
 
   setSideData(sideData, animate = true) {
@@ -1333,6 +1306,7 @@ export class BoardRenderer {
     if (this.hoveredComponentId === componentId) this.updateHoverTooltipContent(componentId);
     const object = this.meshes.get(componentId);
     const descriptor = this.descriptors.get(componentId);
+    this.syncComponentVisualDataset(componentId);
     if (!object || !descriptor) return this.render();
     this.updateAffordanceStyles(false);
     this.render();
@@ -1453,12 +1427,48 @@ export class BoardRenderer {
     });
   }
 
-  async setComponentInspection(componentId, animate = true) {
-    const object = this.renderObjects.get(componentId);
+  syncComponentVisualDataset(componentId = this.inspectionComponentId || this.selectedComponentId) {
     const descriptor = this.descriptors.get(componentId);
-    if (!object || !descriptor?.inspectionProfile || this.inspectionComponentId === componentId) return false;
+    const object = this.renderObjects.get(componentId);
+    if (!descriptor?.componentVisualSpecId || !object) {
+      delete this.container.dataset.componentVisualSpec;
+      delete this.container.dataset.componentVisualDetail;
+      delete this.container.dataset.componentVisualFallback;
+      return;
+    }
+    this.container.dataset.componentVisualSpec = descriptor.componentVisualSpecId;
+    this.container.dataset.componentVisualDetail = object.userData.visualDetailLevel || 'board';
+    this.container.dataset.componentVisualFallback = object.userData.visualFallbackReason || '';
+  }
+
+  replaceComponentVisualDetail(componentId, detailLevel) {
+    const descriptor = this.descriptors.get(componentId);
+    const previous = this.renderObjects.get(componentId);
+    const replacement = replaceComponentVisualState({
+      componentId,
+      detailLevel,
+      descriptor,
+      previous,
+      buildVisual: buildComponentVisual,
+      addObject: (object) => this.group.add(object),
+      disposeObject: (object) => this.disposeObject(object),
+      captureMaterialState,
+      renderObjects: this.renderObjects,
+      meshes: this.meshes,
+    });
+    this.syncComponentVisualDataset(componentId);
+    if (this.inspectionComponentId) this.setInspectionContextOpacity(this.inspectionComponentId);
+    return replacement.object;
+  }
+
+  async setComponentInspection(componentId, animate = true) {
+    const descriptor = this.descriptors.get(componentId);
+    const previous = this.renderObjects.get(componentId);
+    if (!previous || !descriptor?.inspectionProfile || this.inspectionComponentId === componentId) return false;
     if (this.inspectionComponentId) await this.clearComponentInspection(false);
     this.cancelCameraAnimation();
+    const object = this.replaceComponentVisualDetail(componentId, 'isolated');
+    if (!object) return false;
     const narrow = this.container.clientWidth < 620;
     const transform = buildInspectionTransform(descriptor.dimensions, narrow);
     this.inspectionComponentId = componentId;
@@ -1486,6 +1496,7 @@ export class BoardRenderer {
     this.inspectionTarget = target;
     this.container.dataset.dragMode = 'component';
     this.container.dataset.inspectionVisualAsset = descriptor.visualAsset;
+    this.syncComponentVisualDataset(componentId);
     const designator = descriptor.designator || componentId;
     this.renderer.domElement.setAttribute(
       'aria-label',
@@ -1530,7 +1541,8 @@ export class BoardRenderer {
 
   async clearComponentInspection(animate = true) {
     if (!this.inspectionComponentId || !this.inspectionSnapshot) return false;
-    const object = this.renderObjects.get(this.inspectionComponentId);
+    const componentId = this.inspectionComponentId;
+    const object = this.renderObjects.get(componentId);
     const snapshot = this.inspectionSnapshot;
     if (object) {
       const target = {
@@ -1554,12 +1566,14 @@ export class BoardRenderer {
       }
       object.traverse((child) => { child.renderOrder = 0; });
     }
+    this.replaceComponentVisualDetail(componentId, 'board');
     this.manualPanCenter = snapshot.manualPanCenter ? { ...snapshot.manualPanCenter } : null;
     this.inspectionComponentId = null;
     this.restoreInspectionContext();
     this.inspectionSnapshot = null;
     this.inspectionTarget = null;
     delete this.container.dataset.inspectionVisualAsset;
+    this.syncComponentVisualDataset(this.selectedComponentId);
     this.setInteractionMode(this.interactionMode);
     this.renderer.domElement.setAttribute('aria-label', '可交互 2.5D 主板模型');
     this.render();

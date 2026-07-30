@@ -137,6 +137,20 @@ test('reviewed inspection profile survives compilation into the render descripto
   assert.deepEqual(descriptor.inspectionProfile, source.inspection_profile);
 });
 
+test('J6101 descriptor carries reusable visual-spec identity', () => {
+  const source = component('connector', 'reviewed', { x: 0.157, y: 0.079 });
+  source.inspection_profile = { profile_id: 'j6101-connector-v1', fidelity: 'repair_visual' };
+  const descriptor = buildRenderDescriptor(source, { reviewed: true });
+  assert.equal(descriptor.componentVisualSpecId, 'connector-j6101-repair-visual-v1');
+});
+
+test('descriptors without a reusable visual spec carry a null identity', () => {
+  const source = component('connector', 'reviewed', { x: 0.157, y: 0.079 });
+  source.inspection_profile = { profile_id: 'unknown-profile', fidelity: 'repair_visual' };
+  assert.equal(buildRenderDescriptor(source, { reviewed: true }).componentVisualSpecId, null);
+  assert.equal(buildRenderDescriptor(component('connector', 'reviewed'), { reviewed: true }).componentVisualSpecId, null);
+});
+
 test('reviewed inspection profiles select only source-approved refined package assets', () => {
   assert.equal(resolveInspectionVisualAsset({ profile_id: 'u2001-pmic-v1' }), 'reviewed-pmic');
   assert.equal(resolveInspectionVisualAsset({ profile_id: 'u4000-emmc-v1' }), 'reviewed-bga');

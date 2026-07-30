@@ -267,10 +267,52 @@ test('reviewed BGA profiles use a layered inspection package without invented ba
   assert.doesNotMatch(rendererSource, /addInspectionBgaPackage[\s\S]*BallGeometry/);
 });
 
-test('reviewed connector profiles use a recessed package without invented pin geometry', () => {
-  assert.match(rendererSource, /function addInspectionConnectorPackage\(group, descriptor\)/);
-  assert.match(rendererSource, /descriptor\.visualAsset === 'reviewed-connector'/);
-  assert.doesNotMatch(rendererSource, /addInspectionConnectorPackage[\s\S]*PinGeometry/);
+test('reviewed connector profiles use the reusable component visual builder', () => {
+  assert.match(rendererSource, /buildComponentVisual/);
+  assert.match(rendererSource, /disposeComponentVisual/);
+  assert.match(rendererSource, /replaceComponentVisualDetail/);
+  assert.doesNotMatch(rendererSource, /function addInspectionConnectorPackage/);
+  assert.doesNotMatch(rendererSource, /j6101/i);
+});
+
+test('component inspection switches visual detail and restores board detail in order', () => {
+  const enterSource = rendererSource.slice(
+    rendererSource.indexOf('async setComponentInspection'),
+    rendererSource.indexOf('async resetComponentInspectionView'),
+  );
+  const exitSource = rendererSource.slice(
+    rendererSource.indexOf('async clearComponentInspection'),
+    rendererSource.indexOf('isComponentInspectionActive'),
+  );
+
+  assert.match(enterSource, /replaceComponentVisualDetail\(componentId, 'isolated'\)/);
+  assert.ok(
+    enterSource.indexOf("replaceComponentVisualDetail(componentId, 'isolated')")
+      < enterSource.indexOf('this.inspectionSnapshot ='),
+  );
+  assert.match(exitSource, /replaceComponentVisualDetail\(componentId, 'board'\)/);
+  assert.ok(
+    exitSource.indexOf("replaceComponentVisualDetail(componentId, 'board')")
+      < exitSource.indexOf('this.inspectionComponentId = null'),
+  );
+});
+
+test('component visual replacement integrates exact disposal and stable browser metadata', () => {
+  const replacementSource = rendererSource.slice(
+    rendererSource.indexOf('replaceComponentVisualDetail('),
+    rendererSource.indexOf('async setComponentInspection'),
+  );
+  const disposalSource = rendererSource.slice(
+    rendererSource.indexOf('disposeObject('),
+    rendererSource.indexOf('replaceSideData('),
+  );
+
+  assert.match(replacementSource, /replaceComponentVisualState/);
+  assert.match(rendererSource, /dataset\.componentVisualSpec/);
+  assert.match(rendererSource, /dataset\.componentVisualDetail/);
+  assert.match(rendererSource, /dataset\.componentVisualFallback/);
+  assert.match(disposalSource, /disposeComponentVisual/);
+  assert.match(disposalSource, /this\.disposeObject/);
 });
 
 test('reviewed crystal profiles use a layered can without invented internal geometry', () => {
@@ -282,6 +324,9 @@ test('reviewed crystal profiles use a layered can without invented internal geom
 test('component inspection exposes and clears the active visual asset for browser QA', () => {
   assert.match(rendererSource, /this\.container\.dataset\.inspectionVisualAsset = descriptor\.visualAsset/);
   assert.match(rendererSource, /delete this\.container\.dataset\.inspectionVisualAsset/);
+  assert.match(rendererSource, /delete this\.container\.dataset\.componentVisualSpec/);
+  assert.match(rendererSource, /delete this\.container\.dataset\.componentVisualDetail/);
+  assert.match(rendererSource, /delete this\.container\.dataset\.componentVisualFallback/);
 });
 
 test('inspection mode hides board-only controls and keeps direct manipulation tools', () => {
