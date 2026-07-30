@@ -16,6 +16,19 @@
 
 Milo 提供的真实维修案例使用独立的维修案例事实源。`VISUAL-QC-REPAIR-CASE-SOURCE-V1` 历史清单继续可读且不可变；当精确 `board_key` / `board_id` 和完整身份依据已具备、但来源机型名与目录机型名尚不能安全归一时，新修订使用 `VISUAL-QC-REPAIR-CASE-SOURCE-V2` 保存 `unresolved_alias`。Codex 先把案例照片固化为一个或多个来源包，再用 `scripts/stage_visual_qc_repair_case.py` 将明确的机型、板号、前后维修阶段、症状、发现、动作、结果和补充文件连接成不可覆盖的修订链。身份通过追加完整 revision 和 appended evidence 按允许的状态转换单调前进；只有 `conflict -> confirmed_alias` 强制新增 correction record；resolved identity 不可变。`completeness` 只表示当前上下文是否齐全，不表示描述正确、缺陷已确认、Golden 已批准或样本可训练。案例库不会自动写入视觉标注、QC 结论、Golden、COCO、训练清单、受治理数据包或服务器 API。
 
+V3 `supporting_only` 用于只有维修过程补充照片、没有来源包链接的维修案例证据。数据管理员使用：
+
+```powershell
+.\.venv\Scripts\python.exe scripts\stage_visual_qc_repair_case.py `
+  --library-root G:\Programming\_Data\Visual-QC-Controlled-Source\library `
+  --repair-case-id case-003-bg6-f069 `
+  --board-key bg6h-f069 `
+  --case-record <case-record-v3.json> `
+  --supporting-file repair-in-progress-photo=<IMG_5604.HEIC>
+```
+
+缺少 `--source-package` 仅对 V3 `supporting_only` 有效。`source_capture_stage` 保留来源原文，不是 Visual-QC stage。该路径不创建 derivative、registration、Golden、QC、annotation、training、API、server 或 production record。V1/V2 package-linked 行为保持不变。Milo 仍是唯一真实材料来源，Codex 仍在 owner-operated 边界内作为唯一数据操作员；这不是 technician upload。
+
 首个 V2 实例已在仓库外受控库发布：`case-005-bg6-f069` revision 1，`board_key=bg6h-f069`，`board_id=BOARD-F069-MAIN-V1.2`，manifest SHA-256 `85c8c64cb97cf1ea1e567e4d1f7fc62ec00ebf02719939c74a5e0faf46298177`，schema 为 `VISUAL-QC-REPAIR-CASE-SOURCE-V2`，身份状态为 `unresolved_alias`，`model_identity_resolved=false`，完整度为 `symptom_linked`。来源报告机型 `TECNO/BG6`，目录机型为 `BG6H/BG6h`；在新增证据前不得强行归一。该事实源不是视觉诊断证据、不是缺陷确认证据、不是 Golden Sample 证据、不是训练标签证据、不是维修因果证据、不是现场精度证据。Production remains `f278061`; CASE005 的本地发布没有修改服务器、API、数据库或生产环境。
 
 案例材料的唯一顺序为：`stage source package(s) -> source audit -> stage repair case revision -> validate append-only case chain -> later physical acceptance on selected photo package`。Milo 只需提供原始材料和已知背景；Codex 负责稳定 ID、来源包角色、结构化转录和缺失字段报告。维修案例入库不包含组织审批，也不允许根据照片猜机型、板面、故障或维修结果。
