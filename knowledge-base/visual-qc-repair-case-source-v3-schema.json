@@ -2,6 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "VISUAL-QC-REPAIR-CASE-SOURCE-V3",
   "title": "Visual QC Repair Case Source V3",
+  "$comment": "This schema enforces portable record shape and locally expressible constraints. Cross-array evidence-id resolution, uniqueness by evidence_id when context objects differ, supporting_only complete context coverage, image-only repair-photo contexts, canonical object paths derived from the evidence hash, strict in-memory integer checks, identity semantics, and revision history require repair_case_contract.validate_repair_case_manifest plus the on-disk repair_case_library validator.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -67,6 +68,7 @@
     "supporting_evidence": {
       "type": "array",
       "maxItems": 50,
+      "uniqueItems": true,
       "items": {
         "$ref": "#/$defs/supportingEvidence"
       }
@@ -74,6 +76,7 @@
     "supporting_evidence_contexts": {
       "type": "array",
       "maxItems": 50,
+      "uniqueItems": true,
       "items": {
         "$ref": "#/$defs/supportingEvidenceContext"
       }
@@ -343,7 +346,11 @@
       ],
       "properties": {
         "evidence_id": {"$ref": "#/$defs/safeId"},
-        "original_filename": {"$ref": "#/$defs/nonEmptyString"},
+        "original_filename": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?=.*\\S)[^/\\\\]+$"
+        },
         "object_path": {
           "type": "string",
           "pattern": "^objects/case-evidence/[0-9a-f]{2}/[0-9a-f]{64}\\.(pdf|txt|csv|xls|xlsx|png|jpg|heic)$"

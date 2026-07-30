@@ -902,45 +902,33 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
         self.assertEqual(len(linked_objects), 1)
         self.assert_no_supporting_only_artifacts(case_id, baseline_objects)
 
-    def test_v3_supporting_only_atomic_failure_removes_new_object(self):
+    def test_v3_revision_rename_failure_publishes_no_supporting_object(self):
         from scripts.visual_qc import repair_case_library
 
         source = self.root / "post-storage-failure.heic"
         write_heic(source)
         baseline_objects = self.case_evidence_objects()
         case_id = "case-f069-supporting-post-storage"
-        stored_objects = []
-        original_store = repair_case_library.store_supporting_evidence
-
-        def record_store(**kwargs):
-            created = original_store(**kwargs)
-            stored_objects.extend(created)
-            self.assertEqual(len(created), 1)
-            self.assertTrue(created[0].is_file())
-            return created
-
         with (
             mock.patch(
                 "scripts.visual_qc.repair_case_library.store_supporting_evidence",
-                side_effect=record_store,
             ) as store_path,
             mock.patch.object(
                 Path,
                 "rename",
-                side_effect=OSError("simulated post-storage rename failure"),
+                side_effect=OSError("simulated revision rename failure"),
             ),
         ):
             with self.assertRaisesRegex(
                 OSError,
-                "simulated post-storage rename failure",
+                "simulated revision rename failure",
             ):
                 self.stage_f069_supporting_only(
                     source=source,
                     repair_case_id=case_id,
                 )
 
-        store_path.assert_called_once()
-        self.assertEqual(len(stored_objects), 1)
+        store_path.assert_not_called()
         self.assert_no_supporting_only_artifacts(case_id, baseline_objects)
 
     def test_v3_post_storage_revision_fsync_failure_removes_all_artifacts(self):
@@ -959,9 +947,9 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
             stored_objects.extend(created)
             return created
 
-        def fail_revision_staging_fsync(path):
+        def fail_revision_fsync_after_marker(path):
             path = Path(path)
-            if path.name.endswith(".staging") and path.parent.name == "revisions":
+            if path.name == "0001":
                 self.assertEqual(len(stored_objects), 1)
                 self.assertTrue(stored_objects[0].is_file())
                 raise OSError("simulated post-storage revision fsync failure")
@@ -974,7 +962,7 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
             ) as store_path,
             mock.patch(
                 "scripts.visual_qc.repair_case_library._fsync_directory",
-                side_effect=fail_revision_staging_fsync,
+                side_effect=fail_revision_fsync_after_marker,
             ),
         ):
             with self.assertRaisesRegex(
@@ -1768,11 +1756,9 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
             return original_unlink(path, *args, **kwargs)
 
         with (
-            mock.patch.object(
-                Path,
-                "rename",
-                side_effect=OSError("primary publication rename failure"),
-                autospec=True,
+            mock.patch(
+                "scripts.visual_qc.repair_case_library._write_completion_marker",
+                side_effect=OSError("primary completion marker failure"),
             ),
             mock.patch.object(
                 Path,
@@ -1783,7 +1769,7 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
         ):
             with self.assertRaisesRegex(
                 OSError,
-                "primary publication rename failure",
+                "primary completion marker failure",
             ) as raised:
                 self.stage_f069_supporting_only(
                     source=source,
@@ -1797,6 +1783,92 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
         )
         self.assert_no_supporting_only_artifacts(case_id, baseline_objects)
 
+    def test_supporting_object_publication_follows_durable_residual_manifest(self):
+        from scripts.visual_qc import repair_case_library
+
+        source = self.root / "manifest-before-object.heic"
+        write_heic(source)
+        case_id = "case-f069-manifest-before-object"
+        target = (
+            self.library
+            / "cases"
+            / case_id
+            / "revisions"
+            / "0001"
+        )
+        original_store = repair_case_library.store_supporting_evidence
+        observed = []
+
+        def observe_store(**kwargs):
+            observed.append(
+                (
+                    (target / "repair-case.json").is_file(),
+                    (target / ".complete").exists(),
+                )
+            )
+            return original_store(**kwargs)
+
+        with mock.patch(
+            "scripts.visual_qc.repair_case_library.store_supporting_evidence",
+            side_effect=observe_store,
+        ):
+            created = self.stage_f069_supporting_only(
+                source=source,
+                repair_case_id=case_id,
+            )
+
+        self.assertEqual(created["state"], "created")
+        self.assertEqual(observed, [(True, False)])
+
+    def test_marker_free_manifest_recovers_missing_supporting_object(self):
+        source = self.root / "recover-missing-object.heic"
+        write_heic(source)
+        case_id = "case-f069-recover-missing-object"
+        created = self.stage_f069_supporting_only(
+            source=source,
+            repair_case_id=case_id,
+        )
+        manifest_path = created["manifest_path"]
+        payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+        object_path = self.library / payload["supporting_evidence"][0]["object_path"]
+
+        (manifest_path.parent / ".complete").unlink()
+        object_path.unlink()
+
+        replayed = self.stage_f069_supporting_only(
+            source=source,
+            repair_case_id=case_id,
+        )
+
+        self.assertEqual(replayed["state"], "existing")
+        self.assertTrue(object_path.is_file())
+        self.assertTrue((manifest_path.parent / ".complete").is_file())
+        self.assertEqual(
+            hashlib.sha256(object_path.read_bytes()).hexdigest(),
+            payload["supporting_evidence"][0]["sha256"],
+        )
+
+    def test_keyboard_interrupt_after_object_storage_rolls_back_revision_and_object(self):
+        source = self.root / "interrupt-after-object.heic"
+        write_heic(source)
+        case_id = "case-f069-interrupt-after-object"
+        baseline_objects = self.case_evidence_objects()
+
+        with mock.patch(
+            "scripts.visual_qc.repair_case_library._write_completion_marker",
+            side_effect=KeyboardInterrupt("simulated operator interrupt"),
+        ):
+            with self.assertRaisesRegex(
+                KeyboardInterrupt,
+                "simulated operator interrupt",
+            ):
+                self.stage_f069_supporting_only(
+                    source=source,
+                    repair_case_id=case_id,
+                )
+
+        self.assert_no_supporting_only_artifacts(case_id, baseline_objects)
+
     def test_cross_case_shared_object_publication_is_globally_serialized(self):
         from scripts.visual_qc import repair_case_library
 
@@ -1804,7 +1876,7 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
         write_heic(source)
         original_lock = repair_case_library._package_lock
         original_store = repair_case_library.store_supporting_evidence
-        original_rename = Path.rename
+        original_marker = repair_case_library._write_completion_marker
         a_stored = threading.Event()
         release_a = threading.Event()
         b_global_requested = threading.Event()
@@ -1832,11 +1904,11 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
                 a_stored.set()
             return created
 
-        def controlled_rename(path, target):
+        def controlled_marker(path):
             if threading.current_thread().name == "case-a":
                 self.assertTrue(release_a.wait(timeout=10))
                 raise OSError("simulated case A publication failure")
-            return original_rename(path, target)
+            return original_marker(path)
 
         def stage_case(case_id):
             try:
@@ -1856,11 +1928,9 @@ class VisualQcRepairCaseLibraryTests(unittest.TestCase):
                 "scripts.visual_qc.repair_case_library.store_supporting_evidence",
                 side_effect=observe_store,
             ),
-            mock.patch.object(
-                Path,
-                "rename",
-                side_effect=controlled_rename,
-                autospec=True,
+            mock.patch(
+                "scripts.visual_qc.repair_case_library._write_completion_marker",
+                side_effect=controlled_marker,
             ),
         ):
             case_a = threading.Thread(

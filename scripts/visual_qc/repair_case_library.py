@@ -639,7 +639,7 @@ def store_supporting_evidence(
                 _fsync_directory(destination.parent)
             finally:
                 temporary_path.unlink(missing_ok=True)
-    except Exception as primary:
+    except BaseException as primary:
         owned_objects = creation_log[initial_count:]
         cleanup_failures = _retry_created_object_cleanup(
             owned_objects,
@@ -1433,6 +1433,11 @@ def stage_repair_case_revision(
                 manifest_path,
                 payload,
             )
+            store_supporting_evidence(
+                library_root=library_root,
+                inspected=inspected,
+                project_root=project_root,
+            )
             _assert_payload_supporting_objects(
                 library_root=library_root,
                 payload=payload,
@@ -1475,12 +1480,6 @@ def stage_repair_case_revision(
         created_objects = []
         try:
             write_json_atomic(temporary / "repair-case.json", payload)
-            store_supporting_evidence(
-                library_root=library_root,
-                inspected=inspected,
-                project_root=project_root,
-                created_objects=created_objects,
-            )
             _fsync_directory(temporary)
             try:
                 temporary.rename(target)
@@ -1489,10 +1488,16 @@ def stage_repair_case_revision(
                     f"repair case revision conflict: {payload['repair_case_id']}"
                 )
             _fsync_directory(revisions_root)
+            store_supporting_evidence(
+                library_root=library_root,
+                inspected=inspected,
+                project_root=project_root,
+                created_objects=created_objects,
+            )
             _write_completion_marker(target / ".complete")
             _fsync_directory(target)
             _fsync_directory(revisions_root)
-        except Exception as primary:
+        except BaseException as primary:
             revision_absent, cleanup_failures = _remove_revision_directories(
                 [target, temporary],
                 revisions_root=revisions_root,

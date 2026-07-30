@@ -303,7 +303,7 @@ class VisualQcRepairCaseContractTests(unittest.TestCase):
         duplicate_context["supporting_evidence_contexts"].append(
             repair_photo_context()
         )
-        invalid_payloads.append((duplicate_context, False))
+        invalid_payloads.append((duplicate_context, True))
 
         for payload, schema_rejects in invalid_payloads:
             with self.subTest(payload=payload):
@@ -448,6 +448,22 @@ class VisualQcRepairCaseContractTests(unittest.TestCase):
                 if schema_rejects:
                     with self.assertRaises(jsonschema.ValidationError):
                         validator.validate(payload)
+
+    def test_v3_schema_rejects_path_style_original_filenames(self):
+        schema = json.loads(V3_SCHEMA_PATH.read_text(encoding="utf-8"))
+        validator = jsonschema.Draft202012Validator(schema)
+
+        for filename in ("folder/repair.heic", r"folder\repair.heic"):
+            payload = canonical_v3_supporting_only_payload()
+            payload["supporting_evidence"][0]["original_filename"] = filename
+            with self.subTest(filename=filename):
+                with self.assertRaisesRegex(ValueError, "original_filename"):
+                    validate_repair_case_manifest(
+                        payload,
+                        catalog_models=CATALOG_MODELS,
+                    )
+                with self.assertRaises(jsonschema.ValidationError):
+                    validator.validate(payload)
 
     def test_heic_supporting_evidence_remains_v3_only(self):
         for version, schema_path in (
