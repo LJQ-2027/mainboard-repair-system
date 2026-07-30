@@ -91,13 +91,13 @@ V3 `supporting_only` accepts repair-case supporting evidence without a source-pa
   --library-root G:\Programming\_Data\Visual-QC-Controlled-Source\library `
   --repair-case-id case-003-bg6-f069 `
   --board-key bg6h-f069 `
-  --case-record <case-record-v3.json> `
-  --supporting-file repair-in-progress-photo=<IMG_5604.HEIC>
+  --case-record "C:\incoming\case-record-v3.json" `
+  --supporting-file "repair-in-progress-photo=C:\incoming\IMG_5604.HEIC"
 ```
 
 Absence of `--source-package` is valid only for V3 `supporting_only`. The `source_capture_stage` value preserves the source wording; it is not a Visual-QC stage. This path creates no derivative, registration, Golden, QC, annotation, training, API, server, or production record. V1/V2 package-linked behavior is unchanged. Milo remains the sole real-material source, and Codex remains the sole data operator inside the owner-operated boundary; this is not technician upload.
 
-An exact replay returns `existing`. A later revision must provide the complete cumulative case record and package list plus `--previous-manifest`; the publisher increments the revision, binds the exact prior manifest SHA-256, and rejects forks, gaps, historical mutation, unsafe paths, and conflicting replays. Supporting PDF, UTF-8 TXT/CSV, XLS/XLSX, PNG, and JPEG evidence is content-addressed and integrity checked. Corrections reference a historical fact and a current replacement instead of deleting either record.
+An exact replay returns `existing`. A later revision must provide the complete cumulative case record and package list plus `--previous-manifest`; the publisher increments the revision, binds the exact prior manifest SHA-256, and rejects forks, gaps, historical mutation, unsafe paths, and conflicting replays. Supporting PDF, UTF-8 TXT/CSV, XLS/XLSX, PNG, and JPEG evidence is content-addressed and integrity checked; V3 additionally accepts byte-exact HEIC supporting evidence. Corrections reference a historical fact and a current replacement instead of deleting either record.
 
 ## Capture Identity
 

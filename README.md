@@ -23,8 +23,8 @@ V3 `supporting_only` 用于只有维修过程补充照片、没有来源包链�
   --library-root G:\Programming\_Data\Visual-QC-Controlled-Source\library `
   --repair-case-id case-003-bg6-f069 `
   --board-key bg6h-f069 `
-  --case-record <case-record-v3.json> `
-  --supporting-file repair-in-progress-photo=<IMG_5604.HEIC>
+  --case-record "C:\incoming\case-record-v3.json" `
+  --supporting-file "repair-in-progress-photo=C:\incoming\IMG_5604.HEIC"
 ```
 
 缺少 `--source-package` 仅对 V3 `supporting_only` 有效。`source_capture_stage` 保留来源原文，不是 Visual-QC stage。该路径不创建 derivative、registration、Golden、QC、annotation、training、API、server 或 production record。V1/V2 package-linked 行为保持不变。Milo 仍是唯一真实材料来源，Codex 仍在 owner-operated 边界内作为唯一数据操作员；这不是 technician upload。
