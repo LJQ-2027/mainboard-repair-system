@@ -7,12 +7,17 @@ import { validateComponentVisualSpec } from './component-visual-validator.js';
 
 const DETAIL_LEVELS = new Set(['board', 'isolated']);
 const DIMENSION_KEYS = Object.freeze(['x', 'y', 'z']);
+const MIN_COMPONENT_DIMENSION = 1e-6;
+const MAX_COMPONENT_DIMENSION = 100;
+const COMPONENT_VISUAL_OWNERSHIP = new WeakMap();
 
 function hasValidDimensions(dimensions) {
   return dimensions !== null
     && typeof dimensions === 'object'
     && DIMENSION_KEYS.every(
-      (key) => Number.isFinite(dimensions[key]) && dimensions[key] > 0,
+      (key) => Number.isFinite(dimensions[key])
+        && dimensions[key] >= MIN_COMPONENT_DIMENSION
+        && dimensions[key] <= MAX_COMPONENT_DIMENSION,
     );
 }
 
@@ -22,9 +27,19 @@ function ownResource(ownership, type, resource) {
 }
 
 function disposeOwnedResources(ownership) {
-  if (!ownership) return;
+  if (!ownership || ownership.disposed) {
+    return { geometries: 0, materials: 0 };
+  }
+  ownership.disposed = true;
+  const counts = {
+    geometries: ownership.geometries.size,
+    materials: ownership.materials.size,
+  };
   ownership.geometries.forEach((geometry) => geometry.dispose());
   ownership.materials.forEach((material) => material.dispose());
+  ownership.geometries.clear();
+  ownership.materials.clear();
+  return counts;
 }
 
 function materialFor(spec, role, ownership) {
@@ -184,7 +199,7 @@ function addFrame(context) {
 function addInnerLip(context) {
   const lip = context.spec.structure.inner_lip;
   const horizontal = {
-    width: lip.width,
+    width: lip.width - lip.wall * 2,
     depth: lip.wall,
     height: lip.height,
     radius: 0.02,
@@ -291,27 +306,10 @@ function finishMetadata(group, spec, detailLevel, stages) {
 }
 
 export function disposeComponentVisual(group) {
-  const ownership = {
-    geometries: new Set(),
-    materials: new Set(),
-  };
-  if (!group || typeof group.traverse !== 'function') {
-    return { geometries: 0, materials: 0 };
-  }
-  group.traverse((child) => {
-    if (child.geometry?.dispose) ownership.geometries.add(child.geometry);
-    const materials = Array.isArray(child.material)
-      ? child.material
-      : [child.material];
-    materials
-      .filter((material) => material?.dispose)
-      .forEach((material) => ownership.materials.add(material));
-  });
-  disposeOwnedResources(ownership);
-  return {
-    geometries: ownership.geometries.size,
-    materials: ownership.materials.size,
-  };
+  const ownership = group && COMPONENT_VISUAL_OWNERSHIP.get(group);
+  if (!ownership) return { geometries: 0, materials: 0 };
+  COMPONENT_VISUAL_OWNERSHIP.delete(group);
+  return disposeOwnedResources(ownership);
 }
 
 export function componentVisualBounds(group) {
@@ -327,6 +325,7 @@ export function buildComponentVisual(
   dependencies = {},
 ) {
   let ownership = null;
+  let group = null;
   try {
     const resolveSpec = typeof dependencies.resolveSpec === 'function'
       ? dependencies.resolveSpec
@@ -346,13 +345,16 @@ export function buildComponentVisual(
     }
 
     ownership = {
+      disposed: false,
       geometries: new Set(),
       materials: new Set(),
     };
+    group = new THREE.Group();
+    COMPONENT_VISUAL_OWNERSHIP.set(group, ownership);
     const context = {
       allowed: new Set(spec.detail_levels[detailLevel]),
       dimensions: descriptor.dimensions,
-      group: new THREE.Group(),
+      group,
       ownership,
       spec,
     };
@@ -362,9 +364,22 @@ export function buildComponentVisual(
       completedStages.push(name);
     });
     finishMetadata(context.group, spec, detailLevel, completedStages);
+    const bounds = componentVisualBounds(context.group);
+    if (
+      !Number.isFinite(bounds.width)
+      || !Number.isFinite(bounds.depth)
+      || !Number.isFinite(bounds.height)
+      || bounds.width <= 0
+      || bounds.depth <= 0
+      || bounds.height <= 0
+    ) {
+      disposeComponentVisual(context.group);
+      return { group: null, fallbackReason: 'invalid_dimensions' };
+    }
     return { group: context.group, fallbackReason: null };
   } catch {
-    disposeOwnedResources(ownership);
+    if (group) disposeComponentVisual(group);
+    else disposeOwnedResources(ownership);
     return { group: null, fallbackReason: 'visual_build_error' };
   }
 }

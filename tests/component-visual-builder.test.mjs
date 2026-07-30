@@ -200,6 +200,34 @@ test('frame walls form a real opening around the recessed floor', () => {
   assert.ok(opening.max.x < east.min.x);
 });
 
+test('inner-lip rails meet at corners without positive-volume intersection', () => {
+  const group = build('isolated');
+  const boxes = Object.fromEntries(
+    ['north', 'south', 'west', 'east'].map((side) => [
+      side,
+      new THREE.Box3().setFromObject(group.getObjectByName(`inner-lip-${side}`)),
+    ]),
+  );
+  [
+    ['north', 'west'],
+    ['north', 'east'],
+    ['south', 'west'],
+    ['south', 'east'],
+  ].forEach(([horizontal, vertical]) => {
+    const first = boxes[horizontal];
+    const second = boxes[vertical];
+    const overlap = {
+      x: Math.max(0, Math.min(first.max.x, second.max.x) - Math.max(first.min.x, second.min.x)),
+      y: Math.max(0, Math.min(first.max.y, second.max.y) - Math.max(first.min.y, second.min.y)),
+      z: Math.max(0, Math.min(first.max.z, second.max.z) - Math.max(first.min.z, second.min.z)),
+    };
+    assert.ok(first.intersectsBox(second));
+    assert.ok(overlap.z > 0);
+    assert.ok(overlap.x <= 1e-8 || overlap.y <= 1e-8, JSON.stringify(overlap));
+    assert.ok(overlap.x * overlap.y * overlap.z <= 1e-12, JSON.stringify(overlap));
+  });
+});
+
 test('board and isolated bounds stay within normal and extreme valid descriptors', () => {
   const descriptors = [
     DESCRIPTOR,
@@ -223,6 +251,35 @@ test('board and isolated bounds stay within normal and extreme valid descriptors
       assert.ok(bounds.width <= descriptor.dimensions.x + Math.max(1e-9, descriptor.dimensions.x * 1e-6));
       assert.ok(bounds.depth <= descriptor.dimensions.y + Math.max(1e-9, descriptor.dimensions.y * 1e-6));
       assert.ok(bounds.height <= descriptor.dimensions.z + Math.max(1e-9, descriptor.dimensions.z * 1e-6));
+    });
+  });
+});
+
+test('unrepresentable underflow and overflow dimensions fail as invalid input', () => {
+  [Number.MIN_VALUE, 1e-320, Number.MAX_VALUE].forEach((value) => {
+    ['x', 'y', 'z'].forEach((axis) => {
+      const descriptor = {
+        ...DESCRIPTOR,
+        dimensions: { ...DESCRIPTOR.dimensions, [axis]: value },
+      };
+      assert.deepEqual(buildComponentVisual(descriptor), {
+        group: null,
+        fallbackReason: 'invalid_dimensions',
+      });
+    });
+  });
+});
+
+test('safe representable dimension boundaries retain finite positive bounds', () => {
+  [
+    { x: 1e-6, y: 1e-6, z: 1e-6 },
+    { x: 100, y: 100, z: 100 },
+  ].forEach((dimensions) => {
+    const group = build('isolated', { ...DESCRIPTOR, dimensions });
+    const bounds = componentVisualBounds(group);
+    Object.values(bounds).forEach((value) => {
+      assert.equal(Number.isFinite(value), true);
+      assert.ok(value > 0);
     });
   });
 });
@@ -372,13 +429,14 @@ test('late build failure disposes every partially allocated resource and returns
   }
 });
 
-test('component disposal releases each unique resource once without crossing build ownership', () => {
+test('component disposal owns original resources and ignores replacements and foreign children', () => {
   const first = build('isolated');
   const second = build('isolated');
   const firstResources = resources(first);
   const secondResources = resources(second);
   const firstEvents = new Map();
   const secondEvents = new Map();
+  const foreignEvents = new Map();
 
   [...firstResources.geometries, ...firstResources.materials].forEach((resource) => {
     firstEvents.set(resource, 0);
@@ -393,18 +451,55 @@ test('component disposal releases each unique resource once without crossing bui
     });
   });
 
-  assert.deepEqual(disposeComponentVisual(first), {
-    geometries: firstResources.geometries.length,
-    materials: firstResources.materials.length,
+  const base = first.getObjectByName('base');
+  const detachedOwnedMaterial = base.material;
+  const replacementGeometry = new THREE.BoxGeometry(1, 1, 1);
+  const replacementMaterial = new THREE.MeshBasicMaterial();
+  base.geometry = replacementGeometry;
+  base.material = replacementMaterial;
+  const foreignGeometry = new THREE.BoxGeometry(1, 1, 1);
+  const foreignMaterial = new THREE.MeshBasicMaterial();
+  first.add(new THREE.Mesh(foreignGeometry, foreignMaterial));
+  [
+    replacementGeometry,
+    replacementMaterial,
+    foreignGeometry,
+    foreignMaterial,
+  ].forEach((resource) => {
+    foreignEvents.set(resource, 0);
+    resource.addEventListener('dispose', () => {
+      foreignEvents.set(resource, foreignEvents.get(resource) + 1);
+    });
   });
-  firstEvents.forEach((count) => assert.equal(count, 1));
-  secondEvents.forEach((count) => assert.equal(count, 0));
 
-  assert.deepEqual(disposeComponentVisual(second), {
-    geometries: secondResources.geometries.length,
-    materials: secondResources.materials.length,
-  });
-  secondEvents.forEach((count) => assert.equal(count, 1));
+  try {
+    assert.ok(firstResources.materials.includes(detachedOwnedMaterial));
+    assert.deepEqual(disposeComponentVisual(first), {
+      geometries: firstResources.geometries.length,
+      materials: firstResources.materials.length,
+    });
+    firstEvents.forEach((count) => assert.equal(count, 1));
+    secondEvents.forEach((count) => assert.equal(count, 0));
+    foreignEvents.forEach((count) => assert.equal(count, 0));
+
+    assert.deepEqual(disposeComponentVisual(first), {
+      geometries: 0,
+      materials: 0,
+    });
+    firstEvents.forEach((count) => assert.equal(count, 1));
+    foreignEvents.forEach((count) => assert.equal(count, 0));
+
+    assert.deepEqual(disposeComponentVisual(second), {
+      geometries: secondResources.geometries.length,
+      materials: secondResources.materials.length,
+    });
+    secondEvents.forEach((count) => assert.equal(count, 1));
+  } finally {
+    replacementGeometry.dispose();
+    replacementMaterial.dispose();
+    foreignGeometry.dispose();
+    foreignMaterial.dispose();
+  }
 });
 
 test('componentVisualBounds returns finite Three.js Box3 dimensions', () => {
