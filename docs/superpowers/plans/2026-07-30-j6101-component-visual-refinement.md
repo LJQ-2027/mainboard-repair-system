@@ -31,7 +31,7 @@
 - Create: `assets/cross-source-registration/component-visual-validator.js`
 - Create: `tests/component-visual-specs.test.mjs`
 
-- [ ] **Step 1: Write catalog and validator tests**
+- [x] **Step 1: Write catalog and validator tests**
 
 Create `tests/component-visual-specs.test.mjs`:
 
@@ -101,7 +101,7 @@ test('detail levels reference unique declared part names', () => {
 });
 ```
 
-- [ ] **Step 2: Run the tests and verify RED**
+- [x] **Step 2: Run the tests and verify RED**
 
 Run:
 
@@ -111,7 +111,7 @@ node --test tests/component-visual-specs.test.mjs
 
 Expected: FAIL with `ERR_MODULE_NOT_FOUND` for `component-visual-specs.js`.
 
-- [ ] **Step 3: Implement the immutable catalog**
+- [x] **Step 3: Implement the immutable catalog**
 
 Create `assets/cross-source-registration/component-visual-specs.js` with:
 
@@ -201,7 +201,7 @@ export function resolveComponentVisualSpec(inspectionProfileId) {
 }
 ```
 
-- [ ] **Step 4: Implement deterministic validation**
+- [x] **Step 4: Implement deterministic validation**
 
 Create `assets/cross-source-registration/component-visual-validator.js`:
 
@@ -264,7 +264,7 @@ export function validateComponentVisualSpec(spec, materialCatalog = {}) {
 }
 ```
 
-- [ ] **Step 5: Run the focused tests and verify GREEN**
+- [x] **Step 5: Run the focused tests and verify GREEN**
 
 Run:
 
@@ -274,7 +274,7 @@ node --test tests/component-visual-specs.test.mjs
 
 Expected: 4 tests pass.
 
-- [ ] **Step 6: Commit the validated specification layer**
+- [x] **Step 6: Commit the validated specification layer**
 
 ```powershell
 git add assets/cross-source-registration/component-visual-specs.js `
@@ -289,7 +289,7 @@ git commit -m "feat: add validated component visual specs"
 - Create: `assets/cross-source-registration/component-visual-builder.js`
 - Create: `tests/component-visual-builder.test.mjs`
 
-- [ ] **Step 1: Write builder tests**
+- [x] **Step 1: Write builder tests**
 
 Create `tests/component-visual-builder.test.mjs`:
 
@@ -346,7 +346,7 @@ test('unknown and invalid profiles return stable fail-soft reasons', () => {
 });
 ```
 
-- [ ] **Step 2: Run the builder tests and verify RED**
+- [x] **Step 2: Run the builder tests and verify RED**
 
 Run:
 
@@ -356,7 +356,7 @@ node --test tests/component-visual-builder.test.mjs
 
 Expected: FAIL with `ERR_MODULE_NOT_FOUND`.
 
-- [ ] **Step 3: Implement stage-driven geometry and semantic materials**
+- [x] **Step 3: Implement stage-driven geometry and semantic materials**
 
 Create `assets/cross-source-registration/component-visual-builder.js`. The module
 must:
@@ -549,7 +549,7 @@ Before running tests, ensure each mesh uses the exact names from
 `detail_levels`, source dimensions only through normalized ratios, and remains
 inside the descriptor footprint.
 
-- [ ] **Step 4: Run focused tests and inspect deterministic bounds**
+- [x] **Step 4: Run focused tests and inspect deterministic bounds**
 
 Run:
 
@@ -559,7 +559,7 @@ node --test tests/component-visual-specs.test.mjs tests/component-visual-builder
 
 Expected: 8 tests pass and no Node warning or unhandled rejection appears.
 
-- [ ] **Step 5: Commit the procedural builder**
+- [x] **Step 5: Commit the procedural builder**
 
 ```powershell
 git add assets/cross-source-registration/component-visual-builder.js `
@@ -575,7 +575,7 @@ git commit -m "feat: build staged connector visuals"
 - Modify: `tests/model-profiles.test.mjs`
 - Modify: `tests/model-toolbar.test.mjs`
 
-- [ ] **Step 1: Write failing descriptor and renderer integration tests**
+- [x] **Step 1: Write failing descriptor and renderer integration tests**
 
 Add to `tests/model-profiles.test.mjs`:
 
@@ -614,7 +614,7 @@ test('component inspection switches visual detail and restores board detail', ()
 });
 ```
 
-- [ ] **Step 2: Run the focused integration tests and verify RED**
+- [x] **Step 2: Run the focused integration tests and verify RED**
 
 Run:
 
@@ -625,7 +625,7 @@ node --test tests/model-profiles.test.mjs tests/model-toolbar.test.mjs
 Expected: FAIL because the descriptor has no `componentVisualSpecId` and the
 renderer still owns `addInspectionConnectorPackage`.
 
-- [ ] **Step 3: Resolve reusable visual identity in model profiles**
+- [x] **Step 3: Resolve reusable visual identity in model profiles**
 
 In `model-profiles.js`, import `resolveComponentVisualSpec` and add to the
 descriptor:
@@ -644,7 +644,7 @@ return {
 Do not remove `visualAsset`; existing browser selectors and compatibility tests
 still use `reviewed-connector`.
 
-- [ ] **Step 4: Replace connector-specific geometry with builder integration**
+- [x] **Step 4: Replace connector-specific geometry with builder integration**
 
 In `board-renderer.js`:
 
@@ -675,7 +675,7 @@ function createPackageMesh(descriptor, detailLevel = 'board') {
 Delete `addInspectionConnectorPackage`. Keep the generic connector package as
 the fail-soft fallback.
 
-- [ ] **Step 5: Implement transform-preserving detail replacement**
+- [x] **Step 5: Implement transform-preserving detail replacement**
 
 Add renderer methods:
 
@@ -730,7 +730,7 @@ After replacement, reapply inspection opacity/material snapshots and ensure the
 selected identity, pick target, external label, affordance, camera, and
 inspection profile remain unchanged.
 
-- [ ] **Step 6: Run all model tests and verify GREEN**
+- [x] **Step 6: Run all model tests and verify GREEN**
 
 Run:
 
@@ -745,7 +745,7 @@ node --test tests/component-visual-specs.test.mjs `
 
 Expected: all focused tests pass.
 
-- [ ] **Step 7: Commit renderer integration**
+- [x] **Step 7: Commit renderer integration**
 
 ```powershell
 git add assets/cross-source-registration/model-profiles.js `
@@ -762,7 +762,7 @@ git commit -m "feat: integrate reusable connector visuals"
 - Modify if defects are found: `assets/cross-source-registration/component-visual-builder.js`
 - Modify if defects are found: `assets/cross-source-registration/board-renderer.js`
 
-- [ ] **Step 1: Start the actual local application**
+- [x] **Step 1: Start the actual local application**
 
 Run from the worktree:
 
@@ -773,7 +773,7 @@ G:\Programming\mainboard-repair-system\.venv\Scripts\python.exe ai_proxy_server.
 Expected: the app serves the repository worktree on a free local port. Record
 the exact URL. Do not use a static mockup or the brainstorm companion for QA.
 
-- [ ] **Step 2: Capture the board-level J6101 state at desktop**
+- [x] **Step 2: Capture the board-level J6101 state at desktop**
 
 Open:
 
@@ -794,7 +794,7 @@ At `1600x900`:
 6. Sample the WebGL canvas and assert non-background pixels occupy a meaningful
    area around the selected component.
 
-- [ ] **Step 3: Capture and exercise isolated-component inspection**
+- [x] **Step 3: Capture and exercise isolated-component inspection**
 
 Enter `单体查看` and assert:
 
@@ -821,7 +821,7 @@ Save:
 Assert there are zero page errors, zero console errors, and no horizontal or
 vertical document overflow.
 
-- [ ] **Step 4: Repeat the interaction matrix at 390 px touch width**
+- [x] **Step 4: Repeat the interaction matrix at 390 px touch width**
 
 At `390x844`:
 
@@ -840,7 +840,7 @@ Assert:
 - the canvas is nonblank;
 - the page has zero runtime errors.
 
-- [ ] **Step 5: Compare visual acceptance against the baseline**
+- [x] **Step 5: Compare visual acceptance against the baseline**
 
 Use the pre-change screenshot or Git parent rendered at the same viewport.
 Record a short `qa-summary.md` in the ignored evidence directory with:
@@ -870,7 +870,7 @@ and repeat all affected screenshots.
 - Modify: `docs/km4-cross-source-registration-2026-07-13.md`
 - Modify: `docs/superpowers/plans/2026-07-30-j6101-component-visual-refinement.md`
 
-- [ ] **Step 1: Run the complete Node suite**
+- [x] **Step 1: Run the complete Node suite**
 
 Run:
 
@@ -880,7 +880,7 @@ node --test tests/*.test.mjs
 
 Expected: all tests pass; the baseline was 250 tests before adding this feature.
 
-- [ ] **Step 2: Run the source-bound Python regression**
+- [x] **Step 2: Run the source-bound Python regression**
 
 Run:
 
@@ -893,7 +893,7 @@ G:\Programming\mainboard-repair-system\.venv\Scripts\python.exe -m unittest `
 
 Expected: 27 tests pass.
 
-- [ ] **Step 3: Validate repository state**
+- [x] **Step 3: Validate repository state**
 
 Run:
 
@@ -906,7 +906,7 @@ git log --oneline -6
 Expected: no whitespace errors; only intended source, test, documentation, and
 ignored browser evidence changes are present.
 
-- [ ] **Step 4: Document the verified result**
+- [x] **Step 4: Document the verified result**
 
 Append a dated section to `docs/km4-cross-source-registration-2026-07-13.md`
 that records:
@@ -922,7 +922,7 @@ that records:
 - explicit statement that no engineering CAD accuracy or real pin geometry is
   claimed.
 
-- [ ] **Step 5: Mark this plan with actual completion evidence**
+- [x] **Step 5: Mark this plan with actual completion evidence**
 
 Check completed boxes only after their corresponding command or visual
 observation has been executed. Do not mark browser or full regression tasks
