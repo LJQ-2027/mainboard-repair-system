@@ -10,11 +10,17 @@ import {
 import {
   COMPONENT_VISUAL_MATERIALS,
   J6101_CONNECTOR_VISUAL_SPEC,
+  U2001_PMIC_VISUAL_SPEC,
 } from '../assets/cross-source-registration/component-visual-specs.js';
 
 const DESCRIPTOR = Object.freeze({
   dimensions: Object.freeze({ x: 0.314, y: 0.09875, z: 0.045 }),
   inspectionProfile: Object.freeze({ profile_id: 'j6101-connector-v1' }),
+});
+
+const U2001_DESCRIPTOR = Object.freeze({
+  dimensions: Object.freeze({ x: 0.96, y: 1.35, z: 0.18 }),
+  inspectionProfile: Object.freeze({ profile_id: 'u2001-pmic-v1' }),
 });
 
 const BOARD_NAMES = Object.freeze([
@@ -42,6 +48,23 @@ const ISOLATED_NAMES = Object.freeze([
   'opening',
   'retention-east',
   'retention-west',
+]);
+
+const U2001_BOARD_NAMES = Object.freeze([
+  'body',
+  'orientation-marker',
+  'substrate',
+  'top',
+]);
+
+const U2001_ISOLATED_NAMES = Object.freeze([
+  'body',
+  'body-edges',
+  'orientation-marker',
+  'substrate',
+  'substrate-edges',
+  'top',
+  'top-seam',
 ]);
 
 function build(detailLevel = 'board', descriptor = DESCRIPTOR, dependencies) {
@@ -114,6 +137,72 @@ test('J6101 board builds with exact deterministic stage metadata and part names'
     visualBoundaryNote: J6101_CONNECTOR_VISUAL_SPEC.boundary_note,
   });
   assert.deepEqual(directPartNames(group), BOARD_NAMES);
+});
+
+test('U2001 board builds deterministic IC BGA stages and named parts', () => {
+  const group = build('board', U2001_DESCRIPTOR);
+  assert.deepEqual(group.userData, {
+    visualSpecId: 'ic-bga-u2001-repair-visual-v1',
+    visualSpecVersion: 1,
+    visualAssetType: 'procedural',
+    visualDetailLevel: 'board',
+    visualStages: ['blockout', 'structure', 'material', 'polish'],
+    visualPartNames: U2001_BOARD_NAMES,
+    visualBoundaryNote: U2001_PMIC_VISUAL_SPEC.boundary_note,
+  });
+  assert.deepEqual(directPartNames(group), U2001_BOARD_NAMES);
+});
+
+test('U2001 isolated detail adds only source-bounded package edges', () => {
+  const board = build('board', U2001_DESCRIPTOR);
+  const isolated = build('isolated', U2001_DESCRIPTOR);
+  assert.deepEqual(isolated.userData.visualPartNames, U2001_ISOLATED_NAMES);
+  assert.deepEqual(directPartNames(isolated), U2001_ISOLATED_NAMES);
+  assert.ok(U2001_BOARD_NAMES.every((name) => U2001_ISOLATED_NAMES.includes(name)));
+  ['substrate-edges', 'body-edges', 'top-seam'].forEach((name) => {
+    assert.ok(isolated.getObjectByName(name) instanceof THREE.LineSegments);
+    assert.equal(board.getObjectByName(name), undefined);
+  });
+});
+
+test('U2001 hierarchy, material roles, and orientation cue remain explicit', () => {
+  const group = build('isolated', U2001_DESCRIPTOR);
+  const roles = {
+    substrate: 'ic-substrate',
+    body: 'molded-package',
+    top: 'inset-top',
+    'orientation-marker': 'orientation-marker',
+  };
+  Object.entries(roles).forEach(([partName, token]) => {
+    const mesh = group.getObjectByName(partName);
+    const expected = COMPONENT_VISUAL_MATERIALS[token];
+    assert.ok(mesh instanceof THREE.Mesh);
+    assert.equal(mesh.userData.visualMaterial, token);
+    assert.equal(mesh.material.color.getHex(), expected.color);
+    assert.equal(mesh.material.roughness, expected.roughness);
+    assert.equal(mesh.material.metalness, expected.metalness);
+  });
+  assert.ok(group.getObjectByName('orientation-marker').geometry instanceof THREE.CylinderGeometry);
+
+  const substrate = new THREE.Box3().setFromObject(group.getObjectByName('substrate'));
+  const body = new THREE.Box3().setFromObject(group.getObjectByName('body'));
+  const top = new THREE.Box3().setFromObject(group.getObjectByName('top'));
+  const marker = new THREE.Box3().setFromObject(group.getObjectByName('orientation-marker'));
+  assert.ok(body.min.z >= substrate.max.z - 1e-8);
+  assert.ok(top.min.z >= body.max.z - U2001_DESCRIPTOR.dimensions.z * 0.03);
+  assert.ok(top.max.z > body.max.z);
+  assert.ok(marker.min.z >= top.min.z - 1e-8);
+  assert.ok(marker.max.x > top.getCenter(new THREE.Vector3()).x);
+  assert.ok(marker.max.y > top.getCenter(new THREE.Vector3()).y);
+});
+
+test('U2001 visual makes no ball grid, pad, marking, lead, or internal claim', () => {
+  const group = build('isolated', U2001_DESCRIPTOR);
+  const prohibited = /ball|pad|marking|lead|die|internal|pitch|vendor|millimet(?:er|re)|\bmm\b/i;
+  group.traverse((child) => {
+    assert.equal(prohibited.test(child.name), false, child.name);
+    assert.equal(prohibited.test(child.userData.visualPart || ''), false);
+  });
 });
 
 test('isolated detail is the exact named superset with edges and no pin geometry', () => {
@@ -255,6 +344,42 @@ test('board and isolated bounds stay within normal and extreme valid descriptors
   });
 });
 
+test('U2001 board and isolated bounds stay inside normal and extreme descriptors', () => {
+  const descriptors = [
+    U2001_DESCRIPTOR,
+    { ...U2001_DESCRIPTOR, dimensions: { x: 1e-6, y: 20, z: 3e-5 } },
+    { ...U2001_DESCRIPTOR, dimensions: { x: 15, y: 2e-6, z: 9 } },
+  ];
+  descriptors.forEach((descriptor) => {
+    ['board', 'isolated'].forEach((detailLevel) => {
+      assertInsideFootprint(descriptor, detailLevel);
+      const bounds = componentVisualBounds(build(detailLevel, descriptor));
+      Object.values(bounds).forEach((value) => {
+        assert.equal(Number.isFinite(value), true);
+        assert.ok(value > 0);
+      });
+    });
+  });
+});
+
+test('relationally overflowing IC BGA ratios fail after measured bounds validation', () => {
+  const spec = structuredClone(U2001_PMIC_VISUAL_SPEC);
+  spec.structure.marker.radius = 0.9;
+  spec.structure.marker.offset_x = 0.9;
+  spec.structure.marker.offset_y = 0.9;
+  spec.structure.top.height = 1;
+  spec.structure.top.lift = 1;
+  assert.deepEqual(
+    buildComponentVisual(U2001_DESCRIPTOR, 'board', {
+      resolveSpec: () => spec,
+    }),
+    {
+      group: null,
+      fallbackReason: 'visual_bounds_exceeded',
+    },
+  );
+});
+
 test('unrepresentable underflow and overflow dimensions fail as invalid input', () => {
   [Number.MIN_VALUE, 1e-320, Number.MAX_VALUE].forEach((value) => {
     ['x', 'y', 'z'].forEach((axis) => {
@@ -286,6 +411,41 @@ test('safe representable dimension boundaries retain finite positive bounds', ()
 
 test('repeated builds produce identical geometry and transforms', () => {
   assert.deepEqual(snapshot(build('isolated')), snapshot(build('isolated')));
+  assert.deepEqual(
+    snapshot(build('isolated', U2001_DESCRIPTOR)),
+    snapshot(build('isolated', U2001_DESCRIPTOR)),
+  );
+});
+
+test('U2001 builds own independent resources and dispose exactly once', () => {
+  const first = build('isolated', U2001_DESCRIPTOR);
+  const second = build('isolated', U2001_DESCRIPTOR);
+  const firstResources = resources(first);
+  const secondResources = resources(second);
+  firstResources.geometries.forEach((geometry) => {
+    assert.equal(secondResources.geometries.includes(geometry), false);
+  });
+  firstResources.materials.forEach((material) => {
+    assert.equal(secondResources.materials.includes(material), false);
+  });
+  assert.deepEqual(disposeComponentVisual(first), {
+    geometries: firstResources.geometries.length,
+    materials: firstResources.materials.length,
+    failureCount: 0,
+    cleanupWarning: null,
+  });
+  assert.deepEqual(disposeComponentVisual(first), {
+    geometries: 0,
+    materials: 0,
+    failureCount: 0,
+    cleanupWarning: null,
+  });
+  assert.deepEqual(disposeComponentVisual(second), {
+    geometries: secondResources.geometries.length,
+    materials: secondResources.materials.length,
+    failureCount: 0,
+    cleanupWarning: null,
+  });
 });
 
 test('builds do not share mutable geometry or material state', () => {

@@ -181,7 +181,7 @@ function addPart(context, name, source, role, position = {}) {
   return part;
 }
 
-function blockout(context) {
+function connectorBlockout(context) {
   addPart(context, 'base', context.spec.structure.base, 'base');
 }
 
@@ -248,7 +248,7 @@ function addInnerLip(context) {
   });
 }
 
-function structure(context) {
+function connectorStructure(context) {
   addFrame(context);
   addPart(context, 'opening', context.spec.structure.opening, 'opening');
   addPart(context, 'contact', context.spec.structure.contact, 'contact', {
@@ -265,7 +265,7 @@ function structure(context) {
   addInnerLip(context);
 }
 
-function material(context) {
+function applyMaterials(context) {
   context.group.traverse((child) => {
     if (!child.isMesh) return;
     child.material = materialFor(
@@ -276,7 +276,7 @@ function material(context) {
   });
 }
 
-function polish(context) {
+function connectorPolish(context) {
   if (!context.allowed.has('frame-edges')) return;
   const edgeGroup = new THREE.Group();
   edgeGroup.name = 'frame-edges';
@@ -306,12 +306,94 @@ function polish(context) {
   context.group.add(edgeGroup);
 }
 
-const BUILD_STAGES = Object.freeze([
-  ['blockout', blockout],
-  ['structure', structure],
-  ['material', material],
-  ['polish', polish],
-]);
+function addCircularPart(context, name, source, role) {
+  if (!context.allowed.has(name)) return null;
+  const { dimensions, group, spec } = context;
+  const radius = Math.min(dimensions.x, dimensions.y) * source.radius;
+  const height = dimensions.z * source.height;
+  const geometry = ownResource(
+    context.ownership,
+    'geometries',
+    new THREE.CylinderGeometry(radius, radius, height, 24),
+  );
+  const mesh = new THREE.Mesh(geometry, null);
+  mesh.name = name;
+  mesh.userData.visualPart = name;
+  mesh.userData.visualMaterial = spec.materials[role];
+  mesh.userData.visualMaterialRole = role;
+  mesh.rotation.x = Math.PI / 2;
+  mesh.position.set(
+    dimensions.x * source.offset_x,
+    dimensions.y * source.offset_y,
+    dimensions.z * source.lift + height / 2,
+  );
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  group.add(mesh);
+  return mesh;
+}
+
+function addPartEdges(context, name, sourceName) {
+  if (!context.allowed.has(name)) return null;
+  const source = context.group.getObjectByName(sourceName);
+  if (!source?.geometry) return null;
+  const { material: edgeMaterial, token } = materialFor(
+    context.spec,
+    'edge',
+    context.ownership,
+  );
+  const edge = new THREE.LineSegments(
+    ownResource(
+      context.ownership,
+      'geometries',
+      new THREE.EdgesGeometry(source.geometry, 28),
+    ),
+    edgeMaterial,
+  );
+  edge.name = name;
+  edge.userData.visualPart = name;
+  edge.userData.visualMaterial = token;
+  edge.position.copy(source.position);
+  edge.rotation.copy(source.rotation);
+  context.group.add(edge);
+  return edge;
+}
+
+function icBgaBlockout(context) {
+  addPart(context, 'substrate', context.spec.structure.substrate, 'substrate');
+}
+
+function icBgaStructure(context) {
+  addPart(context, 'body', context.spec.structure.body, 'body');
+  addPart(context, 'top', context.spec.structure.top, 'top');
+  addCircularPart(
+    context,
+    'orientation-marker',
+    context.spec.structure.marker,
+    'marker',
+  );
+}
+
+function icBgaPolish(context) {
+  addPartEdges(context, 'substrate-edges', 'substrate');
+  addPartEdges(context, 'body-edges', 'body');
+  addPartEdges(context, 'top-seam', 'top');
+}
+
+const FAMILY_COMPILERS = Object.freeze({
+  connector: Object.freeze({
+    blockout: connectorBlockout,
+    structure: connectorStructure,
+    material: applyMaterials,
+    polish: connectorPolish,
+  }),
+  ic_bga: Object.freeze({
+    blockout: icBgaBlockout,
+    structure: icBgaStructure,
+    material: applyMaterials,
+    polish: icBgaPolish,
+  }),
+});
 
 function finishMetadata(group, spec, detailLevel, stages) {
   const names = group.children
@@ -348,6 +430,17 @@ export function componentVisualBounds(group) {
   return { width: size.x, depth: size.y, height: size.z };
 }
 
+function isWithinDescriptorBounds(group, dimensions) {
+  const bounds = new THREE.Box3().setFromObject(group);
+  const tolerance = (value) => Math.max(1e-9, value * 1e-6);
+  return bounds.min.x >= -dimensions.x / 2 - tolerance(dimensions.x)
+    && bounds.max.x <= dimensions.x / 2 + tolerance(dimensions.x)
+    && bounds.min.y >= -dimensions.y / 2 - tolerance(dimensions.y)
+    && bounds.max.y <= dimensions.y / 2 + tolerance(dimensions.y)
+    && bounds.min.z >= -tolerance(dimensions.z)
+    && bounds.max.z <= dimensions.z + tolerance(dimensions.z);
+}
+
 export function buildComponentVisual(
   descriptor,
   detailLevel = 'board',
@@ -370,8 +463,13 @@ export function buildComponentVisual(
 
     const validation = validateComponentVisualSpec(spec, COMPONENT_VISUAL_MATERIALS);
     if (!validation.valid) {
-      return { group: null, fallbackReason: validation.errors[0].code };
+      const reason = validation.errors[0].code;
+      return {
+        group: null,
+        fallbackReason: reason === 'malformed_spec' ? 'visual_build_error' : reason,
+      };
     }
+    const compiler = FAMILY_COMPILERS[spec.family];
 
     ownership = {
       disposed: false,
@@ -388,8 +486,8 @@ export function buildComponentVisual(
       spec,
     };
     const completedStages = [];
-    BUILD_STAGES.forEach(([name, buildStage]) => {
-      buildStage(context);
+    spec.stages.forEach((name) => {
+      compiler[name](context);
       completedStages.push(name);
     });
     finishMetadata(context.group, spec, detailLevel, completedStages);
@@ -404,6 +502,10 @@ export function buildComponentVisual(
     ) {
       disposeComponentVisual(context.group);
       return { group: null, fallbackReason: 'invalid_dimensions' };
+    }
+    if (!isWithinDescriptorBounds(context.group, descriptor.dimensions)) {
+      disposeComponentVisual(context.group);
+      return { group: null, fallbackReason: 'visual_bounds_exceeded' };
     }
     return { group: context.group, fallbackReason: null };
   } catch {
