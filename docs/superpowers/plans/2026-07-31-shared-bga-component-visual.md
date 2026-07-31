@@ -196,7 +196,7 @@ git commit -m "feat: add shared BGA component visual spec"
 - Modify: `tests/component-visual-builder.test.mjs`
 - Modify `assets/cross-source-registration/component-visual-builder.js` only if a failing test reveals a genuine family defect.
 
-- [ ] **Step 1: Write failing multi-profile builder tests**
+- [x] **Step 1: Write failing multi-profile builder tests**
 
 Define representative descriptors:
 
@@ -241,7 +241,7 @@ For isolated detail require the exact edge superset. Also assert:
 - no part or metadata claims balls, pads, leads, markings, vendor package, die, internals, or millimeter dimensions;
 - U2001 still reports its own spec id and unchanged part set.
 
-- [ ] **Step 2: Run the focused builder test and verify RED**
+- [x] **Step 2: Run the focused builder test and verify RED**
 
 Run:
 
@@ -251,11 +251,11 @@ node --test tests/component-visual-builder.test.mjs
 
 Expected: FAIL with `visual_spec_not_found` for the shared profiles.
 
-- [ ] **Step 3: Implement only defects exposed by the test**
+- [x] **Step 3: Implement only defects exposed by the test**
 
 The existing `ic_bga` compiler should compile the new spec without production-code changes. If it does not, fix only the family-general defect demonstrated by the failing assertion; do not introduce profile or designator branches.
 
-- [ ] **Step 4: Run builder and catalog tests and verify GREEN**
+- [x] **Step 4: Run builder and catalog tests and verify GREEN**
 
 Run:
 
@@ -265,7 +265,7 @@ node --test tests/component-visual-builder.test.mjs tests/component-visual-specs
 
 Expected: all shared BGA, U2001, and J6101 tests pass.
 
-- [ ] **Step 5: Commit the builder proof**
+- [x] **Step 5: Commit the builder proof**
 
 ```powershell
 git add tests/component-visual-builder.test.mjs assets/cross-source-registration/component-visual-builder.js
