@@ -23,6 +23,26 @@ export const COMPONENT_VISUAL_MATERIALS = Object.freeze({
     color: 0x66736d,
     opacity: 0.72,
   }),
+  'ic-substrate': Object.freeze({
+    color: 0x31443d,
+    roughness: 0.66,
+    metalness: 0.08,
+  }),
+  'molded-package': Object.freeze({
+    color: 0x171d1b,
+    roughness: 0.58,
+    metalness: 0.12,
+  }),
+  'inset-top': Object.freeze({
+    color: 0x232a27,
+    roughness: 0.52,
+    metalness: 0.16,
+  }),
+  'orientation-marker': Object.freeze({
+    color: 0xaab3ad,
+    roughness: 0.45,
+    metalness: 0.2,
+  }),
 });
 
 export const J6101_CONNECTOR_VISUAL_SPEC = Object.freeze({
@@ -132,12 +152,111 @@ export const J6101_CONNECTOR_VISUAL_SPEC = Object.freeze({
   }),
 });
 
-const SPEC_BY_INSPECTION_PROFILE = new Map(
-  J6101_CONNECTOR_VISUAL_SPEC.inspection_profiles.map((profileId) => [
-    profileId,
-    J6101_CONNECTOR_VISUAL_SPEC,
+export const U2001_PMIC_VISUAL_SPEC = Object.freeze({
+  spec_id: 'ic-bga-u2001-repair-visual-v1',
+  version: 1,
+  asset_type: 'procedural',
+  family: 'ic_bga',
+  inspection_profiles: Object.freeze(['u2001-pmic-v1']),
+  source_status: 'category_based',
+  fidelity: 'repair_visual',
+  boundary_note: '电源管理 IC 结构为维修识别示意，不代表准确封装、球数、球距、焊盘、丝印、内部结构或工程尺寸。',
+  claims: Object.freeze([
+    'ic_package_silhouette',
+    'substrate_body_hierarchy',
+    'generic_orientation_cue',
   ]),
-);
+  materials: Object.freeze({
+    substrate: 'ic-substrate',
+    body: 'molded-package',
+    top: 'inset-top',
+    marker: 'orientation-marker',
+    edge: 'edge-line',
+  }),
+  structure: Object.freeze({
+    substrate: Object.freeze({
+      width: 1,
+      depth: 1,
+      height: 0.12,
+      radius: 0.045,
+    }),
+    body: Object.freeze({
+      width: 0.88,
+      depth: 0.88,
+      height: 0.62,
+      radius: 0.065,
+      lift: 0.12,
+    }),
+    top: Object.freeze({
+      width: 0.74,
+      depth: 0.74,
+      height: 0.055,
+      radius: 0.05,
+      lift: 0.72,
+    }),
+    marker: Object.freeze({
+      radius: 0.045,
+      offset_x: 0.31,
+      offset_y: 0.31,
+      height: 0.025,
+      lift: 0.775,
+    }),
+  }),
+  detail_levels: Object.freeze({
+    board: Object.freeze([
+      'substrate',
+      'body',
+      'top',
+      'orientation-marker',
+    ]),
+    isolated: Object.freeze([
+      'substrate',
+      'body',
+      'top',
+      'orientation-marker',
+      'substrate-edges',
+      'body-edges',
+      'top-seam',
+    ]),
+  }),
+  stages: Object.freeze(['blockout', 'structure', 'material', 'polish']),
+  acceptance: Object.freeze({
+    ratio_min: 0.02,
+    ratio_max: 1,
+    prohibited_claims: Object.freeze([
+      'exact_pin_count',
+      'exact_pin_pitch',
+      'vendor_latch',
+      'solder_foot_array',
+      'internal_spring_geometry',
+      'millimeter_dimensions',
+      'exact_ball_count',
+      'exact_ball_pitch',
+      'exact_pad_layout',
+      'vendor_package',
+      'die_or_internal_structure',
+      'package_marking',
+    ]),
+  }),
+});
+
+export function buildComponentVisualSpecCatalog(specs) {
+  const catalog = new Map();
+  specs.forEach((spec) => {
+    spec.inspection_profiles.forEach((profileId) => {
+      if (catalog.has(profileId)) {
+        throw new Error(`Duplicate inspection profile: ${profileId}`);
+      }
+      catalog.set(profileId, spec);
+    });
+  });
+  return catalog;
+}
+
+const SPEC_BY_INSPECTION_PROFILE = buildComponentVisualSpecCatalog([
+  J6101_CONNECTOR_VISUAL_SPEC,
+  U2001_PMIC_VISUAL_SPEC,
+]);
 
 export function resolveComponentVisualSpec(inspectionProfileId) {
   return SPEC_BY_INSPECTION_PROFILE.get(inspectionProfileId) || null;

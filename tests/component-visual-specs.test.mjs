@@ -2,9 +2,11 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  buildComponentVisualSpecCatalog,
   COMPONENT_VISUAL_MATERIALS,
   J6101_CONNECTOR_VISUAL_SPEC,
   resolveComponentVisualSpec,
+  U2001_PMIC_VISUAL_SPEC,
 } from '../assets/cross-source-registration/component-visual-specs.js';
 import {
   COMPONENT_VISUAL_STAGE_ORDER,
@@ -17,6 +19,10 @@ const MATERIAL_TOKENS = [
   'plated-metal',
   'contact-metal',
   'edge-line',
+  'ic-substrate',
+  'molded-package',
+  'inset-top',
+  'orientation-marker',
 ];
 
 const PROHIBITED_CLAIMS = [
@@ -26,6 +32,16 @@ const PROHIBITED_CLAIMS = [
   'solder_foot_array',
   'internal_spring_geometry',
   'millimeter_dimensions',
+];
+
+const U2001_PROHIBITED_CLAIMS = [
+  ...PROHIBITED_CLAIMS,
+  'exact_ball_count',
+  'exact_ball_pitch',
+  'exact_pad_layout',
+  'vendor_package',
+  'die_or_internal_structure',
+  'package_marking',
 ];
 
 function validate(spec) {
@@ -57,6 +73,86 @@ test('J6101 resolves through its reviewed inspection profile', () => {
   assert.equal(spec.spec_id, 'connector-j6101-repair-visual-v1');
   assert.equal(resolveComponentVisualSpec('unknown-profile'), null);
   assert.equal(resolveComponentVisualSpec(), null);
+});
+
+test('U2001 resolves through the approved category-based PMIC profile', () => {
+  const spec = resolveComponentVisualSpec('u2001-pmic-v1');
+  assert.equal(spec, U2001_PMIC_VISUAL_SPEC);
+  assert.deepEqual({
+    spec_id: spec.spec_id,
+    version: spec.version,
+    asset_type: spec.asset_type,
+    family: spec.family,
+    inspection_profiles: spec.inspection_profiles,
+    source_status: spec.source_status,
+    fidelity: spec.fidelity,
+    boundary_note: spec.boundary_note,
+  }, {
+    spec_id: 'ic-bga-u2001-repair-visual-v1',
+    version: 1,
+    asset_type: 'procedural',
+    family: 'ic_bga',
+    inspection_profiles: ['u2001-pmic-v1'],
+    source_status: 'category_based',
+    fidelity: 'repair_visual',
+    boundary_note: '电源管理 IC 结构为维修识别示意，不代表准确封装、球数、球距、焊盘、丝印、内部结构或工程尺寸。',
+  });
+});
+
+test('the U2001 evidence boundary rejects package engineering claims', () => {
+  assert.deepEqual(U2001_PMIC_VISUAL_SPEC.claims, [
+    'ic_package_silhouette',
+    'substrate_body_hierarchy',
+    'generic_orientation_cue',
+  ]);
+  assert.deepEqual(
+    U2001_PMIC_VISUAL_SPEC.acceptance.prohibited_claims,
+    U2001_PROHIBITED_CLAIMS,
+  );
+});
+
+test('the approved U2001 spec declares normalized structure and named detail parts', () => {
+  assert.deepEqual(U2001_PMIC_VISUAL_SPEC.materials, {
+    substrate: 'ic-substrate',
+    body: 'molded-package',
+    top: 'inset-top',
+    marker: 'orientation-marker',
+    edge: 'edge-line',
+  });
+  assert.deepEqual(U2001_PMIC_VISUAL_SPEC.structure, {
+    substrate: { width: 1, depth: 1, height: 0.12, radius: 0.045 },
+    body: { width: 0.88, depth: 0.88, height: 0.62, radius: 0.065, lift: 0.12 },
+    top: { width: 0.74, depth: 0.74, height: 0.055, radius: 0.05, lift: 0.72 },
+    marker: {
+      radius: 0.045,
+      offset_x: 0.31,
+      offset_y: 0.31,
+      height: 0.025,
+      lift: 0.775,
+    },
+  });
+  assert.deepEqual(U2001_PMIC_VISUAL_SPEC.detail_levels, {
+    board: ['substrate', 'body', 'top', 'orientation-marker'],
+    isolated: [
+      'substrate',
+      'body',
+      'top',
+      'orientation-marker',
+      'substrate-edges',
+      'body-edges',
+      'top-seam',
+    ],
+  });
+});
+
+test('catalog construction rejects duplicate inspection profiles', () => {
+  assert.throws(
+    () => buildComponentVisualSpecCatalog([
+      J6101_CONNECTOR_VISUAL_SPEC,
+      { ...U2001_PMIC_VISUAL_SPEC, inspection_profiles: ['j6101-connector-v1'] },
+    ]),
+    /Duplicate inspection profile: j6101-connector-v1/,
+  );
 });
 
 test('the approved J6101 identity and evidence boundary remain explicit', () => {
@@ -150,6 +246,30 @@ test('canonical stages and the approved spec are deeply immutable where consumed
   assert.throws(() => J6101_CONNECTOR_VISUAL_SPEC.stages.push('extra'), TypeError);
   assert.throws(() => {
     J6101_CONNECTOR_VISUAL_SPEC.structure.frame.width = 0.5;
+  }, TypeError);
+});
+
+test('the U2001 visual specification is deeply immutable where consumed', () => {
+  [
+    U2001_PMIC_VISUAL_SPEC,
+    U2001_PMIC_VISUAL_SPEC.inspection_profiles,
+    U2001_PMIC_VISUAL_SPEC.claims,
+    U2001_PMIC_VISUAL_SPEC.materials,
+    U2001_PMIC_VISUAL_SPEC.structure,
+    U2001_PMIC_VISUAL_SPEC.structure.substrate,
+    U2001_PMIC_VISUAL_SPEC.structure.body,
+    U2001_PMIC_VISUAL_SPEC.structure.top,
+    U2001_PMIC_VISUAL_SPEC.structure.marker,
+    U2001_PMIC_VISUAL_SPEC.detail_levels,
+    U2001_PMIC_VISUAL_SPEC.detail_levels.board,
+    U2001_PMIC_VISUAL_SPEC.detail_levels.isolated,
+    U2001_PMIC_VISUAL_SPEC.stages,
+    U2001_PMIC_VISUAL_SPEC.acceptance,
+    U2001_PMIC_VISUAL_SPEC.acceptance.prohibited_claims,
+  ].forEach((value) => assert.equal(Object.isFrozen(value), true));
+  assert.throws(() => U2001_PMIC_VISUAL_SPEC.claims.push('extra'), TypeError);
+  assert.throws(() => {
+    U2001_PMIC_VISUAL_SPEC.structure.marker.radius = 0.2;
   }, TypeError);
 });
 
