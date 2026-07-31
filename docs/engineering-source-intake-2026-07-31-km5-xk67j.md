@@ -34,8 +34,10 @@ plus reviewed two-side structural landmarks.
 - Variant-aware sales-model aliases: `KM4n`, `KM4k`, `KM5`, `KM5n`, and `KM5s`.
 - Compile normalized two-side board geometry and footprint candidates.
 - Compile exact schematic designator occurrences from the V1.0B source.
-- Register the three unique KM4n photo byte streams after board compilation.
-- Link source red-box regions only as source annotations pending designator review.
+- Use the reviewed board-coordinate registrations for the three unique KM4n
+  photo byte streams after board compilation.
+- Preserve source red-box regions only as source annotations; they are not
+  defect labels or designator evidence.
 
 ## Prohibited inference
 
@@ -79,8 +81,28 @@ line-art point maps produced no valid candidate:
 - exposed side, image `28a193...`: ORB 54 / 20 but invalid projected shape;
   AKAZE 45 / 3.
 
-Each photo is preserved as `manual_registration_required`. No reviewed
-homography, Golden Sample, defect label, training row, field-accuracy result, or
-repair causality has been created. The next evidence action is reviewed manual
-four-point registration with independent check points; the next knowledge action
-is a source-backed XK67J repair workflow, if one is supplied and reviewed.
+Reviewed manual four-point registration now provides a repeatable normalized
+photo-to-board transform for all three byte streams. Independent check points
+produce the following image-plane errors without applying an industrial pass
+threshold:
+
+- shield side, image `57a9b1...`: RMS `0.013586`, maximum `0.017890`;
+- exposed side, image `1a3e4b...`: RMS `0.025054`, maximum `0.036515`; and
+- exposed side, image `28a193...`: the same transform and error because file-level
+  comparison confirms it shares the same capture geometry as `1a3e4b...`.
+
+A separate fail-closed technical sanity guard rejects duplicate, non-convex,
+crossed, inconsistently wound, ill-conditioned, internally singular, or
+out-of-plane transforms and any independent check error above `0.05` normalized
+image units. This guard only protects board-coordinate association; it is not an
+industrial accuracy or repair acceptance threshold.
+
+The shield-side source image is rotated 90 degrees counter-clockwise before the
+registration transform is applied. Both exposed-side images retain their source
+orientation. Automatic ORB/AKAZE failure evidence remains alongside the reviewed
+manual result instead of being overwritten.
+
+This is a reviewed **board-coordinate alignment** only. It has not created a
+Golden Sample, defect label, training row, field-accuracy result, industrial
+acceptance result, or repair causality. The next knowledge action remains a
+source-backed XK67J repair workflow, if one is supplied and reviewed.

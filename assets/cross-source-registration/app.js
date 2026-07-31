@@ -5,6 +5,7 @@ import { BoardRenderer } from './board-renderer.js';
 import { PointMapViewport } from './point-map-viewport.js';
 import { buildSourceNote } from './source-note-state.js';
 import { buildRegistrationViewState } from './registration-view-state.js';
+import { buildPhysicalRegistrationState } from './physical-registration-state.js';
 import { buildRepairCoverageState } from './repair-coverage-state.js';
 import { buildEntityAccessState } from './entity-access-state.js';
 import { mergeCompiledSchematicLinks } from './source-links.js';
@@ -132,6 +133,38 @@ function updateEntityAccessStatus(entity) {
   visibility.dataset.tone = access.tone;
   visibility.title = access.description;
   visibility.setAttribute('aria-label', `位置状态：${access.label}。${access.description}`);
+}
+
+function renderPhysicalRegistration() {
+  if (!data) return;
+  const state = buildPhysicalRegistrationState(data.physical_evidence, activeSideId);
+  const details = document.querySelector('#physicalRegistrationDetails');
+  details.hidden = !state.visible;
+  if (!state.visible) return;
+  document.querySelector('#physicalRegistrationTitle').textContent = state.title;
+  document.querySelector('#physicalRegistrationCount').textContent = state.summary;
+  const content = document.querySelector('#physicalRegistrationEvidence');
+  content.replaceChildren();
+  state.items.forEach((item) => {
+    const article = document.createElement('article');
+    article.className = 'physical-registration-card';
+    const heading = document.createElement('div');
+    const label = document.createElement('strong');
+    label.textContent = item.label;
+    const hash = document.createElement('code');
+    hash.textContent = item.hash;
+    heading.append(label, hash);
+    const error = document.createElement('span');
+    error.textContent = item.error;
+    const annotation = document.createElement('small');
+    annotation.textContent = item.annotation;
+    article.append(heading, error, annotation);
+    content.append(article);
+  });
+  const boundary = document.createElement('p');
+  boundary.className = 'physical-registration-boundary';
+  boundary.textContent = state.boundary;
+  content.append(boundary);
 }
 
 const GUIDANCE_RESULT_COPY = {
@@ -716,6 +749,7 @@ function updateSideControls() {
   document.querySelector('#entityListHeading').textContent = '已关联维修实体';
   const selectedEntity = data?.entities.find((entity) => entity.component_id === selectedId);
   updateEntityAccessStatus(selectedEntity);
+  renderPhysicalRegistration();
   if (activeView === 'model' && sideData) {
     updateSourceNote();
   }

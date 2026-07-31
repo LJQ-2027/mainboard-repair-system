@@ -1,8 +1,12 @@
 import json
+import sys
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from scripts.build_xk67j_physical_registration import build_manifest as build_physical_registration
 SCHEMATIC = "XK67J_L6735-KM5_MAIN_SCH_V1.0B.pdf"
 MODELS = ["KM4n", "KM4k", "KM5", "KM5n", "KM5s"]
 MODEL_EVIDENCE = {
@@ -170,6 +174,7 @@ def build_dataset(root=ROOT):
             shape="rectangle",
         ),
     ]
+    physical = build_physical_registration()
     return {
         "dataset_id": "XK67J-MAIN-XREG-20260731",
         "board_id": page_two["board_id"],
@@ -186,94 +191,20 @@ def build_dataset(root=ROOT):
             "reference_mode": "point_map_only",
             "point_map_image": "assets/board-atlas/xk67j/main-point-map-page-2.png",
             "point_map_source": "XK67J_MAIN_PCB_V1.0B Placement page 2",
-            "point_map_note": "XK67J V1.0B 第2面点位图；KM4n V1.0 实拍已保存，但尚未进入审核配准。",
+            "point_map_note": "XK67J V1.0B 第2面点位图；三张 KM4n V1.0 实拍已完成板级坐标审核配准。",
             "method": "normalized_point_map_registration",
             "confidence": "source_compiled",
         },
         "physical_evidence": {
-            "status": "preserved_pending_reviewed_registration",
-            "board_revision": "XK67J_MAIN V1.0",
+            "status": physical["status"],
+            "board_revision": physical["physical_board_revision"],
+            "engineering_board_revision": physical["engineering_board_revision"],
             "source_scope": "owner_authorized_feishu_case_library",
-            "unique_image_sha256": [
-                "1a3e4bdb3f5019656cd0910544e4f825b0eb94c3f85bf6668c956cd6a757687d",
-                "28a193f9bbd0750240fb20477f5ec0497de7f279868b408eab7c872dcd0273d6",
-                "57a9b1d36326cd0a0b1cee3a0bc622290728cbb1b4775cfab5182b9b84138fa6",
-            ],
-            "images": [
-                {
-                    "sha256": "1a3e4bdb3f5019656cd0910544e4f825b0eb94c3f85bf6668c956cd6a757687d",
-                    "side_id": "main_page_2",
-                    "view_scope": "full_board_repair_case",
-                    "source_annotation_present": True,
-                    "registration_status": "manual_registration_required",
-                    "automatic_failure_code": "low_inlier_count",
-                    "automatic_attempts": [
-                        {
-                            "detector": "orb",
-                            "matches": 45,
-                            "inliers": 10,
-                            "inlier_ratio": 0.222222,
-                            "failure_code": "low_inlier_ratio",
-                        },
-                        {
-                            "detector": "akaze",
-                            "matches": 40,
-                            "inliers": 4,
-                            "inlier_ratio": 0.1,
-                            "failure_code": "low_inlier_count",
-                        },
-                    ],
-                },
-                {
-                    "sha256": "57a9b1d36326cd0a0b1cee3a0bc622290728cbb1b4775cfab5182b9b84138fa6",
-                    "side_id": "main_page_1",
-                    "view_scope": "full_board_repair_case",
-                    "source_annotation_present": False,
-                    "registration_status": "manual_registration_required",
-                    "automatic_failure_code": "low_inlier_count",
-                    "automatic_attempts": [
-                        {
-                            "detector": "orb",
-                            "matches": 22,
-                            "inliers": 4,
-                            "inlier_ratio": 0.181818,
-                            "failure_code": "low_inlier_count",
-                        },
-                        {
-                            "detector": "akaze",
-                            "matches": 30,
-                            "inliers": 5,
-                            "inlier_ratio": 0.166667,
-                            "failure_code": "low_inlier_count",
-                        },
-                    ],
-                },
-                {
-                    "sha256": "28a193f9bbd0750240fb20477f5ec0497de7f279868b408eab7c872dcd0273d6",
-                    "side_id": "main_page_2",
-                    "view_scope": "full_board_repair_case",
-                    "source_annotation_present": True,
-                    "registration_status": "manual_registration_required",
-                    "automatic_failure_code": "low_inlier_count",
-                    "automatic_attempts": [
-                        {
-                            "detector": "orb",
-                            "matches": 54,
-                            "inliers": 20,
-                            "inlier_ratio": 0.37037,
-                            "failure_code": "invalid_projected_shape",
-                        },
-                        {
-                            "detector": "akaze",
-                            "matches": 45,
-                            "inliers": 3,
-                            "inlier_ratio": 0.066667,
-                            "failure_code": "low_inlier_count",
-                        },
-                    ],
-                },
-            ],
-            "accuracy_boundary": "Preserved repair-case photos are not yet reviewed registrations, Golden Samples, defect labels, or training rows.",
+            "threshold_policy": physical["threshold_policy"],
+            "unique_image_sha256": [item["sha256"] for item in physical["images"]],
+            "images": physical["images"],
+            "downstream_admission": physical["downstream_admission"],
+            "accuracy_boundary": physical["accuracy_boundary"],
         },
         "repair_coverage": {
             "status": "source_unavailable",

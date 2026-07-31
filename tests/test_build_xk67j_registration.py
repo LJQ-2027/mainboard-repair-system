@@ -55,9 +55,9 @@ class Xk67jRegistrationTests(unittest.TestCase):
         self.assertTrue(all(entity["schematic_links"] for entity in entities))
         self.assertTrue(all("inspection_profile" not in entity for entity in entities))
 
-    def test_keeps_preserved_photos_outside_registration_claims(self):
+    def test_links_reviewed_board_coordinate_registrations_without_downstream_claims(self):
         evidence = self.dataset["physical_evidence"]
-        self.assertEqual(evidence["status"], "preserved_pending_reviewed_registration")
+        self.assertEqual(evidence["status"], "reviewed_board_coordinate_registration")
         self.assertEqual(evidence["board_revision"], "XK67J_MAIN V1.0")
         self.assertEqual(len(evidence["unique_image_sha256"]), 3)
         self.assertEqual(self.dataset["registration"]["reference_mode"], "point_map_only")
@@ -67,7 +67,7 @@ class Xk67jRegistrationTests(unittest.TestCase):
             images["1a3e4bdb3f5019656cd0910544e4f825b0eb94c3f85bf6668c956cd6a757687d"][
                 "registration_status"
             ],
-            "manual_registration_required",
+            "reviewed_manual_registration",
         )
         self.assertEqual(
             images["57a9b1d36326cd0a0b1cee3a0bc622290728cbb1b4775cfab5182b9b84138fa6"][
@@ -79,7 +79,7 @@ class Xk67jRegistrationTests(unittest.TestCase):
             images["28a193f9bbd0750240fb20477f5ec0497de7f279868b408eab7c872dcd0273d6"][
                 "registration_status"
             ],
-            "manual_registration_required",
+            "reviewed_manual_registration",
         )
         self.assertEqual(
             images["28a193f9bbd0750240fb20477f5ec0497de7f279868b408eab7c872dcd0273d6"][
@@ -88,6 +88,14 @@ class Xk67jRegistrationTests(unittest.TestCase):
             "full_board_repair_case",
         )
         self.assertTrue(all(item["view_scope"] == "full_board_repair_case" for item in images.values()))
+        self.assertTrue(all(item["registration_review"]["review_status"] == "reviewed" for item in images.values()))
+        self.assertTrue(all(item["registration_review"]["field_accuracy_claim_allowed"] is False for item in images.values()))
+        self.assertEqual(evidence["downstream_admission"], {
+            "golden_sample": False,
+            "defect_label": False,
+            "training_data": False,
+            "repair_causality": False,
+        })
 
     def test_dataset_passes_the_shared_registration_contract(self):
         self.assertEqual(validate_dataset(self.dataset, ROOT), [])

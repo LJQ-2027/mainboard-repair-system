@@ -608,6 +608,13 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) clamp(360px, 27vw, 4
 .source-evidence-content { padding: 10px 10px 3px; }
 .evidence-card { border: 1px solid #c5cec8; padding: 9px 11px; background: white; margin-bottom: 7px; font-size: 12px; line-height: 1.5; }
 .evidence-card small { display: block; color: var(--muted); margin-top: 5px; }
+.physical-registration-card { margin-bottom: 7px; padding: 9px 10px; border: 1px solid #c5cec8; background: white; }
+.physical-registration-card div { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.physical-registration-card strong { font-size: 11px; }
+.physical-registration-card code { color: #56635d; font-size: 9px; }
+.physical-registration-card > span { display: block; margin-top: 5px; color: #26352e; font-size: 10px; font-weight: 600; }
+.physical-registration-card small { display: block; margin-top: 3px; color: var(--muted); font-size: 9px; }
+.physical-registration-boundary { margin: 8px 0 7px; color: #53605a; font-size: 10px; line-height: 1.5; }
 .entity-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; }
 .entity-list button { border: 1px solid var(--line); background: white; padding: 8px; text-align: left; cursor: pointer; font-size: 11px; }
 .entity-list button strong { display: block; font-size: 12px; }
