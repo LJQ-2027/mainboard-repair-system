@@ -489,3 +489,12 @@ Reusable J6101 component visual refinement on 2026-07-31:
 - Browser verification used `http://127.0.0.1:8899/assets/cross-source-registration/?board=km4-f151` at 1600x900 and 390x844. Desktop mouse, wheel, keyboard, reset, return, Escape, and U2001 legacy regression passed; native mobile one-finger rotation, two-finger pinch, reset, and touch return passed.
 - Desktop document overflow was 0 px on both axes; mobile horizontal overflow was 0 px. Clean desktop and mobile sessions produced zero page errors and zero console errors. WebGL canvas entropy was 5.127 on desktop and 4.341 on mobile with broad channel ranges, confirming nonblank rendered content.
 - Browser evidence is stored under the ignored `output/playwright/j6101-component-visual-refinement/` directory, including board, isolated, rotated, restored, desktop, mobile, and `qa-summary.md` records.
+
+Reusable U2001 multi-family visual refinement on 2026-07-31:
+
+- U2001 now resolves through the reusable `ic_bga` compiler as `ic-bga-u2001-repair-visual-v1`; J6101 remains on the same validated pipeline through the `connector` compiler. The catalog, family validator, staged Three.js builder, renderer integration, fallback, and disposal contracts are shared rather than selected by renderer-owned U2001 geometry.
+- U2001 is deliberately a category-based repair visualization. Its visible hierarchy is limited to a substrate, molded body, inset top, generic orientation cue, and isolated-view edge treatment. It does not claim the exact package, dimensions, ball count or pitch, pad layout, leads, markings, vendor package, die, or internal structure.
+- Invalid specifications retain the existing nonblank generic IC fallback. Replacement and disposal remain transactional, deterministic, and independently owned.
+- Validation on branch `codex/u2001-component-visual-refinement` passed 345 Node tests and 27 source-bound Python tests, JavaScript syntax checks, whitespace checks, and strict UTF-8 decoding.
+- Installed-Chrome P3 covered the real KM4 route at 1600x900 and 390x844: U2001 board/isolated selection, mouse and touch rotation, wheel and pinch zoom, reset, return, re-entry, focus visibility, zero label/control overlap, zero mobile overflow, and J6101 regression. Console and page errors were zero.
+- Machine-readable evidence and canvas-only nonblank pixel checks are stored under the ignored `output/playwright/u2001-component-visual-refinement/` directory.

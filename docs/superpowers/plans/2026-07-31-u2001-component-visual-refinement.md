@@ -30,7 +30,7 @@
 - Modify: `tests/component-visual-specs.test.mjs`
 - Modify: `assets/cross-source-registration/component-visual-specs.js`
 
-- [ ] **Step 1: Write failing U2001 catalog tests**
+- [x] **Step 1: Write failing U2001 catalog tests**
 
 Add imports and assertions equivalent to:
 
@@ -76,7 +76,7 @@ test('catalog construction rejects duplicate inspection profiles', () => {
 });
 ```
 
-- [ ] **Step 2: Run the focused test and verify it fails**
+- [x] **Step 2: Run the focused test and verify it fails**
 
 Run:
 
@@ -86,7 +86,7 @@ node --test tests/component-visual-specs.test.mjs
 
 Expected: FAIL because `U2001_PMIC_VISUAL_SPEC` and `buildComponentVisualSpecCatalog` are not exported.
 
-- [ ] **Step 3: Add immutable IC/BGA materials and U2001 specification**
+- [x] **Step 3: Add immutable IC/BGA materials and U2001 specification**
 
 Add material tokens with stable names:
 
@@ -155,7 +155,7 @@ Use the same prohibited-claim policy as the connector plus:
 
 Export `buildComponentVisualSpecCatalog(specs)` and build the production map from both approved specs. Throw on duplicate profile IDs.
 
-- [ ] **Step 4: Run the catalog test and verify the new identity tests pass**
+- [x] **Step 4: Run the catalog test and verify the new identity tests pass**
 
 Run:
 
@@ -165,7 +165,7 @@ node --test tests/component-visual-specs.test.mjs
 
 Expected: U2001 catalog tests pass; validator tests may still fail because `ic_bga` has no contract yet.
 
-- [ ] **Step 5: Commit the catalog slice**
+- [x] **Step 5: Commit the catalog slice**
 
 ```powershell
 git add assets/cross-source-registration/component-visual-specs.js tests/component-visual-specs.test.mjs
@@ -178,7 +178,7 @@ git commit -m "feat: add U2001 component visual specification"
 - Modify: `tests/component-visual-specs.test.mjs`
 - Modify: `assets/cross-source-registration/component-visual-validator.js`
 
-- [ ] **Step 1: Write failing family-contract tests**
+- [x] **Step 1: Write failing family-contract tests**
 
 Cover these mutations with exact expected codes:
 
@@ -194,7 +194,7 @@ Cover these mutations with exact expected codes:
 
 Also retain all current J6101 assertions and add a malformed-input matrix for `null`, arrays, missing sections, `NaN`, `Infinity`, negative ratios, duplicate parts, and unknown dimensions. `validateComponentVisualSpec()` must return an error object and never throw.
 
-- [ ] **Step 2: Run the validator test and verify it fails**
+- [x] **Step 2: Run the validator test and verify it fails**
 
 Run:
 
@@ -204,7 +204,7 @@ node --test tests/component-visual-specs.test.mjs
 
 Expected: FAIL with missing `ic_bga` role support or an `unsupported_family` mismatch.
 
-- [ ] **Step 3: Introduce strict family contracts**
+- [x] **Step 3: Introduce strict family contracts**
 
 Define one immutable registry:
 
@@ -235,7 +235,7 @@ const FAMILY_CONTRACTS = Object.freeze({
 
 Resolve the contract after metadata validation. Emit `unsupported_family` when absent, then run materials, structures, and declared-detail checks only against that contract. Preserve canonical stage, ratio, claim, and malformed-input behavior.
 
-- [ ] **Step 4: Run both family test matrices**
+- [x] **Step 4: Run both family test matrices**
 
 Run:
 
@@ -245,7 +245,7 @@ node --test tests/component-visual-specs.test.mjs
 
 Expected: all tests pass for `connector` and `ic_bga`.
 
-- [ ] **Step 5: Commit the validator slice**
+- [x] **Step 5: Commit the validator slice**
 
 ```powershell
 git add assets/cross-source-registration/component-visual-validator.js tests/component-visual-specs.test.mjs
@@ -258,7 +258,7 @@ git commit -m "refactor: validate component visuals by family"
 - Modify: `tests/component-visual-builder.test.mjs`
 - Modify: `assets/cross-source-registration/component-visual-builder.js`
 
-- [ ] **Step 1: Write failing U2001 builder tests**
+- [x] **Step 1: Write failing U2001 builder tests**
 
 Use a U2001 descriptor with finite `{ x, y, z }` dimensions and assert:
 
@@ -287,7 +287,7 @@ For `isolated`, also require:
 
 Assert every computed bound remains inside the descriptor footprint and height, repeated builds produce identical snapshots, different descriptors do not share geometry or materials, and double disposal reports zero resources on the second call.
 
-- [ ] **Step 2: Run the focused builder test and verify it fails**
+- [x] **Step 2: Run the focused builder test and verify it fails**
 
 Run:
 
@@ -297,7 +297,7 @@ node --test tests/component-visual-builder.test.mjs
 
 Expected: FAIL because the current builder executes connector-only stages for `ic_bga`.
 
-- [ ] **Step 3: Refactor connector stages behind a compiler registry**
+- [x] **Step 3: Refactor connector stages behind a compiler registry**
 
 Keep current connector geometry unchanged, but group its stage handlers:
 
@@ -320,7 +320,7 @@ const FAMILY_COMPILERS = Object.freeze({
 
 `buildComponentVisual()` must validate first, resolve the family compiler, execute the canonical stage list, and return `{ group, fallbackReason: null }`. Unsupported or invalid specs must return `{ group: null, fallbackReason }` without leaking owned resources.
 
-- [ ] **Step 4: Implement the IC/BGA stages**
+- [x] **Step 4: Implement the IC/BGA stages**
 
 Build only source-bounded visual parts:
 
@@ -349,7 +349,7 @@ function icBgaPolish(context) {
 
 `addCircularPart()` must scale marker radius, offsets, lift, and height from descriptor dimensions and use owned `CylinderGeometry`. The marker communicates orientation only; do not add balls, pads, text, leads, or internal layers.
 
-- [ ] **Step 5: Run builder and catalog suites**
+- [x] **Step 5: Run builder and catalog suites**
 
 Run:
 
@@ -359,7 +359,7 @@ node --test tests/component-visual-builder.test.mjs tests/component-visual-specs
 
 Expected: all tests pass, including unchanged J6101 snapshots and disposal assertions.
 
-- [ ] **Step 6: Commit the builder slice**
+- [x] **Step 6: Commit the builder slice**
 
 ```powershell
 git add assets/cross-source-registration/component-visual-builder.js tests/component-visual-builder.test.mjs
@@ -373,7 +373,7 @@ git commit -m "feat: compile IC BGA component visuals"
 - Modify: `tests/model-toolbar.test.mjs`
 - Modify: `assets/cross-source-registration/board-renderer.js`
 
-- [ ] **Step 1: Write failing descriptor and source-boundary tests**
+- [x] **Step 1: Write failing descriptor and source-boundary tests**
 
 Add a reviewed U2001 fixture and assert:
 
@@ -391,7 +391,7 @@ assert.doesNotMatch(source, /visualAsset === 'reviewed-pmic'/);
 assert.match(source, /if \(descriptor\.family === 'ic'\) addIcPackage/);
 ```
 
-- [ ] **Step 2: Run focused integration tests and verify they fail**
+- [x] **Step 2: Run focused integration tests and verify they fail**
 
 Run:
 
@@ -401,7 +401,7 @@ node --test tests/model-profiles.test.mjs tests/model-toolbar.test.mjs
 
 Expected: descriptor mapping may pass after Task 1; renderer source assertions fail until the legacy PMIC path is removed.
 
-- [ ] **Step 3: Remove renderer-owned U2001 geometry**
+- [x] **Step 3: Remove renderer-owned U2001 geometry**
 
 Delete `addInspectionPmicPackage()`. In `createPackageMesh()`:
 
@@ -412,7 +412,7 @@ Delete `addInspectionPmicPackage()`. In `createPackageMesh()`:
 
 Keep `reviewed-pmic` in the descriptor as provenance-compatible UI metadata, but do not use it to choose geometry.
 
-- [ ] **Step 4: Verify replacement and fallback regressions**
+- [x] **Step 4: Verify replacement and fallback regressions**
 
 Run:
 
@@ -422,7 +422,7 @@ node --test tests/model-profiles.test.mjs tests/model-toolbar.test.mjs tests/com
 
 Expected: all tests pass; malformed U2001 specs remain nonblank through the generic IC fallback.
 
-- [ ] **Step 5: Commit the renderer migration**
+- [x] **Step 5: Commit the renderer migration**
 
 ```powershell
 git add assets/cross-source-registration/board-renderer.js tests/model-profiles.test.mjs tests/model-toolbar.test.mjs
@@ -434,7 +434,7 @@ git commit -m "refactor: route U2001 through component visual builder"
 **Files:**
 - Modify only if failures reveal a defect in files owned by Tasks 1-4.
 
-- [ ] **Step 1: Run JavaScript syntax checks**
+- [x] **Step 1: Run JavaScript syntax checks**
 
 ```powershell
 node --check assets/cross-source-registration/component-visual-specs.js
@@ -445,7 +445,7 @@ node --check assets/cross-source-registration/board-renderer.js
 
 Expected: every command exits `0`.
 
-- [ ] **Step 2: Run the complete Node suite**
+- [x] **Step 2: Run the complete Node suite**
 
 ```powershell
 node --test tests/*.test.mjs
@@ -453,7 +453,7 @@ node --test tests/*.test.mjs
 
 Expected: all tests pass with zero failures.
 
-- [ ] **Step 3: Run source-bound Python tests**
+- [x] **Step 3: Run source-bound Python tests**
 
 ```powershell
 G:\Programming\mainboard-repair-system\.venv\Scripts\python.exe -m unittest tests.test_validate_cross_source_registration tests.test_compile_km4_board tests.test_ai_proxy_static -v
@@ -461,7 +461,7 @@ G:\Programming\mainboard-repair-system\.venv\Scripts\python.exe -m unittest test
 
 Expected: 27 tests pass.
 
-- [ ] **Step 4: Run repository and encoding checks**
+- [x] **Step 4: Run repository and encoding checks**
 
 ```powershell
 git diff --check
@@ -476,7 +476,7 @@ Strictly decode every changed text file as UTF-8 and reject U+FFFD. Expected: no
 - Evidence only: `output/playwright/u2001-component-visual-refinement/`
 - Modify owned implementation files only if visual or interaction defects are found.
 
-- [ ] **Step 1: Start or verify the local static server**
+- [x] **Step 1: Start or verify the local static server**
 
 Serve `G:\wt\mbr-j6101` on `127.0.0.1:8899` and open:
 
@@ -486,7 +486,7 @@ http://127.0.0.1:8899/assets/cross-source-registration/?board=km4-f151
 
 Expected: HTTP 200 and no page-level JavaScript errors.
 
-- [ ] **Step 2: Verify desktop U2001 board and isolated states**
+- [x] **Step 2: Verify desktop U2001 board and isolated states**
 
 At `1600x900`:
 
@@ -509,15 +509,15 @@ data-component-visual-cleanup=""
 
 Save board, isolated, and rotated screenshots.
 
-- [ ] **Step 3: Verify mobile touch behavior**
+- [x] **Step 3: Verify mobile touch behavior**
 
 At `390x844`, repeat U2001 selection and isolated mode. Exercise native one-finger rotation and two-finger pinch/translation. Confirm the return action remains visible, the model is not clipped, labels do not overlap controls, and the same data attributes remain valid.
 
-- [ ] **Step 4: Regress J6101**
+- [x] **Step 4: Regress J6101**
 
 Select J6101 at desktop and mobile widths. Confirm its board and isolated geometry, selection identity, return behavior, pan/rotation, and metadata remain unchanged.
 
-- [ ] **Step 5: Capture a machine-readable QA summary**
+- [x] **Step 5: Capture a machine-readable QA summary**
 
 Write `output/playwright/u2001-component-visual-refinement/qa-summary.json` containing viewport, interaction checks, console errors, page errors, component metadata, screenshot paths, and pass/fail values. The file is evidence only and remains ignored.
 
@@ -530,7 +530,7 @@ Write `output/playwright/u2001-component-visual-refinement/qa-summary.json` cont
 - Modify: `C:/Users/Mercurluto/OneDrive/AI/02_Projects/Programming/Mainboard Repair Enablement/Agent Entry.md`
 - Modify: `G:/Programming/mainboard-repair-enablement/PROJECT_LEDGER.md`
 
-- [ ] **Step 1: Document the delivered boundary**
+- [x] **Step 1: Document the delivered boundary**
 
 Record:
 
@@ -541,22 +541,22 @@ Record:
 - desktop and mobile QA evidence paths;
 - exact test counts and commit hashes.
 
-- [ ] **Step 2: Mark plan checkboxes from actual evidence**
+- [x] **Step 2: Mark plan checkboxes from actual evidence**
 
 Change only completed steps to `[x]`. Do not mark browser or test steps complete without their corresponding output.
 
-- [ ] **Step 3: Run the Project Closeout Check**
+- [x] **Step 3: Run the Project Closeout Check**
 
 Verify Git status, local commits, Vault state, ledger state, automated validation, P3 evidence, encoding health, P4 applicability, remote-sync state, and handoff notes.
 
-- [ ] **Step 4: Commit repository documentation**
+- [x] **Step 4: Commit repository documentation**
 
 ```powershell
 git add docs/km4-cross-source-registration-2026-07-13.md docs/superpowers/plans/2026-07-31-u2001-component-visual-refinement.md
 git commit -m "docs: verify U2001 component visual refinement"
 ```
 
-- [ ] **Step 5: Commit the enablement ledger separately**
+- [x] **Step 5: Commit the enablement ledger separately**
 
 ```powershell
 git -C G:\Programming\mainboard-repair-enablement add PROJECT_LEDGER.md
