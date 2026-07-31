@@ -282,7 +282,7 @@ If the builder requires no production change, stage only the test file.
 - Modify: `tests/board-renderer-package-fallback.test.mjs`
 - Modify: `assets/cross-source-registration/board-renderer.js`
 
-- [ ] **Step 1: Write failing descriptor and renderer tests**
+- [x] **Step 1: Write failing descriptor and renderer tests**
 
 For each shared profile, build a reviewed BGA descriptor and assert:
 
@@ -316,7 +316,7 @@ Add executable `createPackageMesh()` assertions for U4000, U0600, and connectivi
 
 Require a nonblank generic IC, `visual_spec_not_found`, and exact generic disposal.
 
-- [ ] **Step 2: Run the focused renderer tests and verify RED**
+- [x] **Step 2: Run the focused renderer tests and verify RED**
 
 Run:
 
@@ -326,7 +326,7 @@ node --test tests/model-profiles.test.mjs tests/model-toolbar.test.mjs tests/boa
 
 Expected: descriptor identity tests fail until Task 1 is implemented; renderer source tests fail while `addInspectionBgaPackage()` remains.
 
-- [ ] **Step 3: Remove renderer-owned BGA geometry**
+- [x] **Step 3: Remove renderer-owned BGA geometry**
 
 Delete `addInspectionBgaPackage()` and remove:
 
@@ -340,7 +340,7 @@ Let the existing reusable-builder-first path return registered shared BGA groups
 
 Do not remove `reviewed-bga` from `model-profiles.js`; it remains provenance/UI metadata.
 
-- [ ] **Step 4: Run renderer, replacement, and disposal regressions**
+- [x] **Step 4: Run renderer, replacement, and disposal regressions**
 
 Run:
 
@@ -350,7 +350,7 @@ node --test tests/model-profiles.test.mjs tests/model-toolbar.test.mjs tests/boa
 
 Expected: all tests pass; U4000/U0600/connectivity use the shared spec, unknown BGA profiles remain nonblank, and U2001/J6101 replacement behavior is unchanged.
 
-- [ ] **Step 5: Commit the renderer migration**
+- [x] **Step 5: Commit the renderer migration**
 
 ```powershell
 git add assets/cross-source-registration/board-renderer.js tests/model-profiles.test.mjs tests/model-toolbar.test.mjs tests/board-renderer-package-fallback.test.mjs
