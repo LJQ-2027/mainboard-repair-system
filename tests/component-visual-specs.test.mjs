@@ -226,6 +226,223 @@ test('the approved J6101 spec passes every source-bound validation rule', () => 
   assert.equal(Object.isFrozen(result.errors), true);
 });
 
+test('the approved U2001 spec passes every IC BGA family validation rule', () => {
+  const result = validate(U2001_PMIC_VISUAL_SPEC);
+  assert.deepEqual(result, { valid: true, errors: [] });
+  assert.deepEqual(Object.keys(result), ['valid', 'errors']);
+  assert.equal(Object.isFrozen(result), true);
+  assert.equal(Object.isFrozen(result.errors), true);
+});
+
+test('family contracts reject unknown families and cross-family roles', () => {
+  const unknownFamily = {
+    ...U2001_PMIC_VISUAL_SPEC,
+    family: 'unknown',
+  };
+  assertError(validate(unknownFamily), 'unsupported_family', 'family');
+
+  const unknownMaterial = structuredClone(U2001_PMIC_VISUAL_SPEC);
+  unknownMaterial.materials.pins = 'plated-metal';
+  assertError(validate(unknownMaterial), 'unknown_material_role', 'materials.pins');
+
+  const unknownStructure = structuredClone(U2001_PMIC_VISUAL_SPEC);
+  unknownStructure.structure.balls = {};
+  assertError(validate(unknownStructure), 'unknown_structure_role', 'structure.balls');
+
+  const unknownDetailPart = structuredClone(U2001_PMIC_VISUAL_SPEC);
+  unknownDetailPart.detail_levels.board.push('ball-grid');
+  assertError(
+    validate(unknownDetailPart),
+    'undeclared_detail_part',
+    'detail_levels.board[4]',
+  );
+});
+
+test('prototype-key family names fail soft as unsupported families', () => {
+  ['__proto__', 'constructor', 'toString'].forEach((family) => {
+    const spec = { ...U2001_PMIC_VISUAL_SPEC, family };
+    let result;
+    assert.doesNotThrow(() => {
+      result = validate(spec);
+    });
+    assertError(result, 'unsupported_family', 'family');
+  });
+});
+
+test('required identity, stage, and ratio fields cannot be inherited', () => {
+  const inheritedTopLevel = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+  const inheritedValues = {};
+  ['spec_id', 'version', 'asset_type', 'stages'].forEach((field) => {
+    inheritedValues[field] = inheritedTopLevel[field];
+    delete inheritedTopLevel[field];
+  });
+  Object.setPrototypeOf(inheritedTopLevel, inheritedValues);
+  const topLevelResult = validate(inheritedTopLevel);
+  assertError(topLevelResult, 'invalid_identity', 'spec_id');
+  assertError(topLevelResult, 'invalid_version', 'version');
+  assertError(topLevelResult, 'unsupported_asset_type', 'asset_type');
+  assertError(topLevelResult, 'invalid_stage_order', 'stages');
+
+  const inheritedRatios = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+  const inheritedMinimum = inheritedRatios.acceptance.ratio_min;
+  const inheritedMaximum = inheritedRatios.acceptance.ratio_max;
+  delete inheritedRatios.acceptance.ratio_min;
+  delete inheritedRatios.acceptance.ratio_max;
+  Object.defineProperties(Object.prototype, {
+    ratio_min: { configurable: true, value: inheritedMinimum },
+    ratio_max: { configurable: true, value: inheritedMaximum },
+  });
+  let ratioResult;
+  try {
+    ratioResult = validate(inheritedRatios);
+  } finally {
+    delete Object.prototype.ratio_min;
+    delete Object.prototype.ratio_max;
+  }
+  assertError(ratioResult, 'invalid_ratio_bounds', 'acceptance.ratio_min');
+  assertError(ratioResult, 'invalid_ratio_bounds', 'acceptance.ratio_max');
+});
+
+test('every prohibited U2001 package claim is rejected', () => {
+  U2001_PROHIBITED_CLAIMS.forEach((claim) => {
+    const spec = {
+      ...U2001_PMIC_VISUAL_SPEC,
+      claims: [...U2001_PMIC_VISUAL_SPEC.claims, claim],
+    };
+    assertError(validate(spec), 'prohibited_claim', 'claims');
+  });
+});
+
+test('each family accepts only its explicit source-backed claims', () => {
+  [
+    [J6101_CONNECTOR_VISUAL_SPEC, 'engineering_digital_twin'],
+    [J6101_CONNECTOR_VISUAL_SPEC, 'ic_package_silhouette'],
+    [U2001_PMIC_VISUAL_SPEC, 'engineering_digital_twin'],
+    [U2001_PMIC_VISUAL_SPEC, 'exact_vendor_top_text'],
+    [U2001_PMIC_VISUAL_SPEC, 'connector_silhouette'],
+  ].forEach(([approvedSpec, unsupportedClaim]) => {
+    const spec = {
+      ...approvedSpec,
+      claims: [...approvedSpec.claims, unsupportedClaim],
+    };
+    assertError(
+      validate(spec),
+      'unsupported_claim',
+      `claims[${approvedSpec.claims.length}]`,
+    );
+  });
+});
+
+test('U2001 family validation remains fail-soft for malformed nested values', () => {
+  const cases = [
+    ['materials.body', (spec) => { spec.materials.body = null; }, 'invalid_material_token'],
+    ['structure.marker.radius', (spec) => { spec.structure.marker.radius = Number.NaN; }, 'ratio_out_of_range'],
+    ['structure.body.lift', (spec) => { spec.structure.body.lift = Number.POSITIVE_INFINITY; }, 'ratio_out_of_range'],
+    ['detail_levels.isolated', (spec) => { spec.detail_levels.isolated = {}; }, 'invalid_detail_level'],
+    ['claims[0]', (spec) => { spec.claims[0] = Symbol('claim'); }, 'invalid_claim'],
+  ];
+  cases.forEach(([path, mutate, code]) => {
+    const spec = structuredClone(U2001_PMIC_VISUAL_SPEC);
+    mutate(spec);
+    let result;
+    assert.doesNotThrow(() => {
+      result = validate(spec);
+    });
+    assertError(result, code, path);
+  });
+});
+
+test('throwing accessors and proxies return a stable malformed-spec result', () => {
+  const throwingGetter = structuredClone(U2001_PMIC_VISUAL_SPEC);
+  Object.defineProperty(throwingGetter.materials, 'body', {
+    enumerable: true,
+    get() {
+      throw new Error('boom');
+    },
+  });
+  const throwingProxy = new Proxy(U2001_PMIC_VISUAL_SPEC, {
+    get() {
+      throw new Error('blocked');
+    },
+  });
+
+  [throwingGetter, throwingProxy].forEach((spec) => {
+    let result;
+    assert.doesNotThrow(() => {
+      result = validate(spec);
+    });
+    assert.deepEqual(result, {
+      valid: false,
+      errors: [{
+        code: 'malformed_spec',
+        path: '',
+        message: 'Component visual specification could not be inspected safely.',
+      }],
+    });
+    assert.equal(Object.isFrozen(result), true);
+    assert.equal(Object.isFrozen(result.errors), true);
+    assert.equal(Object.isFrozen(result.errors[0]), true);
+  });
+});
+
+test('sparse arrays cannot bypass required item validation', () => {
+  const sparseStages = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+  sparseStages.stages = new Array(4);
+  assertError(validate(sparseStages), 'invalid_stage_order', 'stages');
+
+  const sparseProfiles = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+  sparseProfiles.inspection_profiles = new Array(1);
+  assertError(
+    validate(sparseProfiles),
+    'invalid_inspection_profile',
+    'inspection_profiles[0]',
+  );
+
+  const sparseClaims = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+  sparseClaims.claims = new Array(1);
+  assertError(validate(sparseClaims), 'invalid_claim', 'claims[0]');
+
+  ['board', 'isolated'].forEach((level) => {
+    const sparseDetails = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+    sparseDetails.detail_levels[level] = new Array(1);
+    assertError(
+      validate(sparseDetails),
+      'invalid_part_name',
+      `detail_levels.${level}[0]`,
+    );
+  });
+});
+
+test('prototype-backed sparse arrays cannot supply inherited items', () => {
+  const inheritedArray = (value) => {
+    const array = new Array(1);
+    const prototype = Object.create(Array.prototype);
+    prototype[0] = value;
+    Object.setPrototypeOf(array, prototype);
+    return array;
+  };
+
+  const inheritedProfiles = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+  inheritedProfiles.inspection_profiles = inheritedArray('j6101-connector-v1');
+  assertError(
+    validate(inheritedProfiles),
+    'invalid_inspection_profile',
+    'inspection_profiles[0]',
+  );
+
+  const inheritedClaims = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+  inheritedClaims.claims = inheritedArray('connector_silhouette');
+  assertError(validate(inheritedClaims), 'invalid_claim', 'claims[0]');
+
+  const inheritedDetails = structuredClone(J6101_CONNECTOR_VISUAL_SPEC);
+  inheritedDetails.detail_levels.board = inheritedArray('base');
+  assertError(
+    validate(inheritedDetails),
+    'invalid_part_name',
+    'detail_levels.board[0]',
+  );
+});
+
 test('canonical stages and the approved spec are deeply immutable where consumed', () => {
   assert.deepEqual(COMPONENT_VISUAL_STAGE_ORDER, ['blockout', 'structure', 'material', 'polish']);
   assert.equal(Object.isFrozen(COMPONENT_VISUAL_STAGE_ORDER), true);

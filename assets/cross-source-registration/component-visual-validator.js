@@ -6,13 +6,22 @@ export const COMPONENT_VISUAL_STAGE_ORDER = Object.freeze([
 ]);
 
 const SUPPORTED_ASSET_TYPES = new Set(['procedural']);
-const PROHIBITED_CLAIMS = new Set([
+const CONNECTOR_PROHIBITED_CLAIMS = Object.freeze([
   'exact_pin_count',
   'exact_pin_pitch',
   'vendor_latch',
   'solder_foot_array',
   'internal_spring_geometry',
   'millimeter_dimensions',
+]);
+const IC_BGA_PROHIBITED_CLAIMS = Object.freeze([
+  ...CONNECTOR_PROHIBITED_CLAIMS,
+  'exact_ball_count',
+  'exact_ball_pitch',
+  'exact_pad_layout',
+  'vendor_package',
+  'die_or_internal_structure',
+  'package_marking',
 ]);
 
 const REQUIRED_SECTIONS = Object.freeze({
@@ -30,15 +39,7 @@ const REQUIRED_STRING_FIELDS = Object.freeze([
   'boundary_note',
 ]);
 
-const MATERIAL_ROLES = Object.freeze([
-  'base',
-  'opening',
-  'frame',
-  'contact',
-  'edge',
-]);
-
-const STRUCTURE_SHAPES = Object.freeze({
+const CONNECTOR_STRUCTURE_SHAPES = Object.freeze({
   base: Object.freeze(['width', 'depth', 'height', 'radius']),
   frame: Object.freeze(['width', 'depth', 'height', 'wall', 'radius', 'lift']),
   opening: Object.freeze(['width', 'depth', 'height', 'radius', 'lift']),
@@ -49,7 +50,7 @@ const STRUCTURE_SHAPES = Object.freeze({
 
 const DETAIL_LEVELS = Object.freeze(['board', 'isolated']);
 
-const DETAIL_PARTS_BY_STRUCTURE = Object.freeze({
+const CONNECTOR_DETAIL_PARTS = Object.freeze({
   base: Object.freeze(['base']),
   frame: Object.freeze([
     'frame-north',
@@ -67,6 +68,41 @@ const DETAIL_PARTS_BY_STRUCTURE = Object.freeze({
     'inner-lip-west',
     'inner-lip-east',
   ]),
+});
+
+const FAMILY_CONTRACTS = Object.freeze({
+  connector: Object.freeze({
+    materialRoles: Object.freeze(['base', 'opening', 'frame', 'contact', 'edge']),
+    structureShapes: CONNECTOR_STRUCTURE_SHAPES,
+    detailPartsByStructure: CONNECTOR_DETAIL_PARTS,
+    allowedClaims: Object.freeze([
+      'connector_silhouette',
+      'recessed_opening',
+      'generic_contact_region',
+    ]),
+    prohibitedClaims: CONNECTOR_PROHIBITED_CLAIMS,
+  }),
+  ic_bga: Object.freeze({
+    materialRoles: Object.freeze(['substrate', 'body', 'top', 'marker', 'edge']),
+    structureShapes: Object.freeze({
+      substrate: Object.freeze(['width', 'depth', 'height', 'radius']),
+      body: Object.freeze(['width', 'depth', 'height', 'radius', 'lift']),
+      top: Object.freeze(['width', 'depth', 'height', 'radius', 'lift']),
+      marker: Object.freeze(['radius', 'offset_x', 'offset_y', 'height', 'lift']),
+    }),
+    detailPartsByStructure: Object.freeze({
+      substrate: Object.freeze(['substrate', 'substrate-edges']),
+      body: Object.freeze(['body', 'body-edges']),
+      top: Object.freeze(['top', 'top-seam']),
+      marker: Object.freeze(['orientation-marker']),
+    }),
+    allowedClaims: Object.freeze([
+      'ic_package_silhouette',
+      'substrate_body_hierarchy',
+      'generic_orientation_cue',
+    ]),
+    prohibitedClaims: IC_BGA_PROHIBITED_CLAIMS,
+  }),
 });
 
 function validationError(code, path, message) {
@@ -89,8 +125,17 @@ function hasExpectedSectionType(value, type) {
   return type === 'array' ? Array.isArray(value) : isPlainObject(value);
 }
 
+function hasDenseItems(value) {
+  if (!Array.isArray(value)) return false;
+  for (let index = 0; index < value.length; index += 1) {
+    if (!hasOwn(value, index)) return false;
+  }
+  return true;
+}
+
 function hasCanonicalStages(stages) {
   return Array.isArray(stages)
+    && hasDenseItems(stages)
     && stages.length === COMPONENT_VISUAL_STAGE_ORDER.length
     && stages.every((stage, index) => stage === COMPONENT_VISUAL_STAGE_ORDER[index]);
 }
@@ -153,7 +198,8 @@ function validateRequiredMetadata(spec, errors) {
     ));
     return;
   }
-  profiles.forEach((profileId, index) => {
+  for (let index = 0; index < profiles.length; index += 1) {
+    const profileId = hasOwn(profiles, index) ? profiles[index] : undefined;
     if (typeof profileId !== 'string' || profileId.trim() === '') {
       errors.push(validationError(
         'invalid_inspection_profile',
@@ -161,7 +207,7 @@ function validateRequiredMetadata(spec, errors) {
         'Inspection profile IDs must be non-empty strings.',
       ));
     }
-  });
+  }
   if (new Set(profiles).size !== profiles.length) {
     errors.push(validationError(
       'duplicate_inspection_profile',
@@ -171,9 +217,13 @@ function validateRequiredMetadata(spec, errors) {
   }
 }
 
-function validateAcceptance(acceptance, errors) {
-  const ratioMinimum = acceptance.ratio_min;
-  const ratioMaximum = acceptance.ratio_max;
+function validateAcceptance(acceptance, contract, errors) {
+  const ratioMinimum = hasOwn(acceptance, 'ratio_min')
+    ? acceptance.ratio_min
+    : undefined;
+  const ratioMaximum = hasOwn(acceptance, 'ratio_max')
+    ? acceptance.ratio_max
+    : undefined;
   let validBounds = true;
 
   if (!Number.isFinite(ratioMinimum) || ratioMinimum <= 0 || ratioMinimum > 1) {
@@ -213,6 +263,7 @@ function validateAcceptance(acceptance, errors) {
     ));
   } else if (
     !Array.isArray(acceptance.prohibited_claims)
+    || !hasDenseItems(acceptance.prohibited_claims)
     || acceptance.prohibited_claims.some((claim) => typeof claim !== 'string')
   ) {
     errors.push(validationError(
@@ -222,7 +273,7 @@ function validateAcceptance(acceptance, errors) {
     ));
   } else {
     const policy = new Set(acceptance.prohibited_claims);
-    if ([...PROHIBITED_CLAIMS].some((claim) => !policy.has(claim))) {
+    if (contract?.prohibitedClaims.some((claim) => !policy.has(claim))) {
       errors.push(validationError(
         'incomplete_prohibited_claims',
         'acceptance.prohibited_claims',
@@ -234,8 +285,8 @@ function validateAcceptance(acceptance, errors) {
   return validBounds ? { ratioMinimum, ratioMaximum } : null;
 }
 
-function validateMaterials(materials, materialCatalog, errors) {
-  MATERIAL_ROLES.forEach((role) => {
+function validateMaterials(materials, materialCatalog, materialRoles, errors) {
+  materialRoles.forEach((role) => {
     if (!hasOwn(materials, role)) {
       errors.push(validationError(
         'missing_material_role',
@@ -245,7 +296,7 @@ function validateMaterials(materials, materialCatalog, errors) {
     }
   });
   Object.keys(materials).forEach((role) => {
-    if (!MATERIAL_ROLES.includes(role)) {
+    if (!materialRoles.includes(role)) {
       errors.push(validationError(
         'unknown_material_role',
         `materials.${role}`,
@@ -270,9 +321,9 @@ function validateMaterials(materials, materialCatalog, errors) {
   });
 }
 
-function validateStructure(structure, bounds, errors) {
+function validateStructure(structure, bounds, structureShapes, errors) {
   const validRoles = new Set();
-  Object.keys(STRUCTURE_SHAPES).forEach((role) => {
+  Object.keys(structureShapes).forEach((role) => {
     if (!hasOwn(structure, role)) {
       errors.push(validationError(
         'missing_structure_role',
@@ -291,7 +342,7 @@ function validateStructure(structure, bounds, errors) {
     }
 
     const shape = structure[role];
-    const dimensions = STRUCTURE_SHAPES[role];
+    const dimensions = structureShapes[role];
     let buildable = true;
     dimensions.forEach((dimension) => {
       const path = `structure.${role}.${dimension}`;
@@ -338,7 +389,7 @@ function validateStructure(structure, bounds, errors) {
   });
 
   Object.keys(structure).forEach((role) => {
-    if (!hasOwn(STRUCTURE_SHAPES, role)) {
+    if (!hasOwn(structureShapes, role)) {
       errors.push(validationError(
         'unknown_structure_role',
         `structure.${role}`,
@@ -349,12 +400,25 @@ function validateStructure(structure, bounds, errors) {
   return validRoles;
 }
 
-function declaredDetailParts(validStructureRoles) {
+function declaredDetailParts(validStructureRoles, detailPartsByStructure) {
   const names = new Set();
   validStructureRoles.forEach((structureName) => {
-    (DETAIL_PARTS_BY_STRUCTURE[structureName] || []).forEach((name) => names.add(name));
+    (detailPartsByStructure[structureName] || []).forEach((name) => names.add(name));
   });
   return names;
+}
+
+function resolveFamilyContract(spec, errors) {
+  if (typeof spec?.family !== 'string' || spec.family.trim() === '') return null;
+  if (!hasOwn(FAMILY_CONTRACTS, spec.family)) {
+    errors.push(validationError(
+      'unsupported_family',
+      'family',
+      `Unsupported component visual family: ${spec.family}`,
+    ));
+    return null;
+  }
+  return FAMILY_CONTRACTS[spec.family];
 }
 
 function validateDetailLevels(detailLevels, declaredParts, errors) {
@@ -390,7 +454,8 @@ function validateDetailLevels(detailLevels, declaredParts, errors) {
         'Part names must be unique.',
       ));
     }
-    names.forEach((name, index) => {
+    for (let index = 0; index < names.length; index += 1) {
+      const name = hasOwn(names, index) ? names[index] : undefined;
       const path = `detail_levels.${level}[${index}]`;
       if (typeof name !== 'string' || name.trim() === '') {
         errors.push(validationError(
@@ -405,7 +470,7 @@ function validateDetailLevels(detailLevels, declaredParts, errors) {
           `Detail part is not backed by declared structure: ${name}`,
         ));
       }
-    });
+    }
   });
   Object.keys(detailLevels).forEach((level) => {
     if (!DETAIL_LEVELS.includes(level)) {
@@ -418,31 +483,35 @@ function validateDetailLevels(detailLevels, declaredParts, errors) {
   });
 }
 
-export function validateComponentVisualSpec(spec, materialCatalog = {}) {
+function validateComponentVisualSpecUnsafe(spec, materialCatalog) {
   const errors = [];
 
-  if (typeof spec?.spec_id !== 'string' || spec.spec_id.trim() === '') {
+  if (
+    !hasOwn(spec, 'spec_id')
+    || typeof spec.spec_id !== 'string'
+    || spec.spec_id.trim() === ''
+  ) {
     errors.push(validationError(
       'invalid_identity',
       'spec_id',
       'A stable specification ID is required.',
     ));
   }
-  if (!Number.isInteger(spec?.version) || spec.version < 1) {
+  if (!hasOwn(spec, 'version') || !Number.isInteger(spec.version) || spec.version < 1) {
     errors.push(validationError(
       'invalid_version',
       'version',
       'A positive integer specification version is required.',
     ));
   }
-  if (!SUPPORTED_ASSET_TYPES.has(spec?.asset_type)) {
+  if (!hasOwn(spec, 'asset_type') || !SUPPORTED_ASSET_TYPES.has(spec.asset_type)) {
     errors.push(validationError(
       'unsupported_asset_type',
       'asset_type',
       'Only procedural assets are supported.',
     ));
   }
-  if (!hasCanonicalStages(spec?.stages)) {
+  if (!hasOwn(spec, 'stages') || !hasCanonicalStages(spec.stages)) {
     errors.push(validationError(
       'invalid_stage_order',
       'stages',
@@ -451,19 +520,26 @@ export function validateComponentVisualSpec(spec, materialCatalog = {}) {
   }
 
   validateRequiredMetadata(spec, errors);
+  const familyContract = resolveFamilyContract(spec, errors);
   const validSections = validateRequiredSections(spec, errors);
   const bounds = validSections.has('acceptance')
-    ? validateAcceptance(spec.acceptance, errors)
+    ? validateAcceptance(spec.acceptance, familyContract, errors)
     : null;
-  if (validSections.has('materials')) {
+  if (validSections.has('materials') && familyContract) {
     validateMaterials(
       spec.materials,
       isPlainObject(materialCatalog) ? materialCatalog : {},
+      familyContract.materialRoles,
       errors,
     );
   }
-  const validStructureRoles = validSections.has('structure')
-    ? validateStructure(spec.structure, bounds, errors)
+  const validStructureRoles = validSections.has('structure') && familyContract
+    ? validateStructure(
+      spec.structure,
+      bounds,
+      familyContract.structureShapes,
+      errors,
+    )
     : new Set();
   if (validSections.has('claims')) {
     if (spec.claims.length === 0) {
@@ -480,26 +556,36 @@ export function validateComponentVisualSpec(spec, materialCatalog = {}) {
         'Claims must be unique.',
       ));
     }
-    spec.claims.forEach((claim, index) => {
+    for (let index = 0; index < spec.claims.length; index += 1) {
+      const claim = hasOwn(spec.claims, index) ? spec.claims[index] : undefined;
       if (typeof claim !== 'string' || claim.trim() === '') {
         errors.push(validationError(
           'invalid_claim',
           `claims[${index}]`,
           'Claims must be non-empty strings.',
         ));
-      } else if (PROHIBITED_CLAIMS.has(claim)) {
+      } else if (familyContract?.prohibitedClaims.includes(claim)) {
         errors.push(validationError(
           'prohibited_claim',
           'claims',
           `Unsupported engineering claim: ${claim}`,
         ));
+      } else if (familyContract && !familyContract.allowedClaims.includes(claim)) {
+        errors.push(validationError(
+          'unsupported_claim',
+          `claims[${index}]`,
+          `Claim is not supported by the selected family: ${claim}`,
+        ));
       }
-    });
+    }
   }
-  if (validSections.has('detail_levels')) {
+  if (validSections.has('detail_levels') && familyContract) {
     validateDetailLevels(
       spec.detail_levels,
-      declaredDetailParts(validStructureRoles),
+      declaredDetailParts(
+        validStructureRoles,
+        familyContract.detailPartsByStructure,
+      ),
       errors,
     );
   }
@@ -508,4 +594,21 @@ export function validateComponentVisualSpec(spec, materialCatalog = {}) {
     valid: errors.length === 0,
     errors: Object.freeze(errors),
   });
+}
+
+export function validateComponentVisualSpec(spec, materialCatalog = {}) {
+  try {
+    return validateComponentVisualSpecUnsafe(spec, materialCatalog);
+  } catch {
+    return Object.freeze({
+      valid: false,
+      errors: Object.freeze([
+        validationError(
+          'malformed_spec',
+          '',
+          'Component visual specification could not be inspected safely.',
+        ),
+      ]),
+    });
+  }
 }
