@@ -111,8 +111,27 @@ function snapshot(group) {
       name: child.name,
       visualPart: child.userData.visualPart || null,
       position: child.position.toArray(),
+      rotation: child.rotation.toArray(),
+      quaternion: child.quaternion.toArray(),
+      scale: child.scale.toArray(),
       geometry: child.geometry
-        ? Array.from(child.geometry.attributes.position.array)
+        ? {
+          index: child.geometry.index
+            ? {
+              itemSize: child.geometry.index.itemSize,
+              normalized: child.geometry.index.normalized,
+              array: Array.from(child.geometry.index.array),
+            }
+            : null,
+          attributes: Object.entries(child.geometry.attributes)
+            .sort(([first], [second]) => first.localeCompare(second))
+            .map(([name, attribute]) => ({
+              name,
+              itemSize: attribute.itemSize,
+              normalized: attribute.normalized,
+              array: Array.from(attribute.array),
+            })),
+        }
         : null,
       material: child.material
         ? {
@@ -236,19 +255,33 @@ test('shared BGA snapshots are deterministic and all builds own distinct resourc
 
 test('shared BGA disposal is exact and idempotent for every descriptor', () => {
   SHARED_BGA_DESCRIPTORS.forEach((descriptor) => {
-    const group = build('isolated', descriptor);
-    const owned = resources(group);
-    assert.deepEqual(disposeComponentVisual(group), {
-      geometries: owned.geometries.length,
-      materials: owned.materials.length,
-      failureCount: 0,
-      cleanupWarning: null,
-    });
-    assert.deepEqual(disposeComponentVisual(group), {
-      geometries: 0,
-      materials: 0,
-      failureCount: 0,
-      cleanupWarning: null,
+    ['board', 'isolated'].forEach((detailLevel) => {
+      const group = build(detailLevel, descriptor);
+      const owned = resources(group);
+      const disposalEvents = new Map(
+        [...owned.geometries, ...owned.materials].map((resource) => [resource, 0]),
+      );
+      for (const resource of disposalEvents.keys()) {
+        resource.addEventListener('dispose', () => {
+          disposalEvents.set(resource, disposalEvents.get(resource) + 1);
+        });
+      }
+
+      assert.deepEqual(disposeComponentVisual(group), {
+        geometries: owned.geometries.length,
+        materials: owned.materials.length,
+        failureCount: 0,
+        cleanupWarning: null,
+      });
+      disposalEvents.forEach((count) => assert.equal(count, 1));
+
+      assert.deepEqual(disposeComponentVisual(group), {
+        geometries: 0,
+        materials: 0,
+        failureCount: 0,
+        cleanupWarning: null,
+      });
+      disposalEvents.forEach((count) => assert.equal(count, 1));
     });
   });
 });
