@@ -6,6 +6,7 @@ import {
   COMPONENT_VISUAL_MATERIALS,
   J6101_CONNECTOR_VISUAL_SPEC,
   resolveComponentVisualSpec,
+  SHARED_BGA_VISUAL_SPEC,
   U2001_PMIC_VISUAL_SPEC,
 } from '../assets/cross-source-registration/component-visual-specs.js';
 import {
@@ -99,6 +100,77 @@ test('U2001 resolves through the approved category-based PMIC profile', () => {
   });
 });
 
+test('shared BGA profiles resolve to one production spec distinct from U2001', () => {
+  [
+    'u4000-emmc-v1',
+    'u0600-rf-device-v1',
+    'connectivity-bga-v1',
+  ].forEach((profileId) => {
+    assert.equal(resolveComponentVisualSpec(profileId), SHARED_BGA_VISUAL_SPEC);
+  });
+  assert.notEqual(SHARED_BGA_VISUAL_SPEC, U2001_PMIC_VISUAL_SPEC);
+});
+
+test('the shared BGA identity and evidence boundary remain explicit', () => {
+  assert.deepEqual({
+    spec_id: SHARED_BGA_VISUAL_SPEC.spec_id,
+    version: SHARED_BGA_VISUAL_SPEC.version,
+    asset_type: SHARED_BGA_VISUAL_SPEC.asset_type,
+    family: SHARED_BGA_VISUAL_SPEC.family,
+    inspection_profiles: SHARED_BGA_VISUAL_SPEC.inspection_profiles,
+    source_status: SHARED_BGA_VISUAL_SPEC.source_status,
+    fidelity: SHARED_BGA_VISUAL_SPEC.fidelity,
+    boundary_note: SHARED_BGA_VISUAL_SPEC.boundary_note,
+  }, {
+    spec_id: 'ic-bga-shared-package-repair-visual-v1',
+    version: 1,
+    asset_type: 'procedural',
+    family: 'ic_bga',
+    inspection_profiles: [
+      'u4000-emmc-v1',
+      'u0600-rf-device-v1',
+      'connectivity-bga-v1',
+    ],
+    source_status: 'category_based',
+    fidelity: 'repair_visual',
+    boundary_note: '共享 BGA IC 结构为维修识别示意，不代表准确封装、球数、球距、焊盘、丝印、内部结构、方向点或工程尺寸。',
+  });
+  assert.deepEqual(SHARED_BGA_VISUAL_SPEC.claims, [
+    'ic_package_silhouette',
+    'substrate_body_hierarchy',
+    'generic_orientation_cue',
+  ]);
+  assert.deepEqual(
+    SHARED_BGA_VISUAL_SPEC.acceptance.prohibited_claims,
+    U2001_PROHIBITED_CLAIMS,
+  );
+});
+
+test('the shared BGA spec declares normalized structure and U2001 detail part names', () => {
+  assert.deepEqual(SHARED_BGA_VISUAL_SPEC.materials, U2001_PMIC_VISUAL_SPEC.materials);
+  assert.deepEqual(SHARED_BGA_VISUAL_SPEC.structure, {
+    substrate: { width: 1, depth: 1, height: 0.18, radius: 0.045 },
+    body: { width: 0.92, depth: 0.92, height: 0.66, radius: 0.065, lift: 0.18 },
+    top: { width: 0.72, depth: 0.68, height: 0.045, radius: 0.05, lift: 0.84 },
+    marker: {
+      radius: 0.04,
+      offset_x: -0.31,
+      offset_y: 0.31,
+      height: 0.02,
+      lift: 0.89,
+    },
+  });
+  assert.deepEqual(
+    SHARED_BGA_VISUAL_SPEC.detail_levels,
+    U2001_PMIC_VISUAL_SPEC.detail_levels,
+  );
+  assert.deepEqual(SHARED_BGA_VISUAL_SPEC.detail_levels.isolated.slice(-3), [
+    'substrate-edges',
+    'body-edges',
+    'top-seam',
+  ]);
+});
+
 test('the U2001 evidence boundary rejects package engineering claims', () => {
   assert.deepEqual(U2001_PMIC_VISUAL_SPEC.claims, [
     'ic_package_silhouette',
@@ -152,6 +224,16 @@ test('catalog construction rejects duplicate inspection profiles', () => {
       { ...U2001_PMIC_VISUAL_SPEC, inspection_profiles: ['j6101-connector-v1'] },
     ]),
     /Duplicate inspection profile: j6101-connector-v1/,
+  );
+});
+
+test('catalog construction rejects a duplicate shared BGA inspection profile', () => {
+  assert.throws(
+    () => buildComponentVisualSpecCatalog([
+      SHARED_BGA_VISUAL_SPEC,
+      { ...U2001_PMIC_VISUAL_SPEC, inspection_profiles: ['u4000-emmc-v1'] },
+    ]),
+    /Duplicate inspection profile: u4000-emmc-v1/,
   );
 });
 
@@ -487,6 +569,30 @@ test('the U2001 visual specification is deeply immutable where consumed', () => 
   assert.throws(() => U2001_PMIC_VISUAL_SPEC.claims.push('extra'), TypeError);
   assert.throws(() => {
     U2001_PMIC_VISUAL_SPEC.structure.marker.radius = 0.2;
+  }, TypeError);
+});
+
+test('the shared BGA visual specification is deeply immutable where consumed', () => {
+  [
+    SHARED_BGA_VISUAL_SPEC,
+    SHARED_BGA_VISUAL_SPEC.inspection_profiles,
+    SHARED_BGA_VISUAL_SPEC.claims,
+    SHARED_BGA_VISUAL_SPEC.materials,
+    SHARED_BGA_VISUAL_SPEC.structure,
+    SHARED_BGA_VISUAL_SPEC.structure.substrate,
+    SHARED_BGA_VISUAL_SPEC.structure.body,
+    SHARED_BGA_VISUAL_SPEC.structure.top,
+    SHARED_BGA_VISUAL_SPEC.structure.marker,
+    SHARED_BGA_VISUAL_SPEC.detail_levels,
+    SHARED_BGA_VISUAL_SPEC.detail_levels.board,
+    SHARED_BGA_VISUAL_SPEC.detail_levels.isolated,
+    SHARED_BGA_VISUAL_SPEC.stages,
+    SHARED_BGA_VISUAL_SPEC.acceptance,
+    SHARED_BGA_VISUAL_SPEC.acceptance.prohibited_claims,
+  ].forEach((value) => assert.equal(Object.isFrozen(value), true));
+  assert.throws(() => SHARED_BGA_VISUAL_SPEC.inspection_profiles.push('extra'), TypeError);
+  assert.throws(() => {
+    SHARED_BGA_VISUAL_SPEC.structure.marker.offset_x = 0.31;
   }, TypeError);
 });
 

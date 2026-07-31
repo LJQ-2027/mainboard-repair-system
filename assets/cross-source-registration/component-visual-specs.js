@@ -240,6 +240,98 @@ export const U2001_PMIC_VISUAL_SPEC = Object.freeze({
   }),
 });
 
+export const SHARED_BGA_VISUAL_SPEC = Object.freeze({
+  spec_id: 'ic-bga-shared-package-repair-visual-v1',
+  version: 1,
+  asset_type: 'procedural',
+  family: 'ic_bga',
+  inspection_profiles: Object.freeze([
+    'u4000-emmc-v1',
+    'u0600-rf-device-v1',
+    'connectivity-bga-v1',
+  ]),
+  source_status: 'category_based',
+  fidelity: 'repair_visual',
+  boundary_note: '共享 BGA IC 结构为维修识别示意，不代表准确封装、球数、球距、焊盘、丝印、内部结构、方向点或工程尺寸。',
+  claims: Object.freeze([
+    'ic_package_silhouette',
+    'substrate_body_hierarchy',
+    'generic_orientation_cue',
+  ]),
+  materials: Object.freeze({
+    substrate: 'ic-substrate',
+    body: 'molded-package',
+    top: 'inset-top',
+    marker: 'orientation-marker',
+    edge: 'edge-line',
+  }),
+  structure: Object.freeze({
+    substrate: Object.freeze({
+      width: 1,
+      depth: 1,
+      height: 0.18,
+      radius: 0.045,
+    }),
+    body: Object.freeze({
+      width: 0.92,
+      depth: 0.92,
+      height: 0.66,
+      radius: 0.065,
+      lift: 0.18,
+    }),
+    top: Object.freeze({
+      width: 0.72,
+      depth: 0.68,
+      height: 0.045,
+      radius: 0.05,
+      lift: 0.84,
+    }),
+    marker: Object.freeze({
+      radius: 0.04,
+      offset_x: -0.31,
+      offset_y: 0.31,
+      height: 0.02,
+      lift: 0.89,
+    }),
+  }),
+  detail_levels: Object.freeze({
+    board: Object.freeze([
+      'substrate',
+      'body',
+      'top',
+      'orientation-marker',
+    ]),
+    isolated: Object.freeze([
+      'substrate',
+      'body',
+      'top',
+      'orientation-marker',
+      'substrate-edges',
+      'body-edges',
+      'top-seam',
+    ]),
+  }),
+  stages: Object.freeze(['blockout', 'structure', 'material', 'polish']),
+  acceptance: Object.freeze({
+    ratio_min: 0.02,
+    ratio_max: 1,
+    prohibited_claims: Object.freeze([
+      'exact_pin_count',
+      'exact_pin_pitch',
+      'vendor_latch',
+      'solder_foot_array',
+      'internal_spring_geometry',
+      'millimeter_dimensions',
+      'exact_ball_count',
+      'exact_ball_pitch',
+      'exact_pad_layout',
+      'vendor_package',
+      'die_or_internal_structure',
+      'package_marking',
+    ]),
+  }),
+});
+
 export function buildComponentVisualSpecCatalog(specs) {
   const catalog = new Map();
   specs.forEach((spec) => {
@@ -256,6 +348,7 @@ export function buildComponentVisualSpecCatalog(specs) {
 const SPEC_BY_INSPECTION_PROFILE = buildComponentVisualSpecCatalog([
   J6101_CONNECTOR_VISUAL_SPEC,
   U2001_PMIC_VISUAL_SPEC,
+  SHARED_BGA_VISUAL_SPEC,
 ]);
 
 export function resolveComponentVisualSpec(inspectionProfileId) {
