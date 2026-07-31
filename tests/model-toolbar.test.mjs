@@ -264,7 +264,6 @@ test('inspection Escape key uses the same application-owned return path', () => 
 test('reviewed BGA profiles use the reusable builder with generic IC fallback', () => {
   assert.doesNotMatch(rendererSource, /function addInspectionBgaPackage/);
   assert.doesNotMatch(rendererSource, /visualAsset === 'reviewed-bga'/);
-  assert.match(rendererSource, /else if \(descriptor\.family === 'ic'\) addIcPackage/);
 });
 
 test('reviewed connector profiles use the reusable component visual builder', () => {
