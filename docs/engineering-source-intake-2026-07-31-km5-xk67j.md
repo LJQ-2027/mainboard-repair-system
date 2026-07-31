@@ -1,15 +1,16 @@
-# KM5 / KM4n XK67J Shared-Board Compatibility Audit
+# XK67J Shared-Board Compatibility Audit
 
 Date: 2026-07-31
 
 ## Decision
 
-The KM5 engineering package is accepted for the KM4n cases as one shared XK67J
-board-platform reference.
+The KM5 engineering package is accepted as the reference for one shared XK67J
+board platform used by KM4n, KM4k, KM5, KM5n, and KM5s.
 
-This is a board-platform compatibility decision, not a claim that KM5 and KM4n
-are the same sales model or have identical BOM, firmware, peripherals, component
-values, or repair policy.
+This is a board-platform compatibility decision, not a claim that the five sales
+models have identical BOM, firmware, peripherals, component values, or repair
+policy. KM5 is the source model, KM4n is physically checked, and KM4k, KM5n,
+and KM5s are owner-confirmed aliases pending their own photo or revision checks.
 
 ## Evidence
 
@@ -30,7 +31,7 @@ plus reviewed two-side structural landmarks.
 ## Allowed use
 
 - One catalog board platform: `XK67J`.
-- Variant-aware sales-model aliases: `KM5` and `KM4n`.
+- Variant-aware sales-model aliases: `KM4n`, `KM4k`, `KM5`, `KM5n`, and `KM5s`.
 - Compile normalized two-side board geometry and footprint candidates.
 - Compile exact schematic designator occurrences from the V1.0B source.
 - Register the three unique KM4n photo byte streams after board compilation.
@@ -39,7 +40,7 @@ plus reviewed two-side structural landmarks.
 ## Prohibited inference
 
 - Do not rewrite the source revision from V1.0B to V1.0.
-- Do not claim exact BOM/population equality across KM5 and KM4n.
+- Do not claim exact BOM/population equality across the five sales models.
 - Do not infer component values, firmware behavior, peripheral configuration, or
   model-specific repair instructions from the shared layout alone.
 - Do not create a Golden Sample, defect label, training label, or repair-causality
@@ -47,11 +48,10 @@ plus reviewed two-side structural landmarks.
 
 ## Next implementation increment
 
-1. Add `XK67J` as a shared board-catalog profile with KM5/KM4n aliases and an
-   explicit V1.0/V1.0B compatibility note.
+1. Add `XK67J` as a shared board-catalog profile with KM4n/KM4k/KM5/KM5n/KM5s
+   aliases and an explicit V1.0/V1.0B compatibility note.
 2. Compile both Main Placement pages and the 28-page Main SCH.
 3. Run the existing catalog/batch source audit.
 4. Register and review the three unique KM4n image byte streams.
 5. Keep any model-specific repair workflow unavailable until supporting source
    evidence is selected and reviewed.
-

@@ -44,8 +44,19 @@
     "physical_silkscreen_revision": "V1.0",
     "source_sales_model": "KM5",
     "compatible_sales_models": [
+      "KM4n",
+      "KM4k",
       "KM5",
+      "KM5n",
+      "KM5s"
+    ],
+    "photo_verified_sales_models": [
       "KM4n"
+    ],
+    "owner_confirmed_sales_models": [
+      "KM4k",
+      "KM5n",
+      "KM5s"
     ],
     "decision": "shared_board_platform_reference_accepted",
     "geometry_and_registration_allowed": true,

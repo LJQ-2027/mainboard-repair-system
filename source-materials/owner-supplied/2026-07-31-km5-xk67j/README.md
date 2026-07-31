@@ -1,11 +1,16 @@
-# KM5 / KM4n shared XK67J engineering-source intake
+# Shared XK67J engineering-source intake
 
 Received from Milo on 2026-07-31 from the desktop folder `KM5`.
 
 ## Compatibility decision
 
 The engineering package is accepted as the reference package for the shared
-XK67J board platform used by KM5 and the photographed KM4n cases.
+XK67J board platform used by KM4n, KM4k, KM5, KM5n, and KM5s.
+
+Evidence levels are intentionally distinct: KM5 is the engineering-source sales
+model, KM4n has been checked against physical-board photographs, and KM4k,
+KM5n, and KM5s are owner-confirmed platform aliases pending their own photo or
+revision checks.
 
 Evidence:
 
@@ -24,4 +29,3 @@ occurrences, 2.5D modeling, and reviewed KM4n photo registration. Sales-model
 identity, BOM/population differences, component values, firmware, peripherals,
 and repair instructions remain variant-aware and require their own source
 support.
-
