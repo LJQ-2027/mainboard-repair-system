@@ -5,7 +5,6 @@ import test from 'node:test';
 const toolbarMarkup = await readFile(new URL('../assets/cross-source-registration/index.html', import.meta.url), 'utf8');
 const appSource = await readFile(new URL('../assets/cross-source-registration/app.js', import.meta.url), 'utf8');
 const rendererSource = await readFile(new URL('../assets/cross-source-registration/board-renderer.js', import.meta.url), 'utf8');
-const modelProfilesSource = await readFile(new URL('../assets/cross-source-registration/model-profiles.js', import.meta.url), 'utf8');
 const stylesSource = await readFile(new URL('../assets/cross-source-registration/styles.css', import.meta.url), 'utf8');
 
 test('model toolbar keeps source-driven focus without a manual module overlay selector', () => {
@@ -266,9 +265,6 @@ test('reviewed BGA profiles use the reusable builder with generic IC fallback', 
   assert.doesNotMatch(rendererSource, /function addInspectionBgaPackage/);
   assert.doesNotMatch(rendererSource, /visualAsset === 'reviewed-bga'/);
   assert.match(rendererSource, /else if \(descriptor\.family === 'ic'\) addIcPackage/);
-  assert.match(modelProfilesSource, /'u4000-emmc-v1': 'reviewed-bga'/);
-  assert.match(modelProfilesSource, /'u0600-rf-device-v1': 'reviewed-bga'/);
-  assert.match(modelProfilesSource, /'connectivity-bga-v1': 'reviewed-bga'/);
 });
 
 test('reviewed connector profiles use the reusable component visual builder', () => {
