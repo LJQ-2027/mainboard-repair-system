@@ -928,7 +928,7 @@ Check completed boxes only after their corresponding command or visual
 observation has been executed. Do not mark browser or full regression tasks
 complete based on focused unit tests.
 
-- [ ] **Step 6: Commit documentation and final verification record**
+- [x] **Step 6: Commit documentation and final verification record**
 
 ```powershell
 git add docs/km4-cross-source-registration-2026-07-13.md `
@@ -936,7 +936,7 @@ git add docs/km4-cross-source-registration-2026-07-13.md `
 git commit -m "docs: verify J6101 visual refinement"
 ```
 
-- [ ] **Step 7: Perform requirement-by-requirement completion audit**
+- [x] **Step 7: Perform requirement-by-requirement completion audit**
 
 Verify current files and evidence prove:
 
