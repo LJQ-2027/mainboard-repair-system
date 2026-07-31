@@ -29,7 +29,7 @@
 - Modify: `tests/component-visual-specs.test.mjs`
 - Modify: `assets/cross-source-registration/component-visual-specs.js`
 
-- [ ] **Step 1: Write failing shared-catalog tests**
+- [x] **Step 1: Write failing shared-catalog tests**
 
 Add imports and assertions equivalent to:
 
@@ -76,7 +76,7 @@ test('shared BGA evidence boundary rejects package engineering claims', () => {
 
 Also assert deep immutability and duplicate catalog rejection when any shared profile collides with another spec.
 
-- [ ] **Step 2: Run the focused test and verify RED**
+- [x] **Step 2: Run the focused test and verify RED**
 
 Run:
 
@@ -86,7 +86,7 @@ node --test tests/component-visual-specs.test.mjs
 
 Expected: FAIL because `SHARED_BGA_VISUAL_SPEC` is not exported and the profiles do not resolve through the component-visual catalog.
 
-- [ ] **Step 3: Add the immutable shared BGA specification**
+- [x] **Step 3: Add the immutable shared BGA specification**
 
 Add:
 
@@ -173,7 +173,7 @@ export const SHARED_BGA_VISUAL_SPEC = Object.freeze({
 
 Register it in the production catalog beside J6101 and U2001. Do not add designator-specific logic.
 
-- [ ] **Step 4: Run the catalog suite and verify GREEN**
+- [x] **Step 4: Run the catalog suite and verify GREEN**
 
 Run:
 
@@ -183,7 +183,7 @@ node --test tests/component-visual-specs.test.mjs
 
 Expected: all catalog and validator tests pass for connector, U2001, and shared BGA specs.
 
-- [ ] **Step 5: Commit the catalog slice**
+- [x] **Step 5: Commit the catalog slice**
 
 ```powershell
 git add assets/cross-source-registration/component-visual-specs.js tests/component-visual-specs.test.mjs
