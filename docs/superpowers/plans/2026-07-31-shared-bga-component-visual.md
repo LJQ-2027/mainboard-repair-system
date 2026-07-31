@@ -362,7 +362,7 @@ git commit -m "refactor: route reviewed BGA profiles through visual builder"
 **Files:**
 - Modify only if validation reveals a defect owned by Tasks 1-3.
 
-- [ ] **Step 1: Run JavaScript syntax checks**
+- [x] **Step 1: Run JavaScript syntax checks**
 
 ```powershell
 node --check assets/cross-source-registration/component-visual-specs.js
@@ -373,7 +373,7 @@ node --check assets/cross-source-registration/board-renderer.js
 
 Expected: every command exits `0`.
 
-- [ ] **Step 2: Run the complete Node suite**
+- [x] **Step 2: Run the complete Node suite**
 
 ```powershell
 node --test tests/*.test.mjs
@@ -381,7 +381,7 @@ node --test tests/*.test.mjs
 
 Expected: zero failures.
 
-- [ ] **Step 3: Run source-bound Python tests**
+- [x] **Step 3: Run source-bound Python tests**
 
 ```powershell
 G:\Programming\mainboard-repair-system\.venv\Scripts\python.exe -m unittest tests.test_validate_cross_source_registration tests.test_compile_km4_board tests.test_ai_proxy_static -v
@@ -389,7 +389,7 @@ G:\Programming\mainboard-repair-system\.venv\Scripts\python.exe -m unittest test
 
 Expected: all 27 tests pass.
 
-- [ ] **Step 4: Run repository and encoding checks**
+- [x] **Step 4: Run repository and encoding checks**
 
 ```powershell
 git diff --check
