@@ -1,6 +1,6 @@
-# 智能主板维修系统 v8.0 AI版
+# 海外主板维修工作台
 
-基于 AI 大模型的智能主板维修辅助系统，支持 Anthropic Claude 和 DeepSeek 双平台。
+面向海外维修员的来源受控维修工作台，核心能力是交互式诊断 SOP、2.5D 主板模型、跨资料证据关联与视觉 QC 数据链路。通用大模型聊天、问答和自主诊断已经退役，不属于产品路线。
 
 ## 视觉 QC 数据工作台
 
@@ -69,12 +69,13 @@ V3 `supporting_only` 用于只有维修过程补充照片、没有来源包链�
 
 ## 功能特性
 
-- 🤖 **AI 智能诊断**：通过大语言模型辅助分析主板故障
-- 🔌 **多平台支持**：自动识别 API Key 类型，兼容 Anthropic Claude 和 DeepSeek
-- 📸 **原理图分析**：支持上传原理图截图进行视觉分析（需 Claude API）
-- 💬 **流式对话**：实时 SSE 流式输出，交互体验流畅
-- 🔄 **协议转换**：自动将 Anthropic 格式请求转为 OpenAI 兼容格式
+- **交互式诊断 SOP**：根据已审核来源和维修员测量结果推进确定性维修分支
+- **2.5D 主板模型**：支持板面浏览、器件选择、隔离查看与维修上下文联动
+- **跨资料证据关联**：连接点位图、原理图、维修手册、器件身份与案例证据
+- **视觉 QC 数据链路**：支持受控照片入库、OpenCV 配准、Golden Sample、差异候选、人工确认与训练数据出口
 - 📚 **售后知识工作台**：接入 `knowledge-base/` 结构化资料，支持资料总览、MTK 信号查询、L4 报告洞察、资料缺口清单和 SOP 草案查看
+
+历史 `/api/chat`、Anthropic/DeepSeek 适配和相关启动入口仅为未清理的遗留实现，必须保持关闭；不得配置、扩展、部署为产品能力或纳入验收。
 
 ## 项目结构
 
@@ -100,7 +101,7 @@ V3 `supporting_only` 用于只有维修过程补充照片、没有来源包链�
 
 ## 当前阶段
 
-项目当前优先建设第一阶段知识地基。AI 功能保留为辅助入口，但现阶段重点是把制造中心、技术支持和 L4 维修报告中的资料沉淀为可查、可看、可继续补全的知识库。
+项目当前围绕维修员实际路径建设知识地基、2.5D 模型、来源受控 SOP 和视觉 QC。通用大模型功能不再保留为辅助入口。
 
 Phase 1A 已在前端增加：
 
@@ -121,33 +122,11 @@ Phase 1A 已在前端增加：
 ### 1. 环境要求
 
 - Python 3.8+
-- Anthropic API Key 或 DeepSeek API Key
+- 项目依赖见仓库现有 Python 环境与部署文档
 
-### 2. 配置
+### 2. 启动与访问
 
-```bash
-# 复制环境变量模板
-cp .env.example .env
-
-# 编辑 .env 文件，填入你的 API Key
-# ANTHROPIC_API_KEY=sk-ant-api03-your-key-here  (Anthropic)
-# 或
-# ANTHROPIC_API_KEY=sk-your-deepseek-key-here   (DeepSeek)
-```
-
-### 3. 启动
-
-**Windows:**
-双击运行 `启动AI服务.bat`
-
-**macOS/Linux:**
-```bash
-python ai_proxy_server.py
-```
-
-### 4. 访问
-
-打开浏览器，访问前端页面 `mainboard_repair_system_v7.4_updated.html`，确保代理服务器在 `http://localhost:8899` 运行。
+维修工作台和视觉 QC 服务按 `docs/beta-deployment.md` 与 `docs/visual-qc-server-api-2026-07-20.md` 启动。不要使用历史 AI 启动脚本，也不要配置 LLM API Key。
 
 ## 技术架构
 
@@ -159,8 +138,8 @@ python ai_proxy_server.py
 - **当前训练出口**：数据管理员可获取仅含训练合格实拍案例的 `VISUAL-QC-TRAINING-MANIFEST-V1`、对应原图和确定性 `VISUAL-QC-COCO-V1`；`VISUAL-QC-DATASET-BUNDLE-V1` 封装清单、COCO、索引和原图，`VISUAL-QC-DATASET-AUDIT-V1` 解释每个案例被排除的首要门禁原因
 - **当前浏览器接入**：内部视觉数据工作台只检索和恢复受控交接产生的服务器案例，并处理任务状态、自动候选确认、四点回退、Golden Sample、差异热图和逐候选人工决策；浏览器不创建实物服务器案例，海外维修员界面隐藏并由 API 拒绝所有照片入库和数据集工具
 - **当前案例契约**：本地历史基线保留 `VISUAL-QC-CASE-V1`；接入服务器的新案例使用 `VISUAL-QC-CASE-V2`，机器可读定义见 `knowledge-base/visual-qc-case-v2-schema.json`
-- **AI 平台**：Anthropic Claude / DeepSeek
-- **通信协议**：SSE (Server-Sent Events) 流式传输
+- **视觉处理**：CPU OpenCV Worker 与后续专用视觉模型
+- **数据协议**：版本化案例、配准、Golden Sample、候选与训练出口契约
 
 ## License
 

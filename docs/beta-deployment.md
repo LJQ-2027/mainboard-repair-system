@@ -9,7 +9,7 @@ Milo is the only source of real visual photos. Codex is the data administrator f
 ## Isolation Rules
 
 - Remote directory: `/opt/motherboard-repair-beta`
-- Loopback static/AI service port: `3010`
+- Loopback static frontend service port: `3010`
 - Loopback visual-QC API port: `3020`
 - PM2 process name: `motherboard-repair-beta`
 - Env file: `/opt/motherboard-repair-beta/app/.env`
@@ -40,17 +40,18 @@ case database and serving the workbench, KM4 atlas, and training manifest.
 
 ## Runtime
 
-The Python service serves both:
+The Python service serves:
 
 - Frontend page: `/`
-- AI API: `/api/chat`
 - Health check: `/health`
+
+The historical `/api/chat` route is retired legacy code. It must remain disabled and is not a product capability or acceptance target.
 
 The frontend defaults to the current origin when opened through HTTP/HTTPS, so beta users do not need to configure `localhost`.
 
 ## First-Time Server Setup
 
-After the first deploy, configure:
+After the first deploy, verify the service configuration:
 
 ```bash
 cd /opt/motherboard-repair-beta/app
@@ -58,13 +59,8 @@ vim .env
 pm2 restart motherboard-repair-beta --update-env
 ```
 
-Required variable:
-
-```bash
-ANTHROPIC_API_KEY=...
-```
-
 `PORT`, `STATIC_ROOT`, and `INDEX_FILE` are supplied by the deploy script / PM2 environment.
+Do not configure Anthropic, DeepSeek, or any other general-purpose LLM API key for this project.
 
 ## Current Deployment
 
@@ -81,7 +77,7 @@ ANTHROPIC_API_KEY=...
 - Access control: per-user Nginx Basic Auth with gateway-owned actor headers
 - Nginx config touched: `/etc/nginx/sites-available/sikayetvar`
 - Nginx config backup: `/etc/nginx/sites-available/sikayetvar.before-mb-repair-20260622_095918`
-- Current AI status: service is reachable, but `.env` still has no valid `ANTHROPIC_API_KEY`, so AI features are not enabled yet.
+- Retired LLM status: no provider key is configured by design; `/api/chat` is not part of the product roadmap.
 - 2026-07-31 controlled upgrade: the 58.1 MB allowlisted runtime archive was
   bound to SHA-256 `fb11d084a5d2597001f46c36bb2cdb5ae8701ee1eca194886e5eca6713774f07`
   and 37 runtime paths. Immutable-input verification, extraction verification,
