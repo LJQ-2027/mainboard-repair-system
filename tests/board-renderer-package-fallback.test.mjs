@@ -8,6 +8,17 @@ import {
 } from '../assets/cross-source-registration/board-renderer.js';
 
 const DIMENSIONS = Object.freeze({ x: 0.192, y: 0.16875, z: 0.032 });
+const SHARED_BGA_PROFILES = Object.freeze([
+  ['U4000', 'u4000-emmc-v1'],
+  ['U0600', 'u0600-rf-device-v1'],
+  ['connectivity', 'connectivity-bga-v1'],
+]);
+const BOARD_PART_NAMES = Object.freeze([
+  'body',
+  'orientation-marker',
+  'substrate',
+  'top',
+]);
 
 function resources(group) {
   const geometries = [];
@@ -38,12 +49,33 @@ test('U2001 package creation prefers the reusable IC BGA visual', () => {
   BoardRenderer.prototype.disposeObject.call({}, group);
 });
 
-test('failed reusable PMIC visual returns a nonblank generic IC and disposes generically', () => {
+SHARED_BGA_PROFILES.forEach(([designator, profileId]) => {
+  test(`${designator} package creation returns the shared BGA visual`, () => {
+    const group = createPackageMesh({
+      family: 'ic',
+      visualAsset: 'reviewed-bga',
+      dimensions: DIMENSIONS,
+      inspectionProfile: { profile_id: profileId },
+    });
+
+    assert.ok(group instanceof THREE.Group);
+    assert.equal(
+      group.userData.visualSpecId,
+      'ic-bga-shared-package-repair-visual-v1',
+    );
+    assert.deepEqual(group.userData.visualPartNames, BOARD_PART_NAMES);
+    assert.equal(group.userData.visualFallbackReason, undefined);
+
+    BoardRenderer.prototype.disposeObject.call({}, group);
+  });
+});
+
+test('unknown reviewed BGA profile returns a nonblank generic IC and disposes exactly once', () => {
   const group = createPackageMesh({
     family: 'ic',
-    visualAsset: 'reviewed-pmic',
+    visualAsset: 'reviewed-bga',
     dimensions: DIMENSIONS,
-    inspectionProfile: { profile_id: 'missing-pmic-spec' },
+    inspectionProfile: { profile_id: 'missing-reviewed-bga-spec' },
   });
   const parent = new THREE.Group();
   parent.add(group);

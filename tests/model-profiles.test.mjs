@@ -153,6 +153,25 @@ test('U2001 descriptor carries reusable IC BGA identity and provenance metadata'
   assert.equal(descriptor.family, 'ic');
 });
 
+[
+  'u4000-emmc-v1',
+  'u0600-rf-device-v1',
+  'connectivity-bga-v1',
+].forEach((profileId) => {
+  test(`${profileId} descriptor carries the shared BGA visual identity`, () => {
+    const source = component('bga_ic', 'reviewed', { x: 0.096, y: 0.135 });
+    source.inspection_profile = { profile_id: profileId, fidelity: 'repair_visual' };
+    const descriptor = buildRenderDescriptor(source, { reviewed: true });
+
+    assert.equal(
+      descriptor.componentVisualSpecId,
+      'ic-bga-shared-package-repair-visual-v1',
+    );
+    assert.equal(descriptor.visualAsset, 'reviewed-bga');
+    assert.equal(descriptor.family, 'ic');
+  });
+});
+
 test('descriptors without a reusable visual spec carry a null identity', () => {
   const source = component('connector', 'reviewed', { x: 0.157, y: 0.079 });
   source.inspection_profile = { profile_id: 'unknown-profile', fidelity: 'repair_visual' };
