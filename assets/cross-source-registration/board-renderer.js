@@ -23,6 +23,10 @@ import {
   buildComponentVisual,
   disposeComponentVisual,
 } from './component-visual-builder.js';
+import {
+  detachObjectAfterOwnedDisposal,
+  disposeGenericObjectResources,
+} from './component-visual-disposal-state.js';
 import { replaceComponentVisualState } from './component-visual-replacement-state.js';
 import { recordDragTravel, transformBoardCenter } from './model-interaction-state.js';
 import { isPointInFocus } from './repair-focus-state.js';
@@ -864,19 +868,16 @@ export class BoardRenderer {
   }
 
   disposeObject(object) {
-    const componentDisposal = disposeComponentVisual(object);
-    if (!componentDisposal.geometries && !componentDisposal.materials) {
-      object.traverse((child) => {
-        child.geometry?.dispose();
-        const materials = Array.isArray(child.material) ? child.material : [child.material];
-        materials.filter(Boolean).forEach((item) => {
-          const textures = new Set([item.map, ...Object.values(child.userData.labelTextures || {})]);
-          textures.forEach((texture) => texture?.dispose());
-          item.dispose();
-        });
-      });
+    let componentDisposal;
+    try {
+      componentDisposal = disposeComponentVisual(object);
+    } catch {
+      return detachObjectAfterOwnedDisposal(object, 'previous_visual_cleanup_failed');
     }
-    object.removeFromParent();
+    if (!componentDisposal.geometries && !componentDisposal.materials) {
+      return disposeGenericObjectResources(object);
+    }
+    return detachObjectAfterOwnedDisposal(object, componentDisposal.cleanupWarning);
   }
 
   disposeGroup(group) {
@@ -1436,11 +1437,13 @@ export class BoardRenderer {
       delete this.container.dataset.componentVisualSpec;
       delete this.container.dataset.componentVisualDetail;
       delete this.container.dataset.componentVisualFallback;
+      delete this.container.dataset.componentVisualCleanup;
       return;
     }
     this.container.dataset.componentVisualSpec = descriptor.componentVisualSpecId;
     this.container.dataset.componentVisualDetail = object.userData.visualDetailLevel || 'board';
     this.container.dataset.componentVisualFallback = object.userData.visualFallbackReason || '';
+    this.container.dataset.componentVisualCleanup = object.userData.visualCleanupWarning || '';
   }
 
   replaceComponentVisualDetail(componentId, detailLevel) {

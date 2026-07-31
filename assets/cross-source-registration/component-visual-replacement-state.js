@@ -20,6 +20,7 @@ function failureResult(previous, currentDetailLevel, fallbackReason) {
     detailCommitted: false,
     currentDetailLevel,
     fallbackReason,
+    cleanupWarning: null,
   };
 }
 
@@ -38,10 +39,14 @@ function safelyRemoveObject(object, removeObject) {
 
 function safelyDisposeObject(object, disposeObject) {
   try {
-    disposeObject(object);
-    return true;
+    const result = disposeObject(object);
+    return {
+      cleanupWarning: result?.cleanupWarning || null,
+    };
   } catch {
-    return false;
+    return {
+      cleanupWarning: 'previous_visual_cleanup_failed',
+    };
   }
 }
 
@@ -81,6 +86,7 @@ export function replaceComponentVisualState({
       detailCommitted: false,
       currentDetailLevel,
       fallbackReason: null,
+      cleanupWarning: null,
     };
   }
   if (!descriptor?.componentVisualSpecId) {
@@ -90,6 +96,7 @@ export function replaceComponentVisualState({
       detailCommitted: true,
       currentDetailLevel,
       fallbackReason: null,
+      cleanupWarning: null,
     };
   }
   if (descriptor.layer !== 'body') {
@@ -99,6 +106,7 @@ export function replaceComponentVisualState({
       detailCommitted: currentDetailLevel === detailLevel,
       currentDetailLevel,
       fallbackReason: null,
+      cleanupWarning: null,
     };
   }
 
@@ -116,6 +124,7 @@ export function replaceComponentVisualState({
       detailCommitted: currentDetailLevel === detailLevel,
       currentDetailLevel,
       fallbackReason: built.fallbackReason,
+      cleanupWarning: null,
     };
   }
 
@@ -130,6 +139,7 @@ export function replaceComponentVisualState({
       detailCommitted: currentDetailLevel === detailLevel,
       currentDetailLevel,
       fallbackReason: 'visual_detail_mismatch',
+      cleanupWarning: null,
     };
   }
   try {
@@ -186,25 +196,14 @@ export function replaceComponentVisualState({
     return failureResult(previous, currentDetailLevel, 'visual_replacement_commit_failed');
   }
 
-  if (!safelyDisposeObject(previous, disposeObject)) {
-    restoreMapEntry(renderObjects, componentId, renderHadPrevious, renderPrevious);
-    restoreMapEntry(meshes, componentId, meshesHadPrevious, meshesPrevious);
-    if (!previous.parent) {
-      try {
-        addObject(previous);
-      } catch {
-        // The map references still preserve the previous logical object.
-      }
-    }
-    safelyRemoveObject(next, removeObject);
-    safelyDisposeObject(next, disposeObject);
-    return failureResult(previous, currentDetailLevel, 'visual_replacement_dispose_failed');
-  }
+  const { cleanupWarning } = safelyDisposeObject(previous, disposeObject);
+  next.userData.visualCleanupWarning = cleanupWarning || '';
   return {
     object: next,
     replaced: true,
     detailCommitted: true,
     currentDetailLevel: nextDetailLevel,
     fallbackReason: null,
+    cleanupWarning,
   };
 }

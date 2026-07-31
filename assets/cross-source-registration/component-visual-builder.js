@@ -28,18 +28,40 @@ function ownResource(ownership, type, resource) {
 
 function disposeOwnedResources(ownership) {
   if (!ownership || ownership.disposed) {
-    return { geometries: 0, materials: 0 };
+    return {
+      geometries: 0,
+      materials: 0,
+      failureCount: 0,
+      cleanupWarning: null,
+    };
   }
   ownership.disposed = true;
   const counts = {
     geometries: ownership.geometries.size,
     materials: ownership.materials.size,
   };
-  ownership.geometries.forEach((geometry) => geometry.dispose());
-  ownership.materials.forEach((material) => material.dispose());
+  let failureCount = 0;
+  ownership.geometries.forEach((geometry) => {
+    try {
+      geometry.dispose();
+    } catch {
+      failureCount += 1;
+    }
+  });
+  ownership.materials.forEach((material) => {
+    try {
+      material.dispose();
+    } catch {
+      failureCount += 1;
+    }
+  });
   ownership.geometries.clear();
   ownership.materials.clear();
-  return counts;
+  return {
+    ...counts,
+    failureCount,
+    cleanupWarning: failureCount ? 'previous_visual_cleanup_failed' : null,
+  };
 }
 
 function materialFor(spec, role, ownership) {
@@ -307,7 +329,14 @@ function finishMetadata(group, spec, detailLevel, stages) {
 
 export function disposeComponentVisual(group) {
   const ownership = group && COMPONENT_VISUAL_OWNERSHIP.get(group);
-  if (!ownership) return { geometries: 0, materials: 0 };
+  if (!ownership) {
+    return {
+      geometries: 0,
+      materials: 0,
+      failureCount: 0,
+      cleanupWarning: null,
+    };
+  }
   COMPONENT_VISUAL_OWNERSHIP.delete(group);
   return disposeOwnedResources(ownership);
 }

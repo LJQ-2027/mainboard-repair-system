@@ -477,6 +477,8 @@ test('component disposal owns original resources and ignores replacements and fo
     assert.deepEqual(disposeComponentVisual(first), {
       geometries: firstResources.geometries.length,
       materials: firstResources.materials.length,
+      failureCount: 0,
+      cleanupWarning: null,
     });
     firstEvents.forEach((count) => assert.equal(count, 1));
     secondEvents.forEach((count) => assert.equal(count, 0));
@@ -485,6 +487,8 @@ test('component disposal owns original resources and ignores replacements and fo
     assert.deepEqual(disposeComponentVisual(first), {
       geometries: 0,
       materials: 0,
+      failureCount: 0,
+      cleanupWarning: null,
     });
     firstEvents.forEach((count) => assert.equal(count, 1));
     foreignEvents.forEach((count) => assert.equal(count, 0));
@@ -492,6 +496,8 @@ test('component disposal owns original resources and ignores replacements and fo
     assert.deepEqual(disposeComponentVisual(second), {
       geometries: secondResources.geometries.length,
       materials: secondResources.materials.length,
+      failureCount: 0,
+      cleanupWarning: null,
     });
     secondEvents.forEach((count) => assert.equal(count, 1));
   } finally {
@@ -500,6 +506,36 @@ test('component disposal owns original resources and ignores replacements and fo
     foreignGeometry.dispose();
     foreignMaterial.dispose();
   }
+});
+
+test('component disposal attempts all owned resources when one disposal throws', () => {
+  const group = build('isolated');
+  const owned = resources(group);
+  const allResources = [...owned.geometries, ...owned.materials];
+  const attempts = new Map(allResources.map((resource) => [resource, 0]));
+  const originals = new Map(allResources.map((resource) => [resource, resource.dispose]));
+  const failingResource = allResources[0];
+
+  allResources.forEach((resource) => {
+    resource.dispose = function trackedDispose() {
+      attempts.set(resource, attempts.get(resource) + 1);
+      if (resource === failingResource) throw new Error('owned resource disposal failed');
+      return originals.get(resource).call(this);
+    };
+  });
+
+  let result;
+  assert.doesNotThrow(() => {
+    result = disposeComponentVisual(group);
+  });
+
+  attempts.forEach((count) => assert.equal(count, 1));
+  assert.deepEqual(result, {
+    geometries: owned.geometries.length,
+    materials: owned.materials.length,
+    failureCount: 1,
+    cleanupWarning: 'previous_visual_cleanup_failed',
+  });
 });
 
 test('componentVisualBounds returns finite Three.js Box3 dimensions', () => {

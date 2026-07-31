@@ -439,17 +439,6 @@ for (const failure of [
       };
     },
   },
-  {
-    name: 'previous object disposal',
-    reason: 'visual_replacement_dispose_failed',
-    install(fixture) {
-      const baseDispose = fixture.options.disposeObject;
-      fixture.options.disposeObject = (candidate) => {
-        if (candidate === fixture.previous) throw new Error('previous disposal failed');
-        baseDispose(candidate);
-      };
-    },
-  },
 ]) {
   test(`${failure.name} failure rolls back replacement without throwing or leaking`, async () => {
     const { replaceComponentVisualState } = await loadReplacementState();
@@ -482,3 +471,62 @@ for (const failure of [
     assert.equal(fixture.previous.userData.visualFallbackReason, failure.reason);
   });
 }
+
+test('cleanup failure after commit keeps the new visual authoritative', async () => {
+  const { replaceComponentVisualState } = await loadReplacementState();
+  const fixture = replacementFixture('isolated');
+  const baseDispose = fixture.options.disposeObject;
+  fixture.options.disposeObject = (candidate) => {
+    if (candidate === fixture.previous) {
+      fixture.disposals.set(candidate, (fixture.disposals.get(candidate) || 0) + 1);
+      candidate.removeFromParent();
+      candidate.userData.disposed = true;
+      throw new Error('previous disposal failed after removal');
+    }
+    baseDispose(candidate);
+  };
+
+  const result = replaceComponentVisualState(fixture.options);
+
+  assert.deepEqual({
+    object: result.object,
+    replaced: result.replaced,
+    detailCommitted: result.detailCommitted,
+    currentDetailLevel: result.currentDetailLevel,
+    fallbackReason: result.fallbackReason,
+    cleanupWarning: result.cleanupWarning,
+  }, {
+    object: fixture.next,
+    replaced: true,
+    detailCommitted: true,
+    currentDetailLevel: 'isolated',
+    fallbackReason: null,
+    cleanupWarning: 'previous_visual_cleanup_failed',
+  });
+  assert.equal(fixture.renderObjects.get('connector-1'), fixture.next);
+  assert.equal(fixture.meshes.get('connector-1'), fixture.next);
+  assert.equal(fixture.scene.has(fixture.previous), false);
+  assert.equal(fixture.scene.has(fixture.next), true);
+  assert.equal(fixture.previous.userData.disposed, true);
+  assert.equal(fixture.disposals.get(fixture.previous), 1);
+  assert.equal(fixture.disposals.has(fixture.next), false);
+});
+
+test('nonthrowing cleanup warning is preserved on the committed visual', async () => {
+  const { replaceComponentVisualState } = await loadReplacementState();
+  const fixture = replacementFixture('isolated');
+  fixture.options.disposeObject = (candidate) => {
+    fixture.disposals.set(candidate, (fixture.disposals.get(candidate) || 0) + 1);
+    candidate.removeFromParent();
+    return { cleanupWarning: 'previous_visual_cleanup_failed' };
+  };
+
+  const result = replaceComponentVisualState(fixture.options);
+
+  assert.equal(result.object, fixture.next);
+  assert.equal(result.detailCommitted, true);
+  assert.equal(result.cleanupWarning, 'previous_visual_cleanup_failed');
+  assert.equal(fixture.next.userData.visualCleanupWarning, 'previous_visual_cleanup_failed');
+  assert.equal(fixture.scene.has(fixture.next), true);
+  assert.equal(fixture.scene.has(fixture.previous), false);
+});

@@ -342,6 +342,7 @@ test('component visual replacement integrates exact disposal and stable browser 
   assert.match(rendererSource, /dataset\.componentVisualSpec/);
   assert.match(rendererSource, /dataset\.componentVisualDetail/);
   assert.match(rendererSource, /dataset\.componentVisualFallback/);
+  assert.match(rendererSource, /dataset\.componentVisualCleanup/);
   assert.match(disposalSource, /disposeComponentVisual/);
   assert.match(disposalSource, /this\.disposeObject/);
 });
@@ -418,6 +419,7 @@ test('component inspection exposes and clears the active visual asset for browse
   assert.match(rendererSource, /delete this\.container\.dataset\.componentVisualSpec/);
   assert.match(rendererSource, /delete this\.container\.dataset\.componentVisualDetail/);
   assert.match(rendererSource, /delete this\.container\.dataset\.componentVisualFallback/);
+  assert.match(rendererSource, /delete this\.container\.dataset\.componentVisualCleanup/);
 });
 
 test('legacy inspection never publishes reusable component visual detail metadata', () => {
