@@ -22,10 +22,11 @@ def compile_side(root, profile, side, *, primitives=None, outline=None):
     texture = root / side["engineering_texture"]
     primitives = primitives or extract_form_primitives(source, side["source_pdf_page"])
     outline = outline or extract_board_outline(texture)
+    coordinate_bounds = side.get("coordinate_bounds", primitives["visible_bounds"])
     components = compile_designators(
         primitives["labels"],
         primitives["rectangles"],
-        primitives["visible_bounds"],
+        coordinate_bounds,
         component_prefix=f"{profile['component_prefix']}-P{side.get('component_page', side['source_pdf_page'])}",
     )
     required = set(side.get("required_designators", []))
@@ -45,7 +46,7 @@ def compile_side(root, profile, side, *, primitives=None, outline=None):
             "page": side["source_pdf_page"],
             "form_xobject": primitives["form_name"],
             "bounds": primitives["bounds"],
-            "visible_bounds": primitives["visible_bounds"],
+            "visible_bounds": coordinate_bounds,
         },
         "audit": {
             "decoded_text_objects": len(primitives["labels"]),

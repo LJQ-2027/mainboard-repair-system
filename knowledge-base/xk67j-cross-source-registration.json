@@ -1,0 +1,975 @@
+{
+  "dataset_id": "XK67J-MAIN-XREG-20260731",
+  "board_id": "BOARD-XK67J-MAIN-V1.0B",
+  "model": "KM5",
+  "compatible_models": [
+    "KM4n",
+    "KM4k",
+    "KM5",
+    "KM5n",
+    "KM5s"
+  ],
+  "model_evidence": {
+    "KM4n": "photo_verified_shared_platform",
+    "KM4k": "owner_confirmed_alias",
+    "KM5": "engineering_source",
+    "KM5n": "owner_confirmed_alias",
+    "KM5s": "owner_confirmed_alias"
+  },
+  "board_version": "XK67J_MAIN_PCB_V1.0B",
+  "physical_board_revision": "XK67J_MAIN V1.0",
+  "side_id": "main_page_2",
+  "coordinate_system": "normalized_board_plane",
+  "status": "source_compiled_reference_only",
+  "board_outline": [
+    {
+      "x": 0.02375,
+      "y": 0.196753
+    },
+    {
+      "x": 0.043125,
+      "y": 0.161414
+    },
+    {
+      "x": 0.0625,
+      "y": 0.147087
+    },
+    {
+      "x": 0.068125,
+      "y": 0.13085
+    },
+    {
+      "x": 0.06875,
+      "y": 0.108883
+    },
+    {
+      "x": 0.07125,
+      "y": 0.103152
+    },
+    {
+      "x": 0.120625,
+      "y": 0.064947
+    },
+    {
+      "x": 0.141875,
+      "y": 0.063992
+    },
+    {
+      "x": 0.148125,
+      "y": 0.060172
+    },
+    {
+      "x": 0.15375,
+      "y": 0.042025
+    },
+    {
+      "x": 0.164375,
+      "y": 0.031519
+    },
+    {
+      "x": 0.32,
+      "y": 0.031519
+    },
+    {
+      "x": 0.325,
+      "y": 0.03916
+    },
+    {
+      "x": 0.325,
+      "y": 0.063992
+    },
+    {
+      "x": 0.33,
+      "y": 0.071633
+    },
+    {
+      "x": 0.395625,
+      "y": 0.071633
+    },
+    {
+      "x": 0.399375,
+      "y": 0.075454
+    },
+    {
+      "x": 0.400625,
+      "y": 0.148997
+    },
+    {
+      "x": 0.40375,
+      "y": 0.161414
+    },
+    {
+      "x": 0.414375,
+      "y": 0.17383
+    },
+    {
+      "x": 0.443125,
+      "y": 0.174785
+    },
+    {
+      "x": 0.449375,
+      "y": 0.183381
+    },
+    {
+      "x": 0.449375,
+      "y": 0.299904
+    },
+    {
+      "x": 0.454375,
+      "y": 0.30659
+    },
+    {
+      "x": 0.491875,
+      "y": 0.30659
+    },
+    {
+      "x": 0.491875,
+      "y": 0.30277
+    },
+    {
+      "x": 0.495625,
+      "y": 0.30277
+    },
+    {
+      "x": 0.495625,
+      "y": 0.30659
+    },
+    {
+      "x": 0.575,
+      "y": 0.30659
+    },
+    {
+      "x": 0.58,
+      "y": 0.298949
+    },
+    {
+      "x": 0.580625,
+      "y": 0.264565
+    },
+    {
+      "x": 0.585625,
+      "y": 0.258835
+    },
+    {
+      "x": 0.594375,
+      "y": 0.258835
+    },
+    {
+      "x": 0.58875,
+      "y": 0.249284
+    },
+    {
+      "x": 0.58875,
+      "y": 0.219675
+    },
+    {
+      "x": 0.595,
+      "y": 0.212034
+    },
+    {
+      "x": 0.60375,
+      "y": 0.212034
+    },
+    {
+      "x": 0.608125,
+      "y": 0.215855
+    },
+    {
+      "x": 0.610625,
+      "y": 0.234957
+    },
+    {
+      "x": 0.6225,
+      "y": 0.238777
+    },
+    {
+      "x": 0.623125,
+      "y": 0.258835
+    },
+    {
+      "x": 0.63125,
+      "y": 0.25979
+    },
+    {
+      "x": 0.64125,
+      "y": 0.272206
+    },
+    {
+      "x": 0.6725,
+      "y": 0.271251
+    },
+    {
+      "x": 0.68,
+      "y": 0.25979
+    },
+    {
+      "x": 0.688125,
+      "y": 0.258835
+    },
+    {
+      "x": 0.68875,
+      "y": 0.238777
+    },
+    {
+      "x": 0.70125,
+      "y": 0.234002
+    },
+    {
+      "x": 0.703125,
+      "y": 0.215855
+    },
+    {
+      "x": 0.70625,
+      "y": 0.212989
+    },
+    {
+      "x": 0.719375,
+      "y": 0.213945
+    },
+    {
+      "x": 0.7225,
+      "y": 0.219675
+    },
+    {
+      "x": 0.7225,
+      "y": 0.250239
+    },
+    {
+      "x": 0.716875,
+      "y": 0.258835
+    },
+    {
+      "x": 0.7325,
+      "y": 0.258835
+    },
+    {
+      "x": 0.736875,
+      "y": 0.262655
+    },
+    {
+      "x": 0.738125,
+      "y": 0.298949
+    },
+    {
+      "x": 0.740625,
+      "y": 0.30468
+    },
+    {
+      "x": 0.764375,
+      "y": 0.30659
+    },
+    {
+      "x": 0.769375,
+      "y": 0.298949
+    },
+    {
+      "x": 0.769375,
+      "y": 0.232092
+    },
+    {
+      "x": 0.78,
+      "y": 0.21681
+    },
+    {
+      "x": 0.780625,
+      "y": 0.179561
+    },
+    {
+      "x": 0.785625,
+      "y": 0.17383
+    },
+    {
+      "x": 0.805,
+      "y": 0.170965
+    },
+    {
+      "x": 0.81875,
+      "y": 0.151862
+    },
+    {
+      "x": 0.821875,
+      "y": 0.13467
+    },
+    {
+      "x": 0.8225,
+      "y": 0.082139
+    },
+    {
+      "x": 0.82875,
+      "y": 0.076409
+    },
+    {
+      "x": 0.91375,
+      "y": 0.078319
+    },
+    {
+      "x": 0.939375,
+      "y": 0.115568
+    },
+    {
+      "x": 0.95375,
+      "y": 0.117479
+    },
+    {
+      "x": 0.96875,
+      "y": 0.127985
+    },
+    {
+      "x": 0.979375,
+      "y": 0.146132
+    },
+    {
+      "x": 0.985,
+      "y": 0.168099
+    },
+    {
+      "x": 0.985,
+      "y": 0.193887
+    },
+    {
+      "x": 0.978125,
+      "y": 0.217765
+    },
+    {
+      "x": 0.978125,
+      "y": 0.276027
+    },
+    {
+      "x": 0.9675,
+      "y": 0.288443
+    },
+    {
+      "x": 0.965625,
+      "y": 0.30277
+    },
+    {
+      "x": 0.9725,
+      "y": 0.316141
+    },
+    {
+      "x": 0.995,
+      "y": 0.318052
+    },
+    {
+      "x": 0.999375,
+      "y": 0.324737
+    },
+    {
+      "x": 1.0,
+      "y": 0.870105
+    },
+    {
+      "x": 0.99125,
+      "y": 0.880611
+    },
+    {
+      "x": 0.975625,
+      "y": 0.878701
+    },
+    {
+      "x": 0.9675,
+      "y": 0.897803
+    },
+    {
+      "x": 0.954375,
+      "y": 0.908309
+    },
+    {
+      "x": 0.951875,
+      "y": 0.931232
+    },
+    {
+      "x": 0.948125,
+      "y": 0.940783
+    },
+    {
+      "x": 0.9425,
+      "y": 0.948424
+    },
+    {
+      "x": 0.934375,
+      "y": 0.952245
+    },
+    {
+      "x": 0.095,
+      "y": 0.951289
+    },
+    {
+      "x": 0.09125,
+      "y": 0.943649
+    },
+    {
+      "x": 0.09125,
+      "y": 0.922636
+    },
+    {
+      "x": 0.08875,
+      "y": 0.911175
+    },
+    {
+      "x": 0.08,
+      "y": 0.894938
+    },
+    {
+      "x": 0.06625,
+      "y": 0.886342
+    },
+    {
+      "x": 0.0425,
+      "y": 0.886342
+    },
+    {
+      "x": 0.0375,
+      "y": 0.877746
+    },
+    {
+      "x": 0.0375,
+      "y": 0.708691
+    },
+    {
+      "x": 0.035,
+      "y": 0.703916
+    },
+    {
+      "x": 0.0275,
+      "y": 0.702006
+    },
+    {
+      "x": 0.02375,
+      "y": 0.69532
+    }
+  ],
+  "registration": {
+    "reference_mode": "point_map_only",
+    "point_map_image": "assets/board-atlas/xk67j/main-point-map-page-2.png",
+    "point_map_source": "XK67J_MAIN_PCB_V1.0B Placement page 2",
+    "point_map_note": "XK67J V1.0B 第2面点位图；KM4n V1.0 实拍已保存，但尚未进入审核配准。",
+    "method": "normalized_point_map_registration",
+    "confidence": "source_compiled"
+  },
+  "physical_evidence": {
+    "status": "preserved_pending_reviewed_registration",
+    "board_revision": "XK67J_MAIN V1.0",
+    "source_scope": "owner_authorized_feishu_case_library",
+    "unique_image_sha256": [
+      "1a3e4bdb3f5019656cd0910544e4f825b0eb94c3f85bf6668c956cd6a757687d",
+      "28a193f9bbd0750240fb20477f5ec0497de7f279868b408eab7c872dcd0273d6",
+      "57a9b1d36326cd0a0b1cee3a0bc622290728cbb1b4775cfab5182b9b84138fa6"
+    ],
+    "images": [
+      {
+        "sha256": "1a3e4bdb3f5019656cd0910544e4f825b0eb94c3f85bf6668c956cd6a757687d",
+        "side_id": "main_page_2",
+        "view_scope": "full_board_repair_case",
+        "source_annotation_present": true,
+        "registration_status": "manual_registration_required",
+        "automatic_failure_code": "low_inlier_count",
+        "automatic_attempts": [
+          {
+            "detector": "orb",
+            "matches": 45,
+            "inliers": 10,
+            "inlier_ratio": 0.222222,
+            "failure_code": "low_inlier_ratio"
+          },
+          {
+            "detector": "akaze",
+            "matches": 40,
+            "inliers": 4,
+            "inlier_ratio": 0.1,
+            "failure_code": "low_inlier_count"
+          }
+        ]
+      },
+      {
+        "sha256": "57a9b1d36326cd0a0b1cee3a0bc622290728cbb1b4775cfab5182b9b84138fa6",
+        "side_id": "main_page_1",
+        "view_scope": "full_board_repair_case",
+        "source_annotation_present": false,
+        "registration_status": "manual_registration_required",
+        "automatic_failure_code": "low_inlier_count",
+        "automatic_attempts": [
+          {
+            "detector": "orb",
+            "matches": 22,
+            "inliers": 4,
+            "inlier_ratio": 0.181818,
+            "failure_code": "low_inlier_count"
+          },
+          {
+            "detector": "akaze",
+            "matches": 30,
+            "inliers": 5,
+            "inlier_ratio": 0.166667,
+            "failure_code": "low_inlier_count"
+          }
+        ]
+      },
+      {
+        "sha256": "28a193f9bbd0750240fb20477f5ec0497de7f279868b408eab7c872dcd0273d6",
+        "side_id": "main_page_2",
+        "view_scope": "full_board_repair_case",
+        "source_annotation_present": true,
+        "registration_status": "manual_registration_required",
+        "automatic_failure_code": "low_inlier_count",
+        "automatic_attempts": [
+          {
+            "detector": "orb",
+            "matches": 54,
+            "inliers": 20,
+            "inlier_ratio": 0.37037,
+            "failure_code": "invalid_projected_shape"
+          },
+          {
+            "detector": "akaze",
+            "matches": 45,
+            "inliers": 3,
+            "inlier_ratio": 0.066667,
+            "failure_code": "low_inlier_count"
+          }
+        ]
+      }
+    ],
+    "accuracy_boundary": "Preserved repair-case photos are not yet reviewed registrations, Golden Samples, defect labels, or training rows."
+  },
+  "repair_coverage": {
+    "status": "source_unavailable",
+    "title": "暂无可执行维修流程",
+    "note": "当前 XK67J 资料仅支持点位、器件类别和原理图索引；未提供经审核的机型维修步骤，系统不会生成维修动作。"
+  },
+  "repair_flows": [],
+  "entities": [
+    {
+      "component_id": "XK67J-MAIN-U1001",
+      "designator": "U1001",
+      "name": "Main processor",
+      "category": "bga_ic",
+      "module": "Processor",
+      "side_id": "main_page_1",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.633185,
+          "y": 0.732702
+        },
+        "size": {
+          "x": 0.025,
+          "y": 0.025
+        },
+        "rotation": 0,
+        "source_status": "location_only"
+      },
+      "schematic_links": [
+        {
+          "source": "XK67J_L6735-KM5_MAIN_SCH_V1.0B.pdf",
+          "page": "2, 3, 4, 5",
+          "facts": [
+            "Exact schematic designator U1001"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "square",
+        "height": 0.035,
+        "engineering_dimension": false
+      }
+    },
+    {
+      "component_id": "XK67J-MAIN-U2001",
+      "designator": "U2001",
+      "name": "MT6358W/A power management IC",
+      "category": "bga_ic",
+      "module": "Power management",
+      "side_id": "main_page_2",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.529121,
+          "y": 0.54301
+        },
+        "size": {
+          "x": 0.025,
+          "y": 0.025
+        },
+        "rotation": 0,
+        "source_status": "location_only"
+      },
+      "schematic_links": [
+        {
+          "source": "XK67J_L6735-KM5_MAIN_SCH_V1.0B.pdf",
+          "page": "6, 7",
+          "facts": [
+            "Exact schematic designator U2001"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "square",
+        "height": 0.035,
+        "engineering_dimension": false
+      }
+    },
+    {
+      "component_id": "XK67J-MAIN-U3001",
+      "designator": "U3001",
+      "name": "MT6177M RF transceiver",
+      "category": "bga_ic",
+      "module": "RF transceiver",
+      "side_id": "main_page_2",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.727423,
+          "y": 0.478919
+        },
+        "size": {
+          "x": 0.025,
+          "y": 0.025
+        },
+        "rotation": 0,
+        "source_status": "location_only"
+      },
+      "schematic_links": [
+        {
+          "source": "XK67J_L6735-KM5_MAIN_SCH_V1.0B.pdf",
+          "page": "12",
+          "facts": [
+            "Exact schematic designator U3001"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "square",
+        "height": 0.035,
+        "engineering_dimension": false
+      }
+    },
+    {
+      "component_id": "XK67J-MAIN-U3101",
+      "designator": "U3101",
+      "name": "RR88643-31M RF power amplifier",
+      "category": "ic",
+      "module": "RF power amplifier",
+      "side_id": "main_page_2",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.737186,
+          "y": 0.73787
+        },
+        "size": {
+          "x": 0.025,
+          "y": 0.025
+        },
+        "rotation": 0,
+        "source_status": "location_only"
+      },
+      "schematic_links": [
+        {
+          "source": "XK67J_L6735-KM5_MAIN_SCH_V1.0B.pdf",
+          "page": "13",
+          "facts": [
+            "Exact schematic designator U3101"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "square",
+        "height": 0.035,
+        "engineering_dimension": false
+      }
+    },
+    {
+      "component_id": "XK67J-MAIN-U4001",
+      "designator": "U4001",
+      "name": "LPDDR4 memory",
+      "category": "bga_ic",
+      "module": "Memory",
+      "side_id": "main_page_1",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.823145,
+          "y": 0.738664
+        },
+        "size": {
+          "x": 0.025,
+          "y": 0.025
+        },
+        "rotation": 0,
+        "source_status": "location_only"
+      },
+      "schematic_links": [
+        {
+          "source": "XK67J_L6735-KM5_MAIN_SCH_V1.0B.pdf",
+          "page": "17",
+          "facts": [
+            "Exact schematic designator U4001"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "square",
+        "height": 0.035,
+        "engineering_dimension": false
+      }
+    },
+    {
+      "component_id": "XK67J-MAIN-U4002",
+      "designator": "U4002",
+      "name": "eMMC storage",
+      "category": "bga_ic",
+      "module": "Storage",
+      "side_id": "main_page_2",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.187334,
+          "y": 0.706165
+        },
+        "size": {
+          "x": 0.025,
+          "y": 0.025
+        },
+        "rotation": 0,
+        "source_status": "location_only"
+      },
+      "schematic_links": [
+        {
+          "source": "XK67J_L6735-KM5_MAIN_SCH_V1.0B.pdf",
+          "page": "17",
+          "facts": [
+            "Exact schematic designator U4002"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "square",
+        "height": 0.035,
+        "engineering_dimension": false
+      }
+    },
+    {
+      "component_id": "XK67J-MAIN-U5007",
+      "designator": "U5007",
+      "name": "MT6631N wireless connectivity IC",
+      "category": "ic",
+      "module": "Wireless connectivity",
+      "side_id": "main_page_1",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.709679,
+          "y": 0.15765
+        },
+        "size": {
+          "x": 0.025,
+          "y": 0.025
+        },
+        "rotation": 0,
+        "source_status": "location_only"
+      },
+      "schematic_links": [
+        {
+          "source": "XK67J_L6735-KM5_MAIN_SCH_V1.0B.pdf",
+          "page": "18",
+          "facts": [
+            "Exact schematic designator U5007"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "square",
+        "height": 0.035,
+        "engineering_dimension": false
+      }
+    },
+    {
+      "component_id": "XK67J-MAIN-X2101",
+      "designator": "X2101",
+      "name": "OZ26000004 crystal",
+      "category": "crystal",
+      "module": "System clock",
+      "side_id": "main_page_2",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.632755,
+          "y": 0.367125
+        },
+        "size": {
+          "x": 0.025,
+          "y": 0.025
+        },
+        "rotation": 0,
+        "source_status": "location_only"
+      },
+      "schematic_links": [
+        {
+          "source": "XK67J_L6735-KM5_MAIN_SCH_V1.0B.pdf",
+          "page": "7",
+          "facts": [
+            "Exact schematic designator X2101"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "square",
+        "height": 0.035,
+        "engineering_dimension": false
+      }
+    },
+    {
+      "component_id": "XK67J-MAIN-J2810",
+      "designator": "J2810",
+      "name": "Battery connector",
+      "category": "connector",
+      "module": "Battery interconnect",
+      "side_id": "main_page_2",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.84867,
+          "y": 0.911852
+        },
+        "size": {
+          "x": 0.025,
+          "y": 0.025
+        },
+        "rotation": 0,
+        "source_status": "location_only"
+      },
+      "schematic_links": [
+        {
+          "source": "XK67J_L6735-KM5_MAIN_SCH_V1.0B.pdf",
+          "page": "10",
+          "facts": [
+            "Exact schematic designator J2810"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "rectangle",
+        "height": 0.02,
+        "engineering_dimension": false
+      }
+    },
+    {
+      "component_id": "XK67J-MAIN-J6102",
+      "designator": "J6102",
+      "name": "LCM and touch interconnect",
+      "category": "connector",
+      "module": "Display interconnect",
+      "side_id": "main_page_2",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.260529,
+          "y": 0.906194
+        },
+        "size": {
+          "x": 0.025,
+          "y": 0.025
+        },
+        "rotation": 0,
+        "source_status": "location_only"
+      },
+      "schematic_links": [
+        {
+          "source": "XK67J_L6735-KM5_MAIN_SCH_V1.0B.pdf",
+          "page": "20",
+          "facts": [
+            "Exact schematic designator J6102"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "rectangle",
+        "height": 0.02,
+        "engineering_dimension": false
+      }
+    },
+    {
+      "component_id": "XK67J-MAIN-J6402",
+      "designator": "J6402",
+      "name": "USB sub-board interconnect",
+      "category": "connector",
+      "module": "USB interconnect",
+      "side_id": "main_page_2",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.619162,
+          "y": 0.907121
+        },
+        "size": {
+          "x": 0.025,
+          "y": 0.025
+        },
+        "rotation": 0,
+        "source_status": "location_only"
+      },
+      "schematic_links": [
+        {
+          "source": "XK67J_L6735-KM5_MAIN_SCH_V1.0B.pdf",
+          "page": "25",
+          "facts": [
+            "Exact schematic designator J6402"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "rectangle",
+        "height": 0.02,
+        "engineering_dimension": false
+      }
+    },
+    {
+      "component_id": "XK67J-MAIN-J6501",
+      "designator": "J6501",
+      "name": "SIM connector",
+      "category": "connector",
+      "module": "SIM interconnect",
+      "side_id": "main_page_1",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.412365,
+          "y": 0.603401
+        },
+        "size": {
+          "x": 0.025,
+          "y": 0.025
+        },
+        "rotation": 0,
+        "source_status": "location_only"
+      },
+      "schematic_links": [
+        {
+          "source": "XK67J_L6735-KM5_MAIN_SCH_V1.0B.pdf",
+          "page": "26",
+          "facts": [
+            "Exact schematic designator J6501"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "rectangle",
+        "height": 0.02,
+        "engineering_dimension": false
+      }
+    }
+  ]
+}

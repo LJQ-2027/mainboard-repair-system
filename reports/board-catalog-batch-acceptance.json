@@ -147,6 +147,34 @@
       "point_map_source_layout": "shared_multi_page",
       "source_named_sides": false,
       "location_only_entities": 5
+    },
+    {
+      "board_key": "xk67j-shared",
+      "board_id": "BOARD-XK67J-MAIN-V1.0B",
+      "title": "KM4n / KM4k / KM5 / KM5n / KM5s · XK67J_MAIN_PCB_V1.0B",
+      "compatible_models": [
+        "KM4n",
+        "KM4k",
+        "KM5",
+        "KM5n",
+        "KM5s"
+      ],
+      "status": "pass",
+      "errors": [],
+      "side_ids": [
+        "main_page_1",
+        "main_page_2"
+      ],
+      "accepted_designators": 1040,
+      "schematic_linked_designators": 505,
+      "schematic_occurrences": 524,
+      "reviewed_entities": 12,
+      "repair_flows": 0,
+      "repair_coverage": "source_unavailable",
+      "reference_mode": "point_map_only",
+      "point_map_source_layout": "shared_multi_page",
+      "source_named_sides": false,
+      "location_only_entities": 12
     }
   ],
   "coverage": {
@@ -158,14 +186,16 @@
         "cm6-h8918",
         "ck6n-h6929",
         "bg6m-f069m",
-        "bg6h-f069"
+        "bg6h-f069",
+        "xk67j-shared"
       ]
     },
     "shared_platform_models": {
       "covered": true,
       "evidence": [
         "cm6-h8918",
-        "bg6h-f069"
+        "bg6h-f069",
+        "xk67j-shared"
       ]
     },
     "reference_modes": {
@@ -204,7 +234,8 @@
         "cm6-h8918",
         "ck6n-h6929",
         "bg6m-f069m",
-        "bg6h-f069"
+        "bg6h-f069",
+        "xk67j-shared"
       ]
     }
   },

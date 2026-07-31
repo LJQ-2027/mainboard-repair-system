@@ -49,6 +49,35 @@ class BoardProfileTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Unknown board profile"):
             load_profile(ROOT, "missing-board")
 
+    def test_loads_xk67j_with_evidence_tiered_sales_model_aliases(self):
+        profile = load_profile(ROOT, "xk67j-main-v1.0b")
+
+        self.assertEqual(profile["board_id"], "BOARD-XK67J-MAIN-V1.0B")
+        self.assertEqual(
+            profile["models"],
+            ["KM4n", "KM4k", "KM5", "KM5n", "KM5s"],
+        )
+        self.assertEqual(
+            profile["model_evidence"],
+            {
+                "KM4n": "photo_verified_shared_platform",
+                "KM4k": "owner_confirmed_alias",
+                "KM5": "engineering_source",
+                "KM5n": "owner_confirmed_alias",
+                "KM5s": "owner_confirmed_alias",
+            },
+        )
+        self.assertEqual([side["source_pdf_page"] for side in profile["sides"]], [1, 2])
+        self.assertTrue((ROOT / profile["point_map_source"]).is_file())
+        self.assertTrue((ROOT / profile["schematic_source"]).is_file())
+
+    def test_rejects_model_evidence_that_does_not_cover_every_alias(self):
+        profile = copy.deepcopy(load_profile(ROOT, "xk67j-main-v1.0b"))
+        del profile["model_evidence"]["KM5s"]
+
+        with self.assertRaisesRegex(ValueError, "model_evidence"):
+            validate_profile(ROOT, profile)
+
     def test_rejects_duplicate_side_identities(self):
         profile = copy.deepcopy(load_profile(ROOT, "kl4-f201"))
         profile["sides"][1]["side_id"] = profile["sides"][0]["side_id"]

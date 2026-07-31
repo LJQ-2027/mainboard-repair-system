@@ -99,6 +99,35 @@
       },
       "shield": null,
       "atlas": null
+    },
+    "xk67j-shared": {
+      "title": "KM4n / KM4k / KM5 / KM5n / KM5s · XK67J_MAIN_PCB_V1.0B",
+      "model": "KM5",
+      "compatible_models": [
+        "KM4n",
+        "KM4k",
+        "KM5",
+        "KM5n",
+        "KM5s"
+      ],
+      "model_evidence": {
+        "KM4n": "photo_verified_shared_platform",
+        "KM4k": "owner_confirmed_alias",
+        "KM5": "engineering_source",
+        "KM5n": "owner_confirmed_alias",
+        "KM5s": "owner_confirmed_alias"
+      },
+      "board_version": "XK67J_MAIN_PCB_V1.0B",
+      "physical_board_revision": "XK67J_MAIN V1.0",
+      "data": "../../knowledge-base/xk67j-cross-source-registration.json",
+      "schematic": "../../knowledge-base/xk67j-schematic-compiled.json",
+      "side_manifest": "../../knowledge-base/xk67j-board-sides.json",
+      "geometry_by_side": {
+        "main_page_1": "../../knowledge-base/xk67j-board-compiled-page-1.json",
+        "main_page_2": "../../knowledge-base/xk67j-board-compiled-page-2.json"
+      },
+      "shield": null,
+      "atlas": null
     }
   }
 }

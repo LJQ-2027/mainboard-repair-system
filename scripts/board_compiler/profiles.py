@@ -5,6 +5,11 @@ from pathlib import Path
 
 REGISTRY_PATH = Path("knowledge-base/board-compiler-profiles.json")
 DESIGNATOR_PATTERN = re.compile(r"^[A-Z][A-Z0-9_]*$")
+MODEL_EVIDENCE_LEVELS = {
+    "engineering_source",
+    "photo_verified_shared_platform",
+    "owner_confirmed_alias",
+}
 
 
 def _repository_path(root, value, field, *, must_exist=False):
@@ -30,11 +35,44 @@ def _validate_crop(crop, side_id):
         raise ValueError(f"{side_id} source_crop must be a positive normalized rectangle")
 
 
+def _validate_coordinate_bounds(bounds, side_id):
+    if bounds is None:
+        return
+    if (
+        not isinstance(bounds, list)
+        or len(bounds) != 4
+        or any(
+            not isinstance(value, (int, float)) or isinstance(value, bool)
+            for value in bounds
+        )
+        or bounds[2] <= bounds[0]
+        or bounds[3] <= bounds[1]
+    ):
+        raise ValueError(f"{side_id} coordinate_bounds must be [x0, y0, x1, y1]")
+
+
 def validate_profile(root, profile):
     required_text = ("profile_id", "model", "board_id", "board_version", "component_prefix", "default_side_id")
     for field in required_text:
         if not isinstance(profile.get(field), str) or not profile[field].strip():
             raise ValueError(f"{field} is required")
+
+    models = profile.get("models", [profile["model"]])
+    if (
+        not isinstance(models, list)
+        or not models
+        or any(not isinstance(model, str) or not model.strip() for model in models)
+        or len(models) != len(set(models))
+        or profile["model"] not in models
+    ):
+        raise ValueError("models must be unique nonempty sales models including model")
+    model_evidence = profile.get("model_evidence")
+    if model_evidence is not None and (
+        not isinstance(model_evidence, dict)
+        or set(model_evidence) != set(models)
+        or any(level not in MODEL_EVIDENCE_LEVELS for level in model_evidence.values())
+    ):
+        raise ValueError("model_evidence must assign one supported level to every model")
     if profile.get("outline_method", "engineering_marks") not in ("engineering_marks", "alpha_silhouette"):
         raise ValueError("outline_method must be engineering_marks or alpha_silhouette")
 
@@ -70,6 +108,7 @@ def validate_profile(root, profile):
             raise ValueError(f"{side_id} component_page must be a positive integer")
         component_pages.append(component_page)
         _validate_crop(side.get("source_crop"), side_id)
+        _validate_coordinate_bounds(side.get("coordinate_bounds"), side_id)
         for field in ("engineering_texture", "compiled_data"):
             _repository_path(root, side.get(field), f"{side_id}.{field}")
             outputs.append(side[field])

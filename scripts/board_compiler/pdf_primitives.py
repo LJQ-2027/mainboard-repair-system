@@ -85,6 +85,52 @@ def _xobject_clip_bounds(page, reader, form_name):
     return None
 
 
+def _extract_visitor_labels(page):
+    labels = []
+
+    def visit_text(text, current_matrix, text_matrix, font, _font_size):
+        value = text.strip()
+        if not value:
+            return
+        matrix = multiply_matrix(current_matrix, text_matrix)
+        point = transform_point(matrix, 0, 0)
+        labels.append({
+            "text": value,
+            "x": point["x"],
+            "y": point["y"],
+            "font": str(font.get("/BaseFont", "")) if font else "",
+        })
+
+    page.extract_text(visitor_text=visit_text)
+    return labels
+
+
+def _page_display_matrix(page):
+    rotation = int(page.get("/Rotate", 0)) % 360
+    width = float(page.mediabox.width)
+    height = float(page.mediabox.height)
+    if rotation == 90:
+        return [0, -1, 1, 0, 0, width]
+    if rotation == 180:
+        return [-1, 0, 0, -1, width, height]
+    if rotation == 270:
+        return [0, 1, -1, 0, height, 0]
+    return None
+
+
+def _transform_bounds(matrix, bounds):
+    rectangle = transform_rectangle(
+        matrix,
+        [bounds[0], bounds[1], bounds[2] - bounds[0], bounds[3] - bounds[1]],
+    )
+    return [
+        rectangle["x"],
+        rectangle["y"],
+        rectangle["x"] + rectangle["width"],
+        rectangle["y"] + rectangle["height"],
+    ]
+
+
 def extract_form_primitives(pdf_path, page_number):
     reader = PdfReader(str(pdf_path))
     page = reader.pages[page_number - 1]
@@ -124,11 +170,33 @@ def extract_form_primitives(pdf_path, page_number):
             if text:
                 labels.append({"text": text, "x": matrix[4], "y": matrix[5], "font": active_font})
 
+    label_method = "embedded_cmap"
+    if not labels:
+        labels = _extract_visitor_labels(page)
+        label_method = "pypdf_visitor_fallback"
+
+    display_matrix = _page_display_matrix(page) if not source["is_form"] else None
+    if display_matrix:
+        labels = [
+            {**label, **transform_point(display_matrix, label["x"], label["y"])}
+            for label in labels
+        ]
+        rectangles = [
+            transform_rectangle(
+                display_matrix,
+                [rectangle["x"], rectangle["y"], rectangle["width"], rectangle["height"]],
+            )
+            for rectangle in rectangles
+        ]
+        bounds = _transform_bounds(display_matrix, bounds)
+        visible_bounds = _transform_bounds(display_matrix, visible_bounds)
+
     return {
         "form_name": form_name,
         "bounds": bounds,
         "visible_bounds": visible_bounds,
         "labels": labels,
+        "label_method": label_method,
         "rectangles": rectangles,
         "operator_counts": operator_counts,
     }

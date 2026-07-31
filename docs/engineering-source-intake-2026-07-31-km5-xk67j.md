@@ -46,12 +46,41 @@ plus reviewed two-side structural landmarks.
 - Do not create a Golden Sample, defect label, training label, or repair-causality
   conclusion from this compatibility decision.
 
-## Next implementation increment
+## Implementation result
 
-1. Add `XK67J` as a shared board-catalog profile with KM4n/KM4k/KM5/KM5n/KM5s
-   aliases and an explicit V1.0/V1.0B compatibility note.
-2. Compile both Main Placement pages and the 28-page Main SCH.
-3. Run the existing catalog/batch source audit.
-4. Register and review the three unique KM4n image byte streams.
-5. Keep any model-specific repair workflow unavailable until supporting source
-   evidence is selected and reviewed.
+The first compiler increment is complete:
+
+- catalog profile `xk67j-main-v1.0b` exposes the five aliases with separate
+  evidence levels;
+- the two Main Placement pages compile to 319 and 721 accepted designators,
+  for 1,040 positions in total;
+- the 28-page Main SCH compiles to 505 linked designators and 524 occurrences;
+- twelve reviewed repair entities have both Placement locations and exact SCH
+  page links;
+- the seven-board batch acceptance gate passes all seven catalog profiles; and
+- desktop plus 390 px browser QA passes point-map/model switching, both board
+  sides, component selection, pan/drag, readable responsive layout, and zero
+  runtime errors.
+
+The Placement PDF describes package outlines primarily as path line segments,
+not standard rectangle operators. The conservative compiler therefore recovered
+zero footprint candidates. This does not mean that the source contains no
+components; it means that the current automated result supports normalized
+locations and board outline only. The workbench deliberately uses small generic
+location geometry and does not claim exact package size or height.
+
+All three independent KM4n image byte streams are complete-board repair-case
+views. Two contain source red rectangles; those rectangles remain source
+annotations, not defect labels. Automatic ORB/AKAZE registration against the
+line-art point maps produced no valid candidate:
+
+- exposed side, image `1a3e4b...`: ORB 45 matches / 10 inliers; AKAZE 40 / 4;
+- shield side, image `57a9b1...`: ORB 22 / 4; AKAZE 30 / 5; and
+- exposed side, image `28a193...`: ORB 54 / 20 but invalid projected shape;
+  AKAZE 45 / 3.
+
+Each photo is preserved as `manual_registration_required`. No reviewed
+homography, Golden Sample, defect label, training row, field-accuracy result, or
+repair causality has been created. The next evidence action is reviewed manual
+four-point registration with independent check points; the next knowledge action
+is a source-backed XK67J repair workflow, if one is supplied and reviewed.

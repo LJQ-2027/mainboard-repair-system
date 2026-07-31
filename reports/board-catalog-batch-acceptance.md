@@ -12,18 +12,19 @@ Catalog: `REPAIR-WORKBENCH-BOARDS-V1`
 | `ck6n-h6929` | PASS | 1,177 | 506 | 10 | 4 | `point_map_only` | `reviewed_flows` |
 | `bg6m-f069m` | PASS | 1,115 | 604 | 10 | 0 | `point_map_only` | `source_unavailable` |
 | `bg6h-f069` | PASS | 1,126 | 604 | 12 | 0 | `point_map_only` | `source_available_pending_review` |
+| `xk67j-shared` | PASS | 1,040 | 505 | 12 | 0 | `point_map_only` | `source_unavailable` |
 
 ## Coverage Gates
 
 | Gate | Result | Evidence |
 | --- | --- | --- |
-| Five or more board platforms | PASS | km4-f151, kl4-f201, cm6-h8918, ck6n-h6929, bg6m-f069m, bg6h-f069 |
-| Shared platform across sales models | PASS | cm6-h8918, bg6h-f069 |
+| Five or more board platforms | PASS | km4-f151, kl4-f201, cm6-h8918, ck6n-h6929, bg6m-f069m, bg6h-f069, xk67j-shared |
+| Shared platform across sales models | PASS | cm6-h8918, bg6h-f069, xk67j-shared |
 | Photo-proxy and point-map-only references | PASS | photo_proxy, point_map_only |
 | Reviewed-flow and reference-only repair coverage | PASS | reviewed_flows, source_available_pending_review, source_unavailable |
 | Shared and independent point-map source layouts | PASS | independent_per_side, shared_multi_page |
 | Source-named board sides | PASS | ck6n-h6929 |
-| Confidence-limited location-only entities | PASS | km4-f151, kl4-f201, cm6-h8918, ck6n-h6929, bg6m-f069m, bg6h-f069 |
+| Confidence-limited location-only entities | PASS | km4-f151, kl4-f201, cm6-h8918, ck6n-h6929, bg6m-f069m, bg6h-f069, xk67j-shared |
 
 ## Scope Boundaries
 
