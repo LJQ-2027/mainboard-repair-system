@@ -140,64 +140,6 @@ function addIcPackage(group, descriptor) {
   group.add(dot);
 }
 
-function addInspectionPmicPackage(group, descriptor) {
-  const { x, y, z } = descriptor.dimensions;
-  const radius = Math.min(x, y) * 0.075;
-  const substrateMaterial = material('copper', { color: 0x4d5948, roughness: 0.52, metalness: 0.3 });
-  const substrate = new THREE.Mesh(
-    new THREE.ExtrudeGeometry(roundedRectShape(x, y, radius * 0.72), {
-      depth: z * 0.24,
-      bevelEnabled: true,
-      bevelSize: Math.min(radius * 0.24, 0.003),
-      bevelThickness: 0.0015,
-      bevelSegments: 2,
-    }),
-    substrateMaterial,
-  );
-  group.add(substrate);
-  const substrateEdge = new THREE.LineSegments(
-    new THREE.EdgesGeometry(substrate.geometry, 24),
-    new THREE.LineBasicMaterial({ color: 0x9b7742, transparent: true, opacity: 0.78 }),
-  );
-  group.add(substrateEdge);
-
-  const body = new THREE.Mesh(
-    new THREE.ExtrudeGeometry(roundedRectShape(x * 0.94, y * 0.94, radius), {
-      depth: z * 0.7,
-      bevelEnabled: true,
-      bevelSize: Math.min(radius * 0.55, 0.006),
-      bevelThickness: Math.min(z * 0.08, 0.003),
-      bevelSegments: 3,
-    }),
-    material('black', { color: 0x151a19, roughness: 0.38, metalness: 0.2 }),
-  );
-  body.position.z = z * 0.22;
-  group.add(body);
-
-  const top = new THREE.Mesh(
-    new THREE.ShapeGeometry(roundedRectShape(x * 0.76, y * 0.72, radius * 0.65)),
-    material('dark', { color: 0x29302e, roughness: 0.5, metalness: 0.12 }),
-  );
-  top.position.z = z * 0.94;
-  group.add(top);
-
-  const dotRadius = Math.max(Math.min(x, y) * 0.045, 0.003);
-  const dot = new THREE.Mesh(
-    new THREE.CircleGeometry(dotRadius, 24),
-    material('ceramic', { color: 0xa6ada8, roughness: 0.62 }),
-  );
-  dot.position.set(-x * 0.31, y * 0.31, z * 0.955);
-  group.add(dot);
-
-  const edge = new THREE.LineSegments(
-    new THREE.EdgesGeometry(body.geometry, 24),
-    new THREE.LineBasicMaterial({ color: 0x4f5955, transparent: true, opacity: 0.72 }),
-  );
-  edge.position.copy(body.position);
-  group.add(edge);
-  group.userData.inspectionProfileId = descriptor.inspectionProfile.profile_id;
-}
-
 function addInspectionBgaPackage(group, descriptor) {
   const { x, y, z } = descriptor.dimensions;
   const radius = Math.min(x, y) * 0.065;
@@ -356,13 +298,12 @@ function addGenericPackage(group, descriptor) {
   group.add(box(x, y, z, material(descriptor.family === 'led' ? 'ceramic' : 'dark', descriptor.family === 'led' ? { color: 0x9fcbb5 } : {})));
 }
 
-function createPackageMesh(descriptor, detailLevel = 'board') {
+export function createPackageMesh(descriptor, detailLevel = 'board') {
   const refined = buildComponentVisual(descriptor, detailLevel);
   if (refined.group) return refined.group;
 
   const group = new THREE.Group();
-  if (descriptor.visualAsset === 'reviewed-pmic') addInspectionPmicPackage(group, descriptor);
-  else if (descriptor.visualAsset === 'reviewed-bga') addInspectionBgaPackage(group, descriptor);
+  if (descriptor.visualAsset === 'reviewed-bga') addInspectionBgaPackage(group, descriptor);
   else if (descriptor.visualAsset === 'reviewed-crystal') addInspectionCrystalPackage(group, descriptor);
   else if (descriptor.family === 'passive') addPassivePackage(group, descriptor);
   else if (descriptor.family === 'ic') addIcPackage(group, descriptor);

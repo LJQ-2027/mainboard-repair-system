@@ -275,6 +275,13 @@ test('reviewed connector profiles use the reusable component visual builder', ()
   assert.doesNotMatch(rendererSource, /j6101/i);
 });
 
+test('reviewed PMIC profiles use the reusable builder with generic IC fallback', () => {
+  assert.doesNotMatch(rendererSource, /function addInspectionPmicPackage/);
+  assert.doesNotMatch(rendererSource, /visualAsset === 'reviewed-pmic'/);
+  assert.match(rendererSource, /else if \(descriptor\.family === 'ic'\) addIcPackage/);
+  assert.doesNotMatch(rendererSource, /u2001/i);
+});
+
 test('component inspection switches visual detail and restores board detail in order', () => {
   const enterSource = rendererSource.slice(
     rendererSource.indexOf('async setComponentInspection'),

@@ -144,6 +144,15 @@ test('J6101 descriptor carries reusable visual-spec identity', () => {
   assert.equal(descriptor.componentVisualSpecId, 'connector-j6101-repair-visual-v1');
 });
 
+test('U2001 descriptor carries reusable IC BGA identity and provenance metadata', () => {
+  const source = component('bga_ic', 'reviewed', { x: 0.096, y: 0.135 });
+  source.inspection_profile = { profile_id: 'u2001-pmic-v1', fidelity: 'repair_visual' };
+  const descriptor = buildRenderDescriptor(source, { reviewed: true });
+  assert.equal(descriptor.componentVisualSpecId, 'ic-bga-u2001-repair-visual-v1');
+  assert.equal(descriptor.visualAsset, 'reviewed-pmic');
+  assert.equal(descriptor.family, 'ic');
+});
+
 test('descriptors without a reusable visual spec carry a null identity', () => {
   const source = component('connector', 'reviewed', { x: 0.157, y: 0.079 });
   source.inspection_profile = { profile_id: 'unknown-profile', fidelity: 'repair_visual' };
