@@ -154,7 +154,7 @@ test('the shared BGA spec declares normalized structure and U2001 detail part na
     top: { width: 0.72, depth: 0.68, height: 0.045, radius: 0.05, lift: 0.84 },
     marker: {
       radius: 0.04,
-      offset_x: -0.31,
+      offset_x: 0.31,
       offset_y: 0.31,
       height: 0.02,
       lift: 0.89,
@@ -310,6 +310,14 @@ test('the approved J6101 spec passes every source-bound validation rule', () => 
 
 test('the approved U2001 spec passes every IC BGA family validation rule', () => {
   const result = validate(U2001_PMIC_VISUAL_SPEC);
+  assert.deepEqual(result, { valid: true, errors: [] });
+  assert.deepEqual(Object.keys(result), ['valid', 'errors']);
+  assert.equal(Object.isFrozen(result), true);
+  assert.equal(Object.isFrozen(result.errors), true);
+});
+
+test('the approved shared BGA spec passes every IC BGA family validation rule', () => {
+  const result = validate(SHARED_BGA_VISUAL_SPEC);
   assert.deepEqual(result, { valid: true, errors: [] });
   assert.deepEqual(Object.keys(result), ['valid', 'errors']);
   assert.equal(Object.isFrozen(result), true);
@@ -592,7 +600,7 @@ test('the shared BGA visual specification is deeply immutable where consumed', (
   ].forEach((value) => assert.equal(Object.isFrozen(value), true));
   assert.throws(() => SHARED_BGA_VISUAL_SPEC.inspection_profiles.push('extra'), TypeError);
   assert.throws(() => {
-    SHARED_BGA_VISUAL_SPEC.structure.marker.offset_x = 0.31;
+    SHARED_BGA_VISUAL_SPEC.structure.marker.offset_x = 0.2;
   }, TypeError);
 });
 

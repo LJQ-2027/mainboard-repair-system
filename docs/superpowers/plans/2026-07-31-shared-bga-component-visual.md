@@ -139,7 +139,7 @@ export const SHARED_BGA_VISUAL_SPEC = Object.freeze({
     }),
     marker: Object.freeze({
       radius: 0.04,
-      offset_x: -0.31,
+      offset_x: 0.31,
       offset_y: 0.31,
       height: 0.02,
       lift: 0.89,

@@ -48,7 +48,7 @@ They do not establish:
 - die or internal structure;
 - millimeter dimensions.
 
-The visible direction cue remains a generic orientation aid. It must not be described as a source-confirmed pin-one marker.
+The visible direction cue remains a generic orientation aid. Its stable positive-quadrant position (`offset_x: 0.31`, `offset_y: 0.31`) is not source-confirmed and must not be described as Pin 1 or a pin-one marker.
 
 ## Options Considered
 
@@ -104,6 +104,8 @@ The visible hierarchy remains:
 - inset top;
 - generic orientation cue;
 - isolated-only substrate/body/top edge treatment.
+
+The marker uses the normalized positive-quadrant offset `offset_x: 0.31` and `offset_y: 0.31`. This placement is only a stable generic cue, not a claim about Pin 1 or the package's real orientation.
 
 The shared BGA structure may preserve the current reviewed-BGA proportions where they fit the normalized family contract. It must remain inside descriptor bounds for every valid descriptor.
 
