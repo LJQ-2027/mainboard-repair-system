@@ -481,7 +481,7 @@ Record:
 - local branch and commit hashes;
 - no P4/deployment.
 
-- [ ] **Step 2: Run independent final review**
+- [x] **Step 2: Run independent final review**
 
 Review the complete implementation from `a6917af..HEAD`. Fix P1/P2 findings and re-run affected validation.
 
@@ -489,14 +489,14 @@ Review the complete implementation from `a6917af..HEAD`. Fix P1/P2 findings and 
 
 Verify Git, Vault, ledger, P0-P4, encoding, remote-sync state, and handoff.
 
-- [ ] **Step 4: Commit implementation documentation**
+- [x] **Step 4: Commit implementation documentation**
 
 ```powershell
 git add docs/km4-cross-source-registration-2026-07-13.md docs/superpowers/plans/2026-07-31-shared-bga-component-visual.md
 git commit -m "docs: verify shared BGA visual migration"
 ```
 
-- [ ] **Step 5: Commit the enablement ledger**
+- [x] **Step 5: Commit the enablement ledger**
 
 ```powershell
 git -C G:\Programming\mainboard-repair-enablement add PROJECT_LEDGER.md
