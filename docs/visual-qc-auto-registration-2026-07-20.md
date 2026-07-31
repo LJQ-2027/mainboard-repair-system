@@ -2,9 +2,9 @@
 
 ## Status
 
-The first server-side visual registration core, including ORB/AKAZE processing, persisted asynchronous jobs, and reviewed manual fallback, is deployed in production revision `f278061`. Historical local-only cases retain `VISUAL-QC-CASE-V1`; server-connected workbench drafts use `VISUAL-QC-CASE-V2` with recovery, reviewed registration, Golden state, and difference-review state.
+The server-side visual registration core and its later admission hardening are deployed in production revision `08d08cd38aaffc9b01d901dfe9ef7684a614abac`. This includes ORB/AKAZE processing, persisted asynchronous jobs, manual fallback, qualified handoff provenance, Admin List V2, Admin Detail V3, browser physical-upload removal, and governed repair-evidence projections. Historical local-only cases retain `VISUAL-QC-CASE-V1`; server-connected workbench drafts use `VISUAL-QC-CASE-V2` with recovery, reviewed registration, Golden state, and difference-review state.
 
-Later admission hardening is local only: qualified handoff provenance, Admin List V2, Admin Detail V3, and browser physical-upload removal are not deployed. Qualified handoff must not target production until a separately approved deployment and migration verification completes.
+Production admission remains fail-closed: qualified handoff must still pass source audit, physical acceptance, dry-run validation, controlled credentials, and server-side provenance checks. Deployment does not admit existing local evidence or authorize a visual conclusion.
 
 The implementation consists of:
 

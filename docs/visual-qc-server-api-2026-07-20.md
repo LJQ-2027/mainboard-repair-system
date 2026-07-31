@@ -2,16 +2,16 @@
 
 ## Status
 
-This document describes the **Local HEAD contract**. Milo is the only source of real visual photos; Codex operates intake, registration, annotation, Golden Sample management, and export as the data administrator. Overseas technicians do not upload photos and do not use the internal visual data workbench.
+This document describes the current server contract. Milo is the only source of real visual photos; Codex operates intake, registration, annotation, Golden Sample management, and export as the data administrator. Overseas technicians do not upload photos and do not use the internal visual data workbench.
 
-Production remains `f278061`. That deployed revision returns Create/Get `VISUAL-QC-SERVER-CASE-V1`, Admin List `VISUAL-QC-ADMIN-CASE-LIST-V1`, and Admin Detail `VISUAL-QC-SERVER-CASE-V2`; it predates qualified handoff, List V2, Detail V3, and browser physical-upload removal. The qualified-handoff CLI must not target production until a separately approved deployment and migration verification completes.
+Production is `08d08cd38aaffc9b01d901dfe9ef7684a614abac`. It provides qualified handoff provenance, Health V2, Admin List V2, Admin Detail V3, governed dataset exits, browser physical-upload removal, and repair-evidence link projection. The qualified-handoff CLI may target production only after source audit, physical acceptance, successful dry-run, and controlled credential validation.
 
 ## Upgrade Preflight Boundary
 
-Local HEAD includes `VISUAL-QC-UPGRADE-PREFLIGHT-V1`; deployed `f278061` does
-not. Before a future deployment can switch the app directory or Visual-QC
-virtualenv, the candidate runtime must rehearse its migration against the
-deployment-owned consistent rollback snapshot and the persistent object root.
+Production deployment uses `VISUAL-QC-UPGRADE-PREFLIGHT-V1`. Before any future
+deployment can switch the app directory or Visual-QC virtualenv, the candidate
+runtime must rehearse its migration against the deployment-owned consistent
+rollback snapshot and the persistent object root.
 
 The rehearsal verifies the exact source snapshot SHA-256, additive SQLite
 migration, shared legacy row digests, managed-object hashes, Health V2, Admin
@@ -20,9 +20,9 @@ old-runtime rollback readability. The deployment script fails closed unless
 the report is passed and bound to the candidate commit. See
 `docs/visual-qc-upgrade-preflight-2026-07-23.md`.
 
-This is a deployment gate, not a production deployment record. Production
-remains `f278061` until separately approved deployment and post-switch P4
-verification are complete.
+The first production use of this gate completed on 2026-07-31 for
+`08d08cd38aaffc9b01d901dfe9ef7684a614abac`; the gate remains mandatory for
+every later deployment.
 
 ## Runtime
 
@@ -124,7 +124,7 @@ python scripts/handoff_visual_qc_physical_package.py `
   --wait
 ```
 
-This example targets an isolated local integration service. Do not substitute the production URL while production remains `f278061`. The handoff tool revalidates the immutable source package, archived intake, acceptance report, source images, and overlays before it calls the low-level resumable importer. The importer remains an internal transport primitive; it cannot synthesize qualified provenance and direct physical import fails closed. Credentials are never embedded in manifests or receipts. The browser does not create new physical server cases.
+This example targets an isolated local integration service. Production may be used only with the controlled credential file after source audit, physical acceptance, and a successful dry-run. The handoff tool revalidates the immutable source package, archived intake, acceptance report, source images, and overlays before it calls the low-level resumable importer. The importer remains an internal transport primitive; it cannot synthesize qualified provenance and direct physical import fails closed. Credentials are never embedded in manifests or receipts. The browser does not create new physical server cases.
 
 ## Data-Administrator Case Catalog
 
@@ -287,6 +287,7 @@ repair case revision
 -> inspect in internal workbench
 ```
 
-This implementation and the local CASE005 projection are local evidence only.
-Production remains unchanged at `f278061`; no production deployment, database,
-or route was changed by this work.
+The CASE005 controlled-library publication and local projection remain local
+evidence only. The capability was deployed later at
+`08d08cd38aaffc9b01d901dfe9ef7684a614abac` without transferring that evidence
+or creating a visual conclusion.

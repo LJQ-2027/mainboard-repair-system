@@ -151,7 +151,7 @@ Generate the physical acceptance report and overlays, then run the acceptance-qu
   --dry-run
 ```
 
-Production remains `f278061` and does not yet implement the qualified-handoff contract. Do not target production until a separately approved deployment and migration verification completes. For isolated local integration, transfer the same qualified handoff to the loopback API:
+Production `08d08cd38aaffc9b01d901dfe9ef7684a614abac` implements the qualified-handoff contract. Use production only with the controlled credential file after source audit, physical acceptance, and a successful dry-run. For isolated local integration, transfer the same qualified handoff to the loopback API:
 
 ```powershell
 .\.venv\Scripts\python.exe scripts\handoff_visual_qc_physical_package.py `
@@ -211,10 +211,11 @@ case ids, board-side assignments, errors, and evidence boundaries.
 
 The V2 repair-case publication is not visual diagnosis evidence, not confirmed defect evidence, not Golden Sample evidence, not training label evidence, not repair causality evidence, and not field accuracy evidence. The
 remaining real-data gates are human QC conclusions tied through a separately
-approved evidence link, annotation-to-footprint verification, a Milo-confirmed
-normal Golden Sample, and production deployment of the qualified-handoff
-contract. Production remains `f278061`; this local case publication did not
-modify production.
+approved evidence link, annotation-to-footprint verification, and a
+Milo-confirmed normal Golden Sample. At publication time production was
+`f278061`; this local case publication did not modify production. The
+qualified-handoff capability was deployed later without transferring this
+local evidence.
 Synthetic transforms and 21 Service Manual images remain proxy software
 evidence only; they must not be described as physical accuracy or used to
 train a production defect model.
@@ -247,6 +248,7 @@ repair case revision
 -> inspect in internal workbench
 ```
 
-This implementation and the local CASE005 projection are local evidence only.
-Production remains unchanged at `f278061`; no production deployment, database,
-or route was changed by this work.
+The CASE005 controlled-library publication and local projection remain local
+evidence only. The capability was later deployed at
+`08d08cd38aaffc9b01d901dfe9ef7684a614abac`, but no CASE005 local evidence was
+transferred and no visual conclusion was created by deployment.

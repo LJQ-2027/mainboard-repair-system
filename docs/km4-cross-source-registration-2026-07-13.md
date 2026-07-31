@@ -511,3 +511,11 @@ Shared BGA component-visual migration on 2026-07-31:
 - The Chrome extension and native host were installed and healthy, but extension runtime bootstrap failed with `TypeError: Cannot redefine property: process`; P3 therefore used Playwright controlling the installed Chrome executable. Machine-readable evidence and screenshots are under the ignored `output/playwright/shared-bga-component-visual/` directory.
 - Independent final review of `a6917af..757939c` found no P1/P2 issue. Residual risk is limited to one representative connectivity-board browser route, ignored local P3 evidence, and the low-probability case where an underlying Three.js resource `dispose()` method itself throws.
 - Work is local on branch `codex/shared-bga-component-visual`, based on `a6917af`, with implementation and automated-validation commits through `0e39849`. Production remains `f278061`; no P4, deployment, or remote push was performed.
+
+Production deployment on 2026-07-31:
+
+- The completed shared-BGA branch was pushed to `origin/codex/shared-bga-component-visual`, and implementation commit `08d08cd38aaffc9b01d901dfe9ef7684a614abac` was deployed to the controlled beta server.
+- The deployment manifest bound a 60,908,808-byte runtime archive, SHA-256 `fb11d084a5d2597001f46c36bb2cdb5ae8701ee1eca194886e5eca6713774f07`, and 37 reviewed runtime paths. Immutable input/extraction checks and the full `f278061` database migration/rollback rehearsal passed before service switching.
+- Both PM2 services are online. Health V2 reports one worker, one preserved case, one succeeded job, zero failed jobs, zero Golden Samples, and normal storage pressure. Dataset audit remains `0` eligible / `1` excluded with `non_physical_evidence: 1`.
+- Production HTTPS P4 at 1600x900 and 390x844 verified U4000, U0600, and H8918 U5007 on `ic-bga-shared-package-repair-visual-v1`; mouse/touch rotation, wheel/pinch zoom, return visibility, zero overflow/overlap, and zero browser runtime errors passed.
+- Access control remains fail-closed: unauthenticated root returns `401`, and the restricted account receives `403` on the admin case catalog. P4 evidence is retained under ignored `output/playwright/shared-bga-production-p4/`.

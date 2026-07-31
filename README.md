@@ -29,7 +29,7 @@ V3 `supporting_only` 用于只有维修过程补充照片、没有来源包链�
 
 缺少 `--source-package` 仅对 V3 `supporting_only` 有效。`source_capture_stage` 保留来源原文，不是 Visual-QC stage。该路径不创建 derivative、registration、Golden、QC、annotation、training、API、server 或 production record。V1/V2 package-linked 行为保持不变。Milo 仍是唯一真实材料来源，Codex 仍在 owner-operated 边界内作为唯一数据操作员；这不是 technician upload。
 
-首个 V2 实例已在仓库外受控库发布：`case-005-bg6-f069` revision 1，`board_key=bg6h-f069`，`board_id=BOARD-F069-MAIN-V1.2`，manifest SHA-256 `85c8c64cb97cf1ea1e567e4d1f7fc62ec00ebf02719939c74a5e0faf46298177`，schema 为 `VISUAL-QC-REPAIR-CASE-SOURCE-V2`，身份状态为 `unresolved_alias`，`model_identity_resolved=false`，完整度为 `symptom_linked`。来源报告机型 `TECNO/BG6`，目录机型为 `BG6H/BG6h`；在新增证据前不得强行归一。该事实源不是视觉诊断证据、不是缺陷确认证据、不是 Golden Sample 证据、不是训练标签证据、不是维修因果证据、不是现场精度证据。Production remains `f278061`; CASE005 的本地发布没有修改服务器、API、数据库或生产环境。
+首个 V2 实例已在仓库外受控库发布：`case-005-bg6-f069` revision 1，`board_key=bg6h-f069`，`board_id=BOARD-F069-MAIN-V1.2`，manifest SHA-256 `85c8c64cb97cf1ea1e567e4d1f7fc62ec00ebf02719939c74a5e0faf46298177`，schema 为 `VISUAL-QC-REPAIR-CASE-SOURCE-V2`，身份状态为 `unresolved_alias`，`model_identity_resolved=false`，完整度为 `symptom_linked`。来源报告机型 `TECNO/BG6`，目录机型为 `BG6H/BG6h`；在新增证据前不得强行归一。该事实源不是视觉诊断证据、不是缺陷确认证据、不是 Golden Sample 证据、不是训练标签证据、不是维修因果证据、不是现场精度证据。CASE005 本地发布当时未修改 `f278061` 生产服务器；后续能力部署也没有传输该本地证据或改变其证据边界。
 
 案例材料的唯一顺序为：`stage source package(s) -> source audit -> stage repair case revision -> validate append-only case chain -> later physical acceptance on selected photo package`。Milo 只需提供原始材料和已知背景；Codex 负责稳定 ID、来源包角色、结构化转录和缺失字段报告。维修案例入库不包含组织审批，也不允许根据照片猜机型、板面、故障或维修结果。
 
@@ -61,7 +61,7 @@ V3 `supporting_only` 用于只有维修过程补充照片、没有来源包链�
 
 当前本地 HEAD 的数据管理员工作台支持服务器案例目录、原图恢复、任务轮询、自动候选叠图确认、人工四点回退、Golden Sample、差异热图和候选确认/驳回/暂缓；新实物案例只能由验收合格交接命令创建，浏览器没有直接上传入口。服务器侧包含批次与案例溯源、采集身份防污染、确定性合成透视、ORB/AKAZE 特征、RANSAC 单应性、结构化失败原因、持久化人工结论、磁盘压力健康状态和受控留存清理。
 
-生产仍为 `f278061`，地址是 `https://cccsat.top/mb-repair-beta/`。该生产版本早于 qualified handoff、List V2、Detail V3 和浏览器上传移除，不能作为当前本地 HEAD 契约的验证环境，也不能接收 qualified handoff。只有单独批准并完成部署与迁移验证后，生产才切换到本地 HEAD 口径。操作与数据边界见 `docs/visual-qc-capture-intake-spec-2026-07-20.md`、`docs/visual-qc-workbench-2026-07-17.md` 和 `docs/visual-qc-server-api-2026-07-20.md`。
+生产已于 2026-07-31 升级到 `08d08cd38aaffc9b01d901dfe9ef7684a614abac`，地址是 `https://cccsat.top/mb-repair-beta/`。该版本已部署 acceptance-qualified handoff、Admin List V2、Detail V3、浏览器实物上传移除、repair-evidence link 只读投影，以及共享 BGA `ComponentVisualSpec` 管线。升级前从 `f278061` 执行了不可变归档校验、一致 SQLite 备份和完整迁移/回滚演练；生产 P4 通过。操作与数据边界见 `docs/visual-qc-capture-intake-spec-2026-07-20.md`、`docs/visual-qc-workbench-2026-07-17.md` 和 `docs/visual-qc-server-api-2026-07-20.md`。
 
 本地 HEAD 已增加 `VISUAL-QC-UPGRADE-PREFLIGHT-V1` 升级演练门禁和 `VISUAL-QC-DEPLOYMENT-MANIFEST-V1` 部署身份清单。`scripts/audit_visual_qc_upgrade.py` 只接受一致 SQLite 备份，在临时副本上验证受控对象、加法式迁移、Health/List/Detail/Dataset 契约、legacy 训练排除和旧版回读；源库与对象保持只读。真实部署会先将完整 40 位 commit、实际归档 SHA-256/字节数和归档内部运行时清单的 SHA-256 绑定为一个确定性清单，并上传到本次部署独有的只读暂存目录；本地清单只用于核对路径集合，Windows CRLF 不会替代 Git 归档中的真实字节身份。服务器在解包前拒绝重复 JSON 字段、身份不一致和危险 tar 成员，解包后拒绝符号链接、硬链接、特殊文件和运行时边界漂移，最后才停服备份和执行迁移演练。app/venv 只有在完整升级报告通过 JSON Schema、数据库快照和全部候选身份复核后才会切换。使用和证据边界见 `docs/visual-qc-upgrade-preflight-2026-07-23.md`。这些能力本身不代表已经升级生产。
 
@@ -194,6 +194,7 @@ repair case revision
 -> inspect in internal workbench
 ```
 
-This implementation and the local CASE005 projection are local evidence only.
-Production remains unchanged at `f278061`; no production deployment, database,
-or route was changed by this work.
+The CASE005 controlled-library publication and its local projection remain
+local evidence only. The server capability was later deployed at
+`08d08cd38aaffc9b01d901dfe9ef7684a614abac`, but that deployment did not
+transfer the local CASE005 projection or turn it into a visual conclusion.

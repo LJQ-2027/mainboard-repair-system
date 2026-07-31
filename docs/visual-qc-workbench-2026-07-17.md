@@ -4,9 +4,9 @@
 
 `http://127.0.0.1:8898/assets/visual-qc-workbench/`
 
-This document began as the local baseline at commit `45a8613` and now describes the **Local HEAD workbench contract** in `docs/superpowers/specs/2026-07-20-visual-qc-server-architecture-design.md`.
+This document began as the local baseline at commit `45a8613` and now describes the deployed workbench contract in `docs/superpowers/specs/2026-07-20-visual-qc-server-architecture-design.md`.
 
-Production remains `f278061` at `https://cccsat.top/mb-repair-beta/assets/visual-qc-workbench/`. That authenticated pilot predates qualified handoff, List V2, Detail V3, and browser physical-upload removal. The production route must not be used for physical intake under the Local HEAD procedure until a separately approved deployment and migration verification completes. Neither route is a field-accuracy claim.
+Production is `08d08cd38aaffc9b01d901dfe9ef7684a614abac` at `https://cccsat.top/mb-repair-beta/assets/visual-qc-workbench/`. The authenticated route includes qualified handoff, List V2, Detail V3, and browser physical-upload removal. Physical intake remains CLI-only and owner-operated; neither the route nor the deployment is a field-accuracy claim.
 
 ## Ownership And Workflow
 
@@ -99,6 +99,7 @@ repair case revision
 -> inspect in internal workbench
 ```
 
-This implementation and the local CASE005 projection are local evidence only.
-Production remains unchanged at `f278061`; no production deployment, database,
-or route was changed by this work.
+The CASE005 controlled-library publication and local projection remain local
+evidence only. The capability was deployed later at
+`08d08cd38aaffc9b01d901dfe9ef7684a614abac` without transferring that evidence
+or creating a visual conclusion.

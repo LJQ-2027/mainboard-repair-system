@@ -68,8 +68,8 @@ ANTHROPIC_API_KEY=...
 
 ## Current Deployment
 
-- Deployed on: 2026-07-22
-- Deployed commit: `f278061`
+- Deployed on: 2026-07-31
+- Deployed commit: `08d08cd38aaffc9b01d901dfe9ef7684a614abac`
 - Internal service: `http://127.0.0.1:3010`
 - Internal visual-QC API: `http://127.0.0.1:3020`
 - External beta URL: `https://cccsat.top/mb-repair-beta/`
@@ -82,6 +82,20 @@ ANTHROPIC_API_KEY=...
 - Nginx config touched: `/etc/nginx/sites-available/sikayetvar`
 - Nginx config backup: `/etc/nginx/sites-available/sikayetvar.before-mb-repair-20260622_095918`
 - Current AI status: service is reachable, but `.env` still has no valid `ANTHROPIC_API_KEY`, so AI features are not enabled yet.
+- 2026-07-31 controlled upgrade: the 58.1 MB allowlisted runtime archive was
+  bound to SHA-256 `fb11d084a5d2597001f46c36bb2cdb5ae8701ee1eca194886e5eca6713774f07`
+  and 37 runtime paths. Immutable-input verification, extraction verification,
+  a consistent SQLite backup, `VISUAL-QC-UPGRADE-PREFLIGHT-V1`, rollback
+  readability, Nginx validation, authenticated identity convergence, and both
+  PM2 restarts passed. Rollback evidence is retained under
+  `/opt/motherboard-repair-beta/rollback/08d08cd38aaf-20260731_191032-560401`.
+- Post-switch P4: one worker, one preserved succeeded proxy case, zero failed
+  jobs, zero active Golden Samples, normal storage pressure, `0` eligible and
+  `1` excluded training case (`non_physical_evidence`). Unauthenticated access
+  returns `401`; the restricted account receives `403` on the admin catalog.
+  Installed-Chrome desktop `1600x900` and mobile `390x844` verified U4000,
+  U0600, and H8918 U5007 shared-BGA isolation, mouse/touch rotation,
+  wheel/pinch zoom, zero overflow/label overlap, and zero console/page errors.
 - 2026-07-22 owner-managed intake increment: Milo is the sole source of real
   visual photos and Codex operates the data-administrator path. Production now
   enforces data-administrator-only multipart intake before parsing, accepts
@@ -170,12 +184,12 @@ The beta server remains the controlled host for the internal visual data workben
 The server was inspected read-only on 2026-07-20: 4 x86_64 vCPU, 7.3 GB RAM, 4 GB swap, 19 GB free disk, Python 3.10, Node.js 20, no GPU, no installed OpenCV, and no active PostgreSQL or Redis. This supports a bounded CPU pilot, not deep-model training or unrestricted long-term image retention.
 
 The bounded visual-QC pilot is deployed with the approved same-origin
-architecture at production revision `f278061`. Its original controlled upload,
-async processing, manual fallback, role assertion,
-loopback binding, restart recovery, storage health, and proxy-path smoke checks
-have passed. The later acceptance-qualified handoff and server-provenance
-hardening are complete locally but are not yet deployed. Physical bare-board photos, reviewed Golden Samples, and
-real-defect acceptance remain the field-readiness gate. Canonical design:
+architecture at production revision `08d08cd38aaffc9b01d901dfe9ef7684a614abac`.
+Controlled qualified handoff, async processing, manual fallback, role assertion,
+loopback binding, restart recovery, storage health, server provenance, governed
+repair-evidence projection, and proxy-path smoke checks have passed. Physical
+bare-board photos, reviewed Golden Samples, and real-defect acceptance remain
+the field-readiness gate. Canonical design:
 `docs/superpowers/specs/2026-07-20-visual-qc-server-architecture-design.md`.
 
 ### 2026-07-20 P4 Preflight
