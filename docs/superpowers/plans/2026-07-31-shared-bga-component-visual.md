@@ -404,7 +404,7 @@ Strictly decode every changed text file as UTF-8 and reject U+FFFD.
 - Evidence only: `output/playwright/shared-bga-component-visual/`
 - Modify implementation files only if browser QA reveals a defect.
 
-- [ ] **Step 1: Verify the real local route**
+- [x] **Step 1: Verify the real local route**
 
 Open:
 
@@ -414,7 +414,7 @@ http://127.0.0.1:8899/assets/cross-source-registration/?board=km4-f151
 
 Confirm HTTP 200 and no startup error.
 
-- [ ] **Step 2: Verify desktop shared BGA states**
+- [x] **Step 2: Verify desktop shared BGA states**
 
 At 1600x900:
 
@@ -429,7 +429,7 @@ At 1600x900:
 9. inspect hover, selected, focus, return, and control readability;
 10. confirm no labels or controls overlap.
 
-- [ ] **Step 3: Verify mobile touch states**
+- [x] **Step 3: Verify mobile touch states**
 
 At 390x844:
 
@@ -440,11 +440,11 @@ At 390x844:
 5. confirm the return action stays visible;
 6. confirm no horizontal overflow, clipping, or overlap.
 
-- [ ] **Step 4: Verify one connectivity-BGA board**
+- [x] **Step 4: Verify one connectivity-BGA board**
 
 Open one catalog route containing `connectivity-bga-v1`, select its reviewed package, and confirm it reports the same shared spec without runtime errors. If the route is reference-only, preserve that source boundary and inspect only the package interaction.
 
-- [ ] **Step 5: Capture evidence**
+- [x] **Step 5: Capture evidence**
 
 Save desktop/mobile board, isolated, rotated/touch, U2001/J6101 regression, and connectivity screenshots. Write `qa-summary.json` with:
 
@@ -468,7 +468,7 @@ Save desktop/mobile board, isolated, rotated/touch, U2001/J6101 regression, and 
 - Modify: `C:/Users/Mercurluto/OneDrive/AI/02_Projects/Programming/Mainboard Repair Enablement/Agent Entry.md`
 - Modify: `G:/Programming/mainboard-repair-enablement/PROJECT_LEDGER.md`
 
-- [ ] **Step 1: Record the delivered boundary**
+- [x] **Step 1: Record the delivered boundary**
 
 Record:
 

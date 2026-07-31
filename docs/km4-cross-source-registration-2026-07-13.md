@@ -62,7 +62,7 @@ The debug geometry view has been replaced by a layered repair model. Its reset s
 - Pointer or single-touch drag rotates the package around its own center. Wheel and two-touch pinch input use inspection-specific zoom bounds while the board remains still.
 - The canvas toolbar exposes component rotation as the active direct-manipulation mode. Its reset action restores the package angle, zoom, and center without leaving inspection.
 - Return, entity change, side change, and view change restore the original package transform, camera, opacity, shield state, module state, selected identity, evidence context, and prior board drag mode.
-- The refined procedural PMIC/BGA profile uses a layered dark package, muted substrate, metal edge, restrained bevel, and pin-one cue. It explicitly does not claim measured dimensions, exact ball count, or engineering CAD fidelity.
+- The refined procedural PMIC/BGA profile uses a layered dark package, muted substrate, metal edge, restrained bevel, and generic orientation cue. The cue is not a source-confirmed Pin 1 marker, and the visual does not claim measured dimensions, exact ball count, or engineering CAD fidelity.
 - The evidence panel separates source-backed common faults and detection guidance from a visible model-fidelity boundary. No missing voltage, resistance, pin, or replacement values are invented.
 
 ## Evidence Boundary
@@ -498,3 +498,15 @@ Reusable U2001 multi-family visual refinement on 2026-07-31:
 - Validation on branch `codex/u2001-component-visual-refinement` passed 345 Node tests and 27 source-bound Python tests, JavaScript syntax checks, whitespace checks, and strict UTF-8 decoding.
 - Installed-Chrome P3 covered the real KM4 route at 1600x900 and 390x844: U2001 board/isolated selection, mouse and touch rotation, wheel and pinch zoom, reset, return, re-entry, focus visibility, zero label/control overlap, zero mobile overflow, and J6101 regression. Console and page errors were zero.
 - Machine-readable evidence and canvas-only nonblank pixel checks are stored under the ignored `output/playwright/u2001-component-visual-refinement/` directory.
+
+Shared BGA component-visual migration on 2026-07-31:
+
+- U4000 (`u4000-emmc-v1`), U0600 (`u0600-rf-device-v1`), and the existing cross-board connectivity packages (`connectivity-bga-v1`) now resolve to the same immutable `ic-bga-shared-package-repair-visual-v1` specification and the reusable `ic_bga` compiler.
+- U2001 deliberately retains the separately named `ic-bga-u2001-repair-visual-v1` evidence identity while using the same compiler. J6101 remains on the reusable connector compiler.
+- The renderer-owned `reviewed-bga` package constructor and geometry dispatch were removed. `reviewed-bga` remains provenance and UI metadata only. An unknown reviewed BGA profile still produces the established nonblank generic-IC fallback and a stable `visual_spec_not_found` diagnostic.
+- Shared board and isolated views compile deterministic body, substrate, top, orientation-cue, edge, and seam parts with independently owned resources and exact disposal coverage. The cue is a generic positive-quadrant orientation aid, not a source-confirmed Pin 1 marker.
+- The representation does not claim exact package dimensions, ball or pad layout, pitch, leads, markings, material stack, manufacturer package, die, or internal structure. No knowledge-base source relationship or repair instruction changed.
+- Automated verification passed 362 Node tests and 27 source-bound Python tests, JavaScript syntax checks, `git diff --check`, and strict UTF-8/U+FFFD checks.
+- Installed-Chrome P3 used the KM4/F151 route at 1600x900 and 390x844 plus the CM6/CM5-H8918 connectivity route at 1600x900. U4000 and U0600 passed board/isolated selection, mouse or touch rotation, wheel or pinch zoom, reset, and return; U2001, J6101, and H8918 U5007 regressions passed with zero runtime errors, label overlap, canvas overflow, or mobile horizontal overflow.
+- The Chrome extension and native host were installed and healthy, but extension runtime bootstrap failed with `TypeError: Cannot redefine property: process`; P3 therefore used Playwright controlling the installed Chrome executable. Machine-readable evidence and screenshots are under the ignored `output/playwright/shared-bga-component-visual/` directory.
+- Work is local on branch `codex/shared-bga-component-visual`, based on `a6917af`, with implementation and automated-validation commits through `0e39849`. Production remains `f278061`; no P4, deployment, or remote push was performed.
