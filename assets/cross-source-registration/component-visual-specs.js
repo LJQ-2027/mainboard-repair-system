@@ -315,20 +315,7 @@ export const SHARED_BGA_VISUAL_SPEC = Object.freeze({
   acceptance: Object.freeze({
     ratio_min: 0.02,
     ratio_max: 1,
-    prohibited_claims: Object.freeze([
-      'exact_pin_count',
-      'exact_pin_pitch',
-      'vendor_latch',
-      'solder_foot_array',
-      'internal_spring_geometry',
-      'millimeter_dimensions',
-      'exact_ball_count',
-      'exact_ball_pitch',
-      'exact_pad_layout',
-      'vendor_package',
-      'die_or_internal_structure',
-      'package_marking',
-    ]),
+    prohibited_claims: U2001_PMIC_VISUAL_SPEC.acceptance.prohibited_claims,
   }),
 });
 

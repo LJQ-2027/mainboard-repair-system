@@ -144,6 +144,10 @@ test('the shared BGA identity and evidence boundary remain explicit', () => {
     SHARED_BGA_VISUAL_SPEC.acceptance.prohibited_claims,
     U2001_PROHIBITED_CLAIMS,
   );
+  assert.equal(
+    SHARED_BGA_VISUAL_SPEC.acceptance.prohibited_claims,
+    U2001_PMIC_VISUAL_SPEC.acceptance.prohibited_claims,
+  );
 });
 
 test('the shared BGA spec declares normalized structure and U2001 detail part names', () => {
