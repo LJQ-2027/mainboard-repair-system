@@ -23,6 +23,21 @@ const U2001_DESCRIPTOR = Object.freeze({
   inspectionProfile: Object.freeze({ profile_id: 'u2001-pmic-v1' }),
 });
 
+const SHARED_BGA_DESCRIPTORS = Object.freeze([
+  Object.freeze({
+    dimensions: Object.freeze({ x: 0.26, y: 0.22, z: 0.032 }),
+    inspectionProfile: Object.freeze({ profile_id: 'u4000-emmc-v1' }),
+  }),
+  Object.freeze({
+    dimensions: Object.freeze({ x: 0.2, y: 0.175, z: 0.032 }),
+    inspectionProfile: Object.freeze({ profile_id: 'u0600-rf-device-v1' }),
+  }),
+  Object.freeze({
+    dimensions: Object.freeze({ x: 0.11, y: 0.09, z: 0.032 }),
+    inspectionProfile: Object.freeze({ profile_id: 'connectivity-bga-v1' }),
+  }),
+]);
+
 const BOARD_NAMES = Object.freeze([
   'base',
   'contact',
@@ -162,6 +177,99 @@ test('U2001 isolated detail adds only source-bounded package edges', () => {
   ['substrate-edges', 'body-edges', 'top-seam'].forEach((name) => {
     assert.ok(isolated.getObjectByName(name) instanceof THREE.LineSegments);
     assert.equal(board.getObjectByName(name), undefined);
+  });
+});
+
+test('shared BGA profiles compile through one IC BGA spec with exact detail parts', () => {
+  SHARED_BGA_DESCRIPTORS.forEach((descriptor) => {
+    const board = build('board', descriptor);
+    const isolated = build('isolated', descriptor);
+    [board, isolated].forEach((group) => {
+      assert.equal(
+        group.userData.visualSpecId,
+        'ic-bga-shared-package-repair-visual-v1',
+      );
+    });
+    assert.deepEqual(board.userData.visualPartNames, U2001_BOARD_NAMES);
+    assert.deepEqual(directPartNames(board), U2001_BOARD_NAMES);
+    assert.deepEqual(isolated.userData.visualPartNames, U2001_ISOLATED_NAMES);
+    assert.deepEqual(directPartNames(isolated), U2001_ISOLATED_NAMES);
+    ['substrate-edges', 'body-edges', 'top-seam'].forEach((name) => {
+      assert.equal(board.getObjectByName(name), undefined);
+      assert.ok(isolated.getObjectByName(name) instanceof THREE.LineSegments);
+    });
+  });
+});
+
+test('shared BGA board and isolated builds stay within every descriptor bound', () => {
+  SHARED_BGA_DESCRIPTORS.forEach((descriptor) => {
+    ['board', 'isolated'].forEach((detailLevel) => {
+      assertInsideFootprint(descriptor, detailLevel);
+      const bounds = componentVisualBounds(build(detailLevel, descriptor));
+      Object.values(bounds).forEach((value) => {
+        assert.equal(Number.isFinite(value), true);
+        assert.ok(value > 0);
+      });
+      const tolerance = (value) => Math.max(1e-9, value * 1e-6);
+      assert.ok(bounds.width <= descriptor.dimensions.x + tolerance(descriptor.dimensions.x));
+      assert.ok(bounds.depth <= descriptor.dimensions.y + tolerance(descriptor.dimensions.y));
+      assert.ok(bounds.height <= descriptor.dimensions.z + tolerance(descriptor.dimensions.z));
+    });
+  });
+});
+
+test('shared BGA snapshots are deterministic and all builds own distinct resources', () => {
+  const builds = SHARED_BGA_DESCRIPTORS.flatMap((descriptor) => {
+    return ['board', 'isolated'].flatMap((detailLevel) => {
+      const first = build(detailLevel, descriptor);
+      const second = build(detailLevel, descriptor);
+      assert.deepEqual(snapshot(first), snapshot(second));
+      return [first, second];
+    });
+  });
+  const buildResources = builds.map(resources);
+  const geometries = buildResources.flatMap((owned) => owned.geometries);
+  const materials = buildResources.flatMap((owned) => owned.materials);
+  assert.equal(new Set(geometries).size, geometries.length);
+  assert.equal(new Set(materials).size, materials.length);
+});
+
+test('shared BGA disposal is exact and idempotent for every descriptor', () => {
+  SHARED_BGA_DESCRIPTORS.forEach((descriptor) => {
+    const group = build('isolated', descriptor);
+    const owned = resources(group);
+    assert.deepEqual(disposeComponentVisual(group), {
+      geometries: owned.geometries.length,
+      materials: owned.materials.length,
+      failureCount: 0,
+      cleanupWarning: null,
+    });
+    assert.deepEqual(disposeComponentVisual(group), {
+      geometries: 0,
+      materials: 0,
+      failureCount: 0,
+      cleanupWarning: null,
+    });
+  });
+});
+
+test('shared BGA names and metadata make no prohibited package claims', () => {
+  const prohibited = /ball|pad|marking|lead|vendor|die|internal|pitch|millimet(?:er|re)|\bmm\b/i;
+  SHARED_BGA_DESCRIPTORS.forEach((descriptor) => {
+    ['board', 'isolated'].forEach((detailLevel) => {
+      const group = build(detailLevel, descriptor);
+      group.traverse((child) => {
+        assert.equal(prohibited.test(child.name), false, child.name);
+        assert.equal(prohibited.test(JSON.stringify(child.userData)), false);
+      });
+      assert.equal(prohibited.test(JSON.stringify({
+        visualSpecId: group.userData.visualSpecId,
+        visualAssetType: group.userData.visualAssetType,
+        visualDetailLevel: group.userData.visualDetailLevel,
+        visualStages: group.userData.visualStages,
+        visualPartNames: group.userData.visualPartNames,
+      })), false);
+    });
   });
 });
 
