@@ -2,11 +2,17 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+  PointMapViewport,
   canStartPointMapPan,
   centerPoint,
   clampZoom,
   zoomAt,
 } from '../assets/cross-source-registration/point-map-viewport.js';
+
+test('point-map viewport remains a named compatibility class', () => {
+  assert.equal(typeof PointMapViewport, 'function');
+  assert.equal(PointMapViewport.name, 'PointMapViewport');
+});
 
 test('clampZoom keeps the point map within its readable zoom range', () => {
   assert.equal(clampZoom(0.5), 1);
