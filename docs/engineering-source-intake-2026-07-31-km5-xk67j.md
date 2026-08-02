@@ -104,8 +104,7 @@ manual result instead of being overwritten.
 
 This is a reviewed **board-coordinate alignment** only. It has not created a
 Golden Sample, defect label, training row, field-accuracy result, industrial
-acceptance result, or repair causality. The next knowledge action remains a
-source-backed XK67J repair workflow, if one is supplied and reviewed.
+acceptance result, or repair causality.
 
 ## First-stage technician photo navigation
 
@@ -138,3 +137,36 @@ layout QA at 390 x 844. Verified paths include side switching, Side 2 A/B photo
 switching, pan/zoom/reset, explicit component focus, cross-side entity selection,
 point-map synchronization, nonblank 2.5D rendering, responsive readability, and
 zero runtime console errors in clean runs.
+
+## First source-controlled technician path
+
+The first vertical repair path now covers the reported symptom `无显示`. Feishu
+cases `CASE-0022` and `CASE-0025` both record `显示IC坏` and a repaired outcome,
+and both reference the annotated physical image with SHA-256
+`28a193f9bbd0750240fb20477f5ec0497de7f279868b408eab7c872dcd0273d6`.
+Reviewed inverse projection places the annotation near Placement designator
+`U2411`; SCH page 9 identifies U2411 as `OCP2130WPAD-G` in the LCM BIAS circuit.
+
+This evidence supports one technician action only: synchronize photo B, the
+point map, and the 2.5D model at U2411 and verify whether the displayed location
+matches the inspected board. The data contract marks the path
+`source_boundary_only`. Both available results stop without exposing a repair
+action:
+
+- `位置一致` requires an approved XK67J electrical test standard before work can
+  continue.
+- `无法确认` requires board, revision, side, and source verification.
+
+The case finding is retained as a source-reported fact, not promoted to a system
+diagnosis. Current materials still lack an approved XK67J probe location,
+numeric reference, tolerance, branch rule, rework or replacement instruction,
+and post-repair acceptance method. Supplying that reviewed procedure is the
+precise gate for extending this one-step boundary into a multi-step repair SOP.
+
+Final closeout passed 796 Python tests with six platform skips, 393 Node tests,
+JavaScript syntax, JSON parsing, batch acceptance, diff, and strict UTF-8 gates.
+Installed-Chrome Playwright covered the normal desktop and 390 px touch paths,
+photo/point-map/model switching, zoom and horizontal drag, both boundary
+outcomes, and a deliberately hash-mismatched photo that blocked flow activation.
+Independent final review found no P1 or P2 issue after the evidence-contract
+hardening changes.

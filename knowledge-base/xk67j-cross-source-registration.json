@@ -1138,7 +1138,8 @@
       "entry_step_id": "u2411_location_check",
       "source": {
         "source": "CASE-0022 / CASE-0025 + XK67J_L6735-KM5_MAIN_SCH_V1.0B.pdf",
-        "page": "case records / SCH 9"
+        "page": "case records / SCH 9",
+        "label": "案例 CASE-0022 / CASE-0025 · SCH 第 9 页"
       },
       "source_status": "reviewed_partial",
       "source_photo_sha256": "28a193f9bbd0750240fb20477f5ec0497de7f279868b408eab7c872dcd0273d6",

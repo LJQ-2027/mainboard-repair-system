@@ -20,7 +20,7 @@
       "schematic_occurrences": 676,
       "reviewed_entities": 7,
       "repair_flows": 3,
-      "repair_coverage": null,
+      "repair_coverage": "reviewed_flows_with_boundaries",
       "reference_mode": "photo_proxy",
       "point_map_source_layout": "shared_multi_page",
       "source_named_sides": false,
@@ -210,6 +210,7 @@
       "covered": true,
       "evidence": [
         "reviewed_flows",
+        "reviewed_flows_with_boundaries",
         "source_available_pending_review",
         "source_boundary_only",
         "source_unavailable"

@@ -91,6 +91,7 @@ const repairFlowById = new Map();
 const confirmationTimers = new WeakMap();
 let activeRepairFlowId = null;
 let repairEntryExpanded = false;
+let repairEntryError = '';
 
 const FAULT_LABELS = {
   no_power: '无法开机',
@@ -241,8 +242,8 @@ function renderRepairEntry() {
     : activeFlow ? '当前排查' : coverage.eyebrow;
   document.querySelector('#repairEntryTitle').textContent = activeFlow?.title || coverage.title;
   const coverageNote = document.querySelector('#repairCoverageNote');
-  coverageNote.hidden = coverage.available;
-  coverageNote.textContent = coverage.note;
+  coverageNote.hidden = coverage.available && !repairEntryError;
+  coverageNote.textContent = repairEntryError || coverage.note;
   options.hidden = !coverage.available || Boolean(activeFlow && !repairEntryExpanded);
   changeButton.hidden = !activeFlow;
   changeButton.textContent = repairEntryExpanded ? '收起' : '更换故障';
@@ -273,6 +274,12 @@ async function startRepairEntry(flowId) {
     targetEntity.side_id,
     flow.source_photo_sha256,
   );
+  if (flow.source_photo_sha256 && !evidencePhotoId) {
+    repairEntryError = '来源实拍与当前审核资料不一致，已停止进入该排查。请复核照片哈希、板面与审核状态。';
+    renderRepairEntry();
+    return false;
+  }
+  repairEntryError = '';
   if (evidencePhotoId) {
     preferredPhotoBySide.set(targetEntity.side_id, evidencePhotoId);
     if (targetEntity.side_id === activeSideId) syncBoardViews();
@@ -282,6 +289,7 @@ async function startRepairEntry(flowId) {
   activeRepairFlowId = flow.flow_id;
   renderRepairEntry();
   await selectEntity(intent.targetComponentId);
+  return true;
 }
 
 function applyRepairFlowState(flow, next, entity) {
@@ -388,7 +396,8 @@ function renderRepairFlow(entity, guidance) {
   document.querySelector('#repairFlowStep').textContent = state.closed
     ? `已结束 · ${progress.current} / ${progress.total}`
     : `步骤 ${progress.current} / ${progress.total}`;
-  document.querySelector('#repairFlowSource').textContent = `${flow.source.source} · 第 ${flow.source.page} 页`;
+  document.querySelector('#repairFlowSource').textContent = flow.source.label
+    || `${flow.source.source} · 第 ${flow.source.page} 页`;
   const targetId = repairFlowTargetComponentId(flow, state);
   const targetEntity = data.entities.find((candidate) => candidate.component_id === targetId);
   const targetDisplay = targetEntity && technicianEntityCopy(targetEntity);

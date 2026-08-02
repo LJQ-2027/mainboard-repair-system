@@ -108,6 +108,7 @@ class Xk67jRegistrationTests(unittest.TestCase):
         self.assertEqual(flow["entry_label"], "无显示")
         self.assertEqual(flow["entry_component_id"], "XK67J-MAIN-U2411")
         self.assertEqual(flow["source_status"], "reviewed_partial")
+        self.assertEqual(flow["source"]["label"], "案例 CASE-0022 / CASE-0025 · SCH 第 9 页")
         self.assertEqual(flow["source_photo_sha256"], self.dataset["repair_case_evidence"]["source_photo_sha256"])
         self.assertEqual(len(flow["steps"]), 1)
         step = flow["steps"][0]
@@ -120,6 +121,72 @@ class Xk67jRegistrationTests(unittest.TestCase):
         flow_text = str(flow)
         for unsupported in ("更换", "补焊", "重焊", "电压正常", "阻值正常"):
             self.assertNotIn(unsupported, flow_text)
+
+    def test_source_boundary_only_coverage_rejects_action_outcomes(self):
+        dataset = copy.deepcopy(self.dataset)
+        dataset["repair_flows"][0]["steps"][0]["choices"][0]["outcome"]["kind"] = "action"
+
+        self.assertTrue(any(
+            "source-boundary-only coverage cannot expose action outcomes" in error
+            for error in validate_dataset(dataset, ROOT)
+        ))
+
+    def test_existing_flows_reject_a_tampered_no_source_coverage_status(self):
+        dataset = copy.deepcopy(self.dataset)
+        dataset["repair_coverage"]["status"] = "source_unavailable"
+        dataset["repair_flows"][0]["steps"][0]["choices"][0]["outcome"]["kind"] = "action"
+
+        self.assertTrue(any(
+            "repair coverage status is incompatible with existing flows" in error
+            for error in validate_dataset(dataset, ROOT)
+        ))
+
+    def test_repair_case_evidence_requires_the_exact_reviewed_photo(self):
+        dataset = copy.deepcopy(self.dataset)
+        dataset["repair_case_evidence"]["source_photo_sha256"] = "0" * 64
+
+        self.assertTrue(any(
+            "repair case evidence photo must resolve" in error
+            for error in validate_dataset(dataset, ROOT)
+        ))
+
+    def test_repair_case_evidence_cross_references_flow_target_and_hash(self):
+        dataset = copy.deepcopy(self.dataset)
+        dataset["repair_case_evidence"]["reviewed_target_component_id"] = "XK67J-MAIN-U4002"
+        dataset["repair_flows"][0]["source_photo_sha256"] = "1" * 64
+
+        errors = validate_dataset(dataset, ROOT)
+        self.assertTrue(any("repair case evidence target must match" in error for error in errors))
+        self.assertTrue(any("repair flow evidence photo must match" in error for error in errors))
+
+    def test_repair_case_evidence_rejects_terminal_target_drift(self):
+        dataset = copy.deepcopy(self.dataset)
+        for choice in dataset["repair_flows"][0]["steps"][0]["choices"]:
+            choice["outcome"]["target_component_id"] = "XK67J-MAIN-U4002"
+
+        self.assertTrue(any(
+            "repair case evidence target must match every repair flow target" in error
+            for error in validate_dataset(dataset, ROOT)
+        ))
+
+    def test_repair_case_evidence_requires_nonempty_case_identities(self):
+        dataset = copy.deepcopy(self.dataset)
+        dataset["repair_case_evidence"]["cases"] = []
+        dataset["repair_flows"][0]["source_case_ids"] = []
+
+        self.assertTrue(any(
+            "repair case evidence requires source case identities" in error
+            for error in validate_dataset(dataset, ROOT)
+        ))
+
+    def test_repair_case_evidence_rejects_private_fields_and_causality_claims(self):
+        dataset = copy.deepcopy(self.dataset)
+        dataset["repair_case_evidence"]["imei"] = "350314000000000"
+        dataset["repair_case_evidence"]["repair_causality_claim_allowed"] = True
+
+        errors = validate_dataset(dataset, ROOT)
+        self.assertTrue(any("repair case evidence contains prohibited private fields" in error for error in errors))
+        self.assertTrue(any("repair case evidence cannot allow repair causality" in error for error in errors))
 
     def test_links_reviewed_board_coordinate_registrations_without_downstream_claims(self):
         evidence = self.dataset["physical_evidence"]

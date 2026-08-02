@@ -51,6 +51,9 @@ test('starting a hash-bound repair flow selects its reviewed evidence photo befo
   assert.match(startSource, /const targetEntity = data\.entities\.find/);
   assert.match(startSource, /flow\.source_photo_sha256/);
   assert.match(startSource, /resolveReviewedPhotoIdBySourceHash\(/);
+  assert.match(startSource, /if \(flow\.source_photo_sha256 && !evidencePhotoId\)/);
+  assert.match(startSource, /来源实拍与当前审核资料不一致/);
+  assert.match(startSource, /return false/);
   assert.match(startSource, /preferredPhotoBySide\.set\(targetEntity\.side_id, evidencePhotoId\)/);
   assert.ok(
     startSource.indexOf('preferredPhotoBySide.set') < startSource.indexOf('await selectEntity'),
@@ -67,6 +70,7 @@ test('boundary-only repair results never expose action recording controls', () =
   assert.match(flowSource, /state\.terminal\.kind === 'boundary' \? '资料边界' : '维修处理'/);
   assert.match(flowSource, /const actionRecordVisible = state\.terminal\?\.kind === 'action'/);
   assert.match(flowSource, /actionRecord\.hidden = !actionRecordVisible/);
+  assert.match(flowSource, /flow\.source\.label\s*\|\|/);
 });
 
 test('photo and point-map markers are rebuilt from the active-side entity set', () => {

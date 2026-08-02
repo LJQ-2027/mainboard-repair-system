@@ -92,6 +92,7 @@ def _no_display_flow(evidence):
         "source": {
             "source": "CASE-0022 / CASE-0025 + XK67J_L6735-KM5_MAIN_SCH_V1.0B.pdf",
             "page": "case records / SCH 9",
+            "label": "案例 CASE-0022 / CASE-0025 · SCH 第 9 页",
         },
         "source_status": "reviewed_partial",
         "source_photo_sha256": evidence["source_photo_sha256"],

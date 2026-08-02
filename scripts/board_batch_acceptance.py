@@ -126,11 +126,15 @@ def audit_board(root, board_key, entry):
 
     flows = data.get("repair_flows", [])
     flow_source_statuses = {flow.get("source_status") for flow in flows}
-    repair_coverage = (
-        "reviewed_flows"
-        if flows and flow_source_statuses == {"reviewed"}
-        else data.get("repair_coverage", {}).get("status")
-    )
+    declared_repair_coverage = data.get("repair_coverage", {}).get("status")
+    if declared_repair_coverage:
+        repair_coverage = declared_repair_coverage
+    elif flows and flow_source_statuses == {"reviewed"}:
+        repair_coverage = "reviewed_flows"
+    elif flows and flow_source_statuses <= {"reviewed", "reviewed_partial"}:
+        repair_coverage = "reviewed_flows_with_boundaries"
+    else:
+        repair_coverage = None
     reference_mode = data.get("registration", {}).get("reference_mode", "photo_proxy")
     profile_id = manifest.get("profile_id") or board_key
     point_map_source_layout = _profile_source_layout(root, profile_id) if manifest else None

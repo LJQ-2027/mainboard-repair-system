@@ -91,6 +91,7 @@ class BoardBatchAcceptanceTests(unittest.TestCase):
 
         self.assertEqual(result["status"], "pass")
         self.assertEqual(result["errors"], [])
+        self.assertEqual(result["repair_coverage"], "reviewed_flows_with_boundaries")
 
     def test_current_catalog_covers_the_declared_pipeline_risk_classes(self):
         audit = audit_catalog(ROOT)

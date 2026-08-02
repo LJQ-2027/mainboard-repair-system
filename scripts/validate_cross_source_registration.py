@@ -14,6 +14,23 @@ def _number(value):
     return isinstance(value, (int, float)) and not isinstance(value, bool)
 
 
+def _sha256_value(value):
+    return isinstance(value, str) and len(value) == 64 and all(
+        character in "0123456789abcdefABCDEF" for character in value
+    )
+
+
+def _contains_forbidden_key(value, forbidden):
+    if isinstance(value, dict):
+        return any(
+            str(key).lower() in forbidden or _contains_forbidden_key(item, forbidden)
+            for key, item in value.items()
+        )
+    if isinstance(value, list):
+        return any(_contains_forbidden_key(item, forbidden) for item in value)
+    return False
+
+
 def _sha256(path):
     digest = hashlib.sha256()
     with path.open("rb") as source:
@@ -42,6 +59,7 @@ def validate_dataset(data, root):
         errors.append("registration point_map_note is required")
 
     anchors = registration.get("anchors", [])
+    reviewed_photos_by_hash = {}
     if reference_mode == "reviewed_physical_photo_navigation":
         navigation = registration.get("photo_navigation", {})
         photos = navigation.get("photos", [])
@@ -66,6 +84,8 @@ def validate_dataset(data, root):
                 errors.append(f"photo navigation matrix is invalid: {photo.get('photo_id')}")
             if photo.get("registration_review_status") != "reviewed":
                 errors.append(f"photo navigation review is invalid: {photo.get('photo_id')}")
+            elif _sha256_value(photo.get("source_sha256")):
+                reviewed_photos_by_hash[photo["source_sha256"].lower()] = photo
     elif reference_mode != "point_map_only":
         proxy_path = registration.get("proxy_image")
         if not proxy_path or not (root / proxy_path).is_file():
@@ -133,8 +153,11 @@ def validate_dataset(data, root):
             elif reference_kind != "record_only":
                 errors.append(f"{entity_id} measurement reference kind is unsupported")
     repair_flows = data.get("repair_flows", [])
+    repair_coverage = data.get("repair_coverage", {})
+    if repair_flows and repair_coverage and repair_coverage.get("status") != "source_boundary_only":
+        errors.append("repair coverage status is incompatible with existing flows")
     if not repair_flows:
-        coverage = data.get("repair_coverage", {})
+        coverage = repair_coverage
         status = coverage.get("status")
         if status not in ("source_unavailable", "source_available_pending_review") or any(
             not isinstance(coverage.get(key), str) or not coverage[key].strip()
@@ -221,6 +244,57 @@ def validate_dataset(data, root):
                     errors.append(f"{flow_id}/{step_id} flow outcome kind is unsupported")
         if has_boundary and (flow.get("source_status") != "reviewed_partial" or not flow.get("boundary_note")):
             errors.append(f"{flow_id} flow boundary requires reviewed-partial status and a note")
+
+    if repair_coverage.get("status") == "source_boundary_only":
+        if not repair_flows or any(flow.get("source_status") != "reviewed_partial" for flow in repair_flows):
+            errors.append("source-boundary-only coverage requires reviewed-partial flows")
+        for flow in repair_flows:
+            for step in flow.get("steps", []):
+                for choice in step.get("choices", []):
+                    if choice.get("outcome", {}).get("kind") in ("action", "handoff"):
+                        errors.append("source-boundary-only coverage cannot expose action outcomes")
+
+    case_evidence = data.get("repair_case_evidence")
+    if case_evidence is not None:
+        forbidden = {"imei", "country", "operator", "technician", "technician_identity"}
+        if not isinstance(case_evidence, dict):
+            errors.append("repair case evidence must be an object")
+        else:
+            if _contains_forbidden_key(case_evidence, forbidden):
+                errors.append("repair case evidence contains prohibited private fields")
+            if case_evidence.get("repair_causality_claim_allowed") is not False:
+                errors.append("repair case evidence cannot allow repair causality")
+            target_id = case_evidence.get("reviewed_target_component_id")
+            target = entities_by_id.get(target_id)
+            if not target:
+                errors.append("repair case evidence target must resolve to a reviewed entity")
+            photo_hash = case_evidence.get("source_photo_sha256")
+            photo = reviewed_photos_by_hash.get(photo_hash.lower()) if _sha256_value(photo_hash) else None
+            if not photo or not target or photo.get("side_id") != target.get("side_id"):
+                errors.append("repair case evidence photo must resolve on the reviewed target side")
+            evidence_case_ids = {
+                case.get("case_id") for case in case_evidence.get("cases", [])
+                if isinstance(case, dict) and case.get("case_id")
+            }
+            if not evidence_case_ids:
+                errors.append("repair case evidence requires source case identities")
+            for flow in repair_flows:
+                if flow.get("source_photo_sha256") != photo_hash:
+                    errors.append("repair flow evidence photo must match repair case evidence")
+                flow_targets = {flow.get("entry_component_id")}
+                for step in flow.get("steps", []):
+                    if step.get("target_component_id"):
+                        flow_targets.add(step["target_component_id"])
+                    flow_targets.update(
+                        choice.get("outcome", {}).get("target_component_id")
+                        for choice in step.get("choices", [])
+                        if choice.get("outcome", {}).get("target_component_id")
+                    )
+                if flow_targets != {target_id}:
+                    errors.append("repair case evidence target must match every repair flow target")
+                source_case_ids = set(flow.get("source_case_ids", []))
+                if not source_case_ids or source_case_ids != evidence_case_ids:
+                    errors.append("repair flow case identities must match repair case evidence")
     if not data.get("entities"):
         errors.append("dataset requires entities")
     return errors
