@@ -440,12 +440,122 @@
     }
   ],
   "registration": {
-    "reference_mode": "point_map_only",
+    "reference_mode": "reviewed_physical_photo_navigation",
     "point_map_image": "assets/board-atlas/xk67j/main-point-map-page-2.png",
     "point_map_source": "XK67J_MAIN_PCB_V1.0B Placement page 2",
     "point_map_note": "XK67J V1.0B 第2面点位图；三张 KM4n V1.0 实拍已完成板级坐标审核配准。",
     "method": "normalized_point_map_registration",
-    "confidence": "source_compiled"
+    "confidence": "source_compiled",
+    "photo_navigation": {
+      "schema_version": "XK67J-PHOTO-NAVIGATION-V1",
+      "board_key": "xk67j-shared",
+      "board_id": "BOARD-XK67J-MAIN-V1.0B",
+      "physical_board_revision": "XK67J_MAIN V1.0",
+      "engineering_board_revision": "XK67J_MAIN_PCB V1.0B",
+      "reference_mode": "reviewed_physical_photo_navigation",
+      "photos": [
+        {
+          "photo_id": "XK67J-MAIN_PAGE_1-57A9B1D36326",
+          "label": "第1面实拍",
+          "side_id": "main_page_1",
+          "source_sha256": "57a9b1d36326cd0a0b1cee3a0bc622290728cbb1b4775cfab5182b9b84138fa6",
+          "derivative_sha256": "ac7fe5f6366b1141bb575c2671787c1f208dc53fcd9dcad1093b5240f5bc0d42",
+          "asset_path": "assets/board-atlas/xk67j/physical/main-page-1-57a9b1d36326.webp",
+          "source_scope": "owner_authorized_feishu_case_library",
+          "source_annotation_present": false,
+          "source_annotation_role": null,
+          "capture_geometry_id": "XK67J-KM4N-PAGE1-CAPTURE-01-ROTATED-CCW",
+          "registration_dimensions": {
+            "width": 4032,
+            "height": 3024
+          },
+          "derivative_dimensions": {
+            "width": 2000,
+            "height": 1500
+          },
+          "board_to_image_matrix": [
+            0.927247956,
+            -0.03264233,
+            0.01781821,
+            -0.020835922,
+            0.746553332,
+            0.094848382,
+            -0.022503499,
+            -0.057080589,
+            1.0
+          ],
+          "registration_review_status": "reviewed",
+          "field_accuracy_claim_allowed": false
+        },
+        {
+          "photo_id": "XK67J-MAIN_PAGE_2-1A3E4BDB3F50",
+          "label": "第2面实拍 A",
+          "side_id": "main_page_2",
+          "source_sha256": "1a3e4bdb3f5019656cd0910544e4f825b0eb94c3f85bf6668c956cd6a757687d",
+          "derivative_sha256": "d66c5bbe2d17a7def8d95c05faad431be859a67d178f02893e70f3df724a63b3",
+          "asset_path": "assets/board-atlas/xk67j/physical/main-page-2-1a3e4bdb3f50.webp",
+          "source_scope": "owner_authorized_feishu_case_library",
+          "source_annotation_present": true,
+          "source_annotation_role": "source_component_callout_not_system_label",
+          "capture_geometry_id": "XK67J-KM4N-PAGE2-CAPTURE-01",
+          "registration_dimensions": {
+            "width": 4032,
+            "height": 3024
+          },
+          "derivative_dimensions": {
+            "width": 2000,
+            "height": 1500
+          },
+          "board_to_image_matrix": [
+            0.879042829,
+            0.052154986,
+            0.014125221,
+            -0.000395277,
+            0.847446128,
+            0.109972537,
+            1.53e-07,
+            -1.008e-06,
+            1.0
+          ],
+          "registration_review_status": "reviewed",
+          "field_accuracy_claim_allowed": false
+        },
+        {
+          "photo_id": "XK67J-MAIN_PAGE_2-28A193F9BBD0",
+          "label": "第2面实拍 B",
+          "side_id": "main_page_2",
+          "source_sha256": "28a193f9bbd0750240fb20477f5ec0497de7f279868b408eab7c872dcd0273d6",
+          "derivative_sha256": "3287d5f47aa6a0909f2dcdd19ddd69b5a6e894e160cab0771af29236d88750da",
+          "asset_path": "assets/board-atlas/xk67j/physical/main-page-2-28a193f9bbd0.webp",
+          "source_scope": "owner_authorized_feishu_case_library",
+          "source_annotation_present": true,
+          "source_annotation_role": "source_component_callout_not_system_label",
+          "capture_geometry_id": "XK67J-KM4N-PAGE2-CAPTURE-01",
+          "registration_dimensions": {
+            "width": 4032,
+            "height": 3024
+          },
+          "derivative_dimensions": {
+            "width": 2000,
+            "height": 1500
+          },
+          "board_to_image_matrix": [
+            0.879042829,
+            0.052154986,
+            0.014125221,
+            -0.000395277,
+            0.847446128,
+            0.109972537,
+            1.53e-07,
+            -1.008e-06,
+            1.0
+          ],
+          "registration_review_status": "reviewed",
+          "field_accuracy_claim_allowed": false
+        }
+      ],
+      "accuracy_boundary": "These exact hash-bound derivatives support reviewed board-coordinate navigation only. Source callout boxes remain source annotations and are not system findings."
+    }
   },
   "physical_evidence": {
     "status": "reviewed_board_coordinate_registration",

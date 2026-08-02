@@ -60,7 +60,10 @@ class Xk67jRegistrationTests(unittest.TestCase):
         self.assertEqual(evidence["status"], "reviewed_board_coordinate_registration")
         self.assertEqual(evidence["board_revision"], "XK67J_MAIN V1.0")
         self.assertEqual(len(evidence["unique_image_sha256"]), 3)
-        self.assertEqual(self.dataset["registration"]["reference_mode"], "point_map_only")
+        self.assertEqual(
+            self.dataset["registration"]["reference_mode"],
+            "reviewed_physical_photo_navigation",
+        )
 
         images = {item["sha256"]: item for item in evidence["images"]}
         self.assertEqual(
@@ -96,6 +99,27 @@ class Xk67jRegistrationTests(unittest.TestCase):
             "training_data": False,
             "repair_causality": False,
         })
+
+    def test_embeds_hash_bound_reviewed_photo_navigation(self):
+        registration = self.dataset["registration"]
+
+        self.assertEqual(
+            registration["reference_mode"],
+            "reviewed_physical_photo_navigation",
+        )
+        navigation = registration["photo_navigation"]
+        self.assertEqual(navigation["schema_version"], "XK67J-PHOTO-NAVIGATION-V1")
+        self.assertEqual(len(navigation["photos"]), 3)
+        self.assertEqual(
+            [item["side_id"] for item in navigation["photos"]],
+            ["main_page_1", "main_page_2", "main_page_2"],
+        )
+        self.assertTrue(
+            all(len(item["board_to_image_matrix"]) == 9 for item in navigation["photos"])
+        )
+        self.assertTrue(
+            all((ROOT / item["asset_path"]).is_file() for item in navigation["photos"])
+        )
 
     def test_dataset_passes_the_shared_registration_contract(self):
         self.assertEqual(validate_dataset(self.dataset, ROOT), [])

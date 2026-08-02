@@ -20,7 +20,11 @@ def validate_dataset(data, root):
         errors.append("board outline requires at least four normalized points")
     registration = data.get("registration", {})
     reference_mode = registration.get("reference_mode", "photo_proxy")
-    if reference_mode not in ("photo_proxy", "point_map_only"):
+    if reference_mode not in (
+        "photo_proxy",
+        "point_map_only",
+        "reviewed_physical_photo_navigation",
+    ):
         errors.append("registration reference_mode is unsupported")
     point_map_path = registration.get("point_map_image")
     if not point_map_path or not (root / point_map_path).is_file():
@@ -29,7 +33,27 @@ def validate_dataset(data, root):
         errors.append("registration point_map_note is required")
 
     anchors = registration.get("anchors", [])
-    if reference_mode != "point_map_only":
+    if reference_mode == "reviewed_physical_photo_navigation":
+        navigation = registration.get("photo_navigation", {})
+        photos = navigation.get("photos", [])
+        hashes = [item.get("source_sha256") for item in photos]
+        sides = [item.get("side_id") for item in photos]
+        if navigation.get("schema_version") != "XK67J-PHOTO-NAVIGATION-V1":
+            errors.append("photo navigation schema version is unsupported")
+        if len(photos) != 3 or len(set(hashes)) != 3:
+            errors.append("photo navigation requires three unique source hashes")
+        if sides.count("main_page_1") != 1 or sides.count("main_page_2") != 2:
+            errors.append("photo navigation side coverage is invalid")
+        for photo in photos:
+            asset_path = photo.get("asset_path")
+            asset = root / asset_path if asset_path else None
+            if not asset or not asset.is_file():
+                errors.append(f"photo navigation asset does not resolve: {photo.get('photo_id')}")
+            if len(photo.get("board_to_image_matrix", [])) != 9:
+                errors.append(f"photo navigation matrix is invalid: {photo.get('photo_id')}")
+            if photo.get("registration_review_status") != "reviewed":
+                errors.append(f"photo navigation review is invalid: {photo.get('photo_id')}")
+    elif reference_mode != "point_map_only":
         proxy_path = registration.get("proxy_image")
         if not proxy_path or not (root / proxy_path).is_file():
             errors.append("registration proxy_image does not resolve")

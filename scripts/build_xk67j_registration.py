@@ -71,6 +71,7 @@ def build_dataset(root=ROOT):
     page_one = _read_json(root, "knowledge-base/xk67j-board-compiled-page-1.json")
     page_two = _read_json(root, "knowledge-base/xk67j-board-compiled-page-2.json")
     schematic = _read_json(root, "knowledge-base/xk67j-schematic-compiled.json")
+    photo_navigation = _read_json(root, "knowledge-base/xk67j-photo-navigation.json")
     components = _component_index(page_one, page_two)
     entities = [
         _entity(
@@ -188,12 +189,13 @@ def build_dataset(root=ROOT):
         "status": "source_compiled_reference_only",
         "board_outline": page_two["board_outline"],
         "registration": {
-            "reference_mode": "point_map_only",
+            "reference_mode": "reviewed_physical_photo_navigation",
             "point_map_image": "assets/board-atlas/xk67j/main-point-map-page-2.png",
             "point_map_source": "XK67J_MAIN_PCB_V1.0B Placement page 2",
             "point_map_note": "XK67J V1.0B 第2面点位图；三张 KM4n V1.0 实拍已完成板级坐标审核配准。",
             "method": "normalized_point_map_registration",
             "confidence": "source_compiled",
+            "photo_navigation": photo_navigation,
         },
         "physical_evidence": {
             "status": physical["status"],
