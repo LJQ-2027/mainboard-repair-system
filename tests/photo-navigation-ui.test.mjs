@@ -29,7 +29,8 @@ test('physical-photo view has a compact selector and matching navigation control
 });
 
 test('app resolves reviewed photos and refreshes all board views from one side transition', () => {
-  assert.match(appSource, /import \{ buildPhotoNavigationState, failPhotoNavigation \} from '\.\/photo-navigation-state\.js'/);
+  assert.match(appSource, /buildPhotoNavigationState/);
+  assert.match(appSource, /failPhotoNavigation/);
   assert.match(appSource, /import \{ ImageViewport \} from '\.\/image-viewport\.js'/);
   assert.match(appSource, /function syncBoardViews\(/);
   assert.match(appSource, /buildPhotoNavigationState\(\{/);
@@ -38,6 +39,34 @@ test('app resolves reviewed photos and refreshes all board views from one side t
   assert.match(appSource, /#photoSelector/);
   assert.match(appSource, /function failPhotoViewClosed\(/);
   assert.doesNotMatch(appSource, /data\.registration\.proxy_image/);
+});
+
+test('starting a hash-bound repair flow selects its reviewed evidence photo before its component', () => {
+  const startSource = appSource.slice(
+    appSource.indexOf('async function startRepairEntry'),
+    appSource.indexOf('function applyRepairFlowState'),
+  );
+
+  assert.match(appSource, /resolveReviewedPhotoIdBySourceHash/);
+  assert.match(startSource, /const targetEntity = data\.entities\.find/);
+  assert.match(startSource, /flow\.source_photo_sha256/);
+  assert.match(startSource, /resolveReviewedPhotoIdBySourceHash\(/);
+  assert.match(startSource, /preferredPhotoBySide\.set\(targetEntity\.side_id, evidencePhotoId\)/);
+  assert.ok(
+    startSource.indexOf('preferredPhotoBySide.set') < startSource.indexOf('await selectEntity'),
+    'the exact evidence photo must be preferred before side/entity synchronization',
+  );
+});
+
+test('boundary-only repair results never expose action recording controls', () => {
+  const flowSource = appSource.slice(
+    appSource.indexOf('function renderRepairFlow'),
+    appSource.indexOf('function updateInspectionUi'),
+  );
+
+  assert.match(flowSource, /state\.terminal\.kind === 'boundary' \? '资料边界' : '维修处理'/);
+  assert.match(flowSource, /const actionRecordVisible = state\.terminal\?\.kind === 'action'/);
+  assert.match(flowSource, /actionRecord\.hidden = !actionRecordVisible/);
 });
 
 test('photo and point-map markers are rebuilt from the active-side entity set', () => {

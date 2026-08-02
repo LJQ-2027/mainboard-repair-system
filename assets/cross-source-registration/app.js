@@ -4,7 +4,11 @@ import { buildSelectionState, entityListModelRevealOptions, nearestPointerTarget
 import { BoardRenderer } from './board-renderer.js';
 import { ImageViewport } from './image-viewport.js';
 import { PointMapViewport } from './point-map-viewport.js';
-import { buildPhotoNavigationState, failPhotoNavigation } from './photo-navigation-state.js';
+import {
+  buildPhotoNavigationState,
+  failPhotoNavigation,
+  resolveReviewedPhotoIdBySourceHash,
+} from './photo-navigation-state.js';
 import { buildSourceNote } from './source-note-state.js';
 import { buildRegistrationViewState } from './registration-view-state.js';
 import { buildPhysicalRegistrationState } from './physical-registration-state.js';
@@ -263,6 +267,16 @@ function renderRepairEntry() {
 async function startRepairEntry(flowId) {
   const intent = resolveRepairEntryIntent(data?.repair_flows, flowId);
   const flow = data.repair_flows.find((candidate) => candidate.flow_id === intent.flowId);
+  const targetEntity = data.entities.find((candidate) => candidate.component_id === intent.targetComponentId);
+  const evidencePhotoId = targetEntity && resolveReviewedPhotoIdBySourceHash(
+    data.registration,
+    targetEntity.side_id,
+    flow.source_photo_sha256,
+  );
+  if (evidencePhotoId) {
+    preferredPhotoBySide.set(targetEntity.side_id, evidencePhotoId);
+    if (targetEntity.side_id === activeSideId) syncBoardViews();
+  }
   if (!repairFlowById.has(flow.flow_id)) repairFlowById.set(flow.flow_id, createRepairFlowState(flow));
   repairEntryExpanded = false;
   activeRepairFlowId = flow.flow_id;
