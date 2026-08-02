@@ -4,6 +4,7 @@ import test from 'node:test';
 import {
   buildPhotoNavigationState,
   failPhotoNavigation,
+  resolveReviewedPhotoIdBySourceHash,
 } from '../assets/cross-source-registration/photo-navigation-state.js';
 
 
@@ -124,4 +125,29 @@ test('runtime image failure clears the active photo and preserves a fail-closed 
   assert.equal(failed.assetPath, null);
   assert.equal(failed.matrix, null);
   assert.match(failed.boundaryCopy, /载入失败/);
+});
+
+test('resolves an exact reviewed source hash only on the requested side', () => {
+  assert.equal(
+    resolveReviewedPhotoIdBySourceHash(registration, 'main_page_2', hash('c')),
+    'side-2-b',
+  );
+  assert.equal(
+    resolveReviewedPhotoIdBySourceHash(registration, 'main_page_1', hash('c')),
+    null,
+  );
+  assert.equal(
+    resolveReviewedPhotoIdBySourceHash(registration, 'main_page_2', hash('f')),
+    null,
+  );
+});
+
+test('hash resolution fails closed for malformed or unreviewed photo records', () => {
+  const malformed = structuredClone(registration);
+  malformed.photo_navigation.photos[2].registration_review_status = 'draft';
+  assert.equal(
+    resolveReviewedPhotoIdBySourceHash(malformed, 'main_page_2', hash('c')),
+    null,
+  );
+  assert.equal(resolveReviewedPhotoIdBySourceHash(registration, 'main_page_2', 'bad'), null);
 });

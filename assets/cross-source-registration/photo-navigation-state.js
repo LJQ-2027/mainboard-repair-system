@@ -27,6 +27,17 @@ function hasPhotoNavigationContract(registration = {}) {
     && Array.isArray(navigation.photos);
 }
 
+export function resolveReviewedPhotoIdBySourceHash(registration = {}, sideId, sourceSha256) {
+  if (!hasPhotoNavigationContract(registration) || !SHA256_PATTERN.test(sourceSha256 || '')) return null;
+  const normalizedHash = sourceSha256.toLowerCase();
+  const match = registration.photo_navigation.photos.find((photo) => (
+    photo.side_id === sideId
+    && isReviewedPhoto(photo)
+    && photo.source_sha256.toLowerCase() === normalizedHash
+  ));
+  return match?.photo_id || null;
+}
+
 function unavailableState(sideId, reason) {
   return {
     available: false,

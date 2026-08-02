@@ -318,3 +318,31 @@ test('the compiled KL4 small-current path advances from rails to X2100 without i
   assert.equal(backed.currentStepId, 'crystal_check');
   assert.equal(resetRepairFlow(flow).currentStepId, 'rail_check');
 });
+
+test('the compiled XK67J no-display path records location and stops without a repair action', async () => {
+  const dataset = JSON.parse(await readFile(
+    new URL('../knowledge-base/xk67j-cross-source-registration.json', import.meta.url),
+    'utf8',
+  ));
+  const flow = dataset.repair_flows[0];
+  const initial = createRepairFlowState(flow);
+
+  assert.equal(flow.flow_id, 'xk67j-no-display-u2411-location-check');
+  assert.equal(repairFlowTargetComponentId(flow, initial), 'XK67J-MAIN-U2411');
+  assert.deepEqual(buildRepairFlowChoiceOptions(flow, initial).map(({ value }) => value), [
+    'location_match',
+    'location_unconfirmed',
+  ]);
+
+  const matched = answerRepairFlow(flow, initial, 'location_match');
+  assert.equal(matched.terminal.kind, 'boundary');
+  assert.match(matched.terminal.label, /电气测试标准/);
+  assert.equal(matched.actionExecution, null);
+  assert.throws(() => setRepairFlowActionExecuted(matched, true));
+  assert.equal(closeRepairFlow(matched).closed, true);
+
+  const unconfirmed = answerRepairFlow(flow, initial, 'location_unconfirmed');
+  assert.equal(unconfirmed.terminal.kind, 'boundary');
+  assert.match(unconfirmed.terminal.label, /复核主板型号/);
+  assert.equal(unconfirmed.actionExecution, null);
+});
