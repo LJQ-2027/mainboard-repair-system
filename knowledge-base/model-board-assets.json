@@ -2133,7 +2133,7 @@
           "H8921_SUB_SCH_1_维修原理图_V1.2_20250402-2053.pdf"
         ],
         "local_extract_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages",
-        "note": "资料日期晚于当前系统日期，需后续和制造中心确认版本有效性。",
+        "note": "资料日期为 2025-07-18；截至 2026-08-02 已不是未来日期。版本适用范围仍需按来源和板号审查。",
         "package_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM7K-H8921",
         "files": [
           {
