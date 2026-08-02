@@ -20,7 +20,7 @@
       "schematic_occurrences": 676,
       "reviewed_entities": 7,
       "repair_flows": 3,
-      "repair_coverage": "reviewed_flows",
+      "repair_coverage": null,
       "reference_mode": "photo_proxy",
       "point_map_source_layout": "shared_multi_page",
       "source_named_sides": false,
@@ -168,13 +168,13 @@
       "accepted_designators": 1040,
       "schematic_linked_designators": 505,
       "schematic_occurrences": 524,
-      "reviewed_entities": 12,
-      "repair_flows": 0,
-      "repair_coverage": "source_unavailable",
-      "reference_mode": "point_map_only",
+      "reviewed_entities": 13,
+      "repair_flows": 1,
+      "repair_coverage": "source_boundary_only",
+      "reference_mode": "reviewed_physical_photo_navigation",
       "point_map_source_layout": "shared_multi_page",
       "source_named_sides": false,
-      "location_only_entities": 12
+      "location_only_entities": 13
     }
   ],
   "coverage": {
@@ -202,7 +202,8 @@
       "covered": true,
       "evidence": [
         "photo_proxy",
-        "point_map_only"
+        "point_map_only",
+        "reviewed_physical_photo_navigation"
       ]
     },
     "repair_coverage_modes": {
@@ -210,6 +211,7 @@
       "evidence": [
         "reviewed_flows",
         "source_available_pending_review",
+        "source_boundary_only",
         "source_unavailable"
       ]
     },

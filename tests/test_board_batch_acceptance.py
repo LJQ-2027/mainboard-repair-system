@@ -70,9 +70,9 @@ class BoardBatchAcceptanceTests(unittest.TestCase):
         self.assertEqual(result["accepted_designators"], 1040)
         self.assertEqual(result["schematic_linked_designators"], 505)
         self.assertEqual(result["schematic_occurrences"], 524)
-        self.assertEqual(result["reviewed_entities"], 12)
-        self.assertEqual(result["repair_flows"], 0)
-        self.assertEqual(result["repair_coverage"], "source_unavailable")
+        self.assertEqual(result["reviewed_entities"], 13)
+        self.assertEqual(result["repair_flows"], 1)
+        self.assertEqual(result["repair_coverage"], "source_boundary_only")
         self.assertEqual(
             result["reference_mode"],
             "reviewed_physical_photo_navigation",
@@ -134,7 +134,8 @@ class BoardBatchAcceptanceTests(unittest.TestCase):
         self.assertIn("# Board Catalog Batch Acceptance", report)
         self.assertIn("| `bg6m-f069m` | PASS | 1,115 | 604 | 10 | 0 |", report)
         self.assertIn("| `bg6h-f069` | PASS | 1,126 | 604 | 12 | 0 |", report)
-        self.assertIn("| `xk67j-shared` | PASS | 1,040 | 505 | 12 | 0 |", report)
+        self.assertIn("| `xk67j-shared` | PASS | 1,040 | 505 | 13 | 1 |", report)
+        self.assertIn("source_boundary_only", report)
         self.assertIn("reference-only repair coverage", report)
         self.assertIn("Visual defect recognition", report)
         self.assertIn("**Sufficient for current source-to-2.5D pipeline: YES**", report)
