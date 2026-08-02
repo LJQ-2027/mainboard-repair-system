@@ -106,3 +106,35 @@ This is a reviewed **board-coordinate alignment** only. It has not created a
 Golden Sample, defect label, training row, field-accuracy result, industrial
 acceptance result, or repair causality. The next knowledge action remains a
 source-backed XK67J repair workflow, if one is supplied and reviewed.
+
+## First-stage technician photo navigation
+
+The reviewed registrations now drive a technician-facing physical-photo view in
+the existing cross-source workbench. The view is intentionally part of the same
+navigation surface as the high-resolution point map and 2.5D model, rather than a
+separate visual-QC workflow.
+
+- Side 1 exposes the reviewed shield-side image.
+- Side 2 exposes both reviewed complete-board images through an A/B selector.
+- The shared side selector drives the physical photo, point map, and 2.5D model.
+- Component selection is synchronized across all three views. Selecting an entity
+  from the opposite side first changes side, then locates that entity.
+- The physical photo and point map support pointer/touch pan, zoom, and reset.
+- When no reviewed photo is configured, the physical-photo view fails closed while
+  the point map and 2.5D model remain available.
+
+The browser receives only metadata-stripped WebP derivatives. Each derivative is
+generated from an allowlisted source SHA-256, has its own recorded SHA-256, and is
+covered by the proxy-asset inventory so it cannot silently enter QC or training
+intake. Controlled source paths are not published in the manifest.
+
+Source red rectangles remain visible because they are part of the source pixels.
+The active-photo note names this boundary explicitly: they are source annotations,
+not system detections, defect conclusions, Golden evidence, or repair instructions.
+
+Acceptance evidence for this increment includes Node unit/contract tests, Python
+asset and registration validation, desktop browser QA at 1440 x 900, and touch
+layout QA at 390 x 844. Verified paths include side switching, Side 2 A/B photo
+switching, pan/zoom/reset, explicit component focus, cross-side entity selection,
+point-map synchronization, nonblank 2.5D rendering, responsive readability, and
+zero runtime console errors in clean runs.

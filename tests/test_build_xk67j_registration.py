@@ -1,3 +1,4 @@
+import copy
 import unittest
 from pathlib import Path
 
@@ -123,6 +124,16 @@ class Xk67jRegistrationTests(unittest.TestCase):
 
     def test_dataset_passes_the_shared_registration_contract(self):
         self.assertEqual(validate_dataset(self.dataset, ROOT), [])
+
+    def test_shared_contract_rejects_photo_asset_hash_mismatch(self):
+        dataset = copy.deepcopy(self.dataset)
+        photos = dataset["registration"]["photo_navigation"]["photos"]
+        photos[0]["asset_path"] = photos[1]["asset_path"]
+
+        self.assertTrue(any(
+            "derivative hash does not match" in error
+            for error in validate_dataset(dataset, ROOT)
+        ))
 
 
 if __name__ == "__main__":

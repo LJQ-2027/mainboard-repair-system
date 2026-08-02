@@ -71,3 +71,11 @@ export function buildPhotoNavigationState({
       : '实拍图仅用于板级坐标导航，不代表正常板或故障结论。',
   };
 }
+
+export function failPhotoNavigation(state = {}) {
+  const failed = unavailableState(state.sideId || null, 'photo_asset_load_failed');
+  return {
+    ...failed,
+    boundaryCopy: '实拍图载入失败；点位图与2.5D模型仍可继续使用。',
+  };
+}

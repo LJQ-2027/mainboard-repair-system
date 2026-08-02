@@ -2,6 +2,7 @@ export function buildSourceNote({
   view,
   registration,
   side,
+  photo = null,
   inspectionEntity = null,
   repairCoverage = null,
 }) {
@@ -12,6 +13,9 @@ export function buildSourceNote({
   if (view === 'model') {
     return `${side.label} · 2.5D维修视图 · ${side.audit.accepted_designators} 个点位已关联`;
   }
-  if (view === 'pointmap') return registration.point_map_note;
+  if (view === 'pointmap') return side.pointMapNote || registration.point_map_note;
+  if (view === 'photo' && photo) {
+    return photo.label ? `${photo.label} · ${photo.boundaryCopy}` : photo.boundaryCopy;
+  }
   return registration.proxy_note || registration.point_map_note;
 }

@@ -20,6 +20,29 @@ test('source note follows the active photo or point-map view', () => {
   assert.equal(buildSourceNote({ view: 'pointmap', registration, side }), registration.point_map_note);
 });
 
+test('reviewed physical photo note names the active capture and preserves its boundary', () => {
+  const photo = {
+    label: '第2面实拍 B',
+    boundaryCopy: '照片中的红框或标识来自原始维修案例，不是系统识别结果。',
+  };
+  assert.equal(
+    buildSourceNote({ view: 'photo', registration, side, photo }),
+    '第2面实拍 B · 照片中的红框或标识来自原始维修案例，不是系统识别结果。',
+  );
+});
+
+test('failed physical photo note exposes only the fail-closed boundary', () => {
+  assert.equal(
+    buildSourceNote({
+      view: 'photo',
+      registration,
+      side,
+      photo: { label: null, boundaryCopy: '实拍图载入失败；点位图与2.5D模型仍可继续使用。' },
+    }),
+    '实拍图载入失败；点位图与2.5D模型仍可继续使用。',
+  );
+});
+
 test('a board without a photo proxy falls back to its point-map source note', () => {
   const pointMapOnly = { reference_mode: 'point_map_only', point_map_note: 'H6929 TOP/BOT 点位图' };
   assert.equal(buildSourceNote({ view: 'photo', registration: pointMapOnly, side }), pointMapOnly.point_map_note);

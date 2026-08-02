@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { buildPhotoNavigationState } from '../assets/cross-source-registration/photo-navigation-state.js';
+import {
+  buildPhotoNavigationState,
+  failPhotoNavigation,
+} from '../assets/cross-source-registration/photo-navigation-state.js';
 
 
 const matrix = [1, 0, 0, 0, 1, 0, 0, 0, 1];
@@ -107,4 +110,18 @@ test('does not expose photos for legacy or unsupported reference modes', () => {
 
   assert.equal(state.available, false);
   assert.equal(state.reason, 'photo_navigation_unavailable');
+});
+
+test('runtime image failure clears the active photo and preserves a fail-closed boundary', () => {
+  const state = buildPhotoNavigationState({
+    registration,
+    sideId: 'main_page_2',
+  });
+  const failed = failPhotoNavigation(state);
+
+  assert.equal(failed.available, false);
+  assert.equal(failed.activePhoto, null);
+  assert.equal(failed.assetPath, null);
+  assert.equal(failed.matrix, null);
+  assert.match(failed.boundaryCopy, /载入失败/);
 });

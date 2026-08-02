@@ -2,7 +2,9 @@ import { solveHomography } from './registration-core.js';
 import { resolveBoardAssets, resolveBoardKey } from './board-catalog-state.js';
 import { buildSelectionState, entityListModelRevealOptions, nearestPointerTarget } from './selection-state.js';
 import { BoardRenderer } from './board-renderer.js';
+import { ImageViewport } from './image-viewport.js';
 import { PointMapViewport } from './point-map-viewport.js';
+import { buildPhotoNavigationState, failPhotoNavigation } from './photo-navigation-state.js';
 import { buildSourceNote } from './source-note-state.js';
 import { buildRegistrationViewState } from './registration-view-state.js';
 import { buildPhysicalRegistrationState } from './physical-registration-state.js';
@@ -68,6 +70,10 @@ let renderer;
 let geometryData;
 let selectedId;
 let pointMapViewport;
+let photoViewport;
+let photoState = null;
+const preferredPhotoBySide = new Map();
+let technicianSelectionActive = false;
 let activeView = 'photo';
 let currentRepairTarget;
 let sideDataById = new Map();
@@ -119,6 +125,10 @@ function updateSourceNote(inspectionEntity = null) {
     view: activeView,
     registration: data.registration,
     side,
+    photo: activeView === 'photo' && photoState ? {
+      label: photoState.available ? photoState.activePhoto.label : null,
+      boundaryCopy: photoState.boundaryCopy,
+    } : null,
     inspectionEntity,
     repairCoverage: data.repair_coverage,
   });
@@ -779,6 +789,7 @@ async function switchModelSide(sideId, animate = true) {
       renderer.setModuleFocus(null);
       renderer.clearRepairFocus(false);
     }
+    syncBoardViews();
     return activeSideId;
   } finally {
     finishModelTransition(transitionId);
@@ -799,8 +810,10 @@ function addMarkers(layer, positions, entities) {
   entities.forEach((entity) => {
     const display = technicianEntityCopy(entity);
     const point = positions.get(entity.component_id);
+    if (!point || !Number.isFinite(point.x) || !Number.isFinite(point.y)) return;
     const button = document.createElement('button');
     button.className = 'marker';
+    button.classList.toggle('selected', entity.component_id === selectedId);
     button.type = 'button';
     button.dataset.componentId = entity.component_id;
     button.style.left = `${point.x * 100}%`;
@@ -832,6 +845,114 @@ function addMarkers(layer, positions, entities) {
     fragment.append(button);
   });
   layer.append(fragment);
+}
+
+function legacyPhotoState(registration, sideId) {
+  const { proxy_image: assetPath, proxy_note: boundaryCopy, anchors = [] } = registration;
+  if (!assetPath || sideId !== data.side_id || anchors.length < 4) return null;
+  const source = anchors.slice(0, 4).map((anchor) => anchor.board);
+  const target = anchors.slice(0, 4).map((anchor) => anchor.image);
+  return {
+    available: true,
+    items: [{ photoId: 'legacy-photo-proxy', label: '主板实物参考' }],
+    selectorVisible: false,
+    activePhoto: { photo_id: 'legacy-photo-proxy', label: '主板实物参考' },
+    assetPath,
+    matrix: solveHomography(source, target),
+    sourceAnnotationPresent: false,
+    boundaryCopy: boundaryCopy || registration.point_map_note,
+  };
+}
+
+function renderPhotoSelector(state) {
+  const control = document.querySelector('.photo-selector');
+  const select = document.querySelector('#photoSelector');
+  control.hidden = !state?.selectorVisible;
+  select.replaceChildren();
+  (state?.items || []).forEach((item) => {
+    const option = document.createElement('option');
+    option.value = item.photoId;
+    option.textContent = item.label;
+    option.selected = item.photoId === state.activePhoto?.photo_id;
+    select.append(option);
+  });
+}
+
+function focusSelectedImageEntity() {
+  if (!technicianSelectionActive) return;
+  const entity = data?.entities.find((candidate) => candidate.component_id === selectedId);
+  if (!entity || entity.side_id !== activeSideId) return;
+  const state = buildSelectionState(entity, matrix);
+  if (activeView === 'photo' && state.photoPoint) photoViewport?.focus(state.photoPoint);
+  if (activeView === 'pointmap') pointMapViewport?.focus(state.boardPoint);
+}
+
+function syncBoardViews() {
+  const sideData = sideDataById.get(activeSideId);
+  if (!sideData) return;
+  const photoImage = document.querySelector('#photoView img');
+  const pointMapImage = document.querySelector('#pointmapView img');
+  const photoMarkers = document.querySelector('#photoView .markers');
+  const pointMapMarkers = document.querySelector('#pointmapView .markers');
+  const status = document.querySelector('#photoLoadStatus');
+  const preferredPhotoId = preferredPhotoBySide.get(activeSideId) || null;
+  photoState = buildPhotoNavigationState({
+    registration: data.registration,
+    sideId: activeSideId,
+    preferredPhotoId,
+  });
+  if (!photoState.available) photoState = legacyPhotoState(data.registration, activeSideId) || photoState;
+  matrix = photoState.available ? photoState.matrix : null;
+
+  pointMapMarkers.replaceChildren();
+  const boardPositions = new Map(
+    sideData.entities.map((entity) => [entity.component_id, entity.geometry.center]),
+  );
+  addMarkers(pointMapMarkers, boardPositions, sideData.entities);
+  pointMapImage.alt = `${data.board_version} ${sideData.label}点位图`;
+  if (pointMapImage.getAttribute('src') !== sideData.engineeringTextureUrl) {
+    pointMapImage.src = sideData.engineeringTextureUrl;
+    pointMapViewport?.replaceImage(activeSideId);
+  }
+
+  photoMarkers.replaceChildren();
+  renderPhotoSelector(photoState);
+  status.hidden = photoState.available;
+  if (!photoState.available) {
+    photoImage.removeAttribute('src');
+    photoImage.hidden = true;
+    status.textContent = photoState.boundaryCopy;
+  } else {
+    preferredPhotoBySide.set(activeSideId, photoState.activePhoto.photo_id);
+    photoImage.hidden = false;
+    photoImage.alt = `${data.model} ${sideData.label}${photoState.activePhoto.label}`;
+    const nextSource = `../../${photoState.assetPath}`;
+    if (photoImage.getAttribute('src') !== nextSource) photoImage.src = nextSource;
+    photoViewport.replaceImage(photoState.activePhoto.photo_id);
+    const photoPositions = new Map(sideData.entities.map((entity) => [
+      entity.component_id,
+      buildSelectionState(entity, matrix).photoPoint,
+    ]));
+    addMarkers(photoMarkers, photoPositions, sideData.entities);
+  }
+  document.querySelector('#photoTools').hidden = activeView !== 'photo' || !photoState.available;
+  updateSourceNote();
+}
+
+function failPhotoViewClosed() {
+  photoState = failPhotoNavigation(photoState);
+  matrix = null;
+  const photoImage = document.querySelector('#photoView img');
+  photoImage.removeAttribute('src');
+  photoImage.hidden = true;
+  document.querySelector('#photoView .markers').replaceChildren();
+  renderPhotoSelector(photoState);
+  photoViewport?.replaceImage(null);
+  document.querySelector('#photoTools').hidden = true;
+  const status = document.querySelector('#photoLoadStatus');
+  status.hidden = false;
+  status.textContent = photoState.boundaryCopy;
+  updateSourceNote();
 }
 
 function evidenceCard(link, type) {
@@ -933,9 +1054,16 @@ async function selectEntity(componentId, options = {}) {
     if (!leftInspection) return false;
   }
   if (!canAcceptModelInteraction(modelInteraction)) return false;
+  if (entity.side_id !== activeSideId) {
+    const switchedSide = await switchModelSide(entity.side_id, activeView === 'model');
+    if (switchedSide !== entity.side_id) return false;
+  }
+  if (!canAcceptModelInteraction(modelInteraction)) return false;
   modelInteraction = recordSelectionIntent(modelInteraction, options.explicit !== false);
   selectedId = componentId;
+  technicianSelectionActive = options.explicit !== false;
   const state = buildSelectionState(entity, matrix);
+  const shouldFocusImage = options.focus !== false && options.explicit !== false;
   const display = technicianEntityCopy(entity);
   document.querySelectorAll('[data-component-id]').forEach((node) => node.classList.toggle('selected', node.dataset.componentId === componentId));
   document.querySelector('#entityCategory').textContent = display.category;
@@ -958,7 +1086,8 @@ async function selectEntity(componentId, options = {}) {
   if (options.focus === false && activeView === 'model') renderer.clearRepairEmphasis();
   else activateRepairTarget();
   if (activeView === 'model') modelInteraction = consumePendingFocus(modelInteraction);
-  if (activeView === 'pointmap' && pointMapViewport) pointMapViewport.focus(state.boardPoint);
+  if (shouldFocusImage && activeView === 'pointmap' && pointMapViewport) pointMapViewport.focus(state.boardPoint);
+  if (shouldFocusImage && activeView === 'photo' && photoViewport && state.photoPoint) photoViewport.focus(state.photoPoint);
   updateInspectionUi();
   return true;
 }
@@ -987,6 +1116,7 @@ async function setView(name) {
   document.querySelectorAll('[role=tab]').forEach((button) => button.setAttribute('aria-selected', String(button.dataset.view === name)));
   Object.entries(views).forEach(([key, view]) => view.classList.toggle('active', key === name));
   document.querySelector('#pointMapTools').hidden = name !== 'pointmap';
+  document.querySelector('#photoTools').hidden = name !== 'photo' || !photoState?.available;
   document.querySelector('#modelTools').hidden = name !== 'model';
   if (name === 'model') {
     syncInspectionAngleControl(false);
@@ -1066,6 +1196,7 @@ async function init() {
       compiledComponents: compiled.components,
       audit: compiled.audit,
       engineeringTextureUrl: `../../${side.engineering_texture}`,
+      pointMapNote: `${data.board_version} · ${side.label}点位图`,
       anatomy: {
         shields: side.side_id === data.side_id ? extractShieldRegions(shieldData) : [],
         modules: extractModuleRegions(atlasData, side.side_id),
@@ -1084,27 +1215,23 @@ async function init() {
   });
   document.title = `${boardAssets.title} 维修工作台`;
   document.querySelector('#boardTitle').textContent = boardAssets.title;
-  if (registrationView.photoAvailable) {
-    const source = data.registration.anchors.slice(0, 4).map((anchor) => anchor.board);
-    const target = data.registration.anchors.slice(0, 4).map((anchor) => anchor.image);
-    matrix = solveHomography(source, target);
-  }
-
   const photoImage = document.querySelector('#photoView img');
   const pointMapImage = document.querySelector('#pointmapView img');
-  photoImage.alt = `${data.model} 装机主板参考图`;
-  pointMapImage.alt = `${data.board_version} 主板点位图`;
-  if (registrationView.photoAvailable) photoImage.src = `../../${data.registration.proxy_image}`;
-  pointMapImage.src = `../../${data.registration.point_map_image}`;
+  photoViewport = new ImageViewport(
+    document.querySelector('#photoView'),
+    document.querySelector('#photoView .physical-photo'),
+  );
   pointMapViewport = new PointMapViewport(document.querySelector('#pointmapView'), document.querySelector('#pointmapView .point-map'));
-  pointMapImage.addEventListener('load', () => pointMapViewport.reset(), { once: true });
-  const registeredEntities = data.entities.filter((entity) => entity.side_id === data.side_id);
-  const boardPositions = new Map(registeredEntities.map((entity) => [entity.component_id, entity.geometry.center]));
-  if (registrationView.photoAvailable) {
-    const photoPositions = new Map(registeredEntities.map((entity) => [entity.component_id, buildSelectionState(entity, matrix).photoPoint]));
-    addMarkers(document.querySelector('#photoView .markers'), photoPositions, registeredEntities);
-  }
-  addMarkers(document.querySelector('#pointmapView .markers'), boardPositions, registeredEntities);
+  photoImage.addEventListener('load', () => {
+    document.querySelector('#photoLoadStatus').hidden = true;
+    photoViewport.render();
+    focusSelectedImageEntity();
+  });
+  photoImage.addEventListener('error', () => {
+    failPhotoViewClosed();
+  });
+  pointMapImage.addEventListener('load', () => pointMapViewport.render());
+  syncBoardViews();
 
   renderer = new BoardRenderer(
     document.querySelector('#modelCanvas'),
@@ -1132,7 +1259,7 @@ async function init() {
   });
   renderRepairEntry();
   const initialEntity = data.entities.find((entity) => entity.side_id === activeSideId) || data.entities[0];
-  selectEntity(initialEntity.component_id, { explicit: false });
+  selectEntity(initialEntity.component_id, { explicit: false, focus: false });
 }
 
 document.querySelectorAll('[role=tab]').forEach((button) => button.addEventListener('click', () => { void setView(button.dataset.view); }));
@@ -1197,6 +1324,13 @@ document.querySelectorAll('[data-side-id]').forEach((button) => button.addEventL
 document.querySelector('#zoomOutPointMap').addEventListener('click', () => pointMapViewport?.zoomBy(0.8));
 document.querySelector('#zoomInPointMap').addEventListener('click', () => pointMapViewport?.zoomBy(1.25));
 document.querySelector('#resetPointMap').addEventListener('click', () => pointMapViewport?.reset());
+document.querySelector('#zoomOutPhoto').addEventListener('click', () => photoViewport?.zoomBy(0.8));
+document.querySelector('#zoomInPhoto').addEventListener('click', () => photoViewport?.zoomBy(1.25));
+document.querySelector('#resetPhoto').addEventListener('click', () => photoViewport?.reset());
+document.querySelector('#photoSelector').addEventListener('change', (event) => {
+  preferredPhotoBySide.set(activeSideId, event.currentTarget.value);
+  syncBoardViews();
+});
 document.querySelector('#modelTools').hidden = true;
 const evidenceDialog = document.querySelector('#evidenceDialog');
 document.querySelector('#schematicEvidence').addEventListener('click', (event) => {

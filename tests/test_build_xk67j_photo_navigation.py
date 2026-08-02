@@ -10,6 +10,7 @@ from scripts.build_xk67j_photo_navigation import (
     build_navigation_manifest,
     validate_navigation_manifest,
 )
+from scripts.visual_qc.proxy_inventory import known_proxy_hashes
 
 
 def _sha256(path):
@@ -164,6 +165,20 @@ class Xk67jPhotoNavigationBuilderTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "unique source hashes"):
             self._build()
 
+
+class Xk67jPublishedPhotoNavigationTests(unittest.TestCase):
+    def test_published_derivatives_are_protected_by_the_proxy_inventory(self):
+        root = Path(__file__).resolve().parents[1]
+        manifest = json.loads(
+            (root / "knowledge-base/xk67j-photo-navigation.json").read_text(encoding="utf-8")
+        )
+        protected_hashes = known_proxy_hashes(root)
+
+        self.assertTrue(
+            {item["derivative_sha256"] for item in manifest["photos"]}.issubset(
+                protected_hashes
+            )
+        )
 
 if __name__ == "__main__":
     unittest.main()

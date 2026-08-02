@@ -42,13 +42,14 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) clamp(360px, 27vw, 4
 .view-head {
   display: flex;
   align-items: center;
+  gap: 6px;
   padding: 7px 12px;
   background: #f5f6f2;
   border-bottom: 1px solid var(--line);
 }
 
 .tabs, .view-tools { display: flex; gap: 3px; }
-.view-tools { gap: 6px; margin-left: auto; }
+.view-tools { flex: none; gap: 4px; }
 .tabs button, .entity-list button { font: inherit; }
 .tabs button {
   border: 0;
@@ -65,7 +66,8 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) clamp(360px, 27vw, 4
 .model-angle-button:focus-visible,
 .model-interaction-modes button:focus-visible,
 .anatomy-segments button:focus-visible,
-.side-panel button:focus-visible { outline: 3px solid #65a9ff; outline-offset: 2px; }
+.side-panel button:focus-visible,
+.photo-selector select:focus-visible { outline: 3px solid #65a9ff; outline-offset: 2px; }
 .inspect-component:focus-visible { outline: 3px solid #65a9ff; outline-offset: 2px; }
 .icon-button {
   width: 34px;
@@ -78,6 +80,26 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) clamp(360px, 27vw, 4
 }
 .icon-button:hover { border-color: var(--accent); }
 .icon-button[aria-pressed="true"] { background: #17221e; color: white; border-color: #17221e; }
+.photo-selector {
+  display: grid;
+  grid-template-columns: auto minmax(0, 108px);
+  height: 34px;
+  align-items: center;
+  border: 1px solid var(--line);
+  background: white;
+}
+.photo-selector[hidden] { display: none; }
+.photo-selector span { padding-left: 8px; color: #66736d; font-size: 10px; }
+.photo-selector select {
+  width: 108px;
+  height: 32px;
+  border: 0;
+  background: white;
+  color: var(--ink);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
 .model-angle-button {
   width: 46px;
   height: 34px;
@@ -166,6 +188,21 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) clamp(360px, 27vw, 4
 }
 .image-layer img { display: block; max-width: 100%; max-height: calc(100vh - 208px); object-fit: contain; }
 .image-layer.point-map img { background: white; }
+.image-load-status {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: min(320px, calc(100% - 32px));
+  padding: 9px 12px;
+  border: 1px solid #b8a257;
+  background: #fff8dc;
+  color: #665416;
+  font-size: 11px;
+  line-height: 1.45;
+  text-align: center;
+}
+.image-load-status[hidden] { display: none; }
 .markers { position: absolute; inset: 0; }
 .marker {
   position: absolute;
@@ -292,20 +329,17 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) clamp(360px, 27vw, 4
 .anatomy-segments button:hover { border-color: var(--accent); color: #17221e; }
 .anatomy-segments button[aria-pressed="true"] { background: #17221e; color: white; border-color: #17221e; }
 .side-panel {
-  position: absolute;
-  top: 12px;
-  right: 14px;
+  position: static;
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 5px;
-  border: 1px solid #bac3bd;
-  background: #f8f9f6f2;
+  flex: none;
+  gap: 0;
+  margin-left: auto;
 }
 .anatomy-panel[hidden], .side-panel[hidden] { display: none; }
-.side-segments { display: grid; grid-template-columns: repeat(2, 54px); }
+.side-segments { display: grid; grid-template-columns: repeat(2, 48px); }
 .side-segments button {
-  height: 30px;
+  height: 34px;
   border: 1px solid #b9c2bc;
   background: white;
   color: #405049;
@@ -645,8 +679,17 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) clamp(360px, 27vw, 4
 
 @media (max-width: 480px) {
   .workspace { height: 540px; grid-template-rows: auto minmax(0, 1fr) auto; }
-  .view-head { flex-wrap: wrap; row-gap: 4px; padding: 5px 8px; }
-  .tabs button { padding: 8px 9px; font-size: 12px; }
+  .view-head { flex-wrap: wrap; row-gap: 5px; padding: 5px 8px; }
+  .tabs { flex: 1 1 auto; }
+  .tabs button { padding: 8px 8px; font-size: 11px; }
+  .side-panel { position: static; margin-left: 0; padding: 0; }
+  .side-segments { grid-template-columns: repeat(2, 42px); }
+  .side-segments button { height: 32px; }
+  .view-tools { margin-left: auto; }
+  .view-tools .icon-button { width: 32px; height: 32px; }
+  .photo-selector { height: 32px; grid-template-columns: minmax(0, 112px); }
+  .photo-selector span { display: none; }
+  .photo-selector select { width: 112px; height: 30px; }
   #modelTools { left: 8px; bottom: 8px; gap: 4px; padding: 4px; }
   #modelTools .icon-button { width: 32px; height: 32px; }
   #modelTools .model-angle-button { width: 42px; height: 32px; }
@@ -664,17 +707,14 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) clamp(360px, 27vw, 4
   }
   .anatomy-panel { top: 8px; left: 8px; gap: 4px; padding: 4px; }
   .anatomy-segments { grid-template-columns: repeat(3, 36px); }
-  .side-panel { top: 8px; left: auto; right: 8px; padding: 4px; }
-  .side-segments { grid-template-columns: repeat(2, 46px); }
   .inspection-status { right: 8px; bottom: 8px; min-height: 40px; }
 }
 
 @media (max-width: 360px) {
   .anatomy-panel { gap: 3px; }
   .anatomy-segments { grid-template-columns: repeat(3, 30px); }
-  .side-panel { gap: 3px; }
+  .side-panel { gap: 0; }
   .side-segments { grid-template-columns: repeat(2, 38px); }
   .side-segments button { font-size: 10px; }
-  .wide-side-prefix { display: none; }
   .inspection-status > span:last-child { display: none; }
 }

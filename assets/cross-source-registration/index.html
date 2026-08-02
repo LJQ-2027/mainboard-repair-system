@@ -18,9 +18,22 @@
     <section class="workspace" aria-label="同步主板视图">
       <div class="view-head">
         <div class="tabs" role="tablist">
-          <button role="tab" aria-selected="true" data-view="photo">主板实物参考</button>
+          <button role="tab" aria-selected="true" data-view="photo">实物图</button>
           <button role="tab" aria-selected="false" data-view="pointmap">点位图</button>
           <button role="tab" aria-selected="false" data-view="model">2.5D 模型</button>
+        </div>
+        <div class="side-panel" aria-label="主板面切换">
+          <div class="side-segments" role="group" aria-label="选择主板面">
+            <button type="button" data-side-id="main_page_1" aria-pressed="false" aria-label="第1面" disabled>第1面</button>
+            <button type="button" data-side-id="main_page_2" aria-pressed="true" aria-label="第2面" disabled>第2面</button>
+          </div>
+          <span id="activeSideLabel" aria-live="polite">第2面</span>
+        </div>
+        <div class="view-tools" id="photoTools" hidden>
+          <label class="photo-selector" hidden><span>实拍</span><select id="photoSelector" aria-label="选择实拍图"></select></label>
+          <button class="icon-button" id="zoomOutPhoto" title="缩小实拍图" aria-label="缩小实拍图">−</button>
+          <button class="icon-button" id="zoomInPhoto" title="放大实拍图" aria-label="放大实拍图">+</button>
+          <button class="icon-button" id="resetPhoto" title="重置实拍图" aria-label="重置实拍图">↻</button>
         </div>
         <div class="view-tools" id="pointMapTools" hidden>
           <button class="icon-button" id="zoomOutPointMap" title="缩小点位图" aria-label="缩小点位图">−</button>
@@ -29,7 +42,10 @@
         </div>
       </div>
       <div class="stage">
-        <div class="view active" id="photoView"><div class="image-layer"><img alt="装机主板参考图"><div class="markers"></div></div></div>
+        <div class="view photo-view active" id="photoView">
+          <div class="image-layer physical-photo"><img alt="主板实物图"><div class="markers"></div></div>
+          <div class="image-load-status" id="photoLoadStatus" role="status" hidden></div>
+        </div>
         <div class="view point-map-view" id="pointmapView"><div class="image-layer point-map"><img alt="主板点位图"><div class="markers"></div></div></div>
         <div class="view model-view" id="modelView" aria-busy="false">
           <div id="modelCanvas"></div>
@@ -48,13 +64,6 @@
               <button type="button" data-shield-mode="xray" aria-pressed="false" title="半透明查看屏蔽罩下器件">透视</button>
               <button type="button" data-shield-mode="removed" aria-pressed="true" title="移除屏蔽罩查看器件">拆罩</button>
             </div>
-          </div>
-          <div class="side-panel" aria-label="主板面切换">
-            <div class="side-segments" role="group" aria-label="选择主板面">
-              <button type="button" data-side-id="main_page_1" aria-pressed="false" aria-label="第1面"><span class="wide-side-prefix">第</span>1面</button>
-              <button type="button" data-side-id="main_page_2" aria-pressed="true" aria-label="第2面"><span class="wide-side-prefix">第</span>2面</button>
-            </div>
-            <span id="activeSideLabel" aria-live="polite">第2面</span>
           </div>
           <button class="inspection-status" id="inspectionStatus" type="button" hidden aria-live="polite" title="返回主板">
             <span class="inspection-return-icon" aria-hidden="true">←</span><strong id="inspectionDesignator">U2001</strong><span>单体检视</span>

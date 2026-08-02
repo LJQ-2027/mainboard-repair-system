@@ -1,3 +1,4 @@
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -11,6 +12,14 @@ def _normalized(point):
 
 def _number(value):
     return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def _sha256(path):
+    digest = hashlib.sha256()
+    with path.open("rb") as source:
+        for chunk in iter(lambda: source.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def validate_dataset(data, root):
@@ -49,6 +58,10 @@ def validate_dataset(data, root):
             asset = root / asset_path if asset_path else None
             if not asset or not asset.is_file():
                 errors.append(f"photo navigation asset does not resolve: {photo.get('photo_id')}")
+            elif _sha256(asset) != photo.get("derivative_sha256"):
+                errors.append(
+                    f"photo navigation derivative hash does not match: {photo.get('photo_id')}"
+                )
             if len(photo.get("board_to_image_matrix", [])) != 9:
                 errors.append(f"photo navigation matrix is invalid: {photo.get('photo_id')}")
             if photo.get("registration_review_status") != "reviewed":
