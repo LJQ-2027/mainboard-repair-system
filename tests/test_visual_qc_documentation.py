@@ -18,6 +18,7 @@ CASE005_MANIFEST_SHA256 = (
     "85c8c64cb97cf1ea1e567e4d1f7fc62ec00ebf02719939c74a5e0faf46298177"
 )
 CASE005_MODEL_IDENTITY_TOKEN = "model_identity_resolved=false"
+CURRENT_PRODUCTION = "08d08cd38aaffc9b01d901dfe9ef7684a614abac"
 CASE005_BOUNDARY_EQUIVALENTS = (
     ("not visual diagnosis evidence", "不是视觉诊断"),
     ("not confirmed defect evidence", "不是缺陷确认"),
@@ -81,9 +82,9 @@ class VisualQcDocumentationTests(unittest.TestCase):
                 normalized,
                 relative_path,
             )
-            self.assertIn(
-                "Production remains unchanged",
-                normalized,
+            self.assertTrue(
+                "Production remains unchanged" in normalized
+                or CURRENT_PRODUCTION in normalized,
                 relative_path,
             )
             for stage in REPAIR_EVIDENCE_OWNER_SEQUENCE:
@@ -126,7 +127,11 @@ class VisualQcDocumentationTests(unittest.TestCase):
             self.assertIn("symptom_linked", document)
             self.assertIn("TECNO/BG6", document)
             self.assertIn("BG6H/BG6h", document)
-            self.assertIn("Production remains `f278061`", document)
+            self.assertTrue(
+                "Production remains `f278061`" in document
+                or CURRENT_PRODUCTION in document,
+                name,
+            )
             for equivalents in CASE005_BOUNDARY_EQUIVALENTS:
                 self.assertTrue(
                     any(token in document for token in equivalents),
@@ -305,19 +310,19 @@ class VisualQcDocumentationTests(unittest.TestCase):
         ).read_text(encoding="utf-8")
 
         self.assertIn("acceptance-qualified handoff", readme)
-        self.assertIn("生产仍为 `f278061`", readme)
+        self.assertIn(CURRENT_PRODUCTION, readme)
         self.assertNotIn("再由数据管理员批量导入受控 FastAPI 服务", readme)
         self.assertIn("海外维修员不上传视觉照片", product_vision)
         self.assertNotIn("前端负责图片上传", product_vision)
-        self.assertIn("生产仍为 `f278061`", product_vision)
-        self.assertIn("不得把 qualified handoff 指向生产", product_vision)
+        self.assertIn(CURRENT_PRODUCTION, product_vision)
+        self.assertIn("来源审计、实物验收和验收合格交接", product_vision)
         self.assertIn("Milo 是实物照片的唯一来源", security)
         self.assertIn("验收合格交接", security)
-        self.assertIn("生产仍为 `f278061`", security)
-        self.assertIn("qualified handoff 禁止指向生产", security)
+        self.assertIn(CURRENT_PRODUCTION, security)
+        self.assertIn("来源审计、实物验收和干跑全部通过", security)
         self.assertIn("acceptance-qualified handoff CLI", deployment)
-        self.assertIn("Production remains `f278061`", workbench)
-        self.assertIn("must not be used for physical intake", workbench)
+        self.assertIn(CURRENT_PRODUCTION, workbench)
+        self.assertIn("does not upload new physical captures", workbench)
         self.assertIn("VISUAL-QC-SERVER-CASE-V3", architecture)
         self.assertIn("handoff_visual_qc_physical_package.py", architecture)
         self.assertNotIn("scripts.import_visual_qc_batch", architecture)
@@ -325,8 +330,8 @@ class VisualQcDocumentationTests(unittest.TestCase):
         self.assertNotIn("## Next Increment", registration)
         self.assertNotIn("technician or reviewer", registration)
         self.assertIn("data administrator", registration)
-        self.assertIn("production revision `f278061`", registration)
-        self.assertIn("Later admission hardening is local only", registration)
+        self.assertIn(f"production revision `{CURRENT_PRODUCTION}`", registration)
+        self.assertIn("Production admission remains fail-closed", registration)
         self.assertIn("direct generic-import transport", owner_intake)
         self.assertIn("direct importer use superseded", batch_builder)
         self.assertNotIn(
@@ -335,9 +340,8 @@ class VisualQcDocumentationTests(unittest.TestCase):
         )
         self.assertIn("HISTORICAL COMPLETED PLAN", legacy_intake_plan)
         self.assertIn("Do not execute this plan", legacy_intake_plan)
-        self.assertIn("Local HEAD contract", server_api)
-        self.assertIn("Production remains `f278061`", server_api)
-        self.assertIn("must not target production", server_api)
+        self.assertIn(f"Production is `{CURRENT_PRODUCTION}`", server_api)
+        self.assertIn("only after source audit, physical acceptance", server_api)
 
     def test_documented_acceptance_arguments_are_accepted_by_the_cli_parser(self):
         arguments = build_acceptance_parser().parse_args(

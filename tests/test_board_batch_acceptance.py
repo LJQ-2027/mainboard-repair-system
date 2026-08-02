@@ -73,7 +73,10 @@ class BoardBatchAcceptanceTests(unittest.TestCase):
         self.assertEqual(result["reviewed_entities"], 12)
         self.assertEqual(result["repair_flows"], 0)
         self.assertEqual(result["repair_coverage"], "source_unavailable")
-        self.assertEqual(result["reference_mode"], "point_map_only")
+        self.assertEqual(
+            result["reference_mode"],
+            "reviewed_physical_photo_navigation",
+        )
         self.assertEqual(
             result["compatible_models"],
             ["KM4n", "KM4k", "KM5", "KM5n", "KM5s"],
