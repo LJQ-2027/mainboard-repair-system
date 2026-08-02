@@ -16,6 +16,7 @@ MODEL_EVIDENCE = {
     "KM5n": "owner_confirmed_alias",
     "KM5s": "owner_confirmed_alias",
 }
+NO_DISPLAY_PHOTO_SHA256 = "28a193f9bbd0750240fb20477f5ec0497de7f279868b408eab7c872dcd0273d6"
 
 
 def _read_json(root, path):
@@ -39,6 +40,92 @@ def _schematic_link(schematic, designator):
             "facts": [f"Exact schematic designator {designator}"],
         }
     ]
+
+
+def _no_display_case_evidence():
+    return {
+        "evidence_id": "XK67J-KM4N-NO-DISPLAY-CASES-20260731",
+        "source": "Feishu Base Bf57b8mpsatj7isYrmxcQwNXnQe",
+        "source_table_id": "tblSbfji4q1ifubV",
+        "fault": "No display",
+        "source_symptom": "无显示",
+        "source_finding": "显示IC坏",
+        "cases": [
+            {
+                "case_id": "CASE-0022",
+                "source_record_id": "recvqMNGR4Fra2",
+                "board": "XK67J/1.0",
+                "model": "TECNO/KM4n",
+                "board_state": "维修后已修复",
+            },
+            {
+                "case_id": "CASE-0025",
+                "source_record_id": "recvqMNS2NdKDB",
+                "board": "XK67J/1.0",
+                "model": "TECNO/KM4n",
+                "board_state": "维修后已修复",
+            },
+        ],
+        "source_photo_record_id": "recvqMSU2K5nvW",
+        "source_photo_sha256": NO_DISPLAY_PHOTO_SHA256,
+        "source_annotation_role": "source_component_callout_not_system_diagnosis",
+        "reviewed_target_component_id": "XK67J-MAIN-U2411",
+        "reviewed_target_method": "annotation_center_inverse_projection",
+        "repair_causality_claim_allowed": False,
+        "boundary": (
+            "The cases support prioritised U2411 navigation only. They do not provide "
+            "an electrical test standard, pass/fail threshold, repair action, or universal causality."
+        ),
+    }
+
+
+def _no_display_flow(evidence):
+    return {
+        "flow_id": "xk67j-no-display-u2411-location-check",
+        "entry_label": "无显示",
+        "entry_order": 1,
+        "entry_type": "known_fault",
+        "title": "XK67J 无显示 · U2411 定位核对",
+        "fault": "No display",
+        "entry_component_id": "XK67J-MAIN-U2411",
+        "entry_step_id": "u2411_location_check",
+        "source": {
+            "source": "CASE-0022 / CASE-0025 + XK67J_L6735-KM5_MAIN_SCH_V1.0B.pdf",
+            "page": "case records / SCH 9",
+        },
+        "source_status": "reviewed_partial",
+        "source_photo_sha256": evidence["source_photo_sha256"],
+        "source_case_ids": [case["case_id"] for case in evidence["cases"]],
+        "boundary_note": "现有资料支持 U2411 定位与案例关联，不含 XK67J 电气检测标准或维修动作。",
+        "steps": [
+            {
+                "step_id": "u2411_location_check",
+                "label": "U2411 位置核对",
+                "prompt": "实物板与图中 U2411（显示偏压 IC）位置是否一致？",
+                "target_component_id": "XK67J-MAIN-U2411",
+                "choices": [
+                    {
+                        "value": "location_match",
+                        "label": "位置一致",
+                        "outcome": {
+                            "kind": "boundary",
+                            "label": "已完成 U2411 定位；继续检测需补充 XK67J 审核版电气测试标准。",
+                            "target_component_id": "XK67J-MAIN-U2411",
+                        },
+                    },
+                    {
+                        "value": "location_unconfirmed",
+                        "label": "无法确认",
+                        "outcome": {
+                            "kind": "boundary",
+                            "label": "停止排查；请先复核主板型号、版本与板面。",
+                            "target_component_id": "XK67J-MAIN-U2411",
+                        },
+                    },
+                ],
+            }
+        ],
+    }
 
 
 def _entity(components, schematic, designator, *, name, category, module, shape="square"):
@@ -89,6 +176,14 @@ def build_dataset(root=ROOT):
             name="MT6358W/A power management IC",
             category="bga_ic",
             module="Power management",
+        ),
+        _entity(
+            components,
+            schematic,
+            "U2411",
+            name="OCP2130WPAD-G LCM bias IC",
+            category="ic",
+            module="Display bias",
         ),
         _entity(
             components,
@@ -175,6 +270,23 @@ def build_dataset(root=ROOT):
             shape="rectangle",
         ),
     ]
+    no_display_evidence = _no_display_case_evidence()
+    u2411 = next(entity for entity in entities if entity["designator"] == "U2411")
+    u2411["schematic_links"][0]["facts"] = [
+        "Exact schematic designator U2411",
+        "Part marking OCP2130WPAD-G",
+        "LCM BIAS circuit includes AVDD_LCM and AVEE_LCM",
+    ]
+    u2411["repair_links"] = [
+        {
+            "source": "Feishu Base cases CASE-0022 and CASE-0025",
+            "page": "linked photo record recvqMSU2K5nvW",
+            "faults": ["No display"],
+            "instruction": "两条已修复案例均记录无显示与显示IC坏；仅用于优先定位 U2411。",
+            "evidence_role": "field_case_context_only",
+            "repair_causality_claim_allowed": False,
+        }
+    ]
     physical = build_physical_registration()
     return {
         "dataset_id": "XK67J-MAIN-XREG-20260731",
@@ -209,11 +321,12 @@ def build_dataset(root=ROOT):
             "accuracy_boundary": physical["accuracy_boundary"],
         },
         "repair_coverage": {
-            "status": "source_unavailable",
-            "title": "暂无可执行维修流程",
-            "note": "当前 XK67J 资料仅支持点位、器件类别和原理图索引；未提供经审核的机型维修步骤，系统不会生成维修动作。",
+            "status": "source_boundary_only",
+            "title": "可执行 U2411 定位核对",
+            "note": "无显示案例支持定位 U2411；缺少审核版电气检测标准与维修动作，路径将在资料边界停止。",
         },
-        "repair_flows": [],
+        "repair_case_evidence": no_display_evidence,
+        "repair_flows": [_no_display_flow(no_display_evidence)],
         "entities": entities,
     }
 
@@ -225,7 +338,7 @@ def main():
         json.dumps(payload, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
-    print(json.dumps({"entities": len(payload["entities"]), "repair_flows": 0}))
+    print(json.dumps({"entities": len(payload["entities"]), "repair_flows": len(payload["repair_flows"])}))
 
 
 if __name__ == "__main__":

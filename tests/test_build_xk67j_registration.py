@@ -30,9 +30,9 @@ class Xk67jRegistrationTests(unittest.TestCase):
             },
         )
 
-    def test_builds_twelve_source_linked_location_only_entities(self):
+    def test_builds_thirteen_source_linked_location_only_entities(self):
         entities = self.dataset["entities"]
-        self.assertEqual(len(entities), 12)
+        self.assertEqual(len(entities), 13)
         self.assertEqual(
             {entity["designator"] for entity in entities},
             {
@@ -42,6 +42,7 @@ class Xk67jRegistrationTests(unittest.TestCase):
                 "U3101",
                 "U4001",
                 "U4002",
+                "U2411",
                 "U5007",
                 "J2810",
                 "J6102",
@@ -55,6 +56,70 @@ class Xk67jRegistrationTests(unittest.TestCase):
         )
         self.assertTrue(all(entity["schematic_links"] for entity in entities))
         self.assertTrue(all("inspection_profile" not in entity for entity in entities))
+
+    def test_exposes_u2411_no_display_evidence_without_repair_causality(self):
+        entity = next(
+            item for item in self.dataset["entities"]
+            if item["component_id"] == "XK67J-MAIN-U2411"
+        )
+
+        self.assertEqual(entity["side_id"], "main_page_2")
+        self.assertEqual(entity["name"], "OCP2130WPAD-G LCM bias IC")
+        self.assertEqual(entity["schematic_links"][0]["page"], "9")
+        self.assertEqual(
+            entity["schematic_links"][0]["facts"],
+            [
+                "Exact schematic designator U2411",
+                "Part marking OCP2130WPAD-G",
+                "LCM BIAS circuit includes AVDD_LCM and AVEE_LCM",
+            ],
+        )
+        self.assertEqual(entity["repair_links"][0]["evidence_role"], "field_case_context_only")
+        self.assertFalse(entity["repair_links"][0]["repair_causality_claim_allowed"])
+
+    def test_no_display_case_evidence_is_privacy_reduced_and_hash_bound(self):
+        evidence = self.dataset["repair_case_evidence"]
+
+        self.assertEqual(evidence["fault"], "No display")
+        self.assertEqual(evidence["source_symptom"], "无显示")
+        self.assertEqual(evidence["source_finding"], "显示IC坏")
+        self.assertEqual(
+            [case["case_id"] for case in evidence["cases"]],
+            ["CASE-0022", "CASE-0025"],
+        )
+        self.assertTrue(all(case["board_state"] == "维修后已修复" for case in evidence["cases"]))
+        self.assertEqual(
+            evidence["source_photo_sha256"],
+            "28a193f9bbd0750240fb20477f5ec0497de7f279868b408eab7c872dcd0273d6",
+        )
+        self.assertEqual(evidence["reviewed_target_component_id"], "XK67J-MAIN-U2411")
+        self.assertEqual(evidence["reviewed_target_method"], "annotation_center_inverse_projection")
+        self.assertFalse(evidence["repair_causality_claim_allowed"])
+        serialized = str(evidence).lower()
+        for forbidden in ("imei", "350314", "country", "operator", "罗涛"):
+            self.assertNotIn(forbidden, serialized)
+
+    def test_no_display_flow_records_location_check_and_stops_at_source_boundary(self):
+        self.assertEqual(self.dataset["repair_coverage"]["status"], "source_boundary_only")
+        self.assertEqual(len(self.dataset["repair_flows"]), 1)
+        flow = self.dataset["repair_flows"][0]
+
+        self.assertEqual(flow["flow_id"], "xk67j-no-display-u2411-location-check")
+        self.assertEqual(flow["entry_label"], "无显示")
+        self.assertEqual(flow["entry_component_id"], "XK67J-MAIN-U2411")
+        self.assertEqual(flow["source_status"], "reviewed_partial")
+        self.assertEqual(flow["source_photo_sha256"], self.dataset["repair_case_evidence"]["source_photo_sha256"])
+        self.assertEqual(len(flow["steps"]), 1)
+        step = flow["steps"][0]
+        self.assertEqual(step["target_component_id"], "XK67J-MAIN-U2411")
+        self.assertEqual(
+            {choice["value"] for choice in step["choices"]},
+            {"location_match", "location_unconfirmed"},
+        )
+        self.assertTrue(all(choice["outcome"]["kind"] == "boundary" for choice in step["choices"]))
+        flow_text = str(flow)
+        for unsupported in ("更换", "补焊", "重焊", "电压正常", "阻值正常"):
+            self.assertNotIn(unsupported, flow_text)
 
     def test_links_reviewed_board_coordinate_registrations_without_downstream_claims(self):
         evidence = self.dataset["physical_evidence"]
