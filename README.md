@@ -73,7 +73,7 @@ V3 `supporting_only` 用于只有维修过程补充照片、没有来源包链�
 
 当前本地 HEAD 的数据管理员工作台支持服务器案例目录、原图恢复、任务轮询、自动候选叠图确认、人工四点回退、Golden Sample、差异热图和候选确认/驳回/暂缓；新实物案例只能由验收合格交接命令创建，浏览器没有直接上传入口。服务器侧包含批次与案例溯源、采集身份防污染、确定性合成透视、ORB/AKAZE 特征、RANSAC 单应性、结构化失败原因、持久化人工结论、磁盘压力健康状态和受控留存清理。
 
-生产已于 2026-07-31 升级到 `08d08cd38aaffc9b01d901dfe9ef7684a614abac`，地址是 `https://cccsat.top/mb-repair-beta/`。该版本已部署 acceptance-qualified handoff、Admin List V2、Detail V3、浏览器实物上传移除、repair-evidence link 只读投影，以及共享 BGA `ComponentVisualSpec` 管线。升级前从 `f278061` 执行了不可变归档校验、一致 SQLite 备份和完整迁移/回滚演练；生产 P4 通过。操作与数据边界见 `docs/visual-qc-capture-intake-spec-2026-07-20.md`、`docs/visual-qc-workbench-2026-07-17.md` 和 `docs/visual-qc-server-api-2026-07-20.md`。
+生产已于 2026-08-03 升级到 `7ed316c07130ef1488037f537c5968c832e16668`，地址是 `https://cccsat.top/mb-repair-beta/`。该版本在既有受控 Visual-QC、证据链和共享组件视觉能力之上，部署了八板/14 机型的统一维修员入口、已知故障与未知坏点初步排查单一路径，以及 KJ6/H897 症状优先案例导航。升级从 `08d08cd38aaffc9b01d901dfe9ef7684a614abac` 执行不可变归档校验、一致 SQLite 备份和完整迁移/回滚演练；生产 P4 通过。操作与数据边界见 `docs/visual-qc-capture-intake-spec-2026-07-20.md`、`docs/visual-qc-workbench-2026-07-17.md` 和 `docs/visual-qc-server-api-2026-07-20.md`。
 
 本地 HEAD 已增加 `VISUAL-QC-UPGRADE-PREFLIGHT-V1` 升级演练门禁和 `VISUAL-QC-DEPLOYMENT-MANIFEST-V1` 部署身份清单。`scripts/audit_visual_qc_upgrade.py` 只接受一致 SQLite 备份，在临时副本上验证受控对象、加法式迁移、Health/List/Detail/Dataset 契约、legacy 训练排除和旧版回读；源库与对象保持只读。真实部署会先将完整 40 位 commit、实际归档 SHA-256/字节数和归档内部运行时清单的 SHA-256 绑定为一个确定性清单，并上传到本次部署独有的只读暂存目录；本地清单只用于核对路径集合，Windows CRLF 不会替代 Git 归档中的真实字节身份。服务器在解包前拒绝重复 JSON 字段、身份不一致和危险 tar 成员，解包后拒绝符号链接、硬链接、特殊文件和运行时边界漂移，最后才停服备份和执行迁移演练。app/venv 只有在完整升级报告通过 JSON Schema、数据库快照和全部候选身份复核后才会切换。使用和证据边界见 `docs/visual-qc-upgrade-preflight-2026-07-23.md`。这些能力本身不代表已经升级生产。
 

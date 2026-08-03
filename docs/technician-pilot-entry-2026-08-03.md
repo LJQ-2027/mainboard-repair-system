@@ -33,7 +33,7 @@ An initial-check intent without a declared precheck is valid only as a boundary 
 
 ## Not claimed
 
-- No production deployment or global-network P4 validation in this increment.
+- Production deployment `7ed316c07130ef1488037f537c5968c832e16668` and authenticated global-network P4 completed on 2026-08-03. The tested routes were the unified entry, KM4 initial check, and KJ6 no-power source-case group at desktop and 390 px widths.
 - No field technician usability result yet.
 - No new electrical standard, repair causality, visual defect label, or repair action was inferred.
 - Feedback remains local until a later, separately designed controlled collection endpoint exists.

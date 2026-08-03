@@ -64,8 +64,8 @@ Do not configure Anthropic, DeepSeek, or any other general-purpose LLM API key f
 
 ## Current Deployment
 
-- Deployed on: 2026-07-31
-- Deployed commit: `08d08cd38aaffc9b01d901dfe9ef7684a614abac`
+- Deployed on: 2026-08-03
+- Deployed commit: `7ed316c07130ef1488037f537c5968c832e16668`
 - Internal service: `http://127.0.0.1:3010`
 - Internal visual-QC API: `http://127.0.0.1:3020`
 - External beta URL: `https://cccsat.top/mb-repair-beta/`
@@ -78,6 +78,8 @@ Do not configure Anthropic, DeepSeek, or any other general-purpose LLM API key f
 - Nginx config touched: `/etc/nginx/sites-available/sikayetvar`
 - Nginx config backup: `/etc/nginx/sites-available/sikayetvar.before-mb-repair-20260622_095918`
 - Retired LLM status: no provider key is configured by design; `/api/chat` is not part of the product roadmap.
+- 2026-08-03 technician-pilot upgrade: the 71,957,635-byte allowlisted runtime archive was bound to SHA-256 `2c07ed31c23bd2dc2778187a6db51096aff4b0002276e7d99d59d74d36384fe7` and 37 runtime paths. All ten `08d08cd -> 7ed316c` upgrade checks passed, including source immutability, managed-object integrity, no-op schema compatibility, row preservation, candidate API/dataset contracts, and old-runtime readback. Rollback evidence is retained under `/opt/motherboard-repair-beta/rollback/7ed316c07130-20260803_164840-600269`.
+- Post-switch technician P4: unauthenticated entry returned `401`; the restricted account opened the unified 14-model entry, KM4 initial check, and KJ6 no-power group with three source cases. Installed Chrome at 1440x900 and 390x844 reported zero horizontal overflow and zero application console/page errors. The only ignored browser request was the site-root `favicon.ico` returning `404`. Both motherboard PM2 services remained online; the persisted proxy case, one succeeded job, zero failed jobs, and zero active Golden Samples were preserved.
 - 2026-07-31 controlled upgrade: the 58.1 MB allowlisted runtime archive was
   bound to SHA-256 `fb11d084a5d2597001f46c36bb2cdb5ae8701ee1eca194886e5eca6713774f07`
   and 37 runtime paths. Immutable-input verification, extraction verification,
@@ -180,7 +182,7 @@ The beta server remains the controlled host for the internal visual data workben
 The server was inspected read-only on 2026-07-20: 4 x86_64 vCPU, 7.3 GB RAM, 4 GB swap, 19 GB free disk, Python 3.10, Node.js 20, no GPU, no installed OpenCV, and no active PostgreSQL or Redis. This supports a bounded CPU pilot, not deep-model training or unrestricted long-term image retention.
 
 The bounded visual-QC pilot is deployed with the approved same-origin
-architecture at production revision `08d08cd38aaffc9b01d901dfe9ef7684a614abac`.
+architecture at production revision `7ed316c07130ef1488037f537c5968c832e16668`.
 Controlled qualified handoff, async processing, manual fallback, role assertion,
 loopback binding, restart recovery, storage health, server provenance, governed
 repair-evidence projection, and proxy-path smoke checks have passed. Physical
