@@ -28,6 +28,17 @@ test('physical-photo view has a compact selector and matching navigation control
   assert.match(pointMapStyles, /touch-action: none/);
 });
 
+test('source-bounded case navigation is separate from executable repair flows', () => {
+  assert.match(markup, /id="caseNavigation"[^>]*hidden/);
+  assert.match(markup, /id="caseSelector"[^>]*aria-label="选择真实维修案例"/);
+  assert.match(markup, /id="caseCandidateTargets"/);
+  assert.match(markup, /id="caseNavigationBoundary"/);
+  assert.match(appSource, /buildCaseNavigationState/);
+  assert.match(appSource, /function renderCaseNavigation\(/);
+  assert.match(appSource, /async function selectCaseCandidate\(/);
+  assert.match(appSource, /resolveReviewedPhotoIdBySourceHash/);
+});
+
 test('app resolves reviewed photos and refreshes all board views from one side transition', () => {
   assert.match(appSource, /buildPhotoNavigationState/);
   assert.match(appSource, /failPhotoNavigation/);

@@ -49,6 +49,23 @@ test('returns the reviewed photo for the requested board side', () => {
   assert.equal(state.selectorVisible, false);
 });
 
+test('accepts the H897 two-photo reviewed navigation contract', () => {
+  const h897 = structuredClone(registration);
+  h897.photo_navigation.schema_version = 'H897-PHOTO-NAVIGATION-V1';
+  h897.photo_navigation.photos = [
+    photo('h897-side-1', 'main_page_1', '第1面实拍', 'd'),
+    photo('h897-side-2', 'main_page_2', '第2面实拍', 'e'),
+  ];
+
+  const sideOne = buildPhotoNavigationState({ registration: h897, sideId: 'main_page_1' });
+  const sideTwo = buildPhotoNavigationState({ registration: h897, sideId: 'main_page_2' });
+
+  assert.equal(sideOne.available, true);
+  assert.equal(sideOne.activePhoto.photo_id, 'h897-side-1');
+  assert.equal(sideTwo.available, true);
+  assert.equal(sideTwo.activePhoto.photo_id, 'h897-side-2');
+});
+
 test('retains a preferred photo when it belongs to the active side', () => {
   const state = buildPhotoNavigationState({
     registration,

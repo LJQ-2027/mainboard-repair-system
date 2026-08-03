@@ -71,6 +71,18 @@ class BoardProfileTests(unittest.TestCase):
         self.assertTrue((ROOT / profile["point_map_source"]).is_file())
         self.assertTrue((ROOT / profile["schematic_source"]).is_file())
 
+    def test_loads_h897_kj6_from_owner_supplied_exact_sources(self):
+        profile = load_profile(ROOT, "h897-main-v1.2")
+
+        self.assertEqual(profile["board_id"], "BOARD-H897-MAIN-V1.2")
+        self.assertEqual(profile["model"], "KJ6")
+        self.assertEqual(profile["models"], ["KJ6"])
+        self.assertEqual(profile["model_evidence"], {"KJ6": "engineering_source"})
+        self.assertEqual([side["source_pdf_page"] for side in profile["sides"]], [1, 2])
+        self.assertEqual(profile["default_side_id"], "main_page_1")
+        self.assertTrue((ROOT / profile["point_map_source"]).is_file())
+        self.assertTrue((ROOT / profile["schematic_source"]).is_file())
+
     def test_rejects_model_evidence_that_does_not_cover_every_alias(self):
         profile = copy.deepcopy(load_profile(ROOT, "xk67j-main-v1.0b"))
         del profile["model_evidence"]["KM5s"]

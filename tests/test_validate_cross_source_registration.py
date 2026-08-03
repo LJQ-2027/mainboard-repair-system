@@ -13,6 +13,18 @@ class CrossSourceRegistrationTests(unittest.TestCase):
         data = json.loads((ROOT / "knowledge-base/km4-cross-source-registration.json").read_text(encoding="utf-8"))
         self.assertEqual(validate_dataset(data, ROOT), [])
 
+    def test_committed_h897_dataset_with_two_photo_contract_is_valid(self):
+        data = json.loads((ROOT / "knowledge-base/h897-cross-source-registration.json").read_text(encoding="utf-8"))
+        self.assertEqual(validate_dataset(data, ROOT), [])
+
+    def test_h897_case_navigation_rejects_unknown_candidate(self):
+        data = json.loads((ROOT / "knowledge-base/h897-cross-source-registration.json").read_text(encoding="utf-8"))
+        data["case_navigation"]["cases"][0]["candidate_component_ids"] = ["H897-MAIN-MISSING"]
+        self.assertTrue(any(
+            "case navigation candidate" in error
+            for error in validate_dataset(data, ROOT)
+        ))
+
     def test_registration_requires_view_specific_source_notes(self):
         data = json.loads((ROOT / "knowledge-base/km4-cross-source-registration.json").read_text(encoding="utf-8"))
         data["registration"].pop("point_map_note", None)

@@ -65,12 +65,24 @@ def validate_dataset(data, root):
         photos = navigation.get("photos", [])
         hashes = [item.get("source_sha256") for item in photos]
         sides = [item.get("side_id") for item in photos]
-        if navigation.get("schema_version") != "XK67J-PHOTO-NAVIGATION-V1":
+        photo_contracts = {
+            "XK67J-PHOTO-NAVIGATION-V1": {
+                "count": 3,
+                "sides": {"main_page_1": 1, "main_page_2": 2},
+            },
+            "H897-PHOTO-NAVIGATION-V1": {
+                "count": 2,
+                "sides": {"main_page_1": 1, "main_page_2": 1},
+            },
+        }
+        photo_contract = photo_contracts.get(navigation.get("schema_version"))
+        if not photo_contract:
             errors.append("photo navigation schema version is unsupported")
-        if len(photos) != 3 or len(set(hashes)) != 3:
-            errors.append("photo navigation requires three unique source hashes")
-        if sides.count("main_page_1") != 1 or sides.count("main_page_2") != 2:
-            errors.append("photo navigation side coverage is invalid")
+        else:
+            if len(photos) != photo_contract["count"] or len(set(hashes)) != photo_contract["count"]:
+                errors.append("photo navigation unique source hash coverage is invalid")
+            if any(sides.count(side_id) != count for side_id, count in photo_contract["sides"].items()):
+                errors.append("photo navigation side coverage is invalid")
         for photo in photos:
             asset_path = photo.get("asset_path")
             asset = root / asset_path if asset_path else None
@@ -297,6 +309,51 @@ def validate_dataset(data, root):
                     errors.append("repair flow case identities must match repair case evidence")
     if not data.get("entities"):
         errors.append("dataset requires entities")
+
+    case_navigation = data.get("case_navigation")
+    if case_navigation is not None:
+        if not isinstance(case_navigation, dict) or case_navigation.get("schema_version") != "H897-CASE-NAVIGATION-V1":
+            errors.append("case navigation schema version is unsupported")
+        else:
+            forbidden = {"imei", "country", "operator", "technician", "technician_identity"}
+            if _contains_forbidden_key(case_navigation, forbidden):
+                errors.append("case navigation contains prohibited private fields")
+            cases = case_navigation.get("cases", [])
+            case_ids = [case.get("case_id") for case in cases if isinstance(case, dict)]
+            if len(cases) != case_navigation.get("case_count") or len(case_ids) != len(set(case_ids)):
+                errors.append("case navigation count or identity is invalid")
+            unique_hashes = {
+                digest.lower()
+                for case in cases
+                for digest in case.get("photo_sha256", [])
+                if _sha256_value(digest)
+            }
+            if len(unique_hashes) != case_navigation.get("unique_photo_count"):
+                errors.append("case navigation unique photo count is invalid")
+            for case in cases:
+                case_id = case.get("case_id")
+                if case.get("repair_causality_claim_allowed") is not False or case.get("defect_label_allowed") is not False:
+                    errors.append(f"case navigation boundary is invalid: {case_id}")
+                if any(not _sha256_value(digest) for digest in case.get("photo_sha256", [])):
+                    errors.append(f"case navigation photo hash is invalid: {case_id}")
+                for candidate_id in case.get("candidate_component_ids", []):
+                    if candidate_id not in identities:
+                        errors.append(f"case navigation candidate is unresolved: {case_id}/{candidate_id}")
+            required_gaps = {
+                "probe_location",
+                "tool_and_mode",
+                "measured_value",
+                "reference_or_tolerance",
+                "branch_logic",
+                "repair_action_detail",
+                "post_repair_recheck",
+            }
+            declared_gaps = {
+                item.get("field_id") for item in case_navigation.get("missing_fields", [])
+                if isinstance(item, dict)
+            }
+            if declared_gaps != required_gaps:
+                errors.append("case navigation missing-field audit is incomplete")
     return errors
 
 

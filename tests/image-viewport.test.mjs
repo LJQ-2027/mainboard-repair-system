@@ -86,6 +86,41 @@ test('component focus centers an image-space coordinate', () => {
   assert.equal(view.dataset.zoom, '300%');
 });
 
+test('viewport resize recenters the remembered component focus', () => {
+  const view = fakeElement({ width: 600, height: 400 });
+  const layer = fakeElement({ width: 1200, height: 800, layer: true });
+  const viewport = new ImageViewport(view, layer);
+
+  viewport.focus({ x: 0.5, y: 0.25 }, 4);
+  view.clientWidth = 360;
+  view.clientHeight = 260;
+  layer.offsetWidth = 720;
+  layer.offsetHeight = 480;
+  viewport.resize();
+
+  assert.deepEqual(viewport.state, { scale: 4, x: -1080, y: -240 });
+  assert.equal(view.dataset.zoom, '400%');
+});
+
+test('manual image pan clears remembered component focus before resize', () => {
+  const view = fakeElement({ width: 600, height: 400 });
+  const layer = fakeElement({ width: 1200, height: 800, layer: true });
+  const viewport = new ImageViewport(view, layer);
+  const target = { closest: () => null };
+
+  viewport.focus({ x: 0.5, y: 0.25 }, 4);
+  view.dispatch('pointerdown', { target, button: 0, pointerId: 7, clientX: 20, clientY: 30 });
+  view.dispatch('pointermove', { pointerId: 7, clientX: 70, clientY: 90 });
+  const manuallyPositioned = { ...viewport.state };
+  view.clientWidth = 360;
+  view.clientHeight = 260;
+  layer.offsetWidth = 720;
+  layer.offsetHeight = 480;
+  viewport.resize();
+
+  assert.deepEqual(viewport.state, manuallyPositioned);
+});
+
 test('image replacement resets navigation only when the asset changes', () => {
   const view = fakeElement({ width: 600, height: 400 });
   const layer = fakeElement({ width: 1200, height: 800, layer: true });

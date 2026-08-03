@@ -242,6 +242,47 @@
       ]
     },
     {
+      "profile_id": "h897-main-v1.2",
+      "model": "KJ6",
+      "models": ["KJ6"],
+      "model_evidence": {
+        "KJ6": "engineering_source"
+      },
+      "board_id": "BOARD-H897-MAIN-V1.2",
+      "board_version": "H897_MAIN_PCB_V1.2",
+      "component_prefix": "H897-MAIN",
+      "outline_method": "alpha_silhouette",
+      "point_map_source": "source-materials/owner-supplied/2026-07-31-kj6-km4-km4s/packages/KJ6-H897/H897_MAIN_PCB_V1.2_Placement.pdf",
+      "schematic_source": "source-materials/owner-supplied/2026-07-31-kj6-km4-km4s/packages/KJ6-H897/H897_MAIN_SCH_V1.2_202307171706.pdf",
+      "default_side_id": "main_page_1",
+      "schematic_geometry_side_id": "main_page_1",
+      "side_manifest_output": "knowledge-base/h897-board-sides.json",
+      "schematic_output": "knowledge-base/h897-schematic-compiled.json",
+      "cross_source_output": "knowledge-base/h897-cross-source-registration.json",
+      "reviewed_designators": ["U3101", "U6000", "U6601", "J6210", "J6202", "U1001", "U4101", "U5003", "J6204", "U2001", "X2101", "U3001", "U3201", "U4102", "J6101"],
+      "schematic_reviewed_designators": ["U3101", "U6000", "U6601", "J6210", "J6202", "U1001", "U4101", "U5003", "J6204", "U2001", "X2101", "U3001", "U3201", "U4102", "J6101"],
+      "sides": [
+        {
+          "side_id": "main_page_1",
+          "label": "第1面",
+          "source_pdf_page": 1,
+          "engineering_texture": "assets/board-atlas/h897/main-point-map-page-1.png",
+          "compiled_data": "knowledge-base/h897-board-compiled-page-1.json",
+          "source_crop": {"x": 0.0, "y": 0.0, "width": 1.0, "height": 1.0},
+          "required_designators": ["U3101", "U6000", "U6601", "J6210", "J6202", "U1001", "U4101"]
+        },
+        {
+          "side_id": "main_page_2",
+          "label": "第2面",
+          "source_pdf_page": 2,
+          "engineering_texture": "assets/board-atlas/h897/main-point-map-page-2.png",
+          "compiled_data": "knowledge-base/h897-board-compiled-page-2.json",
+          "source_crop": {"x": 0.0, "y": 0.0, "width": 1.0, "height": 1.0},
+          "required_designators": ["U5003", "J6204", "U2001", "X2101", "U3001", "U3201", "U4102", "J6101"]
+        }
+      ]
+    },
+    {
       "profile_id": "xk67j-main-v1.0b",
       "model": "KM5",
       "models": ["KM4n", "KM4k", "KM5", "KM5n", "KM5s"],

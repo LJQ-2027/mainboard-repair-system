@@ -1,0 +1,26 @@
+{
+  "manifest_id": "H897-MAIN-BOARD-SIDES-V1",
+  "profile_id": "h897-main-v1.2",
+  "board_id": "BOARD-H897-MAIN-V1.2",
+  "default_side_id": "main_page_1",
+  "sides": [
+    {
+      "side_id": "main_page_1",
+      "label": "第1面",
+      "source_pdf_page": 1,
+      "component_page": 1,
+      "point_map_source": "source-materials/owner-supplied/2026-07-31-kj6-km4-km4s/packages/KJ6-H897/H897_MAIN_PCB_V1.2_Placement.pdf",
+      "engineering_texture": "assets/board-atlas/h897/main-point-map-page-1.png",
+      "compiled_data": "knowledge-base/h897-board-compiled-page-1.json"
+    },
+    {
+      "side_id": "main_page_2",
+      "label": "第2面",
+      "source_pdf_page": 2,
+      "component_page": 2,
+      "point_map_source": "source-materials/owner-supplied/2026-07-31-kj6-km4-km4s/packages/KJ6-H897/H897_MAIN_PCB_V1.2_Placement.pdf",
+      "engineering_texture": "assets/board-atlas/h897/main-point-map-page-2.png",
+      "compiled_data": "knowledge-base/h897-board-compiled-page-2.json"
+    }
+  ]
+}

@@ -128,6 +128,26 @@
       },
       "shield": null,
       "atlas": null
+    },
+    "kj6-h897": {
+      "title": "KJ6 · H897_MAIN_PCB_V1.2",
+      "model": "KJ6",
+      "compatible_models": [
+        "KJ6"
+      ],
+      "model_evidence": {
+        "KJ6": "engineering_source"
+      },
+      "board_version": "H897_MAIN_PCB_V1.2",
+      "data": "../../knowledge-base/h897-cross-source-registration.json",
+      "schematic": "../../knowledge-base/h897-schematic-compiled.json",
+      "side_manifest": "../../knowledge-base/h897-board-sides.json",
+      "geometry_by_side": {
+        "main_page_1": "../../knowledge-base/h897-board-compiled-page-1.json",
+        "main_page_2": "../../knowledge-base/h897-board-compiled-page-2.json"
+      },
+      "shield": null,
+      "atlas": null
     }
   }
 }

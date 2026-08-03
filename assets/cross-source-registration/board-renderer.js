@@ -526,7 +526,7 @@ export class BoardRenderer {
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.shadowMap.enabled = true;
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.renderer.shadowMap.type = THREE.PCFShadowMap;
     this.renderer.domElement.tabIndex = 0;
     this.renderer.domElement.setAttribute('aria-label', '可交互 2.5D 主板模型');
     container.append(this.renderer.domElement);

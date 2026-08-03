@@ -34,6 +34,7 @@ export class ImageViewport {
     this.state = { scale: 1, x: 0, y: 0 };
     this.drag = null;
     this.imageKey = null;
+    this.focusPoint = null;
     this.bind();
   }
 
@@ -50,12 +51,14 @@ export class ImageViewport {
       };
       const factor = event.deltaY < 0 ? 1.25 : 0.8;
       const zoomed = zoomAt(localState, this.state.scale * factor, pointer);
+      this.focusPoint = null;
       this.state = { ...zoomed, x: zoomed.x - layerOrigin.x, y: zoomed.y - layerOrigin.y };
       this.render();
     }, { passive: false });
     this.view.addEventListener('pointerdown', (event) => {
       const interactive = Boolean(event.target?.closest?.('button, a, input, select, textarea'));
       if (!canStartImagePan({ interactive, button: event.button })) return;
+      this.focusPoint = null;
       this.drag = {
         pointerId: event.pointerId,
         x: event.clientX,
@@ -95,7 +98,16 @@ export class ImageViewport {
   }
 
   reset() {
+    this.focusPoint = null;
     this.state = { scale: 1, x: 0, y: 0 };
+    this.render();
+  }
+
+  resize() {
+    if (this.focusPoint) {
+      this.focus(this.focusPoint, this.state.scale);
+      return;
+    }
     this.render();
   }
 
@@ -113,11 +125,13 @@ export class ImageViewport {
       this.state.scale * factor,
       center,
     );
+    this.focusPoint = null;
     this.state = { ...zoomed, x: zoomed.x - origin.x, y: zoomed.y - origin.y };
     this.render();
   }
 
   focus(point, scale = 4) {
+    this.focusPoint = { ...point };
     const size = { width: this.layer.offsetWidth, height: this.layer.offsetHeight };
     const viewport = { width: this.view.clientWidth, height: this.view.clientHeight };
     const absolute = centerPoint(point, size, viewport, scale);

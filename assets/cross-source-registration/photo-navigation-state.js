@@ -1,5 +1,9 @@
 const PHOTO_MODE = 'reviewed_physical_photo_navigation';
 const SHA256_PATTERN = /^[a-f0-9]{64}$/i;
+const SUPPORTED_SCHEMAS = new Set([
+  'XK67J-PHOTO-NAVIGATION-V1',
+  'H897-PHOTO-NAVIGATION-V1',
+]);
 
 function isReviewedPhoto(photo = {}) {
   return Boolean(photo.photo_id)
@@ -23,7 +27,7 @@ export function hasValidReviewedPhotoNavigation(registration = {}) {
 function hasPhotoNavigationContract(registration = {}) {
   const navigation = registration.photo_navigation || {};
   return registration.reference_mode === PHOTO_MODE
-    && navigation.schema_version === 'XK67J-PHOTO-NAVIGATION-V1'
+    && SUPPORTED_SCHEMAS.has(navigation.schema_version)
     && Array.isArray(navigation.photos);
 }
 

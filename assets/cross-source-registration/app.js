@@ -13,6 +13,7 @@ import { buildSourceNote } from './source-note-state.js';
 import { buildRegistrationViewState } from './registration-view-state.js';
 import { buildPhysicalRegistrationState } from './physical-registration-state.js';
 import { buildRepairCoverageState } from './repair-coverage-state.js';
+import { buildCaseNavigationState } from './case-navigation-state.js';
 import { buildEntityAccessState } from './entity-access-state.js';
 import { mergeCompiledSchematicLinks } from './source-links.js';
 import { mergeCompiledFootprint } from './source-geometry-state.js';
@@ -92,6 +93,7 @@ const confirmationTimers = new WeakMap();
 let activeRepairFlowId = null;
 let repairEntryExpanded = false;
 let repairEntryError = '';
+let selectedCaseId = null;
 
 const FAULT_LABELS = {
   no_power: '无法开机',
@@ -263,6 +265,64 @@ function renderRepairEntry() {
     button.addEventListener('click', () => { void startRepairEntry(entry.flowId); });
     options.append(button);
   });
+  renderCaseNavigation();
+}
+
+function renderCaseNavigation() {
+  const root = document.querySelector('#caseNavigation');
+  if (!root || !data) return;
+  const state = buildCaseNavigationState(data.case_navigation, selectedCaseId);
+  root.hidden = !state.visible;
+  if (!state.visible) return;
+  selectedCaseId = state.activeCase.caseId;
+  document.querySelector('#caseNavigationSummary').textContent = state.summary;
+  const selector = document.querySelector('#caseSelector');
+  selector.replaceChildren();
+  state.options.forEach((option) => {
+    const node = document.createElement('option');
+    node.value = option.caseId;
+    node.textContent = option.label;
+    selector.append(node);
+  });
+  selector.value = state.activeCase.caseId;
+  selector.onchange = () => {
+    selectedCaseId = selector.value;
+    renderCaseNavigation();
+  };
+  document.querySelector('#caseSymptoms').textContent = state.activeCase.symptoms.join(' / ');
+  document.querySelector('#caseFinding').textContent = state.activeCase.finding;
+  document.querySelector('#caseNavigationBoundary').textContent = state.activeCase.boundary;
+  document.querySelector('#caseGapSummary').textContent = `缺少 ${state.missingFieldCount} 类可执行检测字段 · ${state.activeCase.photoCount} 张来源照片记录`;
+  const targets = document.querySelector('#caseCandidateTargets');
+  targets.replaceChildren();
+  if (state.activeCase.boardOnly) {
+    const boundary = document.createElement('p');
+    boundary.textContent = '该案例缺少可审核的精确位号，保留为板级案例。';
+    targets.append(boundary);
+    return;
+  }
+  state.activeCase.candidateComponentIds.forEach((componentId) => {
+    const entity = data.entities.find((candidate) => candidate.component_id === componentId);
+    if (!entity) return;
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.dataset.caseComponentId = componentId;
+    button.innerHTML = `<strong>${entity.designator}</strong><span>${technicianEntityCopy(entity).module}</span>`;
+    button.addEventListener('click', () => { void selectCaseCandidate(componentId); });
+    targets.append(button);
+  });
+}
+
+async function selectCaseCandidate(componentId) {
+  const state = buildCaseNavigationState(data?.case_navigation, selectedCaseId);
+  if (!state.visible || !state.activeCase.candidateComponentIds.includes(componentId)) return false;
+  const entity = data.entities.find((candidate) => candidate.component_id === componentId);
+  if (!entity) return false;
+  const evidencePhotoId = state.activeCase.photoSha256
+    .map((digest) => resolveReviewedPhotoIdBySourceHash(data.registration, entity.side_id, digest))
+    .find(Boolean);
+  if (evidencePhotoId) preferredPhotoBySide.set(entity.side_id, evidencePhotoId);
+  return selectEntity(componentId);
 }
 
 async function startRepairEntry(flowId) {
@@ -1156,6 +1216,7 @@ async function setView(name) {
     });
   }
   if (name === 'pointmap') requestAnimationFrame(() => pointMapViewport?.reset());
+  if (name === 'photo') requestAnimationFrame(() => photoViewport?.resize());
   updateSideControls();
   updateSourceNote();
   updateInspectionUi();
@@ -1353,6 +1414,10 @@ document.querySelector('#resetPhoto').addEventListener('click', () => photoViewp
 document.querySelector('#photoSelector').addEventListener('change', (event) => {
   preferredPhotoBySide.set(activeSideId, event.currentTarget.value);
   syncBoardViews();
+});
+window.addEventListener('resize', () => {
+  if (activeView === 'photo') photoViewport?.resize();
+  if (activeView === 'pointmap') pointMapViewport?.resize();
 });
 document.querySelector('#modelTools').hidden = true;
 const evidenceDialog = document.querySelector('#evidenceDialog');

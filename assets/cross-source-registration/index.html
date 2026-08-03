@@ -80,6 +80,14 @@
         </header>
         <p class="repair-coverage-note" id="repairCoverageNote" hidden></p>
         <div class="repair-entry-options" id="repairEntryOptions" role="group" aria-label="选择故障现象"></div>
+        <section class="case-navigation" id="caseNavigation" hidden aria-labelledby="caseNavigationTitle">
+          <header><div><span>真实案例</span><strong id="caseNavigationTitle">来源案例导航</strong></div><small id="caseNavigationSummary"></small></header>
+          <label class="case-selector"><span>案例</span><select id="caseSelector" aria-label="选择真实维修案例"></select></label>
+          <div class="case-facts"><div><span>故障现象</span><strong id="caseSymptoms"></strong></div><div><span>原始结论</span><strong id="caseFinding"></strong></div></div>
+          <div class="case-candidate-targets" id="caseCandidateTargets" role="group" aria-label="案例关联器件候选"></div>
+          <p class="case-navigation-boundary" id="caseNavigationBoundary"></p>
+          <small class="case-gap-summary" id="caseGapSummary"></small>
+        </section>
       </section>
       <div class="entity-heading">
         <div><span id="entityCategory"></span><h2 id="entityDesignator">—</h2></div>

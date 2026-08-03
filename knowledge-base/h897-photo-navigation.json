@@ -1,0 +1,77 @@
+{
+  "schema_version": "H897-PHOTO-NAVIGATION-V1",
+  "board_key": "kj6-h897",
+  "board_id": "BOARD-H897-MAIN-V1.2",
+  "physical_board_revision": "H897 V1.2",
+  "engineering_board_revision": "H897_MAIN_PCB_V1.2",
+  "reference_mode": "reviewed_physical_photo_navigation",
+  "photos": [
+    {
+      "photo_id": "H897-MAIN_PAGE_1-5B8FFE55F4A2",
+      "label": "第1面实拍",
+      "side_id": "main_page_1",
+      "source_sha256": "5b8ffe55f4a2c285e4d85fcddc9acdbb459e8d1ed3760a0370a807617e476f48",
+      "derivative_sha256": "d83b3dce218d31c3c3592bf720a38d739a7f7ae4704851c9b82e1155e83facd4",
+      "asset_path": "assets/board-atlas/h897/physical/main-page-1-5b8ffe55f4a2.webp",
+      "source_scope": "owner_authorized_feishu_case_library",
+      "source_annotation_present": false,
+      "source_annotation_role": null,
+      "capture_geometry_id": "H897-KJ6-PAGE1-CAPTURE-01-ROTATED-CCW",
+      "registration_dimensions": {
+        "width": 4032,
+        "height": 3024
+      },
+      "derivative_dimensions": {
+        "width": 2000,
+        "height": 1500
+      },
+      "board_to_image_matrix": [
+        1.124433594,
+        0.010344993,
+        -0.053902676,
+        0.003706433,
+        1.120934203,
+        -0.084248316,
+        0.114163196,
+        -0.026309951,
+        1.0
+      ],
+      "registration_review_status": "reviewed",
+      "field_accuracy_claim_allowed": false
+    },
+    {
+      "photo_id": "H897-MAIN_PAGE_2-A862ECEE11E6",
+      "label": "第2面实拍",
+      "side_id": "main_page_2",
+      "source_sha256": "a862ecee11e683562ccfdc9a7743d813accfd37235e0267665bf32b44d9fe491",
+      "derivative_sha256": "60d4783794068b7e3972fe7f6bd3839030a952351618862ff653ba60a9bfe7d0",
+      "asset_path": "assets/board-atlas/h897/physical/main-page-2-a862ecee11e6.webp",
+      "source_scope": "owner_authorized_feishu_case_library",
+      "source_annotation_present": false,
+      "source_annotation_role": null,
+      "capture_geometry_id": "H897-KJ6-PAGE2-CAPTURE-01",
+      "registration_dimensions": {
+        "width": 4032,
+        "height": 3024
+      },
+      "derivative_dimensions": {
+        "width": 2000,
+        "height": 1500
+      },
+      "board_to_image_matrix": [
+        0.996191968,
+        0.00909485,
+        0.003440036,
+        0.001304856,
+        1.107012876,
+        -0.093684894,
+        -0.022089362,
+        0.03179415,
+        1.0
+      ],
+      "registration_review_status": "reviewed",
+      "field_accuracy_claim_allowed": false
+    }
+  ],
+  "accuracy_boundary": "这些与原始 SHA-256 精确绑定的派生图仅支持经审核的板级坐标导航；不能作为 Golden Sample、缺陷标签或维修因果证据。"
+}

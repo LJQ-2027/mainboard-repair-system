@@ -27,6 +27,7 @@ class BoardBatchAcceptanceTests(unittest.TestCase):
         cls.f069m_entry = catalog["boards"]["bg6m-f069m"]
         cls.f069_entry = catalog["boards"]["bg6h-f069"]
         cls.xk67j_entry = catalog["boards"]["xk67j-shared"]
+        cls.h897_entry = catalog["boards"]["kj6-h897"]
 
     def test_reference_only_board_passes_the_shared_board_contract(self):
         result = audit_board(ROOT, "bg6m-f069m", self.f069m_entry)
@@ -82,6 +83,27 @@ class BoardBatchAcceptanceTests(unittest.TestCase):
             ["KM4n", "KM4k", "KM5", "KM5n", "KM5s"],
         )
 
+    def test_h897_passes_as_the_eighth_exact_source_board(self):
+        result = audit_board(ROOT, "kj6-h897", self.h897_entry)
+
+        self.assertEqual(result["status"], "pass")
+        self.assertEqual(result["errors"], [])
+        self.assertEqual(result["board_id"], "BOARD-H897-MAIN-V1.2")
+        self.assertEqual(result["side_ids"], ["main_page_1", "main_page_2"])
+        self.assertEqual(result["accepted_designators"], 1240)
+        self.assertEqual(result["schematic_linked_designators"], 361)
+        self.assertEqual(result["schematic_occurrences"], 388)
+        self.assertEqual(result["reviewed_entities"], 15)
+        self.assertEqual(result["repair_flows"], 0)
+        self.assertEqual(
+            result["repair_coverage"],
+            "source_available_pending_review",
+        )
+        self.assertEqual(
+            result["reference_mode"],
+            "reviewed_physical_photo_navigation",
+        )
+
     def test_legacy_registration_uses_its_dataset_side_when_entities_omit_it(self):
         catalog = json.loads(
             (ROOT / "knowledge-base/repair-workbench-boards.json").read_text(encoding="utf-8")
@@ -104,6 +126,7 @@ class BoardBatchAcceptanceTests(unittest.TestCase):
             "bg6m-f069m",
             "bg6h-f069",
             "xk67j-shared",
+            "kj6-h897",
         ])
         self.assertEqual(audit["audit_id"], "BOARD-CATALOG-BATCH-ACCEPTANCE-V2")
         self.assertTrue(all(board["status"] == "pass" for board in audit["boards"]))
@@ -136,6 +159,7 @@ class BoardBatchAcceptanceTests(unittest.TestCase):
         self.assertIn("| `bg6m-f069m` | PASS | 1,115 | 604 | 10 | 0 |", report)
         self.assertIn("| `bg6h-f069` | PASS | 1,126 | 604 | 12 | 0 |", report)
         self.assertIn("| `xk67j-shared` | PASS | 1,040 | 505 | 13 | 1 |", report)
+        self.assertIn("| `kj6-h897` | PASS | 1,240 | 361 | 15 | 0 |", report)
         self.assertIn("source_boundary_only", report)
         self.assertIn("reference-only repair coverage", report)
         self.assertIn("Visual defect recognition", report)
@@ -187,7 +211,7 @@ class BoardBatchAcceptanceTests(unittest.TestCase):
             )
 
             self.assertEqual(completed.returncode, 0, completed.stderr)
-            self.assertIn("Batch acceptance passed: 7 boards, 7 coverage gates", completed.stdout)
+            self.assertIn("Batch acceptance passed: 8 boards, 7 coverage gates", completed.stdout)
 
 
 if __name__ == "__main__":
