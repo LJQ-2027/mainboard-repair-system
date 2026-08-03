@@ -14,6 +14,13 @@ import { buildRegistrationViewState } from './registration-view-state.js';
 import { buildPhysicalRegistrationState } from './physical-registration-state.js';
 import { buildRepairCoverageState } from './repair-coverage-state.js';
 import { buildCaseNavigationState } from './case-navigation-state.js';
+import { resolvePilotIntent } from './pilot-intent-state.js';
+import {
+  createPilotFeedback,
+  loadPilotFeedback,
+  savePilotFeedback as savePilotFeedbackRecords,
+  serializePilotFeedback,
+} from './pilot-feedback-state.js';
 import { buildEntityAccessState } from './entity-access-state.js';
 import { mergeCompiledSchematicLinks } from './source-links.js';
 import { mergeCompiledFootprint } from './source-geometry-state.js';
@@ -94,6 +101,11 @@ let activeRepairFlowId = null;
 let repairEntryExpanded = false;
 let repairEntryError = '';
 let selectedCaseId = null;
+let selectedCaseSymptomKey = null;
+let pilotIntent = null;
+let activeBoardKey = null;
+let pilotFeedbackTarget = null;
+let pilotFeedbackUsefulness = null;
 
 const FAULT_LABELS = {
   no_power: '无法开机',
@@ -236,17 +248,24 @@ function renderRepairEntry() {
   const flows = data.repair_flows || [];
   const activeFlow = flows.find((flow) => flow.flow_id === activeRepairFlowId);
   const activeState = activeFlow && repairFlowById.get(activeFlow.flow_id);
+  const boundaryOnly = pilotIntent?.valid && pilotIntent.boundaryOnly;
   entryRoot.dataset.active = String(Boolean(activeFlow));
   entryRoot.dataset.closed = String(Boolean(activeState?.closed));
   entryRoot.dataset.available = String(coverage.available);
-  document.querySelector('#repairEntryEyebrow').textContent = activeState?.closed
+  document.querySelector('#repairEntryEyebrow').textContent = boundaryOnly
+    ? '资料边界'
+    : activeState?.closed
     ? '排查已结束'
     : activeFlow ? '当前排查' : coverage.eyebrow;
-  document.querySelector('#repairEntryTitle').textContent = activeFlow?.title || coverage.title;
+  document.querySelector('#repairEntryTitle').textContent = boundaryOnly
+    ? '暂无可执行初步排查步骤'
+    : activeFlow?.title || coverage.title;
   const coverageNote = document.querySelector('#repairCoverageNote');
-  coverageNote.hidden = coverage.available && !repairEntryError;
-  coverageNote.textContent = repairEntryError || coverage.note;
-  options.hidden = !coverage.available || Boolean(activeFlow && !repairEntryExpanded);
+  coverageNote.hidden = !boundaryOnly && coverage.available && !repairEntryError;
+  coverageNote.textContent = boundaryOnly
+    ? '当前资料未形成可执行初步排查步骤。可以查看板面、器件与既有依据，但系统不会建议测量、结论或维修动作。'
+    : repairEntryError || coverage.note;
+  options.hidden = boundaryOnly || !coverage.available || Boolean(activeFlow && !repairEntryExpanded);
   changeButton.hidden = !activeFlow;
   changeButton.textContent = repairEntryExpanded ? '收起' : '更换故障';
   changeButton.setAttribute('aria-expanded', String(repairEntryExpanded));
@@ -255,7 +274,7 @@ function renderRepairEntry() {
     renderRepairEntry();
   };
   options.replaceChildren();
-  buildRepairEntryOptions(flows, activeRepairFlowId).forEach((entry) => {
+  (boundaryOnly ? [] : buildRepairEntryOptions(flows, activeRepairFlowId)).forEach((entry) => {
     const button = document.createElement('button');
     button.type = 'button';
     button.dataset.flowId = entry.flowId;
@@ -268,14 +287,61 @@ function renderRepairEntry() {
   renderCaseNavigation();
 }
 
+function renderPilotIntentContext() {
+  const root = document.querySelector('#pilotIntentContext');
+  const feedback = document.querySelector('#pilotFeedback');
+  const visible = Boolean(pilotIntent?.valid);
+  root.hidden = !visible;
+  feedback.hidden = !visible;
+  if (!visible) return;
+  document.querySelector('#pilotIntentModel').textContent = `${pilotIntent.model} · ${data.board_version}`;
+  document.querySelector('#pilotIntentLabel').textContent = pilotIntent.label;
+  const boundaries = {
+    repair_flow: '按已审核的来源流程进入；系统不会补写资料中没有的检测参数或维修动作。',
+    case_symptom: '候选器件仅来自该故障现象组的原始案例关联，不代表已确认故障因果。',
+    initial_check: pilotIntent.boundaryOnly
+      ? '当前板型没有已审核的初步排查步骤。仅开放结构和既有依据查看，并在此边界停止。'
+      : '按资料中已审核的初步排查步骤进入。',
+  };
+  document.querySelector('#pilotIntentBoundary').textContent = boundaries[pilotIntent.kind];
+}
+
 function renderCaseNavigation() {
   const root = document.querySelector('#caseNavigation');
   if (!root || !data) return;
-  const state = buildCaseNavigationState(data.case_navigation, selectedCaseId);
-  root.hidden = !state.visible;
-  if (!state.visible) return;
+  const state = buildCaseNavigationState(data.case_navigation, selectedCaseId, selectedCaseSymptomKey);
+  const intentAllowsCases = !pilotIntent?.valid || pilotIntent.kind === 'case_symptom';
+  root.hidden = !state.visible || !intentAllowsCases;
+  if (!state.visible || !intentAllowsCases) return;
+  selectedCaseSymptomKey = state.activeGroup.key;
   selectedCaseId = state.activeCase.caseId;
   document.querySelector('#caseNavigationSummary').textContent = state.summary;
+  const symptomSelector = document.querySelector('#caseSymptomSelector');
+  symptomSelector.replaceChildren();
+  state.groups.forEach((group) => {
+    const node = document.createElement('option');
+    node.value = group.key;
+    node.textContent = `${group.label}（${group.caseCount} 个案例）`;
+    symptomSelector.append(node);
+  });
+  symptomSelector.value = state.activeGroup.key;
+  symptomSelector.onchange = () => {
+    selectedCaseSymptomKey = symptomSelector.value;
+    selectedCaseId = null;
+    if (pilotIntent?.valid && pilotIntent.kind === 'case_symptom') {
+      const selectedGroup = state.groups.find((group) => group.key === selectedCaseSymptomKey);
+      pilotIntent = {
+        ...pilotIntent,
+        label: selectedGroup.label,
+        symptomKey: selectedGroup.key,
+      };
+      const url = new URL(window.location.href);
+      url.searchParams.set('symptom', selectedGroup.key);
+      window.history.replaceState(null, '', url);
+      renderPilotIntentContext();
+    }
+    renderCaseNavigation();
+  };
   const selector = document.querySelector('#caseSelector');
   selector.replaceChildren();
   state.options.forEach((option) => {
@@ -314,7 +380,7 @@ function renderCaseNavigation() {
 }
 
 async function selectCaseCandidate(componentId) {
-  const state = buildCaseNavigationState(data?.case_navigation, selectedCaseId);
+  const state = buildCaseNavigationState(data?.case_navigation, selectedCaseId, selectedCaseSymptomKey);
   if (!state.visible || !state.activeCase.candidateComponentIds.includes(componentId)) return false;
   const entity = data.entities.find((candidate) => candidate.component_id === componentId);
   if (!entity) return false;
@@ -325,7 +391,74 @@ async function selectCaseCandidate(componentId) {
   return selectEntity(componentId);
 }
 
-async function startRepairEntry(flowId) {
+function setExclusiveFeedback(selector, value) {
+  document.querySelectorAll(selector).forEach((button) => {
+    button.setAttribute('aria-pressed', String(button.dataset.feedbackTarget === value || button.dataset.feedbackUsefulness === value));
+  });
+}
+
+function feedbackContext() {
+  return {
+    boardKey: activeBoardKey,
+    model: pilotIntent.model,
+    boardVersion: data.board_version,
+    intent: pilotIntent,
+    selectedComponentId: technicianSelectionActive ? selectedId : null,
+    selectedCaseId,
+  };
+}
+
+function recordPilotFeedback() {
+  const status = document.querySelector('#pilotFeedbackStatus');
+  try {
+    const record = createPilotFeedback(feedbackContext(), {
+      targetStatus: pilotFeedbackTarget,
+      usefulness: pilotFeedbackUsefulness,
+      note: document.querySelector('#pilotFeedbackNote').value,
+    });
+    const records = loadPilotFeedback(window.localStorage);
+    savePilotFeedbackRecords(window.localStorage, [...records, record]);
+    status.textContent = `已保存在本机 · 共 ${records.length + 1} 条`;
+  } catch (error) {
+    status.textContent = error.message === 'Select at least one feedback dimension'
+      ? '请至少选择一项反馈。'
+      : `无法记录：${error.message}`;
+  }
+}
+
+function exportPilotFeedback() {
+  const records = loadPilotFeedback(window.localStorage);
+  const blob = new Blob([serializePilotFeedback(records)], { type: 'application/json;charset=utf-8' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `technician-pilot-feedback-${new Date().toISOString().slice(0, 10)}.json`;
+  link.hidden = true;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+  document.querySelector('#pilotFeedbackStatus').textContent = `已导出 ${records.length} 条本机反馈。`;
+}
+
+function syncPilotFlowIntent(flow) {
+  if (!pilotIntent?.valid) return;
+  pilotIntent = {
+    ...pilotIntent,
+    kind: 'repair_flow',
+    label: flow.entry_label,
+    flowId: flow.flow_id,
+    symptomKey: null,
+    boundaryOnly: false,
+  };
+  const url = new URL(window.location.href);
+  url.searchParams.set('intent', 'repair_flow');
+  url.searchParams.set('flow', flow.flow_id);
+  url.searchParams.delete('symptom');
+  window.history.replaceState(null, '', url);
+  renderPilotIntentContext();
+}
+
+async function startRepairEntry(flowId, options = {}) {
   const intent = resolveRepairEntryIntent(data?.repair_flows, flowId);
   const flow = data.repair_flows.find((candidate) => candidate.flow_id === intent.flowId);
   const targetEntity = data.entities.find((candidate) => candidate.component_id === intent.targetComponentId);
@@ -339,6 +472,7 @@ async function startRepairEntry(flowId) {
     renderRepairEntry();
     return false;
   }
+  if (options.syncPilotIntent !== false) syncPilotFlowIntent(flow);
   repairEntryError = '';
   if (evidencePhotoId) {
     preferredPhotoBySide.set(targetEntity.side_id, evidencePhotoId);
@@ -1054,6 +1188,13 @@ function evidenceCountCopy(count) {
 function renderComponentGuidance(entity) {
   const guidanceRoot = document.querySelector('#componentGuidance');
   const evidenceRoot = document.querySelector('.evidence');
+  if (pilotIntent?.valid && pilotIntent.boundaryOnly) {
+    guidanceRoot.hidden = true;
+    guidanceRoot.dataset.repairFlowActive = 'false';
+    evidenceRoot.dataset.repairFlowActive = 'false';
+    renderActiveFlowReturn(entity, false);
+    return;
+  }
   let guidance = repairGuidanceByComponent.get(entity.component_id);
   if (!guidance) {
     guidance = createRepairGuidance(entity);
@@ -1227,8 +1368,10 @@ async function init() {
   const catalogResponse = await fetch(BOARD_CATALOG_URL);
   if (!catalogResponse.ok) throw new Error(`主板目录载入失败 (${catalogResponse.status})`);
   const catalog = await catalogResponse.json();
+  const currentUrl = new URL(window.location.href);
   const boardKey = resolveBoardKey(new URL(window.location.href), catalog);
   const boardAssets = resolveBoardAssets(catalog, boardKey);
+  activeBoardKey = boardKey;
   const fetchAsset = async (label, url) => {
     const response = await fetch(url);
     if (!response.ok) throw new Error(`${boardKey} ${label}载入失败 (${response.status})`);
@@ -1244,6 +1387,18 @@ async function init() {
     boardAssets.atlas ? fetchAsset('模块数据', boardAssets.atlas) : Promise.resolve({ boards: [] }),
   ]);
   data = boardData;
+  pilotIntent = resolvePilotIntent({
+    boardKey,
+    board: boardAssets,
+    dataset: data,
+    query: currentUrl.searchParams,
+  });
+  if (!pilotIntent.valid && !pilotIntent.legacy) {
+    throw new Error(`内测入口参数与资料不一致 (${pilotIntent.reason})`);
+  }
+  if (pilotIntent.valid && pilotIntent.kind === 'case_symptom') {
+    selectedCaseSymptomKey = pilotIntent.symptomKey;
+  }
   const registrationView = buildRegistrationViewState(data.registration);
   activeView = registrationView.initialView;
   const photoTab = document.querySelector('[data-view="photo"]');
@@ -1299,6 +1454,7 @@ async function init() {
   });
   document.title = `${boardAssets.title} 维修工作台`;
   document.querySelector('#boardTitle').textContent = boardAssets.title;
+  renderPilotIntentContext();
   const photoImage = document.querySelector('#photoView img');
   const pointMapImage = document.querySelector('#pointmapView img');
   photoViewport = new ImageViewport(
@@ -1343,7 +1499,10 @@ async function init() {
   });
   renderRepairEntry();
   const initialEntity = data.entities.find((entity) => entity.side_id === activeSideId) || data.entities[0];
-  selectEntity(initialEntity.component_id, { explicit: false, focus: false });
+  await selectEntity(initialEntity.component_id, { explicit: false, focus: false });
+  if (pilotIntent?.valid && pilotIntent.flowId) {
+    await startRepairEntry(pilotIntent.flowId, { syncPilotIntent: false });
+  }
 }
 
 document.querySelectorAll('[role=tab]').forEach((button) => button.addEventListener('click', () => { void setView(button.dataset.view); }));
@@ -1415,6 +1574,16 @@ document.querySelector('#photoSelector').addEventListener('change', (event) => {
   preferredPhotoBySide.set(activeSideId, event.currentTarget.value);
   syncBoardViews();
 });
+document.querySelectorAll('[data-feedback-target]').forEach((button) => button.addEventListener('click', () => {
+  pilotFeedbackTarget = button.dataset.feedbackTarget;
+  setExclusiveFeedback('[data-feedback-target]', pilotFeedbackTarget);
+}));
+document.querySelectorAll('[data-feedback-usefulness]').forEach((button) => button.addEventListener('click', () => {
+  pilotFeedbackUsefulness = button.dataset.feedbackUsefulness;
+  setExclusiveFeedback('[data-feedback-usefulness]', pilotFeedbackUsefulness);
+}));
+document.querySelector('#savePilotFeedback').addEventListener('click', recordPilotFeedback);
+document.querySelector('#exportPilotFeedback').addEventListener('click', exportPilotFeedback);
 window.addEventListener('resize', () => {
   if (activeView === 'photo') photoViewport?.resize();
   if (activeView === 'pointmap') pointMapViewport?.resize();

@@ -62,7 +62,7 @@ test('active repair entry collapses to the current route with an explicit change
   assert.match(toolbarMarkup, /id="changeRepairEntry"[^>]*hidden[^>]*>更换故障<\/button>/);
   assert.match(appSource, /let repairEntryExpanded = false/);
   assert.match(appSource, /entryRoot\.dataset\.active = String\(Boolean\(activeFlow\)\)/);
-  assert.match(appSource, /options\.hidden = !coverage\.available \|\| Boolean\(activeFlow && !repairEntryExpanded\)/);
+  assert.match(appSource, /options\.hidden = boundaryOnly \|\| !coverage\.available \|\| Boolean\(activeFlow && !repairEntryExpanded\)/);
   assert.match(appSource, /changeButton\.setAttribute\('aria-expanded', String\(repairEntryExpanded\)\)/);
   assert.match(appSource, /repairEntryExpanded = false;[\s\S]*activeRepairFlowId = flow\.flow_id/);
 });

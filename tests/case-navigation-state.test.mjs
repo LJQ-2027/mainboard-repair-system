@@ -43,10 +43,9 @@ test('builds a deterministic source-bounded case selector', () => {
 
   assert.equal(state.visible, true);
   assert.equal(state.summary, '2 条案例 · 3 个独立照片');
-  assert.deepEqual(state.options, [
-    { caseId: 'CASE-1', label: 'CASE-1 · 不开机' },
-    { caseId: 'CASE-2', label: 'CASE-2 · 无法充电' },
-  ]);
+  assert.deepEqual(state.groups.map((item) => item.label), ['不开机', '无法充电']);
+  assert.equal(state.activeGroup.label, '不开机');
+  assert.deepEqual(state.options, [{ caseId: 'CASE-1', label: 'CASE-1' }]);
   assert.equal(state.activeCase.caseId, 'CASE-1');
 });
 
@@ -60,6 +59,33 @@ test('selects a requested case and exposes only declared candidates', () => {
   assert.equal(state.activeCase.boardOnly, true);
   assert.equal(state.activeCase.photoCount, 2);
   assert.equal(state.missingFieldCount, 1);
+});
+
+test('filters cases by a preferred symptom group and counts unique source photos', () => {
+  const grouped = structuredClone(contract);
+  grouped.case_count = 3;
+  grouped.unique_photo_count = 4;
+  grouped.cases.push({
+    ...structuredClone(grouped.cases[0]),
+    case_id: 'CASE-3',
+    photo_sha256: ['a'.repeat(64), 'd'.repeat(64)],
+  });
+
+  const state = buildCaseNavigationState(grouped, null, '不开机');
+
+  assert.equal(state.activeGroup.key, '不开机');
+  assert.equal(state.activeGroup.caseCount, 2);
+  assert.equal(state.activeGroup.uniquePhotoCount, 2);
+  assert.deepEqual(state.options.map((item) => item.caseId), ['CASE-1', 'CASE-3']);
+  assert.equal(state.activeCase.caseId, 'CASE-1');
+});
+
+test('keeps preferred-case selection inside its source symptom group', () => {
+  const state = buildCaseNavigationState(contract, 'CASE-2');
+
+  assert.equal(state.activeGroup.label, '无法充电');
+  assert.deepEqual(state.options, [{ caseId: 'CASE-2', label: 'CASE-2' }]);
+  assert.equal(state.activeCase.caseId, 'CASE-2');
 });
 
 test('fails closed for unsupported or causality-enabling contracts', () => {
