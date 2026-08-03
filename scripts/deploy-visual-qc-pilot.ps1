@@ -306,7 +306,11 @@ rollback() {
   trap - ERR
   echo "== rollback after deployment failure =="
   if [ "$SERVICE_STATE_CAPTURED" -eq 1 ]; then
-    pm2 delete motherboard-repair-visual-qc >/dev/null 2>&1 || true
+    if [ "$DATABASE_MAY_BE_MUTATED" -eq 1 ] || [ "$VENV_SWITCHED" -eq 1 ]; then
+      pm2 delete motherboard-repair-visual-qc >/dev/null 2>&1 || true
+    elif [ "$QC_EXISTED" -eq 1 ]; then
+      pm2 restart motherboard-repair-visual-qc || true
+    fi
   fi
   restore_database
   restore_venv_link

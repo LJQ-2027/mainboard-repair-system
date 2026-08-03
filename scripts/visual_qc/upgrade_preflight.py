@@ -28,24 +28,28 @@ from scripts.visual_qc.server.storage import LocalObjectStorage
 
 
 UPGRADE_PREFLIGHT_SCHEMA_VERSION = "VISUAL-QC-UPGRADE-PREFLIGHT-V1"
-SUPPORTED_SOURCE_VERSIONS = frozenset({"f278061"})
+CURRENT_PRODUCTION_SOURCE = "08d08cd38aaffc9b01d901dfe9ef7684a614abac"
+SUPPORTED_SOURCE_VERSIONS = frozenset({"f278061", CURRENT_PRODUCTION_SOURCE})
 ALLOWED_ADDITIVE_COLUMNS = {
     "f278061": {
         "cases": {"qualified_handoff_json"},
-    }
+    },
+    CURRENT_PRODUCTION_SOURCE: {},
 }
 ALLOWED_ADDITIVE_TABLES = {
     "f278061": {
         "repair_evidence_link_revisions",
         "repair_evidence_link_cases",
-    }
+    },
+    CURRENT_PRODUCTION_SOURCE: set(),
 }
 ALLOWED_ADDITIVE_DEFINITIONS = {
     "f278061": {
         "cases": {
             "qualified_handoff_json": "TEXT",
         },
-    }
+    },
+    CURRENT_PRODUCTION_SOURCE: {},
 }
 ALLOWED_ADDITIVE_SCHEMA_SQL = {
     "f278061": """
@@ -74,7 +78,12 @@ ALLOWED_ADDITIVE_SCHEMA_SQL = {
                 );
                 CREATE INDEX IF NOT EXISTS repair_evidence_link_cases_server_case
                     ON repair_evidence_link_cases(server_case_id, link_set_id, revision);
-    """
+    """,
+    CURRENT_PRODUCTION_SOURCE: "",
+}
+EXPECTED_ADDED_COLUMNS = {
+    "f278061": [{"table": "cases", "columns": ["qualified_handoff_json"]}],
+    CURRENT_PRODUCTION_SOURCE: [],
 }
 SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 MANAGED_MIME_EXTENSIONS = {
@@ -1186,7 +1195,7 @@ def audit_visual_qc_upgrade(
     migration_schema_passed = (
         migration["status"] == "passed"
         and migration["added_columns"]
-        == [{"table": "cases", "columns": ["qualified_handoff_json"]}]
+        == EXPECTED_ADDED_COLUMNS[source_version]
     )
     migration_rows_passed = (
         migration["before_digest"] == migration["shared_digest"]

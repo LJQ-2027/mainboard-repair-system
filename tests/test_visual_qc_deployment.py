@@ -303,6 +303,22 @@ class VisualQcDeploymentContractTests(unittest.TestCase):
         self.assertLess(rehearsal, mutation_flag)
         self.assertLess(mutation_flag, start_qc)
 
+    def test_pre_switch_failure_restarts_instead_of_deleting_existing_qc(self):
+        script = (
+            ROOT / "scripts" / "deploy-visual-qc-pilot.ps1"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn(
+            'if [ "$DATABASE_MAY_BE_MUTATED" -eq 1 ] || '
+            '[ "$VENV_SWITCHED" -eq 1 ]; then',
+            script,
+        )
+        self.assertIn(
+            'elif [ "$QC_EXISTED" -eq 1 ]; then\n'
+            '      pm2 restart motherboard-repair-visual-qc || true',
+            script,
+        )
+
     def test_pm2_qc_process_uses_loopback_and_external_data_and_environment(self):
         ecosystem = (ROOT / "ecosystem.config.js").read_text(encoding="utf-8")
         requirements = (ROOT / "requirements-visual-qc.txt").read_text(encoding="utf-8")

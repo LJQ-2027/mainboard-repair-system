@@ -41,6 +41,7 @@ TARGET_CLI_ARGUMENTS = [
     "--target-runtime-manifest-sha256",
     TARGET_EVIDENCE["target_runtime_manifest_sha256"],
 ]
+CURRENT_PRODUCTION = "08d08cd38aaffc9b01d901dfe9ef7684a614abac"
 
 
 def sha256_file(path: Path) -> str:
@@ -666,13 +667,13 @@ class VisualQcUpgradePreflightTests(unittest.TestCase):
             {"qualified_handoff_provenance_required": 1},
         )
 
-    def create_rollback_app(self, *, compatible=True) -> Path:
+    def create_rollback_app(self, *, compatible=True, version="f278061") -> Path:
         app_root = self.root / (
             "rollback-compatible" if compatible else "rollback-incompatible"
         )
         store_path = app_root / "scripts" / "visual_qc" / "server" / "store.py"
         store_path.parent.mkdir(parents=True)
-        (app_root / "VERSION").write_text("f278061\n", encoding="ascii")
+        (app_root / "VERSION").write_text(f"{version}\n", encoding="ascii")
         rejection = """
             columns = {
                 row[1]
@@ -819,6 +820,29 @@ class VisualQcStore:
         self.assertEqual(report["rollback_runtime"]["cases_read"], 1)
         self.assertEqual(self.snapshot_paths(source, source_data_root), before)
         self.assertNotIn(str(self.root), json.dumps(report))
+
+    def test_full_upgrade_audit_accepts_current_production_without_schema_change(self):
+        source = self.create_f278061_database()
+        VisualQcStore(source, recover_interrupted_jobs=False)
+        source_data_root = self.root / "current-production-data"
+        self.attach_managed_objects(source, source_data_root)
+        source_app_root = self.create_rollback_app(version=CURRENT_PRODUCTION)
+        before = self.snapshot_paths(source, source_data_root)
+
+        report = audit_visual_qc_upgrade(
+            project_root=ROOT,
+            source_database=source,
+            source_data_root=source_data_root,
+            source_app_root=source_app_root,
+            **TARGET_EVIDENCE,
+            clock=lambda: "2026-08-03T16:55:00.000Z",
+        )
+
+        self.assertEqual(report["status"], "passed")
+        self.assertEqual(report["source"]["version"], CURRENT_PRODUCTION)
+        self.assertEqual(report["migration"]["added_columns"], [])
+        self.assertTrue(all(check["status"] == "passed" for check in report["checks"]))
+        self.assertEqual(self.snapshot_paths(source, source_data_root), before)
 
     def test_full_upgrade_audit_requires_existing_storage_reference_lock(self):
         source = self.create_f278061_database()
