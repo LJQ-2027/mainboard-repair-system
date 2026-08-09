@@ -16,11 +16,11 @@
 - Create: `assets/cross-source-registration/repair-session-state.js`
 - Create: `tests/repair-session-state.test.mjs`
 
-- [ ] Write failing tests for `createRepairSession`, `updateRepairSession`, `abandonRepairSession`, exact-identity recovery, 50-record retention, malformed-record rejection and deterministic privacy-reduced export.
-- [ ] Run `node --test tests/repair-session-state.test.mjs` and confirm failure because the module does not exist.
-- [ ] Implement `TECHNICIAN-REPAIR-SESSION-V1` normalization. Accept only exact board/model/version/intent/entry-flow identity; normalize `flowStates` as a string-keyed object containing the existing state fields and finite numeric measurements; derive terminal status only from closed flow state.
-- [ ] Implement `loadRepairSessions`, `saveRepairSessions`, `recoverRepairSession` and `serializeRepairSessions`. Drop unknown fields, retain the newest 50 valid records and sort exported records by creation time then session id.
-- [ ] Run the focused test and commit the green state.
+- [x] Write failing tests for `createRepairSession`, `updateRepairSession`, `abandonRepairSession`, exact-identity recovery, 50-record retention, malformed-record rejection and deterministic privacy-reduced export.
+- [x] Run `node --test tests/repair-session-state.test.mjs` and confirm failure because the module does not exist.
+- [x] Implement `TECHNICIAN-REPAIR-SESSION-V1` normalization. Accept only exact board/model/version/intent/entry-flow identity; normalize `flowStates` as a string-keyed object containing the existing state fields and finite numeric measurements; derive terminal status only from closed flow state.
+- [x] Implement `loadRepairSessions`, `saveRepairSessions`, `recoverRepairSession` and `serializeRepairSessions`. Drop unknown fields, retain the newest 50 valid records and sort exported records by creation time then session id.
+- [x] Run the focused test and commit the green state.
 
 ### Task 2: Existing Flow Integration
 
