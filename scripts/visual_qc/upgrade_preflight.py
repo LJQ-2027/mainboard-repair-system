@@ -28,20 +28,24 @@ from scripts.visual_qc.server.storage import LocalObjectStorage
 
 
 UPGRADE_PREFLIGHT_SCHEMA_VERSION = "VISUAL-QC-UPGRADE-PREFLIGHT-V1"
-CURRENT_PRODUCTION_SOURCE = "08d08cd38aaffc9b01d901dfe9ef7684a614abac"
-SUPPORTED_SOURCE_VERSIONS = frozenset({"f278061", CURRENT_PRODUCTION_SOURCE})
+PREVIOUS_PRODUCTION_SOURCE = "08d08cd38aaffc9b01d901dfe9ef7684a614abac"
+CURRENT_PRODUCTION_SOURCE = "7ed316c07130ef1488037f537c5968c832e16668"
+NO_SCHEMA_CHANGE_SOURCES = frozenset(
+    {PREVIOUS_PRODUCTION_SOURCE, CURRENT_PRODUCTION_SOURCE}
+)
+SUPPORTED_SOURCE_VERSIONS = frozenset({"f278061", *NO_SCHEMA_CHANGE_SOURCES})
 ALLOWED_ADDITIVE_COLUMNS = {
     "f278061": {
         "cases": {"qualified_handoff_json"},
     },
-    CURRENT_PRODUCTION_SOURCE: {},
+    **{source: {} for source in NO_SCHEMA_CHANGE_SOURCES},
 }
 ALLOWED_ADDITIVE_TABLES = {
     "f278061": {
         "repair_evidence_link_revisions",
         "repair_evidence_link_cases",
     },
-    CURRENT_PRODUCTION_SOURCE: set(),
+    **{source: set() for source in NO_SCHEMA_CHANGE_SOURCES},
 }
 ALLOWED_ADDITIVE_DEFINITIONS = {
     "f278061": {
@@ -49,7 +53,7 @@ ALLOWED_ADDITIVE_DEFINITIONS = {
             "qualified_handoff_json": "TEXT",
         },
     },
-    CURRENT_PRODUCTION_SOURCE: {},
+    **{source: {} for source in NO_SCHEMA_CHANGE_SOURCES},
 }
 ALLOWED_ADDITIVE_SCHEMA_SQL = {
     "f278061": """
@@ -79,11 +83,11 @@ ALLOWED_ADDITIVE_SCHEMA_SQL = {
                 CREATE INDEX IF NOT EXISTS repair_evidence_link_cases_server_case
                     ON repair_evidence_link_cases(server_case_id, link_set_id, revision);
     """,
-    CURRENT_PRODUCTION_SOURCE: "",
+    **{source: "" for source in NO_SCHEMA_CHANGE_SOURCES},
 }
 EXPECTED_ADDED_COLUMNS = {
     "f278061": [{"table": "cases", "columns": ["qualified_handoff_json"]}],
-    CURRENT_PRODUCTION_SOURCE: [],
+    **{source: [] for source in NO_SCHEMA_CHANGE_SOURCES},
 }
 SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 MANAGED_MIME_EXTENSIONS = {
