@@ -35,3 +35,20 @@ test('pilot context and feedback controls remain compact in the evidence rail', 
   assert.match(css, /\.pilot-feedback/);
   assert.match(css, /\.feedback-segments/);
 });
+
+test('reviewed flows create, persist, restore, and explicitly restart repair sessions', () => {
+  assert.match(app, /beginRepairSession/);
+  assert.match(app, /persistRepairSession/);
+  assert.match(app, /restartRepairSession/);
+  assert.match(app, /declaredFlowIds: new Set\(data\.repair_flows\.map/);
+  assert.match(app, /restartSession: true/);
+});
+
+test('repair session status and export stay inside the existing reviewed-flow panel', () => {
+  assert.match(html, /id="repairFlowControl"[^>]*hidden[\s\S]*id="repairSessionStrip"[^>]*hidden/);
+  assert.match(html, /id="repairSessionStatus"/);
+  assert.match(html, /id="repairSessionSavedAt"/);
+  assert.match(html, /id="exportRepairSession"/);
+  assert.match(app, /serializeRepairSessions\(\[activeRepairSession\]\)/);
+  assert.match(css, /\.repair-session-strip/);
+});

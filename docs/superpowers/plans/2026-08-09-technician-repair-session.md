@@ -28,11 +28,11 @@
 - Modify: `assets/cross-source-registration/app.js`
 - Create: `tests/repair-session-integration.test.mjs`
 
-- [ ] Write a failing integration test that starts a reviewed flow, snapshots a measurement/choice, serializes it, reloads it and reconstructs the exact existing repair-flow state without changing the branch outcome.
-- [ ] Run `node --test tests/repair-session-integration.test.mjs` and confirm the missing integration helper fails.
-- [ ] Import the session module in `app.js`; create or recover the exact session in `startRepairEntry`; restore `repairFlowById` and `activeRepairFlowId`; snapshot after every `applyRepairFlowState` mutation and handoff.
-- [ ] On explicit reset, mark the prior session `abandoned`, persist it, create a new session and then apply the existing reset state. On storage failure, keep the in-memory flow active and expose a non-blocking persistence message.
-- [ ] Run focused session and existing repair-flow tests and commit.
+- [x] Write a failing integration test that starts a reviewed flow, snapshots a measurement/choice, serializes it, reloads it and reconstructs the exact existing repair-flow state without changing the branch outcome.
+- [x] Run `node --test tests/repair-session-integration.test.mjs` and confirm the missing integration helper fails.
+- [x] Import the session module in `app.js`; create or recover the exact session in `startRepairEntry`; restore `repairFlowById` and `activeRepairFlowId`; snapshot after every `applyRepairFlowState` mutation and handoff.
+- [x] On explicit reset, mark the prior session `abandoned`, persist it, create a new session and then apply the existing reset state. On storage failure, keep the in-memory flow active and expose a non-blocking persistence message.
+- [x] Run focused session and existing repair-flow tests and commit.
 
 ### Task 3: Session Status And Export Surface
 
@@ -42,10 +42,10 @@
 - Modify: `assets/cross-source-registration/app.js`
 - Modify: `tests/pilot-workbench-integration.test.mjs`
 
-- [ ] Add failing static/integration assertions for a `repairSessionStatus`, `repairSessionSavedAt` and `exportRepairSession` control contained by the existing repair-flow panel and hidden when no reviewed flow is active.
-- [ ] Add one compact separator-based session strip below the flow header. Show `进行中`, `已恢复`, `已完成`, `已在资料边界停止` or `保存失败`, plus last-saved time and export command; do not add a new page or card.
-- [ ] Wire export to the currently validated session and use `technician-repair-session-YYYY-MM-DD.json`. Disable export only when no valid session exists.
-- [ ] Run the focused UI and session tests and commit.
+- [x] Add failing static/integration assertions for a `repairSessionStatus`, `repairSessionSavedAt` and `exportRepairSession` control contained by the existing repair-flow panel and hidden when no reviewed flow is active.
+- [x] Add one compact separator-based session strip below the flow header. Show `进行中`, `已恢复`, `已完成`, `已在资料边界停止` or `保存失败`, plus last-saved time and export command; do not add a new page or card.
+- [x] Wire export to the currently validated session and use `technician-repair-session-YYYY-MM-DD.json`. Disable export only when no valid session exists.
+- [x] Run the focused UI and session tests and commit.
 
 ### Task 4: Browser And Project Closeout
 

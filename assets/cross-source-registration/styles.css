@@ -548,6 +548,17 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) clamp(360px, 27vw, 4
 .repair-flow-control[data-closed="true"] .repair-flow-position span { border-color: #aeb8b2; background: #e8ece9; color: #435049; }
 .repair-flow-control[hidden] { display: none; }
 .repair-flow-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.repair-session-strip { display: flex; min-height: 40px; align-items: center; justify-content: space-between; gap: 10px; margin: 9px 0 0; padding: 7px 0; border-top: 1px solid #cdd5d0; border-bottom: 1px solid #cdd5d0; }
+.repair-session-strip[hidden] { display: none; }
+.repair-session-strip > div { display: grid; min-width: 0; grid-template-columns: auto auto; align-items: baseline; gap: 2px 7px; }
+.repair-session-strip span { color: #68756e; font-size: 8px; font-weight: 700; }
+.repair-session-strip strong { color: var(--ink); font-size: 10px; }
+.repair-session-strip small { grid-column: 1 / -1; overflow: hidden; color: var(--muted); font-size: 8px; text-overflow: ellipsis; white-space: nowrap; }
+.repair-session-strip button { flex: 0 0 auto; min-height: 32px; padding: 0 9px; border: 1px solid #8f9c94; background: white; color: var(--ink); font: inherit; font-size: 9px; cursor: pointer; }
+.repair-session-strip button:focus-visible { outline: 3px solid #65a9ff; outline-offset: 2px; }
+.repair-session-strip[data-status="completed"] strong,
+.repair-session-strip[data-status="stopped_at_source_boundary"] strong { color: #176b59; }
+.repair-session-strip[data-status="error"] strong { color: #a43d2b; }
 .repair-flow-heading > div:first-child > span { display: block; color: #177d69; font-size: 9px; font-weight: 700; text-transform: uppercase; }
 .repair-flow-heading strong { display: block; margin-top: 3px; font-size: 12px; }
 .repair-flow-position { display: grid; justify-items: end; gap: 3px; }

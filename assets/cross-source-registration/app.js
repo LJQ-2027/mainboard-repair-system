@@ -73,6 +73,13 @@ import {
   resetRepairFlow,
   setRepairFlowActionExecuted,
 } from './repair-flow-state.js';
+import {
+  beginRepairSession,
+  isRepairSessionEligible,
+  persistRepairSession,
+  restartRepairSession,
+} from './repair-session-controller.js';
+import { serializeRepairSessions } from './repair-session-state.js';
 
 const BOARD_CATALOG_URL = '../../knowledge-base/repair-workbench-boards.json';
 const views = { photo: document.querySelector('#photoView'), pointmap: document.querySelector('#pointmapView'), model: document.querySelector('#modelView') };
@@ -106,6 +113,10 @@ let pilotIntent = null;
 let activeBoardKey = null;
 let pilotFeedbackTarget = null;
 let pilotFeedbackUsefulness = null;
+let activeRepairSession = null;
+let activeRepairSessionContext = null;
+let repairSessionRecovered = false;
+let repairSessionPersistenceError = null;
 
 const FAULT_LABELS = {
   no_power: '无法开机',
@@ -391,6 +402,75 @@ async function selectCaseCandidate(componentId) {
   return selectEntity(componentId);
 }
 
+function replaceRepairFlowStates(flowById) {
+  repairFlowById.clear();
+  flowById.forEach((state, flowId) => repairFlowById.set(flowId, state));
+}
+
+function buildRepairSessionContext(entryFlowId, flow) {
+  if (!pilotIntent?.valid || !pilotIntent.model || !isRepairSessionEligible(data, flow)) return null;
+  return {
+    boardKey: activeBoardKey,
+    model: pilotIntent.model,
+    boardVersion: data.board_version,
+    intent: {
+      kind: pilotIntent.kind,
+      label: pilotIntent.label || flow.entry_label,
+      flowId: pilotIntent.flowId || entryFlowId,
+    },
+    entryFlowId,
+  };
+}
+
+function persistActiveRepairSession() {
+  if (!activeRepairSession || !activeRepairFlowId) return;
+  const result = persistRepairSession({
+    storage: window.localStorage,
+    session: activeRepairSession,
+    activeFlowId: activeRepairFlowId,
+    flowById: repairFlowById,
+  });
+  activeRepairSession = result.session;
+  repairSessionPersistenceError = result.persistenceError;
+  repairSessionRecovered = false;
+}
+
+function renderRepairSessionStatus() {
+  const strip = document.querySelector('#repairSessionStrip');
+  if (!strip) return;
+  strip.hidden = !activeRepairSession;
+  if (!activeRepairSession) return;
+  const status = repairSessionPersistenceError ? 'error' : activeRepairSession.status;
+  const statusCopy = repairSessionPersistenceError
+    ? '保存失败'
+    : activeRepairSession.status === 'completed'
+      ? '已完成'
+      : activeRepairSession.status === 'stopped_at_source_boundary'
+        ? '已在资料边界停止'
+        : repairSessionRecovered
+          ? '已恢复'
+          : '进行中';
+  strip.dataset.status = status;
+  document.querySelector('#repairSessionStatus').textContent = statusCopy;
+  document.querySelector('#repairSessionSavedAt').textContent = repairSessionPersistenceError
+    ? '当前流程仍可继续，但本机未能保存最新记录'
+    : `本机保存 · ${new Date(activeRepairSession.updated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+  document.querySelector('#exportRepairSession').disabled = false;
+}
+
+function exportActiveRepairSession() {
+  if (!activeRepairSession) return;
+  const blob = new Blob([serializeRepairSessions([activeRepairSession])], { type: 'application/json;charset=utf-8' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `technician-repair-session-${new Date().toISOString().slice(0, 10)}.json`;
+  link.hidden = true;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+}
+
 function setExclusiveFeedback(selector, value) {
   document.querySelectorAll(selector).forEach((button) => {
     button.setAttribute('aria-pressed', String(button.dataset.feedbackTarget === value || button.dataset.feedbackUsefulness === value));
@@ -479,15 +559,55 @@ async function startRepairEntry(flowId, options = {}) {
     if (targetEntity.side_id === activeSideId) syncBoardViews();
   }
   if (!repairFlowById.has(flow.flow_id)) repairFlowById.set(flow.flow_id, createRepairFlowState(flow));
+  const sessionContext = buildRepairSessionContext(flow.flow_id, flow);
+  if (sessionContext) {
+    const initialFlowById = new Map([[flow.flow_id, repairFlowById.get(flow.flow_id)]]);
+    const session = beginRepairSession({
+      storage: window.localStorage,
+      context: sessionContext,
+      activeFlowId: flow.flow_id,
+      flowById: initialFlowById,
+      declaredFlowIds: new Set(data.repair_flows.map((candidate) => candidate.flow_id)),
+    });
+    activeRepairSession = session.session;
+    activeRepairSessionContext = sessionContext;
+    repairSessionRecovered = session.recovered;
+    repairSessionPersistenceError = session.persistenceError;
+    activeRepairFlowId = session.activeFlowId;
+    replaceRepairFlowStates(session.flowById);
+  } else {
+    activeRepairSession = null;
+    activeRepairSessionContext = null;
+    repairSessionRecovered = false;
+    repairSessionPersistenceError = null;
+    activeRepairFlowId = flow.flow_id;
+  }
   repairEntryExpanded = false;
-  activeRepairFlowId = flow.flow_id;
   renderRepairEntry();
-  await selectEntity(intent.targetComponentId);
+  const activeFlow = data.repair_flows.find((candidate) => candidate.flow_id === activeRepairFlowId);
+  const activeState = activeFlow && repairFlowById.get(activeFlow.flow_id);
+  const activeTarget = activeFlow && repairFlowTargetComponentId(activeFlow, activeState);
+  await selectEntity(activeTarget || intent.targetComponentId);
   return true;
 }
 
-function applyRepairFlowState(flow, next, entity) {
-  repairFlowById.set(flow.flow_id, next);
+function applyRepairFlowState(flow, next, entity, options = {}) {
+  if (options.restartSession && activeRepairSession && activeRepairSessionContext) {
+    const replacementFlows = new Map([[flow.flow_id, next]]);
+    const restarted = restartRepairSession({
+      storage: window.localStorage,
+      session: activeRepairSession,
+      context: activeRepairSessionContext,
+      activeFlowId: flow.flow_id,
+      flowById: replacementFlows,
+    });
+    activeRepairSession = restarted.session;
+    repairSessionRecovered = false;
+    repairSessionPersistenceError = restarted.persistenceError;
+    replaceRepairFlowStates(replacementFlows);
+  } else {
+    repairFlowById.set(flow.flow_id, next);
+  }
   if (next.terminal?.kind === 'handoff') {
     const targetFlow = data.repair_flows.find((candidate) => candidate.flow_id === next.terminal.flowId);
     if (!targetFlow) throw new Error(`Unknown repair flow handoff: ${next.terminal.flowId}`);
@@ -495,6 +615,7 @@ function applyRepairFlowState(flow, next, entity) {
       repairFlowById.set(targetFlow.flow_id, createRepairFlowState(targetFlow));
     }
     activeRepairFlowId = targetFlow.flow_id;
+    persistActiveRepairSession();
     renderRepairEntry();
     const targetState = repairFlowById.get(targetFlow.flow_id);
     const targetId = repairFlowTargetComponentId(targetFlow, targetState);
@@ -503,6 +624,7 @@ function applyRepairFlowState(flow, next, entity) {
     return;
   }
   activeRepairFlowId = flow.flow_id;
+  persistActiveRepairSession();
   renderRepairEntry();
   const target = repairFlowTargetComponentId(flow, next);
   if (target && target !== entity.component_id) {
@@ -587,6 +709,7 @@ function renderRepairFlow(entity, guidance) {
   document.querySelector('#guidanceProgress').textContent = `${progress.current} / ${progress.total}`;
   document.querySelector('#inspectionStepLabel').textContent = '辅助资料';
   document.querySelector('#repairFlowTitle').textContent = flow.title;
+  renderRepairSessionStatus();
   document.querySelector('#repairFlowStep').textContent = state.closed
     ? `已结束 · ${progress.current} / ${progress.total}`
     : `步骤 ${progress.current} / ${progress.total}`;
@@ -774,7 +897,7 @@ function renderRepairFlow(entity, guidance) {
   completionStatus.textContent = readinessCopy;
   completionButton.onclick = () => {
     const next = state.closed ? resetRepairFlow(flow) : closeRepairFlow(repairFlowById.get(flow.flow_id));
-    applyRepairFlowState(flow, next, entity);
+    applyRepairFlowState(flow, next, entity, { restartSession: state.closed });
   };
 
   const history = document.querySelector('#repairFlowHistory');
@@ -799,7 +922,7 @@ function renderRepairFlow(entity, guidance) {
     applyRepairFlowState(flow, backRepairFlow(flow, repairFlowById.get(flow.flow_id)), entity);
   };
   configureResetConfirmation(reset, !state.history.length, () => {
-    applyRepairFlowState(flow, resetRepairFlow(flow), entity);
+    applyRepairFlowState(flow, resetRepairFlow(flow), entity, { restartSession: true });
   });
   return true;
 }
@@ -1584,6 +1707,7 @@ document.querySelectorAll('[data-feedback-usefulness]').forEach((button) => butt
 }));
 document.querySelector('#savePilotFeedback').addEventListener('click', recordPilotFeedback);
 document.querySelector('#exportPilotFeedback').addEventListener('click', exportPilotFeedback);
+document.querySelector('#exportRepairSession').addEventListener('click', exportActiveRepairSession);
 window.addEventListener('resize', () => {
   if (activeView === 'photo') photoViewport?.resize();
   if (activeView === 'pointmap') pointMapViewport?.resize();

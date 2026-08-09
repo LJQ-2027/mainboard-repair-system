@@ -202,6 +202,28 @@ export function recoverRepairSession(records, context) {
     .sort((left, right) => right.updated_at.localeCompare(left.updated_at) || right.session_id.localeCompare(left.session_id))[0] || null;
 }
 
+export function repairSessionSnapshot(activeFlowId, flowById) {
+  const flowStates = flowById instanceof Map ? Object.fromEntries(flowById) : flowById;
+  const normalized = normalizeSnapshot({ activeFlowId, flowStates });
+  return {
+    activeFlowId: normalized.activeFlowId,
+    flowStates: normalized.flowStates,
+  };
+}
+
+export function restoreRepairSessionFlows(session, declaredFlowIds) {
+  const normalized = normalizeSession(session);
+  const allowed = declaredFlowIds instanceof Set ? declaredFlowIds : new Set(declaredFlowIds || []);
+  const storedIds = Object.keys(normalized.flow_states);
+  if (storedIds.some((flowId) => !allowed.has(flowId))) {
+    throw new Error('Stored repair flow is no longer declared by the dataset');
+  }
+  return {
+    activeFlowId: normalized.active_flow_id,
+    flowById: new Map(Object.entries(normalized.flow_states)),
+  };
+}
+
 export function loadRepairSessions(storage = window.localStorage) {
   try {
     return validSessions(JSON.parse(storage.getItem(REPAIR_SESSION_STORAGE_KEY) || '[]'));

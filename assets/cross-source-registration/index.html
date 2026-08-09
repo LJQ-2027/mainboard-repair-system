@@ -122,6 +122,10 @@
             <div><span>当前任务</span><strong id="repairFlowTitle"></strong></div>
             <div class="repair-flow-position"><strong id="repairFlowTarget"></strong><small id="repairFlowTargetMeta"></small><span id="repairFlowStep"></span></div>
           </header>
+          <div class="repair-session-strip" id="repairSessionStrip" hidden aria-live="polite">
+            <div><span>本次维修记录</span><strong id="repairSessionStatus"></strong><small id="repairSessionSavedAt"></small></div>
+            <button id="exportRepairSession" type="button" title="导出本次维修记录">导出记录</button>
+          </div>
           <ol class="repair-flow-trail" id="repairFlowTrail" aria-label="维修步骤"></ol>
           <p class="repair-flow-prompt" id="repairFlowPrompt"></p>
           <div class="repair-flow-measurements" id="repairFlowMeasurements" hidden>
