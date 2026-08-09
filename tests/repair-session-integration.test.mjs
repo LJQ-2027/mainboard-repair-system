@@ -56,7 +56,7 @@ test('existing repair-flow state round trips without changing its declared branc
     'session-roundtrip',
   );
   const parsed = JSON.parse(serializeRepairSessions([session])).sessions[0];
-  const restored = restoreRepairSessionFlows(parsed, new Set(['no-power']));
+  const restored = restoreRepairSessionFlows(parsed, [profile]);
 
   assert.equal(restored.activeFlowId, 'no-power');
   assert.deepEqual(restored.flowById.get('no-power'), measured);
@@ -71,7 +71,44 @@ test('restore fails closed when a stored flow is no longer declared by the datas
     'session-stale',
   );
   assert.throws(
-    () => restoreRepairSessionFlows(session, new Set(['different-flow'])),
+    () => restoreRepairSessionFlows(session, [{ ...profile, flow_id: 'different-flow' }]),
     /no longer declared/,
+  );
+});
+
+test('restore rejects state that does not replay through the declared source graph', () => {
+  const session = createRepairSession(
+    identity,
+    repairSessionSnapshot('no-power', new Map([['no-power', createRepairFlowState(profile)]])),
+    '2026-08-09T10:00:00.000Z',
+    'session-forged',
+  );
+  const forged = structuredClone(session);
+  forged.flow_states['no-power'] = {
+    ...forged.flow_states['no-power'],
+    currentStepId: null,
+    terminal: { kind: 'action', label: 'Replace an undeclared component' },
+    actionExecution: 'pending',
+  };
+  assert.throws(
+    () => restoreRepairSessionFlows(forged, [profile]),
+    /does not match the declared graph/,
+  );
+});
+
+test('restore rejects a declared flow that was not reached by a stored handoff', () => {
+  const otherProfile = { ...profile, flow_id: 'not-charging' };
+  const session = createRepairSession(
+    identity,
+    repairSessionSnapshot('not-charging', new Map([
+      ['no-power', createRepairFlowState(profile)],
+      ['not-charging', createRepairFlowState(otherProfile)],
+    ])),
+    '2026-08-09T10:00:00.000Z',
+    'session-cross-flow',
+  );
+  assert.throws(
+    () => restoreRepairSessionFlows(session, [profile, otherProfile]),
+    /reachable handoff chain/,
   );
 });

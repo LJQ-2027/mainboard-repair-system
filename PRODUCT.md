@@ -31,6 +31,7 @@ Precise, calm, dependable. The product should feel like a professional bench ins
 3. Reveal detail progressively. Show the fault path first, then the module, test point, and measurement instruction at the moment they are needed.
 4. Use depth to explain hierarchy. The 2.5D treatment separates board, module, fault path, and inspection layers without changing coordinates.
 5. Optimize for bench use. Interactions must be quick, readable in a bright workshop, and usable on desktop and narrow screens.
+6. Preserve task continuity without manufacturing truth. Reviewed flows may save and restore technician-entered state locally, but reference-only navigation, visual candidates, and unsourced conclusions must never become executable repair records.
 
 ## Accessibility & Inclusion
 

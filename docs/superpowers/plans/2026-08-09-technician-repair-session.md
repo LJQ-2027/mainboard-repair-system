@@ -55,7 +55,7 @@
 - Modify: `docs/superpowers/plans/2026-08-09-technician-repair-session.md`
 - Modify: project ledger and Vault entries outside the implementation repository
 
-- [ ] Run the complete relevant Node repair-flow/session/pilot suite, JavaScript syntax checks, `git diff --check`, JSON and strict UTF-8 checks.
-- [ ] Start the local app and use installed-Chrome Playwright at desktop and 390 px to complete: entry selection, measurement/choice, refresh recovery, terminal completion, reset/abandonment and export affordance. Check readable interaction states, zero horizontal overflow and zero runtime errors.
-- [ ] Document that sessions remain local, privacy-reduced and non-authoritative; H897 case navigation remains non-executable.
-- [ ] Request independent review, fix every P1/P2, update project facts, commit and retain the feature worktree. Do not deploy production without a separate owner request.
+- [x] Run the complete relevant Node repair-flow/session/pilot suite, JavaScript syntax checks, `git diff --check`, JSON and strict UTF-8 checks.
+- [x] Start the local app and use installed-Chrome Playwright at desktop and 390 px to complete: entry selection, measurement/choice, refresh recovery, terminal completion, reset/abandonment and export affordance. Check readable interaction states, zero horizontal overflow and zero runtime errors.
+- [x] Document that sessions remain local, privacy-reduced and non-authoritative; H897 case navigation remains non-executable.
+- [x] Request independent review, fix every P1/P2, update project facts, commit and retain the feature worktree. Do not deploy production without a separate owner request.

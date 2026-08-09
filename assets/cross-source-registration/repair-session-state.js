@@ -1,3 +1,14 @@
+import {
+  answerRepairFlow,
+  buildRepairFlowChoiceOptions,
+  closeRepairFlow,
+  createRepairFlowState,
+  currentRepairFlowStep,
+  recordRepairFlowMeasurement,
+  recordRepairFlowPostActionCheck,
+  setRepairFlowActionExecuted,
+} from './repair-flow-state.js';
+
 export const REPAIR_SESSION_STORAGE_KEY = 'technician-repair-sessions-v1';
 
 const SESSION_SCHEMA = 'TECHNICIAN-REPAIR-SESSION-V1';
@@ -211,16 +222,72 @@ export function repairSessionSnapshot(activeFlowId, flowById) {
   };
 }
 
-export function restoreRepairSessionFlows(session, declaredFlowIds) {
+function replayRepairFlowState(profile, storedState) {
+  let replayed = createRepairFlowState(profile);
+  const recordedStepIds = new Set(Object.keys(storedState.measurements));
+  const consumedStepIds = new Set();
+  const applyCurrentMeasurements = () => {
+    const step = currentRepairFlowStep(profile, replayed);
+    const values = step ? storedState.measurements[step.step_id] : null;
+    if (!values) return;
+    Object.entries(values).forEach(([measurementId, value]) => {
+      replayed = recordRepairFlowMeasurement(profile, replayed, measurementId, value);
+    });
+    consumedStepIds.add(step.step_id);
+  };
+  storedState.history.forEach((entry) => {
+    if (replayed.currentStepId !== entry.stepId) throw new Error('Stored repair state does not match the declared graph');
+    applyCurrentMeasurements();
+    const allowedChoices = buildRepairFlowChoiceOptions(profile, replayed);
+    if (!allowedChoices.some((choice) => choice.value === entry.choice)) {
+      throw new Error('Stored repair state does not match the declared graph');
+    }
+    replayed = answerRepairFlow(profile, replayed, entry.choice);
+  });
+  applyCurrentMeasurements();
+  if ([...recordedStepIds].some((stepId) => !consumedStepIds.has(stepId))) {
+    throw new Error('Stored repair state does not match the declared graph');
+  }
+  if (storedState.actionExecution === 'executed') {
+    replayed = setRepairFlowActionExecuted(replayed, true);
+  }
+  if (storedState.postActionCheck && storedState.postActionCheck !== 'pending') {
+    replayed = recordRepairFlowPostActionCheck(replayed, storedState.postActionCheck);
+  }
+  if (storedState.closed) replayed = closeRepairFlow(replayed);
+  if (JSON.stringify(replayed) !== JSON.stringify(storedState)) {
+    throw new Error('Stored repair state does not match the declared graph');
+  }
+  return replayed;
+}
+
+export function restoreRepairSessionFlows(session, declaredFlows) {
   const normalized = normalizeSession(session);
-  const allowed = declaredFlowIds instanceof Set ? declaredFlowIds : new Set(declaredFlowIds || []);
+  const profiles = new Map((declaredFlows || []).map((profile) => [profile?.flow_id, profile]));
   const storedIds = Object.keys(normalized.flow_states);
-  if (storedIds.some((flowId) => !allowed.has(flowId))) {
+  if (storedIds.some((flowId) => !profiles.has(flowId))) {
     throw new Error('Stored repair flow is no longer declared by the dataset');
+  }
+  const restoredStates = storedIds.map((flowId) => [
+    flowId,
+    replayRepairFlowState(profiles.get(flowId), normalized.flow_states[flowId]),
+  ]);
+  const restoredMap = new Map(restoredStates);
+  const reachable = new Set();
+  let reachableFlowId = normalized.identity.entry_flow_id;
+  while (reachableFlowId && !reachable.has(reachableFlowId)) {
+    const state = restoredMap.get(reachableFlowId);
+    if (!state) throw new Error('Stored repair flows do not form a reachable handoff chain');
+    reachable.add(reachableFlowId);
+    if (reachableFlowId === normalized.active_flow_id) break;
+    reachableFlowId = state.terminal?.kind === 'handoff' ? state.terminal.flowId : null;
+  }
+  if (reachableFlowId !== normalized.active_flow_id || reachable.size !== storedIds.length) {
+    throw new Error('Stored repair flows do not form a reachable handoff chain');
   }
   return {
     activeFlowId: normalized.active_flow_id,
-    flowById: new Map(Object.entries(normalized.flow_states)),
+    flowById: restoredMap,
   };
 }
 

@@ -8,6 +8,7 @@ import {
   saveRepairSessions,
   updateRepairSession,
 } from './repair-session-state.js';
+import { resetRepairFlow } from './repair-flow-state.js';
 
 function saveWithStatus(storage, records) {
   try {
@@ -24,26 +25,36 @@ export function isRepairSessionEligible(dataset, flow) {
     && dataset?.repair_coverage?.status !== 'source_boundary_only';
 }
 
+export function repairSessionStartState(profile, state) {
+  return state?.closed ? resetRepairFlow(profile) : state;
+}
+
 export function beginRepairSession({
   storage,
   context,
   activeFlowId,
   flowById,
-  declaredFlowIds,
+  declaredFlows,
+  pendingRecords = [],
   now = new Date().toISOString(),
   sessionId = null,
 }) {
   const records = loadRepairSessions(storage);
-  const recoveredSession = recoverRepairSession(records, context);
+  const availableRecords = [...records, ...pendingRecords];
+  const recoveredSession = recoverRepairSession(availableRecords, context);
   if (recoveredSession) {
     try {
-      const restored = restoreRepairSessionFlows(recoveredSession, declaredFlowIds);
+      const restored = restoreRepairSessionFlows(recoveredSession, declaredFlows);
+      const persistenceError = pendingRecords.length
+        ? saveWithStatus(storage, availableRecords)
+        : null;
       return {
         session: recoveredSession,
         activeFlowId: restored.activeFlowId,
         flowById: restored.flowById,
         recovered: true,
-        persistenceError: null,
+        persistenceError,
+        pendingRecords: persistenceError ? pendingRecords : [],
       };
     } catch {
       // A stale dataset cannot restore old state; begin from the current declared flow.
@@ -55,12 +66,15 @@ export function beginRepairSession({
     now,
     sessionId,
   );
+  const retryRecords = [...pendingRecords, session];
+  const persistenceError = saveWithStatus(storage, [...records, ...retryRecords]);
   return {
     session,
     activeFlowId,
     flowById,
     recovered: false,
-    persistenceError: saveWithStatus(storage, [...records, session]),
+    persistenceError,
+    pendingRecords: persistenceError ? retryRecords : [],
   };
 }
 
@@ -69,6 +83,7 @@ export function persistRepairSession({
   session,
   activeFlowId,
   flowById,
+  pendingRecords = [],
   now = new Date().toISOString(),
 }) {
   const updated = updateRepairSession(
@@ -77,9 +92,15 @@ export function persistRepairSession({
     now,
   );
   const records = loadRepairSessions(storage);
+  const retryRecords = [
+    ...pendingRecords.filter((record) => record.session_id !== updated.session_id),
+    updated,
+  ];
+  const persistenceError = saveWithStatus(storage, [...records, ...retryRecords]);
   return {
     session: updated,
-    persistenceError: saveWithStatus(storage, [...records, updated]),
+    persistenceError,
+    pendingRecords: persistenceError ? retryRecords : [],
   };
 }
 
@@ -89,6 +110,7 @@ export function restartRepairSession({
   context,
   activeFlowId,
   flowById,
+  pendingRecords = [],
   now = new Date().toISOString(),
   sessionId = null,
 }) {
@@ -102,9 +124,17 @@ export function restartRepairSession({
     sessionId,
   );
   const records = loadRepairSessions(storage);
+  const replacementIds = new Set([abandoned.session_id, replacement.session_id]);
+  const retryRecords = [
+    ...pendingRecords.filter((record) => !replacementIds.has(record.session_id)),
+    abandoned,
+    replacement,
+  ];
+  const persistenceError = saveWithStatus(storage, [...records, ...retryRecords]);
   return {
     session: replacement,
     abandonedSession: abandoned,
-    persistenceError: saveWithStatus(storage, [...records, abandoned, replacement]),
+    persistenceError,
+    pendingRecords: persistenceError ? retryRecords : [],
   };
 }

@@ -77,6 +77,7 @@ import {
   beginRepairSession,
   isRepairSessionEligible,
   persistRepairSession,
+  repairSessionStartState,
   restartRepairSession,
 } from './repair-session-controller.js';
 import { serializeRepairSessions } from './repair-session-state.js';
@@ -117,6 +118,7 @@ let activeRepairSession = null;
 let activeRepairSessionContext = null;
 let repairSessionRecovered = false;
 let repairSessionPersistenceError = null;
+let repairSessionPendingRecords = [];
 
 const FAULT_LABELS = {
   no_power: '无法开机',
@@ -429,9 +431,11 @@ function persistActiveRepairSession() {
     session: activeRepairSession,
     activeFlowId: activeRepairFlowId,
     flowById: repairFlowById,
+    pendingRecords: repairSessionPendingRecords,
   });
   activeRepairSession = result.session;
   repairSessionPersistenceError = result.persistenceError;
+  repairSessionPendingRecords = result.pendingRecords;
   repairSessionRecovered = false;
 }
 
@@ -559,6 +563,7 @@ async function startRepairEntry(flowId, options = {}) {
     if (targetEntity.side_id === activeSideId) syncBoardViews();
   }
   if (!repairFlowById.has(flow.flow_id)) repairFlowById.set(flow.flow_id, createRepairFlowState(flow));
+  repairFlowById.set(flow.flow_id, repairSessionStartState(flow, repairFlowById.get(flow.flow_id)));
   const sessionContext = buildRepairSessionContext(flow.flow_id, flow);
   if (sessionContext) {
     const initialFlowById = new Map([[flow.flow_id, repairFlowById.get(flow.flow_id)]]);
@@ -567,12 +572,14 @@ async function startRepairEntry(flowId, options = {}) {
       context: sessionContext,
       activeFlowId: flow.flow_id,
       flowById: initialFlowById,
-      declaredFlowIds: new Set(data.repair_flows.map((candidate) => candidate.flow_id)),
+      declaredFlows: data.repair_flows,
+      pendingRecords: repairSessionPendingRecords,
     });
     activeRepairSession = session.session;
     activeRepairSessionContext = sessionContext;
     repairSessionRecovered = session.recovered;
     repairSessionPersistenceError = session.persistenceError;
+    repairSessionPendingRecords = session.pendingRecords;
     activeRepairFlowId = session.activeFlowId;
     replaceRepairFlowStates(session.flowById);
   } else {
@@ -580,6 +587,7 @@ async function startRepairEntry(flowId, options = {}) {
     activeRepairSessionContext = null;
     repairSessionRecovered = false;
     repairSessionPersistenceError = null;
+    repairSessionPendingRecords = [];
     activeRepairFlowId = flow.flow_id;
   }
   repairEntryExpanded = false;
@@ -600,10 +608,12 @@ function applyRepairFlowState(flow, next, entity, options = {}) {
       context: activeRepairSessionContext,
       activeFlowId: flow.flow_id,
       flowById: replacementFlows,
+      pendingRecords: repairSessionPendingRecords,
     });
     activeRepairSession = restarted.session;
     repairSessionRecovered = false;
     repairSessionPersistenceError = restarted.persistenceError;
+    repairSessionPendingRecords = restarted.pendingRecords;
     replaceRepairFlowStates(replacementFlows);
   } else {
     repairFlowById.set(flow.flow_id, next);

@@ -40,7 +40,7 @@ test('reviewed flows create, persist, restore, and explicitly restart repair ses
   assert.match(app, /beginRepairSession/);
   assert.match(app, /persistRepairSession/);
   assert.match(app, /restartRepairSession/);
-  assert.match(app, /declaredFlowIds: new Set\(data\.repair_flows\.map/);
+  assert.match(app, /declaredFlows: data\.repair_flows/);
   assert.match(app, /restartSession: true/);
 });
 
