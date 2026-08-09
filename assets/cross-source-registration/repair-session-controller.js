@@ -92,7 +92,9 @@ export function restartRepairSession({
   now = new Date().toISOString(),
   sessionId = null,
 }) {
-  const abandoned = abandonRepairSession(session, now);
+  const abandoned = session.status === 'active'
+    ? abandonRepairSession(session, now)
+    : session;
   const replacement = createRepairSession(
     context,
     repairSessionSnapshot(activeFlowId, flowById),

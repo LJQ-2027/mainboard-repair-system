@@ -91,6 +91,21 @@ test('restart abandons the prior record and begins a distinct active session', (
   ]);
 });
 
+test('starting a new round preserves a terminal session result', () => {
+  const storage = memoryStorage();
+  const first = beginRepairSession({
+    storage, context, activeFlowId: 'no-power', flowById: initialFlows(),
+    now: '2026-08-09T10:00:00.000Z', sessionId: 'session-complete', declaredFlowIds: new Set(['no-power']),
+  });
+  const completed = { ...first.session, status: 'completed' };
+  const restarted = restartRepairSession({
+    storage, session: completed, context, activeFlowId: 'no-power', flowById: initialFlows(),
+    now: '2026-08-09T10:05:00.000Z', sessionId: 'session-next',
+  });
+  assert.equal(restarted.abandonedSession.status, 'completed');
+  assert.equal(restarted.session.status, 'active');
+});
+
 test('storage failure is reported without blocking the in-memory flow', () => {
   const storage = memoryStorage({ failWrites: true });
   const result = beginRepairSession({
