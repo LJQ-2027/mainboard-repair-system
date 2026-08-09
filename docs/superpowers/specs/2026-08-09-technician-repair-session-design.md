@@ -19,15 +19,15 @@ The first increment applies only to declared `reviewed_flow` paths. H897 case na
 `TECHNICIAN-REPAIR-SESSION-V1` records:
 
 - stable session id, created/updated timestamps and `active`, `completed`, `stopped_at_source_boundary` or `abandoned` status;
-- exact `board_key`, technician-selected model, board version, intent and flow id;
-- a normalized snapshot of the existing repair-flow state: current step, path history, recorded measurements, action execution, post-action checks, terminal and closed state;
+- exact `board_key`, technician-selected model, board version, intent, entry flow id and active flow id;
+- normalized snapshots for every reviewed flow reached during the same task: current step, path history, recorded measurements, action execution, post-action checks, terminal and closed state;
 - optional pilot usability feedback already allowed by the existing privacy-reduced contract.
 
 It excludes photos, IMEI, phone/customer identity, free-form diagnosis, repair causality, inferred defect, model output, server credentials and source document contents. Unknown fields are removed on load and export. Invalid or cross-identity records fail closed.
 
 ## Storage And Recovery
 
-Sessions are stored in browser `localStorage` under a new versioned key. The store keeps a small bounded list and replaces only the same session id. The application recovers only the newest unfinished session whose board/model/version/flow identity exactly matches the current URL intent and dataset.
+Sessions are stored in browser `localStorage` under a new versioned key. The store keeps at most 50 records and replaces only the same session id. The application recovers only the newest unfinished session whose board/model/version/entry-flow identity exactly matches the current URL intent and dataset.
 
 Resetting a repair flow does not silently erase history: the current session becomes `abandoned`, then a new session begins. Completed or stopped sessions remain exportable but are never auto-resumed.
 
