@@ -102,7 +102,9 @@ class VisualQcDeploymentContractTests(unittest.TestCase):
         )
 
         public_location = template.split("location /mb-repair-beta/ {", 1)[1]
-        self.assertNotIn("auth_basic", public_location)
+        self.assertNotIn('auth_basic "Mainboard Repair Pilot";', public_location)
+        self.assertNotIn("auth_basic_user_file", public_location)
+        self.assertIn("auth_basic off;", public_location)
 
     def test_nginx_role_map_fails_closed_to_technician(self):
         role_map = (
