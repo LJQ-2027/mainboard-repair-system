@@ -150,9 +150,10 @@ class VisualQcDeploymentContractTests(unittest.TestCase):
             "Authorization: Basic $authorization",
             "__REVIEWER_AUTH__",
             "wait_for_gateway_identity",
+            "wait_for_public_technician_entry",
             '"__TECH_AUTH__" "__TECH_USER__" "technician"',
             '"__REVIEWER_AUTH__" "__REVIEWER_USER__" "reviewer"',
-            '"$base_url/" >/tmp/mb-repair-public-technician-index.html',
+            "/tmp/mb-repair-public-technician-index.html",
             '"/api/v1/visual-qc/identity"',
             '"/assets/visual-qc-workbench/"',
         ):

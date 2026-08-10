@@ -540,6 +540,22 @@ wait_for_gateway_identity() {
   return 1
 }
 
+wait_for_public_technician_entry() {
+  local output="$1"
+  local attempt
+  local status
+  for attempt in $(seq 1 30); do
+    status="$(curl -ksSL --resolve cccsat.top:443:127.0.0.1 \
+      -o "$output" -w '%{http_code}' "$base_url/")"
+    if [ "$status" = "200" ] && grep -q "modelSelect" "$output"; then
+      return 0
+    fi
+    sleep 1
+  done
+  echo "Public technician entry did not converge." >&2
+  return 1
+}
+
 wait_for_gateway_identity \
   "__TECH_AUTH__" "__TECH_USER__" "technician" \
   /tmp/mb-repair-technician-identity.json
@@ -547,9 +563,8 @@ wait_for_gateway_identity \
   "__REVIEWER_AUTH__" "__REVIEWER_USER__" "reviewer" \
   /tmp/mb-repair-reviewer-identity.json
 
-curl -kfsSL --resolve cccsat.top:443:127.0.0.1 \
-  "$base_url/" >/tmp/mb-repair-public-technician-index.html
-grep -q "modelSelect" /tmp/mb-repair-public-technician-index.html
+wait_for_public_technician_entry \
+  /tmp/mb-repair-public-technician-index.html
 
 for protected_path in \
   "/api/v1/visual-qc/identity" \
