@@ -7,7 +7,7 @@ This is the operating guide for the first controlled technician trial. It tests 
 ## Controlled Entry
 
 - Production URL: `https://cccsat.top/mb-repair-beta/assets/technician-pilot/`
-- Access: use the individually issued restricted pilot account. Do not share credentials.
+- Access: the technician entry does not require an account or password. Internal visual-data tools remain restricted and are not part of this trial.
 - Supported browsers: current Chrome or Edge on desktop or mobile.
 - The technician must already know the phone model and motherboard version. The system does not identify or guess them.
 
@@ -55,7 +55,7 @@ Field feedback remains usability evidence. It does not update the knowledge base
 
 ## 海外维修员简版说明
 
-1. 使用分配给你的内测账号打开统一入口。
+1. 直接打开统一入口，不需要账号密码。
 2. 选择你已经确认的手机机型和主板版本；系统不会自动识别机型。
 3. 已知故障时直接选择故障现象；不确定时选择“先做初步排查”。
 4. 只执行页面显示的检测步骤，并填写真实检测结果。
@@ -67,7 +67,7 @@ Field feedback remains usability evidence. It does not update the knowledge base
 
 ## Short English Instructions
 
-1. Open the controlled pilot entry with your assigned account.
+1. Open the technician pilot entry directly; no account or password is required.
 2. Select the phone model and motherboard version that you have already confirmed; the system does not identify the board.
 3. Select the known symptom, or choose the initial inspection option when the symptom is unknown.
 4. Follow only the displayed checks and enter the actual result requested by each step.

@@ -501,7 +501,7 @@ DATABASE_MAY_BE_MUTATED=1
 pm2 startOrRestart ecosystem.config.js \
   --only motherboard-repair-visual-qc --update-env
 
-echo "== internal and authenticated gateway smoke =="
+echo "== internal and split-access gateway smoke =="
 sleep 3
 curl -fsS http://127.0.0.1:3010/health
 curl -fsS http://127.0.0.1:3010/ >/tmp/mb-repair-index.html
@@ -547,17 +547,17 @@ wait_for_gateway_identity \
   "__REVIEWER_AUTH__" "__REVIEWER_USER__" "reviewer" \
   /tmp/mb-repair-reviewer-identity.json
 
-for attempt in 1 2 3; do
-  status="$(curl -ksS --resolve cccsat.top:443:127.0.0.1 \
-    -o /dev/null -w '%{http_code}' "$base_url/")"
-  test "$status" = "401"
-  sleep 1
-done
+curl -kfsSL --resolve cccsat.top:443:127.0.0.1 \
+  "$base_url/" >/tmp/mb-repair-public-technician-index.html
+grep -q "modelSelect" /tmp/mb-repair-public-technician-index.html
 
-curl -kfsS --resolve cccsat.top:443:127.0.0.1 \
-  -H "Authorization: Basic __TECH_AUTH__" \
-  "$base_url/" >/tmp/mb-repair-authenticated-index.html
-grep -q "aiStatusInline" /tmp/mb-repair-authenticated-index.html
+for protected_path in \
+  "/api/v1/visual-qc/identity" \
+  "/assets/visual-qc-workbench/"; do
+  status="$(curl -ksS --resolve cccsat.top:443:127.0.0.1 \
+    -o /dev/null -w '%{http_code}' "$base_url$protected_path")"
+  test "$status" = "401"
+done
 
 pm2 save
 remove_staged_secrets
@@ -611,8 +611,9 @@ cat /tmp/mb-repair-visual-qc-health.json
   Invoke-RemoteBash $remoteScript $sshArguments
 
   Write-Host "Visual-QC pilot deployment finished at commit $commit."
-  Write-Host "External route requires per-user Basic Auth:"
+  Write-Host "Technician route is public:"
   Write-Host "  https://cccsat.top/mb-repair-beta/"
+  Write-Host "Visual-QC API and data workbench remain Basic Auth protected."
 }
 finally {
   if ($stagingStarted) {

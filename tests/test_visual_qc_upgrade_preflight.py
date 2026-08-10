@@ -41,8 +41,11 @@ TARGET_CLI_ARGUMENTS = [
     "--target-runtime-manifest-sha256",
     TARGET_EVIDENCE["target_runtime_manifest_sha256"],
 ]
-PREVIOUS_PRODUCTION = "08d08cd38aaffc9b01d901dfe9ef7684a614abac"
-CURRENT_PRODUCTION = "7ed316c07130ef1488037f537c5968c832e16668"
+DEPLOYED_PRODUCTIONS = (
+    "08d08cd38aaffc9b01d901dfe9ef7684a614abac",
+    "7ed316c07130ef1488037f537c5968c832e16668",
+    "0594b06581ec41085b6e281159ee52b65ac80081",
+)
 
 
 def sha256_file(path: Path) -> str:
@@ -822,7 +825,7 @@ class VisualQcStore:
         self.assertNotIn(str(self.root), json.dumps(report))
 
     def test_full_upgrade_audit_accepts_deployed_production_versions_without_schema_change(self):
-        for version in (PREVIOUS_PRODUCTION, CURRENT_PRODUCTION):
+        for version in DEPLOYED_PRODUCTIONS:
             with self.subTest(version=version):
                 source = self.create_f278061_database(f"source-{version[:7]}.sqlite3")
                 VisualQcStore(source, recover_interrupted_jobs=False)

@@ -74,7 +74,7 @@ Do not configure Anthropic, DeepSeek, or any other general-purpose LLM API key f
   `https://cccsat.top/mb-repair-beta/assets/visual-qc-workbench/`
 - PM2 processes: `motherboard-repair-beta` and
   `motherboard-repair-visual-qc`
-- Access control: per-user Nginx Basic Auth with gateway-owned actor headers
+- Access control: public technician entry/workbench; Basic Auth and gateway-owned actor headers only for the internal Visual-QC API and data workbench
 - Nginx config touched: `/etc/nginx/sites-available/sikayetvar`
 - Nginx config backup: `/etc/nginx/sites-available/sikayetvar.before-mb-repair-20260622_095918`
 - Retired LLM status: no provider key is configured by design; `/api/chat` is not part of the product roadmap.
@@ -200,7 +200,8 @@ closed that gate and installed the isolated Python 3.10 visual-QC runtime.
 
 The bounded pilot deployment therefore adds:
 
-- per-user Nginx Basic Auth around the complete beta route;
+- public access to the technician entry and source-controlled repair workbench, with the beta root redirected to the technician entry;
+- per-user Nginx Basic Auth retained for the internal Visual-QC API and data workbench only;
 - `$remote_user` as the gateway-owned `X-Actor-Id`;
 - a server-owned data-administrator map that emits the compatibility role `reviewer` and otherwise fails closed to `technician`;
 - removal of client `Authorization` before proxying;
@@ -294,4 +295,4 @@ are mode `0400` inside a deployment-unique mode `0500` staging directory and
 are removed after success or rollback. The script refuses a dirty worktree and
 deploys only committed `HEAD`.
 
-Basic Auth is the controlled-pilot identity provider, not the final global identity architecture. A later corporate SSO/OIDC gateway may replace it while preserving the same verified `X-Actor-Id` and `X-Actor-Role` API contract.
+Basic Auth is the internal visual-data identity provider, not a technician requirement or the final global identity architecture. A later corporate SSO/OIDC gateway may replace it while preserving the same verified `X-Actor-Id` and `X-Actor-Role` API contract.

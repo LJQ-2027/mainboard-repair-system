@@ -76,13 +76,17 @@ class VisualQcDeploymentContractTests(unittest.TestCase):
         for required in REPAIR_EVIDENCE_RUNTIME_PATHS:
             self.assertIn(required, entries)
 
-    def test_nginx_template_protects_static_app_and_injects_verified_api_identity(self):
+    def test_nginx_template_exposes_technician_app_but_protects_visual_qc(self):
         template = (
             ROOT / "deploy" / "nginx" / "mb-repair-beta.locations.conf"
         ).read_text(encoding="utf-8")
 
         self.assertGreaterEqual(template.count("auth_basic "), 2)
         self.assertIn("auth_basic_user_file /etc/nginx/.htpasswd-mb-repair-beta;", template)
+        self.assertIn(
+            "location ^~ /mb-repair-beta/assets/visual-qc-workbench/ {",
+            template,
+        )
         self.assertIn("proxy_pass http://127.0.0.1:3020/api/v1/visual-qc/;", template)
         self.assertIn("proxy_set_header X-Actor-Id $remote_user;", template)
         self.assertIn(
@@ -92,6 +96,13 @@ class VisualQcDeploymentContractTests(unittest.TestCase):
         self.assertIn('proxy_set_header Authorization "";', template)
         self.assertIn("client_max_body_size 20m;", template)
         self.assertIn("proxy_pass http://127.0.0.1:3010/;", template)
+        self.assertIn(
+            "return 302 /mb-repair-beta/assets/technician-pilot/;",
+            template,
+        )
+
+        public_location = template.split("location /mb-repair-beta/ {", 1)[1]
+        self.assertNotIn("auth_basic", public_location)
 
     def test_nginx_role_map_fails_closed_to_technician(self):
         role_map = (
@@ -134,12 +145,14 @@ class VisualQcDeploymentContractTests(unittest.TestCase):
             "chmod 0400",
             "rm -f \"$INPUT_DIR/.htpasswd-mb-repair-beta\"",
             "finally",
-            "Authorization: Basic __TECH_AUTH__",
             "Authorization: Basic $authorization",
             "__REVIEWER_AUTH__",
             "wait_for_gateway_identity",
             '"__TECH_AUTH__" "__TECH_USER__" "technician"',
             '"__REVIEWER_AUTH__" "__REVIEWER_USER__" "reviewer"',
+            '"$base_url/" >/tmp/mb-repair-public-technician-index.html',
+            '"/api/v1/visual-qc/identity"',
+            '"/assets/visual-qc-workbench/"',
         ):
             self.assertIn(required, script)
 
