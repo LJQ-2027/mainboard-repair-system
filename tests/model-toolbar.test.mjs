@@ -72,24 +72,29 @@ test('active repair flow presents one current-task hierarchy without duplicate h
   assert.doesNotMatch(toolbarMarkup, /<span>排查路径<\/span>/);
   assert.match(appSource, /guidanceRoot\.dataset\.repairFlowActive = String\(repairFlowActive\)/);
   assert.match(stylesSource, /\.component-guidance\[data-repair-flow-active="true"\] > \.guidance-heading \{ display: none; \}/);
+  assert.match(stylesSource, /\.component-guidance\[data-repair-flow-active="true"\] \.repair-flow-heading \{ display: none; \}/);
   assert.match(stylesSource, /\.component-guidance\[data-repair-flow-active="true"\] \.repair-flow-control \{[^}]*margin-top:\s*0;[^}]*padding-top:\s*0;[^}]*border-top:\s*0;/);
 });
 
 test('active repair target condenses repeated facts into the current-task summary', () => {
+  assert.match(toolbarMarkup, /class="repair-task-cue"[^>]*id="repairTaskCue"/);
+  assert.match(toolbarMarkup, /<span>现在做<\/span><strong id="repairTaskCueTitle"><\/strong>/);
+  assert.match(toolbarMarkup, /id="locateRepairTarget"[^>]*>在主板上定位<\/button>/);
   assert.match(toolbarMarkup, /<small id="repairFlowTargetMeta"><\/small>/);
   assert.match(appSource, /const targetDisplay = targetEntity && technicianEntityCopy\(targetEntity\)/);
   assert.match(appSource, /#repairFlowTargetMeta'\)\.textContent = targetEntity[\s\S]*targetDisplay\.name[\s\S]*targetSideLabel/);
   assert.match(appSource, /evidenceRoot\.dataset\.repairFlowActive = String\(repairFlowActive\)/);
   assert.match(stylesSource, /\.evidence\[data-repair-flow-active="true"\] \.entity-name,[\s\S]*\.evidence\[data-repair-flow-active="true"\] \.facts \{ display: none; \}/);
-  assert.match(stylesSource, /\.evidence\[data-repair-flow-active="true"\] \.entity-heading h2 \{[^}]*font-size:\s*24px/);
-  assert.match(stylesSource, /\.repair-flow-position small \{[^}]*font-size:\s*9px/);
-  assert.doesNotMatch(stylesSource, /\.evidence\[data-repair-flow-active="true"\] \.entity-heading \{[^}]*display:\s*none/);
+  assert.match(stylesSource, /\.evidence\[data-repair-flow-active="true"\] \.entity-heading \{[^}]*display:\s*none/);
+  assert.match(stylesSource, /\.repair-flow-position small \{[^}]*font-size:\s*11px/);
+  assert.match(appSource, /buildRepairTaskCue\(/);
+  assert.match(appSource, /#locateRepairTarget/);
 });
 
 test('measurement decisions expose one confirmed action and collapse repeated component guidance', () => {
   assert.match(appSource, /buildRepairFlowChoiceOptions\(flow, state\)/);
   assert.match(appSource, /choices\.hidden = !step \|\| !choiceOptions\.length/);
-  assert.match(toolbarMarkup, /<details class="repair-step source-summary" id="componentSourceSummary" open>/);
+  assert.match(toolbarMarkup, /<details class="repair-step source-summary" id="componentSourceSummary">/);
   assert.match(appSource, /sourceSummary\.open = !repairFlowActive/);
   assert.match(appSource, /sourceSummary\.dataset\.context = repairFlowActive \? 'flow' : 'component'/);
   assert.match(appSource, /#inspectionStepLabel'\)\.textContent = '辅助资料'/);
@@ -126,7 +131,7 @@ test('repair workflow uses one framed work surface with readable execution state
 });
 
 test('desktop evidence column expands only when the workspace can afford it', () => {
-  assert.match(stylesSource, /main \{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) clamp\(360px, 27vw, 420px\)/);
+  assert.match(stylesSource, /main \{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) clamp\(440px, 32vw, 560px\)/);
   assert.match(stylesSource, /@media \(max-width: 1100px\)[\s\S]*main \{ display: block; height: auto; \}/);
 });
 

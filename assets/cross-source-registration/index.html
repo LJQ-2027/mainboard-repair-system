@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>跨资料主板维修工作台</title>
   <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="./styles.css?v=20260803-pilot">
+  <link rel="stylesheet" href="./styles.css?v=20260813-task-first">
   <link rel="stylesheet" href="./point-map.css">
   <link rel="stylesheet" href="./schematic-evidence.css">
 </head>
@@ -122,15 +122,15 @@
             <div><span>当前任务</span><strong id="repairFlowTitle"></strong></div>
             <div class="repair-flow-position"><strong id="repairFlowTarget"></strong><small id="repairFlowTargetMeta"></small><span id="repairFlowStep"></span></div>
           </header>
-          <div class="repair-session-strip" id="repairSessionStrip" hidden aria-live="polite">
-            <div><span>本次维修记录</span><strong id="repairSessionStatus"></strong><small id="repairSessionSavedAt"></small></div>
-            <button id="exportRepairSession" type="button" title="导出本次维修记录">导出记录</button>
-          </div>
+          <section class="repair-task-cue" id="repairTaskCue" data-phase="inspect" aria-live="polite">
+            <div><span>现在做</span><strong id="repairTaskCueTitle"></strong><p id="repairTaskCueDetail"></p></div>
+            <button id="locateRepairTarget" type="button">在主板上定位</button>
+          </section>
           <ol class="repair-flow-trail" id="repairFlowTrail" aria-label="维修步骤"></ol>
           <p class="repair-flow-prompt" id="repairFlowPrompt"></p>
           <div class="repair-flow-measurements" id="repairFlowMeasurements" hidden>
             <div id="repairFlowMeasurementFields"></div>
-            <button id="repairFlowRecordMeasurements" type="button">记录本步测量</button>
+            <button id="repairFlowRecordMeasurements" type="button">保存测量值</button>
             <p id="repairFlowMeasurementStatus"></p>
           </div>
           <div class="repair-flow-choices" id="repairFlowChoices" role="group" aria-label="选择检查结果"></div>
@@ -159,12 +159,16 @@
             <span>已记录结果</span>
             <ol class="repair-flow-history" id="repairFlowHistory"></ol>
           </div>
+          <div class="repair-session-strip" id="repairSessionStrip" hidden aria-live="polite">
+            <div><span>本次维修记录</span><strong id="repairSessionStatus"></strong><small id="repairSessionSavedAt"></small></div>
+            <button id="exportRepairSession" type="button" title="导出本次维修记录">导出记录</button>
+          </div>
           <footer>
             <details class="repair-flow-source-details"><summary>资料依据</summary><small id="repairFlowSource"></small></details>
             <div id="repairFlowNavigation"><button id="repairFlowBack" type="button">上一步</button><button id="repairFlowReset" type="button">重新开始</button></div>
           </footer>
         </section>
-        <details class="repair-step source-summary" id="componentSourceSummary" open>
+        <details class="repair-step source-summary" id="componentSourceSummary">
           <summary><span id="inspectionStepLabel">检测步骤 1</span><strong id="inspectionSummaryLabel">检测指导</strong></summary>
           <div class="repair-step-content"><p id="inspectionMethod"></p><small id="inspectionSource"></small></div>
         </details>
@@ -232,6 +236,6 @@
     <img alt="原理图局部证据">
     <p></p>
   </dialog>
-  <script type="module" src="./app.js?v=20260803-pilot"></script>
+  <script type="module" src="./app.js?v=20260813-task-first"></script>
 </body>
 </html>

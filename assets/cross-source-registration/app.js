@@ -81,6 +81,7 @@ import {
   restartRepairSession,
 } from './repair-session-controller.js';
 import { serializeRepairSessions } from './repair-session-state.js';
+import { buildRepairTaskCue } from './repair-task-state.js';
 
 const BOARD_CATALOG_URL = '../../knowledge-base/repair-workbench-boards.json';
 const views = { photo: document.querySelector('#photoView'), pointmap: document.querySelector('#pointmapView'), model: document.querySelector('#modelView') };
@@ -733,6 +734,25 @@ function renderRepairFlow(entity, guidance) {
   document.querySelector('#repairFlowTargetMeta').textContent = targetEntity
     ? `${targetDisplay.name} · ${targetSideLabel}`
     : '';
+  const taskCue = buildRepairTaskCue({
+    step,
+    terminal: state.terminal,
+    closed: state.closed,
+    targetDesignator: targetEntity?.designator || '当前结果',
+    targetSideLabel: targetSideLabel || '当前板面',
+  });
+  const taskCueRoot = document.querySelector('#repairTaskCue');
+  taskCueRoot.dataset.phase = taskCue.phase;
+  document.querySelector('#repairTaskCueTitle').textContent = taskCue.title;
+  document.querySelector('#repairTaskCueDetail').textContent = taskCue.detail;
+  const locateTarget = document.querySelector('#locateRepairTarget');
+  locateTarget.hidden = !targetEntity || state.closed || Boolean(state.terminal);
+  locateTarget.onclick = async () => {
+    if (targetEntity && selectedId !== targetEntity.component_id) {
+      await selectEntity(targetEntity.component_id);
+    }
+    revealModelWorkspace({ behavior: 'smooth', block: 'center' });
+  };
 
   const trail = document.querySelector('#repairFlowTrail');
   trail.replaceChildren();
