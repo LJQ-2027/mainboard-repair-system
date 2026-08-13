@@ -64,8 +64,8 @@ Do not configure Anthropic, DeepSeek, or any other general-purpose LLM API key f
 
 ## Current Deployment
 
-- Deployed on: 2026-08-10
-- Deployed commit: `2489db60b7ef7a7f3453ef2c0d62a007fc95c237`
+- Deployed on: 2026-08-13
+- Deployed commit: `84b391713bc1ce34e8a75482435d6b2ec9d27430`
 - Internal service: `http://127.0.0.1:3010`
 - Internal visual-QC API: `http://127.0.0.1:3020`
 - External beta URL: `https://cccsat.top/mb-repair-beta/`
@@ -78,6 +78,8 @@ Do not configure Anthropic, DeepSeek, or any other general-purpose LLM API key f
 - Nginx config touched: `/etc/nginx/sites-available/sikayetvar`
 - Nginx config backup: `/etc/nginx/sites-available/sikayetvar.before-mb-repair-20260622_095918`
 - Retired LLM status: no provider key is configured by design; `/api/chat` is not part of the product roadmap.
+- 2026-08-13 task-first technician upgrade: the 71,965,886-byte allowlisted runtime archive was bound to SHA-256 `9ae5930b3478fb579f2cf5872b9dbebdf2be1e525bc9a33d53cb53963efe4a82`, 37 runtime paths, and full commit `84b391713bc1ce34e8a75482435d6b2ec9d27430`. The KM4 repair panel now exposes one current action, direct board location, larger measurement controls, gated outcome choices, and collapsed source evidence. The first `d0fba06` attempt correctly rolled back because the upgrade allowlist had not yet recorded the live `2489db6` source; the reviewed no-schema-change source was added, all 25 upgrade-preflight tests passed, and the second deployment passed migration and rollback rehearsal. Rollback evidence is retained under `/opt/motherboard-repair-beta/rollback/84b391713bc1-20260813_164642-871609`.
+- Post-switch technician P4: the public KM4 no-power route loaded the cache-busted task-first assets without credentials, displayed `定位 U4000，并记录 2 项测量`, and exposed the direct board-location action. Public browser verification reported zero application warnings/errors and zero horizontal overflow. Both motherboard PM2 services remained online; one proxy case, one succeeded job, zero failed jobs, and zero active Golden Samples were preserved.
 - 2026-08-10 public technician-entry upgrade: the 71,964,341-byte allowlisted runtime archive was bound to SHA-256 `f485a37559d1eb5c67cee7681cb50d073151ea3ece4e16a94d6d9ea62fbccc6f`, 37 runtime paths, and full commit `2489db60b7ef7a7f3453ef2c0d62a007fc95c237`. The source database passed migration and rollback rehearsal before the application switch. Rollback evidence is retained under `/opt/motherboard-repair-beta/rollback/2489db60b7ef-20260810_202005-788462`.
 - Post-switch access P4: the beta root redirected to the technician pilot and returned `200` without credentials; the direct technician route returned `200` and loaded all 14 model aliases. The Visual-QC workbench and identity API returned `401` without credentials. External Chrome reported no password input, console errors, or horizontal overflow. Both motherboard PM2 services remained online, and the preserved Visual-QC state remained one proxy case, one succeeded job, zero failed jobs, and zero active Golden Samples.
 - 2026-08-09 recoverable-session upgrade: the 71,964,281-byte allowlisted runtime archive was bound to SHA-256 `105adfca5a541af91df0739d3cfe6269548501bc9793e19804eb95626f4ec067`, 37 runtime paths, and full commit `0594b06581ec41085b6e281159ee52b65ac80081`. All ten `7ed316c -> 0594b06` upgrade and rollback checks passed. Rollback evidence is retained under `/opt/motherboard-repair-beta/rollback/0594b06581ec-20260809_183632-720426`.
@@ -186,7 +188,7 @@ The beta server remains the controlled host for the internal visual data workben
 The server was inspected read-only on 2026-07-20: 4 x86_64 vCPU, 7.3 GB RAM, 4 GB swap, 19 GB free disk, Python 3.10, Node.js 20, no GPU, no installed OpenCV, and no active PostgreSQL or Redis. This supports a bounded CPU pilot, not deep-model training or unrestricted long-term image retention.
 
 The bounded visual-QC pilot is deployed with the approved same-origin
-architecture at production revision `2489db60b7ef7a7f3453ef2c0d62a007fc95c237`.
+architecture at production revision `84b391713bc1ce34e8a75482435d6b2ec9d27430`.
 Controlled qualified handoff, async processing, manual fallback, role assertion,
 loopback binding, restart recovery, storage health, server provenance, governed
 repair-evidence projection, and proxy-path smoke checks have passed. Physical
