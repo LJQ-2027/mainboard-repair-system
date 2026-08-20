@@ -1,0 +1,380 @@
+from __future__ import annotations
+
+import hashlib
+import io
+import json
+import os
+from pathlib import Path
+import subprocess
+import tarfile
+import tempfile
+import unittest
+
+from scripts.visual_qc.deployment_verifier import (
+    verify_extracted_runtime,
+    verify_input_bundle,
+    verify_upgrade_report,
+)
+
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+class VisualQcDeploymentVerifierTests(unittest.TestCase):
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory(
+            prefix="visual-qc-deployment-verifier-"
+        )
+        self.root = Path(self.temporary.name)
+        self.runtime_content = (
+            b"deploy/visual-qc-runtime-files.txt\nscripts/a.py\n"
+        )
+        self.archive = self.root / "app.tar.gz"
+        self.write_archive()
+        self.manifest = {
+            "schema_version": "VISUAL-QC-DEPLOYMENT-MANIFEST-V1",
+            "commit_sha": "a" * 40,
+            "archive_sha256": self.sha256(self.archive),
+            "archive_bytes": self.archive.stat().st_size,
+            "runtime_manifest_sha256": hashlib.sha256(
+                self.runtime_content
+            ).hexdigest(),
+            "runtime_path_count": 2,
+        }
+        self.manifest_path = self.root / "deployment-manifest.json"
+        self.write_manifest(self.manifest)
+
+    def tearDown(self):
+        self.temporary.cleanup()
+
+    @staticmethod
+    def sha256(path: Path) -> str:
+        digest = hashlib.sha256()
+        with path.open("rb") as source:
+            for chunk in iter(lambda: source.read(1024 * 1024), b""):
+                digest.update(chunk)
+        return digest.hexdigest()
+
+    def add_bytes(self, archive, name: str, content: bytes):
+        member = tarfile.TarInfo(name)
+        member.size = len(content)
+        member.mode = 0o644
+        archive.addfile(member, io.BytesIO(content))
+
+    def write_archive(self, extra_member=None):
+        with tarfile.open(self.archive, "w:gz") as archive:
+            self.add_bytes(
+                archive,
+                "deploy/visual-qc-runtime-files.txt",
+                self.runtime_content,
+            )
+            self.add_bytes(archive, "scripts/a.py", b"print('ok')\n")
+            if extra_member is not None:
+                archive.addfile(extra_member)
+
+    def write_manifest(self, manifest):
+        self.manifest_path.write_text(
+            json.dumps(manifest, sort_keys=True),
+            encoding="utf-8",
+        )
+
+    def refresh_archive_evidence(self):
+        self.manifest["archive_sha256"] = self.sha256(self.archive)
+        self.manifest["archive_bytes"] = self.archive.stat().st_size
+        self.write_manifest(self.manifest)
+
+    def test_input_bundle_accepts_exact_manifest_and_safe_tar(self):
+        result = verify_input_bundle(
+            manifest_path=self.manifest_path,
+            archive_path=self.archive,
+            expected_manifest=self.manifest,
+        )
+
+        self.assertEqual(result, self.manifest)
+
+    def test_input_bundle_rejects_duplicate_json_fields(self):
+        self.manifest_path.write_text(
+            (
+                '{"schema_version":"VISUAL-QC-DEPLOYMENT-MANIFEST-V1",'
+                f'"commit_sha":"{"a" * 40}",'
+                f'"commit_sha":"{"a" * 40}",'
+                f'"archive_sha256":"{self.manifest["archive_sha256"]}",'
+                f'"archive_bytes":{self.manifest["archive_bytes"]},'
+                f'"runtime_manifest_sha256":'
+                f'"{self.manifest["runtime_manifest_sha256"]}",'
+                '"runtime_path_count":2}'
+            ),
+            encoding="utf-8",
+        )
+
+        with self.assertRaisesRegex(ValueError, "duplicate field"):
+            verify_input_bundle(
+                manifest_path=self.manifest_path,
+                archive_path=self.archive,
+                expected_manifest=self.manifest,
+            )
+
+    def test_input_bundle_rejects_unsafe_tar_members(self):
+        unsafe_members = []
+        traversal = tarfile.TarInfo("../escape.py")
+        traversal.size = 0
+        unsafe_members.append(traversal)
+        symbolic = tarfile.TarInfo("scripts/link.py")
+        symbolic.type = tarfile.SYMTYPE
+        symbolic.linkname = "../../outside.py"
+        unsafe_members.append(symbolic)
+        hardlink = tarfile.TarInfo("scripts/hard.py")
+        hardlink.type = tarfile.LNKTYPE
+        hardlink.linkname = "scripts/a.py"
+        unsafe_members.append(hardlink)
+        fifo = tarfile.TarInfo("scripts/pipe")
+        fifo.type = tarfile.FIFOTYPE
+        unsafe_members.append(fifo)
+
+        for member in unsafe_members:
+            with self.subTest(name=member.name, type=member.type):
+                self.write_archive(extra_member=member)
+                self.refresh_archive_evidence()
+                with self.assertRaisesRegex(ValueError, "unsafe tar member"):
+                    verify_input_bundle(
+                        manifest_path=self.manifest_path,
+                        archive_path=self.archive,
+                        expected_manifest=self.manifest,
+                    )
+
+    def create_extracted_runtime(self) -> Path:
+        app_root = self.root / "app"
+        runtime_path = app_root / "deploy" / "visual-qc-runtime-files.txt"
+        runtime_path.parent.mkdir(parents=True)
+        runtime_path.write_bytes(self.runtime_content)
+        script = app_root / "scripts" / "a.py"
+        script.parent.mkdir(parents=True)
+        script.write_bytes(b"print('ok')\n")
+        return app_root
+
+    def create_directory_link(self, link: Path, target: Path):
+        if os.name == "nt":
+            result = subprocess.run(
+                ["cmd", "/c", "mklink", "/J", str(link), str(target)],
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                check=False,
+            )
+            if result.returncode != 0:
+                self.fail(f"Unable to create test junction: {result.stderr}")
+        else:
+            link.symlink_to(target, target_is_directory=True)
+
+    @staticmethod
+    def remove_directory_link(link: Path):
+        if os.name == "nt":
+            os.rmdir(link)
+        else:
+            link.unlink()
+
+    def test_extracted_runtime_rejects_nested_symlink(self):
+        app_root = self.create_extracted_runtime()
+        external = self.root / "external"
+        external.mkdir()
+        (external / "outside.txt").write_bytes(b"outside")
+        nested = app_root / "scripts" / "nested-link"
+        self.create_directory_link(nested, external)
+        try:
+            with self.assertRaisesRegex(ValueError, "symbolic link"):
+                verify_extracted_runtime(
+                    app_root=app_root,
+                    expected_manifest=self.manifest,
+                )
+        finally:
+            self.remove_directory_link(nested)
+
+    def test_extracted_runtime_rejects_linked_root(self):
+        app_root = self.create_extracted_runtime()
+        linked_root = self.root / "linked-app"
+        self.create_directory_link(linked_root, app_root)
+        try:
+            with self.assertRaisesRegex(ValueError, "root is missing or unsafe"):
+                verify_extracted_runtime(
+                    app_root=linked_root,
+                    expected_manifest=self.manifest,
+                )
+        finally:
+            self.remove_directory_link(linked_root)
+
+    def valid_upgrade_report(self, snapshot: Path) -> dict:
+        check_ids = (
+            "source_version_supported",
+            "source_database_integrity",
+            "managed_objects_integrity",
+            "candidate_migration_integrity",
+            "candidate_schema_additive",
+            "candidate_rows_preserved",
+            "candidate_runtime_contract",
+            "candidate_dataset_gates",
+            "rollback_runtime_compatible",
+            "source_immutable",
+        )
+        digest = "b" * 64
+        counts = {"originals": 0, "artifacts": 0, "total": 0}
+        return {
+            "schema_version": "VISUAL-QC-UPGRADE-PREFLIGHT-V1",
+            "status": "passed",
+            "generated_at": "2026-07-24T00:00:00Z",
+            "source": {
+                "version": "f278061",
+                "snapshot_sha256": self.sha256(snapshot),
+                "logical_digest": digest,
+                "table_counts": {},
+                "managed_object_counts": counts,
+                "fingerprint_digest": digest,
+                "fingerprint_file_count": 1,
+            },
+            "target": {
+                "version": self.manifest["commit_sha"],
+                "archive_sha256": self.manifest["archive_sha256"],
+                "archive_bytes": self.manifest["archive_bytes"],
+                "runtime_manifest_sha256": self.manifest[
+                    "runtime_manifest_sha256"
+                ],
+            },
+            "checks": [
+                {
+                    "check_id": check_id,
+                    "status": "passed",
+                    "error_code": None,
+                    "message": "passed",
+                }
+                for check_id in check_ids
+            ],
+            "managed_objects": {
+                "status": "passed",
+                "counts": counts,
+                "issues": [],
+            },
+            "migration": {
+                "status": "passed",
+                "added_columns": [],
+                "before_digest": digest,
+                "shared_digest": digest,
+                "table_counts": {},
+                "issues": [],
+                "integrity": "ok",
+            },
+            "candidate_runtime": {
+                "status": "passed",
+                "api_schemas": {
+                    "health": "health",
+                    "admin_list": "list",
+                    "admin_detail": "detail",
+                    "dataset_audit": "dataset",
+                },
+                "counts": {
+                    "database_cases": 0,
+                    "listed_cases": 0,
+                    "detailed_cases": 0,
+                },
+                "dataset": {
+                    "eligible_case_count": 0,
+                    "excluded_case_count": 0,
+                    "reason_counts": {},
+                },
+                "issues": [],
+            },
+            "rollback_runtime": {
+                "status": "passed",
+                "source_version": "f278061",
+                "case_count": 0,
+                "cases_read": 0,
+                "issues": [],
+            },
+        }
+
+    def write_upgrade_report(self, report: dict) -> Path:
+        path = self.root / "upgrade-preflight.json"
+        path.write_text(json.dumps(report), encoding="utf-8")
+        return path
+
+    @property
+    def upgrade_schema(self) -> Path:
+        return (
+            ROOT
+            / "knowledge-base"
+            / "visual-qc-upgrade-preflight-v1-schema.json"
+        )
+
+    def test_upgrade_report_requires_complete_schema(self):
+        report = self.root / "upgrade-preflight.json"
+        report.write_text(
+            json.dumps(
+                {
+                    "schema_version": "VISUAL-QC-UPGRADE-PREFLIGHT-V1",
+                    "status": "passed",
+                    "target": {
+                        "version": self.manifest["commit_sha"],
+                        "archive_sha256": self.manifest["archive_sha256"],
+                        "archive_bytes": self.manifest["archive_bytes"],
+                        "runtime_manifest_sha256": self.manifest[
+                            "runtime_manifest_sha256"
+                        ],
+                    },
+                }
+            ),
+            encoding="utf-8",
+        )
+        snapshot = self.root / "snapshot.sqlite3"
+        snapshot.write_bytes(b"snapshot")
+
+        with self.assertRaisesRegex(ValueError, "Schema"):
+            verify_upgrade_report(
+                report_path=report,
+                schema_path=self.upgrade_schema,
+                snapshot_path=snapshot,
+                expected_manifest=self.manifest,
+            )
+
+    def test_upgrade_report_accepts_complete_bound_evidence(self):
+        snapshot = self.root / "snapshot.sqlite3"
+        snapshot.write_bytes(b"snapshot")
+        report = self.write_upgrade_report(
+            self.valid_upgrade_report(snapshot)
+        )
+
+        verified = verify_upgrade_report(
+            report_path=report,
+            schema_path=self.upgrade_schema,
+            snapshot_path=snapshot,
+            expected_manifest=self.manifest,
+        )
+
+        self.assertEqual(verified["status"], "passed")
+
+    def test_upgrade_report_rejects_snapshot_or_target_drift(self):
+        snapshot = self.root / "snapshot.sqlite3"
+        snapshot.write_bytes(b"snapshot")
+        report_data = self.valid_upgrade_report(snapshot)
+        report = self.write_upgrade_report(report_data)
+        snapshot.write_bytes(b"changed snapshot")
+        with self.assertRaisesRegex(ValueError, "snapshot"):
+            verify_upgrade_report(
+                report_path=report,
+                schema_path=self.upgrade_schema,
+                snapshot_path=snapshot,
+                expected_manifest=self.manifest,
+            )
+
+        snapshot.write_bytes(b"snapshot")
+        report_data = self.valid_upgrade_report(snapshot)
+        report_data["target"]["version"] = "c" * 40
+        report = self.write_upgrade_report(report_data)
+        with self.assertRaisesRegex(ValueError, "target"):
+            verify_upgrade_report(
+                report_path=report,
+                schema_path=self.upgrade_schema,
+                snapshot_path=snapshot,
+                expected_manifest=self.manifest,
+            )
+
+
+if __name__ == "__main__":
+    unittest.main()

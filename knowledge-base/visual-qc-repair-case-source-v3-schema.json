@@ -1,0 +1,690 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "VISUAL-QC-REPAIR-CASE-SOURCE-V3",
+  "title": "Visual QC Repair Case Source V3",
+  "$comment": "This schema enforces portable record shape and locally expressible constraints. Cross-array evidence-id resolution, uniqueness by evidence_id when context objects differ, supporting_only complete context coverage, image-only repair-photo contexts, canonical object paths derived from the evidence hash, strict in-memory integer checks, identity semantics, and revision history require repair_case_contract.validate_repair_case_manifest plus the on-disk repair_case_library validator.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "repair_case_id",
+    "revision",
+    "previous_manifest_sha256",
+    "source_origin",
+    "board_key",
+    "board_id",
+    "device_identity",
+    "evidence_mode",
+    "package_links",
+    "supporting_evidence",
+    "supporting_evidence_contexts",
+    "reported_symptoms",
+    "findings",
+    "repair_actions",
+    "outcome",
+    "corrections",
+    "completeness",
+    "boundaries"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "VISUAL-QC-REPAIR-CASE-SOURCE-V3"
+    },
+    "repair_case_id": {
+      "$ref": "#/$defs/safeId"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "previous_manifest_sha256": {
+      "oneOf": [
+        {"type": "null"},
+        {"$ref": "#/$defs/sha256"}
+      ]
+    },
+    "source_origin": {
+      "const": "milo_supplied"
+    },
+    "board_key": {
+      "$ref": "#/$defs/safeId"
+    },
+    "board_id": {
+      "$ref": "#/$defs/nonEmptyString"
+    },
+    "device_identity": {
+      "$ref": "#/$defs/deviceIdentity"
+    },
+    "evidence_mode": {
+      "enum": ["package_linked", "supporting_only"]
+    },
+    "package_links": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "$ref": "#/$defs/packageLink"
+      }
+    },
+    "supporting_evidence": {
+      "type": "array",
+      "maxItems": 50,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/supportingEvidence"
+      }
+    },
+    "supporting_evidence_contexts": {
+      "type": "array",
+      "maxItems": 50,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/supportingEvidenceContext"
+      }
+    },
+    "reported_symptoms": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "$ref": "#/$defs/symptom"
+      }
+    },
+    "findings": {
+      "type": "array",
+      "maxItems": 500,
+      "items": {
+        "$ref": "#/$defs/finding"
+      }
+    },
+    "repair_actions": {
+      "type": "array",
+      "maxItems": 500,
+      "items": {
+        "$ref": "#/$defs/repairAction"
+      }
+    },
+    "outcome": {
+      "$ref": "#/$defs/outcome"
+    },
+    "corrections": {
+      "type": "array",
+      "maxItems": 500,
+      "items": {
+        "$ref": "#/$defs/correction"
+      }
+    },
+    "completeness": {
+      "enum": [
+        "photos_only",
+        "symptom_linked",
+        "diagnosis_linked",
+        "repair_outcome_linked"
+      ]
+    },
+    "boundaries": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "visual_defect_confirmed",
+        "golden_approved",
+        "training_label_allowed",
+        "repair_instruction_allowed",
+        "field_accuracy_claim_allowed",
+        "model_identity_resolved"
+      ],
+      "properties": {
+        "visual_defect_confirmed": {"const": false},
+        "golden_approved": {"const": false},
+        "training_label_allowed": {"const": false},
+        "repair_instruction_allowed": {"const": false},
+        "field_accuracy_claim_allowed": {"const": false},
+        "model_identity_resolved": {"type": "boolean"}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {"evidence_mode": {"const": "package_linked"}},
+        "required": ["evidence_mode"]
+      },
+      "then": {
+        "properties": {"package_links": {"minItems": 1}}
+      },
+      "else": {
+        "properties": {
+          "package_links": {"maxItems": 0},
+          "supporting_evidence": {"minItems": 1},
+          "supporting_evidence_contexts": {"minItems": 1}
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {"revision": {"const": 1}},
+        "required": ["revision"]
+      },
+      "then": {
+        "properties": {"previous_manifest_sha256": {"type": "null"}}
+      },
+      "else": {
+        "properties": {
+          "previous_manifest_sha256": {"$ref": "#/$defs/sha256"}
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {"reported_symptoms": {"maxItems": 0}},
+        "required": ["reported_symptoms"]
+      },
+      "then": {
+        "properties": {"completeness": {"const": "photos_only"}}
+      },
+      "else": {
+        "if": {
+          "properties": {
+            "findings": {
+              "contains": {
+                "type": "object",
+                "properties": {"claim_status": {"const": "documented"}},
+                "required": ["claim_status"]
+              }
+            }
+          },
+          "required": ["findings"]
+        },
+        "then": {
+          "if": {
+            "properties": {
+              "repair_actions": {"minItems": 1},
+              "outcome": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "repair_completed",
+                      "not_repaired",
+                      "non_repairable",
+                      "needs_followup"
+                    ]
+                  }
+                },
+                "required": ["status"]
+              }
+            },
+            "required": ["repair_actions", "outcome"]
+          },
+          "then": {
+            "properties": {
+              "completeness": {"const": "repair_outcome_linked"}
+            }
+          },
+          "else": {
+            "properties": {
+              "completeness": {"const": "diagnosis_linked"}
+            }
+          }
+        },
+        "else": {
+          "properties": {
+            "completeness": {"const": "symptom_linked"}
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "device_identity": {
+            "type": "object",
+            "properties": {
+              "mapping_status": {
+                "enum": ["exact_catalog_match", "confirmed_alias"]
+              }
+            },
+            "required": ["mapping_status"]
+          }
+        },
+        "required": ["device_identity"]
+      },
+      "then": {
+        "properties": {
+          "boundaries": {
+            "properties": {"model_identity_resolved": {"const": true}}
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "boundaries": {
+            "properties": {"model_identity_resolved": {"const": false}}
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "safeId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": ".*\\S.*"
+    },
+    "nullableString": {
+      "oneOf": [
+        {"type": "null"},
+        {"$ref": "#/$defs/nonEmptyString"}
+      ]
+    },
+    "normalizedRegion": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["x", "y", "width", "height"],
+          "properties": {
+            "x": {"type": "number", "minimum": 0, "maximum": 1},
+            "y": {"type": "number", "minimum": 0, "maximum": 1},
+            "width": {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
+            "height": {"type": "number", "exclusiveMinimum": 0, "maximum": 1}
+          }
+        }
+      ]
+    },
+    "packageLink": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "package_id",
+        "source_package_manifest_sha256",
+        "capture_stage",
+        "role",
+        "entry_ids"
+      ],
+      "properties": {
+        "package_id": {"$ref": "#/$defs/safeId"},
+        "source_package_manifest_sha256": {"$ref": "#/$defs/sha256"},
+        "capture_stage": {
+          "enum": ["before_repair", "after_repair", "golden_reference"]
+        },
+        "role": {
+          "enum": [
+            "before_repair",
+            "after_repair",
+            "golden_reference",
+            "supplemental"
+          ]
+        },
+        "entry_ids": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 500,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/safeId"}
+        }
+      }
+    },
+    "supportingEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidence_id",
+        "original_filename",
+        "object_path",
+        "mime_type",
+        "byte_size",
+        "sha256",
+        "description"
+      ],
+      "properties": {
+        "evidence_id": {"$ref": "#/$defs/safeId"},
+        "original_filename": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?=.*\\S)[^/\\\\]+$"
+        },
+        "object_path": {
+          "type": "string",
+          "pattern": "^objects/case-evidence/[0-9a-f]{2}/[0-9a-f]{64}\\.(pdf|txt|csv|xls|xlsx|png|jpg|heic)$"
+        },
+        "mime_type": {
+          "enum": [
+            "application/pdf",
+            "text/plain",
+            "text/csv",
+            "application/vnd.ms-excel",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "image/png",
+            "image/jpeg",
+            "image/heic"
+          ]
+        },
+        "byte_size": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 104857600
+        },
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "description": {"$ref": "#/$defs/nonEmptyString"}
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "mime_type": {"const": "application/pdf"},
+            "object_path": {"pattern": "\\.pdf$"}
+          }
+        },
+        {
+          "properties": {
+            "mime_type": {"const": "text/plain"},
+            "object_path": {"pattern": "\\.txt$"}
+          }
+        },
+        {
+          "properties": {
+            "mime_type": {"const": "text/csv"},
+            "object_path": {"pattern": "\\.csv$"}
+          }
+        },
+        {
+          "properties": {
+            "mime_type": {"const": "application/vnd.ms-excel"},
+            "object_path": {"pattern": "\\.xls$"}
+          }
+        },
+        {
+          "properties": {
+            "mime_type": {
+              "const": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            },
+            "object_path": {"pattern": "\\.xlsx$"}
+          }
+        },
+        {
+          "properties": {
+            "mime_type": {"const": "image/png"},
+            "object_path": {"pattern": "\\.png$"}
+          }
+        },
+        {
+          "properties": {
+            "mime_type": {"const": "image/jpeg"},
+            "object_path": {"pattern": "\\.jpg$"}
+          }
+        },
+        {
+          "properties": {
+            "mime_type": {"const": "image/heic"},
+            "object_path": {"pattern": "\\.heic$"}
+          }
+        }
+      ]
+    },
+    "supportingEvidenceContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidence_id",
+        "evidence_role",
+        "source_capture_stage",
+        "source_board_area"
+      ],
+      "properties": {
+        "evidence_id": {"$ref": "#/$defs/safeId"},
+        "evidence_role": {"const": "repair_in_progress_photo"},
+        "source_capture_stage": {"$ref": "#/$defs/nonEmptyString"},
+        "source_board_area": {"$ref": "#/$defs/nonEmptyString"}
+      }
+    },
+    "packageEvidenceReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "package_id", "entry_id"],
+      "properties": {
+        "kind": {"const": "package_entry"},
+        "package_id": {"$ref": "#/$defs/safeId"},
+        "entry_id": {"$ref": "#/$defs/safeId"}
+      }
+    },
+    "supportingEvidenceReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "evidence_id"],
+      "properties": {
+        "kind": {"const": "supporting_evidence"},
+        "evidence_id": {"$ref": "#/$defs/safeId"}
+      }
+    },
+    "evidenceReference": {
+      "oneOf": [
+        {"$ref": "#/$defs/packageEvidenceReference"},
+        {"$ref": "#/$defs/supportingEvidenceReference"}
+      ]
+    },
+    "evidenceReferences": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {"$ref": "#/$defs/evidenceReference"}
+    },
+    "identityModelList": {
+      "type": "array",
+      "maxItems": 20,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/nonEmptyString"}
+    },
+    "deviceIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reported_models",
+        "catalog_models",
+        "mapping_status",
+        "resolved_models",
+        "resolution_note",
+        "evidence_refs"
+      ],
+      "properties": {
+        "reported_models": {
+          "allOf": [
+            {"$ref": "#/$defs/identityModelList"},
+            {"minItems": 1}
+          ]
+        },
+        "catalog_models": {
+          "allOf": [
+            {"$ref": "#/$defs/identityModelList"},
+            {"minItems": 1}
+          ]
+        },
+        "mapping_status": {
+          "enum": [
+            "exact_catalog_match",
+            "confirmed_alias",
+            "unresolved_alias",
+            "conflict"
+          ]
+        },
+        "resolved_models": {"$ref": "#/$defs/identityModelList"},
+        "resolution_note": {"$ref": "#/$defs/nullableString"},
+        "evidence_refs": {
+          "allOf": [
+            {"$ref": "#/$defs/evidenceReferences"},
+            {"uniqueItems": true}
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "mapping_status": {"const": "exact_catalog_match"}
+            },
+            "required": ["mapping_status"]
+          },
+          "then": {
+            "properties": {
+              "resolved_models": {"minItems": 1},
+              "resolution_note": {"type": "null"}
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "mapping_status": {"const": "confirmed_alias"}
+            },
+            "required": ["mapping_status"]
+          },
+          "then": {
+            "properties": {
+              "resolved_models": {"minItems": 1},
+              "resolution_note": {"$ref": "#/$defs/nonEmptyString"},
+              "evidence_refs": {"minItems": 1}
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "mapping_status": {
+                "enum": ["unresolved_alias", "conflict"]
+              }
+            },
+            "required": ["mapping_status"]
+          },
+          "then": {
+            "properties": {
+              "resolved_models": {"maxItems": 0},
+              "resolution_note": {"type": "null"},
+              "evidence_refs": {"minItems": 1}
+            }
+          }
+        }
+      ]
+    },
+    "symptom": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "symptom_id",
+        "text",
+        "source_wording",
+        "fault_code",
+        "evidence_refs"
+      ],
+      "properties": {
+        "symptom_id": {"$ref": "#/$defs/safeId"},
+        "text": {"$ref": "#/$defs/nonEmptyString"},
+        "source_wording": {"$ref": "#/$defs/nullableString"},
+        "fault_code": {"$ref": "#/$defs/nullableString"},
+        "evidence_refs": {"$ref": "#/$defs/evidenceReferences"}
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "finding_id",
+        "claim_status",
+        "description",
+        "defect_category",
+        "designator",
+        "side_id",
+        "region",
+        "evidence_refs"
+      ],
+      "properties": {
+        "finding_id": {"$ref": "#/$defs/safeId"},
+        "claim_status": {
+          "enum": ["reported", "suspected", "documented"]
+        },
+        "description": {"$ref": "#/$defs/nonEmptyString"},
+        "defect_category": {"$ref": "#/$defs/nullableString"},
+        "designator": {
+          "oneOf": [{"type": "null"}, {"$ref": "#/$defs/safeId"}]
+        },
+        "side_id": {
+          "oneOf": [{"type": "null"}, {"$ref": "#/$defs/safeId"}]
+        },
+        "region": {"$ref": "#/$defs/normalizedRegion"},
+        "evidence_refs": {"$ref": "#/$defs/evidenceReferences"}
+      }
+    },
+    "repairAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action_id",
+        "description",
+        "action_category",
+        "target_designator",
+        "side_id",
+        "region",
+        "evidence_refs"
+      ],
+      "properties": {
+        "action_id": {"$ref": "#/$defs/safeId"},
+        "description": {"$ref": "#/$defs/nonEmptyString"},
+        "action_category": {"$ref": "#/$defs/nullableString"},
+        "target_designator": {
+          "oneOf": [{"type": "null"}, {"$ref": "#/$defs/safeId"}]
+        },
+        "side_id": {
+          "oneOf": [{"type": "null"}, {"$ref": "#/$defs/safeId"}]
+        },
+        "region": {"$ref": "#/$defs/normalizedRegion"},
+        "evidence_refs": {"$ref": "#/$defs/evidenceReferences"}
+      }
+    },
+    "outcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "description",
+        "verification_description",
+        "evidence_refs"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "unknown",
+            "repair_completed",
+            "not_repaired",
+            "non_repairable",
+            "needs_followup"
+          ]
+        },
+        "description": {"$ref": "#/$defs/nullableString"},
+        "verification_description": {"$ref": "#/$defs/nullableString"},
+        "evidence_refs": {"$ref": "#/$defs/evidenceReferences"}
+      }
+    },
+    "correction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "correction_id",
+        "corrects_fact_id",
+        "description",
+        "replacement_fact_id",
+        "evidence_refs"
+      ],
+      "properties": {
+        "correction_id": {"$ref": "#/$defs/safeId"},
+        "corrects_fact_id": {"$ref": "#/$defs/safeId"},
+        "description": {"$ref": "#/$defs/nonEmptyString"},
+        "replacement_fact_id": {"$ref": "#/$defs/safeId"},
+        "evidence_refs": {"$ref": "#/$defs/evidenceReferences"}
+      }
+    }
+  }
+}

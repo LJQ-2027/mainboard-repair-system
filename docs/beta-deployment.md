@@ -1,0 +1,302 @@
+# Motherboard Repair Beta Deployment
+
+This project is deployed as an isolated beta service on the same server used by CSAT.
+
+## Current Operating Model
+
+Milo is the only source of real visual photos. Codex is the data administrator for batch intake, registration correction, visible-defect annotation, Golden Sample management, and governed export. Overseas technicians do not upload visual photos and do not enter the internal visual data workbench. The gateway role string `reviewer` remains only as a wire-compatible identifier for data-administrator permissions.
+
+## Isolation Rules
+
+- Remote directory: `/opt/motherboard-repair-beta`
+- Loopback static frontend service port: `3010`
+- Loopback visual-QC API port: `3020`
+- PM2 process name: `motherboard-repair-beta`
+- Env file: `/opt/motherboard-repair-beta/app/.env`
+- Do not reuse the CSAT directory, port, PM2 process, database, upload directory, or env file.
+
+## Deploy
+
+```powershell
+.\scripts\deploy-beta.ps1 `
+  -KeyPath "C:\Users\Mercurluto\OneDrive\AI\90_Meta\Sensitive\Milo.pem"
+```
+
+The script packages the current Git `HEAD`, uploads it to the server, preserves the remote `.env`, replaces only `/opt/motherboard-repair-beta/app`, restarts PM2, and checks:
+
+- `http://127.0.0.1:3010/health`
+- `http://127.0.0.1:3010/`
+- PM2 process status
+
+The visual-QC pilot deploy uses `deploy/visual-qc-runtime-files.txt` as a
+reviewed runtime allowlist. It includes the internal visual data workbench, board-catalog assets,
+knowledge data, API/worker code, and maintenance validators while excluding raw
+source archives, tests, reports, output, and documentation. The 2026-07-21
+archive smoke reduced the package from about 197 MB to 52.4 MB with 305 tracked
+entries and all required runtime files present. The first production deployment
+through this allowlist completed in about 194 seconds versus about 808 seconds
+for the preceding full-repository deployment, while preserving the existing
+case database and serving the workbench, KM4 atlas, and training manifest.
+
+## Runtime
+
+The Python service serves:
+
+- Frontend page: `/`
+- Health check: `/health`
+
+The historical `/api/chat` route is retired legacy code. It must remain disabled and is not a product capability or acceptance target.
+
+The frontend defaults to the current origin when opened through HTTP/HTTPS, so beta users do not need to configure `localhost`.
+
+## First-Time Server Setup
+
+After the first deploy, verify the service configuration:
+
+```bash
+cd /opt/motherboard-repair-beta/app
+vim .env
+pm2 restart motherboard-repair-beta --update-env
+```
+
+`PORT`, `STATIC_ROOT`, and `INDEX_FILE` are supplied by the deploy script / PM2 environment.
+Do not configure Anthropic, DeepSeek, or any other general-purpose LLM API key for this project.
+
+## Current Deployment
+
+- Deployed on: 2026-08-13
+- Deployed commit: `84b391713bc1ce34e8a75482435d6b2ec9d27430`
+- Internal service: `http://127.0.0.1:3010`
+- Internal visual-QC API: `http://127.0.0.1:3020`
+- External beta URL: `https://cccsat.top/mb-repair-beta/`
+- Health URL: `https://cccsat.top/mb-repair-beta/health`
+- Visual-QC workbench:
+  `https://cccsat.top/mb-repair-beta/assets/visual-qc-workbench/`
+- PM2 processes: `motherboard-repair-beta` and
+  `motherboard-repair-visual-qc`
+- Access control: public technician entry/workbench; Basic Auth and gateway-owned actor headers only for the internal Visual-QC API and data workbench
+- Nginx config touched: `/etc/nginx/sites-available/sikayetvar`
+- Nginx config backup: `/etc/nginx/sites-available/sikayetvar.before-mb-repair-20260622_095918`
+- Retired LLM status: no provider key is configured by design; `/api/chat` is not part of the product roadmap.
+- 2026-08-13 task-first technician upgrade: the 71,965,886-byte allowlisted runtime archive was bound to SHA-256 `9ae5930b3478fb579f2cf5872b9dbebdf2be1e525bc9a33d53cb53963efe4a82`, 37 runtime paths, and full commit `84b391713bc1ce34e8a75482435d6b2ec9d27430`. The KM4 repair panel now exposes one current action, direct board location, larger measurement controls, gated outcome choices, and collapsed source evidence. The first `d0fba06` attempt correctly rolled back because the upgrade allowlist had not yet recorded the live `2489db6` source; the reviewed no-schema-change source was added, all 25 upgrade-preflight tests passed, and the second deployment passed migration and rollback rehearsal. Rollback evidence is retained under `/opt/motherboard-repair-beta/rollback/84b391713bc1-20260813_164642-871609`.
+- Post-switch technician P4: the public KM4 no-power route loaded the cache-busted task-first assets without credentials, displayed `定位 U4000，并记录 2 项测量`, and exposed the direct board-location action. Public browser verification reported zero application warnings/errors and zero horizontal overflow. Both motherboard PM2 services remained online; one proxy case, one succeeded job, zero failed jobs, and zero active Golden Samples were preserved.
+- 2026-08-10 public technician-entry upgrade: the 71,964,341-byte allowlisted runtime archive was bound to SHA-256 `f485a37559d1eb5c67cee7681cb50d073151ea3ece4e16a94d6d9ea62fbccc6f`, 37 runtime paths, and full commit `2489db60b7ef7a7f3453ef2c0d62a007fc95c237`. The source database passed migration and rollback rehearsal before the application switch. Rollback evidence is retained under `/opt/motherboard-repair-beta/rollback/2489db60b7ef-20260810_202005-788462`.
+- Post-switch access P4: the beta root redirected to the technician pilot and returned `200` without credentials; the direct technician route returned `200` and loaded all 14 model aliases. The Visual-QC workbench and identity API returned `401` without credentials. External Chrome reported no password input, console errors, or horizontal overflow. Both motherboard PM2 services remained online, and the preserved Visual-QC state remained one proxy case, one succeeded job, zero failed jobs, and zero active Golden Samples.
+- 2026-08-09 recoverable-session upgrade: the 71,964,281-byte allowlisted runtime archive was bound to SHA-256 `105adfca5a541af91df0739d3cfe6269548501bc9793e19804eb95626f4ec067`, 37 runtime paths, and full commit `0594b06581ec41085b6e281159ee52b65ac80081`. All ten `7ed316c -> 0594b06` upgrade and rollback checks passed. Rollback evidence is retained under `/opt/motherboard-repair-beta/rollback/0594b06581ec-20260809_183632-720426`.
+- Post-switch technician P4: unauthenticated entry returned `401`; the restricted account loaded all 14 model aliases. KM4 no-power completed measurement recording, refresh recovery, terminal action, post-action check, closure and local usability feedback. At 390 px the page, session strip and export control had no horizontal overflow. XK67J no-display reached the explicit missing-electrical-standard boundary and correctly exposed no formal repair-session strip. Browser logs contained no application warning/error. Both motherboard PM2 services remained online; one proxy case, one succeeded job, zero failed jobs and zero active Golden Samples were preserved. The browser backend did not expose a download event, so production export evidence is the enabled controls plus deterministic serialization tests rather than a captured file.
+- 2026-08-03 technician-pilot upgrade: the 71,957,635-byte allowlisted runtime archive was bound to SHA-256 `2c07ed31c23bd2dc2778187a6db51096aff4b0002276e7d99d59d74d36384fe7` and 37 runtime paths. All ten `08d08cd -> 7ed316c` upgrade checks passed, including source immutability, managed-object integrity, no-op schema compatibility, row preservation, candidate API/dataset contracts, and old-runtime readback. Rollback evidence is retained under `/opt/motherboard-repair-beta/rollback/7ed316c07130-20260803_164840-600269`.
+- Post-switch technician P4: unauthenticated entry returned `401`; the restricted account opened the unified 14-model entry, KM4 initial check, and KJ6 no-power group with three source cases. Installed Chrome at 1440x900 and 390x844 reported zero horizontal overflow and zero application console/page errors. The only ignored browser request was the site-root `favicon.ico` returning `404`. Both motherboard PM2 services remained online; the persisted proxy case, one succeeded job, zero failed jobs, and zero active Golden Samples were preserved.
+- 2026-07-31 controlled upgrade: the 58.1 MB allowlisted runtime archive was
+  bound to SHA-256 `fb11d084a5d2597001f46c36bb2cdb5ae8701ee1eca194886e5eca6713774f07`
+  and 37 runtime paths. Immutable-input verification, extraction verification,
+  a consistent SQLite backup, `VISUAL-QC-UPGRADE-PREFLIGHT-V1`, rollback
+  readability, Nginx validation, authenticated identity convergence, and both
+  PM2 restarts passed. Rollback evidence is retained under
+  `/opt/motherboard-repair-beta/rollback/08d08cd38aaf-20260731_191032-560401`.
+- Post-switch P4: one worker, one preserved succeeded proxy case, zero failed
+  jobs, zero active Golden Samples, normal storage pressure, `0` eligible and
+  `1` excluded training case (`non_physical_evidence`). Unauthenticated access
+  returns `401`; the restricted account receives `403` on the admin catalog.
+  Installed-Chrome desktop `1600x900` and mobile `390x844` verified U4000,
+  U0600, and H8918 U5007 shared-BGA isolation, mouse/touch rotation,
+  wheel/pinch zoom, zero overflow/label overlap, and zero console/page errors.
+- 2026-07-22 owner-managed intake increment: Milo is the sole source of real
+  visual photos and Codex operates the data-administrator path. Production now
+  enforces data-administrator-only multipart intake before parsing, accepts
+  validated batch/entry provenance, exposes the actor-scoped admin case
+  catalog/detail/original routes, and restores a server case into the existing
+  canvas workflow. The internal workbench hides every intake, Golden, catalog,
+  local export, and dataset control from the restricted role; the API returned
+  `403 data_admin_role_required` for a restricted multipart request.
+- Production P4 at `f278061` reports one worker, one preserved succeeded proxy
+  case, zero Golden Samples, and normal storage pressure. The legacy KM4 manual
+  proxy was transactionally reassigned from the historical restricted actor to
+  the current data administrator after a SQLite backup at
+  `/opt/motherboard-repair-beta/data/visual-qc/visual-qc.sqlite3.before-owner-admin-actor-migration-20260722_104119`.
+  Its evidence remains `service_manual_proxy`, registration remains
+  `manual_registration_required`, and both intake provenance fields remain
+  null. Dataset audit remains `0` eligible, `1` excluded, with
+  `non_physical_evidence: 1`; repeated dataset ZIPs remain byte-identical.
+- Production headed-Chrome QA at 1440x1000 and 390x844 restored the proxy
+  original from the server catalog, rendered both canvases, and reported no
+  horizontal overflow or console warnings/errors. The restricted production
+  identity displayed the read-only surface with all visual-data controls
+  hidden. Screenshots are retained locally under
+  `output/playwright/owner-managed-intake/` and are not deployment inputs.
+- Latest P4 evidence: desktop and 390px workbench paths render with no fresh
+  console errors or horizontal overflow; restricted/data-administrator wire roles pass through
+  the HTTPS gateway; forged actor headers are overwritten; PM2 restart retains
+  the persisted proxy case and completed registration job.
+
+The increment records below are historical deployment evidence. Their `technician` and `reviewer` labels describe the gateway wire roles tested at that time, not the current photo ownership or staffing model.
+- 2026-07-20 capture-intake increment: the authenticated production route
+  exposes the compact physical-capture panel and actor-scoped capture-session
+  API. Same-board front/back pairing, the three capture confirmations,
+  transaction-level session identity protection, and Golden/training gates are
+  deployed. An authenticated no-write smoke returned the expected technician
+  identity and typed `capture_session_not_found` response from the new API.
+- 2026-07-21 final-QC increment: physical cases can persist append-only final
+  human QC review versions. The reviewer-only training manifest and eligible
+  original-image routes are deployed. Independent P4 checks returned page 200,
+  technician `403 reviewer_role_required`, reviewer
+  `VISUAL-QC-TRAINING-MANIFEST-V1` with zero eligible cases, and typed
+  `404 training_image_not_found` for an unknown image. The empty manifest is
+  expected because the only stored case is proxy evidence.
+- 2026-07-21 governed COCO increment: the reviewer-only
+  `VISUAL-QC-COCO-V1` route deterministically derives images and confirmed
+  human annotations from the eligible training manifest. The reviewer
+  workbench displays server-owned case, annotation, and category totals and
+  downloads both JSON contracts; technicians do not see this panel and the
+  API independently returns `403 reviewer_role_required`. Production P4 at
+  `508cddb` returned an empty but schema-valid dataset with nine fixed
+  categories and byte-identical repeated responses. Headed Chrome QA passed
+  desktop and 390 px layouts, both downloads, no horizontal overflow, and
+  zero console warnings or errors.
+- 2026-07-21 dataset-readiness increment: reviewer-only
+  `VISUAL-QC-DATASET-AUDIT-V1` reports one ordered primary gate reason per
+  server case without exposing actor identity. Production contains one known
+  KM4 manual proxy and now reports `0` eligible, `1` excluded, and
+  `non_physical_evidence: 1`; technicians receive 403 and do not see the
+  workbench audit fields. The legacy P4 case had been stored with the obsolete
+  physical role despite its empty checklist; it was corrected transactionally
+  in both case and capture-session rows after a SQLite backup at
+  `/opt/motherboard-repair-beta/data/visual-qc/visual-qc.sqlite3.before-proxy-role-fix-20260721_134220`.
+  Commit `7b46333` adds a default-collapsed reviewer drill-down listing the
+  excluded board, side, case suffix, and primary blocker. Production Chrome
+  verified keyboard focus, expanded desktop and 390 px states, zero overflow,
+  intact download controls, and zero console warnings/errors.
+- 2026-07-21 complete-dataset increment: reviewer-only
+  `GET /datasets/bundle` returns a deterministic ZIP containing the governed
+  manifest, COCO annotations, `VISUAL-QC-DATASET-BUNDLE-V1` index, and every
+  eligible original under a stable case-derived path. Each original is checked
+  against its stored SHA-256 before packaging; the response removes its
+  temporary server file afterward. Production at `1f07b4a` returned technician
+  403 and reviewer 200, with byte-identical repeated ZIPs. The current empty
+  eligible set correctly produced three JSON entries, zero images/annotations,
+  and nine COCO categories. Headed Chrome verified the download, keyboard focus,
+  1440 px and 390 px two-column controls, no overflow, and zero console warnings
+  or errors.
+- Proxy evidence: one KM4 reviewed manual image was accepted as a proxy case,
+  scored `usable`, and correctly fell back to manual four-point registration
+  after ORB/AKAZE evidence failed the inlier gate. It is not physical-board
+  accuracy evidence.
+
+## Approved Visual-QC Evolution
+
+The beta server remains the controlled host for the internal visual data workbench. Milo is the only physical-photo source, and Codex is the only data operator. New physical cases may enter only through the acceptance-qualified handoff CLI after local source audit and physical acceptance; the browser restores existing server cases and does not upload new physical captures. The approved architecture provides a same-origin QC API, persisted image-processing jobs, controlled image storage, one or two CPU OpenCV workers, Golden Sample management, and candidate confirmation/rejection.
+
+The server was inspected read-only on 2026-07-20: 4 x86_64 vCPU, 7.3 GB RAM, 4 GB swap, 19 GB free disk, Python 3.10, Node.js 20, no GPU, no installed OpenCV, and no active PostgreSQL or Redis. This supports a bounded CPU pilot, not deep-model training or unrestricted long-term image retention.
+
+The bounded visual-QC pilot is deployed with the approved same-origin
+architecture at production revision `84b391713bc1ce34e8a75482435d6b2ec9d27430`.
+Controlled qualified handoff, async processing, manual fallback, role assertion,
+loopback binding, restart recovery, storage health, server provenance, governed
+repair-evidence projection, and proxy-path smoke checks have passed. Physical
+bare-board photos, reviewed Golden Samples, and real-defect acceptance remain
+the field-readiness gate. Canonical design:
+`docs/superpowers/specs/2026-07-20-visual-qc-server-architecture-design.md`.
+
+### 2026-07-20 P4 Preflight
+
+Read-only inspection initially confirmed that `/mb-repair-beta/` had no
+authentication or verified user-header injection. The 2026-07-20 deployment
+closed that gate and installed the isolated Python 3.10 visual-QC runtime.
+
+The bounded pilot deployment therefore adds:
+
+- public access to the technician entry and source-controlled repair workbench, with the beta root redirected to the technician entry;
+- per-user Nginx Basic Auth retained for the internal Visual-QC API and data workbench only;
+- `$remote_user` as the gateway-owned `X-Actor-Id`;
+- a server-owned data-administrator map that emits the compatibility role `reviewer` and otherwise fails closed to `technician`;
+- removal of client `Authorization` before proxying;
+- a loopback-only static/AI process on `127.0.0.1:3010`;
+- a loopback-only QC process on `127.0.0.1:3020`;
+- a commit-versioned QC runtime behind the stable
+  `/opt/motherboard-repair-beta/venv-visual-qc` symlink;
+- persistent data outside the replaceable app directory;
+- Nginx, PM2, internal health, authenticated restricted/data-administrator wire identities,
+  forged-header rejection, and unauthenticated-401 checks;
+- consistent SQLite backup plus automatic application, runtime, database, and
+  gateway rollback on deployment failure.
+- a candidate-owned `VISUAL-QC-UPGRADE-PREFLIGHT-V1` rehearsal after the
+  Visual-QC process is stopped and the rollback SQLite snapshot is complete,
+  but before the application directory or virtualenv link is switched;
+- exact binding between the rollback database SHA-256, the rehearsal report,
+  the full candidate Git commit, the uploaded runtime archive SHA-256 and byte
+  size, and the runtime path-manifest SHA-256. Migration, object-integrity,
+  Local HEAD API, dataset-gate, full SQLite schema, and old-runtime rollback
+  checks must all pass.
+- `VISUAL-QC-DEPLOYMENT-MANIFEST-V1` is built locally without timestamps or
+  workstation identity, uploaded beside `app.tar.gz` into a unique read-only
+  input directory, and validated with system Python before extraction. The
+  runtime-manifest hash is computed from the actual archive member; the
+  checkout copy is used only to assert the same normalized path list.
+  Duplicate JSON fields, mismatched evidence, path traversal, links, and
+  special tar members fail closed. The extracted tree is then checked
+  recursively for links and special files, and the runtime manifest plus
+  every declared runtime path are revalidated before the QC writer is stopped.
+- The migration report is validated against the complete Draft 2020-12
+  Schema with the candidate virtualenv. Its database snapshot and all target
+  identity fields must match the deployment manifest before any app switch.
+
+Run the read-only gate first:
+
+```powershell
+.\scripts\deploy-visual-qc-pilot.ps1 `
+  -KeyPath "C:\Users\Mercurluto\OneDrive\AI\90_Meta\Sensitive\Milo.pem" `
+  -PreflightOnly
+```
+
+`-PreflightOnly` checks host capacity, required commands, PM2, and Nginx
+without uploading or changing server files. It does not rehearse the candidate
+database migration because no candidate archive has been staged.
+
+Every actual deployment performs the deeper rehearsal automatically. The
+script first builds the bounded runtime archive and deterministic deployment
+manifest from a clean full Git commit. The server verifies the uploaded
+archive hash and byte size before extraction, then verifies the extracted
+runtime manifest hash, normalized path count, and every declared path. Only
+then does it stop `motherboard-repair-visual-qc`, create a consistent SQLite
+backup, and run the candidate
+`scripts/audit_visual_qc_upgrade.py` against that backup, the persistent object
+root, and the still-active old application contract. The resulting
+`deployment-manifest.json` and `upgrade-preflight.json` stay in the
+commit-versioned rollback directory.
+The app directory and `venv-visual-qc` link are switched only after the report
+is `passed`, its `source.snapshot_sha256` matches the rollback database, and
+its target object matches the complete deployment manifest. A rehearsal
+failure restarts the unchanged old service without replacing the untouched live database.
+Database restoration is enabled only after the candidate QC process may have
+opened the live database.
+
+The V1 deployment manifest is a byte-integrity and version-binding contract,
+not a digital signature. Signing and CI provenance attestations remain
+deferred until the deployment channel moves into managed CI/CD.
+
+The rehearsal requires an existing Visual-QC database and a deployed
+`VERSION` file whose commit is in the candidate's reviewed source-version
+allowlist. It deliberately rejects a live database carrying `-wal` or `-shm`;
+the deployment-owned SQLite backup is the accepted consistent input.
+
+Actual deployment additionally requires a local htpasswd file, data-administrator map,
+and matching restricted/data-administrator credentials for the authenticated smoke test.
+The PowerShell parameter names remain `TechnicianCredential` and
+`ReviewerCredential` for deployment-script compatibility:
+
+```powershell
+$technician = Get-Credential -UserName "pilot-technician"
+$reviewer = Get-Credential -UserName "pilot-reviewer"
+.\scripts\deploy-visual-qc-pilot.ps1 `
+  -KeyPath "C:\Users\Mercurluto\OneDrive\AI\90_Meta\Sensitive\Milo.pem" `
+  -HtpasswdPath "C:\secure\mb-repair.htpasswd" `
+  -ReviewerMapPath "C:\secure\mb-repair-reviewers.map" `
+  -TechnicianCredential $technician `
+  -ReviewerCredential $reviewer
+```
+
+Passwords and account lists remain outside Git. Uploaded authentication inputs
+are mode `0400` inside a deployment-unique mode `0500` staging directory and
+are removed after success or rollback. The script refuses a dirty worktree and
+deploys only committed `HEAD`.
+
+Basic Auth is the internal visual-data identity provider, not a technician requirement or the final global identity architecture. A later corporate SSO/OIDC gateway may replace it while preserving the same verified `X-Actor-Id` and `X-Actor-Role` API contract.

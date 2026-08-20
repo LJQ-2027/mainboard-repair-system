@@ -1,0 +1,317 @@
+[
+  {
+    "request_id": "GAP-20260604-001",
+    "related_model": [],
+    "related_fault": [],
+    "gap_type": "技能认证明细",
+    "description": "器件维修培训提到完成 13 项认证后可开始试点主板维修，但当前文件未包含 13 项认证明细和每项通过标准。",
+    "provider": "技术支持 / 培训负责人",
+    "priority": "高",
+    "status": "待补充",
+    "next_action": "寻找或索要技能认证表、认证项目清单、评分规则和样例记录。",
+    "source_ids": [
+      "SRC-20260604-001"
+    ]
+  },
+  {
+    "request_id": "GAP-20260604-002",
+    "related_model": [],
+    "related_fault": [],
+    "gap_type": "工具与故障检测资料",
+    "description": "两份资料均引用 L4 故障检测和常用工具，但当前未提供该下钻资料原文。",
+    "provider": "技术支持 / 培训负责人",
+    "priority": "高",
+    "status": "待补充",
+    "next_action": "寻找 L4 故障检测和常用工具文档，用于拆分工具库、故障知识和 SOP 草案。",
+    "source_ids": [
+      "SRC-20260604-001",
+      "SRC-20260604-002"
+    ]
+  },
+  {
+    "request_id": "GAP-20260604-003",
+    "related_model": [],
+    "related_fault": [],
+    "gap_type": "点胶与 BGA 维修资料",
+    "description": "2025 主板培训标准引用点胶主板维修及除胶、BGA 重新焊接基础操作和除胶视频，但当前未提供完整资料。",
+    "provider": "技术支持 / 培训负责人 / 中方技术人员",
+    "priority": "中",
+    "status": "待补充",
+    "next_action": "寻找点胶、除胶、BGA 返修相关文档或视频，后续拆分为培训资料、工具要求和 SOP。",
+    "source_ids": [
+      "SRC-20260604-002"
+    ]
+  },
+  {
+    "request_id": "GAP-20260604-004",
+    "related_model": [],
+    "related_fault": [],
+    "gap_type": "5S 建设资料",
+    "description": "2025 主板培训标准引用 L4 主板维修 5S 建设，但当前未提供完整资料。",
+    "provider": "技术支持 / 培训负责人",
+    "priority": "中",
+    "status": "待补充",
+    "next_action": "寻找 L4 主板维修 5S 建设文档，用于拆分为维修现场要求和培训标准。",
+    "source_ids": [
+      "SRC-20260604-002"
+    ]
+  },
+  {
+    "request_id": "GAP-20260604-005",
+    "related_model": [],
+    "related_fault": [],
+    "gap_type": "维修案例",
+    "description": "当前两份资料提供培训和管理框架，但没有具体主板维修案例、测试数据、定位过程和修后验证记录。",
+    "provider": "中方技术人员 / L4 技术员 / 海外现场",
+    "priority": "高",
+    "status": "待补充",
+    "next_action": "优先收集 3-5 类高频故障的真实维修案例，用于建立案例库和 SOP 样板。",
+    "source_ids": [
+      "SRC-20260604-001",
+      "SRC-20260604-002"
+    ]
+  },
+  {
+    "request_id": "GAP-20260604-006",
+    "related_model": [],
+    "related_fault": [
+      "不充电",
+      "快充异常",
+      "不开机",
+      "显示异常",
+      "射频异常"
+    ],
+    "gap_type": "模块原理到诊断 SOP 的转译",
+    "description": "手机 EE 原理介绍覆盖多个模块，但当前仍是工程原理培训，尚未转化为海外维修员可执行的测试点、正常范围、判断逻辑和操作步骤。",
+    "provider": "制造中心 / 技术支持 / 中方技术人员",
+    "priority": "高",
+    "status": "待补充",
+    "next_action": "优先选择充电、供电、开机、显示、射频等高频模块，把原理图内容转成测试点清单和诊断 SOP 草案。",
+    "source_ids": [
+      "SRC-20260604-003"
+    ]
+  },
+  {
+    "request_id": "GAP-20260604-007",
+    "related_model": [],
+    "related_fault": [
+      "关机漏电流偏大",
+      "飞行模式待机电流偏大"
+    ],
+    "gap_type": "功耗类故障标准阈值",
+    "description": "漏电流和待机电流异常分析已经给出诊断思路，但缺少各机型或平台的标准阈值、BUCK/LDO 支路正常电流范围，以及 Log / 串口命令判定标准。",
+    "provider": "制造中心 / 技术支持 / 软件分析同事",
+    "priority": "高",
+    "status": "待补充",
+    "next_action": "向制造中心或技术支持索要功耗类故障的标准电流范围、支路对照表、典型案例和修后验收标准。",
+    "source_ids": [
+      "SRC-20260604-004"
+    ]
+  },
+  {
+    "request_id": "GAP-20260604-008",
+    "related_model": [],
+    "related_fault": [],
+    "gap_type": "工具操作手册",
+    "description": "手机维修分析培训提到 MES、META 工具和 Log 抓取，但当前资料尚未拆成售后可直接执行的工具操作手册，也缺少不同平台、不同机型的差异说明。",
+    "provider": "技术支持 / 制造中心 / 软件分析同事",
+    "priority": "中",
+    "status": "待补充",
+    "next_action": "补齐 MES 录入模板、META 工具操作步骤、Log 抓取流程和常见错误处理方式。",
+    "source_ids": [
+      "SRC-20260604-005"
+    ]
+  },
+  {
+    "request_id": "GAP-20260604-009",
+    "related_model": [],
+    "related_fault": [],
+    "gap_type": "PPT 图片与示意图结构化",
+    "description": "两份 PPT 中包含大量电路图、链路图和截图，当前只完成文字层面的结构化，图片中的点位、走线、界面步骤和标注尚未解析。",
+    "provider": "技术支持 / 制造中心 / 资料整理人",
+    "priority": "中",
+    "status": "待补充",
+    "next_action": "后续对高价值页截图进行人工或视觉模型解析，沉淀为主板数字地图、工具操作图示或 SOP 配图。",
+    "source_ids": [
+      "SRC-20260604-003",
+      "SRC-20260604-005"
+    ]
+  },
+  {
+    "request_id": "GAP-20260622-001",
+    "related_model": [
+      "BG6m",
+      "KM4",
+      "KL4",
+      "CM6",
+      "KL5",
+      "KM5",
+      "C671L"
+    ],
+    "related_fault": [
+      "420-Memory Failure",
+      "400-CPU Failure",
+      "410-PMU Failure",
+      "430-RF IC Failure",
+      "461-Charger IC Failure"
+    ],
+    "gap_type": "L4 故障分类判定标准",
+    "description": "CI L4 维修报告显示 Memory Failure、CPU Failure、PMU Failure 是高频故障归因，但当前缺少这些分类在 L4 录单中的实际判定标准，例如依据哪些测试点、现象、电流曲线、Log 或更换结果来归类。",
+    "provider": "技术支持 / L4 负责人 / 制造中心维修工程师",
+    "priority": "高",
+    "status": "待补充",
+    "next_action": "索要 L4 故障代码字典、故障分类说明、录单规则和典型判定案例，优先解释 400/410/420/430/461 等高频代码。",
+    "source_ids": [
+      "SRC-20260622-001"
+    ]
+  },
+  {
+    "request_id": "GAP-20260622-002",
+    "related_model": [
+      "BG6m",
+      "KM4",
+      "KL4",
+      "CM6",
+      "KL5",
+      "KM5",
+      "C671L"
+    ],
+    "related_fault": [
+      "PWR01-No power on",
+      "CLA01-No signal/No Service/No network",
+      "PWR07-Restart",
+      "PWR02-Power on stopped at Logo",
+      "CHG01-Can not charging"
+    ],
+    "gap_type": "高频机型真实维修案例",
+    "description": "维修报告能看出哪些机型和故障高频，但不包含详细检测步骤、测试点、照片、测量数据、维修前后对比和修后验证。",
+    "provider": "中方技术人员 / CI L4 技术员 / 技术支持",
+    "priority": "高",
+    "status": "待补充",
+    "next_action": "按机型+故障组合抽取真实案例，例如 BG6m/KM4/KL4 的 Memory Failure、CPU Failure、PMU Failure，每类至少 3-5 个完整案例。",
+    "source_ids": [
+      "SRC-20260622-001"
+    ]
+  },
+  {
+    "request_id": "GAP-20260622-003",
+    "related_model": [],
+    "related_fault": [],
+    "gap_type": "维修状态与维修动作口径",
+    "description": "维修报告包含 Repair Completed、Non Repairable、Damage、Semi-manufactured、Assigned To Technician 等状态，以及 IC Replaced、Re-soldering、Return Without Repair 等服务动作，但当前缺少这些字段的业务含义和使用规则。",
+    "provider": "技术支持 / L4 负责人 / 备件或系统负责人",
+    "priority": "中",
+    "status": "待补充",
+    "next_action": "索要 WO Serialized Report 字段说明、状态流转说明、维修动作代码字典，以及哪些状态应纳入维修成功率/返修率分析。",
+    "source_ids": [
+      "SRC-20260622-001"
+    ]
+  },
+  {
+    "request_id": "GAP-20260701-001",
+    "related_model": [],
+    "related_fault": [
+      "不开机",
+      "不充电",
+      "Memory Failure",
+      "PMU Failure",
+      "无服务",
+      "显示异常",
+      "触摸异常",
+      "摄像头异常"
+    ],
+    "gap_type": "MTK 手册到售后 SOP 转译",
+    "description": "制造中心提供的 MTK 手机维修通用操作指导书已经覆盖大量模块原理和故障分析处理流程，但当前仍是工程手册形态，需要转译为海外维修员可执行的步骤、输入项、判断条件和升级边界。",
+    "provider": "制造中心 / 技术支持 / 中方技术人员",
+    "priority": "高",
+    "status": "待转译",
+    "next_action": "优先选择不开机、不充电、Memory Failure、PMU Failure、无服务等高频故障，拆成第一批交互式 SOP 草案。",
+    "source_ids": [
+      "SRC-20260701-001"
+    ]
+  },
+  {
+    "request_id": "GAP-20260701-002",
+    "related_model": [],
+    "related_fault": [],
+    "gap_type": "手册图片与电路图结构化",
+    "description": "该手册包含 58 张图片，含主板元器件位置图、电路图、流程图或波形图。当前已保存原始 Word，但图片内容尚未结构化，页面也还无法按模块检索图片。",
+    "provider": "制造中心 / 资料整理人",
+    "priority": "高",
+    "status": "待补充",
+    "next_action": "抽取手册图片并按章节命名，优先结构化主板元器件位置图、开机/充电/Memory/射频/显示相关图片。",
+    "source_ids": [
+      "SRC-20260701-001"
+    ]
+  },
+  {
+    "request_id": "GAP-20260701-003",
+    "related_model": [
+      "BG6m",
+      "KM4",
+      "KL4",
+      "CM6",
+      "KL5",
+      "KM5",
+      "C671L"
+    ],
+    "related_fault": [
+      "420-Memory Failure",
+      "400-CPU Failure",
+      "410-PMU Failure",
+      "430-RF IC Failure"
+    ],
+    "gap_type": "MTK 手册与 L4 维修报告映射",
+    "description": "CI L4 维修报告中的高频故障代码需要与 MTK 手册中的模块、信号和故障流程建立映射，例如 Memory Failure 对应 UFS/LPDDR，PMU Failure 对应开机电源管理和各路供电。",
+    "provider": "技术支持 / L4 负责人 / 制造中心维修工程师",
+    "priority": "高",
+    "status": "待补充",
+    "next_action": "建立故障代码到手册章节、关键测试信号、常见维修动作的映射表，用于页面按故障代码检索。",
+    "source_ids": [
+      "SRC-20260701-001",
+      "SRC-20260622-001"
+    ]
+  },
+  {
+    "request_id": "GAP-20260702-001",
+    "related_model": [],
+    "related_fault": [],
+    "gap_type": "外研 Top20 机型资料",
+    "description": "制造中心已提供 Top20 中 11 个内研项目资料，但外研项目资料制造中心同事反馈无法提供。外研机型后续不能依赖制造中心一次性补齐，需要通过技术支持、海外 L4、中方技术人员、售后维修案例或本地资料逐步补充。",
+    "provider": "技术支持 / 海外 L4 / 中方技术人员 / 外研项目资料接口人",
+    "priority": "中",
+    "status": "待补充",
+    "next_action": "先不阻塞内研机型资料库建设；后续根据 L4 维修报告优先级，逐一确认外研高频机型是否存在本地维修指导书、位号图、主板照片或案例。",
+    "source_ids": [
+      "SRC-20260702-001"
+    ]
+  },
+  {
+    "request_id": "GAP-20260702-002",
+    "related_model": [
+      "BG6m",
+      "X6880",
+      "CK6N",
+      "BG6h",
+      "KL4",
+      "CM5",
+      "CM6",
+      "CLA5",
+      "KJ5",
+      "KM7K",
+      "KM4"
+    ],
+    "related_fault": [],
+    "gap_type": "机型资料到可执行 SOP 的转译",
+    "description": "Top20 内研资料包包含大量维修指导书、原理图和位号图，但当前仍是工程资料形态，需要把高频机型与高频故障转译为售后可执行的诊断步骤、测量点、正常范围、异常分支和升级边界。",
+    "provider": "制造中心 / 技术支持 / 中方技术人员",
+    "priority": "高",
+    "status": "待转译",
+    "next_action": "优先选择 BG6m、KM4、KL4、CM6 等 L4 高频机型，围绕不开机、Memory Failure、PMU Failure、不充电等故障产出第一批 SOP 草案。",
+    "source_ids": [
+      "SRC-20260702-001",
+      "SRC-20260622-001",
+      "SRC-20260701-001"
+    ]
+  }
+]

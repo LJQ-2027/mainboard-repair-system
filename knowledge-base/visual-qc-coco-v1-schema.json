@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "VISUAL-QC-COCO-V1",
+  "title": "Human-reviewed Mainboard Visual QC COCO Dataset",
+  "type": "object",
+  "required": ["info", "licenses", "images", "annotations", "categories"],
+  "properties": {
+    "info": {
+      "type": "object",
+      "required": ["description", "version", "source_manifest"],
+      "properties": {
+        "description": { "type": "string", "minLength": 1 },
+        "version": { "const": "VISUAL-QC-COCO-V1" },
+        "source_manifest": { "const": "VISUAL-QC-TRAINING-MANIFEST-V1" }
+      },
+      "additionalProperties": false
+    },
+    "licenses": { "type": "array" },
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id", "case_id", "image_id", "file_name", "width", "height",
+          "sha256", "board_key", "board_id", "side_id", "capture_stage",
+          "qc_status", "qc_review_id", "qc_review_version"
+        ],
+        "properties": {
+          "id": { "type": "integer", "minimum": 1 },
+          "case_id": { "type": "string", "minLength": 1 },
+          "image_id": { "type": "string", "minLength": 1 },
+          "file_name": { "type": "string", "minLength": 1 },
+          "width": { "type": "integer", "minimum": 1 },
+          "height": { "type": "integer", "minimum": 1 },
+          "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "board_key": { "type": "string", "minLength": 1 },
+          "board_id": { "type": "string", "minLength": 1 },
+          "side_id": { "type": "string", "minLength": 1 },
+          "capture_stage": {
+            "enum": ["golden_reference", "before_repair", "after_repair"]
+          },
+          "qc_status": { "enum": ["no_visible_anomaly", "confirmed_anomaly"] },
+          "qc_review_id": { "type": "string", "minLength": 1 },
+          "qc_review_version": { "type": "integer", "minimum": 1 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "annotations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id", "image_id", "category_id", "bbox", "area",
+          "segmentation", "iscrowd", "attributes"
+        ],
+        "properties": {
+          "id": { "type": "integer", "minimum": 1 },
+          "image_id": { "type": "integer", "minimum": 1 },
+          "category_id": { "type": "integer", "minimum": 1, "maximum": 9 },
+          "bbox": {
+            "type": "array", "minItems": 4, "maxItems": 4,
+            "items": { "type": "number", "minimum": 0 }
+          },
+          "area": { "type": "number", "minimum": 0 },
+          "segmentation": { "type": "array", "minItems": 1 },
+          "iscrowd": { "const": 0 },
+          "attributes": { "type": "object" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "categories": {
+      "type": "array",
+      "minItems": 9,
+      "maxItems": 9,
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "supercategory"],
+        "properties": {
+          "id": { "type": "integer", "minimum": 1, "maximum": 9 },
+          "name": { "type": "string", "minLength": 1 },
+          "supercategory": { "const": "visible_mainboard_defect" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

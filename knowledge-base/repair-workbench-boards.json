@@ -1,0 +1,153 @@
+{
+  "catalog_id": "REPAIR-WORKBENCH-BOARDS-V1",
+  "default_board_key": "km4-f151",
+  "boards": {
+    "km4-f151": {
+      "title": "KM4 · F151_MAIN_PCB_V1.2",
+      "model": "KM4",
+      "board_version": "F151_MAIN_PCB_V1.2",
+      "data": "../../knowledge-base/km4-cross-source-registration.json",
+      "schematic": "../../knowledge-base/km4-schematic-compiled.json",
+      "side_manifest": "../../knowledge-base/km4-board-sides.json",
+      "geometry_by_side": {
+        "main_page_1": "../../knowledge-base/km4-board-compiled-page-1.json",
+        "main_page_2": "../../knowledge-base/km4-board-compiled.json"
+      },
+      "shield": "../../knowledge-base/km4-point-map-geometry.json",
+      "atlas": "../../knowledge-base/board-atlas-mvp.json"
+    },
+    "kl4-f201": {
+      "title": "KL4 · F201_MAIN_V1.2",
+      "model": "KL4",
+      "board_version": "F201_MAIN_V1.2",
+      "data": "../../knowledge-base/kl4-cross-source-registration.json",
+      "schematic": "../../knowledge-base/kl4-schematic-compiled.json",
+      "side_manifest": "../../knowledge-base/kl4-board-sides.json",
+      "geometry_by_side": {
+        "main_page_1": "../../knowledge-base/kl4-board-compiled-page-1.json",
+        "main_page_2": "../../knowledge-base/kl4-board-compiled.json"
+      },
+      "shield": null,
+      "atlas": null
+    },
+    "cm6-h8918": {
+      "title": "CM6 / CM5 · H8918_MAIN_PCB_V1.2",
+      "model": "CM6",
+      "compatible_models": [
+        "CM6",
+        "CM5"
+      ],
+      "board_version": "H8918_MAIN_PCB_V1.2",
+      "data": "../../knowledge-base/h8918-cross-source-registration.json",
+      "schematic": "../../knowledge-base/h8918-schematic-compiled.json",
+      "side_manifest": "../../knowledge-base/h8918-board-sides.json",
+      "geometry_by_side": {
+        "main_page_1": "../../knowledge-base/h8918-board-compiled-page-1.json",
+        "main_page_2": "../../knowledge-base/h8918-board-compiled.json"
+      },
+      "shield": null,
+      "atlas": null
+    },
+    "ck6n-h6929": {
+      "title": "CK6N · H6929_MAIN_PCB_V1.1",
+      "model": "CK6N",
+      "compatible_models": [
+        "CK6N"
+      ],
+      "board_version": "H6929_MAIN_PCB_V1.1",
+      "data": "../../knowledge-base/h6929-cross-source-registration.json",
+      "schematic": "../../knowledge-base/h6929-schematic-compiled.json",
+      "side_manifest": "../../knowledge-base/h6929-board-sides.json",
+      "geometry_by_side": {
+        "main_top": "../../knowledge-base/h6929-board-compiled-top.json",
+        "main_bot": "../../knowledge-base/h6929-board-compiled-bot.json"
+      },
+      "shield": null,
+      "atlas": null
+    },
+    "bg6m-f069m": {
+      "title": "BG6M · F069M_MAIN_PCB_V1.0",
+      "model": "BG6M",
+      "compatible_models": [
+        "BG6M"
+      ],
+      "board_version": "F069M_MAIN_PCB_V1.0",
+      "data": "../../knowledge-base/f069m-cross-source-registration.json",
+      "schematic": "../../knowledge-base/f069m-schematic-compiled.json",
+      "side_manifest": "../../knowledge-base/f069m-board-sides.json",
+      "geometry_by_side": {
+        "main_page_1": "../../knowledge-base/f069m-board-compiled-page-1.json",
+        "main_page_2": "../../knowledge-base/f069m-board-compiled-page-2.json"
+      },
+      "shield": null,
+      "atlas": null
+    },
+    "bg6h-f069": {
+      "title": "BG6H · F069_MAIN_PCB_V1.2",
+      "model": "BG6H",
+      "compatible_models": [
+        "BG6H",
+        "BG6h"
+      ],
+      "board_version": "F069_MAIN_PCB_V1.2",
+      "data": "../../knowledge-base/f069-cross-source-registration.json",
+      "schematic": "../../knowledge-base/f069-schematic-compiled.json",
+      "side_manifest": "../../knowledge-base/f069-board-sides.json",
+      "geometry_by_side": {
+        "main_page_1": "../../knowledge-base/f069-board-compiled-page-1.json",
+        "main_page_2": "../../knowledge-base/f069-board-compiled-page-2.json"
+      },
+      "shield": null,
+      "atlas": null
+    },
+    "xk67j-shared": {
+      "title": "KM4n / KM4k / KM5 / KM5n / KM5s · XK67J_MAIN_PCB_V1.0B",
+      "model": "KM5",
+      "compatible_models": [
+        "KM4n",
+        "KM4k",
+        "KM5",
+        "KM5n",
+        "KM5s"
+      ],
+      "model_evidence": {
+        "KM4n": "photo_verified_shared_platform",
+        "KM4k": "owner_confirmed_alias",
+        "KM5": "engineering_source",
+        "KM5n": "owner_confirmed_alias",
+        "KM5s": "owner_confirmed_alias"
+      },
+      "board_version": "XK67J_MAIN_PCB_V1.0B",
+      "physical_board_revision": "XK67J_MAIN V1.0",
+      "data": "../../knowledge-base/xk67j-cross-source-registration.json",
+      "schematic": "../../knowledge-base/xk67j-schematic-compiled.json",
+      "side_manifest": "../../knowledge-base/xk67j-board-sides.json",
+      "geometry_by_side": {
+        "main_page_1": "../../knowledge-base/xk67j-board-compiled-page-1.json",
+        "main_page_2": "../../knowledge-base/xk67j-board-compiled-page-2.json"
+      },
+      "shield": null,
+      "atlas": null
+    },
+    "kj6-h897": {
+      "title": "KJ6 · H897_MAIN_PCB_V1.2",
+      "model": "KJ6",
+      "compatible_models": [
+        "KJ6"
+      ],
+      "model_evidence": {
+        "KJ6": "engineering_source"
+      },
+      "board_version": "H897_MAIN_PCB_V1.2",
+      "data": "../../knowledge-base/h897-cross-source-registration.json",
+      "schematic": "../../knowledge-base/h897-schematic-compiled.json",
+      "side_manifest": "../../knowledge-base/h897-board-sides.json",
+      "geometry_by_side": {
+        "main_page_1": "../../knowledge-base/h897-board-compiled-page-1.json",
+        "main_page_2": "../../knowledge-base/h897-board-compiled-page-2.json"
+      },
+      "shield": null,
+      "atlas": null
+    }
+  }
+}

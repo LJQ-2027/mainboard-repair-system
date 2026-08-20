@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "VISUAL-QC-DATASET-BUNDLE-V1",
+  "title": "Mainboard Visual QC Dataset Bundle Index",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "generated_at",
+    "case_count",
+    "annotation_count",
+    "manifest_path",
+    "coco_path",
+    "files"
+  ],
+  "properties": {
+    "schema_version": { "const": "VISUAL-QC-DATASET-BUNDLE-V1" },
+    "generated_at": { "type": "string", "minLength": 1 },
+    "case_count": { "type": "integer", "minimum": 0 },
+    "annotation_count": { "type": "integer", "minimum": 0 },
+    "manifest_path": { "const": "manifest.json" },
+    "coco_path": { "const": "annotations.coco.json" },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "case_id",
+          "image_id",
+          "archive_path",
+          "mime_type",
+          "sha256",
+          "byte_size"
+        ],
+        "properties": {
+          "case_id": { "type": "string", "minLength": 1 },
+          "image_id": { "type": "string", "minLength": 1 },
+          "archive_path": {
+            "type": "string",
+            "pattern": "^images/[A-Za-z0-9_-]+\\.(jpg|png|webp)$"
+          },
+          "mime_type": { "enum": ["image/jpeg", "image/png", "image/webp"] },
+          "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "byte_size": { "type": "integer", "minimum": 1 }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

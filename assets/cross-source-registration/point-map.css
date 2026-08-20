@@ -1,0 +1,61 @@
+.view-tools {
+  display: flex;
+  gap: 4px;
+}
+
+.view-tools[hidden] {
+  display: none;
+}
+
+.photo-view.active,
+.point-map-view.active {
+  display: block;
+  padding: 0;
+  overflow: hidden;
+  touch-action: none;
+  cursor: grab;
+  background: #d6dad5;
+}
+
+.photo-view.dragging,
+.point-map-view.dragging {
+  cursor: grabbing;
+}
+
+.photo-view .physical-photo,
+.point-map-view .point-map {
+  position: absolute;
+  left: 0;
+  top: 0;
+  max-width: calc(100% - 36px);
+  max-height: calc(100% - 36px);
+  transform-origin: 0 0;
+  box-shadow: 0 5px 18px #26372e33;
+  will-change: transform;
+}
+
+.photo-view .physical-photo img,
+.point-map-view .point-map img {
+  max-width: 100%;
+  max-height: calc(100vh - 208px);
+  user-select: none;
+  pointer-events: none;
+}
+
+.photo-view .marker,
+.point-map-view .marker {
+  pointer-events: auto;
+}
+
+.photo-view::after,
+.point-map-view::after {
+  content: attr(data-zoom);
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  padding: 5px 7px;
+  background: #17221edb;
+  color: white;
+  font-size: 10px;
+  pointer-events: none;
+}

@@ -1,0 +1,334 @@
+{
+  "registry_id": "BOARD-COMPILER-PROFILES-V1",
+  "profiles": [
+    {
+      "profile_id": "km4-f151",
+      "model": "KM4",
+      "board_id": "BOARD-KM4-F151-MAIN-V1.2",
+      "board_version": "F151_MAIN_PCB_V1.2",
+      "component_prefix": "KM4-F151",
+      "outline_method": "engineering_marks",
+      "point_map_source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/F151_MAIN_PCB_V1.2_位号图.pdf",
+      "schematic_source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/F151_MAIN_PCB_1_维修原理图_V1.2_20250310.pdf",
+      "default_side_id": "main_page_2",
+      "schematic_geometry_side_id": "main_page_2",
+      "side_manifest_output": "knowledge-base/km4-board-sides.json",
+      "schematic_output": "knowledge-base/km4-schematic-compiled.json",
+      "cross_source_output": "knowledge-base/km4-cross-source-registration.json",
+      "reviewed_designators": ["U2001", "U4000", "X2100", "U0600", "J6101", "VBAT1", "VBUS1"],
+      "visual_reference": {
+        "path": "assets/vision-reference-gallery/km4/embedded/page-010-image-05.jpg",
+        "accuracy_boundary": "Installed shield-side service-manual context; not an isolated two-side board pair."
+      },
+      "sides": [
+        {
+          "side_id": "main_page_1",
+          "label": "第1面",
+          "source_pdf_page": 1,
+          "engineering_texture": "assets/board-atlas/km4-f151/main-point-map-page-1.png",
+          "compiled_data": "knowledge-base/km4-board-compiled-page-1.json",
+          "source_crop": {"x": 0.13349, "y": 0.26528, "width": 0.73302, "height": 0.66085},
+          "required_designators": []
+        },
+        {
+          "side_id": "main_page_2",
+          "label": "第2面",
+          "source_pdf_page": 2,
+          "engineering_texture": "assets/board-atlas/km4-f151/main-point-map-page-2.png",
+          "compiled_data": "knowledge-base/km4-board-compiled.json",
+          "source_crop": {"x": 0.13444, "y": 0.27065, "width": 0.73159, "height": 0.65749},
+          "required_designators": ["U2001", "U4000", "X2100", "U0600", "J6101", "VBAT1", "VBUS1"]
+        }
+      ]
+    },
+    {
+      "profile_id": "kl4-f201",
+      "model": "KL4",
+      "board_id": "BOARD-KL4-F201-MAIN-V1.2",
+      "board_version": "F201_MAIN_V1.2",
+      "component_prefix": "KL4-F201",
+      "outline_method": "alpha_silhouette",
+      "point_map_source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KL4-F201/F201_MAIN_V1.2_零件位号.pdf",
+      "schematic_source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KL4-F201/K6735_F201_MAIN_SCH_V1.2维修原理图20240614.pdf",
+      "default_side_id": "main_page_2",
+      "schematic_geometry_side_id": "main_page_2",
+      "side_manifest_output": "knowledge-base/kl4-board-sides.json",
+      "schematic_output": "knowledge-base/kl4-schematic-compiled.json",
+      "cross_source_output": "knowledge-base/kl4-cross-source-registration.json",
+      "reviewed_designators": ["U1001", "U2001", "X2100", "VDDCORE", "VDDEMMCCORE"],
+      "visual_reference": {
+        "path": "assets/vision-reference-gallery/kl4/embedded/page-010-image-02.jpg",
+        "accuracy_boundary": "Installed main-board service-manual context; not an isolated two-side board pair."
+      },
+      "sides": [
+        {
+          "side_id": "main_page_1",
+          "label": "第1面",
+          "source_pdf_page": 1,
+          "engineering_texture": "assets/board-atlas/kl4-f201/main-point-map-page-1.png",
+          "compiled_data": "knowledge-base/kl4-board-compiled-page-1.json",
+          "source_crop": {"x": 0.038636, "y": 0.190196, "width": 0.922727, "height": 0.759804},
+          "required_designators": ["U1001"]
+        },
+        {
+          "side_id": "main_page_2",
+          "label": "第2面",
+          "source_pdf_page": 2,
+          "engineering_texture": "assets/board-atlas/kl4-f201/main-point-map-page-2.png",
+          "compiled_data": "knowledge-base/kl4-board-compiled.json",
+          "source_crop": {"x": 0.038636, "y": 0.168627, "width": 0.922727, "height": 0.781373},
+          "required_designators": ["U2001", "X2100"]
+        }
+      ]
+    },
+    {
+      "profile_id": "h8918-main-v1.2",
+      "model": "CM6",
+      "models": ["CM6", "CM5"],
+      "board_id": "BOARD-H8918-MAIN-V1.2",
+      "board_version": "H8918_MAIN_PCB_V1.2",
+      "component_prefix": "H8918-MAIN",
+      "outline_method": "alpha_silhouette",
+      "point_map_source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM6-H8918/H8918_MAIN_PCB_V1.2_╬╗║┼═╝20241030.pdf",
+      "schematic_source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM6-H8918/K6855_H8918_MAIN_PCB_V1.2_╬¼╨▐╘¡└φ═╝.pdf",
+      "repair_guide_source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM6-H8918/Tecno-CM6-H8918╩╓╗·╬¼╨▐═¿╙├▓┘╫≈╓╕╡╝╩ΘV1.0_20241218.pdf",
+      "default_side_id": "main_page_2",
+      "schematic_geometry_side_id": "main_page_2",
+      "side_manifest_output": "knowledge-base/h8918-board-sides.json",
+      "schematic_output": "knowledge-base/h8918-schematic-compiled.json",
+      "cross_source_output": "knowledge-base/h8918-cross-source-registration.json",
+      "reviewed_designators": ["U1001", "U2001", "X2101", "J6102", "U5007", "VBAT1"],
+      "schematic_reviewed_designators": ["U1001", "U2001", "X2101", "U5007"],
+      "visual_reference": {
+        "path": "assets/vision-reference-gallery/cm6/embedded/page-011-image-01.jpg",
+        "accuracy_boundary": "Installed CM6 main-board service-manual context; H8918 is shared with CM5 and no isolated two-side pair is available."
+      },
+      "sides": [
+        {
+          "side_id": "main_page_1",
+          "label": "第1面",
+          "source_pdf_page": 1,
+          "engineering_texture": "assets/board-atlas/h8918/main-point-map-page-1.png",
+          "compiled_data": "knowledge-base/h8918-board-compiled-page-1.json",
+          "source_crop": {"x": 0.035455, "y": 0.129216, "width": 0.929091, "height": 0.77},
+          "required_designators": ["U1001"]
+        },
+        {
+          "side_id": "main_page_2",
+          "label": "第2面",
+          "source_pdf_page": 2,
+          "engineering_texture": "assets/board-atlas/h8918/main-point-map-page-2.png",
+          "compiled_data": "knowledge-base/h8918-board-compiled.json",
+          "source_crop": {"x": 0.035455, "y": 0.133137, "width": 0.929848, "height": 0.764118},
+          "required_designators": ["U2001", "X2101", "J6102", "U5007", "VBAT1"]
+        }
+      ]
+    },
+    {
+      "profile_id": "h6929-main-v1.1",
+      "model": "CK6N",
+      "board_id": "BOARD-H6929-MAIN-V1.1",
+      "board_version": "H6929_MAIN_PCB_V1.1",
+      "component_prefix": "H6929-MAIN",
+      "outline_method": "alpha_silhouette",
+      "point_map_source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CK6N-H6929/H6929_MAIN_PCB_V1.1_╬╗║┼═╝_TOP.pdf",
+      "schematic_source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CK6N-H6929/H6929_MAIN_V1.1_╬¼╨▐╘¡└φ═╝.pdf",
+      "repair_guide_source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CK6N-H6929/TECNO_CK6N-H6929╬¼╨▐▓┘╫≈╓╕╡╝╩Θ_V1.0_20230307.pdf",
+      "default_side_id": "main_bot",
+      "schematic_geometry_side_id": "main_bot",
+      "side_manifest_output": "knowledge-base/h6929-board-sides.json",
+      "schematic_output": "knowledge-base/h6929-schematic-compiled.json",
+      "cross_source_output": "knowledge-base/h6929-cross-source-registration.json",
+      "reviewed_designators": ["U1001", "U2001", "X2101", "U2304", "U2305", "J2101", "U5003", "J6101", "U2404", "VBAT1"],
+      "schematic_reviewed_designators": ["U1001", "U2001", "X2101", "U2304", "U2305", "J2101", "U5003", "J6101", "U2404"],
+      "sides": [
+        {
+          "side_id": "main_top",
+          "label": "TOP 面",
+          "source_pdf_page": 1,
+          "component_page": 1,
+          "engineering_texture": "assets/board-atlas/h6929/main-point-map-top.png",
+          "compiled_data": "knowledge-base/h6929-board-compiled-top.json",
+          "source_crop": {"x": 0.225, "y": 0.405, "width": 0.55, "height": 0.53},
+          "required_designators": ["U1001", "U2304", "U2305"]
+        },
+        {
+          "side_id": "main_bot",
+          "label": "BOT 面",
+          "point_map_source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CK6N-H6929/H6929_MAIN_PCB_V1.1_╬╗║┼═╝_BOT.pdf",
+          "source_pdf_page": 1,
+          "component_page": 2,
+          "engineering_texture": "assets/board-atlas/h6929/main-point-map-bot.png",
+          "compiled_data": "knowledge-base/h6929-board-compiled-bot.json",
+          "source_crop": {"x": 0.225, "y": 0.405, "width": 0.55, "height": 0.53},
+          "required_designators": ["U2001", "X2101", "J2101", "U5003", "J6101", "U2404", "VBAT1"]
+        }
+      ]
+    },
+    {
+      "profile_id": "f069m-main-v1.0",
+      "model": "BG6M",
+      "board_id": "BOARD-F069M-MAIN-V1.0",
+      "board_version": "F069M_MAIN_PCB_V1.0",
+      "component_prefix": "F069M-MAIN",
+      "outline_method": "alpha_silhouette",
+      "point_map_source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/BG6M-F069M/F069M_MAIN_PCB_V1.0_位号图(A1).pdf",
+      "schematic_source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/BG6M-F069M/J6765_F069M_MAIN_SCH_维修原理图_V1.0.pdf",
+      "default_side_id": "main_page_2",
+      "schematic_geometry_side_id": "main_page_2",
+      "side_manifest_output": "knowledge-base/f069m-board-sides.json",
+      "schematic_output": "knowledge-base/f069m-schematic-compiled.json",
+      "cross_source_output": "knowledge-base/f069m-cross-source-registration.json",
+      "reviewed_designators": ["U1001", "U2001", "U4000", "U4001", "U5002", "U0600", "J6101", "J6202", "J6250", "VBUS1"],
+      "schematic_reviewed_designators": ["U1001", "U2001", "U4000", "U4001", "U5002", "U0600", "J6101", "J6202", "J6250", "VBUS1"],
+      "sides": [
+        {
+          "side_id": "main_page_1",
+          "label": "第1面",
+          "source_pdf_page": 1,
+          "engineering_texture": "assets/board-atlas/f069m/main-point-map-page-1.png",
+          "compiled_data": "knowledge-base/f069m-board-compiled-page-1.json",
+          "source_crop": {"x": 0.195, "y": 0.36, "width": 0.65, "height": 0.6},
+          "required_designators": ["U1001", "U4001", "U5002", "J6202", "J6250"]
+        },
+        {
+          "side_id": "main_page_2",
+          "label": "第2面",
+          "source_pdf_page": 2,
+          "engineering_texture": "assets/board-atlas/f069m/main-point-map-page-2.png",
+          "compiled_data": "knowledge-base/f069m-board-compiled-page-2.json",
+          "source_crop": {"x": 0.195, "y": 0.36, "width": 0.65, "height": 0.6},
+          "required_designators": ["U2001", "U4000", "U0600", "J6101", "VBUS1"]
+        }
+      ]
+    },
+    {
+      "profile_id": "bg6h-f069",
+      "model": "BG6H",
+      "models": ["BG6H", "BG6h"],
+      "board_id": "BOARD-F069-MAIN-V1.2",
+      "board_version": "F069_MAIN_PCB_V1.2",
+      "component_prefix": "F069-MAIN",
+      "outline_method": "alpha_silhouette",
+      "point_map_source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/BG6H-F069/F069_MAIN_PCB_V1.2_位号图_20230823（A4）.pdf",
+      "schematic_source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/BG6H-F069/F069_MAIN_PCB_V1.2 维修原理图 20230804.pdf",
+      "repair_guide_source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/BG6H-F069/TECNO_J6563_BG6h-F069_维修操作指导书_V1.0_20231108.docx",
+      "default_side_id": "main_page_2",
+      "schematic_geometry_side_id": "main_page_2",
+      "side_manifest_output": "knowledge-base/f069-board-sides.json",
+      "schematic_output": "knowledge-base/f069-schematic-compiled.json",
+      "cross_source_output": "knowledge-base/f069-cross-source-registration.json",
+      "reviewed_designators": ["U1001", "U2001", "U4000", "U4001", "U5002", "U0600", "J6101", "J6202", "J6250", "X2100", "VBAT1", "VBUS1"],
+      "schematic_reviewed_designators": ["U1001", "U2001", "U4000", "U4001", "U5002", "U0600", "J6101", "J6202", "J6250", "X2100", "VBUS1"],
+      "sides": [
+        {
+          "side_id": "main_page_1",
+          "label": "第1面",
+          "source_pdf_page": 1,
+          "engineering_texture": "assets/board-atlas/bg6h-f069/main-point-map-page-1.png",
+          "compiled_data": "knowledge-base/f069-board-compiled-page-1.json",
+          "source_crop": {"x": 0.1, "y": 0.0, "width": 0.87, "height": 0.93},
+          "required_designators": ["U1001", "U4001", "U5002", "J6202", "J6250"]
+        },
+        {
+          "side_id": "main_page_2",
+          "label": "第2面",
+          "source_pdf_page": 2,
+          "engineering_texture": "assets/board-atlas/bg6h-f069/main-point-map-page-2.png",
+          "compiled_data": "knowledge-base/f069-board-compiled-page-2.json",
+          "source_crop": {"x": 0.1, "y": 0.0, "width": 0.87, "height": 0.93},
+          "required_designators": ["U2001", "U4000", "U0600", "J6101", "X2100", "VBAT1", "VBUS1"]
+        }
+      ]
+    },
+    {
+      "profile_id": "h897-main-v1.2",
+      "model": "KJ6",
+      "models": ["KJ6"],
+      "model_evidence": {
+        "KJ6": "engineering_source"
+      },
+      "board_id": "BOARD-H897-MAIN-V1.2",
+      "board_version": "H897_MAIN_PCB_V1.2",
+      "component_prefix": "H897-MAIN",
+      "outline_method": "alpha_silhouette",
+      "point_map_source": "source-materials/owner-supplied/2026-07-31-kj6-km4-km4s/packages/KJ6-H897/H897_MAIN_PCB_V1.2_Placement.pdf",
+      "schematic_source": "source-materials/owner-supplied/2026-07-31-kj6-km4-km4s/packages/KJ6-H897/H897_MAIN_SCH_V1.2_202307171706.pdf",
+      "default_side_id": "main_page_1",
+      "schematic_geometry_side_id": "main_page_1",
+      "side_manifest_output": "knowledge-base/h897-board-sides.json",
+      "schematic_output": "knowledge-base/h897-schematic-compiled.json",
+      "cross_source_output": "knowledge-base/h897-cross-source-registration.json",
+      "reviewed_designators": ["U3101", "U6000", "U6601", "J6210", "J6202", "U1001", "U4101", "U5003", "J6204", "U2001", "X2101", "U3001", "U3201", "U4102", "J6101"],
+      "schematic_reviewed_designators": ["U3101", "U6000", "U6601", "J6210", "J6202", "U1001", "U4101", "U5003", "J6204", "U2001", "X2101", "U3001", "U3201", "U4102", "J6101"],
+      "sides": [
+        {
+          "side_id": "main_page_1",
+          "label": "第1面",
+          "source_pdf_page": 1,
+          "engineering_texture": "assets/board-atlas/h897/main-point-map-page-1.png",
+          "compiled_data": "knowledge-base/h897-board-compiled-page-1.json",
+          "source_crop": {"x": 0.0, "y": 0.0, "width": 1.0, "height": 1.0},
+          "required_designators": ["U3101", "U6000", "U6601", "J6210", "J6202", "U1001", "U4101"]
+        },
+        {
+          "side_id": "main_page_2",
+          "label": "第2面",
+          "source_pdf_page": 2,
+          "engineering_texture": "assets/board-atlas/h897/main-point-map-page-2.png",
+          "compiled_data": "knowledge-base/h897-board-compiled-page-2.json",
+          "source_crop": {"x": 0.0, "y": 0.0, "width": 1.0, "height": 1.0},
+          "required_designators": ["U5003", "J6204", "U2001", "X2101", "U3001", "U3201", "U4102", "J6101"]
+        }
+      ]
+    },
+    {
+      "profile_id": "xk67j-main-v1.0b",
+      "model": "KM5",
+      "models": ["KM4n", "KM4k", "KM5", "KM5n", "KM5s"],
+      "model_evidence": {
+        "KM4n": "photo_verified_shared_platform",
+        "KM4k": "owner_confirmed_alias",
+        "KM5": "engineering_source",
+        "KM5n": "owner_confirmed_alias",
+        "KM5s": "owner_confirmed_alias"
+      },
+      "board_id": "BOARD-XK67J-MAIN-V1.0B",
+      "board_version": "XK67J_MAIN_PCB_V1.0B",
+      "physical_board_revision": "XK67J_MAIN V1.0",
+      "component_prefix": "XK67J-MAIN",
+      "outline_method": "alpha_silhouette",
+      "point_map_source": "source-materials/owner-supplied/2026-07-31-km5-xk67j/packages/KM5-KM4N-XK67J-SHARED/XK67J_KM5_MAIN_PCB_V1.0B_PLACEMENT.pdf",
+      "schematic_source": "source-materials/owner-supplied/2026-07-31-km5-xk67j/packages/KM5-KM4N-XK67J-SHARED/XK67J_L6735-KM5_MAIN_SCH_V1.0B.pdf",
+      "default_side_id": "main_page_2",
+      "schematic_geometry_side_id": "main_page_2",
+      "side_manifest_output": "knowledge-base/xk67j-board-sides.json",
+      "schematic_output": "knowledge-base/xk67j-schematic-compiled.json",
+      "cross_source_output": "knowledge-base/xk67j-cross-source-registration.json",
+      "reviewed_designators": ["U1001", "U4001", "U5007", "J6501", "U2001", "U3001", "U3101", "U4002", "J6102", "J6402", "J2810", "X2101"],
+      "schematic_reviewed_designators": ["U1001", "U4001", "U5007", "J6501", "U2001", "U3001", "U3101", "U4002", "J6102", "J6402", "J2810", "X2101"],
+      "sides": [
+        {
+          "side_id": "main_page_1",
+          "label": "第1面",
+          "source_pdf_page": 1,
+          "engineering_texture": "assets/board-atlas/xk67j/main-point-map-page-1.png",
+          "compiled_data": "knowledge-base/xk67j-board-compiled-page-1.json",
+          "source_crop": {"x": 0.03, "y": 0.13, "width": 0.78, "height": 0.7},
+          "coordinate_bounds": [25.26, 101.1874, 682.02, 517.8414],
+          "required_designators": ["U1001", "U4001", "U5007", "J6501"]
+        },
+        {
+          "side_id": "main_page_2",
+          "label": "第2面",
+          "source_pdf_page": 2,
+          "engineering_texture": "assets/board-atlas/xk67j/main-point-map-page-2.png",
+          "compiled_data": "knowledge-base/xk67j-board-compiled-page-2.json",
+          "source_crop": {"x": 0.23, "y": 0.18, "width": 0.67, "height": 0.62},
+          "coordinate_bounds": [193.66, 119.044, 757.8, 488.0804],
+          "required_designators": ["U2001", "U3001", "U3101", "U4002", "J6102", "J6402", "J2810", "X2101"]
+        }
+      ]
+    }
+  ]
+}

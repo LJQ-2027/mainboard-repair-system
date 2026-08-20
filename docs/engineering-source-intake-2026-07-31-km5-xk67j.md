@@ -1,0 +1,172 @@
+# XK67J Shared-Board Compatibility Audit
+
+Date: 2026-07-31
+
+## Decision
+
+The KM5 engineering package is accepted as the reference for one shared XK67J
+board platform used by KM4n, KM4k, KM5, KM5n, and KM5s.
+
+This is a board-platform compatibility decision, not a claim that the five sales
+models have identical BOM, firmware, peripherals, component values, or repair
+policy. KM5 is the source model, KM4n is physically checked, and KM4k, KM5n,
+and KM5s are owner-confirmed aliases pending their own photo or revision checks.
+
+## Evidence
+
+| Layer | KM4n evidence | KM5 engineering source | Result |
+| --- | --- | --- | --- |
+| Board identity | physical silkscreen `XK67J_MAIN V1.0` | source PCB `XK67J_L6735-KM5_MAIN_PCB_V1.0B.pcb` | same XK67J platform; suffix retained |
+| Main outline | photographed asymmetric outline and dual upper cut-outs | same normalized outline on both Placement pages | match |
+| Mechanical landmarks | photographed major holes, SIM region, lower connectors, right-side cut-out | corresponding holes and `J6503`, `J6502`, `J6501`, `J6102`, `J6402`, `J2810` regions | match |
+| Exposed component side | large left memory package, central power region, dense right RF/baseband region | `U4002`, `U2001`, `U3001`/`U3101` regions in the same arrangement | match |
+| Shield/SIM side | full SIM assembly and shield-can layout | Page 1 package and shield regions align | match |
+| Source usability | three unique KM4n image byte streams | two-page vector Placement and 28-page SCH | sufficient for compiler and reviewed registration |
+
+An exploratory ORB comparison between vector drawings and physical photos was
+weak because shields, source annotations, and line-art/raster appearance differ.
+It is not used as compatibility proof. The decision rests on exact board identity
+plus reviewed two-side structural landmarks.
+
+## Allowed use
+
+- One catalog board platform: `XK67J`.
+- Variant-aware sales-model aliases: `KM4n`, `KM4k`, `KM5`, `KM5n`, and `KM5s`.
+- Compile normalized two-side board geometry and footprint candidates.
+- Compile exact schematic designator occurrences from the V1.0B source.
+- Use the reviewed board-coordinate registrations for the three unique KM4n
+  photo byte streams after board compilation.
+- Preserve source red-box regions only as source annotations; they are not
+  defect labels or designator evidence.
+
+## Prohibited inference
+
+- Do not rewrite the source revision from V1.0B to V1.0.
+- Do not claim exact BOM/population equality across the five sales models.
+- Do not infer component values, firmware behavior, peripheral configuration, or
+  model-specific repair instructions from the shared layout alone.
+- Do not create a Golden Sample, defect label, training label, or repair-causality
+  conclusion from this compatibility decision.
+
+## Implementation result
+
+The first compiler increment is complete:
+
+- catalog profile `xk67j-main-v1.0b` exposes the five aliases with separate
+  evidence levels;
+- the two Main Placement pages compile to 319 and 721 accepted designators,
+  for 1,040 positions in total;
+- the 28-page Main SCH compiles to 505 linked designators and 524 occurrences;
+- twelve reviewed repair entities have both Placement locations and exact SCH
+  page links;
+- the seven-board batch acceptance gate passes all seven catalog profiles; and
+- desktop plus 390 px browser QA passes point-map/model switching, both board
+  sides, component selection, pan/drag, readable responsive layout, and zero
+  runtime errors.
+
+The Placement PDF describes package outlines primarily as path line segments,
+not standard rectangle operators. The conservative compiler therefore recovered
+zero footprint candidates. This does not mean that the source contains no
+components; it means that the current automated result supports normalized
+locations and board outline only. The workbench deliberately uses small generic
+location geometry and does not claim exact package size or height.
+
+All three independent KM4n image byte streams are complete-board repair-case
+views. Two contain source red rectangles; those rectangles remain source
+annotations, not defect labels. Automatic ORB/AKAZE registration against the
+line-art point maps produced no valid candidate:
+
+- exposed side, image `1a3e4b...`: ORB 45 matches / 10 inliers; AKAZE 40 / 4;
+- shield side, image `57a9b1...`: ORB 22 / 4; AKAZE 30 / 5; and
+- exposed side, image `28a193...`: ORB 54 / 20 but invalid projected shape;
+  AKAZE 45 / 3.
+
+Reviewed manual four-point registration now provides a repeatable normalized
+photo-to-board transform for all three byte streams. Independent check points
+produce the following image-plane errors without applying an industrial pass
+threshold:
+
+- shield side, image `57a9b1...`: RMS `0.013586`, maximum `0.017890`;
+- exposed side, image `1a3e4b...`: RMS `0.025054`, maximum `0.036515`; and
+- exposed side, image `28a193...`: the same transform and error because file-level
+  comparison confirms it shares the same capture geometry as `1a3e4b...`.
+
+A separate fail-closed technical sanity guard rejects duplicate, non-convex,
+crossed, inconsistently wound, ill-conditioned, internally singular, or
+out-of-plane transforms and any independent check error above `0.05` normalized
+image units. This guard only protects board-coordinate association; it is not an
+industrial accuracy or repair acceptance threshold.
+
+The shield-side source image is rotated 90 degrees counter-clockwise before the
+registration transform is applied. Both exposed-side images retain their source
+orientation. Automatic ORB/AKAZE failure evidence remains alongside the reviewed
+manual result instead of being overwritten.
+
+This is a reviewed **board-coordinate alignment** only. It has not created a
+Golden Sample, defect label, training row, field-accuracy result, industrial
+acceptance result, or repair causality.
+
+## First-stage technician photo navigation
+
+The reviewed registrations now drive a technician-facing physical-photo view in
+the existing cross-source workbench. The view is intentionally part of the same
+navigation surface as the high-resolution point map and 2.5D model, rather than a
+separate visual-QC workflow.
+
+- Side 1 exposes the reviewed shield-side image.
+- Side 2 exposes both reviewed complete-board images through an A/B selector.
+- The shared side selector drives the physical photo, point map, and 2.5D model.
+- Component selection is synchronized across all three views. Selecting an entity
+  from the opposite side first changes side, then locates that entity.
+- The physical photo and point map support pointer/touch pan, zoom, and reset.
+- When no reviewed photo is configured, the physical-photo view fails closed while
+  the point map and 2.5D model remain available.
+
+The browser receives only metadata-stripped WebP derivatives. Each derivative is
+generated from an allowlisted source SHA-256, has its own recorded SHA-256, and is
+covered by the proxy-asset inventory so it cannot silently enter QC or training
+intake. Controlled source paths are not published in the manifest.
+
+Source red rectangles remain visible because they are part of the source pixels.
+The active-photo note names this boundary explicitly: they are source annotations,
+not system detections, defect conclusions, Golden evidence, or repair instructions.
+
+Acceptance evidence for this increment includes Node unit/contract tests, Python
+asset and registration validation, desktop browser QA at 1440 x 900, and touch
+layout QA at 390 x 844. Verified paths include side switching, Side 2 A/B photo
+switching, pan/zoom/reset, explicit component focus, cross-side entity selection,
+point-map synchronization, nonblank 2.5D rendering, responsive readability, and
+zero runtime console errors in clean runs.
+
+## First source-controlled technician path
+
+The first vertical repair path now covers the reported symptom `无显示`. Feishu
+cases `CASE-0022` and `CASE-0025` both record `显示IC坏` and a repaired outcome,
+and both reference the annotated physical image with SHA-256
+`28a193f9bbd0750240fb20477f5ec0497de7f279868b408eab7c872dcd0273d6`.
+Reviewed inverse projection places the annotation near Placement designator
+`U2411`; SCH page 9 identifies U2411 as `OCP2130WPAD-G` in the LCM BIAS circuit.
+
+This evidence supports one technician action only: synchronize photo B, the
+point map, and the 2.5D model at U2411 and verify whether the displayed location
+matches the inspected board. The data contract marks the path
+`source_boundary_only`. Both available results stop without exposing a repair
+action:
+
+- `位置一致` requires an approved XK67J electrical test standard before work can
+  continue.
+- `无法确认` requires board, revision, side, and source verification.
+
+The case finding is retained as a source-reported fact, not promoted to a system
+diagnosis. Current materials still lack an approved XK67J probe location,
+numeric reference, tolerance, branch rule, rework or replacement instruction,
+and post-repair acceptance method. Supplying that reviewed procedure is the
+precise gate for extending this one-step boundary into a multi-step repair SOP.
+
+Final closeout passed 796 Python tests with six platform skips, 393 Node tests,
+JavaScript syntax, JSON parsing, batch acceptance, diff, and strict UTF-8 gates.
+Installed-Chrome Playwright covered the normal desktop and 390 px touch paths,
+photo/point-map/model switching, zoom and horizontal drag, both boundary
+outcomes, and a deliberately hash-mismatched photo that blocked flow activation.
+Independent final review found no P1 or P2 issue after the evidence-contract
+hardening changes.

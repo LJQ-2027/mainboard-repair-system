@@ -1,0 +1,87 @@
+{
+  "schema_version": "ENGINEERING-SOURCE-INTAKE-V1",
+  "intake_id": "owner-supplied-kj6-km4-km4s-20260731",
+  "received_date": "2026-07-31",
+  "source_owner": "Milo",
+  "source_folder_label": "KJ6、KM4和KM4s",
+  "files": [
+    {
+      "incoming_name": "H897_MAIN_PCB_V1.2_Placement.pdf",
+      "canonical_path": "packages/KJ6-H897/H897_MAIN_PCB_V1.2_Placement.pdf",
+      "sha256": "7803c88ead7ee9a250147525fb83ee09fe8ec142663a6aed983bf70e140b796f",
+      "bytes": 973857,
+      "identity": "KJ6 / H897 MAIN PCB V1.2",
+      "material_type": "main_placement",
+      "disposition": "accepted_new"
+    },
+    {
+      "incoming_name": "H897_MAIN_SCH_V1.2_202307171706.pdf",
+      "canonical_path": "packages/KJ6-H897/H897_MAIN_SCH_V1.2_202307171706.pdf",
+      "sha256": "600fc30d55672ba07185389beb25476e3c852c084dc20bdf05e8755ba432fb9c",
+      "bytes": 2874921,
+      "identity": "KJ6 / H897 MAIN PCB V1.2",
+      "material_type": "main_schematic",
+      "disposition": "accepted_new"
+    },
+    {
+      "incoming_name": "H6932_SUB_PCB_1_V1.0_20230630.pdf",
+      "canonical_path": "packages/KM4S-H6932-SUB-ONLY/H6932_SUB_PCB_1_V1.0_20230630.pdf",
+      "sha256": "3697d0b70ee7e4bbd847f3a991fc56e526623a7b305d154b23e68a8932b028c3",
+      "bytes": 170090,
+      "identity": "KM4s / H6932 SUB PCB 1 V1.0",
+      "material_type": "sub_schematic",
+      "disposition": "accepted_new"
+    },
+    {
+      "incoming_name": "H6932_SUB_PCB_1_V1.0_Placement.pdf",
+      "canonical_path": "packages/KM4S-H6932-SUB-ONLY/H6932_SUB_PCB_1_V1.0_Placement.pdf",
+      "sha256": "f6148bb148f8c3afb73df2ff884295fb9f8141bf7d649320a9227e4832f6c7e3",
+      "bytes": 99138,
+      "identity": "KM4s / H6932 SUB PCB 1 V1.0",
+      "material_type": "sub_placement",
+      "disposition": "accepted_new"
+    },
+    {
+      "incoming_name": "F151_MAIN_PCB_1_SCH_V1.2_20250310.pdf",
+      "canonical_path": "../../manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/F151_MAIN_PCB_1_维修原理图_V1.2_20250310.pdf",
+      "sha256": "0832b7b7821ed657fb8af22a01db595ac41a52451b6d974f1e318a087b0dcde2",
+      "bytes": 6700262,
+      "identity": "KM4 / F151 MAIN PCB V1.2",
+      "material_type": "main_schematic",
+      "disposition": "exact_duplicate_existing"
+    },
+    {
+      "incoming_name": "F151_MAIN_PCB_V1.2_Placement.pdf",
+      "canonical_path": "../../manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/F151_MAIN_PCB_V1.2_位号图.pdf",
+      "sha256": "7f8f6872ea64854db602f2a0c25707ab93a2d00383f9e5b7a2576c04fb1fddce",
+      "bytes": 937984,
+      "identity": "KM4 / F151 MAIN PCB V1.2",
+      "material_type": "main_placement",
+      "disposition": "exact_duplicate_existing"
+    },
+    {
+      "incoming_name": "F151_SUB_PCB_1_SCH_V1.1_20250310.pdf",
+      "canonical_path": "../../manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/F151_SUB_PCB_1_维修原理图_V1.1_20250310.pdf",
+      "sha256": "69a8cca1f86e879311f51ff2e25d62cbfbf40e40276f5ecd07d5341cbc94bc70",
+      "bytes": 190156,
+      "identity": "KM4 / F151 SUB PCB 1 V1.1",
+      "material_type": "sub_schematic",
+      "disposition": "exact_duplicate_existing"
+    },
+    {
+      "incoming_name": "F151_SUB_PCB_1_V1.1_Placement.pdf",
+      "canonical_path": "../../manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/F151_SUB_PCB_1_V1.1_零件位号.pdf",
+      "sha256": "b6125184ab19945424f3369e0a8928b0e68ed58df3f455f580ec770c2f15a1c6",
+      "bytes": 91999,
+      "identity": "KM4 / F151 SUB PCB 1 V1.1",
+      "material_type": "sub_placement",
+      "disposition": "exact_duplicate_existing"
+    }
+  ],
+  "boundaries": {
+    "h897_mainboard_reference_available": true,
+    "h6932_mainboard_reference_available": false,
+    "xk67j_mainboard_reference_available": false,
+    "engineering_sources_are_physical_qc_evidence": false
+  }
+}

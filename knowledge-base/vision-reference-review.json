@@ -1,0 +1,76 @@
+{
+  "review_id": "VISION-REFERENCE-REVIEW-20260710",
+  "review_date": "2026-07-10",
+  "policy": "Approve only images that clearly show board structure, an installed main board, or an installed sub board. Do not infer TOP/BOTTOM from assembly orientation.",
+  "models": {
+    "KM4": {
+      "coverage": {
+        "main_board_top_standard_photo": "missing",
+        "main_board_bottom_standard_photo": "missing",
+        "exploded_structure": "available",
+        "installed_main_board": "available",
+        "installed_sub_board": "available"
+      },
+      "notes": "Manual provides a useful exploded structure view and installed shield-side context, but no isolated front/back main-board pair.",
+      "assets": {
+        "assets/vision-reference-gallery/km4/embedded/page-003-image-02.jpg": {"review_status": "approved", "reference_role": "exploded_structure", "board_scope": "mixed_phone_components", "board_side": "unknown", "reference_strength": "weak"},
+        "assets/vision-reference-gallery/km4/embedded/page-010-image-05.jpg": {"review_status": "approved", "reference_role": "installed_mainboard", "board_scope": "main", "board_side": "unknown", "reference_strength": "medium"},
+        "assets/vision-reference-gallery/km4/embedded/page-010-image-03.jpg": {"review_status": "approved", "reference_role": "installed_subboard", "board_scope": "sub", "board_side": "unknown", "reference_strength": "medium"}
+      }
+    },
+    "KL4": {
+      "coverage": {"main_board_top_standard_photo": "missing", "main_board_bottom_standard_photo": "missing", "exploded_structure": "available", "installed_main_board": "available", "installed_sub_board": "available"},
+      "notes": "Installed main-board and sub-board context is clear; isolated board faces are absent.",
+      "assets": {
+        "assets/vision-reference-gallery/kl4/embedded/page-003-image-02.jpg": {"review_status": "approved", "reference_role": "exploded_structure", "board_scope": "mixed_phone_components", "board_side": "unknown", "reference_strength": "weak"},
+        "assets/vision-reference-gallery/kl4/embedded/page-010-image-02.jpg": {"review_status": "approved", "reference_role": "installed_mainboard", "board_scope": "main", "board_side": "unknown", "reference_strength": "medium"},
+        "assets/vision-reference-gallery/kl4/embedded/page-011-image-01.jpg": {"review_status": "approved", "reference_role": "installed_subboard", "board_scope": "sub", "board_side": "unknown", "reference_strength": "medium"}
+      }
+    },
+    "CLA5": {
+      "coverage": {"main_board_top_standard_photo": "missing", "main_board_bottom_standard_photo": "missing", "exploded_structure": "available", "installed_main_board": "available", "installed_sub_board": "available"},
+      "notes": "The manual shows assembly structure and board regions but not a clean isolated main-board pair.",
+      "assets": {
+        "assets/vision-reference-gallery/cla5/embedded/page-003-image-02.jpg": {"review_status": "approved", "reference_role": "exploded_structure", "board_scope": "mixed_phone_components", "board_side": "unknown", "reference_strength": "weak"},
+        "assets/vision-reference-gallery/cla5/embedded/page-011-image-04.jpg": {"review_status": "approved", "reference_role": "installed_mainboard", "board_scope": "main", "board_side": "unknown", "reference_strength": "medium"},
+        "assets/vision-reference-gallery/cla5/embedded/page-011-image-02.jpg": {"review_status": "approved", "reference_role": "installed_subboard", "board_scope": "sub", "board_side": "unknown", "reference_strength": "medium"}
+      }
+    },
+    "KJ5": {
+      "coverage": {"main_board_top_standard_photo": "missing", "main_board_bottom_standard_photo": "missing", "exploded_structure": "available", "installed_main_board": "available", "installed_sub_board": "available"},
+      "notes": "Service-manual photos are useful for installed-board recognition; the exact H6931 revision still needs confirmation from the physical board.",
+      "assets": {
+        "assets/vision-reference-gallery/kj5/embedded/page-003-image-02.jpg": {"review_status": "approved", "reference_role": "exploded_structure", "board_scope": "mixed_phone_components", "board_side": "unknown", "reference_strength": "weak"},
+        "assets/vision-reference-gallery/kj5/embedded/page-009-image-06.jpg": {"review_status": "approved", "reference_role": "installed_mainboard", "board_scope": "main", "board_side": "unknown", "reference_strength": "medium"},
+        "assets/vision-reference-gallery/kj5/embedded/page-009-image-04.jpg": {"review_status": "approved", "reference_role": "installed_subboard", "board_scope": "sub", "board_side": "unknown", "reference_strength": "medium"}
+      }
+    },
+    "CM5": {
+      "coverage": {"main_board_top_standard_photo": "missing", "main_board_bottom_standard_photo": "missing", "exploded_structure": "available", "installed_main_board": "available", "installed_sub_board": "available"},
+      "notes": "CM5 shares the H8918 main-board platform with CM6; sales-model separation must use assembly context or sub-board evidence.",
+      "assets": {
+        "assets/vision-reference-gallery/cm5/embedded/page-003-image-02.jpg": {"review_status": "approved", "reference_role": "exploded_structure", "board_scope": "mixed_phone_components", "board_side": "unknown", "reference_strength": "weak"},
+        "assets/vision-reference-gallery/cm5/embedded/page-011-image-01.jpg": {"review_status": "approved", "reference_role": "installed_mainboard", "board_scope": "main", "board_side": "unknown", "reference_strength": "medium"},
+        "assets/vision-reference-gallery/cm5/embedded/page-011-image-06.jpg": {"review_status": "approved", "reference_role": "installed_subboard", "board_scope": "sub", "board_side": "unknown", "reference_strength": "medium"}
+      }
+    },
+    "CM6": {
+      "coverage": {"main_board_top_standard_photo": "missing", "main_board_bottom_standard_photo": "missing", "exploded_structure": "available", "installed_main_board": "available", "installed_sub_board": "available"},
+      "notes": "CM6 shares the H8918 main-board platform with CM5; sub-board and full assembly context are discriminating references.",
+      "assets": {
+        "assets/vision-reference-gallery/cm6/embedded/page-003-image-02.jpg": {"review_status": "approved", "reference_role": "exploded_structure", "board_scope": "mixed_phone_components", "board_side": "unknown", "reference_strength": "weak"},
+        "assets/vision-reference-gallery/cm6/embedded/page-011-image-01.jpg": {"review_status": "approved", "reference_role": "installed_mainboard", "board_scope": "main", "board_side": "unknown", "reference_strength": "medium"},
+        "assets/vision-reference-gallery/cm6/embedded/page-011-image-05.jpg": {"review_status": "approved", "reference_role": "installed_subboard", "board_scope": "sub", "board_side": "unknown", "reference_strength": "medium"}
+      }
+    },
+    "X6880": {
+      "coverage": {"main_board_top_standard_photo": "missing", "main_board_bottom_standard_photo": "missing", "exploded_structure": "available", "installed_main_board": "available", "installed_sub_board": "available"},
+      "notes": "This manual has the strongest installed-board closeups in the batch, but still lacks an isolated two-side main-board pair.",
+      "assets": {
+        "assets/vision-reference-gallery/x6880/embedded/page-003-image-02.jpg": {"review_status": "approved", "reference_role": "exploded_structure", "board_scope": "mixed_phone_components", "board_side": "unknown", "reference_strength": "weak"},
+        "assets/vision-reference-gallery/x6880/embedded/page-009-image-06.jpg": {"review_status": "approved", "reference_role": "installed_mainboard", "board_scope": "main", "board_side": "unknown", "reference_strength": "medium"},
+        "assets/vision-reference-gallery/x6880/embedded/page-010-image-05.jpg": {"review_status": "approved", "reference_role": "installed_subboard", "board_scope": "sub", "board_side": "unknown", "reference_strength": "medium"}
+      }
+    }
+  }
+}

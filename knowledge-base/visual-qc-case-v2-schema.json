@@ -1,0 +1,257 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "VISUAL-QC-CASE-V2",
+  "title": "Server-connected Mainboard Visual QC Case",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "case_id",
+    "board_key",
+    "board_id",
+    "side_id",
+    "storage_scope",
+    "capture_stage",
+    "image",
+    "quality",
+    "registration",
+    "annotations",
+    "qc_result",
+    "server_sync"
+  ],
+  "properties": {
+    "schema_version": { "const": "VISUAL-QC-CASE-V2" },
+    "case_id": { "type": "string", "minLength": 1 },
+    "board_key": { "type": "string", "minLength": 1 },
+    "board_id": { "type": "string", "minLength": 1 },
+    "side_id": { "type": "string", "minLength": 1 },
+    "storage_scope": {
+      "enum": ["local_only", "server_authoritative_with_local_draft"]
+    },
+    "capture_stage": {
+      "enum": ["golden_reference", "before_repair", "after_repair"]
+    },
+    "capture_session": {
+      "type": "object",
+      "required": [
+        "schema_version",
+        "session_id",
+        "setup_id",
+        "expected_side_ids",
+        "captured_side_ids",
+        "pair_status",
+        "checklist"
+      ],
+      "properties": {
+        "schema_version": { "const": "VISUAL-QC-CAPTURE-SESSION-V1" },
+        "session_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "setup_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "expected_side_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "captured_side_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "pair_status": {
+          "enum": ["single_side", "pair_in_progress", "pair_complete"]
+        },
+        "checklist": {
+          "type": "object",
+          "required": ["status", "items", "confirmed_at"],
+          "properties": {
+            "status": { "enum": ["pending", "confirmed", "not_applicable"] },
+            "items": {
+              "type": "object",
+              "properties": {
+                "board_and_side_confirmed": { "type": "boolean" },
+                "focus_and_lens_confirmed": { "type": "boolean" },
+                "lighting_and_occlusion_confirmed": { "type": "boolean" }
+              },
+              "additionalProperties": false
+            },
+            "confirmed_at": { "type": ["string", "null"] }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "image": {
+      "type": "object",
+      "required": ["file_name", "mime_type", "width", "height", "sha256", "evidence_role"],
+      "properties": {
+        "file_name": { "type": "string", "minLength": 1 },
+        "mime_type": { "enum": ["image/jpeg", "image/png", "image/webp"] },
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "evidence_role": { "enum": ["physical_capture", "proxy_sample"] }
+      }
+    },
+    "quality": {
+      "type": "object",
+      "required": ["status", "score", "metrics"],
+      "properties": {
+        "status": { "enum": ["good", "usable", "retake"] },
+        "score": { "type": "number", "minimum": 0, "maximum": 100 },
+        "metrics": { "type": "object" }
+      }
+    },
+    "registration": {
+      "type": "object",
+      "required": [
+        "method",
+        "status",
+        "matrix",
+        "solve_anchors",
+        "check_points",
+        "error"
+      ],
+      "properties": {
+        "method": {
+          "enum": [
+            "reviewed_manual_homography",
+            "reviewed_manual_four_point",
+            "automatic_feature_homography"
+          ]
+        },
+        "status": { "enum": ["draft", "reviewed"] },
+        "matrix": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "array",
+              "minItems": 9,
+              "maxItems": 9,
+              "items": { "type": "number" }
+            }
+          ]
+        },
+        "solve_anchors": {
+          "type": "array",
+          "maxItems": 4,
+          "items": { "$ref": "#/$defs/pointPair" }
+        },
+        "check_points": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/pointPair" }
+        },
+        "error": { "type": "object" },
+        "server_review_id": { "type": "string" },
+        "server_candidate": { "type": "object" },
+        "fallback_reason": { "type": "string" },
+        "reviewed_at": { "type": ["string", "null"] }
+      }
+    },
+    "annotations": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "qc_result": {
+      "type": "object",
+      "required": ["status", "reviewed_at"],
+      "properties": {
+        "status": {
+          "enum": [
+            "image_invalid",
+            "needs_review",
+            "no_visible_anomaly",
+            "confirmed_anomaly"
+          ]
+        },
+        "reviewed_at": { "type": ["string", "null"] }
+      }
+    },
+    "server_sync": {
+      "type": "object",
+      "required": ["schema_version", "status", "idempotency_key"],
+      "properties": {
+        "schema_version": { "const": "VISUAL-QC-SERVER-SYNC-V1" },
+        "status": {
+          "enum": [
+            "local_draft",
+            "uploading",
+            "upload_failed",
+            "queued",
+            "running",
+            "succeeded",
+            "candidate_ready",
+            "manual_required",
+            "sync_interrupted",
+            "failed",
+            "reviewed"
+          ]
+        },
+        "idempotency_key": { "type": "string", "minLength": 1 },
+        "attempt_count": { "type": "integer", "minimum": 0 },
+        "progress": { "type": "number", "minimum": 0, "maximum": 1 },
+        "server_case_id": { "type": ["string", "null"] },
+        "server_image_id": { "type": ["string", "null"] },
+        "job_id": { "type": ["string", "null"] },
+        "job_status": { "type": ["string", "null"] },
+        "last_error": { "type": ["string", "null"] },
+        "updated_at": { "type": "string" }
+      }
+    },
+    "server_qc_review": {
+      "type": "object",
+      "required": [
+        "qc_review_id",
+        "version",
+        "training_status",
+        "created_at"
+      ],
+      "properties": {
+        "qc_review_id": { "type": "string", "minLength": 1 },
+        "case_id": { "type": "string", "minLength": 1 },
+        "registration_review_id": { "type": "string", "minLength": 1 },
+        "reviewer_id": { "type": "string", "minLength": 1 },
+        "version": { "type": "integer", "minimum": 1 },
+        "qc_result": {
+          "enum": ["no_visible_anomaly", "confirmed_anomaly"]
+        },
+        "annotations": { "type": "array" },
+        "notes": { "type": "string" },
+        "created_at": { "type": "string" },
+        "training_status": { "const": "eligible" }
+      },
+      "additionalProperties": false
+    },
+    "visual_comparison": {
+      "type": "object",
+      "required": ["capture_setup_id"],
+      "properties": {
+        "capture_setup_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "golden_sample": { "type": ["object", "null"] },
+        "difference": { "type": ["object", "null"] },
+        "golden_lookup_status": { "type": "string" }
+      }
+    }
+  },
+  "$defs": {
+    "point": {
+      "type": "object",
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "number", "minimum": 0, "maximum": 1 },
+        "y": { "type": "number", "minimum": 0, "maximum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "pointPair": {
+      "type": "object",
+      "required": ["board", "image"],
+      "properties": {
+        "board": { "$ref": "#/$defs/point" },
+        "image": { "$ref": "#/$defs/point" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

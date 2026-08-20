@@ -1,10 +1,11 @@
 {
   "name": "mainboard-repair-system",
   "version": "8.1.0",
-  "description": "智能主板维修系统 - AI 辅助诊断",
+  "description": "海外主板维修工作台 - 来源受控维修流程与视觉 QC 数据链路",
   "main": "mainboard_repair_system_v7.4_updated.html",
   "scripts": {
-    "test": "jest",
+    "test": "node --test tests/*.mjs",
+    "test:legacy-jest": "jest --runInBand",
     "test:watch": "jest --watch",
     "setup-internal": "node scripts/setup-internal.js",
     "restore-public": "node scripts/restore-public.js"
@@ -12,8 +13,8 @@
   "keywords": [
     "repair",
     "mainboard",
-    "AI",
-    "diagnosis"
+    "technician-workbench",
+    "visual-qc"
   ],
   "author": "junqiao.long",
   "license": "MIT",

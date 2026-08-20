@@ -1,0 +1,922 @@
+{
+  "dataset_id": "H8918-MAIN-XREG-20260716",
+  "board_id": "BOARD-H8918-MAIN-V1.2",
+  "model": "CM6",
+  "compatible_models": [
+    "CM6",
+    "CM5"
+  ],
+  "board_version": "H8918_MAIN_PCB_V1.2",
+  "side_id": "main_page_2",
+  "coordinate_system": "normalized_board_plane",
+  "status": "source_compiled_pilot",
+  "board_outline": [
+    {
+      "x": 0.010625,
+      "y": 0.61811
+    },
+    {
+      "x": 0.016875,
+      "y": 0.608268
+    },
+    {
+      "x": 0.015,
+      "y": 0.601378
+    },
+    {
+      "x": 0.018125,
+      "y": 0.595472
+    },
+    {
+      "x": 0.014375,
+      "y": 0.587598
+    },
+    {
+      "x": 0.019375,
+      "y": 0.580709
+    },
+    {
+      "x": 0.016875,
+      "y": 0.572835
+    },
+    {
+      "x": 0.0175,
+      "y": 0.121063
+    },
+    {
+      "x": 0.069375,
+      "y": 0.036417
+    },
+    {
+      "x": 0.08875,
+      "y": 0.033465
+    },
+    {
+      "x": 0.10125,
+      "y": 0.016732
+    },
+    {
+      "x": 0.109375,
+      "y": 0.016732
+    },
+    {
+      "x": 0.115,
+      "y": 0.027559
+    },
+    {
+      "x": 0.115,
+      "y": 0.033465
+    },
+    {
+      "x": 0.13,
+      "y": 0.033465
+    },
+    {
+      "x": 0.138125,
+      "y": 0.027559
+    },
+    {
+      "x": 0.15,
+      "y": 0.033465
+    },
+    {
+      "x": 0.360625,
+      "y": 0.033465
+    },
+    {
+      "x": 0.35625,
+      "y": 0.016732
+    },
+    {
+      "x": 0.361875,
+      "y": 0.011811
+    },
+    {
+      "x": 0.375,
+      "y": 0.033465
+    },
+    {
+      "x": 0.415,
+      "y": 0.033465
+    },
+    {
+      "x": 0.42,
+      "y": 0.043307
+    },
+    {
+      "x": 0.42,
+      "y": 0.24311
+    },
+    {
+      "x": 0.424375,
+      "y": 0.25
+    },
+    {
+      "x": 0.561875,
+      "y": 0.25
+    },
+    {
+      "x": 0.58,
+      "y": 0.264764
+    },
+    {
+      "x": 0.7775,
+      "y": 0.262795
+    },
+    {
+      "x": 0.786875,
+      "y": 0.250984
+    },
+    {
+      "x": 0.79125,
+      "y": 0.222441
+    },
+    {
+      "x": 0.79875,
+      "y": 0.208661
+    },
+    {
+      "x": 0.79875,
+      "y": 0.156496
+    },
+    {
+      "x": 0.790625,
+      "y": 0.141732
+    },
+    {
+      "x": 0.790625,
+      "y": 0.040354
+    },
+    {
+      "x": 0.795,
+      "y": 0.033465
+    },
+    {
+      "x": 0.808125,
+      "y": 0.033465
+    },
+    {
+      "x": 0.81625,
+      "y": 0.044291
+    },
+    {
+      "x": 0.82125,
+      "y": 0.043307
+    },
+    {
+      "x": 0.828125,
+      "y": 0.033465
+    },
+    {
+      "x": 0.8875,
+      "y": 0.033465
+    },
+    {
+      "x": 0.883125,
+      "y": 0.016732
+    },
+    {
+      "x": 0.889375,
+      "y": 0.011811
+    },
+    {
+      "x": 0.901875,
+      "y": 0.033465
+    },
+    {
+      "x": 0.926875,
+      "y": 0.033465
+    },
+    {
+      "x": 0.9325,
+      "y": 0.037402
+    },
+    {
+      "x": 0.965625,
+      "y": 0.081693
+    },
+    {
+      "x": 0.975,
+      "y": 0.102362
+    },
+    {
+      "x": 0.9775,
+      "y": 0.11811
+    },
+    {
+      "x": 0.9775,
+      "y": 0.28937
+    },
+    {
+      "x": 0.983125,
+      "y": 0.300197
+    },
+    {
+      "x": 0.98875,
+      "y": 0.323819
+    },
+    {
+      "x": 0.9875,
+      "y": 0.356299
+    },
+    {
+      "x": 0.9775,
+      "y": 0.38189
+    },
+    {
+      "x": 0.9775,
+      "y": 0.724409
+    },
+    {
+      "x": 0.961875,
+      "y": 0.750984
+    },
+    {
+      "x": 0.96,
+      "y": 0.781496
+    },
+    {
+      "x": 0.951875,
+      "y": 0.80315
+    },
+    {
+      "x": 0.95125,
+      "y": 0.926181
+    },
+    {
+      "x": 0.946875,
+      "y": 0.933071
+    },
+    {
+      "x": 0.92125,
+      "y": 0.949803
+    },
+    {
+      "x": 0.92,
+      "y": 0.977362
+    },
+    {
+      "x": 0.915625,
+      "y": 0.985236
+    },
+    {
+      "x": 0.041875,
+      "y": 0.98622
+    },
+    {
+      "x": 0.035625,
+      "y": 0.975394
+    },
+    {
+      "x": 0.035625,
+      "y": 0.767717
+    },
+    {
+      "x": 0.016875,
+      "y": 0.732283
+    },
+    {
+      "x": 0.0175,
+      "y": 0.655512
+    },
+    {
+      "x": 0.0375,
+      "y": 0.621063
+    },
+    {
+      "x": 0.038125,
+      "y": 0.612205
+    },
+    {
+      "x": 0.035,
+      "y": 0.606299
+    },
+    {
+      "x": 0.029375,
+      "y": 0.614173
+    },
+    {
+      "x": 0.025,
+      "y": 0.607283
+    },
+    {
+      "x": 0.021875,
+      "y": 0.613189
+    },
+    {
+      "x": 0.0175,
+      "y": 0.610236
+    },
+    {
+      "x": 0.011875,
+      "y": 0.620079
+    }
+  ],
+  "registration": {
+    "proxy_image": "assets/vision-reference-gallery/cm6/embedded/page-011-image-01.jpg",
+    "proxy_label": "Service Manual page 11 installed mainboard",
+    "proxy_limit": "Installed shield-side context; not an isolated two-side main-board pair.",
+    "proxy_note": "主板实物参考 · CM6维修手册第11页 · 屏蔽罩下器件不可直接观察",
+    "point_map_image": "assets/board-atlas/h8918/main-point-map-page-2.png",
+    "point_map_source": "H8918_MAIN_PCB_V1.2 零件位号图 page 2",
+    "point_map_note": "点位图 · H8918_MAIN_PCB_V1.2 · 第2面",
+    "method": "reviewed_four_anchor_homography",
+    "confidence": "provisional_proxy",
+    "anchors": [
+      {
+        "anchor_id": "board_top_left",
+        "label": "PCB upper-left extent",
+        "board": {
+          "x": 0.02,
+          "y": 0.02
+        },
+        "image": {
+          "x": 0.23,
+          "y": 0.1
+        }
+      },
+      {
+        "anchor_id": "board_top_right",
+        "label": "PCB upper-right extent",
+        "board": {
+          "x": 0.98,
+          "y": 0.02
+        },
+        "image": {
+          "x": 0.74,
+          "y": 0.11
+        }
+      },
+      {
+        "anchor_id": "board_bottom_right",
+        "label": "PCB lower-right extent",
+        "board": {
+          "x": 0.98,
+          "y": 0.98
+        },
+        "image": {
+          "x": 0.72,
+          "y": 0.58
+        }
+      },
+      {
+        "anchor_id": "board_bottom_left",
+        "label": "PCB lower-left extent",
+        "board": {
+          "x": 0.02,
+          "y": 0.98
+        },
+        "image": {
+          "x": 0.2,
+          "y": 0.58
+        }
+      }
+    ]
+  },
+  "repair_flows": [
+    {
+      "flow_id": "h8918-no-power-small-current-page-11",
+      "entry_label": "不开机 · 小电流",
+      "entry_order": 1,
+      "entry_type": "known_fault",
+      "title": "H8918 小电流不开机排查",
+      "fault": "No power",
+      "entry_component_id": "H8918-MAIN-X2101",
+      "entry_step_id": "dcxo_check",
+      "source": {
+        "source": "Tecno-CM6-H8918手机主板维修专用操作指导书V1.0_20241218.pdf",
+        "page": "11"
+      },
+      "source_status": "reviewed",
+      "steps": [
+        {
+          "step_id": "dcxo_check",
+          "label": "26 MHz 时钟",
+          "prompt": "X2101 的 26 MHz 输出是否正常？",
+          "target_component_id": "H8918-MAIN-X2101",
+          "measurements": [
+            {
+              "measurement_id": "x2101-frequency",
+              "label": "X2101 输出频率",
+              "unit": "MHz",
+              "input_step": 0.1,
+              "required": true,
+              "reference": {
+                "kind": "nominal",
+                "value": 26
+              }
+            }
+          ],
+          "choices": [
+            {
+              "value": "normal",
+              "label": "正常",
+              "outcome": {
+                "kind": "next",
+                "step_id": "power_input_check"
+              }
+            },
+            {
+              "value": "abnormal",
+              "label": "异常",
+              "outcome": {
+                "kind": "action",
+                "label": "维修或更换 X2101",
+                "target_component_id": "H8918-MAIN-X2101"
+              }
+            }
+          ]
+        },
+        {
+          "step_id": "power_input_check",
+          "label": "PMIC 输入",
+          "prompt": "U1001 / U4101 电源线输入电压是否正常？",
+          "target_component_id": "H8918-MAIN-U2001",
+          "choices": [
+            {
+              "value": "normal",
+              "label": "正常",
+              "outcome": {
+                "kind": "action",
+                "label": "按手册重焊或更换 U1001 / U4101 / U4102",
+                "target_component_id": "H8918-MAIN-U1001"
+              }
+            },
+            {
+              "value": "abnormal",
+              "label": "异常",
+              "outcome": {
+                "kind": "action",
+                "label": "维修或更换 U2001",
+                "target_component_id": "H8918-MAIN-U2001"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "flow_id": "h8918-wifi-page-23",
+      "entry_label": "Wi-Fi 无法连接",
+      "entry_order": 2,
+      "entry_type": "known_fault",
+      "title": "H8918 Wi-Fi 连接故障排查",
+      "fault": "WiFi connection failure",
+      "entry_component_id": "H8918-MAIN-U5007",
+      "entry_step_id": "u5007_solder_check",
+      "source": {
+        "source": "Tecno-CM6-H8918手机主板维修专用操作指导书V1.0_20241218.pdf",
+        "page": "23"
+      },
+      "source_status": "reviewed",
+      "steps": [
+        {
+          "step_id": "u5007_solder_check",
+          "label": "四合一芯片",
+          "prompt": "U5007 焊接是否正常？",
+          "target_component_id": "H8918-MAIN-U5007",
+          "choices": [
+            {
+              "value": "normal",
+              "label": "正常",
+              "outcome": {
+                "kind": "next",
+                "step_id": "antenna_path_check"
+              }
+            },
+            {
+              "value": "abnormal",
+              "label": "异常",
+              "outcome": {
+                "kind": "action",
+                "label": "检测 VCN33_WBT / AVDD18_WBT，并重焊 U5007",
+                "target_component_id": "H8918-MAIN-U5007"
+              }
+            }
+          ]
+        },
+        {
+          "step_id": "antenna_path_check",
+          "label": "Wi-Fi 天线路径",
+          "prompt": "Wi-Fi 天线路径是否正常？",
+          "target_component_id": "H8918-MAIN-U5007",
+          "choices": [
+            {
+              "value": "normal",
+              "label": "正常",
+              "outcome": {
+                "kind": "action",
+                "label": "重焊或更换 U5007",
+                "target_component_id": "H8918-MAIN-U5007"
+              }
+            },
+            {
+              "value": "abnormal",
+              "label": "异常",
+              "outcome": {
+                "kind": "action",
+                "label": "重装天线并重焊或更换天线外围器件",
+                "target_component_id": "H8918-MAIN-U5007"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "flow_id": "h8918-display-page-25",
+      "entry_label": "LCD 无显示",
+      "entry_order": 3,
+      "entry_type": "known_fault",
+      "title": "H8918 LCD 无显示排查",
+      "fault": "Display failure",
+      "entry_component_id": "H8918-MAIN-J6102",
+      "entry_step_id": "display_connector_check",
+      "source": {
+        "source": "Tecno-CM6-H8918手机主板维修专用操作指导书V1.0_20241218.pdf",
+        "page": "25"
+      },
+      "source_status": "reviewed",
+      "steps": [
+        {
+          "step_id": "display_connector_check",
+          "label": "显示连接器",
+          "prompt": "J6102 焊接、PIN 脚及 LCD 交叉验证是否正常？",
+          "target_component_id": "H8918-MAIN-J6102",
+          "choices": [
+            {
+              "value": "normal",
+              "label": "正常",
+              "outcome": {
+                "kind": "next",
+                "step_id": "mipi_check"
+              }
+            },
+            {
+              "value": "abnormal",
+              "label": "异常",
+              "outcome": {
+                "kind": "action",
+                "label": "修复 J6102 或更换已确认故障的 LCD",
+                "target_component_id": "H8918-MAIN-J6102"
+              }
+            }
+          ]
+        },
+        {
+          "step_id": "mipi_check",
+          "label": "MIPI 信号",
+          "prompt": "MIPI DATA / CLK 是否正常？",
+          "target_component_id": "H8918-MAIN-U1001",
+          "choices": [
+            {
+              "value": "normal",
+              "label": "正常",
+              "outcome": {
+                "kind": "next",
+                "step_id": "lcd_drive_check"
+              }
+            },
+            {
+              "value": "abnormal",
+              "label": "异常",
+              "outcome": {
+                "kind": "action",
+                "label": "检查开短路并重焊或更换 U1001",
+                "target_component_id": "H8918-MAIN-U1001"
+              }
+            }
+          ]
+        },
+        {
+          "step_id": "lcd_drive_check",
+          "label": "LCD 驱动供电",
+          "prompt": "LEDK / LEDA、AVDD / AVEE 是否正常？",
+          "target_component_id": "H8918-MAIN-U2001",
+          "choices": [
+            {
+              "value": "normal",
+              "label": "正常",
+              "outcome": {
+                "kind": "action",
+                "label": "按手册处理 U1001 / U2001",
+                "target_component_id": "H8918-MAIN-U2001"
+              }
+            },
+            {
+              "value": "abnormal",
+              "label": "异常",
+              "outcome": {
+                "kind": "action",
+                "label": "检查外围并重焊或更换 U2401",
+                "target_component_id": "H8918-MAIN-U2001"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "entities": [
+    {
+      "component_id": "H8918-MAIN-U1001",
+      "designator": "U1001",
+      "name": "Main processor IC",
+      "category": "bga_ic",
+      "module": "Processor",
+      "side_id": "main_page_1",
+      "proxy_visibility": "concealed_by_shield",
+      "geometry": {
+        "center": {
+          "x": 0.369855,
+          "y": 0.587798
+        },
+        "size": {
+          "x": 0.025,
+          "y": 0.025
+        },
+        "rotation": 0,
+        "source_status": "low"
+      },
+      "schematic_links": [
+        {
+          "source": "K6855_H8918_MAIN_PCB_V1.2维修原理图.pdf",
+          "page": "2-5",
+          "facts": [
+            "Designator U1001"
+          ]
+        }
+      ],
+      "repair_links": [
+        {
+          "source": "Tecno-CM6-H8918手机主板维修专用操作指导书V1.0_20241218.pdf",
+          "page": "11, 25",
+          "faults": [
+            "No power",
+            "Display failure"
+          ],
+          "instruction": "完成供电、时钟或显示信号分支检测后，再按手册处理 U1001。"
+        }
+      ],
+      "visual_profile": {
+        "shape": "point",
+        "height": 0.018,
+        "engineering_dimension": false
+      }
+    },
+    {
+      "component_id": "H8918-MAIN-U2001",
+      "designator": "U2001",
+      "name": "Power management IC",
+      "category": "bga_ic",
+      "module": "Power management",
+      "side_id": "main_page_2",
+      "proxy_visibility": "concealed_by_shield",
+      "geometry": {
+        "center": {
+          "x": 0.431155,
+          "y": 0.690891
+        },
+        "size": {
+          "x": 0.089205,
+          "y": 0.108578
+        },
+        "rotation": 0,
+        "source_status": "high"
+      },
+      "schematic_links": [
+        {
+          "source": "K6855_H8918_MAIN_PCB_V1.2维修原理图.pdf",
+          "page": "6-7",
+          "facts": [
+            "Designator U2001"
+          ]
+        }
+      ],
+      "repair_links": [
+        {
+          "source": "Tecno-CM6-H8918手机主板维修专用操作指导书V1.0_20241218.pdf",
+          "page": "11-12, 25",
+          "faults": [
+            "No power",
+            "Display failure"
+          ],
+          "instruction": "检查电池输入与核心供电；仅在前置分支完成后处理 U2001。"
+        }
+      ],
+      "visual_profile": {
+        "shape": "square",
+        "height": 0.055,
+        "engineering_dimension": false
+      },
+      "inspection_profile": {
+        "profile_id": "u2001-pmic-v1",
+        "fidelity": "repair_visual",
+        "source_status": "category_based",
+        "visual_note": "外观、层高和封装细节为维修识别示意，不代表实测尺寸或工程封装。"
+      }
+    },
+    {
+      "component_id": "H8918-MAIN-X2101",
+      "designator": "X2101",
+      "name": "26 MHz crystal",
+      "category": "crystal",
+      "module": "Clock",
+      "side_id": "main_page_2",
+      "proxy_visibility": "concealed_by_shield",
+      "geometry": {
+        "center": {
+          "x": 0.319444,
+          "y": 0.702124
+        },
+        "size": {
+          "x": 0.034596,
+          "y": 0.053431
+        },
+        "rotation": 0,
+        "source_status": "high"
+      },
+      "schematic_links": [
+        {
+          "source": "K6855_H8918_MAIN_PCB_V1.2维修原理图.pdf",
+          "page": "7",
+          "facts": [
+            "Designator X2101"
+          ]
+        }
+      ],
+      "repair_links": [
+        {
+          "source": "Tecno-CM6-H8918手机主板维修专用操作指导书V1.0_20241218.pdf",
+          "page": "11, 16",
+          "faults": [
+            "No power",
+            "Clock failure"
+          ],
+          "instruction": "测量并记录 X2101 输出频率；资料参考值为 26 MHz。"
+        }
+      ],
+      "measurement_profile": {
+        "measurement_id": "x2101-frequency",
+        "label": "X2101 输出频率",
+        "quantity": "frequency",
+        "unit": "MHz",
+        "input_step": 0.1,
+        "reference": {
+          "kind": "nominal",
+          "value": 26
+        },
+        "source_link_index": 0
+      },
+      "visual_profile": {
+        "shape": "rectangle",
+        "height": 0.035,
+        "engineering_dimension": false
+      },
+      "inspection_profile": {
+        "profile_id": "crystal-26mhz-v1",
+        "fidelity": "repair_visual",
+        "source_status": "category_based",
+        "visual_note": "晶振外观与层高为维修识别示意，不代表实测外壳尺寸、焊盘结构或内部构造。"
+      }
+    },
+    {
+      "component_id": "H8918-MAIN-J6102",
+      "designator": "J6102",
+      "name": "Display connector",
+      "category": "connector",
+      "module": "Display interconnect",
+      "side_id": "main_page_2",
+      "proxy_visibility": "visible_in_reference",
+      "geometry": {
+        "center": {
+          "x": 0.602715,
+          "y": 0.853522
+        },
+        "size": {
+          "x": 0.025,
+          "y": 0.025
+        },
+        "rotation": 0,
+        "source_status": "low"
+      },
+      "schematic_links": [],
+      "repair_links": [
+        {
+          "source": "Tecno-CM6-H8918手机主板维修专用操作指导书V1.0_20241218.pdf",
+          "page": "25",
+          "faults": [
+            "Display failure"
+          ],
+          "instruction": "检查 J6102 焊接、PIN 脚变形，并交叉验证 LCD。"
+        }
+      ],
+      "visual_profile": {
+        "shape": "point",
+        "height": 0.018,
+        "engineering_dimension": false
+      }
+    },
+    {
+      "component_id": "H8918-MAIN-U5007",
+      "designator": "U5007",
+      "name": "Wi-Fi connectivity IC",
+      "category": "bga_ic",
+      "module": "Connectivity",
+      "side_id": "main_page_2",
+      "proxy_visibility": "concealed_by_shield",
+      "geometry": {
+        "center": {
+          "x": 0.503125,
+          "y": 0.418423
+        },
+        "size": {
+          "x": 0.074558,
+          "y": 0.096487
+        },
+        "rotation": 0,
+        "source_status": "high"
+      },
+      "schematic_links": [
+        {
+          "source": "K6855_H8918_MAIN_PCB_V1.2维修原理图.pdf",
+          "page": "17",
+          "facts": [
+            "Designator U5007"
+          ]
+        }
+      ],
+      "repair_links": [
+        {
+          "source": "Tecno-CM6-H8918手机主板维修专用操作指导书V1.0_20241218.pdf",
+          "page": "23",
+          "faults": [
+            "WiFi connection failure"
+          ],
+          "instruction": "检查 U5007 焊接及 VCN33_WBT、AVDD18_WBT 供电，再检查天线路径。"
+        }
+      ],
+      "visual_profile": {
+        "shape": "square",
+        "height": 0.045,
+        "engineering_dimension": false
+      },
+      "inspection_profile": {
+        "profile_id": "connectivity-bga-v1",
+        "fidelity": "repair_visual",
+        "source_status": "category_based",
+        "visual_note": "BGA 外观与层高为维修识别示意，不代表实测尺寸、焊球数量或工程封装。"
+      }
+    },
+    {
+      "component_id": "H8918-MAIN-VBAT1",
+      "designator": "VBAT1",
+      "name": "Battery input test point",
+      "category": "test_point",
+      "module": "Base power",
+      "side_id": "main_page_2",
+      "proxy_visibility": "visible_in_reference",
+      "geometry": {
+        "center": {
+          "x": 0.716162,
+          "y": 0.867401
+        },
+        "size": {
+          "x": 0.025,
+          "y": 0.025
+        },
+        "rotation": 0,
+        "source_status": "location_only"
+      },
+      "schematic_links": [],
+      "repair_links": [
+        {
+          "source": "Tecno-CM6-H8918手机主板维修专用操作指导书V1.0_20241218.pdf",
+          "page": "11-12",
+          "faults": [
+            "No power"
+          ],
+          "instruction": "测量 VBAT；手册给出的正常范围为 3.4-4.35 V。"
+        }
+      ],
+      "measurement_profile": {
+        "measurement_id": "vbat1-voltage",
+        "label": "VBAT 电压",
+        "quantity": "voltage",
+        "unit": "V",
+        "input_step": 0.01,
+        "reference": {
+          "kind": "range",
+          "min": 3.4,
+          "max": 4.35
+        },
+        "source_link_index": 0
+      },
+      "visual_profile": {
+        "shape": "point",
+        "height": 0.006,
+        "engineering_dimension": false
+      }
+    }
+  ]
+}

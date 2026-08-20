@@ -1,0 +1,126 @@
+[
+  {
+    "module_id": "MOD-20260604-001",
+    "module_name": "标准充电链路",
+    "source_ids": [
+      "SRC-20260604-003"
+    ],
+    "related_faults": [
+      "不充电",
+      "充电慢",
+      "充电异常",
+      "不开机"
+    ],
+    "principle_summary": "标准充电链路通常由 USB 输入、过压保护、充电 IC、PMIC、VSYS 和电池链路组成。资料中以 5V/2A 标准充电为例，说明电池电压经 PMIC 转换为系统电压，充电 IC 通过 Buck 降压完成给电池充电。",
+    "key_signals_or_nodes": [
+      "VBUS",
+      "VBAT",
+      "VSYS",
+      "PMIC",
+      "Charge IC",
+      "OVP MOS"
+    ],
+    "diagnosis_value": "后续可以转成充电类故障的基础解释、测试点说明和维修员培训材料。",
+    "structured_status": "已完成第一版原理摘要，尚未抽取完整点位和图示"
+  },
+  {
+    "module_id": "MOD-20260604-002",
+    "module_name": "快充与电荷泵链路",
+    "source_ids": [
+      "SRC-20260604-003"
+    ],
+    "related_faults": [
+      "快充异常",
+      "充电慢",
+      "充电发热",
+      "充电电流异常"
+    ],
+    "principle_summary": "资料介绍了 7.5V/2.4A、9V/2A 等快充形态，以及电荷泵在高功率快充中的作用。电荷泵可实现 2:1 或 4:1 电压转换，典型表现为输出电压约为输入电压的一半、输出电流约为输入电流的两倍。",
+    "key_signals_or_nodes": [
+      "DP",
+      "DM",
+      "I2C SDA",
+      "I2C SCL",
+      "Charge Pump",
+      "Fly Cap",
+      "OVPGATE"
+    ],
+    "diagnosis_value": "适合用于快充协议、快充 IC 和电荷泵相关故障的知识说明；真正诊断时仍需补齐各机型正常电压、电流和协议判定条件。",
+    "structured_status": "已完成第一版原理摘要，待制造中心补齐机型级参数"
+  },
+  {
+    "module_id": "MOD-20260604-003",
+    "module_name": "电池 BTB 与电池检测信号",
+    "source_ids": [
+      "SRC-20260604-003"
+    ],
+    "related_faults": [
+      "不开机",
+      "电池识别异常",
+      "充电异常",
+      "电量显示异常"
+    ],
+    "principle_summary": "资料中提到电池 BTB 相关信号包括 BATON、VBIF28、VBATADC、VBAT_S、ID、CS_P 和 CS_N 等。这些信号可用于电池在位识别、电池电压采样、电池 ID 识别和电流检测。",
+    "key_signals_or_nodes": [
+      "BATON",
+      "VBIF28",
+      "VBATADC",
+      "VBAT_S",
+      "ID",
+      "CS_P",
+      "CS_N"
+    ],
+    "diagnosis_value": "适合作为电池座、电池识别、电量采样异常的基础知识来源。",
+    "structured_status": "已完成信号级摘要，待补齐图示和测量方法"
+  },
+  {
+    "module_id": "MOD-20260604-004",
+    "module_name": "基带开机逻辑",
+    "source_ids": [
+      "SRC-20260604-005"
+    ],
+    "related_faults": [
+      "不开机",
+      "开机电流异常",
+      "卡 Logo",
+      "反复重启"
+    ],
+    "principle_summary": "资料说明手机基带开机需要供电、开机键触发、PMIC 输出核心电压和系统电压、26M 晶振提供时钟、复位信号唤醒 CPU，随后 CPU 与 PMIC、Flash 等器件通信并运行程序。",
+    "key_signals_or_nodes": [
+      "PWRKEY",
+      "PMIC",
+      "CPU",
+      "FLASH",
+      "26M Clock",
+      "RESET"
+    ],
+    "diagnosis_value": "适合作为不开机类故障的诊断基础，后续可继续细化为开机电流曲线、关键电源和复位时序检查。",
+    "structured_status": "已完成第一版原理摘要"
+  },
+  {
+    "module_id": "MOD-20260604-005",
+    "module_name": "射频收发链路",
+    "source_ids": [
+      "SRC-20260604-005"
+    ],
+    "related_faults": [
+      "无服务",
+      "信号弱",
+      "无法通话",
+      "通话异常"
+    ],
+    "principle_summary": "资料描述了送话和受话链路。送话路径通常为 MIC 采集声音后进入 CPU 编码和处理，再经射频芯片调制、混频、滤波、功放、双工器、天线开关和天线发射；受话路径则从天线接收后反向进入射频芯片、CPU 解码和音频输出。",
+    "key_signals_or_nodes": [
+      "MIC",
+      "CPU",
+      "RTR",
+      "PA",
+      "Filter",
+      "Duplexer",
+      "Antenna Switch",
+      "Antenna"
+    ],
+    "diagnosis_value": "适合作为无服务、信号弱、通话异常等故障的基础解释，后续需补齐具体平台射频测试项目和校准数据。",
+    "structured_status": "已完成第一版原理摘要，待补齐测试项目"
+  }
+]

@@ -1,0 +1,66 @@
+{
+  "schema_version": "ENGINEERING-SOURCE-INTAKE-V1",
+  "intake_id": "owner-supplied-km5-xk67j-20260731",
+  "received_date": "2026-07-31",
+  "source_owner": "Milo",
+  "source_folder_label": "KM5",
+  "files": [
+    {
+      "name": "XK67J_KM5_MAIN_PCB_V1.0B_PLACEMENT.pdf",
+      "canonical_path": "packages/KM5-KM4N-XK67J-SHARED/XK67J_KM5_MAIN_PCB_V1.0B_PLACEMENT.pdf",
+      "sha256": "cba2bd34d2f377514ca0c9f7fa17acb98cbdfb44f44d6baf58cfaccdbb660075",
+      "bytes": 167393,
+      "pages": 2,
+      "material_type": "main_placement"
+    },
+    {
+      "name": "XK67J_L6735-KM5_MAIN_SCH_V1.0B.pdf",
+      "canonical_path": "packages/KM5-KM4N-XK67J-SHARED/XK67J_L6735-KM5_MAIN_SCH_V1.0B.pdf",
+      "sha256": "1ac26f1450e59b548bb8a5a1412d9f15c97aea0e944a585b789a7f972e0625ca",
+      "bytes": 2789260,
+      "pages": 28,
+      "material_type": "main_schematic"
+    },
+    {
+      "name": "XK67J_KM5_SUB_PCB_V1.0B_PLACEMENT.pdf",
+      "canonical_path": "packages/KM5-KM4N-XK67J-SHARED/XK67J_KM5_SUB_PCB_V1.0B_PLACEMENT.pdf",
+      "sha256": "f64a6d428f136761f3f813c192090239539671bd6422a67369f8845d74fe8fb6",
+      "bytes": 93483,
+      "pages": 2,
+      "material_type": "sub_placement"
+    },
+    {
+      "name": "XK67J_L6735-KM5_SUB_SCH_V1.0B.pdf",
+      "canonical_path": "packages/KM5-KM4N-XK67J-SHARED/XK67J_L6735-KM5_SUB_SCH_V1.0B.pdf",
+      "sha256": "86f66993f10e12535958098ef623c6285d41fceb4b0bf9d096cba742c495d0be",
+      "bytes": 202386,
+      "pages": 2,
+      "material_type": "sub_schematic"
+    }
+  ],
+  "compatibility": {
+    "board_platform": "XK67J",
+    "engineering_revision": "V1.0B",
+    "physical_silkscreen_revision": "V1.0",
+    "source_sales_model": "KM5",
+    "compatible_sales_models": [
+      "KM4n",
+      "KM4k",
+      "KM5",
+      "KM5n",
+      "KM5s"
+    ],
+    "photo_verified_sales_models": [
+      "KM4n"
+    ],
+    "owner_confirmed_sales_models": [
+      "KM4k",
+      "KM5n",
+      "KM5s"
+    ],
+    "decision": "shared_board_platform_reference_accepted",
+    "geometry_and_registration_allowed": true,
+    "exact_bom_equivalence_claim_allowed": false,
+    "sales_model_equivalence_claim_allowed": false
+  }
+}

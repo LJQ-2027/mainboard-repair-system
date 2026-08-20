@@ -1,0 +1,41 @@
+# Controlled-server runtime. Keep source archives, tests, reports, and docs out.
+deploy/visual-qc-runtime-files.txt
+ai_proxy_server.py
+visual_qc_server.py
+ecosystem.config.js
+requirements-visual-qc.txt
+mainboard_repair_system_v7.4_updated.html
+assets
+data
+knowledge-base
+scripts/maintain_visual_qc_server.py
+scripts/audit_visual_qc_upgrade.py
+scripts/build_visual_qc_deployment_manifest.py
+scripts/import_visual_qc_batch.py
+scripts/export_visual_qc_coco.py
+scripts/stage_visual_qc_repair_case.py
+scripts/validate_visual_qc_dataset.py
+scripts/visual_qc
+
+# Repair-evidence-link runtime boundary added at local HEAD on 2026-07-29.
+# Parent directories above remain because they contain the established runtime.
+assets/visual-qc-workbench/app.js
+assets/visual-qc-workbench/index.html
+assets/visual-qc-workbench/repair-evidence-links.js
+assets/visual-qc-workbench/styles.css
+assets/visual-qc-workbench/visual-qc-server-client.js
+knowledge-base/visual-qc-linkable-physical-evidence-v1-schema.json
+knowledge-base/visual-qc-repair-evidence-link-v1-schema.json
+knowledge-base/visual-qc-repair-evidence-link-list-v1-schema.json
+knowledge-base/visual-qc-repair-evidence-link-detail-v1-schema.json
+scripts/export_visual_qc_linkable_evidence.py
+scripts/stage_visual_qc_repair_evidence_link.py
+scripts/sync_visual_qc_repair_evidence_link.py
+scripts/visual_qc/repair_evidence_engineering.py
+scripts/visual_qc/repair_evidence_export.py
+scripts/visual_qc/repair_evidence_link_contract.py
+scripts/visual_qc/repair_evidence_link_library.py
+scripts/visual_qc/server/api.py
+scripts/visual_qc/server/service.py
+scripts/visual_qc/server/store.py
+scripts/visual_qc/upgrade_preflight.py

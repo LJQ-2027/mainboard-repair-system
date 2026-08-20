@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "VISUAL-QC-REGISTRATION-CANDIDATE-V1",
+  "title": "Visual QC automatic registration candidate",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "status",
+    "method",
+    "review_status",
+    "requires_human_review",
+    "requires_manual_registration",
+    "board_to_image_matrix",
+    "evidence",
+    "failure",
+    "fallback"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "VISUAL-QC-REGISTRATION-CANDIDATE-V1"
+    },
+    "status": {
+      "enum": [
+        "candidate",
+        "manual_required"
+      ]
+    },
+    "method": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "review_status": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "requires_human_review": {
+      "type": "boolean"
+    },
+    "requires_manual_registration": {
+      "type": "boolean"
+    },
+    "board_to_image_matrix": {
+      "oneOf": [
+        {
+          "type": "array",
+          "minItems": 9,
+          "maxItems": 9,
+          "items": {
+            "type": "number"
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "evidence": {
+      "type": "object"
+    },
+    "failure": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "fallback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "reason_code"
+      ],
+      "properties": {
+        "method": {
+          "const": "reviewed_manual_four_point"
+        },
+        "reason_code": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "candidate"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "method": {
+            "const": "automatic_feature_homography"
+          },
+          "review_status": {
+            "const": "draft"
+          },
+          "requires_human_review": {
+            "const": true
+          },
+          "requires_manual_registration": {
+            "const": false
+          },
+          "board_to_image_matrix": {
+            "type": "array"
+          },
+          "failure": {
+            "type": "null"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "method": {
+            "type": "null"
+          },
+          "review_status": {
+            "type": "null"
+          },
+          "requires_human_review": {
+            "const": false
+          },
+          "requires_manual_registration": {
+            "const": true
+          },
+          "board_to_image_matrix": {
+            "type": "null"
+          },
+          "failure": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  ]
+}

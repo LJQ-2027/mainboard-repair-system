@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>主板维修内测</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <span class="product-mark">CARLCARE · INTERNAL PILOT</span>
+      <h1>主板维修内测</h1>
+    </div>
+    <span class="source-badge">已审核资料范围</span>
+  </header>
+
+  <main class="pilot-layout">
+    <aside class="model-rail" aria-labelledby="boardHeading">
+      <div class="section-number">01</div>
+      <h2 id="boardHeading">确认机型与主板</h2>
+      <p class="section-copy">选择维修员已确认的手机机型。系统不会识别或猜测机型。</p>
+
+      <label for="modelSelect">手机机型</label>
+      <select id="modelSelect" disabled>
+        <option value="">正在加载目录…</option>
+      </select>
+
+      <dl class="board-facts">
+        <div>
+          <dt>主板版本</dt>
+          <dd id="boardVersion">—</dd>
+        </div>
+        <div>
+          <dt>当前资料能力</dt>
+          <dd id="capabilityStatus">等待选择机型</dd>
+        </div>
+      </dl>
+    </aside>
+
+    <section class="intent-workspace" aria-labelledby="intentHeading">
+      <div class="section-number">02</div>
+      <h2 id="intentHeading">选择当前问题</h2>
+      <p class="section-copy">知道故障现象就直接选择；不确定时，选择初步排查。两种情况进入同一维修工作台。</p>
+
+      <label for="intentSelect">故障现象或排查方式</label>
+      <select id="intentSelect" disabled>
+        <option value="">请先选择机型</option>
+      </select>
+
+      <div class="launch-row">
+        <button id="openWorkbench" type="button" disabled>
+          进入主板维修工作台
+          <span aria-hidden="true">→</span>
+        </button>
+        <p id="pilotLoadStatus" class="load-status" role="status" aria-live="polite">正在读取八板资料目录…</p>
+      </div>
+
+      <div class="boundary-note">
+        <strong>资料边界</strong>
+        <span>仅展示已入库并审核的点位图、结构、案例和维修步骤；资料未覆盖时会明确停止。</span>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="./app.js?v=20260803"></script>
+</body>
+</html>

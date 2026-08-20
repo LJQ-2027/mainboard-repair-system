@@ -1,0 +1,77 @@
+[
+  {
+    "boundary_id": "BDR-20260604-001",
+    "title": "器件维修试点准入门槛",
+    "source_ids": [
+      "SRC-20260604-001"
+    ],
+    "related_model": [],
+    "related_fault": [],
+    "local_repair_scope": [
+      "完成指定技能点认证后，可开始试点主板维修",
+      "手机维修员确认属于主板问题后，再分派给主板维修员处理"
+    ],
+    "expert_repair_scope": [],
+    "board_replacement_condition": [
+      "用户明确要求使用新主板时，应在 CRM Technician remark 中备注 Customer requested new MB."
+    ],
+    "forbidden_or_limited_actions": [
+      "未确认主板问题前，不应直接发送给主板维修员",
+      "未按 CRM / Escalation / PO / 多维表格规则记录时，系统可能无法识别维修数据"
+    ],
+    "required_skill_level": [
+      "完成 13 项技能认证"
+    ],
+    "required_tools": [
+      "植锡钢网",
+      "直流电源",
+      "万用表",
+      "电烙铁",
+      "热风枪",
+      "放大镜"
+    ],
+    "notes": "该边界更偏试点准入和流程规范，后续需要补充具体故障维修边界。"
+  },
+  {
+    "boundary_id": "BDR-20260604-002",
+    "title": "L4 场所能力定义",
+    "source_ids": [
+      "SRC-20260604-002"
+    ],
+    "related_model": [],
+    "related_fault": [],
+    "local_repair_scope": [
+      "可完成主板维修",
+      "可完成旧机翻新",
+      "可完成 KD 大货生产"
+    ],
+    "expert_repair_scope": [],
+    "board_replacement_condition": [],
+    "forbidden_or_limited_actions": [],
+    "required_skill_level": [
+      "L4 维修能力"
+    ],
+    "required_tools": [],
+    "notes": "L4 被定义为能够完成主板维修、旧机翻新或 KD 大货生产的高维维修场所。"
+  },
+  {
+    "boundary_id": "BDR-20260604-003",
+    "title": "培训不达标网点判定",
+    "source_ids": [
+      "SRC-20260604-002"
+    ],
+    "related_model": [],
+    "related_fault": [],
+    "local_repair_scope": [],
+    "expert_repair_scope": [],
+    "board_replacement_condition": [],
+    "forbidden_or_limited_actions": [
+      "培训完成率无法达到 90%",
+      "维修主板产出 / 换板量小于 80%",
+      "二返率大于 5%"
+    ],
+    "required_skill_level": [],
+    "required_tools": [],
+    "notes": "不达标网点需要通报改善；连续多月不达标且 KPI 持续恶化时，可上报地区部并提交汰换或重新培训需求。"
+  }
+]

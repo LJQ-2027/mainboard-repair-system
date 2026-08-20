@@ -1,0 +1,21 @@
+{
+  "schema_version": "VISUAL-QC-INTAKE-BATCH-V1",
+  "batch_id": "km4-first-physical-batch",
+  "entries": [
+    {
+      "entry_id": "km4-board-01-side-2",
+      "file_path": "C:/controlled-source/km4-board-01-side-2.jpg",
+      "board_key": "km4-f151",
+      "side_id": "main_page_2",
+      "capture_stage": "golden_reference",
+      "capture_session_id": "km4-board-01",
+      "capture_setup_id": "standard-bench",
+      "capture_checklist": {
+        "board_and_side_confirmed": true,
+        "focus_and_lens_confirmed": true,
+        "lighting_and_occlusion_confirmed": true
+      },
+      "expected_sha256": null
+    }
+  ]
+}

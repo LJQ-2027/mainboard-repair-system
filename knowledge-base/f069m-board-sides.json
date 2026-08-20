@@ -1,0 +1,26 @@
+{
+  "manifest_id": "F069M-MAIN-BOARD-SIDES-V1",
+  "profile_id": "f069m-main-v1.0",
+  "board_id": "BOARD-F069M-MAIN-V1.0",
+  "default_side_id": "main_page_2",
+  "sides": [
+    {
+      "side_id": "main_page_1",
+      "label": "第1面",
+      "source_pdf_page": 1,
+      "component_page": 1,
+      "point_map_source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/BG6M-F069M/F069M_MAIN_PCB_V1.0_位号图(A1).pdf",
+      "engineering_texture": "assets/board-atlas/f069m/main-point-map-page-1.png",
+      "compiled_data": "knowledge-base/f069m-board-compiled-page-1.json"
+    },
+    {
+      "side_id": "main_page_2",
+      "label": "第2面",
+      "source_pdf_page": 2,
+      "component_page": 2,
+      "point_map_source": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/BG6M-F069M/F069M_MAIN_PCB_V1.0_位号图(A1).pdf",
+      "engineering_texture": "assets/board-atlas/f069m/main-point-map-page-2.png",
+      "compiled_data": "knowledge-base/f069m-board-compiled-page-2.json"
+    }
+  ]
+}

@@ -1,0 +1,930 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Board Vision Reference Gallery</title>
+  <style>
+    :root { color-scheme: light; font-family: Inter, "Segoe UI", Arial, sans-serif; color: #192126; background: #eef1f2; }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    header { position: sticky; top: 0; z-index: 2; background: #ffffff; border-bottom: 1px solid #cbd2d5; padding: 14px 20px 12px; }
+    .title-row { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+    h1 { margin: 0; font-size: 20px; letter-spacing: 0; }
+    .summary { margin: 0; color: #526168; font-size: 13px; }
+    nav { display: flex; gap: 6px; overflow-x: auto; margin-top: 12px; padding-bottom: 2px; }
+    button { border: 1px solid #aeb9bd; background: #f8faf9; color: #263238; height: 34px; padding: 0 12px; border-radius: 4px; cursor: pointer; white-space: nowrap; }
+    button[aria-pressed="true"] { background: #123c35; border-color: #123c35; color: #ffffff; }
+    .show-all { margin-left: auto; border-color: #b66a2c; color: #7c4217; }
+    .show-all[aria-pressed="true"] { background: #8a4a1b; border-color: #8a4a1b; color: #ffffff; }
+    main { padding: 18px 20px 32px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+    .asset { min-width: 0; background: #ffffff; border: 1px solid #cbd2d5; border-radius: 6px; overflow: hidden; }
+    .asset[hidden] { display: none; }
+    .asset-image { aspect-ratio: 4 / 3; background: #dfe5e7; display: grid; place-items: center; overflow: hidden; }
+    .asset-image img { width: 100%; height: 100%; object-fit: contain; }
+    .asset-meta { padding: 10px 11px 12px; }
+    .asset-meta div { display: flex; justify-content: space-between; gap: 8px; }
+    .asset-meta span, .asset-meta p { color: #617077; font-size: 12px; }
+    .asset-meta p { margin: 7px 0; }
+    code { display: block; overflow: hidden; text-overflow: ellipsis; color: #874c16; font-size: 11px; white-space: nowrap; }
+    @media (max-width: 600px) { header, main { padding-left: 12px; padding-right: 12px; } .title-row { display: block; } .summary { margin-top: 4px; } .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="title-row"><h1>Board Vision Reference Gallery</h1><p class="summary">7 models · 21 curated · 96 candidates</p></div>
+    <nav aria-label="Model filter"><button type="button" data-filter="all" aria-pressed="true">All</button><button type="button" data-filter="KM4">KM4</button><button type="button" data-filter="KL4">KL4</button><button type="button" data-filter="CLA5">CLA5</button><button type="button" data-filter="KJ5">KJ5</button><button type="button" data-filter="CM5">CM5</button><button type="button" data-filter="CM6">CM6</button><button type="button" data-filter="X6880">X6880</button><button class="show-all" type="button" id="showAll" aria-pressed="false">Show all candidates</button></nav>
+  </header>
+  <main><section class="grid" aria-live="polite">
+                    <article class="asset" data-model="KM4" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/km4/embedded/page-003-image-01.jpg" alt="KM4 page 3 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KM4</strong><span>Page 3 · not_selected</span></div>
+                        <p>675 x 418 · unknown · candidate</p>
+                        <code>F151_MAIN_PCB_V1.2 + F151_SUB_PCB_1_V1.1</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KM4" data-status="approved">
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/km4/embedded/page-003-image-02.jpg" alt="KM4 page 3 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KM4</strong><span>Page 3 · approved</span></div>
+                        <p>1087 x 663 · unknown · exploded_structure</p>
+                        <code>F151_MAIN_PCB_V1.2 + F151_SUB_PCB_1_V1.1</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KM4" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/km4/embedded/page-010-image-01.jpg" alt="KM4 page 10 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KM4</strong><span>Page 10 · not_selected</span></div>
+                        <p>825 x 600 · unknown · candidate</p>
+                        <code>F151_MAIN_PCB_V1.2 + F151_SUB_PCB_1_V1.1</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KM4" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/km4/embedded/page-010-image-02.jpg" alt="KM4 page 10 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KM4</strong><span>Page 10 · not_selected</span></div>
+                        <p>738 x 506 · unknown · candidate</p>
+                        <code>F151_MAIN_PCB_V1.2 + F151_SUB_PCB_1_V1.1</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KM4" data-status="approved">
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/km4/embedded/page-010-image-03.jpg" alt="KM4 page 10 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KM4</strong><span>Page 10 · approved</span></div>
+                        <p>962 x 593 · unknown · installed_subboard</p>
+                        <code>F151_SUB_PCB_1_V1.1</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KM4" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/km4/embedded/page-010-image-04.jpg" alt="KM4 page 10 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KM4</strong><span>Page 10 · not_selected</span></div>
+                        <p>947 x 585 · unknown · candidate</p>
+                        <code>F151_MAIN_PCB_V1.2 + F151_SUB_PCB_1_V1.1</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KM4" data-status="approved">
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/km4/embedded/page-010-image-05.jpg" alt="KM4 page 10 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KM4</strong><span>Page 10 · approved</span></div>
+                        <p>725 x 426 · unknown · installed_mainboard</p>
+                        <code>F151_MAIN_PCB_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KM4" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/km4/embedded/page-010-image-06.jpg" alt="KM4 page 10 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KM4</strong><span>Page 10 · not_selected</span></div>
+                        <p>924 x 530 · unknown · candidate</p>
+                        <code>F151_MAIN_PCB_V1.2 + F151_SUB_PCB_1_V1.1</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KM4" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/km4/embedded/page-011-image-01.jpg" alt="KM4 page 11 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KM4</strong><span>Page 11 · not_selected</span></div>
+                        <p>728 x 470 · unknown · candidate</p>
+                        <code>F151_MAIN_PCB_V1.2 + F151_SUB_PCB_1_V1.1</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KM4" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/km4/embedded/page-011-image-02.jpg" alt="KM4 page 11 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KM4</strong><span>Page 11 · not_selected</span></div>
+                        <p>780 x 472 · unknown · candidate</p>
+                        <code>F151_MAIN_PCB_V1.2 + F151_SUB_PCB_1_V1.1</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KM4" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/km4/embedded/page-011-image-03.jpg" alt="KM4 page 11 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KM4</strong><span>Page 11 · not_selected</span></div>
+                        <p>896 x 545 · unknown · candidate</p>
+                        <code>F151_MAIN_PCB_V1.2 + F151_SUB_PCB_1_V1.1</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KM4" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/km4/embedded/page-011-image-04.jpg" alt="KM4 page 11 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KM4</strong><span>Page 11 · not_selected</span></div>
+                        <p>822 x 502 · unknown · candidate</p>
+                        <code>F151_MAIN_PCB_V1.2 + F151_SUB_PCB_1_V1.1</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KM4" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/km4/embedded/page-011-image-05.jpg" alt="KM4 page 11 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KM4</strong><span>Page 11 · not_selected</span></div>
+                        <p>774 x 510 · unknown · candidate</p>
+                        <code>F151_MAIN_PCB_V1.2 + F151_SUB_PCB_1_V1.1</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KM4" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/km4/embedded/page-011-image-06.jpg" alt="KM4 page 11 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KM4</strong><span>Page 11 · not_selected</span></div>
+                        <p>704 x 458 · unknown · candidate</p>
+                        <code>F151_MAIN_PCB_V1.2 + F151_SUB_PCB_1_V1.1</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KL4" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/kl4/embedded/page-003-image-01.jpg" alt="KL4 page 3 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KL4</strong><span>Page 3 · not_selected</span></div>
+                        <p>675 x 418 · unknown · candidate</p>
+                        <code>F201_MAIN_V1.2 + F201_SUB_SCH_1_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KL4" data-status="approved">
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/kl4/embedded/page-003-image-02.jpg" alt="KL4 page 3 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KL4</strong><span>Page 3 · approved</span></div>
+                        <p>1023 x 605 · unknown · exploded_structure</p>
+                        <code>F201_MAIN_V1.2 + F201_SUB_SCH_1_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KL4" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/kl4/embedded/page-010-image-01.jpg" alt="KL4 page 10 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KL4</strong><span>Page 10 · not_selected</span></div>
+                        <p>1007 x 674 · unknown · candidate</p>
+                        <code>F201_MAIN_V1.2 + F201_SUB_SCH_1_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KL4" data-status="approved">
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/kl4/embedded/page-010-image-02.jpg" alt="KL4 page 10 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KL4</strong><span>Page 10 · approved</span></div>
+                        <p>609 x 392 · unknown · installed_mainboard</p>
+                        <code>F201_MAIN_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KL4" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/kl4/embedded/page-010-image-03.jpg" alt="KL4 page 10 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KL4</strong><span>Page 10 · not_selected</span></div>
+                        <p>899 x 521 · unknown · candidate</p>
+                        <code>F201_MAIN_V1.2 + F201_SUB_SCH_1_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KL4" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/kl4/embedded/page-010-image-05.jpg" alt="KL4 page 10 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KL4</strong><span>Page 10 · not_selected</span></div>
+                        <p>785 x 510 · unknown · candidate</p>
+                        <code>F201_MAIN_V1.2 + F201_SUB_SCH_1_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KL4" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/kl4/embedded/page-010-image-06.jpg" alt="KL4 page 10 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KL4</strong><span>Page 10 · not_selected</span></div>
+                        <p>686 x 426 · unknown · candidate</p>
+                        <code>F201_MAIN_V1.2 + F201_SUB_SCH_1_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KL4" data-status="approved">
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/kl4/embedded/page-011-image-01.jpg" alt="KL4 page 11 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KL4</strong><span>Page 11 · approved</span></div>
+                        <p>738 x 449 · unknown · installed_subboard</p>
+                        <code>F201_SUB_SCH_1_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KL4" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/kl4/embedded/page-011-image-02.jpg" alt="KL4 page 11 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KL4</strong><span>Page 11 · not_selected</span></div>
+                        <p>776 x 485 · unknown · candidate</p>
+                        <code>F201_MAIN_V1.2 + F201_SUB_SCH_1_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KL4" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/kl4/embedded/page-011-image-03.jpg" alt="KL4 page 11 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KL4</strong><span>Page 11 · not_selected</span></div>
+                        <p>792 x 462 · unknown · candidate</p>
+                        <code>F201_MAIN_V1.2 + F201_SUB_SCH_1_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KL4" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/kl4/embedded/page-011-image-04.jpg" alt="KL4 page 11 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KL4</strong><span>Page 11 · not_selected</span></div>
+                        <p>815 x 463 · unknown · candidate</p>
+                        <code>F201_MAIN_V1.2 + F201_SUB_SCH_1_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KL4" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/kl4/embedded/page-011-image-05.jpg" alt="KL4 page 11 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KL4</strong><span>Page 11 · not_selected</span></div>
+                        <p>728 x 462 · unknown · candidate</p>
+                        <code>F201_MAIN_V1.2 + F201_SUB_SCH_1_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KL4" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/kl4/embedded/page-011-image-06.jpg" alt="KL4 page 11 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KL4</strong><span>Page 11 · not_selected</span></div>
+                        <p>1119 x 687 · unknown · candidate</p>
+                        <code>F201_MAIN_V1.2 + F201_SUB_SCH_1_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CLA5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cla5/embedded/page-003-image-01.jpg" alt="CLA5 page 3 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CLA5</strong><span>Page 3 · not_selected</span></div>
+                        <p>675 x 418 · unknown · candidate</p>
+                        <code>H8910_MAIN_PCB_V1.1 + H8910_SUB_PCB_1_V1.0</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CLA5" data-status="approved">
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cla5/embedded/page-003-image-02.jpg" alt="CLA5 page 3 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CLA5</strong><span>Page 3 · approved</span></div>
+                        <p>1199 x 758 · unknown · exploded_structure</p>
+                        <code>H8910_MAIN_PCB_V1.1 + H8910_SUB_PCB_1_V1.0</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CLA5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cla5/embedded/page-010-image-06.jpg" alt="CLA5 page 10 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CLA5</strong><span>Page 10 · not_selected</span></div>
+                        <p>750 x 443 · unknown · candidate</p>
+                        <code>H8910_MAIN_PCB_V1.1 + H8910_SUB_PCB_1_V1.0</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CLA5" data-status="approved">
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cla5/embedded/page-011-image-02.jpg" alt="CLA5 page 11 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CLA5</strong><span>Page 11 · approved</span></div>
+                        <p>870 x 545 · unknown · installed_subboard</p>
+                        <code>H8910_SUB_PCB_1_V1.0</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CLA5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cla5/embedded/page-011-image-03.jpg" alt="CLA5 page 11 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CLA5</strong><span>Page 11 · not_selected</span></div>
+                        <p>601 x 366 · unknown · candidate</p>
+                        <code>H8910_MAIN_PCB_V1.1 + H8910_SUB_PCB_1_V1.0</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CLA5" data-status="approved">
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cla5/embedded/page-011-image-04.jpg" alt="CLA5 page 11 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CLA5</strong><span>Page 11 · approved</span></div>
+                        <p>645 x 387 · unknown · installed_mainboard</p>
+                        <code>H8910_MAIN_PCB_V1.1</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CLA5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cla5/embedded/page-011-image-05.jpg" alt="CLA5 page 11 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CLA5</strong><span>Page 11 · not_selected</span></div>
+                        <p>644 x 384 · unknown · candidate</p>
+                        <code>H8910_MAIN_PCB_V1.1 + H8910_SUB_PCB_1_V1.0</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CLA5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cla5/embedded/page-011-image-06.jpg" alt="CLA5 page 11 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CLA5</strong><span>Page 11 · not_selected</span></div>
+                        <p>671 x 392 · unknown · candidate</p>
+                        <code>H8910_MAIN_PCB_V1.1 + H8910_SUB_PCB_1_V1.0</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CLA5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cla5/embedded/page-012-image-01.jpg" alt="CLA5 page 12 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CLA5</strong><span>Page 12 · not_selected</span></div>
+                        <p>687 x 398 · unknown · candidate</p>
+                        <code>H8910_MAIN_PCB_V1.1 + H8910_SUB_PCB_1_V1.0</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CLA5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cla5/embedded/page-012-image-02.jpg" alt="CLA5 page 12 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CLA5</strong><span>Page 12 · not_selected</span></div>
+                        <p>837 x 443 · unknown · candidate</p>
+                        <code>H8910_MAIN_PCB_V1.1 + H8910_SUB_PCB_1_V1.0</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CLA5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cla5/embedded/page-012-image-03.jpg" alt="CLA5 page 12 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CLA5</strong><span>Page 12 · not_selected</span></div>
+                        <p>868 x 515 · unknown · candidate</p>
+                        <code>H8910_MAIN_PCB_V1.1 + H8910_SUB_PCB_1_V1.0</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CLA5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cla5/embedded/page-012-image-04.jpg" alt="CLA5 page 12 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CLA5</strong><span>Page 12 · not_selected</span></div>
+                        <p>608 x 360 · unknown · candidate</p>
+                        <code>H8910_MAIN_PCB_V1.1 + H8910_SUB_PCB_1_V1.0</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CLA5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cla5/embedded/page-012-image-05.jpg" alt="CLA5 page 12 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CLA5</strong><span>Page 12 · not_selected</span></div>
+                        <p>725 x 429 · unknown · candidate</p>
+                        <code>H8910_MAIN_PCB_V1.1 + H8910_SUB_PCB_1_V1.0</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CLA5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cla5/embedded/page-012-image-06.jpg" alt="CLA5 page 12 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CLA5</strong><span>Page 12 · not_selected</span></div>
+                        <p>682 x 397 · unknown · candidate</p>
+                        <code>H8910_MAIN_PCB_V1.1 + H8910_SUB_PCB_1_V1.0</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CLA5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cla5/embedded/page-015-image-02.jpg" alt="CLA5 page 15 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CLA5</strong><span>Page 15 · not_selected</span></div>
+                        <p>842 x 521 · unknown · candidate</p>
+                        <code>H8910_MAIN_PCB_V1.1 + H8910_SUB_PCB_1_V1.0</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CLA5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cla5/embedded/page-015-image-03.jpg" alt="CLA5 page 15 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CLA5</strong><span>Page 15 · not_selected</span></div>
+                        <p>825 x 518 · unknown · candidate</p>
+                        <code>H8910_MAIN_PCB_V1.1 + H8910_SUB_PCB_1_V1.0</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CLA5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cla5/embedded/page-015-image-04.jpg" alt="CLA5 page 15 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CLA5</strong><span>Page 15 · not_selected</span></div>
+                        <p>683 x 384 · unknown · candidate</p>
+                        <code>H8910_MAIN_PCB_V1.1 + H8910_SUB_PCB_1_V1.0</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CLA5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cla5/embedded/page-015-image-05.jpg" alt="CLA5 page 15 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CLA5</strong><span>Page 15 · not_selected</span></div>
+                        <p>736 x 440 · unknown · candidate</p>
+                        <code>H8910_MAIN_PCB_V1.1 + H8910_SUB_PCB_1_V1.0</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CLA5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cla5/embedded/page-015-image-06.jpg" alt="CLA5 page 15 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CLA5</strong><span>Page 15 · not_selected</span></div>
+                        <p>731 x 432 · unknown · candidate</p>
+                        <code>H8910_MAIN_PCB_V1.1 + H8910_SUB_PCB_1_V1.0</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KJ5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/kj5/embedded/page-003-image-01.jpg" alt="KJ5 page 3 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KJ5</strong><span>Page 3 · not_selected</span></div>
+                        <p>675 x 418 · unknown · candidate</p>
+                        <code>H6931_MAIN_PCB_V1.0 + H6931_MAIN_PCB_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KJ5" data-status="approved">
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/kj5/embedded/page-003-image-02.jpg" alt="KJ5 page 3 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KJ5</strong><span>Page 3 · approved</span></div>
+                        <p>1152 x 693 · unknown · exploded_structure</p>
+                        <code>H6931_MAIN_PCB_V1.0 + H6931_MAIN_PCB_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KJ5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/kj5/embedded/page-009-image-01.jpg" alt="KJ5 page 9 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KJ5</strong><span>Page 9 · not_selected</span></div>
+                        <p>741 x 562 · unknown · candidate</p>
+                        <code>H6931_MAIN_PCB_V1.0 + H6931_MAIN_PCB_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KJ5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/kj5/embedded/page-009-image-02.jpg" alt="KJ5 page 9 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KJ5</strong><span>Page 9 · not_selected</span></div>
+                        <p>939 x 721 · unknown · candidate</p>
+                        <code>H6931_MAIN_PCB_V1.0 + H6931_MAIN_PCB_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KJ5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/kj5/embedded/page-009-image-03.jpg" alt="KJ5 page 9 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KJ5</strong><span>Page 9 · not_selected</span></div>
+                        <p>859 x 503 · unknown · candidate</p>
+                        <code>H6931_MAIN_PCB_V1.0 + H6931_MAIN_PCB_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KJ5" data-status="approved">
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/kj5/embedded/page-009-image-04.jpg" alt="KJ5 page 9 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KJ5</strong><span>Page 9 · approved</span></div>
+                        <p>758 x 454 · unknown · installed_subboard</p>
+                        <code>board version unresolved</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KJ5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/kj5/embedded/page-009-image-05.jpg" alt="KJ5 page 9 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KJ5</strong><span>Page 9 · not_selected</span></div>
+                        <p>929 x 531 · unknown · candidate</p>
+                        <code>H6931_MAIN_PCB_V1.0 + H6931_MAIN_PCB_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KJ5" data-status="approved">
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/kj5/embedded/page-009-image-06.jpg" alt="KJ5 page 9 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KJ5</strong><span>Page 9 · approved</span></div>
+                        <p>824 x 474 · unknown · installed_mainboard</p>
+                        <code>H6931_MAIN_PCB_V1.0 + H6931_MAIN_PCB_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KJ5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/kj5/embedded/page-010-image-01.jpg" alt="KJ5 page 10 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KJ5</strong><span>Page 10 · not_selected</span></div>
+                        <p>608 x 411 · unknown · candidate</p>
+                        <code>H6931_MAIN_PCB_V1.0 + H6931_MAIN_PCB_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KJ5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/kj5/embedded/page-010-image-02.jpg" alt="KJ5 page 10 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KJ5</strong><span>Page 10 · not_selected</span></div>
+                        <p>765 x 517 · unknown · candidate</p>
+                        <code>H6931_MAIN_PCB_V1.0 + H6931_MAIN_PCB_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KJ5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/kj5/embedded/page-010-image-03.jpg" alt="KJ5 page 10 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KJ5</strong><span>Page 10 · not_selected</span></div>
+                        <p>809 x 488 · unknown · candidate</p>
+                        <code>H6931_MAIN_PCB_V1.0 + H6931_MAIN_PCB_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KJ5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/kj5/embedded/page-010-image-04.jpg" alt="KJ5 page 10 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KJ5</strong><span>Page 10 · not_selected</span></div>
+                        <p>707 x 425 · unknown · candidate</p>
+                        <code>H6931_MAIN_PCB_V1.0 + H6931_MAIN_PCB_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KJ5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/kj5/embedded/page-010-image-05.jpg" alt="KJ5 page 10 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KJ5</strong><span>Page 10 · not_selected</span></div>
+                        <p>705 x 419 · unknown · candidate</p>
+                        <code>H6931_MAIN_PCB_V1.0 + H6931_MAIN_PCB_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="KJ5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/kj5/embedded/page-010-image-06.jpg" alt="KJ5 page 10 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>KJ5</strong><span>Page 10 · not_selected</span></div>
+                        <p>918 x 567 · unknown · candidate</p>
+                        <code>H6931_MAIN_PCB_V1.0 + H6931_MAIN_PCB_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CM5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cm5/embedded/page-003-image-01.jpg" alt="CM5 page 3 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CM5</strong><span>Page 3 · not_selected</span></div>
+                        <p>675 x 418 · unknown · candidate</p>
+                        <code>H8918_MAIN_PCB_V1.2 + H8918_SUB_PCB_2_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CM5" data-status="approved">
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cm5/embedded/page-003-image-02.jpg" alt="CM5 page 3 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CM5</strong><span>Page 3 · approved</span></div>
+                        <p>1290 x 785 · unknown · exploded_structure</p>
+                        <code>H8918_MAIN_PCB_V1.2 + H8918_SUB_PCB_2_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CM5" data-status="approved">
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cm5/embedded/page-011-image-01.jpg" alt="CM5 page 11 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CM5</strong><span>Page 11 · approved</span></div>
+                        <p>851 x 524 · unknown · installed_mainboard</p>
+                        <code>H8918_MAIN_PCB_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CM5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cm5/embedded/page-011-image-02.jpg" alt="CM5 page 11 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CM5</strong><span>Page 11 · not_selected</span></div>
+                        <p>740 x 449 · unknown · candidate</p>
+                        <code>H8918_MAIN_PCB_V1.2 + H8918_SUB_PCB_2_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CM5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cm5/embedded/page-011-image-03.jpg" alt="CM5 page 11 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CM5</strong><span>Page 11 · not_selected</span></div>
+                        <p>895 x 530 · unknown · candidate</p>
+                        <code>H8918_MAIN_PCB_V1.2 + H8918_SUB_PCB_2_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CM5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cm5/embedded/page-011-image-04.jpg" alt="CM5 page 11 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CM5</strong><span>Page 11 · not_selected</span></div>
+                        <p>794 x 464 · unknown · candidate</p>
+                        <code>H8918_MAIN_PCB_V1.2 + H8918_SUB_PCB_2_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CM5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cm5/embedded/page-011-image-05.jpg" alt="CM5 page 11 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CM5</strong><span>Page 11 · not_selected</span></div>
+                        <p>929 x 611 · unknown · candidate</p>
+                        <code>H8918_MAIN_PCB_V1.2 + H8918_SUB_PCB_2_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CM5" data-status="approved">
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cm5/embedded/page-011-image-06.jpg" alt="CM5 page 11 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CM5</strong><span>Page 11 · approved</span></div>
+                        <p>1010 x 647 · unknown · installed_subboard</p>
+                        <code>H8918_SUB_PCB_2_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CM5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cm5/embedded/page-012-image-01.jpg" alt="CM5 page 12 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CM5</strong><span>Page 12 · not_selected</span></div>
+                        <p>1088 x 626 · unknown · candidate</p>
+                        <code>H8918_MAIN_PCB_V1.2 + H8918_SUB_PCB_2_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CM5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cm5/embedded/page-012-image-02.jpg" alt="CM5 page 12 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CM5</strong><span>Page 12 · not_selected</span></div>
+                        <p>1064 x 596 · unknown · candidate</p>
+                        <code>H8918_MAIN_PCB_V1.2 + H8918_SUB_PCB_2_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CM5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cm5/embedded/page-012-image-03.jpg" alt="CM5 page 12 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CM5</strong><span>Page 12 · not_selected</span></div>
+                        <p>788 x 467 · unknown · candidate</p>
+                        <code>H8918_MAIN_PCB_V1.2 + H8918_SUB_PCB_2_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CM5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cm5/embedded/page-012-image-04.jpg" alt="CM5 page 12 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CM5</strong><span>Page 12 · not_selected</span></div>
+                        <p>1022 x 563 · unknown · candidate</p>
+                        <code>H8918_MAIN_PCB_V1.2 + H8918_SUB_PCB_2_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CM5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cm5/embedded/page-012-image-05.jpg" alt="CM5 page 12 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CM5</strong><span>Page 12 · not_selected</span></div>
+                        <p>1319 x 762 · unknown · candidate</p>
+                        <code>H8918_MAIN_PCB_V1.2 + H8918_SUB_PCB_2_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CM5" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cm5/embedded/page-012-image-06.jpg" alt="CM5 page 12 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CM5</strong><span>Page 12 · not_selected</span></div>
+                        <p>795 x 440 · unknown · candidate</p>
+                        <code>H8918_MAIN_PCB_V1.2 + H8918_SUB_PCB_2_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CM6" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cm6/embedded/page-003-image-01.jpg" alt="CM6 page 3 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CM6</strong><span>Page 3 · not_selected</span></div>
+                        <p>675 x 418 · unknown · candidate</p>
+                        <code>H8918_MAIN_PCB_V1.2 + H8918_SUB_PCB_1_V1.3</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CM6" data-status="approved">
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cm6/embedded/page-003-image-02.jpg" alt="CM6 page 3 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CM6</strong><span>Page 3 · approved</span></div>
+                        <p>1361 x 798 · unknown · exploded_structure</p>
+                        <code>H8918_MAIN_PCB_V1.2 + H8918_SUB_PCB_1_V1.3</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CM6" data-status="approved">
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cm6/embedded/page-011-image-01.jpg" alt="CM6 page 11 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CM6</strong><span>Page 11 · approved</span></div>
+                        <p>863 x 504 · unknown · installed_mainboard</p>
+                        <code>H8918_MAIN_PCB_V1.2</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CM6" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cm6/embedded/page-011-image-02.jpg" alt="CM6 page 11 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CM6</strong><span>Page 11 · not_selected</span></div>
+                        <p>801 x 443 · unknown · candidate</p>
+                        <code>H8918_MAIN_PCB_V1.2 + H8918_SUB_PCB_1_V1.3</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CM6" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cm6/embedded/page-011-image-03.jpg" alt="CM6 page 11 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CM6</strong><span>Page 11 · not_selected</span></div>
+                        <p>726 x 438 · unknown · candidate</p>
+                        <code>H8918_MAIN_PCB_V1.2 + H8918_SUB_PCB_1_V1.3</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CM6" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cm6/embedded/page-011-image-04.jpg" alt="CM6 page 11 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CM6</strong><span>Page 11 · not_selected</span></div>
+                        <p>765 x 446 · unknown · candidate</p>
+                        <code>H8918_MAIN_PCB_V1.2 + H8918_SUB_PCB_1_V1.3</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CM6" data-status="approved">
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cm6/embedded/page-011-image-05.jpg" alt="CM6 page 11 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CM6</strong><span>Page 11 · approved</span></div>
+                        <p>701 x 419 · unknown · installed_subboard</p>
+                        <code>H8918_SUB_PCB_1_V1.3</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="CM6" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/cm6/embedded/page-011-image-06.jpg" alt="CM6 page 11 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>CM6</strong><span>Page 11 · not_selected</span></div>
+                        <p>780 x 446 · unknown · candidate</p>
+                        <code>H8918_MAIN_PCB_V1.2 + H8918_SUB_PCB_1_V1.3</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="X6880" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/x6880/embedded/page-003-image-01.jpg" alt="X6880 page 3 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>X6880</strong><span>Page 3 · not_selected</span></div>
+                        <p>675 x 418 · unknown · candidate</p>
+                        <code>H8912_MAIN_PCB_V1.1 + H8912_SUB_PCB_1_V1.1</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="X6880" data-status="approved">
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/x6880/embedded/page-003-image-02.jpg" alt="X6880 page 3 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>X6880</strong><span>Page 3 · approved</span></div>
+                        <p>1587 x 798 · unknown · exploded_structure</p>
+                        <code>H8912_MAIN_PCB_V1.1 + H8912_SUB_PCB_1_V1.1</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="X6880" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/x6880/embedded/page-009-image-01.jpg" alt="X6880 page 9 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>X6880</strong><span>Page 9 · not_selected</span></div>
+                        <p>1578 x 732 · unknown · candidate</p>
+                        <code>H8912_MAIN_PCB_V1.1 + H8912_SUB_PCB_1_V1.1</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="X6880" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/x6880/embedded/page-009-image-02.jpg" alt="X6880 page 9 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>X6880</strong><span>Page 9 · not_selected</span></div>
+                        <p>1281 x 585 · unknown · candidate</p>
+                        <code>H8912_MAIN_PCB_V1.1 + H8912_SUB_PCB_1_V1.1</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="X6880" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/x6880/embedded/page-009-image-03.jpg" alt="X6880 page 9 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>X6880</strong><span>Page 9 · not_selected</span></div>
+                        <p>1067 x 857 · unknown · candidate</p>
+                        <code>H8912_MAIN_PCB_V1.1 + H8912_SUB_PCB_1_V1.1</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="X6880" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/x6880/embedded/page-009-image-04.jpg" alt="X6880 page 9 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>X6880</strong><span>Page 9 · not_selected</span></div>
+                        <p>1110 x 846 · unknown · candidate</p>
+                        <code>H8912_MAIN_PCB_V1.1 + H8912_SUB_PCB_1_V1.1</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="X6880" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/x6880/embedded/page-009-image-05.jpg" alt="X6880 page 9 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>X6880</strong><span>Page 9 · not_selected</span></div>
+                        <p>1193 x 555 · unknown · candidate</p>
+                        <code>H8912_MAIN_PCB_V1.1 + H8912_SUB_PCB_1_V1.1</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="X6880" data-status="approved">
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/x6880/embedded/page-009-image-06.jpg" alt="X6880 page 9 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>X6880</strong><span>Page 9 · approved</span></div>
+                        <p>1519 x 865 · unknown · installed_mainboard</p>
+                        <code>H8912_MAIN_PCB_V1.1</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="X6880" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/x6880/embedded/page-010-image-01.jpg" alt="X6880 page 10 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>X6880</strong><span>Page 10 · not_selected</span></div>
+                        <p>1003 x 699 · unknown · candidate</p>
+                        <code>H8912_MAIN_PCB_V1.1 + H8912_SUB_PCB_1_V1.1</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="X6880" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/x6880/embedded/page-010-image-02.jpg" alt="X6880 page 10 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>X6880</strong><span>Page 10 · not_selected</span></div>
+                        <p>1315 x 927 · unknown · candidate</p>
+                        <code>H8912_MAIN_PCB_V1.1 + H8912_SUB_PCB_1_V1.1</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="X6880" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/x6880/embedded/page-010-image-03.jpg" alt="X6880 page 10 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>X6880</strong><span>Page 10 · not_selected</span></div>
+                        <p>1124 x 647 · unknown · candidate</p>
+                        <code>H8912_MAIN_PCB_V1.1 + H8912_SUB_PCB_1_V1.1</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="X6880" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/x6880/embedded/page-010-image-04.jpg" alt="X6880 page 10 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>X6880</strong><span>Page 10 · not_selected</span></div>
+                        <p>1287 x 728 · unknown · candidate</p>
+                        <code>H8912_MAIN_PCB_V1.1 + H8912_SUB_PCB_1_V1.1</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="X6880" data-status="approved">
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/x6880/embedded/page-010-image-05.jpg" alt="X6880 page 10 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>X6880</strong><span>Page 10 · approved</span></div>
+                        <p>1323 x 786 · unknown · installed_subboard</p>
+                        <code>H8912_SUB_PCB_1_V1.1</code>
+                      </div>
+                    </article>
+
+                    <article class="asset" data-model="X6880" data-status="not_selected" hidden>
+                      <div class="asset-image"><img src="../../assets/vision-reference-gallery/x6880/embedded/page-010-image-06.jpg" alt="X6880 page 10 candidate"></div>
+                      <div class="asset-meta">
+                        <div><strong>X6880</strong><span>Page 10 · not_selected</span></div>
+                        <p>1224 x 702 · unknown · candidate</p>
+                        <code>H8912_MAIN_PCB_V1.1 + H8912_SUB_PCB_1_V1.1</code>
+                      </div>
+                    </article>
+                    </section></main>
+  <script>
+    const buttons = [...document.querySelectorAll('[data-filter]')];
+    const assets = [...document.querySelectorAll('.asset')];
+    const showAllButton = document.getElementById('showAll');
+    let activeFilter = 'all';
+    let showAll = false;
+    function applyFilters() {
+      assets.forEach(asset => {
+        const modelMatches = activeFilter === 'all' || asset.dataset.model === activeFilter;
+        const statusMatches = showAll || asset.dataset.status === 'approved';
+        asset.hidden = !modelMatches || !statusMatches;
+      });
+    }
+    buttons.forEach(button => button.addEventListener('click', () => {
+      activeFilter = button.dataset.filter;
+      buttons.forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+      applyFilters();
+    }));
+    showAllButton.addEventListener('click', () => {
+      showAll = !showAll;
+      showAllButton.setAttribute('aria-pressed', String(showAll));
+      applyFilters();
+    });
+  </script>
+</body>
+</html>

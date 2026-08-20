@@ -1,0 +1,830 @@
+{
+  "library_id": "MODEL-REPAIR-GUIDANCE-COVERAGE-20260706",
+  "title": "机型维修步骤指导覆盖清单",
+  "generated_at": "2026-07-06",
+  "generation_rule": "基于现有维修指导书、原理图、位号图和平台信号库生成可执行步骤指导；不等待人工录入真实维修案例。",
+  "models": [
+    {
+      "package": "BG6H-F069",
+      "model_name": "BG6h",
+      "aliases": [
+        "J6563",
+        "F069",
+        "BG6H"
+      ],
+      "guide_available": true,
+      "guide_file": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/BG6H-F069/TECNO_J6563_BG6h-F069_维修操作指导书_V1.0_20231108.docx",
+      "extracted_chars": 14118,
+      "generated_count": 11,
+      "generated_sops": [
+        {
+          "sop_id": "SOP-BG6H-NO_POWER-AUTO-001",
+          "title": "BG6h 不开机维修步骤指导",
+          "module": "不开机",
+          "references": 3
+        },
+        {
+          "sop_id": "SOP-BG6H-NO_CHARGE-AUTO-001",
+          "title": "BG6h 不充电维修步骤指导",
+          "module": "不充电",
+          "references": 6
+        },
+        {
+          "sop_id": "SOP-BG6H-USB-AUTO-001",
+          "title": "BG6h USB 不识别维修步骤指导",
+          "module": "USB 不识别",
+          "references": 3
+        },
+        {
+          "sop_id": "SOP-BG6H-SIM-AUTO-001",
+          "title": "BG6h SIM 卡不识别维修步骤指导",
+          "module": "SIM 卡不识别",
+          "references": 2
+        },
+        {
+          "sop_id": "SOP-BG6H-DISPLAY-AUTO-001",
+          "title": "BG6h 显示异常/无显示维修步骤指导",
+          "module": "显示异常/无显示",
+          "references": 2
+        },
+        {
+          "sop_id": "SOP-BG6H-TOUCH-AUTO-001",
+          "title": "BG6h 触摸异常维修步骤指导",
+          "module": "触摸异常",
+          "references": 3
+        },
+        {
+          "sop_id": "SOP-BG6H-FRONT_CAMERA-AUTO-001",
+          "title": "BG6h 前置摄像头无显示维修步骤指导",
+          "module": "前置摄像头无显示",
+          "references": 3
+        },
+        {
+          "sop_id": "SOP-BG6H-REAR_CAMERA-AUTO-001",
+          "title": "BG6h 后置摄像头无显示维修步骤指导",
+          "module": "后置摄像头无显示",
+          "references": 3
+        },
+        {
+          "sop_id": "SOP-BG6H-RECEIVER-AUTO-001",
+          "title": "BG6h 受话器无声维修步骤指导",
+          "module": "受话器无声",
+          "references": 1
+        },
+        {
+          "sop_id": "SOP-BG6H-MIC-AUTO-001",
+          "title": "BG6h 送话器不送话维修步骤指导",
+          "module": "送话器不送话",
+          "references": 3
+        },
+        {
+          "sop_id": "SOP-BG6H-HEADPHONE-AUTO-001",
+          "title": "BG6h 耳机无声/耳机检测异常维修步骤指导",
+          "module": "耳机无声/耳机检测异常",
+          "references": 6
+        }
+      ],
+      "skipped_modules": []
+    },
+    {
+      "package": "BG6M-F069M",
+      "model_name": "BG6M-F069M",
+      "guide_available": false,
+      "generated_count": 0,
+      "generated_sops": [],
+      "skipped_reason": "未识别到维修指导书，当前只能挂载图纸和位号图。"
+    },
+    {
+      "package": "CK6N-H6929",
+      "model_name": "CK6N",
+      "aliases": [
+        "H6929",
+        "TECNO CK6N"
+      ],
+      "guide_available": true,
+      "guide_file": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CK6N-H6929/TECNO_CK6N-H6929╬¼╨▐▓┘╫≈╓╕╡╝╩Θ_V1.0_20230307.pdf",
+      "extracted_chars": 24051,
+      "generated_count": 11,
+      "generated_sops": [
+        {
+          "sop_id": "SOP-CK6N-NO_POWER-AUTO-001",
+          "title": "CK6N 不开机维修步骤指导",
+          "module": "不开机",
+          "references": 6
+        },
+        {
+          "sop_id": "SOP-CK6N-NO_CHARGE-AUTO-001",
+          "title": "CK6N 不充电维修步骤指导",
+          "module": "不充电",
+          "references": 6
+        },
+        {
+          "sop_id": "SOP-CK6N-USB-AUTO-001",
+          "title": "CK6N USB 不识别维修步骤指导",
+          "module": "USB 不识别",
+          "references": 4
+        },
+        {
+          "sop_id": "SOP-CK6N-SIM-AUTO-001",
+          "title": "CK6N SIM 卡不识别维修步骤指导",
+          "module": "SIM 卡不识别",
+          "references": 4
+        },
+        {
+          "sop_id": "SOP-CK6N-DISPLAY-AUTO-001",
+          "title": "CK6N 显示异常/无显示维修步骤指导",
+          "module": "显示异常/无显示",
+          "references": 6
+        },
+        {
+          "sop_id": "SOP-CK6N-TOUCH-AUTO-001",
+          "title": "CK6N 触摸异常维修步骤指导",
+          "module": "触摸异常",
+          "references": 2
+        },
+        {
+          "sop_id": "SOP-CK6N-FRONT_CAMERA-AUTO-001",
+          "title": "CK6N 前置摄像头无显示维修步骤指导",
+          "module": "前置摄像头无显示",
+          "references": 6
+        },
+        {
+          "sop_id": "SOP-CK6N-REAR_CAMERA-AUTO-001",
+          "title": "CK6N 后置摄像头无显示维修步骤指导",
+          "module": "后置摄像头无显示",
+          "references": 6
+        },
+        {
+          "sop_id": "SOP-CK6N-RECEIVER-AUTO-001",
+          "title": "CK6N 受话器无声维修步骤指导",
+          "module": "受话器无声",
+          "references": 0
+        },
+        {
+          "sop_id": "SOP-CK6N-MIC-AUTO-001",
+          "title": "CK6N 送话器不送话维修步骤指导",
+          "module": "送话器不送话",
+          "references": 1
+        },
+        {
+          "sop_id": "SOP-CK6N-HEADPHONE-AUTO-001",
+          "title": "CK6N 耳机无声/耳机检测异常维修步骤指导",
+          "module": "耳机无声/耳机检测异常",
+          "references": 2
+        }
+      ],
+      "skipped_modules": []
+    },
+    {
+      "package": "CLA5-H8910",
+      "model_name": "CLA5",
+      "aliases": [
+        "J6789",
+        "H8910",
+        "TECNO CLA5"
+      ],
+      "guide_available": true,
+      "guide_file": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CLA5-H8910/TECNO-J6789-CLA5-H8910手机维修通用操作指导书V1.0_20240805.pdf",
+      "extracted_chars": 26714,
+      "generated_count": 11,
+      "generated_sops": [
+        {
+          "sop_id": "SOP-CLA5-NO_POWER-AUTO-001",
+          "title": "CLA5 不开机维修步骤指导",
+          "module": "不开机",
+          "references": 6
+        },
+        {
+          "sop_id": "SOP-CLA5-NO_CHARGE-AUTO-001",
+          "title": "CLA5 不充电维修步骤指导",
+          "module": "不充电",
+          "references": 6
+        },
+        {
+          "sop_id": "SOP-CLA5-USB-AUTO-001",
+          "title": "CLA5 USB 不识别维修步骤指导",
+          "module": "USB 不识别",
+          "references": 4
+        },
+        {
+          "sop_id": "SOP-CLA5-SIM-AUTO-001",
+          "title": "CLA5 SIM 卡不识别维修步骤指导",
+          "module": "SIM 卡不识别",
+          "references": 4
+        },
+        {
+          "sop_id": "SOP-CLA5-DISPLAY-AUTO-001",
+          "title": "CLA5 显示异常/无显示维修步骤指导",
+          "module": "显示异常/无显示",
+          "references": 7
+        },
+        {
+          "sop_id": "SOP-CLA5-TOUCH-AUTO-001",
+          "title": "CLA5 触摸异常维修步骤指导",
+          "module": "触摸异常",
+          "references": 2
+        },
+        {
+          "sop_id": "SOP-CLA5-FRONT_CAMERA-AUTO-001",
+          "title": "CLA5 前置摄像头无显示维修步骤指导",
+          "module": "前置摄像头无显示",
+          "references": 5
+        },
+        {
+          "sop_id": "SOP-CLA5-REAR_CAMERA-AUTO-001",
+          "title": "CLA5 后置摄像头无显示维修步骤指导",
+          "module": "后置摄像头无显示",
+          "references": 5
+        },
+        {
+          "sop_id": "SOP-CLA5-RECEIVER-AUTO-001",
+          "title": "CLA5 受话器无声维修步骤指导",
+          "module": "受话器无声",
+          "references": 0
+        },
+        {
+          "sop_id": "SOP-CLA5-MIC-AUTO-001",
+          "title": "CLA5 送话器不送话维修步骤指导",
+          "module": "送话器不送话",
+          "references": 1
+        },
+        {
+          "sop_id": "SOP-CLA5-HEADPHONE-AUTO-001",
+          "title": "CLA5 耳机无声/耳机检测异常维修步骤指导",
+          "module": "耳机无声/耳机检测异常",
+          "references": 2
+        }
+      ],
+      "skipped_modules": []
+    },
+    {
+      "package": "CM5-H8918",
+      "model_name": "CM5",
+      "aliases": [
+        "K6855",
+        "H8918",
+        "TECNO CM5"
+      ],
+      "guide_available": true,
+      "guide_file": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM5-H8918/Tecno-CM5-H8918╩╓╗·╬¼╨▐═¿╙├▓┘╫≈╓╕╡╝╩ΘV1.0_20241218.pdf",
+      "extracted_chars": 26877,
+      "generated_count": 11,
+      "generated_sops": [
+        {
+          "sop_id": "SOP-CM5-NO_POWER-AUTO-001",
+          "title": "CM5 不开机维修步骤指导",
+          "module": "不开机",
+          "references": 6
+        },
+        {
+          "sop_id": "SOP-CM5-NO_CHARGE-AUTO-001",
+          "title": "CM5 不充电维修步骤指导",
+          "module": "不充电",
+          "references": 5
+        },
+        {
+          "sop_id": "SOP-CM5-USB-AUTO-001",
+          "title": "CM5 USB 不识别维修步骤指导",
+          "module": "USB 不识别",
+          "references": 4
+        },
+        {
+          "sop_id": "SOP-CM5-SIM-AUTO-001",
+          "title": "CM5 SIM 卡不识别维修步骤指导",
+          "module": "SIM 卡不识别",
+          "references": 4
+        },
+        {
+          "sop_id": "SOP-CM5-DISPLAY-AUTO-001",
+          "title": "CM5 显示异常/无显示维修步骤指导",
+          "module": "显示异常/无显示",
+          "references": 7
+        },
+        {
+          "sop_id": "SOP-CM5-TOUCH-AUTO-001",
+          "title": "CM5 触摸异常维修步骤指导",
+          "module": "触摸异常",
+          "references": 5
+        },
+        {
+          "sop_id": "SOP-CM5-FRONT_CAMERA-AUTO-001",
+          "title": "CM5 前置摄像头无显示维修步骤指导",
+          "module": "前置摄像头无显示",
+          "references": 6
+        },
+        {
+          "sop_id": "SOP-CM5-REAR_CAMERA-AUTO-001",
+          "title": "CM5 后置摄像头无显示维修步骤指导",
+          "module": "后置摄像头无显示",
+          "references": 6
+        },
+        {
+          "sop_id": "SOP-CM5-RECEIVER-AUTO-001",
+          "title": "CM5 受话器无声维修步骤指导",
+          "module": "受话器无声",
+          "references": 0
+        },
+        {
+          "sop_id": "SOP-CM5-MIC-AUTO-001",
+          "title": "CM5 送话器不送话维修步骤指导",
+          "module": "送话器不送话",
+          "references": 1
+        },
+        {
+          "sop_id": "SOP-CM5-HEADPHONE-AUTO-001",
+          "title": "CM5 耳机无声/耳机检测异常维修步骤指导",
+          "module": "耳机无声/耳机检测异常",
+          "references": 2
+        }
+      ],
+      "skipped_modules": []
+    },
+    {
+      "package": "CM6-H8918",
+      "model_name": "CM6",
+      "aliases": [
+        "K6855",
+        "H8918",
+        "TECNO CM6"
+      ],
+      "guide_available": true,
+      "guide_file": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM6-H8918/Tecno-CM6-H8918╩╓╗·╬¼╨▐═¿╙├▓┘╫≈╓╕╡╝╩ΘV1.0_20241218.pdf",
+      "extracted_chars": 26877,
+      "generated_count": 11,
+      "generated_sops": [
+        {
+          "sop_id": "SOP-CM6-NO_POWER-AUTO-001",
+          "title": "CM6 不开机维修步骤指导",
+          "module": "不开机",
+          "references": 6
+        },
+        {
+          "sop_id": "SOP-CM6-NO_CHARGE-AUTO-001",
+          "title": "CM6 不充电维修步骤指导",
+          "module": "不充电",
+          "references": 5
+        },
+        {
+          "sop_id": "SOP-CM6-USB-AUTO-001",
+          "title": "CM6 USB 不识别维修步骤指导",
+          "module": "USB 不识别",
+          "references": 4
+        },
+        {
+          "sop_id": "SOP-CM6-SIM-AUTO-001",
+          "title": "CM6 SIM 卡不识别维修步骤指导",
+          "module": "SIM 卡不识别",
+          "references": 4
+        },
+        {
+          "sop_id": "SOP-CM6-DISPLAY-AUTO-001",
+          "title": "CM6 显示异常/无显示维修步骤指导",
+          "module": "显示异常/无显示",
+          "references": 7
+        },
+        {
+          "sop_id": "SOP-CM6-TOUCH-AUTO-001",
+          "title": "CM6 触摸异常维修步骤指导",
+          "module": "触摸异常",
+          "references": 5
+        },
+        {
+          "sop_id": "SOP-CM6-FRONT_CAMERA-AUTO-001",
+          "title": "CM6 前置摄像头无显示维修步骤指导",
+          "module": "前置摄像头无显示",
+          "references": 6
+        },
+        {
+          "sop_id": "SOP-CM6-REAR_CAMERA-AUTO-001",
+          "title": "CM6 后置摄像头无显示维修步骤指导",
+          "module": "后置摄像头无显示",
+          "references": 6
+        },
+        {
+          "sop_id": "SOP-CM6-RECEIVER-AUTO-001",
+          "title": "CM6 受话器无声维修步骤指导",
+          "module": "受话器无声",
+          "references": 0
+        },
+        {
+          "sop_id": "SOP-CM6-MIC-AUTO-001",
+          "title": "CM6 送话器不送话维修步骤指导",
+          "module": "送话器不送话",
+          "references": 1
+        },
+        {
+          "sop_id": "SOP-CM6-HEADPHONE-AUTO-001",
+          "title": "CM6 耳机无声/耳机检测异常维修步骤指导",
+          "module": "耳机无声/耳机检测异常",
+          "references": 2
+        }
+      ],
+      "skipped_modules": []
+    },
+    {
+      "package": "KJ5-H6931",
+      "model_name": "KJ5",
+      "aliases": [
+        "J6563",
+        "H6931",
+        "TECNO KJ5"
+      ],
+      "guide_available": true,
+      "guide_file": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KJ5-H6931/Tecno-KJ5-H6931手机维修通用操作指导书V1.0_20230915.docx",
+      "extracted_chars": 14828,
+      "generated_count": 11,
+      "generated_sops": [
+        {
+          "sop_id": "SOP-KJ5-NO_POWER-AUTO-001",
+          "title": "KJ5 不开机维修步骤指导",
+          "module": "不开机",
+          "references": 5
+        },
+        {
+          "sop_id": "SOP-KJ5-NO_CHARGE-AUTO-001",
+          "title": "KJ5 不充电维修步骤指导",
+          "module": "不充电",
+          "references": 6
+        },
+        {
+          "sop_id": "SOP-KJ5-USB-AUTO-001",
+          "title": "KJ5 USB 不识别维修步骤指导",
+          "module": "USB 不识别",
+          "references": 4
+        },
+        {
+          "sop_id": "SOP-KJ5-SIM-AUTO-001",
+          "title": "KJ5 SIM 卡不识别维修步骤指导",
+          "module": "SIM 卡不识别",
+          "references": 4
+        },
+        {
+          "sop_id": "SOP-KJ5-DISPLAY-AUTO-001",
+          "title": "KJ5 显示异常/无显示维修步骤指导",
+          "module": "显示异常/无显示",
+          "references": 5
+        },
+        {
+          "sop_id": "SOP-KJ5-TOUCH-AUTO-001",
+          "title": "KJ5 触摸异常维修步骤指导",
+          "module": "触摸异常",
+          "references": 4
+        },
+        {
+          "sop_id": "SOP-KJ5-FRONT_CAMERA-AUTO-001",
+          "title": "KJ5 前置摄像头无显示维修步骤指导",
+          "module": "前置摄像头无显示",
+          "references": 6
+        },
+        {
+          "sop_id": "SOP-KJ5-REAR_CAMERA-AUTO-001",
+          "title": "KJ5 后置摄像头无显示维修步骤指导",
+          "module": "后置摄像头无显示",
+          "references": 6
+        },
+        {
+          "sop_id": "SOP-KJ5-RECEIVER-AUTO-001",
+          "title": "KJ5 受话器无声维修步骤指导",
+          "module": "受话器无声",
+          "references": 0
+        },
+        {
+          "sop_id": "SOP-KJ5-MIC-AUTO-001",
+          "title": "KJ5 送话器不送话维修步骤指导",
+          "module": "送话器不送话",
+          "references": 1
+        },
+        {
+          "sop_id": "SOP-KJ5-HEADPHONE-AUTO-001",
+          "title": "KJ5 耳机无声/耳机检测异常维修步骤指导",
+          "module": "耳机无声/耳机检测异常",
+          "references": 2
+        }
+      ],
+      "skipped_modules": []
+    },
+    {
+      "package": "KL4-F201",
+      "model_name": "KL4",
+      "aliases": [
+        "K6735",
+        "F201",
+        "TECNO KL4"
+      ],
+      "guide_available": true,
+      "guide_file": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KL4-F201/TECNO_K6735_KL4-F201维修操作指导书_V1.0_20240705.pdf",
+      "extracted_chars": 16752,
+      "generated_count": 11,
+      "generated_sops": [
+        {
+          "sop_id": "SOP-KL4-NO_POWER-AUTO-001",
+          "title": "KL4 不开机维修步骤指导",
+          "module": "不开机",
+          "references": 5
+        },
+        {
+          "sop_id": "SOP-KL4-NO_CHARGE-AUTO-001",
+          "title": "KL4 不充电维修步骤指导",
+          "module": "不充电",
+          "references": 7
+        },
+        {
+          "sop_id": "SOP-KL4-USB-AUTO-001",
+          "title": "KL4 USB 不识别维修步骤指导",
+          "module": "USB 不识别",
+          "references": 4
+        },
+        {
+          "sop_id": "SOP-KL4-SIM-AUTO-001",
+          "title": "KL4 SIM 卡不识别维修步骤指导",
+          "module": "SIM 卡不识别",
+          "references": 5
+        },
+        {
+          "sop_id": "SOP-KL4-DISPLAY-AUTO-001",
+          "title": "KL4 显示异常/无显示维修步骤指导",
+          "module": "显示异常/无显示",
+          "references": 3
+        },
+        {
+          "sop_id": "SOP-KL4-TOUCH-AUTO-001",
+          "title": "KL4 触摸异常维修步骤指导",
+          "module": "触摸异常",
+          "references": 0
+        },
+        {
+          "sop_id": "SOP-KL4-FRONT_CAMERA-AUTO-001",
+          "title": "KL4 前置摄像头无显示维修步骤指导",
+          "module": "前置摄像头无显示",
+          "references": 2
+        },
+        {
+          "sop_id": "SOP-KL4-REAR_CAMERA-AUTO-001",
+          "title": "KL4 后置摄像头无显示维修步骤指导",
+          "module": "后置摄像头无显示",
+          "references": 2
+        },
+        {
+          "sop_id": "SOP-KL4-RECEIVER-AUTO-001",
+          "title": "KL4 受话器无声维修步骤指导",
+          "module": "受话器无声",
+          "references": 0
+        },
+        {
+          "sop_id": "SOP-KL4-MIC-AUTO-001",
+          "title": "KL4 送话器不送话维修步骤指导",
+          "module": "送话器不送话",
+          "references": 3
+        },
+        {
+          "sop_id": "SOP-KL4-HEADPHONE-AUTO-001",
+          "title": "KL4 耳机无声/耳机检测异常维修步骤指导",
+          "module": "耳机无声/耳机检测异常",
+          "references": 6
+        }
+      ],
+      "skipped_modules": []
+    },
+    {
+      "package": "KM4-F151",
+      "model_name": "KM4",
+      "aliases": [
+        "L6735",
+        "F151",
+        "TECNO KM4"
+      ],
+      "guide_available": true,
+      "guide_file": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/TECNO-L6735-KM4-F151手机维修通用操作指导书V1.0_20250331.pdf",
+      "extracted_chars": 15623,
+      "generated_count": 11,
+      "generated_sops": [
+        {
+          "sop_id": "SOP-KM4-NO_POWER-AUTO-001",
+          "title": "KM4 不开机维修步骤指导",
+          "module": "不开机",
+          "references": 6
+        },
+        {
+          "sop_id": "SOP-KM4-NO_CHARGE-AUTO-001",
+          "title": "KM4 不充电维修步骤指导",
+          "module": "不充电",
+          "references": 6
+        },
+        {
+          "sop_id": "SOP-KM4-USB-AUTO-001",
+          "title": "KM4 USB 不识别维修步骤指导",
+          "module": "USB 不识别",
+          "references": 3
+        },
+        {
+          "sop_id": "SOP-KM4-SIM-AUTO-001",
+          "title": "KM4 SIM 卡不识别维修步骤指导",
+          "module": "SIM 卡不识别",
+          "references": 4
+        },
+        {
+          "sop_id": "SOP-KM4-DISPLAY-AUTO-001",
+          "title": "KM4 显示异常/无显示维修步骤指导",
+          "module": "显示异常/无显示",
+          "references": 2
+        },
+        {
+          "sop_id": "SOP-KM4-TOUCH-AUTO-001",
+          "title": "KM4 触摸异常维修步骤指导",
+          "module": "触摸异常",
+          "references": 1
+        },
+        {
+          "sop_id": "SOP-KM4-FRONT_CAMERA-AUTO-001",
+          "title": "KM4 前置摄像头无显示维修步骤指导",
+          "module": "前置摄像头无显示",
+          "references": 2
+        },
+        {
+          "sop_id": "SOP-KM4-REAR_CAMERA-AUTO-001",
+          "title": "KM4 后置摄像头无显示维修步骤指导",
+          "module": "后置摄像头无显示",
+          "references": 2
+        },
+        {
+          "sop_id": "SOP-KM4-RECEIVER-AUTO-001",
+          "title": "KM4 受话器无声维修步骤指导",
+          "module": "受话器无声",
+          "references": 1
+        },
+        {
+          "sop_id": "SOP-KM4-MIC-AUTO-001",
+          "title": "KM4 送话器不送话维修步骤指导",
+          "module": "送话器不送话",
+          "references": 3
+        },
+        {
+          "sop_id": "SOP-KM4-HEADPHONE-AUTO-001",
+          "title": "KM4 耳机无声/耳机检测异常维修步骤指导",
+          "module": "耳机无声/耳机检测异常",
+          "references": 6
+        }
+      ],
+      "skipped_modules": []
+    },
+    {
+      "package": "KM7K-H8921",
+      "model_name": "KM7K",
+      "aliases": [
+        "H8921",
+        "TECNO KM7K"
+      ],
+      "guide_available": true,
+      "guide_file": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM7K-H8921/TECNO-KM7K-H8921手机维修通用操作指导书V1.0_20250718.pdf",
+      "extracted_chars": 24701,
+      "generated_count": 11,
+      "generated_sops": [
+        {
+          "sop_id": "SOP-KM7K-NO_POWER-AUTO-001",
+          "title": "KM7K 不开机维修步骤指导",
+          "module": "不开机",
+          "references": 6
+        },
+        {
+          "sop_id": "SOP-KM7K-NO_CHARGE-AUTO-001",
+          "title": "KM7K 不充电维修步骤指导",
+          "module": "不充电",
+          "references": 5
+        },
+        {
+          "sop_id": "SOP-KM7K-USB-AUTO-001",
+          "title": "KM7K USB 不识别维修步骤指导",
+          "module": "USB 不识别",
+          "references": 4
+        },
+        {
+          "sop_id": "SOP-KM7K-SIM-AUTO-001",
+          "title": "KM7K SIM 卡不识别维修步骤指导",
+          "module": "SIM 卡不识别",
+          "references": 4
+        },
+        {
+          "sop_id": "SOP-KM7K-DISPLAY-AUTO-001",
+          "title": "KM7K 显示异常/无显示维修步骤指导",
+          "module": "显示异常/无显示",
+          "references": 7
+        },
+        {
+          "sop_id": "SOP-KM7K-TOUCH-AUTO-001",
+          "title": "KM7K 触摸异常维修步骤指导",
+          "module": "触摸异常",
+          "references": 5
+        },
+        {
+          "sop_id": "SOP-KM7K-FRONT_CAMERA-AUTO-001",
+          "title": "KM7K 前置摄像头无显示维修步骤指导",
+          "module": "前置摄像头无显示",
+          "references": 6
+        },
+        {
+          "sop_id": "SOP-KM7K-REAR_CAMERA-AUTO-001",
+          "title": "KM7K 后置摄像头无显示维修步骤指导",
+          "module": "后置摄像头无显示",
+          "references": 6
+        },
+        {
+          "sop_id": "SOP-KM7K-RECEIVER-AUTO-001",
+          "title": "KM7K 受话器无声维修步骤指导",
+          "module": "受话器无声",
+          "references": 0
+        },
+        {
+          "sop_id": "SOP-KM7K-MIC-AUTO-001",
+          "title": "KM7K 送话器不送话维修步骤指导",
+          "module": "送话器不送话",
+          "references": 1
+        },
+        {
+          "sop_id": "SOP-KM7K-HEADPHONE-AUTO-001",
+          "title": "KM7K 耳机无声/耳机检测异常维修步骤指导",
+          "module": "耳机无声/耳机检测异常",
+          "references": 2
+        }
+      ],
+      "skipped_modules": []
+    },
+    {
+      "package": "X6880-H8912",
+      "model_name": "X6880",
+      "aliases": [
+        "K6789",
+        "H8912",
+        "Infinix X6880"
+      ],
+      "guide_available": true,
+      "guide_file": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/X6880-H8912/Infinix_K6789_X6880-H8912维修操作指导书_V1.0_20240815.pdf",
+      "extracted_chars": 20338,
+      "generated_count": 10,
+      "generated_sops": [
+        {
+          "sop_id": "SOP-X6880-NO_POWER-AUTO-001",
+          "title": "X6880 不开机维修步骤指导",
+          "module": "不开机",
+          "references": 6
+        },
+        {
+          "sop_id": "SOP-X6880-NO_CHARGE-AUTO-001",
+          "title": "X6880 不充电维修步骤指导",
+          "module": "不充电",
+          "references": 7
+        },
+        {
+          "sop_id": "SOP-X6880-USB-AUTO-001",
+          "title": "X6880 USB 不识别维修步骤指导",
+          "module": "USB 不识别",
+          "references": 4
+        },
+        {
+          "sop_id": "SOP-X6880-DISPLAY-AUTO-001",
+          "title": "X6880 显示异常/无显示维修步骤指导",
+          "module": "显示异常/无显示",
+          "references": 7
+        },
+        {
+          "sop_id": "SOP-X6880-TOUCH-AUTO-001",
+          "title": "X6880 触摸异常维修步骤指导",
+          "module": "触摸异常",
+          "references": 1
+        },
+        {
+          "sop_id": "SOP-X6880-FRONT_CAMERA-AUTO-001",
+          "title": "X6880 前置摄像头无显示维修步骤指导",
+          "module": "前置摄像头无显示",
+          "references": 6
+        },
+        {
+          "sop_id": "SOP-X6880-REAR_CAMERA-AUTO-001",
+          "title": "X6880 后置摄像头无显示维修步骤指导",
+          "module": "后置摄像头无显示",
+          "references": 6
+        },
+        {
+          "sop_id": "SOP-X6880-RECEIVER-AUTO-001",
+          "title": "X6880 受话器无声维修步骤指导",
+          "module": "受话器无声",
+          "references": 0
+        },
+        {
+          "sop_id": "SOP-X6880-MIC-AUTO-001",
+          "title": "X6880 送话器不送话维修步骤指导",
+          "module": "送话器不送话",
+          "references": 3
+        },
+        {
+          "sop_id": "SOP-X6880-HEADPHONE-AUTO-001",
+          "title": "X6880 耳机无声/耳机检测异常维修步骤指导",
+          "module": "耳机无声/耳机检测异常",
+          "references": 3
+        }
+      ],
+      "skipped_modules": [
+        "SIM 卡不识别"
+      ]
+    }
+  ]
+}

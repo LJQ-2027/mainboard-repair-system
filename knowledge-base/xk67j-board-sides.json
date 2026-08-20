@@ -1,0 +1,26 @@
+{
+  "manifest_id": "XK67J-MAIN-BOARD-SIDES-V1",
+  "profile_id": "xk67j-main-v1.0b",
+  "board_id": "BOARD-XK67J-MAIN-V1.0B",
+  "default_side_id": "main_page_2",
+  "sides": [
+    {
+      "side_id": "main_page_1",
+      "label": "第1面",
+      "source_pdf_page": 1,
+      "component_page": 1,
+      "point_map_source": "source-materials/owner-supplied/2026-07-31-km5-xk67j/packages/KM5-KM4N-XK67J-SHARED/XK67J_KM5_MAIN_PCB_V1.0B_PLACEMENT.pdf",
+      "engineering_texture": "assets/board-atlas/xk67j/main-point-map-page-1.png",
+      "compiled_data": "knowledge-base/xk67j-board-compiled-page-1.json"
+    },
+    {
+      "side_id": "main_page_2",
+      "label": "第2面",
+      "source_pdf_page": 2,
+      "component_page": 2,
+      "point_map_source": "source-materials/owner-supplied/2026-07-31-km5-xk67j/packages/KM5-KM4N-XK67J-SHARED/XK67J_KM5_MAIN_PCB_V1.0B_PLACEMENT.pdf",
+      "engineering_texture": "assets/board-atlas/xk67j/main-point-map-page-2.png",
+      "compiled_data": "knowledge-base/xk67j-board-compiled-page-2.json"
+    }
+  ]
+}

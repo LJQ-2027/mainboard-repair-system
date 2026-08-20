@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mainboard-repair.local/schemas/visual-qc-repair-evidence-link-list-v1.json",
+  "title": "Visual-QC Repair Evidence Link List V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "links"],
+  "properties": {
+    "schema_version": {
+      "const": "VISUAL-QC-REPAIR-EVIDENCE-LINK-LIST-V1"
+    },
+    "links": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/summary"}
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "safeId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+    },
+    "health": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "reasons"],
+      "properties": {
+        "state": {"enum": ["active", "stale", "unavailable"]},
+        "reasons": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "server_case_identity_mismatch",
+              "image_identity_mismatch",
+              "qualified_handoff_mismatch",
+              "registration_job_mismatch",
+              "registration_review_mismatch",
+              "board_asset_mismatch",
+              "server_case_missing",
+              "image_missing",
+              "registration_job_missing",
+              "registration_review_missing",
+              "board_asset_missing",
+              "link_authority_missing",
+              "link_authority_mismatch"
+            ]
+          }
+        }
+      }
+    },
+    "associationCounts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "related",
+        "possibly_related",
+        "not_related",
+        "insufficient_evidence"
+      ],
+      "properties": {
+        "related": {"type": "integer", "minimum": 0},
+        "possibly_related": {"type": "integer", "minimum": 0},
+        "not_related": {"type": "integer", "minimum": 0},
+        "insufficient_evidence": {"type": "integer", "minimum": 0}
+      }
+    },
+    "visibilityCounts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["not_assessed", "visible", "not_visible", "occluded"],
+      "properties": {
+        "not_assessed": {"type": "integer", "minimum": 0},
+        "visible": {"type": "integer", "minimum": 0},
+        "not_visible": {"type": "integer", "minimum": 0},
+        "occluded": {"type": "integer", "minimum": 0}
+      }
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "association",
+        "visibility",
+        "source_fact_superseded",
+        "binding_superseded"
+      ],
+      "properties": {
+        "association": {"$ref": "#/$defs/associationCounts"},
+        "visibility": {"$ref": "#/$defs/visibilityCounts"},
+        "source_fact_superseded": {"type": "integer", "minimum": 0},
+        "binding_superseded": {"type": "integer", "minimum": 0}
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "link_set_id",
+        "revision",
+        "manifest_sha256",
+        "repair_case_id",
+        "board",
+        "server_case_ids",
+        "counts",
+        "health",
+        "imported_at"
+      ],
+      "properties": {
+        "link_set_id": {"$ref": "#/$defs/safeId"},
+        "revision": {"type": "integer", "minimum": 1},
+        "manifest_sha256": {"$ref": "#/$defs/sha256"},
+        "repair_case_id": {"$ref": "#/$defs/safeId"},
+        "board": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["board_key", "board_id"],
+          "properties": {
+            "board_key": {"$ref": "#/$defs/safeId"},
+            "board_id": {"$ref": "#/$defs/safeId"}
+          }
+        },
+        "server_case_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/safeId"}
+        },
+        "counts": {"$ref": "#/$defs/counts"},
+        "health": {"$ref": "#/$defs/health"},
+        "imported_at": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

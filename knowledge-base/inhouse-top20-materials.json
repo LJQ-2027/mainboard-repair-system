@@ -1,0 +1,346 @@
+{
+  "inventory_id": "TOP20-INHOUSE-MATERIALS-20260702",
+  "title": "Top20 内研机型资料包清单",
+  "received_date": "2026-07-02",
+  "source_id": "SRC-20260702-001",
+  "raw_archive_path": "D:/Feishu/top20机型中内研的11个.zip",
+  "local_extract_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages",
+  "commit_policy": "当前已在 source-materials 中保存原始压缩包和解包资料，同时提交结构化清单和资料状态。",
+  "scope": {
+    "received": "Top20 机型中的 11 个内研项目资料",
+    "unavailable": "Top20 外研项目资料，制造中心同事反馈无法提供。",
+    "implication": "第一阶段机型资料库先围绕内研项目建设；外研机型作为资料缺口记录，不阻塞内研资料结构化。"
+  },
+  "package_count": 11,
+  "packages": [
+    {
+      "package_id": "TOP20-INHOUSE-BG6M-F069M",
+      "model_name": "BG6m",
+      "aliases": [
+        "BG6M",
+        "F069M",
+        "J6765"
+      ],
+      "brand_series": "TECNO / J series",
+      "source_archive": "BG6M-F069M.zip",
+      "board_versions": [
+        "F069M_MAIN_PCB_V1.0"
+      ],
+      "material_types": [
+        "main_schematic",
+        "main_point_map"
+      ],
+      "key_files": [
+        "J6765_F069M_MAIN_SCH_维修原理图_V1.0.pdf",
+        "F069M_MAIN_PCB_V1.0_位号图(A1).pdf"
+      ],
+      "notes": "仅识别到主板维修原理图和主板位号图，未识别到独立维修操作指导书。"
+    },
+    {
+      "package_id": "TOP20-INHOUSE-X6880-H8912",
+      "model_name": "X6880",
+      "aliases": [
+        "K6789",
+        "H8912",
+        "Infinix X6880"
+      ],
+      "brand_series": "Infinix",
+      "source_archive": "Infinix_K6789_X6880-H8912维修操作指导书_V1.0_20240815.7z",
+      "board_versions": [
+        "H8912_MAIN_PCB_V1.1",
+        "H8912_SUB_PCB_1_V1.1"
+      ],
+      "material_types": [
+        "repair_guide",
+        "main_schematic",
+        "main_point_map",
+        "sub_board_schematic",
+        "sub_board_pcb"
+      ],
+      "key_files": [
+        "维修操作指导书",
+        "H8912_MAIN_PCB_V1.1.pdf",
+        "H8912_MAIN_PCB_V1.1_位号图_20240605.pdf",
+        "H8912_SUB_PCB_1_V1.1.pdf"
+      ],
+      "notes": "包含维修指导书、主板图纸、主板位号图和副板资料。"
+    },
+    {
+      "package_id": "TOP20-INHOUSE-CK6N-H6929",
+      "model_name": "CK6N",
+      "aliases": [
+        "H6929",
+        "TECNO CK6N"
+      ],
+      "brand_series": "TECNO",
+      "source_archive": "TECNO_CK6N-H6929维修操作指导书_V1.0_20230307.zip",
+      "board_versions": [
+        "H6929_MAIN_V1.1",
+        "H894_SUB_SCH_2_V1.0"
+      ],
+      "material_types": [
+        "repair_guide",
+        "main_schematic",
+        "main_point_map_top",
+        "main_point_map_bottom",
+        "sub_board_schematic"
+      ],
+      "key_files": [
+        "维修操作指导书",
+        "H6929_MAIN_V1.1",
+        "H6929_MAIN_PCB_V1.1_TOP",
+        "H6929_MAIN_PCB_V1.1_BOT",
+        "H894_SUB_SCH_2_V1.0"
+      ],
+      "notes": "部分文件名存在压缩包编码导致的乱码，需要后续按文件内容规范命名。"
+    },
+    {
+      "package_id": "TOP20-INHOUSE-BG6H-F069",
+      "model_name": "BG6h",
+      "aliases": [
+        "J6563",
+        "F069",
+        "BG6H"
+      ],
+      "brand_series": "TECNO / J series",
+      "source_archive": "TECNO_J6563_BG6h-F069_维修操作指导书_V1.0_20231108.zip",
+      "board_versions": [
+        "F069_MAIN_PCB_V1.2",
+        "F069_SUB_PCB_1_V1.1"
+      ],
+      "material_types": [
+        "repair_guide",
+        "main_schematic",
+        "main_point_map",
+        "sub_board_schematic"
+      ],
+      "key_files": [
+        "TECNO_J6563_BG6h-F069_维修操作指导书_V1.0_20231108.docx",
+        "F069_MAIN_PCB_V1.2 维修原理图 20230804.pdf",
+        "F069_MAIN_PCB_V1.2_位号图_20230823（A4）.pdf",
+        "F069_SUB_PCB_1_V1.1 维修原理图 20230712.pdf"
+      ],
+      "notes": "包含 Word 维修指导书，适合后续抽取为机型 SOP 草案。"
+    },
+    {
+      "package_id": "TOP20-INHOUSE-KL4-F201",
+      "model_name": "KL4",
+      "aliases": [
+        "K6735",
+        "F201",
+        "TECNO KL4"
+      ],
+      "brand_series": "TECNO / K series",
+      "source_archive": "TECNO_K6735_KL4-F201维修操作指导书_V1.0_20240705.7z",
+      "board_versions": [
+        "F201_MAIN_V1.2",
+        "F201_SUB_SCH_1_V1.2"
+      ],
+      "material_types": [
+        "repair_guide",
+        "main_schematic",
+        "main_point_map",
+        "sub_board_schematic"
+      ],
+      "key_files": [
+        "TECNO_K6735_KL4-F201维修操作指导书_V1.0_20240705.pdf",
+        "K6735_F201_MAIN_SCH_V1.2维修原理图20240614.pdf",
+        "F201_MAIN_V1.2_零件位号.pdf",
+        "K6735_F201_SUB_SCH_1_V1.2维修原理图20240614.pdf"
+      ],
+      "notes": "该机型已在 L4 报告 Top 机型中出现，可优先进入资料审核。"
+    },
+    {
+      "package_id": "TOP20-INHOUSE-CM5-H8918",
+      "model_name": "CM5",
+      "aliases": [
+        "K6855",
+        "H8918",
+        "TECNO CM5"
+      ],
+      "brand_series": "TECNO / C series",
+      "source_archive": "Tecno-CM5-H8918手机维修通用操作指导书V1.0_20241218.zip",
+      "board_versions": [
+        "H8918_MAIN_PCB_V1.2",
+        "H8918_SUB_PCB_2_V1.2"
+      ],
+      "material_types": [
+        "repair_guide",
+        "main_schematic",
+        "main_point_map",
+        "sub_board_schematic",
+        "comparison_table"
+      ],
+      "key_files": [
+        "手机维修通用操作指导书",
+        "K6855_H8918_MAIN_PCB_V1.2_维修原理图.pdf",
+        "H8918_MAIN_PCB_V1.2_位号图20241030.pdf",
+        "H8918_SUB_PCB_2_V1.2_维修原理图.pdf",
+        "xlsx 对照表"
+      ],
+      "notes": "与 CM6 共用 H8918 主板资料，需要后续确认差异和适用边界。"
+    },
+    {
+      "package_id": "TOP20-INHOUSE-CM6-H8918",
+      "model_name": "CM6",
+      "aliases": [
+        "K6855",
+        "H8918",
+        "TECNO CM6"
+      ],
+      "brand_series": "TECNO / C series",
+      "source_archive": "Tecno-CM6-H8918手机维修通用操作指导书V1.0_20241218.zip",
+      "board_versions": [
+        "H8918_MAIN_PCB_V1.2",
+        "H8918_SUB_PCB_1_V1.3"
+      ],
+      "material_types": [
+        "repair_guide",
+        "main_schematic",
+        "main_point_map",
+        "sub_board_schematic",
+        "comparison_table"
+      ],
+      "key_files": [
+        "手机维修通用操作指导书",
+        "K6855_H8918_MAIN_PCB_V1.2_维修原理图.pdf",
+        "H8918_MAIN_PCB_V1.2_位号图20241030.pdf",
+        "H8918_SUB_PCB_1_V1.3_维修原理图.pdf",
+        "CM6 对照表"
+      ],
+      "notes": "该机型已在 L4 报告 Top 机型中出现，可优先进入资料审核。"
+    },
+    {
+      "package_id": "TOP20-INHOUSE-CLA5-H8910",
+      "model_name": "CLA5",
+      "aliases": [
+        "J6789",
+        "H8910",
+        "TECNO CLA5"
+      ],
+      "brand_series": "TECNO / CLA series",
+      "source_archive": "TECNO-J6789-CLA5-H8910手机维修通用操作指导书V1.0_20240805.zip",
+      "board_versions": [
+        "H8910_MAIN_PCB_V1.1",
+        "H8910_SUB_PCB_1_V1.0"
+      ],
+      "material_types": [
+        "repair_guide",
+        "main_schematic",
+        "main_point_map",
+        "sub_board_schematic",
+        "sub_board_point_map"
+      ],
+      "key_files": [
+        "TECNO-J6789-CLA5-H8910手机维修通用操作指导书V1.0_20240805.pdf",
+        "J6789_H8910_MAIN_SCH_V1.1_维修原理图_20240513.pdf",
+        "H8910_MAIN_PCB_V1.1_位号图.pdf",
+        "H8910_SUB_SCH_1_V1.0_维修原理图_20240513.pdf",
+        "H8910_SUB_PCB_1_V1.0_位号图.pdf"
+      ],
+      "notes": "资料结构较完整，可作为机型资料入库模板样本。"
+    },
+    {
+      "package_id": "TOP20-INHOUSE-KJ5-H6931",
+      "model_name": "KJ5",
+      "aliases": [
+        "J6563",
+        "H6931",
+        "TECNO KJ5"
+      ],
+      "brand_series": "TECNO / K series",
+      "source_archive": "Tecno-KJ5-H6931手机维修通用操作指导书V1.0_20230915.zip",
+      "board_versions": [
+        "H6931_MAIN_PCB_V1.0",
+        "H6931_MAIN_PCB_V1.2"
+      ],
+      "material_types": [
+        "repair_guide",
+        "main_schematic",
+        "main_point_map",
+        "multi_version_materials"
+      ],
+      "key_files": [
+        "Tecno-KJ5-H6931手机维修通用操作指导书V1.0_20230915.docx",
+        "J6563_H6931_MAIN_SCH_维修原理图_V1.1_20230727-0926.pdf",
+        "J6563_H6931_MAIN_SCH_维修原理图_V1.0_20230616-1535.pdf",
+        "H6931_MAIN_PCB_V1.2_ 位号图.pdf",
+        "H6931_MAIN_PCB_V1.0_ 位号图.pdf"
+      ],
+      "notes": "存在多个主板版本，需要后续确认版本适用规则。"
+    },
+    {
+      "package_id": "TOP20-INHOUSE-KM7K-H8921",
+      "model_name": "KM7K",
+      "aliases": [
+        "H8921",
+        "TECNO KM7K"
+      ],
+      "brand_series": "TECNO / K series",
+      "source_archive": "TECNO-KM7K-H8921手机维修通用操作指导书V1.0_20250718.7z",
+      "board_versions": [
+        "H8921_MAIN_PCB_V1.2",
+        "H8921_SUB_SCH_1_V1.2"
+      ],
+      "material_types": [
+        "repair_guide",
+        "main_schematic",
+        "main_point_map",
+        "sub_board_schematic"
+      ],
+      "key_files": [
+        "TECNO-KM7K-H8921手机维修通用操作指导书V1.0_20250718.pdf",
+        "H8921_MAIN_SCH_维修原理图_V1.2_20250402_2048.pdf",
+        "H8921_MAIN_PCB_V1.2_位号图.pdf",
+        "H8921_SUB_SCH_1_维修原理图_V1.2_20250402-2053.pdf"
+      ],
+      "notes": "资料日期为 2025-07-18；截至 2026-08-02 已不是未来日期。版本适用范围仍需按来源和板号审查。"
+    },
+    {
+      "package_id": "TOP20-INHOUSE-KM4-F151",
+      "model_name": "KM4",
+      "aliases": [
+        "L6735",
+        "F151",
+        "TECNO KM4"
+      ],
+      "brand_series": "TECNO / K series",
+      "source_archive": "TECNO-L6735-KM4-F151手机维修通用操作指导书V1.0_20250331 (1).zip",
+      "board_versions": [
+        "F151_MAIN_PCB_V1.2",
+        "F151_SUB_PCB_1_V1.1"
+      ],
+      "material_types": [
+        "repair_guide",
+        "main_schematic",
+        "main_point_map",
+        "sub_board_schematic"
+      ],
+      "key_files": [
+        "TECNO-L6735-KM4-F151手机维修通用操作指导书V1.0_20250331.pdf",
+        "F151_MAIN_PCB_1_维修原理图_V1.2_20250310.pdf",
+        "F151_MAIN_PCB_V1.2_位号图.pdf",
+        "F151_SUB_PCB_1_维修原理图_V1.1_20250310.pdf"
+      ],
+      "notes": "该机型已在 L4 报告 Top 机型中出现，可优先进入资料审核。"
+    }
+  ],
+  "material_type_legend": {
+    "repair_guide": "维修操作指导书或通用操作指导书",
+    "main_schematic": "主板维修原理图",
+    "main_point_map": "主板位号图 / 零件位号图",
+    "main_point_map_top": "主板 TOP 面位号图",
+    "main_point_map_bottom": "主板 BOT 面位号图",
+    "sub_board_schematic": "副板维修原理图",
+    "sub_board_point_map": "副板位号图",
+    "comparison_table": "对照表或差异表",
+    "multi_version_materials": "同一机型存在多个板号或版本资料"
+  },
+  "next_steps": [
+    "统一文件命名，解决部分压缩包中文文件名乱码问题。",
+    "按机型抽取维修指导书章节，沉淀为机型 SOP 草案。",
+    "按机型登记主板版本、位号图、维修原理图和副板资料。",
+    "把 BG6m、KM4、KL4、CM6 等 L4 高频机型优先送技术支持/制造中心确认。",
+    "将外研 Top20 资料不可得记录为正式缺口，后续通过售后维修案例或本地资料补齐。"
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "VISUAL-QC-DEPLOYMENT-MANIFEST-V1",
+  "title": "Visual QC Deployment Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "commit_sha",
+    "archive_sha256",
+    "archive_bytes",
+    "runtime_manifest_sha256",
+    "runtime_path_count"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "VISUAL-QC-DEPLOYMENT-MANIFEST-V1"
+    },
+    "commit_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "archive_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "archive_bytes": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "runtime_manifest_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "runtime_path_count": {
+      "type": "integer",
+      "minimum": 1
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

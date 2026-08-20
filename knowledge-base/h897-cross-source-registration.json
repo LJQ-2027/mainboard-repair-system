@@ -1,0 +1,2463 @@
+{
+  "dataset_id": "H897-MAIN-XREG-20260802",
+  "board_id": "BOARD-H897-MAIN-V1.2",
+  "model": "KJ6",
+  "compatible_models": [
+    "KJ6"
+  ],
+  "model_evidence": {
+    "KJ6": "engineering_source"
+  },
+  "board_version": "H897_MAIN_PCB_V1.2",
+  "side_id": "main_page_1",
+  "coordinate_system": "normalized_board_plane",
+  "status": "source_compiled_with_reviewed_physical_navigation",
+  "board_outline": [
+    {
+      "x": 0.045,
+      "y": 0.800162
+    },
+    {
+      "x": 0.051875,
+      "y": 0.792071
+    },
+    {
+      "x": 0.054375,
+      "y": 0.783981
+    },
+    {
+      "x": 0.054375,
+      "y": 0.282362
+    },
+    {
+      "x": 0.063125,
+      "y": 0.257282
+    },
+    {
+      "x": 0.08875,
+      "y": 0.22411
+    },
+    {
+      "x": 0.098125,
+      "y": 0.216828
+    },
+    {
+      "x": 0.110625,
+      "y": 0.212783
+    },
+    {
+      "x": 0.251875,
+      "y": 0.212783
+    },
+    {
+      "x": 0.255625,
+      "y": 0.21521
+    },
+    {
+      "x": 0.2575,
+      "y": 0.219256
+    },
+    {
+      "x": 0.2575,
+      "y": 0.29288
+    },
+    {
+      "x": 0.248125,
+      "y": 0.305825
+    },
+    {
+      "x": 0.2475,
+      "y": 0.326861
+    },
+    {
+      "x": 0.249375,
+      "y": 0.326861
+    },
+    {
+      "x": 0.249375,
+      "y": 0.334951
+    },
+    {
+      "x": 0.253125,
+      "y": 0.337379
+    },
+    {
+      "x": 0.263125,
+      "y": 0.328479
+    },
+    {
+      "x": 0.2925,
+      "y": 0.330097
+    },
+    {
+      "x": 0.295,
+      "y": 0.334951
+    },
+    {
+      "x": 0.295,
+      "y": 0.385922
+    },
+    {
+      "x": 0.290625,
+      "y": 0.392395
+    },
+    {
+      "x": 0.261875,
+      "y": 0.392395
+    },
+    {
+      "x": 0.255625,
+      "y": 0.384304
+    },
+    {
+      "x": 0.249375,
+      "y": 0.385922
+    },
+    {
+      "x": 0.2475,
+      "y": 0.404531
+    },
+    {
+      "x": 0.249375,
+      "y": 0.410194
+    },
+    {
+      "x": 0.255,
+      "y": 0.415049
+    },
+    {
+      "x": 0.288125,
+      "y": 0.415049
+    },
+    {
+      "x": 0.2975,
+      "y": 0.40534
+    },
+    {
+      "x": 0.433125,
+      "y": 0.40534
+    },
+    {
+      "x": 0.440625,
+      "y": 0.401294
+    },
+    {
+      "x": 0.56375,
+      "y": 0.401294
+    },
+    {
+      "x": 0.570625,
+      "y": 0.390777
+    },
+    {
+      "x": 0.57125,
+      "y": 0.216828
+    },
+    {
+      "x": 0.575625,
+      "y": 0.212783
+    },
+    {
+      "x": 0.615625,
+      "y": 0.212783
+    },
+    {
+      "x": 0.6275,
+      "y": 0.200647
+    },
+    {
+      "x": 0.6625,
+      "y": 0.200647
+    },
+    {
+      "x": 0.666875,
+      "y": 0.196602
+    },
+    {
+      "x": 0.669375,
+      "y": 0.187702
+    },
+    {
+      "x": 0.675,
+      "y": 0.183657
+    },
+    {
+      "x": 0.84625,
+      "y": 0.183657
+    },
+    {
+      "x": 0.85125,
+      "y": 0.186893
+    },
+    {
+      "x": 0.8525,
+      "y": 0.203074
+    },
+    {
+      "x": 0.858125,
+      "y": 0.211974
+    },
+    {
+      "x": 0.898125,
+      "y": 0.212783
+    },
+    {
+      "x": 0.914375,
+      "y": 0.219256
+    },
+    {
+      "x": 0.925625,
+      "y": 0.231392
+    },
+    {
+      "x": 0.945625,
+      "y": 0.264563
+    },
+    {
+      "x": 0.94875,
+      "y": 0.283172
+    },
+    {
+      "x": 0.94875,
+      "y": 0.320388
+    },
+    {
+      "x": 0.955,
+      "y": 0.330906
+    },
+    {
+      "x": 0.955,
+      "y": 0.871359
+    },
+    {
+      "x": 0.94875,
+      "y": 0.881877
+    },
+    {
+      "x": 0.951875,
+      "y": 0.906149
+    },
+    {
+      "x": 0.945,
+      "y": 0.921521
+    },
+    {
+      "x": 0.9225,
+      "y": 0.923139
+    },
+    {
+      "x": 0.91625,
+      "y": 0.927994
+    },
+    {
+      "x": 0.908125,
+      "y": 0.941748
+    },
+    {
+      "x": 0.905625,
+      "y": 0.940129
+    },
+    {
+      "x": 0.910625,
+      "y": 0.936893
+    },
+    {
+      "x": 0.825,
+      "y": 0.936893
+    },
+    {
+      "x": 0.825,
+      "y": 0.897249
+    },
+    {
+      "x": 0.83375,
+      "y": 0.897249
+    },
+    {
+      "x": 0.83375,
+      "y": 0.894013
+    },
+    {
+      "x": 0.835625,
+      "y": 0.897249
+    },
+    {
+      "x": 0.836875,
+      "y": 0.894013
+    },
+    {
+      "x": 0.839375,
+      "y": 0.897249
+    },
+    {
+      "x": 0.839375,
+      "y": 0.894013
+    },
+    {
+      "x": 0.841875,
+      "y": 0.894013
+    },
+    {
+      "x": 0.841875,
+      "y": 0.897249
+    },
+    {
+      "x": 0.854375,
+      "y": 0.897249
+    },
+    {
+      "x": 0.854375,
+      "y": 0.894013
+    },
+    {
+      "x": 0.856875,
+      "y": 0.894013
+    },
+    {
+      "x": 0.856875,
+      "y": 0.897249
+    },
+    {
+      "x": 0.858125,
+      "y": 0.894013
+    },
+    {
+      "x": 0.85875,
+      "y": 0.897249
+    },
+    {
+      "x": 0.861875,
+      "y": 0.897249
+    },
+    {
+      "x": 0.860625,
+      "y": 0.894013
+    },
+    {
+      "x": 0.8625,
+      "y": 0.897249
+    },
+    {
+      "x": 0.875625,
+      "y": 0.897249
+    },
+    {
+      "x": 0.875625,
+      "y": 0.894013
+    },
+    {
+      "x": 0.878125,
+      "y": 0.894013
+    },
+    {
+      "x": 0.878125,
+      "y": 0.897249
+    },
+    {
+      "x": 0.87875,
+      "y": 0.894013
+    },
+    {
+      "x": 0.88125,
+      "y": 0.897249
+    },
+    {
+      "x": 0.883125,
+      "y": 0.897249
+    },
+    {
+      "x": 0.881875,
+      "y": 0.894013
+    },
+    {
+      "x": 0.88375,
+      "y": 0.897249
+    },
+    {
+      "x": 0.896875,
+      "y": 0.897249
+    },
+    {
+      "x": 0.896875,
+      "y": 0.894013
+    },
+    {
+      "x": 0.89875,
+      "y": 0.897249
+    },
+    {
+      "x": 0.9,
+      "y": 0.894013
+    },
+    {
+      "x": 0.900625,
+      "y": 0.897249
+    },
+    {
+      "x": 0.90375,
+      "y": 0.897249
+    },
+    {
+      "x": 0.9025,
+      "y": 0.894013
+    },
+    {
+      "x": 0.905,
+      "y": 0.894013
+    },
+    {
+      "x": 0.905,
+      "y": 0.897249
+    },
+    {
+      "x": 0.91125,
+      "y": 0.898058
+    },
+    {
+      "x": 0.911875,
+      "y": 0.935275
+    },
+    {
+      "x": 0.916875,
+      "y": 0.925566
+    },
+    {
+      "x": 0.925625,
+      "y": 0.921521
+    },
+    {
+      "x": 0.918125,
+      "y": 0.908576
+    },
+    {
+      "x": 0.918125,
+      "y": 0.89644
+    },
+    {
+      "x": 0.926875,
+      "y": 0.882686
+    },
+    {
+      "x": 0.806875,
+      "y": 0.882686
+    },
+    {
+      "x": 0.800625,
+      "y": 0.891586
+    },
+    {
+      "x": 0.8,
+      "y": 0.923139
+    },
+    {
+      "x": 0.795625,
+      "y": 0.930421
+    },
+    {
+      "x": 0.788125,
+      "y": 0.933657
+    },
+    {
+      "x": 0.68125,
+      "y": 0.933657
+    },
+    {
+      "x": 0.663125,
+      "y": 0.924757
+    },
+    {
+      "x": 0.545,
+      "y": 0.924757
+    },
+    {
+      "x": 0.5375,
+      "y": 0.917476
+    },
+    {
+      "x": 0.536875,
+      "y": 0.928803
+    },
+    {
+      "x": 0.54875,
+      "y": 0.929612
+    },
+    {
+      "x": 0.53625,
+      "y": 0.929612
+    },
+    {
+      "x": 0.53625,
+      "y": 0.91343
+    },
+    {
+      "x": 0.664375,
+      "y": 0.915049
+    },
+    {
+      "x": 0.68125,
+      "y": 0.923948
+    },
+    {
+      "x": 0.788125,
+      "y": 0.923948
+    },
+    {
+      "x": 0.793125,
+      "y": 0.918285
+    },
+    {
+      "x": 0.794375,
+      "y": 0.885113
+    },
+    {
+      "x": 0.805,
+      "y": 0.872977
+    },
+    {
+      "x": 0.935625,
+      "y": 0.872977
+    },
+    {
+      "x": 0.94125,
+      "y": 0.868932
+    },
+    {
+      "x": 0.941875,
+      "y": 0.602751
+    },
+    {
+      "x": 0.93875,
+      "y": 0.596278
+    },
+    {
+      "x": 0.675625,
+      "y": 0.595469
+    },
+    {
+      "x": 0.675625,
+      "y": 0.585761
+    },
+    {
+      "x": 0.9375,
+      "y": 0.585761
+    },
+    {
+      "x": 0.944375,
+      "y": 0.588997
+    },
+    {
+      "x": 0.949375,
+      "y": 0.601133
+    },
+    {
+      "x": 0.949375,
+      "y": 0.867314
+    },
+    {
+      "x": 0.94625,
+      "y": 0.877023
+    },
+    {
+      "x": 0.94,
+      "y": 0.881877
+    },
+    {
+      "x": 0.9475,
+      "y": 0.88754
+    },
+    {
+      "x": 0.948125,
+      "y": 0.880259
+    },
+    {
+      "x": 0.954375,
+      "y": 0.868123
+    },
+    {
+      "x": 0.954375,
+      "y": 0.334142
+    },
+    {
+      "x": 0.9475,
+      "y": 0.319579
+    },
+    {
+      "x": 0.946875,
+      "y": 0.274272
+    },
+    {
+      "x": 0.94,
+      "y": 0.254854
+    },
+    {
+      "x": 0.918125,
+      "y": 0.22411
+    },
+    {
+      "x": 0.9,
+      "y": 0.214401
+    },
+    {
+      "x": 0.85875,
+      "y": 0.213592
+    },
+    {
+      "x": 0.85375,
+      "y": 0.209547
+    },
+    {
+      "x": 0.85125,
+      "y": 0.18932
+    },
+    {
+      "x": 0.8475,
+      "y": 0.185275
+    },
+    {
+      "x": 0.67375,
+      "y": 0.185275
+    },
+    {
+      "x": 0.668125,
+      "y": 0.196602
+    },
+    {
+      "x": 0.661875,
+      "y": 0.202265
+    },
+    {
+      "x": 0.62625,
+      "y": 0.202265
+    },
+    {
+      "x": 0.620625,
+      "y": 0.211165
+    },
+    {
+      "x": 0.615,
+      "y": 0.214401
+    },
+    {
+      "x": 0.573125,
+      "y": 0.216019
+    },
+    {
+      "x": 0.57125,
+      "y": 0.220874
+    },
+    {
+      "x": 0.57125,
+      "y": 0.393204
+    },
+    {
+      "x": 0.563125,
+      "y": 0.402913
+    },
+    {
+      "x": 0.29875,
+      "y": 0.406149
+    },
+    {
+      "x": 0.286875,
+      "y": 0.416667
+    },
+    {
+      "x": 0.255625,
+      "y": 0.416667
+    },
+    {
+      "x": 0.248125,
+      "y": 0.410194
+    },
+    {
+      "x": 0.246875,
+      "y": 0.359223
+    },
+    {
+      "x": 0.243125,
+      "y": 0.359223
+    },
+    {
+      "x": 0.2425,
+      "y": 0.367314
+    },
+    {
+      "x": 0.234375,
+      "y": 0.369741
+    },
+    {
+      "x": 0.231875,
+      "y": 0.367314
+    },
+    {
+      "x": 0.21375,
+      "y": 0.367314
+    },
+    {
+      "x": 0.21375,
+      "y": 0.31068
+    },
+    {
+      "x": 0.243125,
+      "y": 0.31068
+    },
+    {
+      "x": 0.243125,
+      "y": 0.320388
+    },
+    {
+      "x": 0.246875,
+      "y": 0.320388
+    },
+    {
+      "x": 0.246875,
+      "y": 0.305825
+    },
+    {
+      "x": 0.25625,
+      "y": 0.29288
+    },
+    {
+      "x": 0.256875,
+      "y": 0.222492
+    },
+    {
+      "x": 0.25375,
+      "y": 0.21521
+    },
+    {
+      "x": 0.10875,
+      "y": 0.214401
+    },
+    {
+      "x": 0.093125,
+      "y": 0.221683
+    },
+    {
+      "x": 0.065,
+      "y": 0.256472
+    },
+    {
+      "x": 0.0575,
+      "y": 0.272654
+    },
+    {
+      "x": 0.055,
+      "y": 0.285599
+    },
+    {
+      "x": 0.055,
+      "y": 0.326861
+    },
+    {
+      "x": 0.06375,
+      "y": 0.314725
+    },
+    {
+      "x": 0.07375,
+      "y": 0.313107
+    },
+    {
+      "x": 0.083125,
+      "y": 0.31877
+    },
+    {
+      "x": 0.088125,
+      "y": 0.331715
+    },
+    {
+      "x": 0.085,
+      "y": 0.348706
+    },
+    {
+      "x": 0.075,
+      "y": 0.356796
+    },
+    {
+      "x": 0.06125,
+      "y": 0.35356
+    },
+    {
+      "x": 0.055,
+      "y": 0.343042
+    },
+    {
+      "x": 0.055,
+      "y": 0.555016
+    },
+    {
+      "x": 0.081875,
+      "y": 0.555016
+    },
+    {
+      "x": 0.0675,
+      "y": 0.552589
+    },
+    {
+      "x": 0.065625,
+      "y": 0.521036
+    },
+    {
+      "x": 0.07,
+      "y": 0.513754
+    },
+    {
+      "x": 0.186875,
+      "y": 0.513754
+    },
+    {
+      "x": 0.186875,
+      "y": 0.511327
+    },
+    {
+      "x": 0.30125,
+      "y": 0.513754
+    },
+    {
+      "x": 0.30125,
+      "y": 0.511327
+    },
+    {
+      "x": 0.34,
+      "y": 0.511327
+    },
+    {
+      "x": 0.33875,
+      "y": 0.530744
+    },
+    {
+      "x": 0.3425,
+      "y": 0.530744
+    },
+    {
+      "x": 0.3425,
+      "y": 0.513754
+    },
+    {
+      "x": 0.3675,
+      "y": 0.513754
+    },
+    {
+      "x": 0.394375,
+      "y": 0.522654
+    },
+    {
+      "x": 0.3975,
+      "y": 0.522654
+    },
+    {
+      "x": 0.401875,
+      "y": 0.515372
+    },
+    {
+      "x": 0.41,
+      "y": 0.513754
+    },
+    {
+      "x": 0.45,
+      "y": 0.513754
+    },
+    {
+      "x": 0.45,
+      "y": 0.530744
+    },
+    {
+      "x": 0.45375,
+      "y": 0.530744
+    },
+    {
+      "x": 0.4525,
+      "y": 0.511327
+    },
+    {
+      "x": 0.485,
+      "y": 0.511327
+    },
+    {
+      "x": 0.485,
+      "y": 0.513754
+    },
+    {
+      "x": 0.56375,
+      "y": 0.511327
+    },
+    {
+      "x": 0.56375,
+      "y": 0.529935
+    },
+    {
+      "x": 0.558125,
+      "y": 0.533172
+    },
+    {
+      "x": 0.558125,
+      "y": 0.535599
+    },
+    {
+      "x": 0.56125,
+      "y": 0.535599
+    },
+    {
+      "x": 0.56125,
+      "y": 0.555825
+    },
+    {
+      "x": 0.556875,
+      "y": 0.556634
+    },
+    {
+      "x": 0.5575,
+      "y": 0.561489
+    },
+    {
+      "x": 0.56125,
+      "y": 0.561489
+    },
+    {
+      "x": 0.56125,
+      "y": 0.606796
+    },
+    {
+      "x": 0.556875,
+      "y": 0.607605
+    },
+    {
+      "x": 0.556875,
+      "y": 0.61165
+    },
+    {
+      "x": 0.56125,
+      "y": 0.614887
+    },
+    {
+      "x": 0.56125,
+      "y": 0.712783
+    },
+    {
+      "x": 0.5525,
+      "y": 0.718447
+    },
+    {
+      "x": 0.565625,
+      "y": 0.719256
+    },
+    {
+      "x": 0.565625,
+      "y": 0.737864
+    },
+    {
+      "x": 0.5525,
+      "y": 0.738673
+    },
+    {
+      "x": 0.553125,
+      "y": 0.7411
+    },
+    {
+      "x": 0.56125,
+      "y": 0.7411
+    },
+    {
+      "x": 0.561875,
+      "y": 0.779126
+    },
+    {
+      "x": 0.53375,
+      "y": 0.776699
+    },
+    {
+      "x": 0.534375,
+      "y": 0.798544
+    },
+    {
+      "x": 0.5,
+      "y": 0.798544
+    },
+    {
+      "x": 0.499375,
+      "y": 0.796117
+    },
+    {
+      "x": 0.399375,
+      "y": 0.796117
+    },
+    {
+      "x": 0.399375,
+      "y": 0.798544
+    },
+    {
+      "x": 0.214375,
+      "y": 0.796117
+    },
+    {
+      "x": 0.21375,
+      "y": 0.798544
+    },
+    {
+      "x": 0.175,
+      "y": 0.798544
+    },
+    {
+      "x": 0.175,
+      "y": 0.796117
+    },
+    {
+      "x": 0.12,
+      "y": 0.796117
+    },
+    {
+      "x": 0.119375,
+      "y": 0.79288
+    },
+    {
+      "x": 0.093125,
+      "y": 0.79288
+    },
+    {
+      "x": 0.093125,
+      "y": 0.820388
+    },
+    {
+      "x": 0.085625,
+      "y": 0.822006
+    },
+    {
+      "x": 0.084375,
+      "y": 0.788835
+    },
+    {
+      "x": 0.075625,
+      "y": 0.786408
+    },
+    {
+      "x": 0.0725,
+      "y": 0.793689
+    },
+    {
+      "x": 0.0725,
+      "y": 0.821197
+    },
+    {
+      "x": 0.065,
+      "y": 0.822006
+    },
+    {
+      "x": 0.064375,
+      "y": 0.787217
+    },
+    {
+      "x": 0.07,
+      "y": 0.777508
+    },
+    {
+      "x": 0.074375,
+      "y": 0.77589
+    },
+    {
+      "x": 0.07,
+      "y": 0.775081
+    },
+    {
+      "x": 0.065625,
+      "y": 0.767799
+    },
+    {
+      "x": 0.0675,
+      "y": 0.746764
+    },
+    {
+      "x": 0.081875,
+      "y": 0.743528
+    },
+    {
+      "x": 0.06625,
+      "y": 0.743528
+    },
+    {
+      "x": 0.059375,
+      "y": 0.734628
+    },
+    {
+      "x": 0.059375,
+      "y": 0.630259
+    },
+    {
+      "x": 0.055,
+      "y": 0.630259
+    },
+    {
+      "x": 0.055,
+      "y": 0.787217
+    },
+    {
+      "x": 0.04625,
+      "y": 0.799353
+    },
+    {
+      "x": 0.04625,
+      "y": 0.86165
+    },
+    {
+      "x": 0.055,
+      "y": 0.874595
+    },
+    {
+      "x": 0.055,
+      "y": 0.927994
+    },
+    {
+      "x": 0.059375,
+      "y": 0.933657
+    },
+    {
+      "x": 0.115,
+      "y": 0.933657
+    },
+    {
+      "x": 0.125,
+      "y": 0.941748
+    },
+    {
+      "x": 0.115625,
+      "y": 0.935275
+    },
+    {
+      "x": 0.06,
+      "y": 0.935275
+    },
+    {
+      "x": 0.055,
+      "y": 0.93123
+    },
+    {
+      "x": 0.054375,
+      "y": 0.877832
+    },
+    {
+      "x": 0.0525,
+      "y": 0.87055
+    },
+    {
+      "x": 0.045,
+      "y": 0.86165
+    }
+  ],
+  "registration": {
+    "reference_mode": "reviewed_physical_photo_navigation",
+    "point_map_image": "assets/board-atlas/h897/main-point-map-page-1.png",
+    "point_map_source": "H897_MAIN_PCB_V1.2 Placement page 1",
+    "point_map_note": "H897 V1.2 双面 Placement 已编译；两张精确哈希实拍已完成板级坐标审核配准。",
+    "method": "normalized_point_map_registration",
+    "confidence": "source_compiled",
+    "photo_navigation": {
+      "schema_version": "H897-PHOTO-NAVIGATION-V1",
+      "board_key": "kj6-h897",
+      "board_id": "BOARD-H897-MAIN-V1.2",
+      "physical_board_revision": "H897 V1.2",
+      "engineering_board_revision": "H897_MAIN_PCB_V1.2",
+      "reference_mode": "reviewed_physical_photo_navigation",
+      "photos": [
+        {
+          "photo_id": "H897-MAIN_PAGE_1-5B8FFE55F4A2",
+          "label": "第1面实拍",
+          "side_id": "main_page_1",
+          "source_sha256": "5b8ffe55f4a2c285e4d85fcddc9acdbb459e8d1ed3760a0370a807617e476f48",
+          "derivative_sha256": "d83b3dce218d31c3c3592bf720a38d739a7f7ae4704851c9b82e1155e83facd4",
+          "asset_path": "assets/board-atlas/h897/physical/main-page-1-5b8ffe55f4a2.webp",
+          "source_scope": "owner_authorized_feishu_case_library",
+          "source_annotation_present": false,
+          "source_annotation_role": null,
+          "capture_geometry_id": "H897-KJ6-PAGE1-CAPTURE-01-ROTATED-CCW",
+          "registration_dimensions": {
+            "width": 4032,
+            "height": 3024
+          },
+          "derivative_dimensions": {
+            "width": 2000,
+            "height": 1500
+          },
+          "board_to_image_matrix": [
+            1.124433594,
+            0.010344993,
+            -0.053902676,
+            0.003706433,
+            1.120934203,
+            -0.084248316,
+            0.114163196,
+            -0.026309951,
+            1.0
+          ],
+          "registration_review_status": "reviewed",
+          "field_accuracy_claim_allowed": false
+        },
+        {
+          "photo_id": "H897-MAIN_PAGE_2-A862ECEE11E6",
+          "label": "第2面实拍",
+          "side_id": "main_page_2",
+          "source_sha256": "a862ecee11e683562ccfdc9a7743d813accfd37235e0267665bf32b44d9fe491",
+          "derivative_sha256": "60d4783794068b7e3972fe7f6bd3839030a952351618862ff653ba60a9bfe7d0",
+          "asset_path": "assets/board-atlas/h897/physical/main-page-2-a862ecee11e6.webp",
+          "source_scope": "owner_authorized_feishu_case_library",
+          "source_annotation_present": false,
+          "source_annotation_role": null,
+          "capture_geometry_id": "H897-KJ6-PAGE2-CAPTURE-01",
+          "registration_dimensions": {
+            "width": 4032,
+            "height": 3024
+          },
+          "derivative_dimensions": {
+            "width": 2000,
+            "height": 1500
+          },
+          "board_to_image_matrix": [
+            0.996191968,
+            0.00909485,
+            0.003440036,
+            0.001304856,
+            1.107012876,
+            -0.093684894,
+            -0.022089362,
+            0.03179415,
+            1.0
+          ],
+          "registration_review_status": "reviewed",
+          "field_accuracy_claim_allowed": false
+        }
+      ],
+      "accuracy_boundary": "这些与原始 SHA-256 精确绑定的派生图仅支持经审核的板级坐标导航；不能作为 Golden Sample、缺陷标签或维修因果证据。"
+    }
+  },
+  "physical_evidence": {
+    "status": "reviewed_board_coordinate_registration",
+    "board_revision": "H897 V1.2",
+    "engineering_board_revision": "H897_MAIN_PCB_V1.2",
+    "source_scope": "owner_authorized_feishu_case_library",
+    "threshold_policy": "no_industrial_pass_threshold_declared",
+    "unique_image_sha256": [
+      "5b8ffe55f4a2c285e4d85fcddc9acdbb459e8d1ed3760a0370a807617e476f48",
+      "a862ecee11e683562ccfdc9a7743d813accfd37235e0267665bf32b44d9fe491"
+    ],
+    "images": [
+      {
+        "sha256": "5b8ffe55f4a2c285e4d85fcddc9acdbb459e8d1ed3760a0370a807617e476f48",
+        "side_id": "main_page_1",
+        "source_dimensions": {
+          "width": 3024,
+          "height": 4032
+        },
+        "registration_transform": "rotate_90_counterclockwise",
+        "registration_dimensions": {
+          "width": 4032,
+          "height": 3024
+        },
+        "capture_geometry_id": "H897-KJ6-PAGE1-CAPTURE-01-ROTATED-CCW",
+        "view_scope": "full_board_repair_case",
+        "source_annotation_present": false,
+        "source_annotation_role": null,
+        "automatic_registration": {
+          "status": "not_used",
+          "reason": "reviewed_manual_registration_selected_for_first_exact_hash_pair"
+        },
+        "registration_status": "reviewed_manual_registration",
+        "registration_review": {
+          "method": "reviewed_manual_four_point",
+          "review_status": "reviewed",
+          "review_scope": "board_coordinate_alignment",
+          "selection_basis": "reviewed_outline_and_visible_mechanical_correspondence",
+          "board_to_image_matrix": [
+            1.124433594,
+            0.010344993,
+            -0.053902676,
+            0.003706433,
+            1.120934203,
+            -0.084248316,
+            0.114163196,
+            -0.026309951,
+            1.0
+          ],
+          "solve_anchors": [
+            {
+              "landmark_id": "outline_upper_left",
+              "label": "Upper-left board outline",
+              "selection_basis": "reviewed_outline_correspondence",
+              "board": {
+                "x": 0.055,
+                "y": 0.2
+              },
+              "image": {
+                "x": 0.01,
+                "y": 0.14
+              }
+            },
+            {
+              "landmark_id": "outline_upper_right",
+              "label": "Upper-right board outline",
+              "selection_basis": "reviewed_outline_correspondence",
+              "board": {
+                "x": 0.954,
+                "y": 0.2
+              },
+              "image": {
+                "x": 0.925,
+                "y": 0.13
+              }
+            },
+            {
+              "landmark_id": "outline_lower_right",
+              "label": "Lower-right board outline",
+              "selection_basis": "reviewed_outline_correspondence",
+              "board": {
+                "x": 0.955,
+                "y": 0.952
+              },
+              "image": {
+                "x": 0.95,
+                "y": 0.91
+              }
+            },
+            {
+              "landmark_id": "outline_lower_left",
+              "label": "Lower-left board outline",
+              "selection_basis": "reviewed_outline_correspondence",
+              "board": {
+                "x": 0.045,
+                "y": 0.795
+              },
+              "image": {
+                "x": 0.005,
+                "y": 0.82
+              }
+            }
+          ],
+          "independent_check_points": [
+            {
+              "landmark_id": "j6210_center",
+              "label": "J6210 connector center",
+              "selection_basis": "reviewed_visible_landmark",
+              "board": {
+                "x": 0.501326,
+                "y": 0.436234
+              },
+              "image": {
+                "x": 0.468,
+                "y": 0.385
+              },
+              "projected_error": 0.024117
+            },
+            {
+              "landmark_id": "upper_shield_hole",
+              "label": "Upper shield mechanical hole",
+              "selection_basis": "reviewed_visible_landmark",
+              "board": {
+                "x": 0.697,
+                "y": 0.287
+              },
+              "image": {
+                "x": 0.691,
+                "y": 0.21
+              },
+              "projected_error": 0.015778
+            },
+            {
+              "landmark_id": "sim_cage_upper_left",
+              "label": "SIM cage upper-left corner",
+              "selection_basis": "reviewed_visible_landmark",
+              "board": {
+                "x": 0.065,
+                "y": 0.535
+              },
+              "image": {
+                "x": 0.02,
+                "y": 0.51
+              },
+              "projected_error": 0.01037
+            }
+          ],
+          "error": {
+            "unit": "normalized_image_plane",
+            "rms": 0.017684,
+            "maximum": 0.024117,
+            "threshold_status": "not_declared",
+            "technical_guardrail": {
+              "purpose": "board_coordinate_association_only",
+              "maximum_normalized_check_error": 0.05,
+              "status": "passed"
+            }
+          },
+          "review_note": "The EXIF-normalized photograph was rotated counterclockwise and aligned to the Placement page-1 outline. J6210 and two independent visible mechanical landmarks were used only to check board-coordinate association.",
+          "field_accuracy_claim_allowed": false
+        }
+      },
+      {
+        "sha256": "a862ecee11e683562ccfdc9a7743d813accfd37235e0267665bf32b44d9fe491",
+        "side_id": "main_page_2",
+        "source_dimensions": {
+          "width": 4032,
+          "height": 3024
+        },
+        "registration_transform": "none",
+        "registration_dimensions": {
+          "width": 4032,
+          "height": 3024
+        },
+        "capture_geometry_id": "H897-KJ6-PAGE2-CAPTURE-01",
+        "view_scope": "full_board_repair_case",
+        "source_annotation_present": false,
+        "source_annotation_role": null,
+        "automatic_registration": {
+          "status": "not_used",
+          "reason": "reviewed_manual_registration_selected_for_first_exact_hash_pair"
+        },
+        "registration_status": "reviewed_manual_registration",
+        "registration_review": {
+          "method": "reviewed_manual_four_point",
+          "review_status": "reviewed",
+          "review_scope": "board_coordinate_alignment",
+          "selection_basis": "reviewed_outline_and_visible_connector_correspondence",
+          "board_to_image_matrix": [
+            0.996191968,
+            0.00909485,
+            0.003440036,
+            0.001304856,
+            1.107012876,
+            -0.093684894,
+            -0.022089362,
+            0.03179415,
+            1.0
+          ],
+          "solve_anchors": [
+            {
+              "landmark_id": "outline_upper_left",
+              "label": "Upper-left board outline",
+              "selection_basis": "reviewed_outline_correspondence",
+              "board": {
+                "x": 0.05,
+                "y": 0.23
+              },
+              "image": {
+                "x": 0.055,
+                "y": 0.16
+              }
+            },
+            {
+              "landmark_id": "outline_upper_right",
+              "label": "Upper-right board outline",
+              "selection_basis": "reviewed_outline_correspondence",
+              "board": {
+                "x": 0.95,
+                "y": 0.235
+              },
+              "image": {
+                "x": 0.965,
+                "y": 0.17
+              }
+            },
+            {
+              "landmark_id": "outline_lower_right",
+              "label": "Lower-right board outline",
+              "selection_basis": "reviewed_outline_correspondence",
+              "board": {
+                "x": 0.96,
+                "y": 0.94
+              },
+              "image": {
+                "x": 0.96,
+                "y": 0.94
+              }
+            },
+            {
+              "landmark_id": "outline_lower_left",
+              "label": "Lower-left board outline",
+              "selection_basis": "reviewed_outline_correspondence",
+              "board": {
+                "x": 0.05,
+                "y": 0.93
+              },
+              "image": {
+                "x": 0.06,
+                "y": 0.91
+              }
+            }
+          ],
+          "independent_check_points": [
+            {
+              "landmark_id": "j6204_center",
+              "label": "J6204 connector center",
+              "selection_basis": "reviewed_visible_landmark",
+              "board": {
+                "x": 0.369571,
+                "y": 0.460008
+              },
+              "image": {
+                "x": 0.386,
+                "y": 0.436
+              },
+              "projected_error": 0.025921
+            },
+            {
+              "landmark_id": "j6101_center",
+              "label": "J6101 connector center",
+              "selection_basis": "reviewed_visible_landmark",
+              "board": {
+                "x": 0.390593,
+                "y": 0.906658
+              },
+              "image": {
+                "x": 0.356,
+                "y": 0.908
+              },
+              "projected_error": 0.039991
+            },
+            {
+              "landmark_id": "j6401_center",
+              "label": "J6401 connector center",
+              "selection_basis": "reviewed_visible_landmark",
+              "board": {
+                "x": 0.597696,
+                "y": 0.906658
+              },
+              "image": {
+                "x": 0.605,
+                "y": 0.91
+              },
+              "projected_error": 0.015082
+            },
+            {
+              "landmark_id": "j2801_center",
+              "label": "J2801 connector center",
+              "selection_basis": "reviewed_visible_landmark",
+              "board": {
+                "x": 0.716225,
+                "y": 0.906658
+              },
+              "image": {
+                "x": 0.718,
+                "y": 0.91
+              },
+              "projected_error": 0.010971
+            }
+          ],
+          "error": {
+            "unit": "normalized_image_plane",
+            "rms": 0.025588,
+            "maximum": 0.039991,
+            "threshold_status": "not_declared",
+            "technical_guardrail": {
+              "purpose": "board_coordinate_association_only",
+              "maximum_normalized_check_error": 0.05,
+              "status": "passed"
+            }
+          },
+          "review_note": "The full-board photograph was aligned to the Placement page-2 outline and checked against four visible connectors. Shielded package identities were not used as registration evidence.",
+          "field_accuracy_claim_allowed": false
+        }
+      }
+    ],
+    "downstream_admission": {
+      "golden_sample": false,
+      "defect_label": false,
+      "training_data": false,
+      "repair_causality": false
+    },
+    "accuracy_boundary": "Reviewed registration supports board-coordinate navigation for these exact image hashes. It does not establish industrial measurement accuracy, a normal-board Golden Sample, a defect label, training admission, or repair causality."
+  },
+  "repair_coverage": {
+    "status": "source_available_pending_review",
+    "title": "案例可导航，检测步骤资料不足",
+    "note": "当前可查询 15 个来源关联器件及 13 条案例；案例仅支持板级或模块候选导航，不能生成维修动作。",
+    "source": "Feishu Base Bf57b8mpsatj7isYrmxcQwNXnQe KJ6/H897 cases and owner-supplied H897 V1.2 engineering sources"
+  },
+  "repair_flows": [],
+  "case_navigation": {
+    "schema_version": "H897-CASE-NAVIGATION-V1",
+    "source": "Feishu Base Bf57b8mpsatj7isYrmxcQwNXnQe / 案例登记与照片清单",
+    "source_table_id": "tblSbfji4q1ifubV",
+    "photo_table_id": "tblrB8Q4YrMPuJk9",
+    "case_count": 13,
+    "unique_photo_count": 14,
+    "cases": [
+      {
+        "case_id": "CASE-008-KJ6",
+        "source_record_id": "recvq1622otvtN",
+        "symptoms": [
+          "摄像头异常"
+        ],
+        "reported_finding": "Three rows resistors bad",
+        "photo_sha256": [
+          "6915613106c8d912c87a5815e833774bc13ea2c8bdd21855352631eb8a673e77",
+          "fa1055e69a47806cda43ec7ec09d6ef961adf02f2f7e98910b43d0cffacf56ea"
+        ],
+        "navigation_scope": "component_group_candidate",
+        "candidate_component_ids": [
+          "H897-MAIN-J6202",
+          "H897-MAIN-J6204",
+          "H897-MAIN-J6210"
+        ],
+        "candidate_basis": "symptom_to_schematic_camera_interconnect_group_only",
+        "source_annotation_role": "source_case_context_not_system_diagnosis",
+        "repair_causality_claim_allowed": false,
+        "defect_label_allowed": false,
+        "boundary": "此来源案例仅用于板级或模块候选导航；资料未提供经审核的电气标准、可执行维修动作、通用因果或视觉缺陷标签。"
+      },
+      {
+        "case_id": "CASE-009-KJ6",
+        "source_record_id": "recvq162ggDrBn",
+        "symptoms": [
+          "不开机"
+        ],
+        "reported_finding": "Charging connector bad",
+        "photo_sha256": [
+          "827681e4835e0f79a5b6a6d680ec38a614080b4eb8ed4aa469db6efeb33e3cd4",
+          "6915613106c8d912c87a5815e833774bc13ea2c8bdd21855352631eb8a673e77"
+        ],
+        "navigation_scope": "board_only",
+        "candidate_component_ids": [],
+        "candidate_basis": "source_case_has_no_exact_reviewed_designator",
+        "source_annotation_role": "source_case_context_not_system_diagnosis",
+        "repair_causality_claim_allowed": false,
+        "defect_label_allowed": false,
+        "boundary": "此来源案例仅用于板级或模块候选导航；资料未提供经审核的电气标准、可执行维修动作、通用因果或视觉缺陷标签。"
+      },
+      {
+        "case_id": "CASE-0010-KJ6",
+        "source_record_id": "recvq1SdKg9cNB",
+        "symptoms": [
+          "音频异常"
+        ],
+        "reported_finding": "Power bad",
+        "photo_sha256": [
+          "827681e4835e0f79a5b6a6d680ec38a614080b4eb8ed4aa469db6efeb33e3cd4",
+          "5fe76e7d39b5a992ca16d4b4f8327f2bd01fef3a9ffad7fa70c85032c70de788"
+        ],
+        "navigation_scope": "board_only",
+        "candidate_component_ids": [],
+        "candidate_basis": "source_case_has_no_exact_reviewed_designator",
+        "source_annotation_role": "source_case_context_not_system_diagnosis",
+        "repair_causality_claim_allowed": false,
+        "defect_label_allowed": false,
+        "boundary": "此来源案例仅用于板级或模块候选导航；资料未提供经审核的电气标准、可执行维修动作、通用因果或视觉缺陷标签。"
+      },
+      {
+        "case_id": "CASE-0011-KJ6",
+        "source_record_id": "recvq1SdYD7L0P",
+        "symptoms": [
+          "不开机"
+        ],
+        "reported_finding": "CPU bad",
+        "photo_sha256": [
+          "10a4cf0297ea162de4bf31121a3321fe8c78e8312fd63676234add19a54b2be1",
+          "0bf4e68ba445f7907bd9e4716991faafc18e2bed7e3094a906401466da9c0ff8"
+        ],
+        "navigation_scope": "component_candidate",
+        "candidate_component_ids": [
+          "H897-MAIN-U1001"
+        ],
+        "candidate_basis": "source_CPU_term_to_exact_schematic_main_processor_designator",
+        "source_annotation_role": "source_case_context_not_system_diagnosis",
+        "repair_causality_claim_allowed": false,
+        "defect_label_allowed": false,
+        "boundary": "此来源案例仅用于板级或模块候选导航；资料未提供经审核的电气标准、可执行维修动作、通用因果或视觉缺陷标签。"
+      },
+      {
+        "case_id": "CASE-0012",
+        "source_record_id": "recvqj9TvqHUlX",
+        "symptoms": [
+          "不开机"
+        ],
+        "reported_finding": "EMMC坏",
+        "photo_sha256": [
+          "b5d638f44fc3f78e496ad09ff65be63d1c7d21269037f8ffeb906601b01fbb4b",
+          "5b8ffe55f4a2c285e4d85fcddc9acdbb459e8d1ed3760a0370a807617e476f48"
+        ],
+        "navigation_scope": "board_only",
+        "candidate_component_ids": [],
+        "candidate_basis": "source_case_has_no_exact_reviewed_designator",
+        "source_annotation_role": "source_case_context_not_system_diagnosis",
+        "repair_causality_claim_allowed": false,
+        "defect_label_allowed": false,
+        "boundary": "此来源案例仅用于板级或模块候选导航；资料未提供经审核的电气标准、可执行维修动作、通用因果或视觉缺陷标签。"
+      },
+      {
+        "case_id": "CASE-0013",
+        "source_record_id": "recvqj9TK9CfTh",
+        "symptoms": [
+          "无法充电"
+        ],
+        "reported_finding": "充电IC坏",
+        "photo_sha256": [
+          "e938724504f5d34d7513d68f24df041a77f2b5f1e4777670c6fed3e32e0ec2cb",
+          "5b8ffe55f4a2c285e4d85fcddc9acdbb459e8d1ed3760a0370a807617e476f48"
+        ],
+        "navigation_scope": "board_only",
+        "candidate_component_ids": [],
+        "candidate_basis": "source_case_has_no_exact_reviewed_designator",
+        "source_annotation_role": "source_case_context_not_system_diagnosis",
+        "repair_causality_claim_allowed": false,
+        "defect_label_allowed": false,
+        "boundary": "此来源案例仅用于板级或模块候选导航；资料未提供经审核的电气标准、可执行维修动作、通用因果或视觉缺陷标签。"
+      },
+      {
+        "case_id": "CASE-0014",
+        "source_record_id": "recvqj9UBS16Dp",
+        "symptoms": [
+          "连接器损坏",
+          "不开机"
+        ],
+        "reported_finding": "电池排扣坏",
+        "photo_sha256": [
+          "1fb4ccb4bdad50e0470312158cf0f4347fc23457fdec168a823e6de1093d109b",
+          "e6f86bf8890651ca07bfb6d1c468aab04345ba6376b3f605a4d45c059178d666",
+          "5b8ffe55f4a2c285e4d85fcddc9acdbb459e8d1ed3760a0370a807617e476f48"
+        ],
+        "navigation_scope": "board_only",
+        "candidate_component_ids": [],
+        "candidate_basis": "source_case_has_no_exact_reviewed_designator",
+        "source_annotation_role": "source_case_context_not_system_diagnosis",
+        "repair_causality_claim_allowed": false,
+        "defect_label_allowed": false,
+        "boundary": "此来源案例仅用于板级或模块候选导航；资料未提供经审核的电气标准、可执行维修动作、通用因果或视觉缺陷标签。"
+      },
+      {
+        "case_id": "CASE-0015",
+        "source_record_id": "recvqj9UQZgp7W",
+        "symptoms": [
+          "不开机",
+          "连接器损坏"
+        ],
+        "reported_finding": "电池排扣坏",
+        "photo_sha256": [
+          "1fb4ccb4bdad50e0470312158cf0f4347fc23457fdec168a823e6de1093d109b",
+          "e6f86bf8890651ca07bfb6d1c468aab04345ba6376b3f605a4d45c059178d666",
+          "5b8ffe55f4a2c285e4d85fcddc9acdbb459e8d1ed3760a0370a807617e476f48"
+        ],
+        "navigation_scope": "board_only",
+        "candidate_component_ids": [],
+        "candidate_basis": "source_case_has_no_exact_reviewed_designator",
+        "source_annotation_role": "source_case_context_not_system_diagnosis",
+        "repair_causality_claim_allowed": false,
+        "defect_label_allowed": false,
+        "boundary": "此来源案例仅用于板级或模块候选导航；资料未提供经审核的电气标准、可执行维修动作、通用因果或视觉缺陷标签。"
+      },
+      {
+        "case_id": "CASE-0016",
+        "source_record_id": "recvqj9V73k84B",
+        "symptoms": [
+          "不开机",
+          "连接器损坏"
+        ],
+        "reported_finding": "电池排扣坏",
+        "photo_sha256": [
+          "1fb4ccb4bdad50e0470312158cf0f4347fc23457fdec168a823e6de1093d109b",
+          "e6f86bf8890651ca07bfb6d1c468aab04345ba6376b3f605a4d45c059178d666",
+          "5b8ffe55f4a2c285e4d85fcddc9acdbb459e8d1ed3760a0370a807617e476f48"
+        ],
+        "navigation_scope": "board_only",
+        "candidate_component_ids": [],
+        "candidate_basis": "source_case_has_no_exact_reviewed_designator",
+        "source_annotation_role": "source_case_context_not_system_diagnosis",
+        "repair_causality_claim_allowed": false,
+        "defect_label_allowed": false,
+        "boundary": "此来源案例仅用于板级或模块候选导航；资料未提供经审核的电气标准、可执行维修动作、通用因果或视觉缺陷标签。"
+      },
+      {
+        "case_id": "CASE-0017",
+        "source_record_id": "recvqj9Vnpz9Fa",
+        "symptoms": [
+          "重启 / 卡 logo"
+        ],
+        "reported_finding": "DDR坏",
+        "photo_sha256": [
+          "0eab68987cfce1aec8bdeb53969d87d8e9fbc861645886000520e3f049f29f36",
+          "a862ecee11e683562ccfdc9a7743d813accfd37235e0267665bf32b44d9fe491"
+        ],
+        "navigation_scope": "component_group_candidate",
+        "candidate_component_ids": [
+          "H897-MAIN-U4101",
+          "H897-MAIN-U4102"
+        ],
+        "candidate_basis": "source_DDR_term_to_exact_schematic_LPDDR4_designator_group",
+        "source_annotation_role": "source_case_context_not_system_diagnosis",
+        "repair_causality_claim_allowed": false,
+        "defect_label_allowed": false,
+        "boundary": "此来源案例仅用于板级或模块候选导航；资料未提供经审核的电气标准、可执行维修动作、通用因果或视觉缺陷标签。"
+      },
+      {
+        "case_id": "CASE-0018",
+        "source_record_id": "recvqj9VDPYIx5",
+        "symptoms": [
+          "音频异常"
+        ],
+        "reported_finding": "电源坏",
+        "photo_sha256": [
+          "e938724504f5d34d7513d68f24df041a77f2b5f1e4777670c6fed3e32e0ec2cb",
+          "5b8ffe55f4a2c285e4d85fcddc9acdbb459e8d1ed3760a0370a807617e476f48"
+        ],
+        "navigation_scope": "board_only",
+        "candidate_component_ids": [],
+        "candidate_basis": "source_case_has_no_exact_reviewed_designator",
+        "source_annotation_role": "source_case_context_not_system_diagnosis",
+        "repair_causality_claim_allowed": false,
+        "defect_label_allowed": false,
+        "boundary": "此来源案例仅用于板级或模块候选导航；资料未提供经审核的电气标准、可执行维修动作、通用因果或视觉缺陷标签。"
+      },
+      {
+        "case_id": "CASE-0019",
+        "source_record_id": "recvqj9VWYmIf3",
+        "symptoms": [
+          "摄像头异常"
+        ],
+        "reported_finding": "后摄像头排扣坏",
+        "photo_sha256": [
+          "37eecca8dc343a2913c66728e1e741973ba1bcf0340b22215219b9929c32fd87",
+          "5b8ffe55f4a2c285e4d85fcddc9acdbb459e8d1ed3760a0370a807617e476f48"
+        ],
+        "navigation_scope": "component_group_candidate",
+        "candidate_component_ids": [
+          "H897-MAIN-J6202",
+          "H897-MAIN-J6204"
+        ],
+        "candidate_basis": "source_rear_camera_connector_term_to_schematic_camera_connector_group_only",
+        "source_annotation_role": "source_case_context_not_system_diagnosis",
+        "repair_causality_claim_allowed": false,
+        "defect_label_allowed": false,
+        "boundary": "此来源案例仅用于板级或模块候选导航；资料未提供经审核的电气标准、可执行维修动作、通用因果或视觉缺陷标签。"
+      },
+      {
+        "case_id": "CASE-0020",
+        "source_record_id": "recvqjaM96kkqn",
+        "symptoms": [
+          "无显示"
+        ],
+        "reported_finding": "显示IC坏",
+        "photo_sha256": [
+          "5fe76e7d39b5a992ca16d4b4f8327f2bd01fef3a9ffad7fa70c85032c70de788",
+          "827681e4835e0f79a5b6a6d680ec38a614080b4eb8ed4aa469db6efeb33e3cd4"
+        ],
+        "navigation_scope": "board_only",
+        "candidate_component_ids": [],
+        "candidate_basis": "source_case_has_no_exact_reviewed_designator",
+        "source_annotation_role": "source_case_context_not_system_diagnosis",
+        "repair_causality_claim_allowed": false,
+        "defect_label_allowed": false,
+        "boundary": "此来源案例仅用于板级或模块候选导航；资料未提供经审核的电气标准、可执行维修动作、通用因果或视觉缺陷标签。"
+      }
+    ],
+    "missing_fields": [
+      {
+        "field_id": "probe_location",
+        "label": "探针或检查位置",
+        "missing_case_count": 13,
+        "impact": "Cannot reproduce the reported check."
+      },
+      {
+        "field_id": "tool_and_mode",
+        "label": "工具与档位",
+        "missing_case_count": 13,
+        "impact": "Cannot reproduce measurement conditions."
+      },
+      {
+        "field_id": "measured_value",
+        "label": "测量值",
+        "missing_case_count": 13,
+        "impact": "No auditable electrical result."
+      },
+      {
+        "field_id": "reference_or_tolerance",
+        "label": "参考值或容差",
+        "missing_case_count": 13,
+        "impact": "No source-backed pass/fail judgment."
+      },
+      {
+        "field_id": "branch_logic",
+        "label": "结果分支",
+        "missing_case_count": 13,
+        "impact": "Cannot create an executable diagnostic path."
+      },
+      {
+        "field_id": "repair_action_detail",
+        "label": "维修动作细节",
+        "missing_case_count": 13,
+        "impact": "Cannot prescribe a reviewed action."
+      },
+      {
+        "field_id": "post_repair_recheck",
+        "label": "维修后复检",
+        "missing_case_count": 13,
+        "impact": "Cannot verify outcome beyond the reported case state."
+      }
+    ],
+    "duplicate_policy": "same_sha256_is_one_physical_image_stream_across_cases",
+    "boundary": "案例导航仅展示来源记录的故障现象和谨慎限定的模块候选；不据此生成缺陷标签、电气阈值、维修动作或因果结论。"
+  },
+  "entities": [
+    {
+      "component_id": "H897-MAIN-U1001",
+      "designator": "U1001",
+      "name": "MT6789 main processor",
+      "category": "bga_ic",
+      "module": "Main processor",
+      "side_id": "main_page_1",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.653093,
+          "y": 0.744369
+        },
+        "size": {
+          "x": 0.025,
+          "y": 0.025
+        },
+        "rotation": 0,
+        "source_status": "location_only"
+      },
+      "schematic_links": [
+        {
+          "source": "H897_MAIN_SCH_V1.2_202307171706.pdf",
+          "page": "2, 3, 4, 5",
+          "facts": [
+            "Exact schematic designator U1001",
+            "MT6789 source page family"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "square",
+        "height": 0.035,
+        "engineering_dimension": false
+      }
+    },
+    {
+      "component_id": "H897-MAIN-U2001",
+      "designator": "U2001",
+      "name": "MT6366MW/A power management IC",
+      "category": "bga_ic",
+      "module": "Power management",
+      "side_id": "main_page_2",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.488573,
+          "y": 0.538848
+        },
+        "size": {
+          "x": 0.025,
+          "y": 0.025
+        },
+        "rotation": 0,
+        "source_status": "location_only"
+      },
+      "schematic_links": [
+        {
+          "source": "H897_MAIN_SCH_V1.2_202307171706.pdf",
+          "page": "6, 7",
+          "facts": [
+            "Exact schematic designator U2001",
+            "MT6366MW/A"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "square",
+        "height": 0.035,
+        "engineering_dimension": false
+      }
+    },
+    {
+      "component_id": "H897-MAIN-X2101",
+      "designator": "X2101",
+      "name": "OZ26030001 crystal",
+      "category": "crystal",
+      "module": "System clock",
+      "side_id": "main_page_2",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.608333,
+          "y": 0.527962
+        },
+        "size": {
+          "x": 0.025,
+          "y": 0.025
+        },
+        "rotation": 0,
+        "source_status": "location_only"
+      },
+      "schematic_links": [
+        {
+          "source": "H897_MAIN_SCH_V1.2_202307171706.pdf",
+          "page": "7",
+          "facts": [
+            "Exact schematic designator X2101",
+            "OZ26030001",
+            "XTAL1"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "square",
+        "height": 0.035,
+        "engineering_dimension": false
+      }
+    },
+    {
+      "component_id": "H897-MAIN-U3001",
+      "designator": "U3001",
+      "name": "MT6186MV/AXD RF transceiver",
+      "category": "bga_ic",
+      "module": "RF transceiver",
+      "side_id": "main_page_2",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.678409,
+          "y": 0.518669
+        },
+        "size": {
+          "x": 0.025,
+          "y": 0.025
+        },
+        "rotation": 0,
+        "source_status": "location_only"
+      },
+      "schematic_links": [
+        {
+          "source": "H897_MAIN_SCH_V1.2_202307171706.pdf",
+          "page": "12",
+          "facts": [
+            "Exact schematic designator U3001",
+            "MT6186MV/AXD"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "square",
+        "height": 0.035,
+        "engineering_dimension": false
+      }
+    },
+    {
+      "component_id": "H897-MAIN-U3101",
+      "designator": "U3101",
+      "name": "L/M/H RF power amplifier",
+      "category": "ic",
+      "module": "RF power amplifier",
+      "side_id": "main_page_1",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.132986,
+          "y": 0.384566
+        },
+        "size": {
+          "x": 0.025,
+          "y": 0.025
+        },
+        "rotation": 0,
+        "source_status": "location_only"
+      },
+      "schematic_links": [
+        {
+          "source": "H897_MAIN_SCH_V1.2_202307171706.pdf",
+          "page": "13",
+          "facts": [
+            "Exact schematic designator U3101",
+            "L/M/H PA"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "square",
+        "height": 0.035,
+        "engineering_dimension": false
+      }
+    },
+    {
+      "component_id": "H897-MAIN-U3201",
+      "designator": "U3201",
+      "name": "RF receive-path device U3201",
+      "category": "ic",
+      "module": "RF receive path",
+      "side_id": "main_page_2",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.801452,
+          "y": 0.579126
+        },
+        "size": {
+          "x": 0.025,
+          "y": 0.025
+        },
+        "rotation": 0,
+        "source_status": "location_only"
+      },
+      "schematic_links": [
+        {
+          "source": "H897_MAIN_SCH_V1.2_202307171706.pdf",
+          "page": "14",
+          "facts": [
+            "Exact schematic designator U3201",
+            "RF_MT6186M_RF_PRX"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "square",
+        "height": 0.035,
+        "engineering_dimension": false
+      }
+    },
+    {
+      "component_id": "H897-MAIN-U4101",
+      "designator": "U4101",
+      "name": "LPDDR4 memory package U4101",
+      "category": "bga_ic",
+      "module": "Memory",
+      "side_id": "main_page_1",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.832797,
+          "y": 0.736527
+        },
+        "size": {
+          "x": 0.025,
+          "y": 0.025
+        },
+        "rotation": 0,
+        "source_status": "location_only"
+      },
+      "schematic_links": [
+        {
+          "source": "H897_MAIN_SCH_V1.2_202307171706.pdf",
+          "page": "18",
+          "facts": [
+            "Exact schematic designator U4101",
+            "MEM_DSC_LPDDR4x",
+            "LPDDR4_200B"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "square",
+        "height": 0.035,
+        "engineering_dimension": false
+      }
+    },
+    {
+      "component_id": "H897-MAIN-U4102",
+      "designator": "U4102",
+      "name": "LPDDR4 memory package U4102",
+      "category": "bga_ic",
+      "module": "Memory",
+      "side_id": "main_page_2",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.615846,
+          "y": 0.744322
+        },
+        "size": {
+          "x": 0.025,
+          "y": 0.025
+        },
+        "rotation": 0,
+        "source_status": "location_only"
+      },
+      "schematic_links": [
+        {
+          "source": "H897_MAIN_SCH_V1.2_202307171706.pdf",
+          "page": "18",
+          "facts": [
+            "Exact schematic designator U4102",
+            "MEM_DSC_LPDDR4x",
+            "LPDDR4_200B"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "square",
+        "height": 0.035,
+        "engineering_dimension": false
+      }
+    },
+    {
+      "component_id": "H897-MAIN-U5003",
+      "designator": "U5003",
+      "name": "MT6631 connectivity IC",
+      "category": "ic",
+      "module": "Wireless connectivity",
+      "side_id": "main_page_2",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.257639,
+          "y": 0.280703
+        },
+        "size": {
+          "x": 0.025,
+          "y": 0.025
+        },
+        "rotation": 0,
+        "source_status": "location_only"
+      },
+      "schematic_links": [
+        {
+          "source": "H897_MAIN_SCH_V1.2_202307171706.pdf",
+          "page": "19",
+          "facts": [
+            "Exact schematic designator U5003",
+            "CONNECTIVITY_MT6631"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "square",
+        "height": 0.035,
+        "engineering_dimension": false
+      }
+    },
+    {
+      "component_id": "H897-MAIN-U6000",
+      "designator": "U6000",
+      "name": "FS1559SN audio amplifier",
+      "category": "ic",
+      "module": "Audio amplifier",
+      "side_id": "main_page_1",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.236742,
+          "y": 0.468426
+        },
+        "size": {
+          "x": 0.025,
+          "y": 0.025
+        },
+        "rotation": 0,
+        "source_status": "location_only"
+      },
+      "schematic_links": [
+        {
+          "source": "H897_MAIN_SCH_V1.2_202307171706.pdf",
+          "page": "20",
+          "facts": [
+            "Exact schematic designator U6000",
+            "FS1559SN",
+            "Audio PA"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "square",
+        "height": 0.035,
+        "engineering_dimension": false
+      }
+    },
+    {
+      "component_id": "H897-MAIN-J6101",
+      "designator": "J6101",
+      "name": "LCM and touch connector",
+      "category": "connector",
+      "module": "Display interconnect",
+      "side_id": "main_page_2",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.365404,
+          "y": 0.913791
+        },
+        "size": {
+          "x": 0.025,
+          "y": 0.025
+        },
+        "rotation": 0,
+        "source_status": "location_only"
+      },
+      "schematic_links": [
+        {
+          "source": "H897_MAIN_SCH_V1.2_202307171706.pdf",
+          "page": "21",
+          "facts": [
+            "Exact schematic designator J6101",
+            "PERI_LCM_CTP_FP"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "rectangle",
+        "height": 0.02,
+        "engineering_dimension": false
+      }
+    },
+    {
+      "component_id": "H897-MAIN-J6202",
+      "designator": "J6202",
+      "name": "Camera connector J6202",
+      "category": "connector",
+      "module": "Camera interconnect",
+      "side_id": "main_page_1",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.644981,
+          "y": 0.475735
+        },
+        "size": {
+          "x": 0.025,
+          "y": 0.025
+        },
+        "rotation": 0,
+        "source_status": "location_only"
+      },
+      "schematic_links": [
+        {
+          "source": "H897_MAIN_SCH_V1.2_202307171706.pdf",
+          "page": "22",
+          "facts": [
+            "Exact schematic designator J6202",
+            "PERI_CAMERA_I"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "rectangle",
+        "height": 0.02,
+        "engineering_dimension": false
+      }
+    },
+    {
+      "component_id": "H897-MAIN-J6204",
+      "designator": "J6204",
+      "name": "Camera connector J6204",
+      "category": "connector",
+      "module": "Camera interconnect",
+      "side_id": "main_page_2",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.372364,
+          "y": 0.479003
+        },
+        "size": {
+          "x": 0.025,
+          "y": 0.025
+        },
+        "rotation": 0,
+        "source_status": "location_only"
+      },
+      "schematic_links": [
+        {
+          "source": "H897_MAIN_SCH_V1.2_202307171706.pdf",
+          "page": "22",
+          "facts": [
+            "Exact schematic designator J6204",
+            "PERI_CAMERA_I"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "rectangle",
+        "height": 0.02,
+        "engineering_dimension": false
+      }
+    },
+    {
+      "component_id": "H897-MAIN-J6210",
+      "designator": "J6210",
+      "name": "Front camera connector",
+      "category": "connector",
+      "module": "Camera interconnect",
+      "side_id": "main_page_1",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.486553,
+          "y": 0.439913
+        },
+        "size": {
+          "x": 0.025,
+          "y": 0.025
+        },
+        "rotation": 0,
+        "source_status": "location_only"
+      },
+      "schematic_links": [
+        {
+          "source": "H897_MAIN_SCH_V1.2_202307171706.pdf",
+          "page": "24",
+          "facts": [
+            "Exact schematic designator J6210",
+            "PERI_CAMERA_III",
+            "FRONT MAIN CAMERA"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "rectangle",
+        "height": 0.02,
+        "engineering_dimension": false
+      }
+    },
+    {
+      "component_id": "H897-MAIN-U6601",
+      "designator": "U6601",
+      "name": "PN557 NFC controller",
+      "category": "ic",
+      "module": "NFC",
+      "side_id": "main_page_1",
+      "proxy_visibility": "point_map_only",
+      "geometry": {
+        "center": {
+          "x": 0.780114,
+          "y": 0.285828
+        },
+        "size": {
+          "x": 0.025,
+          "y": 0.025
+        },
+        "rotation": 0,
+        "source_status": "location_only"
+      },
+      "schematic_links": [
+        {
+          "source": "H897_MAIN_SCH_V1.2_202307171706.pdf",
+          "page": "28",
+          "facts": [
+            "Exact schematic designator U6601",
+            "PN557",
+            "PERI_NFC"
+          ]
+        }
+      ],
+      "repair_links": [],
+      "visual_profile": {
+        "shape": "square",
+        "height": 0.035,
+        "engineering_dimension": false
+      }
+    }
+  ],
+  "boundaries": {
+    "visual_defect_confirmed": false,
+    "golden_approved": false,
+    "training_label_allowed": false,
+    "repair_causality_confirmed": false,
+    "repair_instruction_allowed": false,
+    "field_accuracy_claim_allowed": false
+  }
+}

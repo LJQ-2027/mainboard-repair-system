@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "VISUAL-QC-ADMIN-CASE-LIST-V2",
+  "title": "Actor-scoped Visual QC data-administrator case list",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "page", "page_size", "total", "cases"],
+  "properties": {
+    "schema_version": {"const": "VISUAL-QC-ADMIN-CASE-LIST-V2"},
+    "page": {"type": "integer", "minimum": 1},
+    "page_size": {"type": "integer", "minimum": 1, "maximum": 100},
+    "total": {"type": "integer", "minimum": 0},
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "case_id",
+          "board_key",
+          "board_id",
+          "side_id",
+          "capture_stage",
+          "evidence_role",
+          "capture_session_id",
+          "capture_setup_id",
+          "intake",
+          "qualified_handoff",
+          "state",
+          "created_at",
+          "image",
+          "job"
+        ],
+        "properties": {
+          "case_id": {"type": "string", "minLength": 1},
+          "board_key": {"type": "string", "minLength": 1},
+          "board_id": {"type": "string", "minLength": 1},
+          "side_id": {"type": "string", "minLength": 1},
+          "capture_stage": {
+            "enum": ["golden_reference", "before_repair", "after_repair"]
+          },
+          "evidence_role": {
+            "enum": ["physical_capture", "synthetic_proxy", "service_manual_proxy"]
+          },
+          "capture_session_id": {"type": "string", "minLength": 1},
+          "capture_setup_id": {"type": "string", "minLength": 1},
+          "intake": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["batch_id", "entry_id"],
+            "properties": {
+              "batch_id": {"type": ["string", "null"]},
+              "entry_id": {"type": ["string", "null"]}
+            }
+          },
+          "qualified_handoff": {
+            "anyOf": [
+              {"type": "null"},
+              {"$ref": "#/$defs/qualifiedHandoff"}
+            ]
+          },
+          "state": {
+            "enum": [
+              "processing",
+              "processing_failed",
+              "manual_registration_required",
+              "registration_review_required",
+              "ready_for_human_qc",
+              "completed"
+            ]
+          },
+          "created_at": {"type": "string", "minLength": 1},
+          "image": {"type": "object"},
+          "job": {"type": "object"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "qualifiedHandoff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "handoff_schema_version",
+        "source_package_manifest_sha256",
+        "archived_intake_manifest_sha256",
+        "acceptance_report_sha256",
+        "acceptance_action",
+        "registration_review_required",
+        "field_accuracy_claim_allowed"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "VISUAL-QC-QUALIFIED-HANDOFF-PROVENANCE-V1"
+        },
+        "handoff_schema_version": {
+          "const": "VISUAL-QC-PHYSICAL-HANDOFF-V1"
+        },
+        "source_package_manifest_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "archived_intake_manifest_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "acceptance_report_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "acceptance_action": {
+          "enum": [
+            "automatic_candidate_review_required",
+            "manual_registration_required"
+          ]
+        },
+        "registration_review_required": {"const": true},
+        "field_accuracy_claim_allowed": {"const": false}
+      }
+    }
+  }
+}

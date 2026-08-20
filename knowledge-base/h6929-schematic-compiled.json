@@ -1,0 +1,7447 @@
+{
+  "compiler_id": "SCHEMATIC-COMPILER-PYPDF-V2",
+  "profile_id": "h6929-main-v1.1",
+  "board_id": "BOARD-H6929-MAIN-V1.1",
+  "source": {
+    "path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CK6N-H6929/H6929_MAIN_V1.1_╬¼╨▐╘¡└φ═╝.pdf",
+    "pages": 27
+  },
+  "audit": {
+    "board_designators": 602,
+    "linked_designators": 506,
+    "unlinked_designators": 96,
+    "schematic_occurrences": 530,
+    "page_occurrences": {
+      "2": 43,
+      "3": 2,
+      "4": 2,
+      "5": 1,
+      "6": 52,
+      "7": 33,
+      "8": 11,
+      "9": 2,
+      "10": 18,
+      "11": 8,
+      "13": 102,
+      "14": 10,
+      "15": 43,
+      "17": 65,
+      "18": 35,
+      "19": 15,
+      "20": 1,
+      "21": 12,
+      "22": 2,
+      "24": 8,
+      "25": 2,
+      "26": 48,
+      "27": 15
+    },
+    "reviewed_designators": [
+      "J2101",
+      "J6101",
+      "U1001",
+      "U2001",
+      "U2304",
+      "U2305",
+      "U2404",
+      "U5003",
+      "X2101"
+    ],
+    "recovered_reviewed_designators": [
+      "J2101",
+      "J6101",
+      "U1001",
+      "U2001",
+      "U2304",
+      "U2305",
+      "U2404",
+      "U5003",
+      "X2101"
+    ],
+    "missing_reviewed_designators": [],
+    "reviewed_recovery_complete": true,
+    "standalone_match_only": true,
+    "quality_gate_complete": true
+  },
+  "accuracy_boundary": "Only standalone exact designator text runs are linked. Coordinates are normalized PDF text origins, not symbol centers. Embedded note references and merged runs are excluded, and electrical net connectivity is not inferred.",
+  "components": {
+    "ANT2201": [
+      {
+        "page": 8,
+        "source_text": "ANT2201",
+        "x": 629.469,
+        "y": 915.438,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.373794,
+          "y": 0.23137
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "ANT2202": [
+      {
+        "page": 8,
+        "source_text": "ANT2202",
+        "x": 629.469,
+        "y": 879.446,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.373794,
+          "y": 0.26159
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "ANT3401": [
+      {
+        "page": 15,
+        "source_text": "ANT3401",
+        "x": 102.977,
+        "y": 1098.1,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.06115,
+          "y": 0.078002
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "ANT3406": [
+      {
+        "page": 15,
+        "source_text": "ANT3406",
+        "x": 200.155,
+        "y": 536.628,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.118857,
+          "y": 0.549431
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "ANT5001": [
+      {
+        "page": 17,
+        "source_text": "ANT5001",
+        "x": 84.506,
+        "y": 1093.923,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.050182,
+          "y": 0.081509
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "ANT5003": [
+      {
+        "page": 17,
+        "source_text": "ANT5003",
+        "x": 286.06,
+        "y": 1093.923,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.169869,
+          "y": 0.081509
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "ANT5005": [
+      {
+        "page": 17,
+        "source_text": "ANT5005",
+        "x": 325.651,
+        "y": 1086.725,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.193379,
+          "y": 0.087552
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "ANT5006": [
+      {
+        "page": 17,
+        "source_text": "ANT5006",
+        "x": 136.334,
+        "y": 1094.643,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.080958,
+          "y": 0.080904
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "ANT6601": [
+      {
+        "page": 26,
+        "source_text": "ANT6601",
+        "x": 1621.431,
+        "y": 703.99,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.962845,
+          "y": 0.408908
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1007": [
+      {
+        "page": 2,
+        "source_text": "C1007",
+        "x": 152.139,
+        "y": 433.108,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.090344,
+          "y": 0.636349
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1019": [
+      {
+        "page": 2,
+        "source_text": "C1019",
+        "x": 622.978,
+        "y": 1002.017,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.369939,
+          "y": 0.158676
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1023": [
+      {
+        "page": 2,
+        "source_text": "C1023",
+        "x": 622.978,
+        "y": 735.678,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.369939,
+          "y": 0.382302
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1024": [
+      {
+        "page": 2,
+        "source_text": "C1024",
+        "x": 622.978,
+        "y": 706.885,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.369939,
+          "y": 0.406478
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1027": [
+      {
+        "page": 2,
+        "source_text": "C1027",
+        "x": 619.059,
+        "y": 397.355,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.367612,
+          "y": 0.666369
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1028": [
+      {
+        "page": 2,
+        "source_text": "C1028",
+        "x": 622.978,
+        "y": 875.943,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.369939,
+          "y": 0.264531
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1029": [
+      {
+        "page": 2,
+        "source_text": "C1029",
+        "x": 687.443,
+        "y": 869.465,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.40822,
+          "y": 0.269971
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1030": [
+      {
+        "page": 2,
+        "source_text": "C1030",
+        "x": 622.978,
+        "y": 688.786,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.369939,
+          "y": 0.421674
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1031": [
+      {
+        "page": 2,
+        "source_text": "C1031",
+        "x": 625.138,
+        "y": 364.86,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.371222,
+          "y": 0.693652
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1032": [
+      {
+        "page": 2,
+        "source_text": "C1032",
+        "x": 689.923,
+        "y": 357.661,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.409693,
+          "y": 0.699697
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1033": [
+      {
+        "page": 2,
+        "source_text": "C1033",
+        "x": 622.658,
+        "y": 351.183,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.369749,
+          "y": 0.705136
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1034": [
+      {
+        "page": 2,
+        "source_text": "C1034",
+        "x": 622.978,
+        "y": 560.655,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.369939,
+          "y": 0.529257
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1036": [
+      {
+        "page": 2,
+        "source_text": "C1036",
+        "x": 625.138,
+        "y": 983.919,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.371222,
+          "y": 0.173872
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1037": [
+      {
+        "page": 2,
+        "source_text": "C1037",
+        "x": 625.138,
+        "y": 379.256,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.371222,
+          "y": 0.681565
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1038": [
+      {
+        "page": 2,
+        "source_text": "C1038",
+        "x": 689.923,
+        "y": 976.72,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.409693,
+          "y": 0.179916
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1040": [
+      {
+        "page": 2,
+        "source_text": "C1040",
+        "x": 226.748,
+        "y": 804.782,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.134648,
+          "y": 0.32428
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1044": [
+      {
+        "page": 2,
+        "source_text": "C1044",
+        "x": 221.31,
+        "y": 775.166,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.131419,
+          "y": 0.349147
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1045": [
+      {
+        "page": 2,
+        "source_text": "C1045",
+        "x": 157.244,
+        "y": 767.968,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.093375,
+          "y": 0.355191
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1046": [
+      {
+        "page": 2,
+        "source_text": "C1046",
+        "x": 219.87,
+        "y": 559.935,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.130564,
+          "y": 0.529861
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1047": [
+      {
+        "page": 2,
+        "source_text": "C1047",
+        "x": 155.804,
+        "y": 552.017,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.09252,
+          "y": 0.53651
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1049": [
+      {
+        "page": 2,
+        "source_text": "C1049",
+        "x": 620.099,
+        "y": 214.414,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.36823,
+          "y": 0.819971
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1053": [
+      {
+        "page": 2,
+        "source_text": "C1053",
+        "x": 689.923,
+        "y": 372.058,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.409693,
+          "y": 0.687609
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1054": [
+      {
+        "page": 2,
+        "source_text": "C1054",
+        "x": 226.748,
+        "y": 1020.733,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.134648,
+          "y": 0.142961
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1058": [
+      {
+        "page": 2,
+        "source_text": "C1058",
+        "x": 157.244,
+        "y": 983.919,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.093375,
+          "y": 0.173872
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1059": [
+      {
+        "page": 2,
+        "source_text": "C1059",
+        "x": 221.31,
+        "y": 991.117,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.131419,
+          "y": 0.167828
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1060": [
+      {
+        "page": 2,
+        "source_text": "C1060",
+        "x": 625.138,
+        "y": 465.637,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.371222,
+          "y": 0.609037
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1061": [
+      {
+        "page": 2,
+        "source_text": "C1061",
+        "x": 687.763,
+        "y": 807.559,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.40841,
+          "y": 0.321949
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1062": [
+      {
+        "page": 2,
+        "source_text": "C1062",
+        "x": 622.978,
+        "y": 800.361,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.369939,
+          "y": 0.327992
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1063": [
+      {
+        "page": 2,
+        "source_text": "C1063",
+        "x": 689.203,
+        "y": 458.438,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.409265,
+          "y": 0.615081
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1065": [
+      {
+        "page": 2,
+        "source_text": "C1065",
+        "x": 155.485,
+        "y": 868.745,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.092331,
+          "y": 0.270575
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1066": [
+      {
+        "page": 2,
+        "source_text": "C1066",
+        "x": 220.27,
+        "y": 1091.894,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.130802,
+          "y": 0.083212
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1067": [
+      {
+        "page": 2,
+        "source_text": "C1067",
+        "x": 155.485,
+        "y": 1084.696,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.092331,
+          "y": 0.089256
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1069": [
+      {
+        "page": 2,
+        "source_text": "C1069",
+        "x": 625.138,
+        "y": 1070.299,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.371222,
+          "y": 0.101344
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1070": [
+      {
+        "page": 2,
+        "source_text": "C1070",
+        "x": 689.203,
+        "y": 1063.101,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.409265,
+          "y": 0.107388
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1071": [
+      {
+        "page": 2,
+        "source_text": "C1071",
+        "x": 216.924,
+        "y": 422.31,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.128815,
+          "y": 0.645416
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1072": [
+      {
+        "page": 2,
+        "source_text": "C1072",
+        "x": 152.139,
+        "y": 415.112,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.090344,
+          "y": 0.651459
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1074": [
+      {
+        "page": 2,
+        "source_text": "C1074",
+        "x": 221.31,
+        "y": 400.851,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.131419,
+          "y": 0.663433
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1075": [
+      {
+        "page": 2,
+        "source_text": "C1075",
+        "x": 156.524,
+        "y": 393.653,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.092948,
+          "y": 0.669477
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1076": [
+      {
+        "page": 2,
+        "source_text": "C1076",
+        "x": 221.31,
+        "y": 386.455,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.131419,
+          "y": 0.675521
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1077": [
+      {
+        "page": 2,
+        "source_text": "C1077",
+        "x": 157.244,
+        "y": 379.256,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.093375,
+          "y": 0.681565
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C1078": [
+      {
+        "page": 2,
+        "source_text": "C1078",
+        "x": 205.153,
+        "y": 202.999,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.121825,
+          "y": 0.829556
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2001": [
+      {
+        "page": 6,
+        "source_text": "C2001",
+        "x": 204.034,
+        "y": 1034.897,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.12116,
+          "y": 0.131069
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2002": [
+      {
+        "page": 6,
+        "source_text": "C2002",
+        "x": 961.954,
+        "y": 915.438,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.571232,
+          "y": 0.23137
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2004": [
+      {
+        "page": 6,
+        "source_text": "C2004",
+        "x": 202.527,
+        "y": 965.826,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.120265,
+          "y": 0.189063
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2007": [
+      {
+        "page": 6,
+        "source_text": "C2007",
+        "x": 206.126,
+        "y": 879.446,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.122403,
+          "y": 0.26159
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2008": [
+      {
+        "page": 6,
+        "source_text": "C2008",
+        "x": 1388.326,
+        "y": 883.239,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.824422,
+          "y": 0.258406
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2009": [
+      {
+        "page": 6,
+        "source_text": "C2009",
+        "x": 206.126,
+        "y": 793.066,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.122403,
+          "y": 0.334118
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2012": [
+      {
+        "page": 6,
+        "source_text": "C2012",
+        "x": 1334.339,
+        "y": 883.239,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.792363,
+          "y": 0.258406
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2013": [
+      {
+        "page": 6,
+        "source_text": "C2013",
+        "x": 208.752,
+        "y": 688.689,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.123962,
+          "y": 0.421756
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2014": [
+      {
+        "page": 6,
+        "source_text": "C2014",
+        "x": 1323.541,
+        "y": 883.239,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.785951,
+          "y": 0.258406
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2015": [
+      {
+        "page": 6,
+        "source_text": "C2015",
+        "x": 1312.744,
+        "y": 883.239,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.779539,
+          "y": 0.258406
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2016": [
+      {
+        "page": 6,
+        "source_text": "C2016",
+        "x": 209.726,
+        "y": 598.71,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.12454,
+          "y": 0.497305
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2017": [
+      {
+        "page": 6,
+        "source_text": "C2017",
+        "x": 616.899,
+        "y": 595.077,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.36633,
+          "y": 0.500355
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2018": [
+      {
+        "page": 6,
+        "source_text": "C2018",
+        "x": 913.072,
+        "y": 825.424,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.542204,
+          "y": 0.306949
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2020": [
+      {
+        "page": 6,
+        "source_text": "C2020",
+        "x": 945.465,
+        "y": 757.04,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.56144,
+          "y": 0.364366
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2021": [
+      {
+        "page": 6,
+        "source_text": "C2021",
+        "x": 1391.926,
+        "y": 717.677,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.826559,
+          "y": 0.397416
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2023": [
+      {
+        "page": 6,
+        "source_text": "C2023",
+        "x": 208.752,
+        "y": 497.933,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.123962,
+          "y": 0.58192
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2024": [
+      {
+        "page": 6,
+        "source_text": "C2024",
+        "x": 208.752,
+        "y": 382.759,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.123962,
+          "y": 0.678624
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2025": [
+      {
+        "page": 6,
+        "source_text": "C2025",
+        "x": 209.726,
+        "y": 303.577,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.12454,
+          "y": 0.745107
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2028": [
+      {
+        "page": 6,
+        "source_text": "C2028",
+        "x": 208.752,
+        "y": 209.998,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.123962,
+          "y": 0.823679
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2030": [
+      {
+        "page": 6,
+        "source_text": "C2030",
+        "x": 1334.339,
+        "y": 717.677,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.792363,
+          "y": 0.397416
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2031": [
+      {
+        "page": 6,
+        "source_text": "C2031",
+        "x": 1323.541,
+        "y": 717.677,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.785951,
+          "y": 0.397416
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2034": [
+      {
+        "page": 6,
+        "source_text": "C2034",
+        "x": 1312.744,
+        "y": 717.677,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.779539,
+          "y": 0.397416
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2035": [
+      {
+        "page": 6,
+        "source_text": "C2035",
+        "x": 945.465,
+        "y": 681.457,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.56144,
+          "y": 0.427828
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2036": [
+      {
+        "page": 6,
+        "source_text": "C2036",
+        "x": 945.465,
+        "y": 825.424,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.56144,
+          "y": 0.306949
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2037": [
+      {
+        "page": 6,
+        "source_text": "C2037",
+        "x": 1310.102,
+        "y": 591.511,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.77797,
+          "y": 0.503349
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2038": [
+      {
+        "page": 6,
+        "source_text": "C2038",
+        "x": 1348.736,
+        "y": 591.705,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.800912,
+          "y": 0.503186
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2039": [
+      {
+        "page": 6,
+        "source_text": "C2039",
+        "x": 1345.136,
+        "y": 883.239,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.798774,
+          "y": 0.258406
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2040": [
+      {
+        "page": 6,
+        "source_text": "C2040",
+        "x": 1312.744,
+        "y": 591.705,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.779539,
+          "y": 0.503186
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2041": [
+      {
+        "page": 6,
+        "source_text": "C2041",
+        "x": 1274.11,
+        "y": 591.511,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.756597,
+          "y": 0.503349
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2042": [
+      {
+        "page": 6,
+        "source_text": "C2042",
+        "x": 964.9,
+        "y": 423.886,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.572981,
+          "y": 0.644092
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2044": [
+      {
+        "page": 6,
+        "source_text": "C2044",
+        "x": 968.899,
+        "y": 322.259,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.575356,
+          "y": 0.729421
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2048": [
+      {
+        "page": 6,
+        "source_text": "C2048",
+        "x": 1340.324,
+        "y": 400.949,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.795917,
+          "y": 0.663351
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2049": [
+      {
+        "page": 6,
+        "source_text": "C2049",
+        "x": 1329.526,
+        "y": 400.949,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.789505,
+          "y": 0.663351
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2094": [
+      {
+        "page": 6,
+        "source_text": "C2094",
+        "x": 849.407,
+        "y": 1081.0,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.504398,
+          "y": 0.092359
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2106": [
+      {
+        "page": 7,
+        "source_text": "C2106",
+        "x": 447.338,
+        "y": 693.694,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.26564,
+          "y": 0.417553
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2110": [
+      {
+        "page": 7,
+        "source_text": "C2110",
+        "x": 1516.695,
+        "y": 800.23,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.90065,
+          "y": 0.328102
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2112": [
+      {
+        "page": 7,
+        "source_text": "C2112",
+        "x": 1515.255,
+        "y": 670.693,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.899795,
+          "y": 0.436866
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2113": [
+      {
+        "page": 7,
+        "source_text": "C2113",
+        "x": 1080.474,
+        "y": 555.486,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.641612,
+          "y": 0.533597
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2117": [
+      {
+        "page": 7,
+        "source_text": "C2117",
+        "x": 909.153,
+        "y": 977.31,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.539877,
+          "y": 0.179421
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2118": [
+      {
+        "page": 7,
+        "source_text": "C2118",
+        "x": 909.473,
+        "y": 919.003,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.540067,
+          "y": 0.228377
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2119": [
+      {
+        "page": 7,
+        "source_text": "C2119",
+        "x": 911.632,
+        "y": 553.326,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.541349,
+          "y": 0.535411
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2131": [
+      {
+        "page": 7,
+        "source_text": "C2131",
+        "x": 1174.372,
+        "y": 657.113,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.697371,
+          "y": 0.448268
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2143": [
+      {
+        "page": 7,
+        "source_text": "C2143",
+        "x": 327.525,
+        "y": 209.998,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.194492,
+          "y": 0.823679
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2201": [
+      {
+        "page": 8,
+        "source_text": "C2201",
+        "x": 266.339,
+        "y": 998.219,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.158159,
+          "y": 0.161865
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2202": [
+      {
+        "page": 8,
+        "source_text": "C2202",
+        "x": 446.298,
+        "y": 983.822,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.265023,
+          "y": 0.173953
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2204": [
+      {
+        "page": 8,
+        "source_text": "C2204",
+        "x": 507.484,
+        "y": 977.44,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.301356,
+          "y": 0.179312
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2401": [
+      {
+        "page": 10,
+        "source_text": "C2401",
+        "x": 156.204,
+        "y": 848.459,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.092813,
+          "y": 0.287009
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2402": [
+      {
+        "page": 10,
+        "source_text": "C2402",
+        "x": 323.206,
+        "y": 851.338,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.192042,
+          "y": 0.28459
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2403": [
+      {
+        "page": 10,
+        "source_text": "C2403",
+        "x": 583.067,
+        "y": 1001.818,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.346445,
+          "y": 0.158136
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2417": [
+      {
+        "page": 10,
+        "source_text": "C2417",
+        "x": 1022.167,
+        "y": 928.395,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.607348,
+          "y": 0.219836
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2419": [
+      {
+        "page": 10,
+        "source_text": "C2419",
+        "x": 1047.361,
+        "y": 1036.37,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.622318,
+          "y": 0.129101
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2425": [
+      {
+        "page": 10,
+        "source_text": "C2425",
+        "x": 1078.634,
+        "y": 929.8,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.6409,
+          "y": 0.218655
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2426": [
+      {
+        "page": 10,
+        "source_text": "C2426",
+        "x": 1115.746,
+        "y": 929.835,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.662951,
+          "y": 0.218626
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2427": [
+      {
+        "page": 10,
+        "source_text": "C2427",
+        "x": 1082.234,
+        "y": 829.023,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.643039,
+          "y": 0.303342
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C2428": [
+      {
+        "page": 10,
+        "source_text": "C2428",
+        "x": 1126.543,
+        "y": 829.057,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.669366,
+          "y": 0.303313
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3006": [
+      {
+        "page": 11,
+        "source_text": "C3006",
+        "x": 1162.135,
+        "y": 535.33,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.690104,
+          "y": 0.550521
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3007": [
+      {
+        "page": 11,
+        "source_text": "C3007",
+        "x": 133.17,
+        "y": 84.027,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.07908,
+          "y": 0.929448
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3008": [
+      {
+        "page": 11,
+        "source_text": "C3008",
+        "x": 165.562,
+        "y": 84.027,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.098315,
+          "y": 0.929448
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3201": [
+      {
+        "page": 13,
+        "source_text": "C3201",
+        "x": 143.967,
+        "y": 1081.0,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.085491,
+          "y": 0.092359
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3202": [
+      {
+        "page": 13,
+        "source_text": "C3202",
+        "x": 568.67,
+        "y": 1134.988,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.33769,
+          "y": 0.047029
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3203": [
+      {
+        "page": 13,
+        "source_text": "C3203",
+        "x": 590.265,
+        "y": 929.795,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.350514,
+          "y": 0.219316
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3204": [
+      {
+        "page": 13,
+        "source_text": "C3204",
+        "x": 619.059,
+        "y": 944.192,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.367612,
+          "y": 0.207228
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3205": [
+      {
+        "page": 13,
+        "source_text": "C3205",
+        "x": 619.059,
+        "y": 868.609,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.367612,
+          "y": 0.270689
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3206": [
+      {
+        "page": 13,
+        "source_text": "C3206",
+        "x": 1048.334,
+        "y": 537.524,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.622526,
+          "y": 0.548678
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3207": [
+      {
+        "page": 13,
+        "source_text": "C3207",
+        "x": 1059.132,
+        "y": 389.918,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.628938,
+          "y": 0.672613
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3208": [
+      {
+        "page": 13,
+        "source_text": "C3208",
+        "x": 1248.916,
+        "y": 548.321,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.741637,
+          "y": 0.539613
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3211": [
+      {
+        "page": 13,
+        "source_text": "C3211",
+        "x": 1180.065,
+        "y": 732.56,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.700751,
+          "y": 0.38492
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3212": [
+      {
+        "page": 13,
+        "source_text": "C3212",
+        "x": 1493.66,
+        "y": 865.049,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.886971,
+          "y": 0.273678
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3213": [
+      {
+        "page": 13,
+        "source_text": "C3213",
+        "x": 1418.077,
+        "y": 796.665,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.842088,
+          "y": 0.331096
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3214": [
+      {
+        "page": 13,
+        "source_text": "C3214",
+        "x": 1133.742,
+        "y": 767.871,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.673243,
+          "y": 0.355272
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3216": [
+      {
+        "page": 13,
+        "source_text": "C3216",
+        "x": 536.278,
+        "y": 1134.948,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.318455,
+          "y": 0.047063
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3217": [
+      {
+        "page": 13,
+        "source_text": "C3217",
+        "x": 633.456,
+        "y": 1037.81,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.376162,
+          "y": 0.128623
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3218": [
+      {
+        "page": 13,
+        "source_text": "C3218",
+        "x": 1328.097,
+        "y": 541.123,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.788656,
+          "y": 0.545657
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3219": [
+      {
+        "page": 13,
+        "source_text": "C3219",
+        "x": 1277.709,
+        "y": 249.55,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.758735,
+          "y": 0.79047
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3221": [
+      {
+        "page": 13,
+        "source_text": "C3221",
+        "x": 1444.244,
+        "y": 990.981,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.857627,
+          "y": 0.167942
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3222": [
+      {
+        "page": 13,
+        "source_text": "C3222",
+        "x": 1416.289,
+        "y": 867.402,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.841027,
+          "y": 0.271703
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3223": [
+      {
+        "page": 13,
+        "source_text": "C3223",
+        "x": 572.27,
+        "y": 433.108,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.339828,
+          "y": 0.636349
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3224": [
+      {
+        "page": 13,
+        "source_text": "C3224",
+        "x": 960.981,
+        "y": 767.871,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.570654,
+          "y": 0.355272
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3225": [
+      {
+        "page": 13,
+        "source_text": "C3225",
+        "x": 681.218,
+        "y": 1034.171,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.404524,
+          "y": 0.131678
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3227": [
+      {
+        "page": 13,
+        "source_text": "C3227",
+        "x": 539.877,
+        "y": 307.137,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.320592,
+          "y": 0.742118
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3228": [
+      {
+        "page": 13,
+        "source_text": "C3228",
+        "x": 543.476,
+        "y": 173.967,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.322729,
+          "y": 0.853932
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3229": [
+      {
+        "page": 13,
+        "source_text": "C3229",
+        "x": 256.515,
+        "y": 166.808,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.152325,
+          "y": 0.859943
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3230": [
+      {
+        "page": 13,
+        "source_text": "C3230",
+        "x": 478.691,
+        "y": 181.205,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.284258,
+          "y": 0.847855
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3231": [
+      {
+        "page": 13,
+        "source_text": "C3231",
+        "x": 485.889,
+        "y": 688.65,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.288533,
+          "y": 0.421788
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3232": [
+      {
+        "page": 13,
+        "source_text": "C3232",
+        "x": 166.535,
+        "y": 681.491,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.098893,
+          "y": 0.427799
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3233": [
+      {
+        "page": 13,
+        "source_text": "C3233",
+        "x": 1361.463,
+        "y": 397.116,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.80847,
+          "y": 0.666569
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3237": [
+      {
+        "page": 13,
+        "source_text": "C3237",
+        "x": 249.316,
+        "y": 299.978,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.14805,
+          "y": 0.748129
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3238": [
+      {
+        "page": 13,
+        "source_text": "C3238",
+        "x": 478.691,
+        "y": 314.375,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.284258,
+          "y": 0.736041
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3239": [
+      {
+        "page": 13,
+        "source_text": "C3239",
+        "x": 1544.048,
+        "y": 915.398,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.916893,
+          "y": 0.231404
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3240": [
+      {
+        "page": 13,
+        "source_text": "C3240",
+        "x": 1306.502,
+        "y": 1062.965,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.775833,
+          "y": 0.107502
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3241": [
+      {
+        "page": 13,
+        "source_text": "C3241",
+        "x": 961.954,
+        "y": 1030.612,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.571232,
+          "y": 0.134667
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3242": [
+      {
+        "page": 13,
+        "source_text": "C3242",
+        "x": 959.795,
+        "y": 891.827,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.56995,
+          "y": 0.251195
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3246": [
+      {
+        "page": 13,
+        "source_text": "C3246",
+        "x": 972.752,
+        "y": 213.598,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.577644,
+          "y": 0.820657
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3247": [
+      {
+        "page": 13,
+        "source_text": "C3247",
+        "x": 207.566,
+        "y": 484.4,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.123258,
+          "y": 0.593283
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3261": [
+      {
+        "page": 13,
+        "source_text": "C3261",
+        "x": 443.672,
+        "y": 911.839,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.263463,
+          "y": 0.234392
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3262": [
+      {
+        "page": 13,
+        "source_text": "C3262",
+        "x": 486.862,
+        "y": 911.839,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.28911,
+          "y": 0.234392
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3264": [
+      {
+        "page": 13,
+        "source_text": "C3264",
+        "x": 601.063,
+        "y": 1134.988,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.356926,
+          "y": 0.047029
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3265": [
+      {
+        "page": 13,
+        "source_text": "C3265",
+        "x": 943.958,
+        "y": 731.88,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.560545,
+          "y": 0.385491
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3266": [
+      {
+        "page": 13,
+        "source_text": "C3266",
+        "x": 1069.93,
+        "y": 645.499,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.63535,
+          "y": 0.458019
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3300": [
+      {
+        "page": 14,
+        "source_text": "C3300",
+        "x": 1457.668,
+        "y": 613.067,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.865599,
+          "y": 0.48525
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3320": [
+      {
+        "page": 14,
+        "source_text": "C3320",
+        "x": 478.691,
+        "y": 825.419,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.284258,
+          "y": 0.306953
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3321": [
+      {
+        "page": 14,
+        "source_text": "C3321",
+        "x": 1203.099,
+        "y": 980.183,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.714429,
+          "y": 0.177008
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3322": [
+      {
+        "page": 14,
+        "source_text": "C3322",
+        "x": 482.29,
+        "y": 731.84,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.286395,
+          "y": 0.385525
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3323": [
+      {
+        "page": 14,
+        "source_text": "C3323",
+        "x": 459.975,
+        "y": 513.73,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.273144,
+          "y": 0.568657
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3324": [
+      {
+        "page": 14,
+        "source_text": "C3324",
+        "x": 510.364,
+        "y": 135.816,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.303067,
+          "y": 0.885965
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3325": [
+      {
+        "page": 14,
+        "source_text": "C3325",
+        "x": 1256.114,
+        "y": 231.554,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.745911,
+          "y": 0.80558
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3327": [
+      {
+        "page": 14,
+        "source_text": "C3327",
+        "x": 1199.5,
+        "y": 872.208,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.712292,
+          "y": 0.267668
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3329": [
+      {
+        "page": 14,
+        "source_text": "C3329",
+        "x": 524.76,
+        "y": 308.576,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.311615,
+          "y": 0.74091
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3334": [
+      {
+        "page": 14,
+        "source_text": "C3334",
+        "x": 1285.88,
+        "y": 375.521,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.763587,
+          "y": 0.684701
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3406": [
+      {
+        "page": 15,
+        "source_text": "C3406",
+        "x": 110.12,
+        "y": 735.859,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.065392,
+          "y": 0.38215
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3422": [
+      {
+        "page": 15,
+        "source_text": "C3422",
+        "x": 203.18,
+        "y": 194.706,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.120653,
+          "y": 0.836519
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3426": [
+      {
+        "page": 15,
+        "source_text": "C3426",
+        "x": 253.569,
+        "y": 230.698,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.150575,
+          "y": 0.806299
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3428": [
+      {
+        "page": 15,
+        "source_text": "C3428",
+        "x": 318.354,
+        "y": 230.698,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.189046,
+          "y": 0.806299
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3433": [
+      {
+        "page": 15,
+        "source_text": "C3433",
+        "x": 670.887,
+        "y": 1084.599,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.398389,
+          "y": 0.089338
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3434": [
+      {
+        "page": 15,
+        "source_text": "C3434",
+        "x": 731.607,
+        "y": 1066.564,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.434446,
+          "y": 0.10448
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3450": [
+      {
+        "page": 15,
+        "source_text": "C3450",
+        "x": 149.193,
+        "y": 194.706,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.088594,
+          "y": 0.836519
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3451": [
+      {
+        "page": 15,
+        "source_text": "C3451",
+        "x": 1368.008,
+        "y": 559.935,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.812356,
+          "y": 0.529861
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3452": [
+      {
+        "page": 15,
+        "source_text": "C3452",
+        "x": 1310.421,
+        "y": 559.935,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.77816,
+          "y": 0.529861
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3454": [
+      {
+        "page": 15,
+        "source_text": "C3454",
+        "x": 1356.891,
+        "y": 393.557,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.805755,
+          "y": 0.669558
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3455": [
+      {
+        "page": 15,
+        "source_text": "C3455",
+        "x": 1094.151,
+        "y": 389.957,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.649733,
+          "y": 0.67258
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3456": [
+      {
+        "page": 15,
+        "source_text": "C3456",
+        "x": 1094.151,
+        "y": 411.553,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.649733,
+          "y": 0.654448
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3959": [
+      {
+        "page": 15,
+        "source_text": "C3959",
+        "x": 230.667,
+        "y": 947.652,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.136976,
+          "y": 0.204322
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C3975": [
+      {
+        "page": 15,
+        "source_text": "C3975",
+        "x": 407.027,
+        "y": 1023.235,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.241702,
+          "y": 0.140861
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C5001": [
+      {
+        "page": 17,
+        "source_text": "C5001",
+        "x": 183.878,
+        "y": 484.353,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.109191,
+          "y": 0.593322
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C5003": [
+      {
+        "page": 17,
+        "source_text": "C5003",
+        "x": 932.508,
+        "y": 450.966,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.553746,
+          "y": 0.621355
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C5005": [
+      {
+        "page": 17,
+        "source_text": "C5005",
+        "x": 1241.717,
+        "y": 793.032,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.737362,
+          "y": 0.334146
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C5006": [
+      {
+        "page": 17,
+        "source_text": "C5006",
+        "x": 1041.136,
+        "y": 649.059,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.618252,
+          "y": 0.45503
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C5009": [
+      {
+        "page": 17,
+        "source_text": "C5009",
+        "x": 1040.163,
+        "y": 634.798,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.617674,
+          "y": 0.467004
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C5010": [
+      {
+        "page": 17,
+        "source_text": "C5010",
+        "x": 119.093,
+        "y": 484.353,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.07072,
+          "y": 0.593322
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C5011": [
+      {
+        "page": 17,
+        "source_text": "C5011",
+        "x": 1025.046,
+        "y": 549.138,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.608697,
+          "y": 0.538927
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C5012": [
+      {
+        "page": 17,
+        "source_text": "C5012",
+        "x": 269.938,
+        "y": 177.428,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.160296,
+          "y": 0.851026
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C5013": [
+      {
+        "page": 17,
+        "source_text": "C5013",
+        "x": 1083.673,
+        "y": 412.369,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.643511,
+          "y": 0.653762
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C5014": [
+      {
+        "page": 17,
+        "source_text": "C5014",
+        "x": 793.886,
+        "y": 414.226,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.471429,
+          "y": 0.652203
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C5015": [
+      {
+        "page": 17,
+        "source_text": "C5015",
+        "x": 529.399,
+        "y": 422.172,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.31437,
+          "y": 0.645531
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C5016": [
+      {
+        "page": 17,
+        "source_text": "C5016",
+        "x": 745.35,
+        "y": 671.51,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.442607,
+          "y": 0.43618
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C5017": [
+      {
+        "page": 17,
+        "source_text": "C5017",
+        "x": 1308.982,
+        "y": 323.109,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.777305,
+          "y": 0.728708
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C5018": [
+      {
+        "page": 17,
+        "source_text": "C5018",
+        "x": 1349.293,
+        "y": 323.829,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.801243,
+          "y": 0.728103
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C5019": [
+      {
+        "page": 17,
+        "source_text": "C5019",
+        "x": 269.938,
+        "y": 253.011,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.160296,
+          "y": 0.787564
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C5020": [
+      {
+        "page": 17,
+        "source_text": "C5020",
+        "x": 604.982,
+        "y": 422.172,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.359253,
+          "y": 0.645531
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C5022": [
+      {
+        "page": 17,
+        "source_text": "C5022",
+        "x": 673.366,
+        "y": 404.176,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.399861,
+          "y": 0.660641
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C5025": [
+      {
+        "page": 17,
+        "source_text": "C5025",
+        "x": 173.081,
+        "y": 462.757,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.10278,
+          "y": 0.611455
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C5027": [
+      {
+        "page": 17,
+        "source_text": "C5027",
+        "x": 1243.477,
+        "y": 811.878,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.738407,
+          "y": 0.318322
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C5028": [
+      {
+        "page": 17,
+        "source_text": "C5028",
+        "x": 552.474,
+        "y": 728.102,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.328072,
+          "y": 0.388663
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C5029": [
+      {
+        "page": 17,
+        "source_text": "C5029",
+        "x": 914.192,
+        "y": 440.168,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.542869,
+          "y": 0.630421
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C5030": [
+      {
+        "page": 17,
+        "source_text": "C5030",
+        "x": 975.378,
+        "y": 440.168,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.579203,
+          "y": 0.630421
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C5031": [
+      {
+        "page": 17,
+        "source_text": "C5031",
+        "x": 669.767,
+        "y": 666.111,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.397724,
+          "y": 0.440713
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C5032": [
+      {
+        "page": 17,
+        "source_text": "C5032",
+        "x": 698.561,
+        "y": 747.093,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.414822,
+          "y": 0.372718
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C5040": [
+      {
+        "page": 17,
+        "source_text": "C5040",
+        "x": 960.981,
+        "y": 681.313,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.570654,
+          "y": 0.427949
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C5041": [
+      {
+        "page": 17,
+        "source_text": "C5041",
+        "x": 837.076,
+        "y": 658.65,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.497076,
+          "y": 0.446977
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C5042": [
+      {
+        "page": 17,
+        "source_text": "C5042",
+        "x": 326.046,
+        "y": 403.371,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.193614,
+          "y": 0.661317
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6001": [
+      {
+        "page": 18,
+        "source_text": "C6001",
+        "x": 350.16,
+        "y": 490.831,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.207933,
+          "y": 0.587883
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6002": [
+      {
+        "page": 18,
+        "source_text": "C6002",
+        "x": 393.031,
+        "y": 490.111,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.233391,
+          "y": 0.588488
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6003": [
+      {
+        "page": 18,
+        "source_text": "C6003",
+        "x": 879.64,
+        "y": 537.49,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.522352,
+          "y": 0.548707
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6004": [
+      {
+        "page": 18,
+        "source_text": "C6004",
+        "x": 879.64,
+        "y": 443.911,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.522352,
+          "y": 0.627279
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6007": [
+      {
+        "page": 18,
+        "source_text": "C6007",
+        "x": 320.327,
+        "y": 550.481,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.190218,
+          "y": 0.537799
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6008": [
+      {
+        "page": 18,
+        "source_text": "C6008",
+        "x": 184.598,
+        "y": 418.847,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.109619,
+          "y": 0.648323
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6009": [
+      {
+        "page": 18,
+        "source_text": "C6009",
+        "x": 184.598,
+        "y": 398.692,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.109619,
+          "y": 0.665246
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6020": [
+      {
+        "page": 18,
+        "source_text": "C6020",
+        "x": 832.985,
+        "y": 840.057,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.494647,
+          "y": 0.294662
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6021": [
+      {
+        "page": 18,
+        "source_text": "C6021",
+        "x": 879.64,
+        "y": 490.7,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.522352,
+          "y": 0.587993
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6022": [
+      {
+        "page": 18,
+        "source_text": "C6022",
+        "x": 1522.453,
+        "y": 363.324,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.904069,
+          "y": 0.694942
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6024": [
+      {
+        "page": 18,
+        "source_text": "C6024",
+        "x": 1288.826,
+        "y": 505.948,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.765336,
+          "y": 0.575191
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6025": [
+      {
+        "page": 18,
+        "source_text": "C6025",
+        "x": 1282.348,
+        "y": 394.373,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.761489,
+          "y": 0.668872
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6027": [
+      {
+        "page": 18,
+        "source_text": "C6027",
+        "x": 1513.815,
+        "y": 481.473,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.89894,
+          "y": 0.595741
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6028": [
+      {
+        "page": 18,
+        "source_text": "C6028",
+        "x": 1514.535,
+        "y": 425.915,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.899368,
+          "y": 0.642389
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6035": [
+      {
+        "page": 18,
+        "source_text": "C6035",
+        "x": 889.965,
+        "y": 839.644,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.528483,
+          "y": 0.295009
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6036": [
+      {
+        "page": 18,
+        "source_text": "C6036",
+        "x": 219.87,
+        "y": 363.289,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.130564,
+          "y": 0.694971
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6039": [
+      {
+        "page": 18,
+        "source_text": "C6039",
+        "x": 957.382,
+        "y": 924.796,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.568517,
+          "y": 0.223513
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6040": [
+      {
+        "page": 18,
+        "source_text": "C6040",
+        "x": 839.582,
+        "y": 890.204,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.498564,
+          "y": 0.252558
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6041": [
+      {
+        "page": 18,
+        "source_text": "C6041",
+        "x": 818.054,
+        "y": 509.547,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.48578,
+          "y": 0.572169
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6042": [
+      {
+        "page": 18,
+        "source_text": "C6042",
+        "x": 818.773,
+        "y": 467.796,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.486207,
+          "y": 0.607224
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6125": [
+      {
+        "page": 19,
+        "source_text": "C6125",
+        "x": 303.051,
+        "y": 130.193,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.179959,
+          "y": 0.890686
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6126": [
+      {
+        "page": 19,
+        "source_text": "C6126",
+        "x": 331.844,
+        "y": 130.193,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.197057,
+          "y": 0.890686
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6212": [
+      {
+        "page": 21,
+        "source_text": "C6212",
+        "x": 226.748,
+        "y": 278.383,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.134648,
+          "y": 0.766261
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6230": [
+      {
+        "page": 21,
+        "source_text": "C6230",
+        "x": 318.168,
+        "y": 272.59,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.188936,
+          "y": 0.771125
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6244": [
+      {
+        "page": 21,
+        "source_text": "C6244",
+        "x": 1027.526,
+        "y": 441.032,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.61017,
+          "y": 0.629696
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6245": [
+      {
+        "page": 21,
+        "source_text": "C6245",
+        "x": 1098.79,
+        "y": 743.494,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.652488,
+          "y": 0.37574
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6246": [
+      {
+        "page": 21,
+        "source_text": "C6246",
+        "x": 1034.724,
+        "y": 1013.301,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.614444,
+          "y": 0.149202
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6247": [
+      {
+        "page": 21,
+        "source_text": "C6247",
+        "x": 1091.591,
+        "y": 171.224,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.648213,
+          "y": 0.856235
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6422": [
+      {
+        "page": 24,
+        "source_text": "C6422",
+        "x": 331.125,
+        "y": 179.765,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.19663,
+          "y": 0.849064
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6427": [
+      {
+        "page": 24,
+        "source_text": "C6427",
+        "x": 120.532,
+        "y": 218.013,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.071575,
+          "y": 0.81695
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6501": [
+      {
+        "page": 25,
+        "source_text": "C6501",
+        "x": 831.411,
+        "y": 778.669,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.493712,
+          "y": 0.346206
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6601": [
+      {
+        "page": 26,
+        "source_text": "C6601",
+        "x": 291.534,
+        "y": 490.557,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.17312,
+          "y": 0.588113
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6602": [
+      {
+        "page": 26,
+        "source_text": "C6602",
+        "x": 939.386,
+        "y": 796.665,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.55783,
+          "y": 0.331096
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6603": [
+      {
+        "page": 26,
+        "source_text": "C6603",
+        "x": 558.193,
+        "y": 412.369,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.331469,
+          "y": 0.653762
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6607": [
+      {
+        "page": 26,
+        "source_text": "C6607",
+        "x": 442.699,
+        "y": 843.454,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.262885,
+          "y": 0.29181
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6608": [
+      {
+        "page": 26,
+        "source_text": "C6608",
+        "x": 247.624,
+        "y": 854.348,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.147045,
+          "y": 0.282663
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6609": [
+      {
+        "page": 26,
+        "source_text": "C6609",
+        "x": 277.137,
+        "y": 854.252,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.164571,
+          "y": 0.282744
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6611": [
+      {
+        "page": 26,
+        "source_text": "C6611",
+        "x": 880.679,
+        "y": 740.614,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.522969,
+          "y": 0.378158
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6612": [
+      {
+        "page": 26,
+        "source_text": "C6612",
+        "x": 1221.882,
+        "y": 827.714,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.725583,
+          "y": 0.305026
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6613": [
+      {
+        "page": 26,
+        "source_text": "C6613",
+        "x": 1222.601,
+        "y": 439.003,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.72601,
+          "y": 0.6314
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6614": [
+      {
+        "page": 26,
+        "source_text": "C6614",
+        "x": 1270.511,
+        "y": 666.916,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.75446,
+          "y": 0.440037
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6615": [
+      {
+        "page": 26,
+        "source_text": "C6615",
+        "x": 1270.511,
+        "y": 591.334,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.75446,
+          "y": 0.503498
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6618": [
+      {
+        "page": 26,
+        "source_text": "C6618",
+        "x": 1407.599,
+        "y": 707.502,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.835866,
+          "y": 0.40596
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6619": [
+      {
+        "page": 26,
+        "source_text": "C6619",
+        "x": 1407.599,
+        "y": 556.336,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.835866,
+          "y": 0.532883
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6620": [
+      {
+        "page": 26,
+        "source_text": "C6620",
+        "x": 1407.279,
+        "y": 743.494,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.835676,
+          "y": 0.37574
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6621": [
+      {
+        "page": 26,
+        "source_text": "C6621",
+        "x": 1407.279,
+        "y": 520.344,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.835676,
+          "y": 0.563103
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6623": [
+      {
+        "page": 26,
+        "source_text": "C6623",
+        "x": 1464.866,
+        "y": 677.714,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.869873,
+          "y": 0.430971
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6624": [
+      {
+        "page": 26,
+        "source_text": "C6624",
+        "x": 1464.866,
+        "y": 587.734,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.869873,
+          "y": 0.506521
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6626": [
+      {
+        "page": 26,
+        "source_text": "C6626",
+        "x": 89.98,
+        "y": 706.685,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.053432,
+          "y": 0.406646
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6627": [
+      {
+        "page": 26,
+        "source_text": "C6627",
+        "x": 1529.651,
+        "y": 677.714,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.908344,
+          "y": 0.430971
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6628": [
+      {
+        "page": 26,
+        "source_text": "C6628",
+        "x": 1562.044,
+        "y": 582.84,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.92758,
+          "y": 0.51063
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6629": [
+      {
+        "page": 26,
+        "source_text": "C6629",
+        "x": 633.456,
+        "y": 864.871,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.376162,
+          "y": 0.273828
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6630": [
+      {
+        "page": 26,
+        "source_text": "C6630",
+        "x": 864.123,
+        "y": 624.721,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.513137,
+          "y": 0.475465
+        },
+        "source_status": "decoded_pdf_text_run"
+      },
+      {
+        "page": 26,
+        "source_text": "C6630",
+        "x": 960.981,
+        "y": 609.33,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.570654,
+          "y": 0.488388
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6631": [
+      {
+        "page": 26,
+        "source_text": "C6631",
+        "x": 475.412,
+        "y": 844.27,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.282311,
+          "y": 0.291125
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6632": [
+      {
+        "page": 26,
+        "source_text": "C6632",
+        "x": 215.951,
+        "y": 706.685,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.128237,
+          "y": 0.406646
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6635": [
+      {
+        "page": 26,
+        "source_text": "C6635",
+        "x": 1349.693,
+        "y": 677.714,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.80148,
+          "y": 0.430971
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6636": [
+      {
+        "page": 26,
+        "source_text": "C6636",
+        "x": 1349.693,
+        "y": 594.933,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.80148,
+          "y": 0.500476
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6637": [
+      {
+        "page": 26,
+        "source_text": "C6637",
+        "x": 471.493,
+        "y": 150.972,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.279984,
+          "y": 0.873239
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6638": [
+      {
+        "page": 26,
+        "source_text": "C6638",
+        "x": 494.527,
+        "y": 152.412,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.293662,
+          "y": 0.87203
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "C6639": [
+      {
+        "page": 26,
+        "source_text": "C6639",
+        "x": 248.343,
+        "y": 118.579,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.147472,
+          "y": 0.900437
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "D2101": [
+      {
+        "page": 7,
+        "source_text": "D2101",
+        "x": 282.696,
+        "y": 210.815,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.167872,
+          "y": 0.822993
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "D3201": [
+      {
+        "page": 13,
+        "source_text": "D3201",
+        "x": 691.529,
+        "y": 1131.389,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.410647,
+          "y": 0.050051
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "J2101": [
+      {
+        "page": 7,
+        "source_text": "J2101",
+        "x": 162.429,
+        "y": 281.948,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.096454,
+          "y": 0.763268
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "J3402": [
+      {
+        "page": 15,
+        "source_text": "J3402",
+        "x": 496.49,
+        "y": 702.19,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.294828,
+          "y": 0.41042
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "J6101": [
+      {
+        "page": 19,
+        "source_text": "J6101",
+        "x": 515.403,
+        "y": 890.929,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.306059,
+          "y": 0.251949
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "J6201": [
+      {
+        "page": 20,
+        "source_text": "J6201",
+        "x": 1213.856,
+        "y": 574.202,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.720817,
+          "y": 0.517882
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "J6203": [
+      {
+        "page": 21,
+        "source_text": "J6203",
+        "x": 361.104,
+        "y": 359.69,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.214432,
+          "y": 0.697993
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "J6204": [
+      {
+        "page": 21,
+        "source_text": "J6204",
+        "x": 1188.993,
+        "y": 440.346,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.706053,
+          "y": 0.630272
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "J6206": [
+      {
+        "page": 22,
+        "source_text": "J6206",
+        "x": 386.298,
+        "y": 305.703,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.229393,
+          "y": 0.743322
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "J6208": [
+      {
+        "page": 21,
+        "source_text": "J6208",
+        "x": 343.186,
+        "y": 1059.405,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.203792,
+          "y": 0.110491
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "J6209": [
+      {
+        "page": 21,
+        "source_text": "J6209",
+        "x": 1196.191,
+        "y": 1012.616,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.710327,
+          "y": 0.149777
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "J6210": [
+      {
+        "page": 22,
+        "source_text": "J6210",
+        "x": 1221.308,
+        "y": 294.905,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.725242,
+          "y": 0.752389
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "J6402": [
+      {
+        "page": 24,
+        "source_text": "J6402",
+        "x": 278.069,
+        "y": 1063.69,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.165124,
+          "y": 0.106893
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "J6701": [
+      {
+        "page": 27,
+        "source_text": "J6701",
+        "x": 490.208,
+        "y": 750.561,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.29127,
+          "y": 0.369276
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "J6702": [
+      {
+        "page": 27,
+        "source_text": "J6702",
+        "x": 1166.601,
+        "y": 652.664,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.693168,
+          "y": 0.451543
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "J6703": [
+      {
+        "page": 27,
+        "source_text": "J6703",
+        "x": 1166.601,
+        "y": 546.488,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.693168,
+          "y": 0.540766
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3201": [
+      {
+        "page": 13,
+        "source_text": "L3201",
+        "x": 1009.197,
+        "y": 491.624,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.599286,
+          "y": 0.587217
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3202": [
+      {
+        "page": 13,
+        "source_text": "L3202",
+        "x": 95.714,
+        "y": 1055.806,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.056837,
+          "y": 0.113513
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3206": [
+      {
+        "page": 13,
+        "source_text": "L3206",
+        "x": 1283.119,
+        "y": 496.687,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.761947,
+          "y": 0.582966
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3207": [
+      {
+        "page": 13,
+        "source_text": "L3207",
+        "x": 220.977,
+        "y": 117.309,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.131221,
+          "y": 0.901504
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3208": [
+      {
+        "page": 13,
+        "source_text": "L3208",
+        "x": 1006.306,
+        "y": 361.124,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.597569,
+          "y": 0.696789
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3210": [
+      {
+        "page": 13,
+        "source_text": "L3210",
+        "x": 998.784,
+        "y": 680.245,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.593102,
+          "y": 0.428846
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3211": [
+      {
+        "page": 13,
+        "source_text": "L3211",
+        "x": 527.291,
+        "y": 133.17,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.313118,
+          "y": 0.888186
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3212": [
+      {
+        "page": 13,
+        "source_text": "L3212",
+        "x": 108.671,
+        "y": 652.842,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.064531,
+          "y": 0.451854
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3215": [
+      {
+        "page": 13,
+        "source_text": "L3215",
+        "x": 548.502,
+        "y": 392.311,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.325714,
+          "y": 0.670604
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3216": [
+      {
+        "page": 13,
+        "source_text": "L3216",
+        "x": 196.166,
+        "y": 635.591,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.116488,
+          "y": 0.466338
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3219": [
+      {
+        "page": 13,
+        "source_text": "L3219",
+        "x": 200.09,
+        "y": 274.784,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.118818,
+          "y": 0.769283
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3222": [
+      {
+        "page": 13,
+        "source_text": "L3222",
+        "x": 1228.747,
+        "y": 1020.703,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.72966,
+          "y": 0.142987
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3223": [
+      {
+        "page": 13,
+        "source_text": "L3223",
+        "x": 1034.775,
+        "y": 1013.505,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.614474,
+          "y": 0.14903
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3224": [
+      {
+        "page": 13,
+        "source_text": "L3224",
+        "x": 430.113,
+        "y": 264.875,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.255412,
+          "y": 0.777603
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3225": [
+      {
+        "page": 13,
+        "source_text": "L3225",
+        "x": 1153.548,
+        "y": 887.533,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.685005,
+          "y": 0.2548
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3226": [
+      {
+        "page": 13,
+        "source_text": "L3226",
+        "x": 433.712,
+        "y": 125.971,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.257549,
+          "y": 0.894231
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3227": [
+      {
+        "page": 13,
+        "source_text": "L3227",
+        "x": 1031.176,
+        "y": 880.335,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.612337,
+          "y": 0.260844
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3228": [
+      {
+        "page": 13,
+        "source_text": "L3228",
+        "x": 523.692,
+        "y": 255.542,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.310981,
+          "y": 0.785439
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3230": [
+      {
+        "page": 13,
+        "source_text": "L3230",
+        "x": 1088.379,
+        "y": 344.057,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.646306,
+          "y": 0.711119
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3232": [
+      {
+        "page": 13,
+        "source_text": "L3232",
+        "x": 1229.131,
+        "y": 694.642,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.729888,
+          "y": 0.416757
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3234": [
+      {
+        "page": 13,
+        "source_text": "L3234",
+        "x": 1379.913,
+        "y": 689.578,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.819426,
+          "y": 0.421009
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3237": [
+      {
+        "page": 13,
+        "source_text": "L3237",
+        "x": 1264.739,
+        "y": 210.887,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.751033,
+          "y": 0.822933
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3238": [
+      {
+        "page": 13,
+        "source_text": "L3238",
+        "x": 1325.925,
+        "y": 207.288,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.787366,
+          "y": 0.825955
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3240": [
+      {
+        "page": 13,
+        "source_text": "L3240",
+        "x": 1279.136,
+        "y": 347.656,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.759582,
+          "y": 0.708097
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3242": [
+      {
+        "page": 13,
+        "source_text": "L3242",
+        "x": 1466.677,
+        "y": 887.533,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.870948,
+          "y": 0.2548
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3243": [
+      {
+        "page": 13,
+        "source_text": "L3243",
+        "x": 285.762,
+        "y": 470.029,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.169692,
+          "y": 0.605349
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3245": [
+      {
+        "page": 13,
+        "source_text": "L3245",
+        "x": 1191.329,
+        "y": 1066.603,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.70744,
+          "y": 0.104448
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3246": [
+      {
+        "page": 13,
+        "source_text": "L3246",
+        "x": 1527.863,
+        "y": 887.533,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.907282,
+          "y": 0.2548
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3247": [
+      {
+        "page": 13,
+        "source_text": "L3247",
+        "x": 358.13,
+        "y": 642.789,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.212666,
+          "y": 0.460295
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3248": [
+      {
+        "page": 13,
+        "source_text": "L3248",
+        "x": 403.108,
+        "y": 692.289,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.239375,
+          "y": 0.418733
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3249": [
+      {
+        "page": 13,
+        "source_text": "L3249",
+        "x": 462.122,
+        "y": 639.19,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.274419,
+          "y": 0.463317
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3250": [
+      {
+        "page": 13,
+        "source_text": "L3250",
+        "x": 1187.729,
+        "y": 937.033,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.705302,
+          "y": 0.213238
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3252": [
+      {
+        "page": 13,
+        "source_text": "L3252",
+        "x": 1018.568,
+        "y": 242.391,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.60485,
+          "y": 0.796481
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3253": [
+      {
+        "page": 13,
+        "source_text": "L3253",
+        "x": 507.484,
+        "y": 519.528,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.301356,
+          "y": 0.563788
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3254": [
+      {
+        "page": 13,
+        "source_text": "L3254",
+        "x": 507.484,
+        "y": 440.346,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.301356,
+          "y": 0.630272
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3255": [
+      {
+        "page": 13,
+        "source_text": "L3255",
+        "x": 254.078,
+        "y": 544.722,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.150878,
+          "y": 0.542635
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3256": [
+      {
+        "page": 13,
+        "source_text": "L3256",
+        "x": 254.078,
+        "y": 519.528,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.150878,
+          "y": 0.563788
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3257": [
+      {
+        "page": 13,
+        "source_text": "L3257",
+        "x": 451.324,
+        "y": 392.311,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.268007,
+          "y": 0.670604
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3401": [
+      {
+        "page": 15,
+        "source_text": "L3401",
+        "x": 71.339,
+        "y": 835.36,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.042363,
+          "y": 0.298606
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3908": [
+      {
+        "page": 15,
+        "source_text": "L3908",
+        "x": 178.495,
+        "y": 969.426,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.105995,
+          "y": 0.18604
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L3925": [
+      {
+        "page": 15,
+        "source_text": "L3925",
+        "x": 687.443,
+        "y": 1063.004,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.40822,
+          "y": 0.107469
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L5001": [
+      {
+        "page": 17,
+        "source_text": "L5001",
+        "x": 61.186,
+        "y": 893.665,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.036334,
+          "y": 0.249652
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L5002": [
+      {
+        "page": 17,
+        "source_text": "L5002",
+        "x": 803.933,
+        "y": 440.168,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.477395,
+          "y": 0.630421
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L5003": [
+      {
+        "page": 17,
+        "source_text": "L5003",
+        "x": 248.343,
+        "y": 893.665,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.147472,
+          "y": 0.249652
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L5004": [
+      {
+        "page": 17,
+        "source_text": "L5004",
+        "x": 248.343,
+        "y": 987.243,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.147472,
+          "y": 0.171081
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L5006": [
+      {
+        "page": 17,
+        "source_text": "L5006",
+        "x": 57.587,
+        "y": 706.507,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.034197,
+          "y": 0.406795
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L5007": [
+      {
+        "page": 17,
+        "source_text": "L5007",
+        "x": 282.802,
+        "y": 651.452,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.167935,
+          "y": 0.453021
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L5010": [
+      {
+        "page": 17,
+        "source_text": "L5010",
+        "x": 533.995,
+        "y": 682.307,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.317099,
+          "y": 0.427114
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L5011": [
+      {
+        "page": 17,
+        "source_text": "L5011",
+        "x": 1030.681,
+        "y": 483.358,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.612043,
+          "y": 0.594158
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L5013": [
+      {
+        "page": 17,
+        "source_text": "L5013",
+        "x": 555.59,
+        "y": 436.569,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.329923,
+          "y": 0.633443
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L5015": [
+      {
+        "page": 17,
+        "source_text": "L5015",
+        "x": 896.905,
+        "y": 568.67,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.532604,
+          "y": 0.522527
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L5016": [
+      {
+        "page": 17,
+        "source_text": "L5016",
+        "x": 968.888,
+        "y": 568.67,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.575349,
+          "y": 0.522527
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L5019": [
+      {
+        "page": 17,
+        "source_text": "L5019",
+        "x": 310.845,
+        "y": 425.771,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.184587,
+          "y": 0.64251
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L5020": [
+      {
+        "page": 17,
+        "source_text": "L5020",
+        "x": 377.925,
+        "y": 799.018,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.224421,
+          "y": 0.32912
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L5023": [
+      {
+        "page": 17,
+        "source_text": "L5023",
+        "x": 61.186,
+        "y": 807.284,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.036334,
+          "y": 0.32218
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L5030": [
+      {
+        "page": 17,
+        "source_text": "L5030",
+        "x": 988.931,
+        "y": 667.78,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.587251,
+          "y": 0.439312
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L5031": [
+      {
+        "page": 17,
+        "source_text": "L5031",
+        "x": 952.25,
+        "y": 656.367,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.565469,
+          "y": 0.448894
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L5032": [
+      {
+        "page": 17,
+        "source_text": "L5032",
+        "x": 775.14,
+        "y": 706.507,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.460297,
+          "y": 0.406795
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L6601": [
+      {
+        "page": 26,
+        "source_text": "L6601",
+        "x": 1217.839,
+        "y": 706.507,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.723182,
+          "y": 0.406795
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "L6602": [
+      {
+        "page": 26,
+        "source_text": "L6602",
+        "x": 1225.037,
+        "y": 555.342,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.727457,
+          "y": 0.533718
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "PL2001": [
+      {
+        "page": 6,
+        "source_text": "PL2001",
+        "x": 537.191,
+        "y": 985.948,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.318997,
+          "y": 0.172168
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "PL2002": [
+      {
+        "page": 6,
+        "source_text": "PL2002",
+        "x": 533.744,
+        "y": 899.601,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.31695,
+          "y": 0.244668
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "PL2003": [
+      {
+        "page": 6,
+        "source_text": "PL2003",
+        "x": 537.191,
+        "y": 813.187,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.318997,
+          "y": 0.317223
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "PL2004": [
+      {
+        "page": 6,
+        "source_text": "PL2004",
+        "x": 537.191,
+        "y": 712.41,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.318997,
+          "y": 0.401839
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "PL2005": [
+      {
+        "page": 6,
+        "source_text": "PL2005",
+        "x": 537.191,
+        "y": 618.831,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.318997,
+          "y": 0.480411
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "PL2006": [
+      {
+        "page": 6,
+        "source_text": "PL2006",
+        "x": 540.79,
+        "y": 525.253,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.321134,
+          "y": 0.558982
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "PL2007": [
+      {
+        "page": 6,
+        "source_text": "PL2007",
+        "x": 540.79,
+        "y": 417.277,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.321134,
+          "y": 0.649641
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "PL2008": [
+      {
+        "page": 6,
+        "source_text": "PL2008",
+        "x": 533.744,
+        "y": 338.129,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.31695,
+          "y": 0.716097
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "PL2009": [
+      {
+        "page": 6,
+        "source_text": "PL2009",
+        "x": 540.79,
+        "y": 244.517,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.321134,
+          "y": 0.794696
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "PL2011": [
+      {
+        "page": 6,
+        "source_text": "PL2011",
+        "x": 836.321,
+        "y": 1125.12,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.496628,
+          "y": 0.055315
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "PL2204": [
+      {
+        "page": 8,
+        "source_text": "PL2204",
+        "x": 339.236,
+        "y": 1018.34,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.201447,
+          "y": 0.144971
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "PL2401": [
+      {
+        "page": 10,
+        "source_text": "PL2401",
+        "x": 886.464,
+        "y": 1061.564,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.526717,
+          "y": 0.107929
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "PL2402": [
+      {
+        "page": 10,
+        "source_text": "PL2402",
+        "x": 886.464,
+        "y": 1047.168,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.526717,
+          "y": 0.120027
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "PL2403": [
+      {
+        "page": 10,
+        "source_text": "PL2403",
+        "x": 946.584,
+        "y": 836.216,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.562439,
+          "y": 0.297297
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "PL6601": [
+      {
+        "page": 26,
+        "source_text": "PL6601",
+        "x": 248.343,
+        "y": 163.209,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.147472,
+          "y": 0.862965
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "Q2401": [
+      {
+        "page": 10,
+        "source_text": "Q2401",
+        "x": 619.35,
+        "y": 1023.373,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.368004,
+          "y": 0.140023
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "Q2402": [
+      {
+        "page": 10,
+        "source_text": "Q2402",
+        "x": 666.139,
+        "y": 933.434,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.395805,
+          "y": 0.215602
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R2001": [
+      {
+        "page": 6,
+        "source_text": "R2001",
+        "x": 158.684,
+        "y": 1055.052,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.09423,
+          "y": 0.114146
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R2007": [
+      {
+        "page": 6,
+        "source_text": "R2007",
+        "x": 1032.965,
+        "y": 1081.816,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.6134,
+          "y": 0.091674
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R2008": [
+      {
+        "page": 6,
+        "source_text": "R2008",
+        "x": 1032.965,
+        "y": 1099.812,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.6134,
+          "y": 0.076564
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R2021": [
+      {
+        "page": 6,
+        "source_text": "R2021",
+        "x": 907.966,
+        "y": 1019.774,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.539172,
+          "y": 0.143767
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R2022": [
+      {
+        "page": 6,
+        "source_text": "R2022",
+        "x": 907.966,
+        "y": 1077.361,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.539172,
+          "y": 0.095415
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R2101": [
+      {
+        "page": 7,
+        "source_text": "R2101",
+        "x": 126.291,
+        "y": 877.972,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.074995,
+          "y": 0.262828
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R2102": [
+      {
+        "page": 7,
+        "source_text": "R2102",
+        "x": 72.957,
+        "y": 719.642,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.043324,
+          "y": 0.395767
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R2105": [
+      {
+        "page": 7,
+        "source_text": "R2105",
+        "x": 346.241,
+        "y": 307.273,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.205606,
+          "y": 0.742004
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R2106": [
+      {
+        "page": 7,
+        "source_text": "R2106",
+        "x": 116.613,
+        "y": 681.588,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.069248,
+          "y": 0.427718
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R2107": [
+      {
+        "page": 7,
+        "source_text": "R2107",
+        "x": 72.957,
+        "y": 705.246,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.043324,
+          "y": 0.407854
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R2108": [
+      {
+        "page": 7,
+        "source_text": "R2108",
+        "x": 398.789,
+        "y": 307.273,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.236811,
+          "y": 0.742004
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R2112": [
+      {
+        "page": 7,
+        "source_text": "R2112",
+        "x": 1165.014,
+        "y": 670.659,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.691814,
+          "y": 0.436894
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R2113": [
+      {
+        "page": 7,
+        "source_text": "R2113",
+        "x": 1138.061,
+        "y": 713.26,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.675808,
+          "y": 0.401125
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R2118": [
+      {
+        "page": 7,
+        "source_text": "R2118",
+        "x": 414.426,
+        "y": 231.56,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.246096,
+          "y": 0.805575
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R2119": [
+      {
+        "page": 7,
+        "source_text": "R2119",
+        "x": 1029.685,
+        "y": 901.857,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.611452,
+          "y": 0.242773
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R2121": [
+      {
+        "page": 7,
+        "source_text": "R2121",
+        "x": 219.55,
+        "y": 120.835,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.130374,
+          "y": 0.898543
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R2122": [
+      {
+        "page": 7,
+        "source_text": "R2122",
+        "x": 205.153,
+        "y": 253.189,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.121825,
+          "y": 0.787415
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R2123": [
+      {
+        "page": 7,
+        "source_text": "R2123",
+        "x": 172.761,
+        "y": 163.209,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.10259,
+          "y": 0.862965
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R2128": [
+      {
+        "page": 7,
+        "source_text": "R2128",
+        "x": 1137.341,
+        "y": 587.912,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.675381,
+          "y": 0.506371
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R2206": [
+      {
+        "page": 8,
+        "source_text": "R2206",
+        "x": 258.421,
+        "y": 934.25,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.153457,
+          "y": 0.215575
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R2207": [
+      {
+        "page": 8,
+        "source_text": "R2207",
+        "x": 257.701,
+        "y": 923.452,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.153029,
+          "y": 0.224641
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R2208": [
+      {
+        "page": 8,
+        "source_text": "R2208",
+        "x": 544.449,
+        "y": 922.636,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.323307,
+          "y": 0.225327
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R2209": [
+      {
+        "page": 8,
+        "source_text": "R2209",
+        "x": 544.449,
+        "y": 886.644,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.323307,
+          "y": 0.255547
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R2217": [
+      {
+        "page": 7,
+        "source_text": "R2217",
+        "x": 414.226,
+        "y": 274.75,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.245977,
+          "y": 0.769312
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R2401": [
+      {
+        "page": 10,
+        "source_text": "R2401",
+        "x": 619.059,
+        "y": 1048.607,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.367831,
+          "y": 0.118818
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R2402": [
+      {
+        "page": 10,
+        "source_text": "R2402",
+        "x": 713.611,
+        "y": 987.382,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.424011,
+          "y": 0.170267
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R3001": [
+      {
+        "page": 11,
+        "source_text": "R3001",
+        "x": 1177.252,
+        "y": 624.721,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.699081,
+          "y": 0.475465
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R3002": [
+      {
+        "page": 11,
+        "source_text": "R3002",
+        "x": 1393.203,
+        "y": 652.52,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.827318,
+          "y": 0.452124
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R3003": [
+      {
+        "page": 11,
+        "source_text": "R3003",
+        "x": 1354.001,
+        "y": 601.383,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.804039,
+          "y": 0.49506
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R3004": [
+      {
+        "page": 11,
+        "source_text": "R3004",
+        "x": 1425.984,
+        "y": 604.982,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.846784,
+          "y": 0.492039
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R3201": [
+      {
+        "page": 13,
+        "source_text": "R3201",
+        "x": 573.243,
+        "y": 875.847,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.340406,
+          "y": 0.264612
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R3202": [
+      {
+        "page": 13,
+        "source_text": "R3202",
+        "x": 530.506,
+        "y": 817.014,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.315027,
+          "y": 0.31401
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R3203": [
+      {
+        "page": 13,
+        "source_text": "R3203",
+        "x": 606.089,
+        "y": 825.185,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.35991,
+          "y": 0.307149
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R3204": [
+      {
+        "page": 13,
+        "source_text": "R3204",
+        "x": 681.218,
+        "y": 1081.0,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.404524,
+          "y": 0.092359
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R3205": [
+      {
+        "page": 13,
+        "source_text": "R3205",
+        "x": 1410.879,
+        "y": 748.436,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.837814,
+          "y": 0.37159
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R3206": [
+      {
+        "page": 13,
+        "source_text": "R3206",
+        "x": 1001.545,
+        "y": 1055.806,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.594742,
+          "y": 0.113513
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R3208": [
+      {
+        "page": 13,
+        "source_text": "R3208",
+        "x": 1490.061,
+        "y": 917.597,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.884834,
+          "y": 0.229558
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R3212": [
+      {
+        "page": 13,
+        "source_text": "R3212",
+        "x": 558.846,
+        "y": 951.43,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.331856,
+          "y": 0.20115
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R3402": [
+      {
+        "page": 15,
+        "source_text": "R3402",
+        "x": 70.011,
+        "y": 720.186,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.041574,
+          "y": 0.39531
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R3407": [
+      {
+        "page": 15,
+        "source_text": "R3407",
+        "x": 325.553,
+        "y": 684.194,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.193321,
+          "y": 0.42553
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R3410": [
+      {
+        "page": 15,
+        "source_text": "R3410",
+        "x": 1081.38,
+        "y": 910.943,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.64215,
+          "y": 0.235144
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R3413": [
+      {
+        "page": 15,
+        "source_text": "R3413",
+        "x": 1322.965,
+        "y": 341.922,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.785609,
+          "y": 0.712912
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R3414": [
+      {
+        "page": 15,
+        "source_text": "R3414",
+        "x": 1166.843,
+        "y": 432.221,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.6929,
+          "y": 0.637094
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R3415": [
+      {
+        "page": 15,
+        "source_text": "R3415",
+        "x": 1168.201,
+        "y": 345.521,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.693706,
+          "y": 0.70989
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R3416": [
+      {
+        "page": 15,
+        "source_text": "R3416",
+        "x": 1035.11,
+        "y": 854.632,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.614673,
+          "y": 0.282425
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R3417": [
+      {
+        "page": 15,
+        "source_text": "R3417",
+        "x": 1117.301,
+        "y": 860.204,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.66348,
+          "y": 0.277746
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R3420": [
+      {
+        "page": 15,
+        "source_text": "R3420",
+        "x": 122.372,
+        "y": 915.438,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.072667,
+          "y": 0.23137
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R3430": [
+      {
+        "page": 15,
+        "source_text": "R3430",
+        "x": 221.176,
+        "y": 446.649,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.13134,
+          "y": 0.62498
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R3431": [
+      {
+        "page": 15,
+        "source_text": "R3431",
+        "x": 176.36,
+        "y": 479.937,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.104727,
+          "y": 0.59703
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R3433": [
+      {
+        "page": 15,
+        "source_text": "R3433",
+        "x": 242.771,
+        "y": 324.277,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.144163,
+          "y": 0.727727
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R3434": [
+      {
+        "page": 15,
+        "source_text": "R3434",
+        "x": 66.412,
+        "y": 338.673,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.039437,
+          "y": 0.71564
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R3436": [
+      {
+        "page": 15,
+        "source_text": "R3436",
+        "x": 66.412,
+        "y": 324.277,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.039437,
+          "y": 0.727727
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R3956": [
+      {
+        "page": 15,
+        "source_text": "R3956",
+        "x": 597.464,
+        "y": 1059.405,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.354789,
+          "y": 0.110491
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R3957": [
+      {
+        "page": 15,
+        "source_text": "R3957",
+        "x": 597.464,
+        "y": 1034.211,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.354789,
+          "y": 0.131645
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R3959": [
+      {
+        "page": 15,
+        "source_text": "R3959",
+        "x": 597.464,
+        "y": 969.426,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.354789,
+          "y": 0.18604
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R3960": [
+      {
+        "page": 15,
+        "source_text": "R3960",
+        "x": 597.464,
+        "y": 991.021,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.354789,
+          "y": 0.167908
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R5002": [
+      {
+        "page": 17,
+        "source_text": "R5002",
+        "x": 311.596,
+        "y": 950.503,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.185033,
+          "y": 0.201929
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R5010": [
+      {
+        "page": 17,
+        "source_text": "R5010",
+        "x": 921.71,
+        "y": 592.328,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.547334,
+          "y": 0.502663
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R5017": [
+      {
+        "page": 17,
+        "source_text": "R5017",
+        "x": 227.068,
+        "y": 702.908,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.134838,
+          "y": 0.409817
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R5018": [
+      {
+        "page": 17,
+        "source_text": "R5018",
+        "x": 112.283,
+        "y": 745.03,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.066676,
+          "y": 0.37445
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R5019": [
+      {
+        "page": 17,
+        "source_text": "R5019",
+        "x": 313.837,
+        "y": 867.402,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.186364,
+          "y": 0.271703
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R5020": [
+      {
+        "page": 17,
+        "source_text": "R5020",
+        "x": 479.011,
+        "y": 710.106,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.284448,
+          "y": 0.403773
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R5023": [
+      {
+        "page": 17,
+        "source_text": "R5023",
+        "x": 117.24,
+        "y": 856.925,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.06962,
+          "y": 0.2805
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R5025": [
+      {
+        "page": 17,
+        "source_text": "R5025",
+        "x": 432.221,
+        "y": 832.479,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.256663,
+          "y": 0.301025
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R5026": [
+      {
+        "page": 17,
+        "source_text": "R5026",
+        "x": 299.052,
+        "y": 832.479,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.177584,
+          "y": 0.301025
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R5028": [
+      {
+        "page": 17,
+        "source_text": "R5028",
+        "x": 594.185,
+        "y": 747.898,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.352841,
+          "y": 0.372042
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6003": [
+      {
+        "page": 18,
+        "source_text": "R6003",
+        "x": 986.495,
+        "y": 973.841,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.585805,
+          "y": 0.182333
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6004": [
+      {
+        "page": 18,
+        "source_text": "R6004",
+        "x": 986.495,
+        "y": 833.473,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.585805,
+          "y": 0.300191
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6008": [
+      {
+        "page": 18,
+        "source_text": "R6008",
+        "x": 1551.247,
+        "y": 977.44,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.921168,
+          "y": 0.179312
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6009": [
+      {
+        "page": 18,
+        "source_text": "R6009",
+        "x": 1551.247,
+        "y": 919.853,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.921168,
+          "y": 0.227663
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6010": [
+      {
+        "page": 18,
+        "source_text": "R6010",
+        "x": 1425.275,
+        "y": 542.659,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.846363,
+          "y": 0.544367
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6011": [
+      {
+        "page": 18,
+        "source_text": "R6011",
+        "x": 1426.315,
+        "y": 449.8,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.84698,
+          "y": 0.622334
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6012": [
+      {
+        "page": 18,
+        "source_text": "R6012",
+        "x": 255.542,
+        "y": 181.205,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.151747,
+          "y": 0.847855
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6013": [
+      {
+        "page": 18,
+        "source_text": "R6013",
+        "x": 255.542,
+        "y": 148.812,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.151747,
+          "y": 0.875053
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6015": [
+      {
+        "page": 18,
+        "source_text": "R6015",
+        "x": 777.423,
+        "y": 877.252,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.461653,
+          "y": 0.263432
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6016": [
+      {
+        "page": 18,
+        "source_text": "R6016",
+        "x": 777.423,
+        "y": 862.136,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.461653,
+          "y": 0.276124
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6019": [
+      {
+        "page": 18,
+        "source_text": "R6019",
+        "x": 1350.412,
+        "y": 393.523,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.801907,
+          "y": 0.669586
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6022": [
+      {
+        "page": 18,
+        "source_text": "R6022",
+        "x": 1522.773,
+        "y": 507.257,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.90426,
+          "y": 0.574092
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6134": [
+      {
+        "page": 19,
+        "source_text": "R6134",
+        "x": 511.084,
+        "y": 303.399,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.303494,
+          "y": 0.745257
+        },
+        "source_status": "decoded_pdf_text_run"
+      },
+      {
+        "page": 19,
+        "source_text": "R6134",
+        "x": 244.344,
+        "y": 281.948,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.145097,
+          "y": 0.763268
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6154": [
+      {
+        "page": 19,
+        "source_text": "R6154",
+        "x": 478.691,
+        "y": 303.399,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.284258,
+          "y": 0.745257
+        },
+        "source_status": "decoded_pdf_text_run"
+      },
+      {
+        "page": 19,
+        "source_text": "R6154",
+        "x": 244.344,
+        "y": 271.151,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.145097,
+          "y": 0.772333
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6155": [
+      {
+        "page": 19,
+        "source_text": "R6155",
+        "x": 482.29,
+        "y": 289.002,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.286395,
+          "y": 0.757345
+        },
+        "source_status": "decoded_pdf_text_run"
+      },
+      {
+        "page": 19,
+        "source_text": "R6155",
+        "x": 229.948,
+        "y": 242.357,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.136549,
+          "y": 0.79651
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6156": [
+      {
+        "page": 19,
+        "source_text": "R6156",
+        "x": 482.29,
+        "y": 274.606,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.286395,
+          "y": 0.769432
+        },
+        "source_status": "decoded_pdf_text_run"
+      },
+      {
+        "page": 19,
+        "source_text": "R6156",
+        "x": 233.547,
+        "y": 209.964,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.138686,
+          "y": 0.823708
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6157": [
+      {
+        "page": 19,
+        "source_text": "R6157",
+        "x": 482.29,
+        "y": 260.209,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.286395,
+          "y": 0.781521
+        },
+        "source_status": "decoded_pdf_text_run"
+      },
+      {
+        "page": 19,
+        "source_text": "R6157",
+        "x": 233.547,
+        "y": 199.167,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.138686,
+          "y": 0.832773
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6159": [
+      {
+        "page": 19,
+        "source_text": "R6159",
+        "x": 780.622,
+        "y": 310.741,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.463552,
+          "y": 0.739092
+        },
+        "source_status": "decoded_pdf_text_run"
+      },
+      {
+        "page": 19,
+        "source_text": "R6159",
+        "x": 482.29,
+        "y": 217.019,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.286395,
+          "y": 0.817784
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6201": [
+      {
+        "page": 21,
+        "source_text": "R6201",
+        "x": 230.667,
+        "y": 328.737,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.136976,
+          "y": 0.723982
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6209": [
+      {
+        "page": 21,
+        "source_text": "R6209",
+        "x": 227.068,
+        "y": 299.944,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.134838,
+          "y": 0.748158
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6410": [
+      {
+        "page": 24,
+        "source_text": "R6410",
+        "x": 496.687,
+        "y": 943.248,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.294945,
+          "y": 0.20802
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6411": [
+      {
+        "page": 24,
+        "source_text": "R6411",
+        "x": 435.821,
+        "y": 954.851,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.258801,
+          "y": 0.198278
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6419": [
+      {
+        "page": 24,
+        "source_text": "R6419",
+        "x": 162.936,
+        "y": 253.149,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.096755,
+          "y": 0.787448
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6510": [
+      {
+        "page": 25,
+        "source_text": "R6510",
+        "x": 547.395,
+        "y": 858.537,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.325056,
+          "y": 0.279146
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6602": [
+      {
+        "page": 26,
+        "source_text": "R6602",
+        "x": 285.308,
+        "y": 119.979,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.169423,
+          "y": 0.899262
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6604": [
+      {
+        "page": 26,
+        "source_text": "R6604",
+        "x": 252.916,
+        "y": 546.882,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.150188,
+          "y": 0.540821
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6608": [
+      {
+        "page": 26,
+        "source_text": "R6608",
+        "x": 172.294,
+        "y": 796.665,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.102312,
+          "y": 0.331096
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6609": [
+      {
+        "page": 26,
+        "source_text": "R6609",
+        "x": 265.873,
+        "y": 620.305,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.157882,
+          "y": 0.479173
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6611": [
+      {
+        "page": 26,
+        "source_text": "R6611",
+        "x": 1378.486,
+        "y": 786.684,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.818578,
+          "y": 0.339476
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6612": [
+      {
+        "page": 26,
+        "source_text": "R6612",
+        "x": 1378.486,
+        "y": 480.753,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.818578,
+          "y": 0.596345
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6613": [
+      {
+        "page": 26,
+        "source_text": "R6613",
+        "x": 1393.203,
+        "y": 823.985,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.827318,
+          "y": 0.308157
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6614": [
+      {
+        "page": 26,
+        "source_text": "R6614",
+        "x": 1411.198,
+        "y": 438.872,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.838004,
+          "y": 0.63151
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6615": [
+      {
+        "page": 26,
+        "source_text": "R6615",
+        "x": 327.845,
+        "y": 253.155,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.194682,
+          "y": 0.787443
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6616": [
+      {
+        "page": 26,
+        "source_text": "R6616",
+        "x": 327.125,
+        "y": 242.357,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.194255,
+          "y": 0.79651
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6630": [
+      {
+        "page": 26,
+        "source_text": "R6630",
+        "x": 397.709,
+        "y": 674.293,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.236169,
+          "y": 0.433843
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6733": [
+      {
+        "page": 27,
+        "source_text": "R6733",
+        "x": 1274.11,
+        "y": 604.469,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.757047,
+          "y": 0.492043
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6734": [
+      {
+        "page": 27,
+        "source_text": "R6734",
+        "x": 1422.396,
+        "y": 639.74,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.845155,
+          "y": 0.462403
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6735": [
+      {
+        "page": 27,
+        "source_text": "R6735",
+        "x": 1422.396,
+        "y": 630.383,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.845155,
+          "y": 0.470266
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6736": [
+      {
+        "page": 27,
+        "source_text": "R6736",
+        "x": 1274.11,
+        "y": 647.659,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.757047,
+          "y": 0.455749
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6738": [
+      {
+        "page": 27,
+        "source_text": "R6738",
+        "x": 1422.396,
+        "y": 621.025,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.845155,
+          "y": 0.47813
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "R6739": [
+      {
+        "page": 27,
+        "source_text": "R6739",
+        "x": 1422.396,
+        "y": 611.667,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.845155,
+          "y": 0.485994
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "TP3910": [
+      {
+        "page": 15,
+        "source_text": "TP3910",
+        "x": 405.248,
+        "y": 954.989,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.240646,
+          "y": 0.198162
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "TP6701": [
+      {
+        "page": 27,
+        "source_text": "TP6701",
+        "x": 1263.604,
+        "y": 536.541,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.750805,
+          "y": 0.549125
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "TP6702": [
+      {
+        "page": 27,
+        "source_text": "TP6702",
+        "x": 1263.604,
+        "y": 522.144,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.750805,
+          "y": 0.561224
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "TP6703": [
+      {
+        "page": 27,
+        "source_text": "TP6703",
+        "x": 1263.604,
+        "y": 507.747,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.750805,
+          "y": 0.573322
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "TP6704": [
+      {
+        "page": 27,
+        "source_text": "TP6704",
+        "x": 1263.604,
+        "y": 493.35,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.750805,
+          "y": 0.58542
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "TP6705": [
+      {
+        "page": 27,
+        "source_text": "TP6705",
+        "x": 1263.604,
+        "y": 478.954,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.750805,
+          "y": 0.597518
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "TP6706": [
+      {
+        "page": 27,
+        "source_text": "TP6706",
+        "x": 1263.604,
+        "y": 464.557,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.750805,
+          "y": 0.609616
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U1001": [
+      {
+        "page": 2,
+        "source_text": "U1001",
+        "x": 935.787,
+        "y": 1181.743,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.555693,
+          "y": 0.007772
+        },
+        "source_status": "decoded_pdf_text_run"
+      },
+      {
+        "page": 2,
+        "source_text": "U1001",
+        "x": 334.724,
+        "y": 1091.763,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.198767,
+          "y": 0.083322
+        },
+        "source_status": "decoded_pdf_text_run"
+      },
+      {
+        "page": 3,
+        "source_text": "U1001",
+        "x": 377.914,
+        "y": 1077.367,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.224414,
+          "y": 0.09541
+        },
+        "source_status": "decoded_pdf_text_run"
+      },
+      {
+        "page": 3,
+        "source_text": "U1001",
+        "x": 1065.357,
+        "y": 1073.048,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.632635,
+          "y": 0.099036
+        },
+        "source_status": "decoded_pdf_text_run"
+      },
+      {
+        "page": 4,
+        "source_text": "U1001",
+        "x": 331.125,
+        "y": 1055.772,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.19663,
+          "y": 0.113542
+        },
+        "source_status": "decoded_pdf_text_run"
+      },
+      {
+        "page": 4,
+        "source_text": "U1001",
+        "x": 1126.543,
+        "y": 1055.772,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.668969,
+          "y": 0.113542
+        },
+        "source_status": "decoded_pdf_text_run"
+      },
+      {
+        "page": 5,
+        "source_text": "U1001",
+        "x": 719.836,
+        "y": 1034.177,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.427456,
+          "y": 0.131673
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U2001": [
+      {
+        "page": 6,
+        "source_text": "U2001",
+        "x": 284.335,
+        "y": 1098.242,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.168845,
+          "y": 0.077882
+        },
+        "source_status": "decoded_pdf_text_run"
+      },
+      {
+        "page": 6,
+        "source_text": "U2001",
+        "x": 1040.163,
+        "y": 1026.978,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.617674,
+          "y": 0.137718
+        },
+        "source_status": "decoded_pdf_text_run"
+      },
+      {
+        "page": 7,
+        "source_text": "U2001",
+        "x": 651.452,
+        "y": 1109.759,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.386848,
+          "y": 0.068212
+        },
+        "source_status": "decoded_pdf_text_run"
+      },
+      {
+        "page": 7,
+        "source_text": "U2001",
+        "x": 1248.916,
+        "y": 1109.759,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.741637,
+          "y": 0.068212
+        },
+        "source_status": "decoded_pdf_text_run"
+      },
+      {
+        "page": 7,
+        "source_text": "U2001",
+        "x": 208.752,
+        "y": 1091.763,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.123962,
+          "y": 0.083322
+        },
+        "source_status": "decoded_pdf_text_run"
+      },
+      {
+        "page": 7,
+        "source_text": "U2001",
+        "x": 208.752,
+        "y": 803.109,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.123962,
+          "y": 0.325685
+        },
+        "source_status": "decoded_pdf_text_run"
+      },
+      {
+        "page": 7,
+        "source_text": "U2001",
+        "x": 212.352,
+        "y": 644.745,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.1261,
+          "y": 0.458652
+        },
+        "source_status": "decoded_pdf_text_run"
+      },
+      {
+        "page": 7,
+        "source_text": "U2001",
+        "x": 856.925,
+        "y": 630.349,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.508863,
+          "y": 0.47074
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U2002": [
+      {
+        "page": 6,
+        "source_text": "U2002",
+        "x": 777.909,
+        "y": 1133.548,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.461941,
+          "y": 0.048238
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U2202": [
+      {
+        "page": 8,
+        "source_text": "U2202",
+        "x": 340.282,
+        "y": 977.31,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.202068,
+          "y": 0.179421
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U2304": [
+      {
+        "page": 9,
+        "source_text": "U2304",
+        "x": 1193.975,
+        "y": 662.775,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.709011,
+          "y": 0.443514
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U2305": [
+      {
+        "page": 9,
+        "source_text": "U2305",
+        "x": 821.1,
+        "y": 975.184,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.487589,
+          "y": 0.181206
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U2401": [
+      {
+        "page": 10,
+        "source_text": "U2401",
+        "x": 235.906,
+        "y": 899.567,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.14017,
+          "y": 0.244061
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U2404": [
+      {
+        "page": 10,
+        "source_text": "U2404",
+        "x": 923.35,
+        "y": 967.851,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.548633,
+          "y": 0.18668
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U3001": [
+      {
+        "page": 11,
+        "source_text": "U3001",
+        "x": 554.274,
+        "y": 942.038,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.329141,
+          "y": 0.209036
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U3201": [
+      {
+        "page": 13,
+        "source_text": "U3201",
+        "x": 1181.018,
+        "y": 255.348,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.701317,
+          "y": 0.785602
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U3202": [
+      {
+        "page": 13,
+        "source_text": "U3202",
+        "x": 387.038,
+        "y": 442.505,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.229833,
+          "y": 0.628459
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U3203": [
+      {
+        "page": 13,
+        "source_text": "U3203",
+        "x": 1152.224,
+        "y": 550.625,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.684219,
+          "y": 0.537678
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U3204": [
+      {
+        "page": 13,
+        "source_text": "U3204",
+        "x": 1285.394,
+        "y": 755.634,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.763298,
+          "y": 0.365547
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U3205": [
+      {
+        "page": 13,
+        "source_text": "U3205",
+        "x": 1087.439,
+        "y": 939.192,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.645748,
+          "y": 0.211426
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U3206": [
+      {
+        "page": 13,
+        "source_text": "U3206",
+        "x": 1086.952,
+        "y": 744.837,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.645458,
+          "y": 0.374612
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U3207": [
+      {
+        "page": 13,
+        "source_text": "U3207",
+        "x": 353.206,
+        "y": 183.364,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.209742,
+          "y": 0.846042
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U3208": [
+      {
+        "page": 13,
+        "source_text": "U3208",
+        "x": 264.666,
+        "y": 698.047,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.157165,
+          "y": 0.413898
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U3209": [
+      {
+        "page": 13,
+        "source_text": "U3209",
+        "x": 1145.026,
+        "y": 406.514,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.679944,
+          "y": 0.658678
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U3210": [
+      {
+        "page": 13,
+        "source_text": "U3210",
+        "x": 320.118,
+        "y": 977.337,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.190094,
+          "y": 0.179398
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U3211": [
+      {
+        "page": 13,
+        "source_text": "U3211",
+        "x": 1400.081,
+        "y": 957.053,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.831402,
+          "y": 0.196429
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U3217": [
+      {
+        "page": 13,
+        "source_text": "U3217",
+        "x": 353.206,
+        "y": 316.534,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.209742,
+          "y": 0.734228
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U3220": [
+      {
+        "page": 13,
+        "source_text": "U3220",
+        "x": 1087.439,
+        "y": 1072.362,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.645748,
+          "y": 0.099612
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U3221": [
+      {
+        "page": 15,
+        "source_text": "U3221",
+        "x": 529.08,
+        "y": 1063.004,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.314181,
+          "y": 0.107469
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U3222": [
+      {
+        "page": 13,
+        "source_text": "U3222",
+        "x": 363.284,
+        "y": 527.59,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.215727,
+          "y": 0.557019
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U3401": [
+      {
+        "page": 15,
+        "source_text": "U3401",
+        "x": 192.716,
+        "y": 312.8,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.114439,
+          "y": 0.737364
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U3402": [
+      {
+        "page": 15,
+        "source_text": "U3402",
+        "x": 1260.033,
+        "y": 444.762,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.748238,
+          "y": 0.626564
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U3403": [
+      {
+        "page": 15,
+        "source_text": "U3403",
+        "x": 941.012,
+        "y": 946.935,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.558796,
+          "y": 0.204924
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U5001": [
+      {
+        "page": 17,
+        "source_text": "U5001",
+        "x": 377.914,
+        "y": 719.642,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.224414,
+          "y": 0.395767
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U5002": [
+      {
+        "page": 17,
+        "source_text": "U5002",
+        "x": 410.793,
+        "y": 460.501,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.243939,
+          "y": 0.613349
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U5003": [
+      {
+        "page": 17,
+        "source_text": "U5003",
+        "x": 1119.345,
+        "y": 750.561,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.664694,
+          "y": 0.369806
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U5004": [
+      {
+        "page": 17,
+        "source_text": "U5004",
+        "x": 865.763,
+        "y": 716.009,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.514111,
+          "y": 0.398817
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U5005": [
+      {
+        "page": 17,
+        "source_text": "U5005",
+        "x": 607.182,
+        "y": 734.005,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.360559,
+          "y": 0.383707
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U5006": [
+      {
+        "page": 17,
+        "source_text": "U5006",
+        "x": 531.852,
+        "y": 843.814,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.315827,
+          "y": 0.291508
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U5015": [
+      {
+        "page": 17,
+        "source_text": "U5015",
+        "x": 716.557,
+        "y": 473.555,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.425509,
+          "y": 0.602389
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U6001": [
+      {
+        "page": 18,
+        "source_text": "U6001",
+        "x": 183.558,
+        "y": 321.395,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.109001,
+          "y": 0.730147
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U6004": [
+      {
+        "page": 18,
+        "source_text": "U6004",
+        "x": 183.558,
+        "y": 332.193,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.109001,
+          "y": 0.721081
+        },
+        "source_status": "decoded_pdf_text_run"
+      },
+      {
+        "page": 18,
+        "source_text": "U6004",
+        "x": 284.822,
+        "y": 325.172,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.169134,
+          "y": 0.726976
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U6403": [
+      {
+        "page": 24,
+        "source_text": "U6403",
+        "x": 221.51,
+        "y": 129.343,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.131538,
+          "y": 0.8914
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U6601": [
+      {
+        "page": 26,
+        "source_text": "U6601",
+        "x": 751.509,
+        "y": 800.23,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.446264,
+          "y": 0.328102
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "U6602": [
+      {
+        "page": 26,
+        "source_text": "U6602",
+        "x": 351.08,
+        "y": 191.825,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.20848,
+          "y": 0.838938
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "VBUS1": [
+      {
+        "page": 24,
+        "source_text": "VBUS1",
+        "x": 427.103,
+        "y": 741.923,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.253624,
+          "y": 0.377059
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "X2101": [
+      {
+        "page": 7,
+        "source_text": "X2101",
+        "x": 1011.311,
+        "y": 845.502,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.600541,
+          "y": 0.290091
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ],
+    "X6601": [
+      {
+        "page": 26,
+        "source_text": "X6601",
+        "x": 149.691,
+        "y": 761.489,
+        "match_method": "exact_text_run",
+        "text_origin": {
+          "x": 0.08889,
+          "y": 0.360631
+        },
+        "source_status": "decoded_pdf_text_run"
+      }
+    ]
+  }
+}

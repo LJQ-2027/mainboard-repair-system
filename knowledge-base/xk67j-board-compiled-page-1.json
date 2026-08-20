@@ -1,0 +1,4842 @@
+{
+  "compiler_id": "BOARD-COMPILER-PYPDF-V2",
+  "profile_id": "xk67j-main-v1.0b",
+  "board_id": "BOARD-XK67J-MAIN-V1.0B",
+  "side_id": "main_page_1",
+  "coordinate_system": "normalized_form_xobject",
+  "source": {
+    "path": "source-materials/owner-supplied/2026-07-31-km5-xk67j/packages/KM5-KM4N-XK67J-SHARED/XK67J_KM5_MAIN_PCB_V1.0B_PLACEMENT.pdf",
+    "page": 1,
+    "form_xobject": "/PageContents",
+    "bounds": [
+      0.0,
+      0.0,
+      842.0,
+      595.22
+    ],
+    "visible_bounds": [
+      25.26,
+      101.1874,
+      682.02,
+      517.8414
+    ]
+  },
+  "audit": {
+    "decoded_text_objects": 405,
+    "vector_rectangles": 345,
+    "accepted_designators": 319,
+    "candidate_footprints": 0,
+    "footprint_confidence": {},
+    "required_designators": [
+      "J6501",
+      "U1001",
+      "U4001",
+      "U5007"
+    ],
+    "recovered_required_designators": [
+      "J6501",
+      "U1001",
+      "U4001",
+      "U5007"
+    ],
+    "missing_required_designators": [],
+    "required_recovery_complete": true,
+    "outline_points": 79,
+    "outline_mask_area_ratio": 0.773578
+  },
+  "board_outline": [
+    {
+      "x": 0.008125,
+      "y": 0.871921
+    },
+    {
+      "x": 0.01125,
+      "y": 0.863054
+    },
+    {
+      "x": 0.01125,
+      "y": 0.337931
+    },
+    {
+      "x": 0.0175,
+      "y": 0.328079
+    },
+    {
+      "x": 0.038125,
+      "y": 0.327094
+    },
+    {
+      "x": 0.044375,
+      "y": 0.316256
+    },
+    {
+      "x": 0.04375,
+      "y": 0.300493
+    },
+    {
+      "x": 0.0325,
+      "y": 0.284729
+    },
+    {
+      "x": 0.0325,
+      "y": 0.199015
+    },
+    {
+      "x": 0.0375,
+      "y": 0.176355
+    },
+    {
+      "x": 0.09625,
+      "y": 0.083744
+    },
+    {
+      "x": 0.184375,
+      "y": 0.083744
+    },
+    {
+      "x": 0.1875,
+      "y": 0.09064
+    },
+    {
+      "x": 0.1875,
+      "y": 0.144828
+    },
+    {
+      "x": 0.191875,
+      "y": 0.162562
+    },
+    {
+      "x": 0.20375,
+      "y": 0.178325
+    },
+    {
+      "x": 0.221875,
+      "y": 0.181281
+    },
+    {
+      "x": 0.228125,
+      "y": 0.187192
+    },
+    {
+      "x": 0.22875,
+      "y": 0.225616
+    },
+    {
+      "x": 0.239375,
+      "y": 0.240394
+    },
+    {
+      "x": 0.239375,
+      "y": 0.310345
+    },
+    {
+      "x": 0.244375,
+      "y": 0.317241
+    },
+    {
+      "x": 0.268125,
+      "y": 0.315271
+    },
+    {
+      "x": 0.270625,
+      "y": 0.307389
+    },
+    {
+      "x": 0.270625,
+      "y": 0.275862
+    },
+    {
+      "x": 0.275,
+      "y": 0.268966
+    },
+    {
+      "x": 0.3275,
+      "y": 0.268966
+    },
+    {
+      "x": 0.336875,
+      "y": 0.281773
+    },
+    {
+      "x": 0.3675,
+      "y": 0.281773
+    },
+    {
+      "x": 0.3775,
+      "y": 0.268966
+    },
+    {
+      "x": 0.4225,
+      "y": 0.268966
+    },
+    {
+      "x": 0.426875,
+      "y": 0.275862
+    },
+    {
+      "x": 0.426875,
+      "y": 0.308374
+    },
+    {
+      "x": 0.431875,
+      "y": 0.317241
+    },
+    {
+      "x": 0.551875,
+      "y": 0.317241
+    },
+    {
+      "x": 0.556875,
+      "y": 0.30936
+    },
+    {
+      "x": 0.556875,
+      "y": 0.190148
+    },
+    {
+      "x": 0.56125,
+      "y": 0.183251
+    },
+    {
+      "x": 0.591875,
+      "y": 0.181281
+    },
+    {
+      "x": 0.6025,
+      "y": 0.167488
+    },
+    {
+      "x": 0.605,
+      "y": 0.157635
+    },
+    {
+      "x": 0.60625,
+      "y": 0.081773
+    },
+    {
+      "x": 0.610625,
+      "y": 0.076847
+    },
+    {
+      "x": 0.676875,
+      "y": 0.075862
+    },
+    {
+      "x": 0.68,
+      "y": 0.068966
+    },
+    {
+      "x": 0.68,
+      "y": 0.044335
+    },
+    {
+      "x": 0.684375,
+      "y": 0.036453
+    },
+    {
+      "x": 0.84125,
+      "y": 0.037438
+    },
+    {
+      "x": 0.85,
+      "y": 0.047291
+    },
+    {
+      "x": 0.850625,
+      "y": 0.056158
+    },
+    {
+      "x": 0.855,
+      "y": 0.065025
+    },
+    {
+      "x": 0.860625,
+      "y": 0.068966
+    },
+    {
+      "x": 0.8825,
+      "y": 0.069951
+    },
+    {
+      "x": 0.931875,
+      "y": 0.10936
+    },
+    {
+      "x": 0.934375,
+      "y": 0.117241
+    },
+    {
+      "x": 0.935,
+      "y": 0.139901
+    },
+    {
+      "x": 0.94,
+      "y": 0.153695
+    },
+    {
+      "x": 0.9475,
+      "y": 0.162562
+    },
+    {
+      "x": 0.96,
+      "y": 0.169458
+    },
+    {
+      "x": 0.9775,
+      "y": 0.2
+    },
+    {
+      "x": 0.97875,
+      "y": 0.714286
+    },
+    {
+      "x": 0.965,
+      "y": 0.729064
+    },
+    {
+      "x": 0.965,
+      "y": 0.899507
+    },
+    {
+      "x": 0.96,
+      "y": 0.90936
+    },
+    {
+      "x": 0.9375,
+      "y": 0.90936
+    },
+    {
+      "x": 0.923125,
+      "y": 0.918227
+    },
+    {
+      "x": 0.91375,
+      "y": 0.936946
+    },
+    {
+      "x": 0.91125,
+      "y": 0.970443
+    },
+    {
+      "x": 0.9075,
+      "y": 0.976355
+    },
+    {
+      "x": 0.0775,
+      "y": 0.97734
+    },
+    {
+      "x": 0.06625,
+      "y": 0.971429
+    },
+    {
+      "x": 0.061875,
+      "y": 0.964532
+    },
+    {
+      "x": 0.058125,
+      "y": 0.952709
+    },
+    {
+      "x": 0.05625,
+      "y": 0.93202
+    },
+    {
+      "x": 0.044375,
+      "y": 0.923153
+    },
+    {
+      "x": 0.03375,
+      "y": 0.900493
+    },
+    {
+      "x": 0.02125,
+      "y": 0.903448
+    },
+    {
+      "x": 0.01375,
+      "y": 0.898522
+    },
+    {
+      "x": 0.00875,
+      "y": 0.887685
+    }
+  ],
+  "board_outline_source": {
+    "image": "assets/board-atlas/xk67j/main-point-map-page-1.png",
+    "method": "engineering-mark closing, largest component, hole fill, contour simplification",
+    "image_size": {
+      "width": 6567,
+      "height": 4167
+    }
+  },
+  "accuracy_boundary": "Designators are decoded from the embedded PDF CMap. Footprints are provisional nearest-vector candidates until geometry pairing is reviewed.",
+  "components": [
+    {
+      "component_id": "XK67J-MAIN-P1-ANT3906",
+      "designator": "ANT3906",
+      "category": "antenna",
+      "source_point": {
+        "x": 46.875,
+        "y": 359.042
+      },
+      "center": {
+        "x": 0.032911,
+        "y": 0.38113
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-ANT3908",
+      "designator": "ANT3908",
+      "category": "antenna",
+      "source_point": {
+        "x": 74.72,
+        "y": 184.982
+      },
+      "center": {
+        "x": 0.07531,
+        "y": 0.798887
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-ANT3909",
+      "designator": "ANT3909",
+      "category": "antenna",
+      "source_point": {
+        "x": 648.543,
+        "y": 159.836
+      },
+      "center": {
+        "x": 0.949026,
+        "y": 0.859239
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-ANT3910",
+      "designator": "ANT3910",
+      "category": "antenna",
+      "source_point": {
+        "x": 630.147,
+        "y": 344.48
+      },
+      "center": {
+        "x": 0.921016,
+        "y": 0.41608
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-ANT3911",
+      "designator": "ANT3911",
+      "category": "antenna",
+      "source_point": {
+        "x": 602.553,
+        "y": 439.898
+      },
+      "center": {
+        "x": 0.879001,
+        "y": 0.18707
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-ANT3912",
+      "designator": "ANT3912",
+      "category": "antenna",
+      "source_point": {
+        "x": 125.049,
+        "y": 451.022
+      },
+      "center": {
+        "x": 0.151941,
+        "y": 0.160371
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-ANT6503",
+      "designator": "ANT6503",
+      "category": "antenna",
+      "source_point": {
+        "x": 525.387,
+        "y": 123.962
+      },
+      "center": {
+        "x": 0.761506,
+        "y": 0.94534
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-ANT6504",
+      "designator": "ANT6504",
+      "category": "antenna",
+      "source_point": {
+        "x": 597.116,
+        "y": 123.962
+      },
+      "center": {
+        "x": 0.870724,
+        "y": 0.945339
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-ANT6506",
+      "designator": "ANT6506",
+      "category": "antenna",
+      "source_point": {
+        "x": 362.793,
+        "y": 129.686
+      },
+      "center": {
+        "x": 0.513936,
+        "y": 0.931601
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C1001",
+      "designator": "C1001",
+      "category": "capacitor",
+      "source_point": {
+        "x": 400.899,
+        "y": 207.59
+      },
+      "center": {
+        "x": 0.571957,
+        "y": 0.744626
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C1004",
+      "designator": "C1004",
+      "category": "capacitor",
+      "source_point": {
+        "x": 395.877,
+        "y": 184.028
+      },
+      "center": {
+        "x": 0.564311,
+        "y": 0.801175
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C1005",
+      "designator": "C1005",
+      "category": "capacitor",
+      "source_point": {
+        "x": 633.621,
+        "y": 179.24
+      },
+      "center": {
+        "x": 0.926306,
+        "y": 0.812668
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C1012",
+      "designator": "C1012",
+      "category": "capacitor",
+      "source_point": {
+        "x": 437.385,
+        "y": 286.502
+      },
+      "center": {
+        "x": 0.627512,
+        "y": 0.555231
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C1013",
+      "designator": "C1013",
+      "category": "capacitor",
+      "source_point": {
+        "x": 471.099,
+        "y": 161.456
+      },
+      "center": {
+        "x": 0.678846,
+        "y": 0.855351
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C1073",
+      "designator": "C1073",
+      "category": "capacitor",
+      "source_point": {
+        "x": 497.847,
+        "y": 154.778
+      },
+      "center": {
+        "x": 0.719573,
+        "y": 0.871378
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C1082",
+      "designator": "C1082",
+      "category": "capacitor",
+      "source_point": {
+        "x": 497.847,
+        "y": 163.742
+      },
+      "center": {
+        "x": 0.719573,
+        "y": 0.849864
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C1085",
+      "designator": "C1085",
+      "category": "capacitor",
+      "source_point": {
+        "x": 441.507,
+        "y": 164.138
+      },
+      "center": {
+        "x": 0.633788,
+        "y": 0.848914
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C1086",
+      "designator": "C1086",
+      "category": "capacitor",
+      "source_point": {
+        "x": 436.917,
+        "y": 164.138
+      },
+      "center": {
+        "x": 0.626799,
+        "y": 0.848915
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C1092",
+      "designator": "C1092",
+      "category": "capacitor",
+      "source_point": {
+        "x": 482.709,
+        "y": 163.94
+      },
+      "center": {
+        "x": 0.696523,
+        "y": 0.849389
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C1093",
+      "designator": "C1093",
+      "category": "capacitor",
+      "source_point": {
+        "x": 493.257,
+        "y": 163.742
+      },
+      "center": {
+        "x": 0.712584,
+        "y": 0.849864
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C1095",
+      "designator": "C1095",
+      "category": "capacitor",
+      "source_point": {
+        "x": 493.221,
+        "y": 154.796
+      },
+      "center": {
+        "x": 0.712529,
+        "y": 0.871335
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C1098",
+      "designator": "C1098",
+      "category": "capacitor",
+      "source_point": {
+        "x": 417.675,
+        "y": 163.418
+      },
+      "center": {
+        "x": 0.597501,
+        "y": 0.850642
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C1099",
+      "designator": "C1099",
+      "category": "capacitor",
+      "source_point": {
+        "x": 394.347,
+        "y": 168.188
+      },
+      "center": {
+        "x": 0.561981,
+        "y": 0.839194
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C1100",
+      "designator": "C1100",
+      "category": "capacitor",
+      "source_point": {
+        "x": 390.693,
+        "y": 173.264
+      },
+      "center": {
+        "x": 0.556417,
+        "y": 0.827011
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C1103",
+      "designator": "C1103",
+      "category": "capacitor",
+      "source_point": {
+        "x": 562.719,
+        "y": 296.024
+      },
+      "center": {
+        "x": 0.818349,
+        "y": 0.532378
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C1205",
+      "designator": "C1205",
+      "category": "capacitor",
+      "source_point": {
+        "x": 446.133,
+        "y": 283.568
+      },
+      "center": {
+        "x": 0.640832,
+        "y": 0.562273
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C1206",
+      "designator": "C1206",
+      "category": "capacitor",
+      "source_point": {
+        "x": 456.717,
+        "y": 287.114
+      },
+      "center": {
+        "x": 0.656947,
+        "y": 0.553763
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2140",
+      "designator": "C2140",
+      "category": "capacitor",
+      "source_point": {
+        "x": 470.973,
+        "y": 148.676
+      },
+      "center": {
+        "x": 0.678654,
+        "y": 0.886024
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2406",
+      "designator": "C2406",
+      "category": "capacitor",
+      "source_point": {
+        "x": 429.339,
+        "y": 417.542
+      },
+      "center": {
+        "x": 0.615261,
+        "y": 0.240726
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2410",
+      "designator": "C2410",
+      "category": "capacitor",
+      "source_point": {
+        "x": 417.315,
+        "y": 410.612
+      },
+      "center": {
+        "x": 0.596953,
+        "y": 0.257358
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2412",
+      "designator": "C2412",
+      "category": "capacitor",
+      "source_point": {
+        "x": 429.339,
+        "y": 409.676
+      },
+      "center": {
+        "x": 0.615261,
+        "y": 0.259605
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2475",
+      "designator": "C2475",
+      "category": "capacitor",
+      "source_point": {
+        "x": 400.665,
+        "y": 393.782
+      },
+      "center": {
+        "x": 0.571601,
+        "y": 0.297752
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2531",
+      "designator": "C2531",
+      "category": "capacitor",
+      "source_point": {
+        "x": 195.681,
+        "y": 132.89
+      },
+      "center": {
+        "x": 0.259487,
+        "y": 0.923912
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2703",
+      "designator": "C2703",
+      "category": "capacitor",
+      "source_point": {
+        "x": 308.45,
+        "y": 147.38
+      },
+      "center": {
+        "x": 0.431193,
+        "y": 0.889135
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2704",
+      "designator": "C2704",
+      "category": "capacitor",
+      "source_point": {
+        "x": 202.413,
+        "y": 133.142
+      },
+      "center": {
+        "x": 0.269737,
+        "y": 0.923307
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2705",
+      "designator": "C2705",
+      "category": "capacitor",
+      "source_point": {
+        "x": 263.216,
+        "y": 124.124
+      },
+      "center": {
+        "x": 0.362319,
+        "y": 0.94495
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2706",
+      "designator": "C2706",
+      "category": "capacitor",
+      "source_point": {
+        "x": 301.233,
+        "y": 134.24
+      },
+      "center": {
+        "x": 0.420203,
+        "y": 0.920671
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2708",
+      "designator": "C2708",
+      "category": "capacitor",
+      "source_point": {
+        "x": 298.803,
+        "y": 171.644
+      },
+      "center": {
+        "x": 0.416503,
+        "y": 0.830899
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2709",
+      "designator": "C2709",
+      "category": "capacitor",
+      "source_point": {
+        "x": 308.055,
+        "y": 179.042
+      },
+      "center": {
+        "x": 0.43059,
+        "y": 0.813143
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2711",
+      "designator": "C2711",
+      "category": "capacitor",
+      "source_point": {
+        "x": 238.881,
+        "y": 133.412
+      },
+      "center": {
+        "x": 0.325264,
+        "y": 0.922659
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2715",
+      "designator": "C2715",
+      "category": "capacitor",
+      "source_point": {
+        "x": 306.669,
+        "y": 161.708
+      },
+      "center": {
+        "x": 0.42848,
+        "y": 0.854746
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2716",
+      "designator": "C2716",
+      "category": "capacitor",
+      "source_point": {
+        "x": 259.977,
+        "y": 168.764
+      },
+      "center": {
+        "x": 0.357386,
+        "y": 0.837811
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2717",
+      "designator": "C2717",
+      "category": "capacitor",
+      "source_point": {
+        "x": 252.705,
+        "y": 176.396
+      },
+      "center": {
+        "x": 0.346313,
+        "y": 0.819494
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2718",
+      "designator": "C2718",
+      "category": "capacitor",
+      "source_point": {
+        "x": 270.597,
+        "y": 168.782
+      },
+      "center": {
+        "x": 0.373556,
+        "y": 0.837768
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2719",
+      "designator": "C2719",
+      "category": "capacitor",
+      "source_point": {
+        "x": 236.414,
+        "y": 178.988
+      },
+      "center": {
+        "x": 0.321509,
+        "y": 0.813273
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2720",
+      "designator": "C2720",
+      "category": "capacitor",
+      "source_point": {
+        "x": 265.431,
+        "y": 141.188
+      },
+      "center": {
+        "x": 0.36569,
+        "y": 0.903996
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2721",
+      "designator": "C2721",
+      "category": "capacitor",
+      "source_point": {
+        "x": 281.343,
+        "y": 166.298
+      },
+      "center": {
+        "x": 0.389918,
+        "y": 0.84373
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2723",
+      "designator": "C2723",
+      "category": "capacitor",
+      "source_point": {
+        "x": 268.149,
+        "y": 133.394
+      },
+      "center": {
+        "x": 0.369829,
+        "y": 0.922702
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2724",
+      "designator": "C2724",
+      "category": "capacitor",
+      "source_point": {
+        "x": 216.093,
+        "y": 176.414
+      },
+      "center": {
+        "x": 0.290567,
+        "y": 0.819451
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2726",
+      "designator": "C2726",
+      "category": "capacitor",
+      "source_point": {
+        "x": 221.997,
+        "y": 168.764
+      },
+      "center": {
+        "x": 0.299556,
+        "y": 0.837811
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2727",
+      "designator": "C2727",
+      "category": "capacitor",
+      "source_point": {
+        "x": 371.073,
+        "y": 179.33
+      },
+      "center": {
+        "x": 0.526544,
+        "y": 0.812452
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2732",
+      "designator": "C2732",
+      "category": "capacitor",
+      "source_point": {
+        "x": 354.261,
+        "y": 178.844
+      },
+      "center": {
+        "x": 0.500945,
+        "y": 0.813619
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2748",
+      "designator": "C2748",
+      "category": "capacitor",
+      "source_point": {
+        "x": 272.684,
+        "y": 176.414
+      },
+      "center": {
+        "x": 0.376735,
+        "y": 0.81945
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2750",
+      "designator": "C2750",
+      "category": "capacitor",
+      "source_point": {
+        "x": 244.37,
+        "y": 178.988
+      },
+      "center": {
+        "x": 0.333623,
+        "y": 0.813273
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2803",
+      "designator": "C2803",
+      "category": "capacitor",
+      "source_point": {
+        "x": 142.293,
+        "y": 173.75
+      },
+      "center": {
+        "x": 0.178197,
+        "y": 0.825844
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2804",
+      "designator": "C2804",
+      "category": "capacitor",
+      "source_point": {
+        "x": 149.205,
+        "y": 173.75
+      },
+      "center": {
+        "x": 0.188722,
+        "y": 0.825845
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2805",
+      "designator": "C2805",
+      "category": "capacitor",
+      "source_point": {
+        "x": 157.521,
+        "y": 172.598
+      },
+      "center": {
+        "x": 0.201383,
+        "y": 0.828609
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2806",
+      "designator": "C2806",
+      "category": "capacitor",
+      "source_point": {
+        "x": 164.919,
+        "y": 172.598
+      },
+      "center": {
+        "x": 0.212648,
+        "y": 0.828609
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2807",
+      "designator": "C2807",
+      "category": "capacitor",
+      "source_point": {
+        "x": 173.252,
+        "y": 169.61
+      },
+      "center": {
+        "x": 0.225337,
+        "y": 0.835781
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2808",
+      "designator": "C2808",
+      "category": "capacitor",
+      "source_point": {
+        "x": 137.451,
+        "y": 144.824
+      },
+      "center": {
+        "x": 0.170824,
+        "y": 0.895269
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2809",
+      "designator": "C2809",
+      "category": "capacitor",
+      "source_point": {
+        "x": 153.363,
+        "y": 159.368
+      },
+      "center": {
+        "x": 0.195052,
+        "y": 0.860363
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2810",
+      "designator": "C2810",
+      "category": "capacitor",
+      "source_point": {
+        "x": 139.827,
+        "y": 161.924
+      },
+      "center": {
+        "x": 0.174442,
+        "y": 0.854228
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2812",
+      "designator": "C2812",
+      "category": "capacitor",
+      "source_point": {
+        "x": 138.657,
+        "y": 140.018
+      },
+      "center": {
+        "x": 0.172661,
+        "y": 0.906804
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2813",
+      "designator": "C2813",
+      "category": "capacitor",
+      "source_point": {
+        "x": 96.753,
+        "y": 149.828
+      },
+      "center": {
+        "x": 0.108857,
+        "y": 0.883259
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2814",
+      "designator": "C2814",
+      "category": "capacitor",
+      "source_point": {
+        "x": 118.677,
+        "y": 127.454
+      },
+      "center": {
+        "x": 0.142239,
+        "y": 0.936958
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2815",
+      "designator": "C2815",
+      "category": "capacitor",
+      "source_point": {
+        "x": 118.551,
+        "y": 138.128
+      },
+      "center": {
+        "x": 0.142047,
+        "y": 0.91134
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2816",
+      "designator": "C2816",
+      "category": "capacitor",
+      "source_point": {
+        "x": 95.961,
+        "y": 167.342
+      },
+      "center": {
+        "x": 0.10765,
+        "y": 0.841224
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2817",
+      "designator": "C2817",
+      "category": "capacitor",
+      "source_point": {
+        "x": 96.771,
+        "y": 154.04
+      },
+      "center": {
+        "x": 0.108884,
+        "y": 0.87315
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2818",
+      "designator": "C2818",
+      "category": "capacitor",
+      "source_point": {
+        "x": 91.929,
+        "y": 171.986
+      },
+      "center": {
+        "x": 0.101511,
+        "y": 0.830078
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2820",
+      "designator": "C2820",
+      "category": "capacitor",
+      "source_point": {
+        "x": 143.355,
+        "y": 154.382
+      },
+      "center": {
+        "x": 0.179814,
+        "y": 0.872329
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2821",
+      "designator": "C2821",
+      "category": "capacitor",
+      "source_point": {
+        "x": 95.961,
+        "y": 163.49
+      },
+      "center": {
+        "x": 0.10765,
+        "y": 0.850469
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2822",
+      "designator": "C2822",
+      "category": "capacitor",
+      "source_point": {
+        "x": 96.806,
+        "y": 158.882
+      },
+      "center": {
+        "x": 0.108939,
+        "y": 0.861529
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2823",
+      "designator": "C2823",
+      "category": "capacitor",
+      "source_point": {
+        "x": 143.427,
+        "y": 159.26
+      },
+      "center": {
+        "x": 0.179924,
+        "y": 0.860621
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2824",
+      "designator": "C2824",
+      "category": "capacitor",
+      "source_point": {
+        "x": 98.031,
+        "y": 144.752
+      },
+      "center": {
+        "x": 0.110803,
+        "y": 0.895442
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2825",
+      "designator": "C2825",
+      "category": "capacitor",
+      "source_point": {
+        "x": 110.109,
+        "y": 134.132
+      },
+      "center": {
+        "x": 0.129193,
+        "y": 0.920931
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2826",
+      "designator": "C2826",
+      "category": "capacitor",
+      "source_point": {
+        "x": 123.141,
+        "y": 176.072
+      },
+      "center": {
+        "x": 0.149036,
+        "y": 0.820271
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C2827",
+      "designator": "C2827",
+      "category": "capacitor",
+      "source_point": {
+        "x": 98.985,
+        "y": 175.262
+      },
+      "center": {
+        "x": 0.112255,
+        "y": 0.822216
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C3907",
+      "designator": "C3907",
+      "category": "capacitor",
+      "source_point": {
+        "x": 86.673,
+        "y": 436.226
+      },
+      "center": {
+        "x": 0.093508,
+        "y": 0.195883
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C4008",
+      "designator": "C4008",
+      "category": "capacitor",
+      "source_point": {
+        "x": 636.087,
+        "y": 198.338
+      },
+      "center": {
+        "x": 0.930061,
+        "y": 0.766831
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C4010",
+      "designator": "C4010",
+      "category": "capacitor",
+      "source_point": {
+        "x": 576.633,
+        "y": 293.954
+      },
+      "center": {
+        "x": 0.839534,
+        "y": 0.537346
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C4014",
+      "designator": "C4014",
+      "category": "capacitor",
+      "source_point": {
+        "x": 595.515,
+        "y": 293.954
+      },
+      "center": {
+        "x": 0.868285,
+        "y": 0.537346
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C4015",
+      "designator": "C4015",
+      "category": "capacitor",
+      "source_point": {
+        "x": 600.141,
+        "y": 293.954
+      },
+      "center": {
+        "x": 0.875328,
+        "y": 0.537346
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C4016",
+      "designator": "C4016",
+      "category": "capacitor",
+      "source_point": {
+        "x": 633.603,
+        "y": 203.666
+      },
+      "center": {
+        "x": 0.926278,
+        "y": 0.754044
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C4021",
+      "designator": "C4021",
+      "category": "capacitor",
+      "source_point": {
+        "x": 633.603,
+        "y": 174.632
+      },
+      "center": {
+        "x": 0.926278,
+        "y": 0.823728
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C4022",
+      "designator": "C4022",
+      "category": "capacitor",
+      "source_point": {
+        "x": 585.129,
+        "y": 287.204
+      },
+      "center": {
+        "x": 0.852471,
+        "y": 0.553547
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C4050",
+      "designator": "C4050",
+      "category": "capacitor",
+      "source_point": {
+        "x": 606.945,
+        "y": 288.698
+      },
+      "center": {
+        "x": 0.885688,
+        "y": 0.549961
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C4411",
+      "designator": "C4411",
+      "category": "capacitor",
+      "source_point": {
+        "x": 581.313,
+        "y": 293.954
+      },
+      "center": {
+        "x": 0.84666,
+        "y": 0.537346
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C5006",
+      "designator": "C5006",
+      "category": "capacitor",
+      "source_point": {
+        "x": 448.545,
+        "y": 429.944
+      },
+      "center": {
+        "x": 0.644504,
+        "y": 0.21096
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C5010",
+      "designator": "C5010",
+      "category": "capacitor",
+      "source_point": {
+        "x": 542.325,
+        "y": 453.794
+      },
+      "center": {
+        "x": 0.787296,
+        "y": 0.153718
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C5013",
+      "designator": "C5013",
+      "category": "capacitor",
+      "source_point": {
+        "x": 466.635,
+        "y": 446.648
+      },
+      "center": {
+        "x": 0.672049,
+        "y": 0.170869
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C5019",
+      "designator": "C5019",
+      "category": "capacitor",
+      "source_point": {
+        "x": 467.265,
+        "y": 416.12
+      },
+      "center": {
+        "x": 0.673008,
+        "y": 0.244139
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C5022",
+      "designator": "C5022",
+      "category": "capacitor",
+      "source_point": {
+        "x": 565.041,
+        "y": 436.442
+      },
+      "center": {
+        "x": 0.821884,
+        "y": 0.195365
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C5023",
+      "designator": "C5023",
+      "category": "capacitor",
+      "source_point": {
+        "x": 467.265,
+        "y": 421.628
+      },
+      "center": {
+        "x": 0.673008,
+        "y": 0.230919
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C5024",
+      "designator": "C5024",
+      "category": "capacitor",
+      "source_point": {
+        "x": 552.747,
+        "y": 462.164
+      },
+      "center": {
+        "x": 0.803165,
+        "y": 0.13363
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C5028",
+      "designator": "C5028",
+      "category": "capacitor",
+      "source_point": {
+        "x": 537.915,
+        "y": 463.946
+      },
+      "center": {
+        "x": 0.780581,
+        "y": 0.129353
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C5029",
+      "designator": "C5029",
+      "category": "capacitor",
+      "source_point": {
+        "x": 539.823,
+        "y": 469.004
+      },
+      "center": {
+        "x": 0.783487,
+        "y": 0.117213
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C5030",
+      "designator": "C5030",
+      "category": "capacitor",
+      "source_point": {
+        "x": 534.171,
+        "y": 470.498
+      },
+      "center": {
+        "x": 0.774881,
+        "y": 0.113628
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C5031",
+      "designator": "C5031",
+      "category": "capacitor",
+      "source_point": {
+        "x": 534.729,
+        "y": 434.3
+      },
+      "center": {
+        "x": 0.77573,
+        "y": 0.200505
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C5033",
+      "designator": "C5033",
+      "category": "capacitor",
+      "source_point": {
+        "x": 528.717,
+        "y": 473.162
+      },
+      "center": {
+        "x": 0.766576,
+        "y": 0.107234
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C5035",
+      "designator": "C5035",
+      "category": "capacitor",
+      "source_point": {
+        "x": 540.993,
+        "y": 441.734
+      },
+      "center": {
+        "x": 0.785268,
+        "y": 0.182663
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C5036",
+      "designator": "C5036",
+      "category": "capacitor",
+      "source_point": {
+        "x": 479.469,
+        "y": 427.172
+      },
+      "center": {
+        "x": 0.69159,
+        "y": 0.217613
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C5037",
+      "designator": "C5037",
+      "category": "capacitor",
+      "source_point": {
+        "x": 483.357,
+        "y": 427.172
+      },
+      "center": {
+        "x": 0.69751,
+        "y": 0.217613
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C5038",
+      "designator": "C5038",
+      "category": "capacitor",
+      "source_point": {
+        "x": 474.123,
+        "y": 469.778
+      },
+      "center": {
+        "x": 0.68345,
+        "y": 0.115356
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C5039",
+      "designator": "C5039",
+      "category": "capacitor",
+      "source_point": {
+        "x": 473.421,
+        "y": 478.832
+      },
+      "center": {
+        "x": 0.682381,
+        "y": 0.093625
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C5043",
+      "designator": "C5043",
+      "category": "capacitor",
+      "source_point": {
+        "x": 569.073,
+        "y": 436.19
+      },
+      "center": {
+        "x": 0.828023,
+        "y": 0.195969
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C5047",
+      "designator": "C5047",
+      "category": "capacitor",
+      "source_point": {
+        "x": 450.291,
+        "y": 451.616
+      },
+      "center": {
+        "x": 0.647163,
+        "y": 0.158946
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C6013",
+      "designator": "C6013",
+      "category": "capacitor",
+      "source_point": {
+        "x": 102.099,
+        "y": 357.746
+      },
+      "center": {
+        "x": 0.116996,
+        "y": 0.384241
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C6014",
+      "designator": "C6014",
+      "category": "capacitor",
+      "source_point": {
+        "x": 115.203,
+        "y": 362.876
+      },
+      "center": {
+        "x": 0.136949,
+        "y": 0.371928
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C6015",
+      "designator": "C6015",
+      "category": "capacitor",
+      "source_point": {
+        "x": 166.143,
+        "y": 372.794
+      },
+      "center": {
+        "x": 0.214512,
+        "y": 0.348124
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C6016",
+      "designator": "C6016",
+      "category": "capacitor",
+      "source_point": {
+        "x": 162.741,
+        "y": 376.88
+      },
+      "center": {
+        "x": 0.209332,
+        "y": 0.338318
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C6017",
+      "designator": "C6017",
+      "category": "capacitor",
+      "source_point": {
+        "x": 157.161,
+        "y": 371.318
+      },
+      "center": {
+        "x": 0.200835,
+        "y": 0.351667
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C6018",
+      "designator": "C6018",
+      "category": "capacitor",
+      "source_point": {
+        "x": 138.963,
+        "y": 385.376
+      },
+      "center": {
+        "x": 0.173127,
+        "y": 0.317927
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C6019",
+      "designator": "C6019",
+      "category": "capacitor",
+      "source_point": {
+        "x": 130.341,
+        "y": 399.758
+      },
+      "center": {
+        "x": 0.159998,
+        "y": 0.283409
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C6032",
+      "designator": "C6032",
+      "category": "capacitor",
+      "source_point": {
+        "x": 121.935,
+        "y": 357.836
+      },
+      "center": {
+        "x": 0.147199,
+        "y": 0.384025
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C6033",
+      "designator": "C6033",
+      "category": "capacitor",
+      "source_point": {
+        "x": 143.571,
+        "y": 367.196
+      },
+      "center": {
+        "x": 0.180143,
+        "y": 0.36156
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C6034",
+      "designator": "C6034",
+      "category": "capacitor",
+      "source_point": {
+        "x": 106.149,
+        "y": 380.246
+      },
+      "center": {
+        "x": 0.123163,
+        "y": 0.330239
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C6037",
+      "designator": "C6037",
+      "category": "capacitor",
+      "source_point": {
+        "x": 143.57,
+        "y": 377.78
+      },
+      "center": {
+        "x": 0.180143,
+        "y": 0.336158
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C6038",
+      "designator": "C6038",
+      "category": "capacitor",
+      "source_point": {
+        "x": 155.523,
+        "y": 389.012
+      },
+      "center": {
+        "x": 0.198341,
+        "y": 0.3092
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C6040",
+      "designator": "C6040",
+      "category": "capacitor",
+      "source_point": {
+        "x": 150.861,
+        "y": 393.494
+      },
+      "center": {
+        "x": 0.191243,
+        "y": 0.298443
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C6045",
+      "designator": "C6045",
+      "category": "capacitor",
+      "source_point": {
+        "x": 165.189,
+        "y": 392.63
+      },
+      "center": {
+        "x": 0.213059,
+        "y": 0.300516
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C6203",
+      "designator": "C6203",
+      "category": "capacitor",
+      "source_point": {
+        "x": 428.205,
+        "y": 343.67
+      },
+      "center": {
+        "x": 0.613534,
+        "y": 0.418024
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C6204",
+      "designator": "C6204",
+      "category": "capacitor",
+      "source_point": {
+        "x": 434.397,
+        "y": 354.902
+      },
+      "center": {
+        "x": 0.622962,
+        "y": 0.391066
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C6205",
+      "designator": "C6205",
+      "category": "capacitor",
+      "source_point": {
+        "x": 436.413,
+        "y": 398.39
+      },
+      "center": {
+        "x": 0.626032,
+        "y": 0.286692
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C6210",
+      "designator": "C6210",
+      "category": "capacitor",
+      "source_point": {
+        "x": 428.295,
+        "y": 338.486
+      },
+      "center": {
+        "x": 0.613671,
+        "y": 0.430466
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C6211",
+      "designator": "C6211",
+      "category": "capacitor",
+      "source_point": {
+        "x": 429.105,
+        "y": 355.172
+      },
+      "center": {
+        "x": 0.614904,
+        "y": 0.390418
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C6221",
+      "designator": "C6221",
+      "category": "capacitor",
+      "source_point": {
+        "x": 399.963,
+        "y": 342.5
+      },
+      "center": {
+        "x": 0.570532,
+        "y": 0.420832
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C6224",
+      "designator": "C6224",
+      "category": "capacitor",
+      "source_point": {
+        "x": 399.963,
+        "y": 337.91
+      },
+      "center": {
+        "x": 0.570532,
+        "y": 0.431848
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C6258",
+      "designator": "C6258",
+      "category": "capacitor",
+      "source_point": {
+        "x": 644.367,
+        "y": 197.924
+      },
+      "center": {
+        "x": 0.942668,
+        "y": 0.767825
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C6303",
+      "designator": "C6303",
+      "category": "capacitor",
+      "source_point": {
+        "x": 96.771,
+        "y": 370.85
+      },
+      "center": {
+        "x": 0.108884,
+        "y": 0.35279
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C6309",
+      "designator": "C6309",
+      "category": "capacitor",
+      "source_point": {
+        "x": 71.121,
+        "y": 413.87
+      },
+      "center": {
+        "x": 0.069829,
+        "y": 0.249539
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C6310",
+      "designator": "C6310",
+      "category": "capacitor",
+      "source_point": {
+        "x": 570.855,
+        "y": 439.088
+      },
+      "center": {
+        "x": 0.830737,
+        "y": 0.189014
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C6312",
+      "designator": "C6312",
+      "category": "capacitor",
+      "source_point": {
+        "x": 79.671,
+        "y": 428.54
+      },
+      "center": {
+        "x": 0.082847,
+        "y": 0.21433
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C6314",
+      "designator": "C6314",
+      "category": "capacitor",
+      "source_point": {
+        "x": 99.075,
+        "y": 426.236
+      },
+      "center": {
+        "x": 0.112392,
+        "y": 0.21986
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C6316",
+      "designator": "C6316",
+      "category": "capacitor",
+      "source_point": {
+        "x": 432.723,
+        "y": 433.058
+      },
+      "center": {
+        "x": 0.620413,
+        "y": 0.203486
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C6317",
+      "designator": "C6317",
+      "category": "capacitor",
+      "source_point": {
+        "x": 552.657,
+        "y": 471.092
+      },
+      "center": {
+        "x": 0.803028,
+        "y": 0.112202
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C6319",
+      "designator": "C6319",
+      "category": "capacitor",
+      "source_point": {
+        "x": 412.166,
+        "y": 430.448
+      },
+      "center": {
+        "x": 0.589114,
+        "y": 0.209751
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C6415",
+      "designator": "C6415",
+      "category": "capacitor",
+      "source_point": {
+        "x": 391.899,
+        "y": 142.106
+      },
+      "center": {
+        "x": 0.558254,
+        "y": 0.901792
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C6501",
+      "designator": "C6501",
+      "category": "capacitor",
+      "source_point": {
+        "x": 143.265,
+        "y": 357.89
+      },
+      "center": {
+        "x": 0.179677,
+        "y": 0.383895
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-C6502",
+      "designator": "C6502",
+      "category": "capacitor",
+      "source_point": {
+        "x": 171.273,
+        "y": 362.282
+      },
+      "center": {
+        "x": 0.222323,
+        "y": 0.373354
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-D1101",
+      "designator": "D1101",
+      "category": "diode",
+      "source_point": {
+        "x": 394.311,
+        "y": 178.178
+      },
+      "center": {
+        "x": 0.561926,
+        "y": 0.815217
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-D1102",
+      "designator": "D1102",
+      "category": "diode",
+      "source_point": {
+        "x": 366.483,
+        "y": 179.762
+      },
+      "center": {
+        "x": 0.519555,
+        "y": 0.811415
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-D2701",
+      "designator": "D2701",
+      "category": "diode",
+      "source_point": {
+        "x": 172.443,
+        "y": 127.76
+      },
+      "center": {
+        "x": 0.224104,
+        "y": 0.936224
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-D2801",
+      "designator": "D2801",
+      "category": "diode",
+      "source_point": {
+        "x": 181.533,
+        "y": 179.978
+      },
+      "center": {
+        "x": 0.237945,
+        "y": 0.810897
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-D2830",
+      "designator": "D2830",
+      "category": "diode",
+      "source_point": {
+        "x": 108.813,
+        "y": 140.234
+      },
+      "center": {
+        "x": 0.127219,
+        "y": 0.906285
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-D6402",
+      "designator": "D6402",
+      "category": "diode",
+      "source_point": {
+        "x": 397.875,
+        "y": 141.116
+      },
+      "center": {
+        "x": 0.567353,
+        "y": 0.904168
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-F6104",
+      "designator": "F6104",
+      "category": "fuse",
+      "source_point": {
+        "x": 440.606,
+        "y": 122.864
+      },
+      "center": {
+        "x": 0.632417,
+        "y": 0.947975
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-F6106",
+      "designator": "F6106",
+      "category": "fuse",
+      "source_point": {
+        "x": 422.733,
+        "y": 122.648
+      },
+      "center": {
+        "x": 0.605202,
+        "y": 0.948493
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-F6107",
+      "designator": "F6107",
+      "category": "fuse",
+      "source_point": {
+        "x": 412.095,
+        "y": 122.702
+      },
+      "center": {
+        "x": 0.589005,
+        "y": 0.948363
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-F6110",
+      "designator": "F6110",
+      "category": "fuse",
+      "source_point": {
+        "x": 431.714,
+        "y": 122.756
+      },
+      "center": {
+        "x": 0.618878,
+        "y": 0.948234
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-F6122",
+      "designator": "F6122",
+      "category": "fuse",
+      "source_point": {
+        "x": 450.398,
+        "y": 122.972
+      },
+      "center": {
+        "x": 0.647327,
+        "y": 0.947715
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-J6205",
+      "designator": "J6205",
+      "category": "connector",
+      "source_point": {
+        "x": 341.517,
+        "y": 364.928
+      },
+      "center": {
+        "x": 0.481541,
+        "y": 0.367003
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-J6210",
+      "designator": "J6210",
+      "category": "connector",
+      "source_point": {
+        "x": 465.807,
+        "y": 379.922
+      },
+      "center": {
+        "x": 0.670788,
+        "y": 0.331017
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-J6501",
+      "designator": "J6501",
+      "category": "connector",
+      "source_point": {
+        "x": 296.085,
+        "y": 266.432
+      },
+      "center": {
+        "x": 0.412365,
+        "y": 0.603401
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-J6502",
+      "designator": "J6502",
+      "category": "connector",
+      "source_point": {
+        "x": 205.959,
+        "y": 271.796
+      },
+      "center": {
+        "x": 0.275136,
+        "y": 0.590527
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-J6504",
+      "designator": "J6504",
+      "category": "connector",
+      "source_point": {
+        "x": 257.637,
+        "y": 204.134
+      },
+      "center": {
+        "x": 0.353823,
+        "y": 0.752921
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-L5004",
+      "designator": "L5004",
+      "category": "inductor",
+      "source_point": {
+        "x": 458.463,
+        "y": 436.262
+      },
+      "center": {
+        "x": 0.659606,
+        "y": 0.195797
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-L5010",
+      "designator": "L5010",
+      "category": "inductor",
+      "source_point": {
+        "x": 465.933,
+        "y": 457.448
+      },
+      "center": {
+        "x": 0.67098,
+        "y": 0.144949
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-L5018",
+      "designator": "L5018",
+      "category": "inductor",
+      "source_point": {
+        "x": 560.991,
+        "y": 434.174
+      },
+      "center": {
+        "x": 0.815717,
+        "y": 0.200808
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-L5019",
+      "designator": "L5019",
+      "category": "inductor",
+      "source_point": {
+        "x": 467.481,
+        "y": 426.11
+      },
+      "center": {
+        "x": 0.673337,
+        "y": 0.220162
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-L5020",
+      "designator": "L5020",
+      "category": "inductor",
+      "source_point": {
+        "x": 548.697,
+        "y": 448.43
+      },
+      "center": {
+        "x": 0.796998,
+        "y": 0.166592
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-L5023",
+      "designator": "L5023",
+      "category": "inductor",
+      "source_point": {
+        "x": 539.337,
+        "y": 434.192
+      },
+      "center": {
+        "x": 0.782747,
+        "y": 0.200765
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-L5024",
+      "designator": "L5024",
+      "category": "inductor",
+      "source_point": {
+        "x": 534.621,
+        "y": 447.656
+      },
+      "center": {
+        "x": 0.775566,
+        "y": 0.16845
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-L5025",
+      "designator": "L5025",
+      "category": "inductor",
+      "source_point": {
+        "x": 533.649,
+        "y": 458.996
+      },
+      "center": {
+        "x": 0.774086,
+        "y": 0.141233
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-L5080",
+      "designator": "L5080",
+      "category": "inductor",
+      "source_point": {
+        "x": 542.541,
+        "y": 459.248
+      },
+      "center": {
+        "x": 0.787625,
+        "y": 0.140628
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-LED2401",
+      "designator": "LED2401",
+      "category": "led",
+      "source_point": {
+        "x": 475.833,
+        "y": 484.034
+      },
+      "center": {
+        "x": 0.686054,
+        "y": 0.08114
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-LED2402",
+      "designator": "LED2402",
+      "category": "led",
+      "source_point": {
+        "x": 489.837,
+        "y": 484.07
+      },
+      "center": {
+        "x": 0.707377,
+        "y": 0.081054
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-LED2403",
+      "designator": "LED2403",
+      "category": "led",
+      "source_point": {
+        "x": 505.551,
+        "y": 483.908
+      },
+      "center": {
+        "x": 0.731303,
+        "y": 0.081443
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-PL2401",
+      "designator": "PL2401",
+      "category": "inductor",
+      "source_point": {
+        "x": 416.217,
+        "y": 381.398
+      },
+      "center": {
+        "x": 0.595281,
+        "y": 0.327474
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-PL2701",
+      "designator": "PL2701",
+      "category": "inductor",
+      "source_point": {
+        "x": 322.779,
+        "y": 172.994
+      },
+      "center": {
+        "x": 0.45301,
+        "y": 0.827659
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-Q2702",
+      "designator": "Q2702",
+      "category": "transistor",
+      "source_point": {
+        "x": 190.803,
+        "y": 146.39
+      },
+      "center": {
+        "x": 0.25206,
+        "y": 0.89151
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-Q2704",
+      "designator": "Q2704",
+      "category": "transistor",
+      "source_point": {
+        "x": 181.119,
+        "y": 167.234
+      },
+      "center": {
+        "x": 0.237314,
+        "y": 0.841484
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-Q2706",
+      "designator": "Q2706",
+      "category": "transistor",
+      "source_point": {
+        "x": 195.465,
+        "y": 173.21
+      },
+      "center": {
+        "x": 0.259158,
+        "y": 0.827141
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-Q6402",
+      "designator": "Q6402",
+      "category": "transistor",
+      "source_point": {
+        "x": 397.659,
+        "y": 127.85
+      },
+      "center": {
+        "x": 0.567024,
+        "y": 0.936008
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R1208",
+      "designator": "R1208",
+      "category": "resistor",
+      "source_point": {
+        "x": 442.371,
+        "y": 286.502
+      },
+      "center": {
+        "x": 0.635104,
+        "y": 0.555231
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R1209",
+      "designator": "R1209",
+      "category": "resistor",
+      "source_point": {
+        "x": 459.741,
+        "y": 279.392
+      },
+      "center": {
+        "x": 0.661552,
+        "y": 0.572296
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R1301",
+      "designator": "R1301",
+      "category": "resistor",
+      "source_point": {
+        "x": 516.621,
+        "y": 285.386
+      },
+      "center": {
+        "x": 0.748159,
+        "y": 0.55791
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R2405",
+      "designator": "R2405",
+      "category": "resistor",
+      "source_point": {
+        "x": 400.629,
+        "y": 389.192
+      },
+      "center": {
+        "x": 0.571546,
+        "y": 0.308768
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R2426",
+      "designator": "R2426",
+      "category": "resistor",
+      "source_point": {
+        "x": 407.631,
+        "y": 409.172
+      },
+      "center": {
+        "x": 0.582208,
+        "y": 0.260814
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R2428",
+      "designator": "R2428",
+      "category": "resistor",
+      "source_point": {
+        "x": 432.327,
+        "y": 451.85
+      },
+      "center": {
+        "x": 0.61981,
+        "y": 0.158384
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R2429",
+      "designator": "R2429",
+      "category": "resistor",
+      "source_point": {
+        "x": 410.889,
+        "y": 411.26
+      },
+      "center": {
+        "x": 0.587168,
+        "y": 0.255803
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R2436",
+      "designator": "R2436",
+      "category": "resistor",
+      "source_point": {
+        "x": 417.62,
+        "y": 353.12
+      },
+      "center": {
+        "x": 0.597418,
+        "y": 0.395343
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R2456",
+      "designator": "R2456",
+      "category": "resistor",
+      "source_point": {
+        "x": 412.221,
+        "y": 420.386
+      },
+      "center": {
+        "x": 0.589196,
+        "y": 0.2339
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R2701",
+      "designator": "R2701",
+      "category": "resistor",
+      "source_point": {
+        "x": 313.437,
+        "y": 151.196
+      },
+      "center": {
+        "x": 0.438785,
+        "y": 0.879976
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R2702",
+      "designator": "R2702",
+      "category": "resistor",
+      "source_point": {
+        "x": 215.805,
+        "y": 144.374
+      },
+      "center": {
+        "x": 0.290128,
+        "y": 0.896349
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R2704",
+      "designator": "R2704",
+      "category": "resistor",
+      "source_point": {
+        "x": 371.847,
+        "y": 170.348
+      },
+      "center": {
+        "x": 0.527722,
+        "y": 0.83401
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R2705",
+      "designator": "R2705",
+      "category": "resistor",
+      "source_point": {
+        "x": 376.545,
+        "y": 161.978
+      },
+      "center": {
+        "x": 0.534875,
+        "y": 0.854098
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R2706",
+      "designator": "R2706",
+      "category": "resistor",
+      "source_point": {
+        "x": 366.429,
+        "y": 158.738
+      },
+      "center": {
+        "x": 0.519472,
+        "y": 0.861875
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R2707",
+      "designator": "R2707",
+      "category": "resistor",
+      "source_point": {
+        "x": 277.833,
+        "y": 141.116
+      },
+      "center": {
+        "x": 0.384574,
+        "y": 0.904169
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R2717",
+      "designator": "R2717",
+      "category": "resistor",
+      "source_point": {
+        "x": 215.805,
+        "y": 148.982
+      },
+      "center": {
+        "x": 0.290128,
+        "y": 0.88529
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R2728",
+      "designator": "R2728",
+      "category": "resistor",
+      "source_point": {
+        "x": 296.409,
+        "y": 141.152
+      },
+      "center": {
+        "x": 0.412858,
+        "y": 0.904082
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R2729",
+      "designator": "R2729",
+      "category": "resistor",
+      "source_point": {
+        "x": 161.625,
+        "y": 158.054
+      },
+      "center": {
+        "x": 0.207633,
+        "y": 0.863516
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R2730",
+      "designator": "R2730",
+      "category": "resistor",
+      "source_point": {
+        "x": 291.639,
+        "y": 141.152
+      },
+      "center": {
+        "x": 0.405595,
+        "y": 0.904082
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R2731",
+      "designator": "R2731",
+      "category": "resistor",
+      "source_point": {
+        "x": 157.791,
+        "y": 159.368
+      },
+      "center": {
+        "x": 0.201795,
+        "y": 0.860363
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R2732",
+      "designator": "R2732",
+      "category": "resistor",
+      "source_point": {
+        "x": 282.441,
+        "y": 141.152
+      },
+      "center": {
+        "x": 0.39159,
+        "y": 0.904082
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R2733",
+      "designator": "R2733",
+      "category": "resistor",
+      "source_point": {
+        "x": 287.031,
+        "y": 141.152
+      },
+      "center": {
+        "x": 0.398579,
+        "y": 0.904082
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R2749",
+      "designator": "R2749",
+      "category": "resistor",
+      "source_point": {
+        "x": 382.107,
+        "y": 135.446
+      },
+      "center": {
+        "x": 0.543344,
+        "y": 0.917777
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R2750",
+      "designator": "R2750",
+      "category": "resistor",
+      "source_point": {
+        "x": 382.071,
+        "y": 125.636
+      },
+      "center": {
+        "x": 0.543289,
+        "y": 0.941322
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R2751",
+      "designator": "R2751",
+      "category": "resistor",
+      "source_point": {
+        "x": 264.279,
+        "y": 136.076
+      },
+      "center": {
+        "x": 0.363936,
+        "y": 0.916265
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R2761",
+      "designator": "R2761",
+      "category": "resistor",
+      "source_point": {
+        "x": 176.421,
+        "y": 150.296
+      },
+      "center": {
+        "x": 0.230161,
+        "y": 0.882136
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R2764",
+      "designator": "R2764",
+      "category": "resistor",
+      "source_point": {
+        "x": 165.801,
+        "y": 150.296
+      },
+      "center": {
+        "x": 0.213991,
+        "y": 0.882136
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R2785",
+      "designator": "R2785",
+      "category": "resistor",
+      "source_point": {
+        "x": 227.577,
+        "y": 128.534
+      },
+      "center": {
+        "x": 0.308053,
+        "y": 0.934366
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R2786",
+      "designator": "R2786",
+      "category": "resistor",
+      "source_point": {
+        "x": 227.577,
+        "y": 123.944
+      },
+      "center": {
+        "x": 0.308053,
+        "y": 0.945383
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R2801",
+      "designator": "R2801",
+      "category": "resistor",
+      "source_point": {
+        "x": 175.268,
+        "y": 181.67
+      },
+      "center": {
+        "x": 0.228407,
+        "y": 0.806836
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R2804",
+      "designator": "R2804",
+      "category": "resistor",
+      "source_point": {
+        "x": 93.135,
+        "y": 154.292
+      },
+      "center": {
+        "x": 0.103348,
+        "y": 0.872545
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R2805",
+      "designator": "R2805",
+      "category": "resistor",
+      "source_point": {
+        "x": 92.163,
+        "y": 163.166
+      },
+      "center": {
+        "x": 0.101868,
+        "y": 0.851247
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R2806",
+      "designator": "R2806",
+      "category": "resistor",
+      "source_point": {
+        "x": 151.994,
+        "y": 140.288
+      },
+      "center": {
+        "x": 0.192969,
+        "y": 0.906156
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R2807",
+      "designator": "R2807",
+      "category": "resistor",
+      "source_point": {
+        "x": 103.161,
+        "y": 142.754
+      },
+      "center": {
+        "x": 0.118613,
+        "y": 0.900237
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R2808",
+      "designator": "R2808",
+      "category": "resistor",
+      "source_point": {
+        "x": 165.585,
+        "y": 178.826
+      },
+      "center": {
+        "x": 0.213662,
+        "y": 0.813662
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R2810",
+      "designator": "R2810",
+      "category": "resistor",
+      "source_point": {
+        "x": 106.851,
+        "y": 145.094
+      },
+      "center": {
+        "x": 0.124232,
+        "y": 0.894621
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R3008",
+      "designator": "R3008",
+      "category": "resistor",
+      "source_point": {
+        "x": 400.611,
+        "y": 297.5
+      },
+      "center": {
+        "x": 0.571519,
+        "y": 0.528835
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R3009",
+      "designator": "R3009",
+      "category": "resistor",
+      "source_point": {
+        "x": 401.295,
+        "y": 288.23
+      },
+      "center": {
+        "x": 0.57256,
+        "y": 0.551083
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R3010",
+      "designator": "R3010",
+      "category": "resistor",
+      "source_point": {
+        "x": 400.611,
+        "y": 306.698
+      },
+      "center": {
+        "x": 0.571519,
+        "y": 0.506759
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R3011",
+      "designator": "R3011",
+      "category": "resistor",
+      "source_point": {
+        "x": 400.611,
+        "y": 292.856
+      },
+      "center": {
+        "x": 0.571519,
+        "y": 0.539981
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R3012",
+      "designator": "R3012",
+      "category": "resistor",
+      "source_point": {
+        "x": 401.295,
+        "y": 283.622
+      },
+      "center": {
+        "x": 0.57256,
+        "y": 0.562143
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R3013",
+      "designator": "R3013",
+      "category": "resistor",
+      "source_point": {
+        "x": 400.611,
+        "y": 302.108
+      },
+      "center": {
+        "x": 0.571519,
+        "y": 0.517776
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R3014",
+      "designator": "R3014",
+      "category": "resistor",
+      "source_point": {
+        "x": 400.971,
+        "y": 279.428
+      },
+      "center": {
+        "x": 0.572067,
+        "y": 0.572209
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R3015",
+      "designator": "R3015",
+      "category": "resistor",
+      "source_point": {
+        "x": 401.295,
+        "y": 274.37
+      },
+      "center": {
+        "x": 0.57256,
+        "y": 0.584348
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R3910",
+      "designator": "R3910",
+      "category": "resistor",
+      "source_point": {
+        "x": 74.559,
+        "y": 365.918
+      },
+      "center": {
+        "x": 0.075063,
+        "y": 0.364627
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R4001",
+      "designator": "R4001",
+      "category": "resistor",
+      "source_point": {
+        "x": 571.917,
+        "y": 296.024
+      },
+      "center": {
+        "x": 0.832354,
+        "y": 0.532378
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R4002",
+      "designator": "R4002",
+      "category": "resistor",
+      "source_point": {
+        "x": 585.11,
+        "y": 291.884
+      },
+      "center": {
+        "x": 0.852443,
+        "y": 0.542315
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R5005",
+      "designator": "R5005",
+      "category": "resistor",
+      "source_point": {
+        "x": 454.251,
+        "y": 424.004
+      },
+      "center": {
+        "x": 0.653193,
+        "y": 0.225217
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R5016",
+      "designator": "R5016",
+      "category": "resistor",
+      "source_point": {
+        "x": 573.681,
+        "y": 429.584
+      },
+      "center": {
+        "x": 0.83504,
+        "y": 0.211824
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6002",
+      "designator": "R6002",
+      "category": "resistor",
+      "source_point": {
+        "x": 96.95,
+        "y": 386.096
+      },
+      "center": {
+        "x": 0.109158,
+        "y": 0.316198
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6004",
+      "designator": "R6004",
+      "category": "resistor",
+      "source_point": {
+        "x": 100.965,
+        "y": 368.744
+      },
+      "center": {
+        "x": 0.11527,
+        "y": 0.357845
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6005",
+      "designator": "R6005",
+      "category": "resistor",
+      "source_point": {
+        "x": 103.269,
+        "y": 386.762
+      },
+      "center": {
+        "x": 0.118778,
+        "y": 0.3146
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6006",
+      "designator": "R6006",
+      "category": "resistor",
+      "source_point": {
+        "x": 113.835,
+        "y": 392.09
+      },
+      "center": {
+        "x": 0.134866,
+        "y": 0.301812
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6008",
+      "designator": "R6008",
+      "category": "resistor",
+      "source_point": {
+        "x": 165.729,
+        "y": 366.944
+      },
+      "center": {
+        "x": 0.213881,
+        "y": 0.362165
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6009",
+      "designator": "R6009",
+      "category": "resistor",
+      "source_point": {
+        "x": 157.791,
+        "y": 366.98
+      },
+      "center": {
+        "x": 0.201795,
+        "y": 0.362078
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6116",
+      "designator": "R6116",
+      "category": "resistor",
+      "source_point": {
+        "x": 410.925,
+        "y": 132.728
+      },
+      "center": {
+        "x": 0.587223,
+        "y": 0.9243
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6184",
+      "designator": "R6184",
+      "category": "resistor",
+      "source_point": {
+        "x": 448.383,
+        "y": 132.638
+      },
+      "center": {
+        "x": 0.644258,
+        "y": 0.924516
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6185",
+      "designator": "R6185",
+      "category": "resistor",
+      "source_point": {
+        "x": 452.054,
+        "y": 132.728
+      },
+      "center": {
+        "x": 0.649848,
+        "y": 0.924301
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6186",
+      "designator": "R6186",
+      "category": "resistor",
+      "source_point": {
+        "x": 439.13,
+        "y": 132.548
+      },
+      "center": {
+        "x": 0.63017,
+        "y": 0.924733
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6187",
+      "designator": "R6187",
+      "category": "resistor",
+      "source_point": {
+        "x": 442.839,
+        "y": 132.71
+      },
+      "center": {
+        "x": 0.635816,
+        "y": 0.924343
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6189",
+      "designator": "R6189",
+      "category": "resistor",
+      "source_point": {
+        "x": 424.334,
+        "y": 132.548
+      },
+      "center": {
+        "x": 0.607641,
+        "y": 0.924733
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6191",
+      "designator": "R6191",
+      "category": "resistor",
+      "source_point": {
+        "x": 414.957,
+        "y": 132.584
+      },
+      "center": {
+        "x": 0.593362,
+        "y": 0.924646
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6192",
+      "designator": "R6192",
+      "category": "resistor",
+      "source_point": {
+        "x": 429.806,
+        "y": 132.836
+      },
+      "center": {
+        "x": 0.615973,
+        "y": 0.924041
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6193",
+      "designator": "R6193",
+      "category": "resistor",
+      "source_point": {
+        "x": 433.55,
+        "y": 132.692
+      },
+      "center": {
+        "x": 0.621674,
+        "y": 0.924387
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6201",
+      "designator": "R6201",
+      "category": "resistor",
+      "source_point": {
+        "x": 442.047,
+        "y": 297.554
+      },
+      "center": {
+        "x": 0.63461,
+        "y": 0.528706
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6203",
+      "designator": "R6203",
+      "category": "resistor",
+      "source_point": {
+        "x": 450.849,
+        "y": 297.482
+      },
+      "center": {
+        "x": 0.648012,
+        "y": 0.528879
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6204",
+      "designator": "R6204",
+      "category": "resistor",
+      "source_point": {
+        "x": 450.849,
+        "y": 302.09
+      },
+      "center": {
+        "x": 0.648012,
+        "y": 0.517819
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6205",
+      "designator": "R6205",
+      "category": "resistor",
+      "source_point": {
+        "x": 442.047,
+        "y": 302.162
+      },
+      "center": {
+        "x": 0.63461,
+        "y": 0.517646
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6206",
+      "designator": "R6206",
+      "category": "resistor",
+      "source_point": {
+        "x": 442.046,
+        "y": 306.752
+      },
+      "center": {
+        "x": 0.63461,
+        "y": 0.50663
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6207",
+      "designator": "R6207",
+      "category": "resistor",
+      "source_point": {
+        "x": 442.047,
+        "y": 311.36
+      },
+      "center": {
+        "x": 0.63461,
+        "y": 0.49557
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6209",
+      "designator": "R6209",
+      "category": "resistor",
+      "source_point": {
+        "x": 425.99,
+        "y": 311.234
+      },
+      "center": {
+        "x": 0.610163,
+        "y": 0.495873
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6210",
+      "designator": "R6210",
+      "category": "resistor",
+      "source_point": {
+        "x": 426.152,
+        "y": 315.734
+      },
+      "center": {
+        "x": 0.610409,
+        "y": 0.485072
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6211",
+      "designator": "R6211",
+      "category": "resistor",
+      "source_point": {
+        "x": 426.17,
+        "y": 319.766
+      },
+      "center": {
+        "x": 0.610437,
+        "y": 0.475395
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6212",
+      "designator": "R6212",
+      "category": "resistor",
+      "source_point": {
+        "x": 426.009,
+        "y": 324.32
+      },
+      "center": {
+        "x": 0.61019,
+        "y": 0.464465
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6213",
+      "designator": "R6213",
+      "category": "resistor",
+      "source_point": {
+        "x": 426.044,
+        "y": 329.648
+      },
+      "center": {
+        "x": 0.610245,
+        "y": 0.451678
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6216",
+      "designator": "R6216",
+      "category": "resistor",
+      "source_point": {
+        "x": 450.848,
+        "y": 311.288
+      },
+      "center": {
+        "x": 0.648012,
+        "y": 0.495743
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6217",
+      "designator": "R6217",
+      "category": "resistor",
+      "source_point": {
+        "x": 434.612,
+        "y": 306.554
+      },
+      "center": {
+        "x": 0.623291,
+        "y": 0.507105
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6218",
+      "designator": "R6218",
+      "category": "resistor",
+      "source_point": {
+        "x": 434.757,
+        "y": 311.09
+      },
+      "center": {
+        "x": 0.62351,
+        "y": 0.496218
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6219",
+      "designator": "R6219",
+      "category": "resistor",
+      "source_point": {
+        "x": 434.81,
+        "y": 315.806
+      },
+      "center": {
+        "x": 0.623592,
+        "y": 0.4849
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6220",
+      "designator": "R6220",
+      "category": "resistor",
+      "source_point": {
+        "x": 434.829,
+        "y": 320.306
+      },
+      "center": {
+        "x": 0.62362,
+        "y": 0.474099
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6222",
+      "designator": "R6222",
+      "category": "resistor",
+      "source_point": {
+        "x": 434.487,
+        "y": 324.392
+      },
+      "center": {
+        "x": 0.623099,
+        "y": 0.464293
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6223",
+      "designator": "R6223",
+      "category": "resistor",
+      "source_point": {
+        "x": 434.684,
+        "y": 329.72
+      },
+      "center": {
+        "x": 0.6234,
+        "y": 0.451505
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6225",
+      "designator": "R6225",
+      "category": "resistor",
+      "source_point": {
+        "x": 429.519,
+        "y": 401.99
+      },
+      "center": {
+        "x": 0.615535,
+        "y": 0.278052
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6229",
+      "designator": "R6229",
+      "category": "resistor",
+      "source_point": {
+        "x": 399.963,
+        "y": 347.396
+      },
+      "center": {
+        "x": 0.570532,
+        "y": 0.409081
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6251",
+      "designator": "R6251",
+      "category": "resistor",
+      "source_point": {
+        "x": 643.305,
+        "y": 206.744
+      },
+      "center": {
+        "x": 0.941051,
+        "y": 0.746657
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6302",
+      "designator": "R6302",
+      "category": "resistor",
+      "source_point": {
+        "x": 94.449,
+        "y": 426.218
+      },
+      "center": {
+        "x": 0.105348,
+        "y": 0.219903
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6304",
+      "designator": "R6304",
+      "category": "resistor",
+      "source_point": {
+        "x": 574.419,
+        "y": 434.192
+      },
+      "center": {
+        "x": 0.836163,
+        "y": 0.200765
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6306",
+      "designator": "R6306",
+      "category": "resistor",
+      "source_point": {
+        "x": 558.093,
+        "y": 295.988
+      },
+      "center": {
+        "x": 0.811305,
+        "y": 0.532464
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6307",
+      "designator": "R6307",
+      "category": "resistor",
+      "source_point": {
+        "x": 102.819,
+        "y": 418.73
+      },
+      "center": {
+        "x": 0.118093,
+        "y": 0.237875
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6308",
+      "designator": "R6308",
+      "category": "resistor",
+      "source_point": {
+        "x": 112.197,
+        "y": 399.65
+      },
+      "center": {
+        "x": 0.132372,
+        "y": 0.283668
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6309",
+      "designator": "R6309",
+      "category": "resistor",
+      "source_point": {
+        "x": 580.539,
+        "y": 446.828
+      },
+      "center": {
+        "x": 0.845482,
+        "y": 0.170437
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6313",
+      "designator": "R6313",
+      "category": "resistor",
+      "source_point": {
+        "x": 423.327,
+        "y": 431.888
+      },
+      "center": {
+        "x": 0.606107,
+        "y": 0.206294
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6417",
+      "designator": "R6417",
+      "category": "resistor",
+      "source_point": {
+        "x": 391.899,
+        "y": 132.62
+      },
+      "center": {
+        "x": 0.558254,
+        "y": 0.92456
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6418",
+      "designator": "R6418",
+      "category": "resistor",
+      "source_point": {
+        "x": 382.107,
+        "y": 130.766
+      },
+      "center": {
+        "x": 0.543344,
+        "y": 0.929009
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6420",
+      "designator": "R6420",
+      "category": "resistor",
+      "source_point": {
+        "x": 402.249,
+        "y": 142.16
+      },
+      "center": {
+        "x": 0.574013,
+        "y": 0.901663
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6424",
+      "designator": "R6424",
+      "category": "resistor",
+      "source_point": {
+        "x": 381.405,
+        "y": 140.216
+      },
+      "center": {
+        "x": 0.542275,
+        "y": 0.906328
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6433",
+      "designator": "R6433",
+      "category": "resistor",
+      "source_point": {
+        "x": 406.875,
+        "y": 142.16
+      },
+      "center": {
+        "x": 0.581056,
+        "y": 0.901663
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6501",
+      "designator": "R6501",
+      "category": "resistor",
+      "source_point": {
+        "x": 515.145,
+        "y": 146.354
+      },
+      "center": {
+        "x": 0.745911,
+        "y": 0.891597
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6502",
+      "designator": "R6502",
+      "category": "resistor",
+      "source_point": {
+        "x": 506.325,
+        "y": 146.498
+      },
+      "center": {
+        "x": 0.732482,
+        "y": 0.891251
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6503",
+      "designator": "R6503",
+      "category": "resistor",
+      "source_point": {
+        "x": 456.968,
+        "y": 132.386
+      },
+      "center": {
+        "x": 0.65733,
+        "y": 0.925121
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6504",
+      "designator": "R6504",
+      "category": "resistor",
+      "source_point": {
+        "x": 394.041,
+        "y": 163.382
+      },
+      "center": {
+        "x": 0.561515,
+        "y": 0.850728
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6505",
+      "designator": "R6505",
+      "category": "resistor",
+      "source_point": {
+        "x": 385.401,
+        "y": 168.152
+      },
+      "center": {
+        "x": 0.548359,
+        "y": 0.83928
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6506",
+      "designator": "R6506",
+      "category": "resistor",
+      "source_point": {
+        "x": 394.041,
+        "y": 158.774
+      },
+      "center": {
+        "x": 0.561515,
+        "y": 0.861788
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6508",
+      "designator": "R6508",
+      "category": "resistor",
+      "source_point": {
+        "x": 410.961,
+        "y": 163.58
+      },
+      "center": {
+        "x": 0.587278,
+        "y": 0.850253
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6509",
+      "designator": "R6509",
+      "category": "resistor",
+      "source_point": {
+        "x": 376.527,
+        "y": 170.87
+      },
+      "center": {
+        "x": 0.534848,
+        "y": 0.832757
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6510",
+      "designator": "R6510",
+      "category": "resistor",
+      "source_point": {
+        "x": 171.561,
+        "y": 366.872
+      },
+      "center": {
+        "x": 0.222761,
+        "y": 0.362338
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6511",
+      "designator": "R6511",
+      "category": "resistor",
+      "source_point": {
+        "x": 405.219,
+        "y": 163.436
+      },
+      "center": {
+        "x": 0.578535,
+        "y": 0.850599
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6513",
+      "designator": "R6513",
+      "category": "resistor",
+      "source_point": {
+        "x": 422.391,
+        "y": 164.12
+      },
+      "center": {
+        "x": 0.604681,
+        "y": 0.848957
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6514",
+      "designator": "R6514",
+      "category": "resistor",
+      "source_point": {
+        "x": 381.981,
+        "y": 158.738
+      },
+      "center": {
+        "x": 0.543152,
+        "y": 0.861875
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6515",
+      "designator": "R6515",
+      "category": "resistor",
+      "source_point": {
+        "x": 382.035,
+        "y": 153.932
+      },
+      "center": {
+        "x": 0.543234,
+        "y": 0.873409
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6516",
+      "designator": "R6516",
+      "category": "resistor",
+      "source_point": {
+        "x": 400.611,
+        "y": 315.878
+      },
+      "center": {
+        "x": 0.571519,
+        "y": 0.484727
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6517",
+      "designator": "R6517",
+      "category": "resistor",
+      "source_point": {
+        "x": 432.309,
+        "y": 164.12
+      },
+      "center": {
+        "x": 0.619783,
+        "y": 0.848957
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6518",
+      "designator": "R6518",
+      "category": "resistor",
+      "source_point": {
+        "x": 427.701,
+        "y": 164.12
+      },
+      "center": {
+        "x": 0.612767,
+        "y": 0.848957
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6520",
+      "designator": "R6520",
+      "category": "resistor",
+      "source_point": {
+        "x": 458.985,
+        "y": 146.246
+      },
+      "center": {
+        "x": 0.6604,
+        "y": 0.891856
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6551",
+      "designator": "R6551",
+      "category": "resistor",
+      "source_point": {
+        "x": 458.985,
+        "y": 141.422
+      },
+      "center": {
+        "x": 0.6604,
+        "y": 0.903434
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-R6552",
+      "designator": "R6552",
+      "category": "resistor",
+      "source_point": {
+        "x": 455.061,
+        "y": 142.52
+      },
+      "center": {
+        "x": 0.654426,
+        "y": 0.900799
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-TP2809",
+      "designator": "TP2809",
+      "category": "test_point",
+      "source_point": {
+        "x": 415.821,
+        "y": 277.664
+      },
+      "center": {
+        "x": 0.594678,
+        "y": 0.576443
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-TP2810",
+      "designator": "TP2810",
+      "category": "test_point",
+      "source_point": {
+        "x": 415.929,
+        "y": 285.638
+      },
+      "center": {
+        "x": 0.594842,
+        "y": 0.557305
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-TP4001",
+      "designator": "TP4001",
+      "category": "test_point",
+      "source_point": {
+        "x": 622.911,
+        "y": 147.794
+      },
+      "center": {
+        "x": 0.909998,
+        "y": 0.888141
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-TP4002",
+      "designator": "TP4002",
+      "category": "test_point",
+      "source_point": {
+        "x": 611.283,
+        "y": 147.794
+      },
+      "center": {
+        "x": 0.892293,
+        "y": 0.888141
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-TP4003",
+      "designator": "TP4003",
+      "category": "test_point",
+      "source_point": {
+        "x": 551.415,
+        "y": 148.712
+      },
+      "center": {
+        "x": 0.801137,
+        "y": 0.885938
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-TP4004",
+      "designator": "TP4004",
+      "category": "test_point",
+      "source_point": {
+        "x": 539.228,
+        "y": 149.0
+      },
+      "center": {
+        "x": 0.782582,
+        "y": 0.885247
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-TP4005",
+      "designator": "TP4005",
+      "category": "test_point",
+      "source_point": {
+        "x": 620.931,
+        "y": 159.512
+      },
+      "center": {
+        "x": 0.906984,
+        "y": 0.860017
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-TP4006",
+      "designator": "TP4006",
+      "category": "test_point",
+      "source_point": {
+        "x": 539.696,
+        "y": 159.8
+      },
+      "center": {
+        "x": 0.783294,
+        "y": 0.859326
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-TP4007",
+      "designator": "TP4007",
+      "category": "test_point",
+      "source_point": {
+        "x": 621.417,
+        "y": 267.818
+      },
+      "center": {
+        "x": 0.907724,
+        "y": 0.600074
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-TP4008",
+      "designator": "TP4008",
+      "category": "test_point",
+      "source_point": {
+        "x": 539.804,
+        "y": 268.268
+      },
+      "center": {
+        "x": 0.783459,
+        "y": 0.598995
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-TP4011",
+      "designator": "TP4011",
+      "category": "test_point",
+      "source_point": {
+        "x": 552.549,
+        "y": 281.102
+      },
+      "center": {
+        "x": 0.802863,
+        "y": 0.568192
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-TP4012",
+      "designator": "TP4012",
+      "category": "test_point",
+      "source_point": {
+        "x": 541.424,
+        "y": 281.156
+      },
+      "center": {
+        "x": 0.785925,
+        "y": 0.568063
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-U1001",
+      "designator": "U1001",
+      "category": "ic",
+      "source_point": {
+        "x": 441.111,
+        "y": 212.558
+      },
+      "center": {
+        "x": 0.633185,
+        "y": 0.732702
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-U2405",
+      "designator": "U2405",
+      "category": "ic",
+      "source_point": {
+        "x": 413.535,
+        "y": 400.154
+      },
+      "center": {
+        "x": 0.591197,
+        "y": 0.282458
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-U2701",
+      "designator": "U2701",
+      "category": "ic",
+      "source_point": {
+        "x": 218.954,
+        "y": 135.896
+      },
+      "center": {
+        "x": 0.294924,
+        "y": 0.916696
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-U2702",
+      "designator": "U2702",
+      "category": "ic",
+      "source_point": {
+        "x": 238.197,
+        "y": 153.698
+      },
+      "center": {
+        "x": 0.324223,
+        "y": 0.873971
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-U2703",
+      "designator": "U2703",
+      "category": "ic",
+      "source_point": {
+        "x": 288.741,
+        "y": 156.362
+      },
+      "center": {
+        "x": 0.401182,
+        "y": 0.867577
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-U2705",
+      "designator": "U2705",
+      "category": "ic",
+      "source_point": {
+        "x": 250.095,
+        "y": 130.136
+      },
+      "center": {
+        "x": 0.342339,
+        "y": 0.930521
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-U2801",
+      "designator": "U2801",
+      "category": "ic",
+      "source_point": {
+        "x": 121.467,
+        "y": 162.482
+      },
+      "center": {
+        "x": 0.146487,
+        "y": 0.852888
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-U4001",
+      "designator": "U4001",
+      "category": "ic",
+      "source_point": {
+        "x": 565.869,
+        "y": 210.074
+      },
+      "center": {
+        "x": 0.823145,
+        "y": 0.738664
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-U5005",
+      "designator": "U5005",
+      "category": "ic",
+      "source_point": {
+        "x": 461.433,
+        "y": 425.498
+      },
+      "center": {
+        "x": 0.664128,
+        "y": 0.221631
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-U5006",
+      "designator": "U5006",
+      "category": "ic",
+      "source_point": {
+        "x": 545.367,
+        "y": 432.68
+      },
+      "center": {
+        "x": 0.791928,
+        "y": 0.204394
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-U5007",
+      "designator": "U5007",
+      "category": "ic",
+      "source_point": {
+        "x": 491.349,
+        "y": 452.156
+      },
+      "center": {
+        "x": 0.709679,
+        "y": 0.15765
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-U6001",
+      "designator": "U6001",
+      "category": "ic",
+      "source_point": {
+        "x": 119.379,
+        "y": 378.986
+      },
+      "center": {
+        "x": 0.143307,
+        "y": 0.333263
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-U6301",
+      "designator": "U6301",
+      "category": "ic",
+      "source_point": {
+        "x": 67.647,
+        "y": 426.614
+      },
+      "center": {
+        "x": 0.064539,
+        "y": 0.218953
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-U6302",
+      "designator": "U6302",
+      "category": "ic",
+      "source_point": {
+        "x": 78.087,
+        "y": 377.096
+      },
+      "center": {
+        "x": 0.080435,
+        "y": 0.337799
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-U6303",
+      "designator": "U6303",
+      "category": "ic",
+      "source_point": {
+        "x": 560.433,
+        "y": 469.616
+      },
+      "center": {
+        "x": 0.814868,
+        "y": 0.115744
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-U6304",
+      "designator": "U6304",
+      "category": "ic",
+      "source_point": {
+        "x": 89.571,
+        "y": 402.278
+      },
+      "center": {
+        "x": 0.097921,
+        "y": 0.277361
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-U6305",
+      "designator": "U6305",
+      "category": "ic",
+      "source_point": {
+        "x": 82.641,
+        "y": 360.338
+      },
+      "center": {
+        "x": 0.087369,
+        "y": 0.37802
+      },
+      "source_status": "decoded_pdf_text"
+    },
+    {
+      "component_id": "XK67J-MAIN-P1-U6306",
+      "designator": "U6306",
+      "category": "ic",
+      "source_point": {
+        "x": 552.171,
+        "y": 491.828
+      },
+      "center": {
+        "x": 0.802288,
+        "y": 0.062434
+      },
+      "source_status": "decoded_pdf_text"
+    }
+  ]
+}

@@ -1,0 +1,568 @@
+[
+  {
+    "source_id": "SRC-20260604-001",
+    "file_name": "器件维修培训.docx",
+    "original_path": "C:/Users/Mercurluto/Downloads/器件维修培训.docx",
+    "file_type": "Word",
+    "received_date": "2026-06-04",
+    "main_category": "培训资料库",
+    "secondary_categories": [
+      "维修边界库",
+      "缺口与需求库"
+    ],
+    "related_models": [],
+    "related_faults": [],
+    "related_components": [
+      "CPU",
+      "EMMC",
+      "PMU"
+    ],
+    "related_tools": [
+      "植锡钢网",
+      "直流电源",
+      "万用表",
+      "电烙铁",
+      "热风枪",
+      "放大镜"
+    ],
+    "summary": "器件维修培训资料，包含器件维修计划、所需设备、人员认证、试点网点计划，以及 CRM、Escalation、PO、多维表格记录等维修流程经验。",
+    "extractable_items": [
+      "器件维修试点计划",
+      "必备工具清单",
+      "人员认证门槛",
+      "CRM 录单规则",
+      "Escalation 提交流程",
+      "缺料 PO 流程",
+      "主板维修员 AssignedTo 要求",
+      "多维表格维修记录要求"
+    ],
+    "missing_fields": [
+      "13 项技能认证明细",
+      "各认证项目的通过标准",
+      "各网点实际培训完成状态",
+      "器件维修试点对应的具体故障范围"
+    ],
+    "target_knowledge_base": [
+      "training-materials",
+      "repair-boundaries",
+      "gap-requests"
+    ],
+    "processing_status": "已归类并完成第一版结构化入库",
+    "notes": "该文件更偏能力建设和流程管理，不是具体故障诊断 SOP。"
+  },
+  {
+    "source_id": "SRC-20260604-002",
+    "file_name": "2025 主板培训标准.docx",
+    "original_path": "C:/Users/Mercurluto/Downloads/2025 主板培训标准.docx",
+    "file_type": "Word",
+    "received_date": "2026-06-04",
+    "main_category": "培训资料库",
+    "secondary_categories": [
+      "维修边界库",
+      "缺口与需求库"
+    ],
+    "related_models": [],
+    "related_faults": [],
+    "related_components": [],
+    "related_tools": [],
+    "summary": "2025 主板培训标准，定义 L4 场所、培训资料、培训方式、培训目标、培训结果呈现、质量监控和不达标网点通报规则。",
+    "extractable_items": [
+      "L4 定义",
+      "全球 L4 清单说明",
+      "L4 故障检测和常用工具资料入口",
+      "点胶主板维修及除胶资料入口",
+      "BGA 重新焊接基础操作资料入口",
+      "5S 标准资料入口",
+      "培训方式",
+      "培训目标",
+      "培训后结果呈现要求",
+      "培训质量监控指标",
+      "不达标网点定义",
+      "通报规则"
+    ],
+    "missing_fields": [
+      "完整全球 L4 清单表",
+      "L4 故障检测和常用工具原文",
+      "点胶主板维修及除胶资料",
+      "BGA 重新焊接基础操作资料",
+      "除胶视频",
+      "L4 主板维修 5S 建设资料",
+      "培训完成后每个维修员的技能打分字段"
+    ],
+    "target_knowledge_base": [
+      "training-materials",
+      "repair-boundaries",
+      "gap-requests"
+    ],
+    "processing_status": "已归类并完成第一版结构化入库",
+    "notes": "该文件是 L4 能力建设总纲，可作为第一阶段售后场景知识库的培训与指标基线。"
+  },
+  {
+    "source_id": "SRC-20260604-003",
+    "file_name": "手机EE原理介绍.pptx",
+    "original_path": "C:/Users/Mercurluto/Downloads/手机EE原理介绍.pptx",
+    "file_type": "PowerPoint",
+    "received_date": "2026-06-04",
+    "main_category": "培训资料库",
+    "secondary_categories": [
+      "模块原理库",
+      "故障知识库",
+      "器件与点位库"
+    ],
+    "related_models": [],
+    "related_faults": [
+      "不开机",
+      "不充电",
+      "快充异常",
+      "电池识别异常",
+      "无服务",
+      "显示异常",
+      "摄像头异常",
+      "音频异常"
+    ],
+    "related_components": [
+      "PMIC",
+      "Charge IC",
+      "Charge Pump",
+      "CPU",
+      "Battery BTB",
+      "RF IC",
+      "Camera",
+      "LCD",
+      "Sensor"
+    ],
+    "related_tools": [],
+    "summary": "手机 EE 工作原理培训资料，覆盖充电、供电、电池 BTB、USB、摄像头、显示、音频、Sensor、射频等模块原理。该资料适合作为第一阶段知识库中“模块原理说明”和后续诊断 SOP 的基础素材。",
+    "extractable_items": [
+      "标准充电链路原理",
+      "快充和电荷泵原理",
+      "电池 BTB 信号说明",
+      "USB 及 I2C 复用链路说明",
+      "供电模块基础说明",
+      "摄像头 / 显示 / 音频 / Sensor / 射频模块原理",
+      "关键 IC 和信号名称"
+    ],
+    "missing_fields": [
+      "每个模块的完整高清原理图或点位图",
+      "各机型对应的正常电压 / 阻值 / 波形范围",
+      "模块原理到故障诊断步骤的正式转译",
+      "PPT 中图片和示意图的结构化解析"
+    ],
+    "target_knowledge_base": [
+      "training-materials",
+      "module-principles",
+      "gap-requests"
+    ],
+    "processing_status": "已归类并完成第一版结构化入库",
+    "notes": "该资料偏原理培训，不应直接当作维修 SOP 使用；需要制造中心或技术支持把原理转化为测试点、判断条件和操作步骤。"
+  },
+  {
+    "source_id": "SRC-20260604-004",
+    "file_name": "漏电流和待机电流异常分析.docx",
+    "original_path": "C:/Users/Mercurluto/Downloads/漏电流和待机电流异常分析.docx",
+    "file_type": "Word",
+    "received_date": "2026-06-04",
+    "main_category": "故障知识库",
+    "secondary_categories": [
+      "诊断SOP库",
+      "培训资料库",
+      "案例素材库"
+    ],
+    "related_models": [],
+    "related_faults": [
+      "关机漏电流偏大",
+      "飞行模式待机电流偏大",
+      "待机功耗偏大",
+      "功耗不良"
+    ],
+    "related_components": [
+      "Charge IC",
+      "PMIC",
+      "VBAT",
+      "VBAT_SYS",
+      "BUCK",
+      "LDO"
+    ],
+    "related_tools": [
+      "程控电源",
+      "万用表",
+      "红外热像仪",
+      "串口工具",
+      "日志抓取工具"
+    ],
+    "summary": "电流异常学习总结，围绕关机漏电流偏大和飞行模式待机电流偏大，给出原因分析、检测方法、软件与硬件区分思路，以及触摸感知、红外热像、压差法、电流倒灌法等定位方法。",
+    "extractable_items": [
+      "关机漏电流异常原因",
+      "飞行模式待机电流异常原因",
+      "程控电源检测方法",
+      "Charge IC VBAT 与 VBAT_SYS 后级区分思路",
+      "软件 / 驱动未进入飞行模式的排查路径",
+      "红外热像定位方法",
+      "压差法",
+      "电流倒灌法",
+      "BUCK / LDO 支路对比数据"
+    ],
+    "missing_fields": [
+      "各机型关机漏电流标准阈值",
+      "各机型飞行模式待机电流标准阈值",
+      "各平台飞行模式串口命令和 Log 判定规则",
+      "各 BUCK / LDO 支路正常电流范围",
+      "完整维修案例照片和修后验证记录"
+    ],
+    "target_knowledge_base": [
+      "fault-knowledge",
+      "sop-drafts",
+      "training-materials",
+      "gap-requests"
+    ],
+    "processing_status": "已归类并完成第一版结构化入库",
+    "notes": "这是当前最接近可执行诊断 SOP 的资料，适合优先让技术支持或制造中心确认后转成正式流程。"
+  },
+  {
+    "source_id": "SRC-20260604-005",
+    "file_name": "手机维修分析培训_20190510.pptx",
+    "original_path": "C:/Users/Mercurluto/Downloads/手机维修分析培训_20190510.pptx",
+    "file_type": "PowerPoint",
+    "received_date": "2026-06-04",
+    "main_category": "培训资料库",
+    "secondary_categories": [
+      "模块原理库",
+      "Log分析知识库",
+      "流程规范库",
+      "故障知识库"
+    ],
+    "related_models": [],
+    "related_faults": [
+      "不开机",
+      "无服务",
+      "显示异常",
+      "触控异常",
+      "产线异常"
+    ],
+    "related_components": [
+      "PMIC",
+      "CPU",
+      "FLASH",
+      "26M 晶振",
+      "RF IC",
+      "LCD",
+      "CTP"
+    ],
+    "related_tools": [
+      "MES",
+      "META 工具",
+      "Log 抓取工具"
+    ],
+    "summary": "手机维修分析培训资料，内容包括 MES 维修录入规范、META 工具使用、手机原理讲解、Log 抓取、封胶不良品返工、常用维修分析手法和产线异常反馈。",
+    "extractable_items": [
+      "MES 维修录入规范",
+      "META 工具使用说明",
+      "基带开机原理",
+      "开机硬件逻辑顺序",
+      "射频收发原理",
+      "LCD / CTP 电路基础",
+      "Log 抓取操作",
+      "常用维修分析手法",
+      "产线异常问题反馈规则"
+    ],
+    "missing_fields": [
+      "META 工具完整操作步骤",
+      "Log 抓取工具版本和平台差异",
+      "MES 录入字段模板",
+      "封胶不良品返工的正式边界和风险控制",
+      "常用维修分析手法对应的案例样本"
+    ],
+    "target_knowledge_base": [
+      "training-materials",
+      "module-principles",
+      "gap-requests"
+    ],
+    "processing_status": "已归类并完成第一版结构化入库",
+    "notes": "该资料是维修分析培训总览，适合拆成培训路径、模块原理和工具操作入口；其中 MES / META / Log 内容需要继续下钻。"
+  },
+  {
+    "source_id": "SRC-20260622-001",
+    "file_name": "WO_Serialized_Report_2068984729568735233.xlsx",
+    "original_path": "D:/Feishu/WO_Serialized_Report_2068984729568735233.xlsx",
+    "file_type": "Excel",
+    "received_date": "2026-06-22",
+    "main_category": "维修报告库",
+    "secondary_categories": [
+      "案例素材库",
+      "故障知识库",
+      "优先级规划库",
+      "缺口与需求库"
+    ],
+    "related_models": [
+      "BG6m",
+      "KM4",
+      "KL4",
+      "CM6",
+      "KL5",
+      "KM5",
+      "C671L",
+      "A6611L",
+      "KM7",
+      "CL6k"
+    ],
+    "related_faults": [
+      "PWR01-No power on",
+      "CLA01-No signal/No Service/No network",
+      "PWR07-Restart",
+      "PWR02-Power on stopped at Logo",
+      "CHG01-Can not charging",
+      "420-Memory Failure",
+      "400-CPU Failure",
+      "410-PMU Failure",
+      "430-RF IC Failure",
+      "461-Charger IC Failure"
+    ],
+    "related_components": [
+      "Memory",
+      "CPU",
+      "PMU",
+      "RF IC",
+      "Charger IC",
+      "Resistor/Capacitor/Inductor"
+    ],
+    "related_tools": [],
+    "summary": "CI L4 PCBA 维修工单报告，共识别 4705 条记录，包含国家、仓库、维修状态、机型、故障现象、故障归因、维修动作、消耗物料等字段。该文件含 IMEI、序列号、技师姓名和工单号等敏感字段，因此当前只沉淀脱敏统计摘要，不保存原始明细。",
+    "extractable_items": [
+      "L4 PCBA 维修量",
+      "维修状态分布",
+      "高频机型",
+      "高频故障现象",
+      "高频故障归因",
+      "维修动作分布",
+      "消耗物料分布",
+      "机型与故障交叉统计"
+    ],
+    "missing_fields": [
+      "Memory Failure / CPU Failure / PMU Failure 等故障分类的判定标准",
+      "高频机型对应的测试点正常值",
+      "高频故障的真实维修过程、照片、测量数据和修后验证记录",
+      "Non Repairable / Damage / Semi-manufactured 等状态的业务含义",
+      "IC Replaced 等维修动作对应的工艺参数和验收标准"
+    ],
+    "target_knowledge_base": [
+      "repair-report-summaries",
+      "gap-requests"
+    ],
+    "processing_status": "已完成脱敏汇总入库，未入库原始明细",
+    "notes": "该报告适合用于确定第一阶段优先机型和优先故障，不应直接当作诊断 SOP 使用。"
+  },
+  {
+    "source_id": "SRC-20260701-001",
+    "file_name": "手机维修通用操作指导书.docx",
+    "original_path": "D:/Feishu/手机维修通用操作指导书.docx",
+    "stored_path": "source-materials/manufacturing-center/2026-07-01_MTK_手机维修通用操作指导书.docx",
+    "file_type": "Word",
+    "received_date": "2026-07-01",
+    "main_category": "平台维修手册库",
+    "secondary_categories": [
+      "培训资料库",
+      "模块原理库",
+      "诊断SOP库",
+      "器件与点位库",
+      "故障知识库"
+    ],
+    "related_models": [],
+    "related_platforms": [
+      "MTK"
+    ],
+    "related_faults": [
+      "不开机",
+      "不充电",
+      "快充异常",
+      "Memory Failure",
+      "CPU Failure",
+      "PMU Failure",
+      "无服务",
+      "GPS异常",
+      "WIFI异常",
+      "显示异常",
+      "触摸异常",
+      "摄像头异常",
+      "SIM卡异常",
+      "USB异常",
+      "音频异常",
+      "指纹异常"
+    ],
+    "related_components": [
+      "MTK CPU",
+      "PMU",
+      "Charge IC",
+      "Charge Pump",
+      "UFS",
+      "LPDDR",
+      "RF Transceiver",
+      "WCN",
+      "LCD/AMOLED",
+      "TP",
+      "Camera",
+      "Sensor",
+      "SIM",
+      "USB Type-C",
+      "Audio"
+    ],
+    "related_tools": [
+      "直流稳压电源",
+      "频谱仪",
+      "WBG工位",
+      "万用表",
+      "示波器"
+    ],
+    "summary": "制造中心提供的 MTK 平台手机维修通用操作指导书，版本 V1.0。内容包含产品简介、主板/副板元器件位置图、手机原理、开机电源、充电、时钟、Memory、射频、显示、触摸、摄像头、传感器、按键、音频、SIM、USB、BT、FM、NFC、指纹和红外等模块的原理说明、故障分析处理流程和信号汇总。",
+    "extractable_items": [
+      "MTK 平台维修手册章节结构",
+      "开机故障电流分型",
+      "充电与快充故障分析基础",
+      "Memory / UFS / LPDDR 信号说明",
+      "射频接收/发射/GPS/WIFI 通路说明",
+      "显示、触摸、摄像头、传感器、音频、SIM、USB 等外围电路故障处理流程",
+      "138 条信号名称、功能说明和测试参考值"
+    ],
+    "missing_fields": [
+      "图片、电路图、流程图和波形图的结构化解析",
+      "各故障流程对应的标准操作步骤和判定条件",
+      "适用机型范围和不适用边界",
+      "修后验证标准",
+      "与 L4 工单故障代码的正式映射关系"
+    ],
+    "target_knowledge_base": [
+      "platform-repair-manuals",
+      "mtk-signal-reference",
+      "module-principles",
+      "sop-drafts",
+      "gap-requests"
+    ],
+    "processing_status": "已保存原始文件并完成第一版结构化入库",
+    "notes": "这是当前项目最重要的平台级维修资料之一。正式给海外维修员使用前，需要继续完成流程转译、图片结构化和工程确认。"
+  },
+  {
+    "source_id": "SRC-20260702-001",
+    "file_name": "top20机型中内研的11个.zip",
+    "original_path": "D:/Feishu/top20机型中内研的11个.zip",
+    "stored_path": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20",
+    "file_type": "Archive",
+    "received_date": "2026-07-02",
+    "main_category": "机型资料库",
+    "secondary_categories": [
+      "器件与点位库",
+      "平台维修手册库",
+      "诊断SOP库",
+      "缺口与需求库"
+    ],
+    "related_models": [
+      "BG6m",
+      "X6880",
+      "CK6N",
+      "BG6h",
+      "KL4",
+      "CM5",
+      "CM6",
+      "CLA5",
+      "KJ5",
+      "KM7K",
+      "KM4"
+    ],
+    "related_faults": [],
+    "related_components": [],
+    "related_tools": [],
+    "summary": "制造中心提供的 Top20 内研项目资料包，共 11 个机型/项目包，包含维修操作指导书、主/副板维修原理图、主/副板位号图和少量对照表。外研项目资料制造中心同事反馈无法提供。",
+    "extractable_items": [
+      "机型级维修指导书",
+      "主板维修原理图",
+      "主板位号图 / 零件位号图",
+      "副板维修原理图",
+      "部分副板位号图",
+      "部分机型差异或对照表",
+      "主板版本信息"
+    ],
+    "missing_fields": [
+      "外研 Top20 机型资料",
+      "主板实物正反面高清照片",
+      "BOM 和器件替代表",
+      "真实维修案例、测量数据和修后验证记录",
+      "机型维修边界和可下放范围",
+      "图纸版本适用范围的工程确认",
+      "部分压缩包中文文件名需要规范化"
+    ],
+    "target_knowledge_base": [
+      "model-board-assets",
+      "inhouse-top20-materials",
+      "sop-drafts",
+      "gap-requests"
+    ],
+    "processing_status": "已完成资料包解包和清单登记，待结构化抽取",
+    "notes": "该资料包显著提升机型资料库完整度，但仍不能直接等同于海外可执行 SOP，需要继续做章节抽取、图纸映射和工程确认。"
+  },
+  {
+    "source_id": "SRC-20260710-001",
+    "file_name": "Desktop manual service-manual library",
+    "original_path": "C:/Users/Mercurluto/Desktop/manual",
+    "stored_path": "source-materials/service-manual-library/2026-07-10-desktop-manual/files",
+    "file_type": "Folder (PDF, DOCX, DOC, JPG)",
+    "received_date": "2026-07-10",
+    "main_category": "机型维修手册库",
+    "secondary_categories": [
+      "主板视觉资料库",
+      "培训资料库",
+      "机型资料库",
+      "拆装与结构资料库"
+    ],
+    "related_models": [
+      "KM4",
+      "KL4",
+      "CLA5",
+      "KJ5",
+      "CM5",
+      "CM6",
+      "X6880"
+    ],
+    "related_model_count": 96,
+    "related_faults": [],
+    "related_components": [],
+    "related_tools": [],
+    "summary": "Milo 提供的大型 TECNO / Infinix Service Manual 资料库。共收到 125 个源文件，SHA-256 去重后保存 119 份唯一文件，约 1.437 GB；包含 86 份 PDF、26 份 DOCX、3 份 DOC 和 10 张 JPG。全部文件通过基础格式或解析检查，86 份 PDF 合计约 1404 页。前 12 页抽样检查中，110 条文件记录已检测到 PCB、main board、schematic、circuit 等主板相关词。",
+    "extractable_items": [
+      "机型级 Service Manual",
+      "手册内嵌主板和副板图片候选",
+      "拆机步骤和部件位置",
+      "主板模块和连接器上下文",
+      "机型别名和外观识别参考",
+      "视觉识别 Demo 的参考图片候选"
+    ],
+    "missing_fields": [
+      "逐手册主板版本和项目代号映射",
+      "主板实物图片所在页和正反面标签",
+      "手册图片与现有位号图的对应关系",
+      "视觉识别训练样本的授权和标注状态",
+      "每份手册可直接用于维修 SOP 的章节边界"
+    ],
+    "target_knowledge_base": [
+      "service-manual-library-2026-07-10",
+      "model-board-assets",
+      "training-materials",
+      "source-records"
+    ],
+    "processing_status": "已完成项目本地原件复制、SHA-256 去重、完整性验证和第一版机型索引；待按优先机型深度抽取",
+    "extraction_progress": {
+      "priority_models_completed": [
+        "KM4",
+        "KL4",
+        "CLA5",
+        "KJ5",
+        "CM5",
+        "CM6",
+        "X6880"
+      ],
+      "source_pages_extracted": 26,
+      "embedded_image_candidates": 96,
+      "approved_reference_images": 21,
+      "standard_main_board_front_back_pairs": 0,
+      "gallery_manifest": "knowledge-base/vision-reference-gallery.json"
+    },
+    "notes": "1.437 GB 二进制原件保存在项目本地 source-materials 目录并排除 Git 历史；Git 跟踪完整清单、哈希、重复映射和解析结果。Service Manual 可补充实物外观、拆装和模块上下文，但不替代 Placement 位号图或 SCH 原理图。"
+  }
+]

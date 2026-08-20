@@ -1,0 +1,334 @@
+{
+  "schema_version": "H897-PHYSICAL-REGISTRATION-REVIEW-V1",
+  "review_id": "H897-KJ6-REGISTRATION-REVIEW-20260802",
+  "board_key": "kj6-h897",
+  "board_id": "BOARD-H897-MAIN-V1.2",
+  "physical_board_revision": "H897 V1.2",
+  "engineering_board_revision": "H897_MAIN_PCB_V1.2",
+  "status": "reviewed_board_coordinate_registration",
+  "threshold_policy": "no_industrial_pass_threshold_declared",
+  "field_accuracy_claim_allowed": false,
+  "images": [
+    {
+      "sha256": "5b8ffe55f4a2c285e4d85fcddc9acdbb459e8d1ed3760a0370a807617e476f48",
+      "side_id": "main_page_1",
+      "source_dimensions": {
+        "width": 3024,
+        "height": 4032
+      },
+      "registration_transform": "rotate_90_counterclockwise",
+      "registration_dimensions": {
+        "width": 4032,
+        "height": 3024
+      },
+      "capture_geometry_id": "H897-KJ6-PAGE1-CAPTURE-01-ROTATED-CCW",
+      "view_scope": "full_board_repair_case",
+      "source_annotation_present": false,
+      "source_annotation_role": null,
+      "automatic_registration": {
+        "status": "not_used",
+        "reason": "reviewed_manual_registration_selected_for_first_exact_hash_pair"
+      },
+      "registration_status": "reviewed_manual_registration",
+      "registration_review": {
+        "method": "reviewed_manual_four_point",
+        "review_status": "reviewed",
+        "review_scope": "board_coordinate_alignment",
+        "selection_basis": "reviewed_outline_and_visible_mechanical_correspondence",
+        "board_to_image_matrix": [
+          1.124433594,
+          0.010344993,
+          -0.053902676,
+          0.003706433,
+          1.120934203,
+          -0.084248316,
+          0.114163196,
+          -0.026309951,
+          1.0
+        ],
+        "solve_anchors": [
+          {
+            "landmark_id": "outline_upper_left",
+            "label": "Upper-left board outline",
+            "selection_basis": "reviewed_outline_correspondence",
+            "board": {
+              "x": 0.055,
+              "y": 0.2
+            },
+            "image": {
+              "x": 0.01,
+              "y": 0.14
+            }
+          },
+          {
+            "landmark_id": "outline_upper_right",
+            "label": "Upper-right board outline",
+            "selection_basis": "reviewed_outline_correspondence",
+            "board": {
+              "x": 0.954,
+              "y": 0.2
+            },
+            "image": {
+              "x": 0.925,
+              "y": 0.13
+            }
+          },
+          {
+            "landmark_id": "outline_lower_right",
+            "label": "Lower-right board outline",
+            "selection_basis": "reviewed_outline_correspondence",
+            "board": {
+              "x": 0.955,
+              "y": 0.952
+            },
+            "image": {
+              "x": 0.95,
+              "y": 0.91
+            }
+          },
+          {
+            "landmark_id": "outline_lower_left",
+            "label": "Lower-left board outline",
+            "selection_basis": "reviewed_outline_correspondence",
+            "board": {
+              "x": 0.045,
+              "y": 0.795
+            },
+            "image": {
+              "x": 0.005,
+              "y": 0.82
+            }
+          }
+        ],
+        "independent_check_points": [
+          {
+            "landmark_id": "j6210_center",
+            "label": "J6210 connector center",
+            "selection_basis": "reviewed_visible_landmark",
+            "board": {
+              "x": 0.501326,
+              "y": 0.436234
+            },
+            "image": {
+              "x": 0.468,
+              "y": 0.385
+            },
+            "projected_error": 0.024117
+          },
+          {
+            "landmark_id": "upper_shield_hole",
+            "label": "Upper shield mechanical hole",
+            "selection_basis": "reviewed_visible_landmark",
+            "board": {
+              "x": 0.697,
+              "y": 0.287
+            },
+            "image": {
+              "x": 0.691,
+              "y": 0.21
+            },
+            "projected_error": 0.015778
+          },
+          {
+            "landmark_id": "sim_cage_upper_left",
+            "label": "SIM cage upper-left corner",
+            "selection_basis": "reviewed_visible_landmark",
+            "board": {
+              "x": 0.065,
+              "y": 0.535
+            },
+            "image": {
+              "x": 0.02,
+              "y": 0.51
+            },
+            "projected_error": 0.01037
+          }
+        ],
+        "error": {
+          "unit": "normalized_image_plane",
+          "rms": 0.017684,
+          "maximum": 0.024117,
+          "threshold_status": "not_declared",
+          "technical_guardrail": {
+            "purpose": "board_coordinate_association_only",
+            "maximum_normalized_check_error": 0.05,
+            "status": "passed"
+          }
+        },
+        "review_note": "The EXIF-normalized photograph was rotated counterclockwise and aligned to the Placement page-1 outline. J6210 and two independent visible mechanical landmarks were used only to check board-coordinate association.",
+        "field_accuracy_claim_allowed": false
+      }
+    },
+    {
+      "sha256": "a862ecee11e683562ccfdc9a7743d813accfd37235e0267665bf32b44d9fe491",
+      "side_id": "main_page_2",
+      "source_dimensions": {
+        "width": 4032,
+        "height": 3024
+      },
+      "registration_transform": "none",
+      "registration_dimensions": {
+        "width": 4032,
+        "height": 3024
+      },
+      "capture_geometry_id": "H897-KJ6-PAGE2-CAPTURE-01",
+      "view_scope": "full_board_repair_case",
+      "source_annotation_present": false,
+      "source_annotation_role": null,
+      "automatic_registration": {
+        "status": "not_used",
+        "reason": "reviewed_manual_registration_selected_for_first_exact_hash_pair"
+      },
+      "registration_status": "reviewed_manual_registration",
+      "registration_review": {
+        "method": "reviewed_manual_four_point",
+        "review_status": "reviewed",
+        "review_scope": "board_coordinate_alignment",
+        "selection_basis": "reviewed_outline_and_visible_connector_correspondence",
+        "board_to_image_matrix": [
+          0.996191968,
+          0.00909485,
+          0.003440036,
+          0.001304856,
+          1.107012876,
+          -0.093684894,
+          -0.022089362,
+          0.03179415,
+          1.0
+        ],
+        "solve_anchors": [
+          {
+            "landmark_id": "outline_upper_left",
+            "label": "Upper-left board outline",
+            "selection_basis": "reviewed_outline_correspondence",
+            "board": {
+              "x": 0.05,
+              "y": 0.23
+            },
+            "image": {
+              "x": 0.055,
+              "y": 0.16
+            }
+          },
+          {
+            "landmark_id": "outline_upper_right",
+            "label": "Upper-right board outline",
+            "selection_basis": "reviewed_outline_correspondence",
+            "board": {
+              "x": 0.95,
+              "y": 0.235
+            },
+            "image": {
+              "x": 0.965,
+              "y": 0.17
+            }
+          },
+          {
+            "landmark_id": "outline_lower_right",
+            "label": "Lower-right board outline",
+            "selection_basis": "reviewed_outline_correspondence",
+            "board": {
+              "x": 0.96,
+              "y": 0.94
+            },
+            "image": {
+              "x": 0.96,
+              "y": 0.94
+            }
+          },
+          {
+            "landmark_id": "outline_lower_left",
+            "label": "Lower-left board outline",
+            "selection_basis": "reviewed_outline_correspondence",
+            "board": {
+              "x": 0.05,
+              "y": 0.93
+            },
+            "image": {
+              "x": 0.06,
+              "y": 0.91
+            }
+          }
+        ],
+        "independent_check_points": [
+          {
+            "landmark_id": "j6204_center",
+            "label": "J6204 connector center",
+            "selection_basis": "reviewed_visible_landmark",
+            "board": {
+              "x": 0.369571,
+              "y": 0.460008
+            },
+            "image": {
+              "x": 0.386,
+              "y": 0.436
+            },
+            "projected_error": 0.025921
+          },
+          {
+            "landmark_id": "j6101_center",
+            "label": "J6101 connector center",
+            "selection_basis": "reviewed_visible_landmark",
+            "board": {
+              "x": 0.390593,
+              "y": 0.906658
+            },
+            "image": {
+              "x": 0.356,
+              "y": 0.908
+            },
+            "projected_error": 0.039991
+          },
+          {
+            "landmark_id": "j6401_center",
+            "label": "J6401 connector center",
+            "selection_basis": "reviewed_visible_landmark",
+            "board": {
+              "x": 0.597696,
+              "y": 0.906658
+            },
+            "image": {
+              "x": 0.605,
+              "y": 0.91
+            },
+            "projected_error": 0.015082
+          },
+          {
+            "landmark_id": "j2801_center",
+            "label": "J2801 connector center",
+            "selection_basis": "reviewed_visible_landmark",
+            "board": {
+              "x": 0.716225,
+              "y": 0.906658
+            },
+            "image": {
+              "x": 0.718,
+              "y": 0.91
+            },
+            "projected_error": 0.010971
+          }
+        ],
+        "error": {
+          "unit": "normalized_image_plane",
+          "rms": 0.025588,
+          "maximum": 0.039991,
+          "threshold_status": "not_declared",
+          "technical_guardrail": {
+            "purpose": "board_coordinate_association_only",
+            "maximum_normalized_check_error": 0.05,
+            "status": "passed"
+          }
+        },
+        "review_note": "The full-board photograph was aligned to the Placement page-2 outline and checked against four visible connectors. Shielded package identities were not used as registration evidence.",
+        "field_accuracy_claim_allowed": false
+      }
+    }
+  ],
+  "downstream_admission": {
+    "golden_sample": false,
+    "defect_label": false,
+    "training_data": false,
+    "repair_causality": false
+  },
+  "accuracy_boundary": "Reviewed registration supports board-coordinate navigation for these exact image hashes. It does not establish industrial measurement accuracy, a normal-board Golden Sample, a defect label, training admission, or repair causality."
+}

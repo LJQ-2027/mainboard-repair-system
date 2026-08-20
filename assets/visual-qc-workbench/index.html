@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>主板视觉数据工作台</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="app-header">
+    <div>
+      <span class="eyebrow">内部数据管理 · 配准、标注与训练证据</span>
+      <h1>主板视觉数据工作台</h1>
+    </div>
+    <div class="header-status">
+      <span id="saveStatus" class="status-dot">尚未建立案例</span>
+      <span id="actorRoleLabel" class="role-label">正在确认身份</span>
+      <button id="serverCasesButton" class="text-button" type="button" hidden>服务器案例</button>
+      <button id="savedCasesButton" class="text-button" type="button">本机草稿</button>
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <section class="source-bar" aria-label="案例来源">
+      <label>
+        <span>主板平台</span>
+        <select id="boardSelect"></select>
+      </label>
+      <fieldset id="sideSelector">
+        <legend>板面</legend>
+      </fieldset>
+      <label>
+        <span>采集阶段</span>
+        <select id="captureStage">
+          <option value="golden_reference">正常板基准</option>
+          <option value="before_repair" selected>维修前</option>
+          <option value="after_repair">维修后</option>
+        </select>
+      </label>
+      <div class="source-actions">
+        <input id="imageInput" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+        <button id="chooseImageButton" class="primary-button" type="button">导入实拍图</button>
+        <button id="proxyButton" class="secondary-button" type="button" hidden>载入代理样本</button>
+        <input id="caseImportInput" type="file" accept="application/json,.json" hidden>
+        <button id="importCaseButton" class="icon-button" type="button" title="导入案例 JSON" aria-label="导入案例 JSON">↑</button>
+      </div>
+    </section>
+
+    <section class="workbench">
+      <div class="visual-workspace">
+        <div class="mode-toolbar">
+          <div class="segmented" role="tablist" aria-label="工作模式">
+            <button id="registrationModeButton" role="tab" aria-selected="true" type="button">图片配准</button>
+            <button id="annotationModeButton" role="tab" aria-selected="false" type="button" disabled>缺陷标注</button>
+          </div>
+          <div id="registrationTools" class="tool-group" aria-label="配准工具">
+            <button data-registration-tool="anchor" aria-pressed="true" type="button">锚点</button>
+            <button data-registration-tool="check" aria-pressed="false" type="button" disabled>检查点</button>
+            <button data-registration-tool="pan" aria-pressed="false" type="button">平移</button>
+          </div>
+          <div id="annotationTools" class="tool-group" aria-label="标注工具" hidden>
+            <button data-annotation-tool="rectangle" aria-pressed="true" type="button">矩形</button>
+            <button data-annotation-tool="polygon" aria-pressed="false" type="button">多边形</button>
+            <button data-annotation-tool="pan" aria-pressed="false" type="button">平移</button>
+            <button id="finishPolygonButton" type="button" disabled>闭合</button>
+          </div>
+          <div class="view-actions">
+            <button id="zoomOutButton" class="icon-button" type="button" title="缩小" aria-label="缩小">−</button>
+            <button id="zoomInButton" class="icon-button" type="button" title="放大" aria-label="放大">+</button>
+            <button id="resetViewButton" class="icon-button" type="button" title="重置视图" aria-label="重置视图">↻</button>
+            <button id="undoButton" class="icon-button" type="button" title="撤销" aria-label="撤销" disabled>↶</button>
+            <button id="redoButton" class="icon-button" type="button" title="重做" aria-label="重做" disabled>↷</button>
+          </div>
+        </div>
+
+        <div class="canvas-grid">
+          <figure class="canvas-pane">
+            <figcaption>
+              <strong>工程点位图</strong>
+              <span id="boardCanvasMeta">正在载入</span>
+            </figcaption>
+            <div class="canvas-wrap">
+              <canvas id="boardCanvas" aria-label="工程点位图配准画布"></canvas>
+              <div id="boardEmpty" class="canvas-empty">正在准备点位图</div>
+            </div>
+          </figure>
+          <figure class="canvas-pane">
+            <figcaption>
+              <strong>实拍图与叠图</strong>
+              <span id="photoCanvasMeta">尚未导入图片</span>
+            </figcaption>
+            <div id="photoDropZone" class="canvas-wrap drop-zone">
+              <canvas id="photoCanvas" aria-label="实拍图配准与缺陷标注画布"></canvas>
+              <button id="photoEmpty" class="canvas-empty empty-action" type="button">导入主板图片</button>
+            </div>
+          </figure>
+        </div>
+
+        <div class="canvas-footer">
+          <span id="interactionPrompt">请先导入一张主板图片</span>
+          <label>
+            <span>叠图</span>
+            <input id="overlayOpacity" type="range" min="0" max="70" value="32" disabled>
+          </label>
+        </div>
+      </div>
+
+      <aside class="inspection-panel" aria-label="QC 案例详情">
+        <section id="captureIntakeSection" class="panel-section capture-intake-section">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">实物采集</span>
+              <h2 id="captureSessionTitle">等待实拍图</h2>
+            </div>
+            <span id="captureSessionBadge" class="badge neutral">未开始</span>
+          </div>
+          <p id="captureSessionSummary" class="source-note">导入后建立本块主板的正反面采集批次。</p>
+          <fieldset id="captureChecklist" class="capture-checklist">
+            <legend>拍摄确认</legend>
+            <label>
+              <input type="checkbox" data-capture-check="board_and_side_confirmed">
+              <span>整板入镜，板面无误</span>
+            </label>
+            <label>
+              <input type="checkbox" data-capture-check="focus_and_lens_confirmed">
+              <span>镜头清洁，对焦清晰</span>
+            </label>
+            <label>
+              <input type="checkbox" data-capture-check="lighting_and_occlusion_confirmed">
+              <span>光线均匀，没有遮挡</span>
+            </label>
+          </fieldset>
+          <div class="button-row capture-session-actions">
+            <button id="refreshCaptureSessionButton" class="secondary-button" type="button" disabled>刷新批次</button>
+            <button id="captureOtherSideButton" class="primary-button" type="button" disabled>采集另一面</button>
+          </div>
+        </section>
+
+        <section id="serverSyncSection" class="panel-section server-sync-section">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">服务器处理</span>
+              <h2 id="serverSyncTitle">等待图片</h2>
+            </div>
+            <span id="serverSyncBadge" class="badge neutral">本机</span>
+          </div>
+          <progress id="serverSyncProgress" max="100" value="0"></progress>
+          <p id="serverSyncDetail" class="source-note">请先通过受控交接命令传输，再从服务器案例恢复。</p>
+          <button id="serverSyncButton" class="primary-button full-button" type="button" hidden disabled>继续服务器处理</button>
+        </section>
+
+        <section class="panel-section">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">图像质量</span>
+              <h2 id="qualityTitle">等待图片</h2>
+            </div>
+            <span id="qualityBadge" class="badge neutral">未检测</span>
+          </div>
+          <dl class="metrics">
+            <div><dt>质量分</dt><dd id="qualityScore">—</dd></div>
+            <div><dt>分辨率</dt><dd id="qualityResolution">—</dd></div>
+            <div><dt>清晰度</dt><dd id="qualitySharpness">—</dd></div>
+          </dl>
+          <p id="qualityGuidance" class="source-note">导入后立即本机检查；服务器处理会保留独立质量证据。</p>
+        </section>
+
+        <section class="panel-section">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">配准审核</span>
+              <h2 id="registrationTitle">尚未配准</h2>
+            </div>
+            <span id="registrationBadge" class="badge neutral">草稿</span>
+          </div>
+          <div class="progress-rows">
+            <div><span>求解锚点</span><strong id="anchorCount">0 / 4</strong></div>
+            <div><span id="checkCountLabel">独立检查点</span><strong id="checkCount">0</strong></div>
+            <div><span>归一化 RMS</span><strong id="registrationError">—</strong></div>
+          </div>
+          <div class="button-row">
+            <button id="removeLastPairButton" class="secondary-button" type="button" disabled>移除上一组</button>
+            <button id="clearRegistrationButton" class="secondary-button" type="button" disabled>清除配准</button>
+            <button id="reviewRegistrationButton" class="primary-button" type="button" disabled>确认配准</button>
+          </div>
+        </section>
+
+        <section id="repairEvidenceSection" class="panel-section repair-evidence-section" hidden aria-labelledby="repairEvidenceTitle">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">维修案例证据</span>
+              <h2 id="repairEvidenceTitle">等待服务器案例</h2>
+            </div>
+            <span id="repairEvidenceBadge" class="badge neutral">未读取</span>
+          </div>
+          <p id="repairEvidenceSummary" class="source-note">只读关联不会形成视觉缺陷、Golden 或训练结论。</p>
+          <div id="repairEvidenceList" class="repair-evidence-list" aria-live="polite"></div>
+        </section>
+
+        <section id="comparisonSection" class="panel-section comparison-section">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">基准与差异</span>
+              <h2 id="comparisonTitle">等待已审核案例</h2>
+            </div>
+            <span id="comparisonBadge" class="badge neutral">未就绪</span>
+          </div>
+          <label class="full-field">
+            <span>拍摄工位</span>
+            <input id="captureSetupId" type="text" value="standard-bench" maxlength="128">
+          </label>
+          <p id="goldenSummary" class="source-note">选择固定拍摄工位后查询正常板基准。</p>
+          <label id="normalConfirmationField" class="check-field" hidden>
+            <input id="normalConfirmation" type="checkbox">
+            <span>已确认这是正常板</span>
+          </label>
+          <div class="button-row comparison-actions">
+            <button id="refreshGoldenButton" class="secondary-button" type="button" disabled>查询基准</button>
+            <button id="approveGoldenButton" class="primary-button" type="button" hidden disabled>批准为 Golden</button>
+            <button id="runDifferenceButton" class="primary-button" type="button" disabled>生成差异候选</button>
+          </div>
+          <figure id="heatmapFigure" class="heatmap-figure" hidden>
+            <figcaption>
+              <strong>差异热图</strong>
+              <span id="heatmapMeta">等待结果</span>
+            </figcaption>
+            <div class="heatmap-stage">
+              <img id="heatmapImage" alt="Golden Sample 差异候选热图">
+              <div id="heatmapOverlay" aria-hidden="true"></div>
+            </div>
+          </figure>
+          <div id="candidateList" class="candidate-list"></div>
+        </section>
+
+        <section id="annotationSection" class="panel-section" hidden>
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">人工缺陷标注</span>
+              <h2>当前板面</h2>
+            </div>
+            <span id="annotationCount" class="badge neutral">0 项</span>
+          </div>
+          <label class="full-field">
+            <span>缺陷类别</span>
+            <select id="defectCategory"></select>
+          </label>
+          <div id="annotationList" class="annotation-list"></div>
+          <button id="finalizeQcButton" class="primary-button full-button" type="button" disabled>完成人工 QC</button>
+        </section>
+
+        <section id="trainingDatasetSection" class="panel-section training-dataset-section" hidden>
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">数据管理</span>
+              <h2>已审核数据集</h2>
+            </div>
+            <span id="trainingCaseCount" class="badge neutral">0 案例</span>
+          </div>
+          <dl class="training-metrics">
+            <div><dt>合格标注</dt><dd id="trainingAnnotationCount">0</dd></div>
+            <div><dt>异常类别</dt><dd id="trainingCategoryCount">0</dd></div>
+            <div><dt>排除案例</dt><dd id="trainingExcludedCount">0</dd></div>
+          </dl>
+          <p id="trainingDatasetSummary" class="source-note">正在读取服务器训练门禁结果。</p>
+          <div id="trainingGateSummary" class="training-gate-summary" aria-live="polite"></div>
+          <details id="trainingGateCasesDisclosure" class="training-gate-cases" hidden>
+            <summary>排除案例明细 <span id="trainingGateCaseCount">0</span></summary>
+            <div id="trainingGateCaseList"></div>
+          </details>
+          <div class="button-row training-dataset-actions">
+            <button id="refreshTrainingDatasetButton" class="secondary-button" type="button">刷新</button>
+            <button id="downloadTrainingManifestButton" class="secondary-button" type="button" disabled>下载清单</button>
+            <button id="downloadTrainingCocoButton" class="primary-button" type="button" disabled>下载 COCO</button>
+            <button id="downloadTrainingBundleButton" class="primary-button" type="button" disabled>下载完整包</button>
+          </div>
+        </section>
+
+        <section id="localExportSection" class="panel-section export-section">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">本机数据</span>
+              <h2 id="qcResultTitle">待审核</h2>
+            </div>
+            <span id="qcResultBadge" class="badge neutral">needs_review</span>
+          </div>
+          <div class="button-row">
+            <button id="exportJsonButton" class="secondary-button" type="button" disabled>导出 JSON</button>
+            <button id="exportPngButton" class="secondary-button" type="button" disabled>导出标注图</button>
+          </div>
+          <p class="source-note">模型候选不会写成确认缺陷；训练集仍需通过 Python 数据门禁。</p>
+        </section>
+      </aside>
+    </section>
+  </main>
+
+  <dialog id="savedCasesDialog">
+    <div class="dialog-heading">
+      <h2>本机草稿</h2>
+      <button id="closeSavedCasesButton" class="icon-button" type="button" aria-label="关闭">×</button>
+    </div>
+    <div id="savedCasesList" class="saved-cases-list"></div>
+  </dialog>
+
+  <dialog id="serverCasesDialog" class="server-cases-dialog">
+    <div class="dialog-heading">
+      <div>
+        <span class="eyebrow">数据管理</span>
+        <h2>服务器案例</h2>
+      </div>
+      <button id="closeServerCasesButton" class="icon-button" type="button" aria-label="关闭">×</button>
+    </div>
+    <div class="server-case-toolbar">
+      <label>
+        <span>主板</span>
+        <select id="serverCaseBoardFilter"></select>
+      </label>
+      <label>
+        <span>板面</span>
+        <select id="serverCaseSideFilter"></select>
+      </label>
+      <label>
+        <span>采集阶段</span>
+        <select id="serverCaseStageFilter">
+          <option value="">全部</option>
+          <option value="golden_reference">正常板基准</option>
+          <option value="before_repair">维修前</option>
+          <option value="after_repair">维修后</option>
+        </select>
+      </label>
+      <label>
+        <span>状态</span>
+        <select id="serverCaseStateFilter">
+          <option value="">全部</option>
+          <option value="processing">处理中</option>
+          <option value="processing_failed">处理失败</option>
+          <option value="manual_registration_required">需人工配准</option>
+          <option value="registration_review_required">待确认配准</option>
+          <option value="ready_for_human_qc">待人工 QC</option>
+          <option value="completed">已完成</option>
+        </select>
+      </label>
+      <button id="refreshServerCasesButton" class="secondary-button" type="button">刷新</button>
+    </div>
+    <p id="serverCasesStatus" class="server-cases-status" aria-live="polite">等待读取</p>
+    <div id="serverCasesList" class="server-cases-list"></div>
+    <div class="server-case-pagination">
+      <button id="serverCasesPreviousButton" class="secondary-button" type="button" disabled>上一页</button>
+      <span id="serverCasesPageLabel">第 1 页</span>
+      <button id="serverCasesNextButton" class="secondary-button" type="button" disabled>下一页</button>
+    </div>
+  </dialog>
+
+  <template id="annotationTemplate">
+    <article class="annotation-item">
+      <button class="annotation-select" type="button">
+        <span class="annotation-swatch"></span>
+        <span><strong></strong><small></small></span>
+      </button>
+      <div class="annotation-actions">
+        <button data-status="confirmed" type="button">确认</button>
+        <button data-status="not_defect" type="button">排除</button>
+        <button data-action="delete" class="icon-button" type="button" aria-label="删除标注">×</button>
+      </div>
+    </article>
+  </template>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

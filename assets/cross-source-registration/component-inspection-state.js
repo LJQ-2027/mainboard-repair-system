@@ -1,0 +1,100 @@
+const IDLE_INSPECTION = Object.freeze({
+  mode: 'idle',
+  componentId: null,
+  sideId: null,
+  profileId: null,
+});
+
+function clamp(value, minimum, maximum) {
+  return Math.max(minimum, Math.min(maximum, value));
+}
+
+export function canInspectComponent(entity) {
+  return Boolean(entity?.inspection_profile?.profile_id);
+}
+
+export function resolveModelComponentActivation(entity, selectedComponentId, ready) {
+  if (!ready || !entity) return 'ignore';
+  if (entity.component_id === selectedComponentId && canInspectComponent(entity)) return 'inspect';
+  return 'select';
+}
+
+export function buildInspectionActionState({ active, inspectable, ready }) {
+  if (active) {
+    return { hidden: false, disabled: !ready, label: '返回主板', title: '' };
+  }
+  return {
+    hidden: !inspectable,
+    disabled: !ready || !inspectable,
+    label: '单体查看',
+    title: inspectable ? '' : '该点位没有可单独检视的器件包体',
+  };
+}
+
+export function buildInspectionEntryIntent(entity, activeView, activeSideId) {
+  if (!canInspectComponent(entity)) return null;
+  return {
+    view: 'model',
+    sideId: entity.side_id,
+    changeView: activeView !== 'model',
+    changeSide: entity.side_id !== activeSideId,
+  };
+}
+
+export function enterComponentInspection(entity, activeSideId) {
+  if (!canInspectComponent(entity) || entity.side_id !== activeSideId) return { ...IDLE_INSPECTION };
+  return {
+    mode: 'isolated',
+    componentId: entity.component_id,
+    sideId: entity.side_id,
+    profileId: entity.inspection_profile.profile_id,
+  };
+}
+
+export function exitComponentInspection() {
+  return { ...IDLE_INSPECTION };
+}
+
+export function inspectionOpacity(activeComponentId, componentId) {
+  if (!activeComponentId || activeComponentId === componentId) return 1;
+  return 0.12;
+}
+
+export function buildInspectionToolbarState({ active, ready, boardMode }) {
+  return {
+    boardControlsHidden: active,
+    inspectionAngleHidden: active,
+    panHidden: active,
+    panDisabled: active || !ready,
+    panPressed: !active && boardMode === 'pan',
+    rotateDisabled: !ready,
+    rotatePressed: active || boardMode === 'rotate',
+    resetLabel: active ? '恢复单体初始视角' : '显示全板并恢复俯视',
+  };
+}
+
+const INSPECTION_KEY_ACTIONS = Object.freeze({
+  ArrowLeft: Object.freeze({ rotationY: -0.12 }),
+  ArrowRight: Object.freeze({ rotationY: 0.12 }),
+  ArrowUp: Object.freeze({ rotationX: -0.09 }),
+  ArrowDown: Object.freeze({ rotationX: 0.09 }),
+  '+': Object.freeze({ zoomFactor: 1.1 }),
+  '=': Object.freeze({ zoomFactor: 1.1 }),
+  '-': Object.freeze({ zoomFactor: 0.9 }),
+  _: Object.freeze({ zoomFactor: 0.9 }),
+  Home: Object.freeze({ reset: true }),
+  Escape: Object.freeze({ exit: true }),
+});
+
+export function resolveInspectionKeyAction(key) {
+  return INSPECTION_KEY_ACTIONS[key] || null;
+}
+
+export function buildInspectionTransform(dimensions, narrow = false) {
+  const largestSide = Math.max(dimensions.x, dimensions.y, 0.001);
+  return {
+    scale: Math.round(clamp(0.42 / largestSide, 1.7, 2.6) * 1_000_000) / 1_000_000,
+    lift: Math.round(clamp(dimensions.z * 2.4 + 0.08, 0.12, 0.2) * 1_000_000) / 1_000_000,
+    zoom: narrow ? 1.9 : 2.25,
+  };
+}

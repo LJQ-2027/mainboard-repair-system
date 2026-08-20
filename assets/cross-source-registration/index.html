@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>跨资料主板维修工作台</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./styles.css?v=20260813-task-first">
+  <link rel="stylesheet" href="./point-map.css">
+  <link rel="stylesheet" href="./schematic-evidence.css">
+</head>
+<body>
+  <header class="topbar">
+    <div><span class="eyebrow">已选机型 · 工程资料已关联</span><h1 id="boardTitle">正在载入主板</h1></div>
+    <div class="status"><i></i>2.5D 维修视图</div>
+  </header>
+  <main>
+    <section class="workspace" aria-label="同步主板视图">
+      <div class="view-head">
+        <div class="tabs" role="tablist">
+          <button role="tab" aria-selected="true" data-view="photo">实物图</button>
+          <button role="tab" aria-selected="false" data-view="pointmap">点位图</button>
+          <button role="tab" aria-selected="false" data-view="model">2.5D 模型</button>
+        </div>
+        <div class="side-panel" aria-label="主板面切换">
+          <div class="side-segments" role="group" aria-label="选择主板面">
+            <button type="button" data-side-id="main_page_1" aria-pressed="false" aria-label="第1面" disabled>第1面</button>
+            <button type="button" data-side-id="main_page_2" aria-pressed="true" aria-label="第2面" disabled>第2面</button>
+          </div>
+          <span id="activeSideLabel" aria-live="polite">第2面</span>
+        </div>
+        <div class="view-tools" id="photoTools" hidden>
+          <label class="photo-selector" hidden><span>实拍</span><select id="photoSelector" aria-label="选择实拍图"></select></label>
+          <button class="icon-button" id="zoomOutPhoto" title="缩小实拍图" aria-label="缩小实拍图">−</button>
+          <button class="icon-button" id="zoomInPhoto" title="放大实拍图" aria-label="放大实拍图">+</button>
+          <button class="icon-button" id="resetPhoto" title="重置实拍图" aria-label="重置实拍图">↻</button>
+        </div>
+        <div class="view-tools" id="pointMapTools" hidden>
+          <button class="icon-button" id="zoomOutPointMap" title="缩小点位图" aria-label="缩小点位图">−</button>
+          <button class="icon-button" id="zoomInPointMap" title="放大点位图" aria-label="放大点位图">+</button>
+          <button class="icon-button" id="resetPointMap" title="重置点位图" aria-label="重置点位图">↻</button>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="view photo-view active" id="photoView">
+          <div class="image-layer physical-photo"><img alt="主板实物图"><div class="markers"></div></div>
+          <div class="image-load-status" id="photoLoadStatus" role="status" hidden></div>
+        </div>
+        <div class="view point-map-view" id="pointmapView"><div class="image-layer point-map"><img alt="主板点位图"><div class="markers"></div></div></div>
+        <div class="view model-view" id="modelView" aria-busy="false">
+          <div id="modelCanvas"></div>
+          <div class="model-load-status" id="modelLoadStatus" role="status">正在准备主板模型</div>
+          <div class="view-tools" id="modelTools" hidden>
+            <div class="model-interaction-modes" role="group" aria-label="模型拖拽模式">
+              <button type="button" data-model-drag-mode="pan" aria-pressed="true">平移</button>
+              <button type="button" data-model-drag-mode="rotate" aria-pressed="false">旋转</button>
+            </div>
+            <button class="model-angle-button" id="toggleInspection" type="button" aria-pressed="false" title="切换为斜视" aria-label="切换为斜视">斜视</button>
+            <button class="icon-button" id="resetModel" type="button" title="显示全板并恢复俯视" aria-label="显示全板并恢复俯视">↻</button>
+          </div>
+          <div class="anatomy-panel" aria-label="模型解剖层控制">
+            <div class="anatomy-segments" role="group" aria-label="屏蔽罩状态">
+              <button type="button" data-shield-mode="installed" aria-pressed="false" title="显示安装状态的屏蔽罩">罩上</button>
+              <button type="button" data-shield-mode="xray" aria-pressed="false" title="半透明查看屏蔽罩下器件">透视</button>
+              <button type="button" data-shield-mode="removed" aria-pressed="true" title="移除屏蔽罩查看器件">拆罩</button>
+            </div>
+          </div>
+          <button class="inspection-status" id="inspectionStatus" type="button" hidden aria-live="polite" title="返回主板">
+            <span class="inspection-return-icon" aria-hidden="true">←</span><strong id="inspectionDesignator">U2001</strong><span>单体检视</span>
+          </button>
+        </div>
+      </div>
+      <div class="source-note" id="sourceNote"></div>
+    </section>
+    <aside class="evidence">
+      <section class="pilot-intent-context" id="pilotIntentContext" hidden aria-live="polite">
+        <div><span>内测任务</span><a href="../technician-pilot/">返回入口</a><strong id="pilotIntentModel"></strong></div>
+        <p id="pilotIntentLabel"></p>
+        <small id="pilotIntentBoundary"></small>
+      </section>
+      <section class="repair-entry" id="repairEntry" aria-labelledby="repairEntryTitle">
+        <header>
+          <div><span id="repairEntryEyebrow">维修入口</span><h2 id="repairEntryTitle">选择故障现象</h2></div>
+          <button id="changeRepairEntry" type="button" hidden aria-controls="repairEntryOptions" aria-expanded="false">更换故障</button>
+        </header>
+        <p class="repair-coverage-note" id="repairCoverageNote" hidden></p>
+        <div class="repair-entry-options" id="repairEntryOptions" role="group" aria-label="选择故障现象"></div>
+        <section class="case-navigation" id="caseNavigation" hidden aria-labelledby="caseNavigationTitle">
+          <header><div><span>真实案例</span><strong id="caseNavigationTitle">来源案例导航</strong></div><small id="caseNavigationSummary"></small></header>
+          <label class="case-selector"><span>故障现象</span><select id="caseSymptomSelector" aria-label="选择案例故障现象"></select></label>
+          <label class="case-selector"><span>案例</span><select id="caseSelector" aria-label="选择真实维修案例"></select></label>
+          <div class="case-facts"><div><span>故障现象</span><strong id="caseSymptoms"></strong></div><div><span>原始结论</span><strong id="caseFinding"></strong></div></div>
+          <div class="case-candidate-targets" id="caseCandidateTargets" role="group" aria-label="案例关联器件候选"></div>
+          <p class="case-navigation-boundary" id="caseNavigationBoundary"></p>
+          <small class="case-gap-summary" id="caseGapSummary"></small>
+        </section>
+      </section>
+      <div class="entity-heading">
+        <div><span id="entityCategory"></span><h2 id="entityDesignator">—</h2></div>
+        <div class="entity-actions">
+          <span class="visibility" id="entityVisibility"></span>
+          <button class="inspect-component" id="inspectComponent" type="button" aria-pressed="false" disabled>单体查看</button>
+        </div>
+      </div>
+      <p class="entity-name" id="entityName"></p>
+      <dl class="facts"><div><dt>功能模块</dt><dd id="entityModule"></dd></div><div><dt>所在板面</dt><dd id="entitySide"></dd></div></dl>
+      <section class="active-flow-return" id="activeFlowReturn" hidden aria-live="polite">
+        <div><span>进行中的排查</span><strong id="activeFlowReturnTitle"></strong><small id="activeFlowReturnTarget"></small></div>
+        <button id="resumeActiveFlow" type="button">返回流程</button>
+      </section>
+      <section class="component-guidance" id="componentGuidance" hidden>
+        <header class="guidance-heading">
+          <div><span id="guidanceContextLabel">器件资料</span><h3 id="guidanceTitle">检测参考</h3></div>
+          <strong id="guidanceProgress">0 / 1</strong>
+        </header>
+        <div class="guidance-group">
+          <h4>关联故障资料</h4>
+          <div class="fault-list" id="commonFaults" role="group" aria-label="选择关联故障资料"></div>
+        </div>
+        <section class="repair-flow-control" id="repairFlowControl" hidden>
+          <header class="repair-flow-heading">
+            <div><span>当前任务</span><strong id="repairFlowTitle"></strong></div>
+            <div class="repair-flow-position"><strong id="repairFlowTarget"></strong><small id="repairFlowTargetMeta"></small><span id="repairFlowStep"></span></div>
+          </header>
+          <section class="repair-task-cue" id="repairTaskCue" data-phase="inspect" aria-live="polite">
+            <div><span>现在做</span><strong id="repairTaskCueTitle"></strong><p id="repairTaskCueDetail"></p></div>
+            <button id="locateRepairTarget" type="button">在主板上定位</button>
+          </section>
+          <ol class="repair-flow-trail" id="repairFlowTrail" aria-label="维修步骤"></ol>
+          <p class="repair-flow-prompt" id="repairFlowPrompt"></p>
+          <div class="repair-flow-measurements" id="repairFlowMeasurements" hidden>
+            <div id="repairFlowMeasurementFields"></div>
+            <button id="repairFlowRecordMeasurements" type="button">保存测量值</button>
+            <p id="repairFlowMeasurementStatus"></p>
+          </div>
+          <div class="repair-flow-choices" id="repairFlowChoices" role="group" aria-label="选择检查结果"></div>
+          <div class="repair-flow-terminal" id="repairFlowTerminal" hidden>
+            <span id="repairFlowTerminalType"></span><strong id="repairFlowTerminalLabel"></strong>
+            <p id="repairFlowBoundary"></p>
+            <div class="repair-flow-action-record" id="repairFlowActionRecord" hidden>
+              <button id="recordRepairFlowAction" type="button" aria-pressed="false">记录已执行</button>
+              <p id="repairFlowActionStatus" aria-live="polite"></p>
+              <fieldset class="repair-flow-recheck" id="repairFlowRecheck" hidden>
+                <legend>执行后复检</legend>
+                <div role="group" aria-label="记录执行后的故障现象">
+                  <button type="button" data-post-action-check="symptom_cleared" aria-pressed="false">现象消失</button>
+                  <button type="button" data-post-action-check="symptom_persists" aria-pressed="false">现象仍在</button>
+                  <button type="button" data-post-action-check="uncertain" aria-pressed="false">无法确认</button>
+                </div>
+                <p id="repairFlowRecheckStatus" data-result="pending" aria-live="polite"></p>
+              </fieldset>
+            </div>
+            <div class="repair-flow-completion" id="repairFlowCompletion" hidden>
+              <button id="closeRepairFlow" type="button">结束本次排查</button>
+              <p id="repairFlowCompletionStatus" aria-live="polite"></p>
+            </div>
+          </div>
+          <div class="repair-flow-log" id="repairFlowLog" hidden>
+            <span>已记录结果</span>
+            <ol class="repair-flow-history" id="repairFlowHistory"></ol>
+          </div>
+          <div class="repair-session-strip" id="repairSessionStrip" hidden aria-live="polite">
+            <div><span>本次维修记录</span><strong id="repairSessionStatus"></strong><small id="repairSessionSavedAt"></small></div>
+            <button id="exportRepairSession" type="button" title="导出本次维修记录">导出记录</button>
+          </div>
+          <footer>
+            <details class="repair-flow-source-details"><summary>资料依据</summary><small id="repairFlowSource"></small></details>
+            <div id="repairFlowNavigation"><button id="repairFlowBack" type="button">上一步</button><button id="repairFlowReset" type="button">重新开始</button></div>
+          </footer>
+        </section>
+        <details class="repair-step source-summary" id="componentSourceSummary">
+          <summary><span id="inspectionStepLabel">检测步骤 1</span><strong id="inspectionSummaryLabel">检测指导</strong></summary>
+          <div class="repair-step-content"><p id="inspectionMethod"></p><small id="inspectionSource"></small></div>
+        </details>
+        <section class="measurement-control" id="measurementControl" hidden>
+          <header><label for="guidanceMeasurementValue" id="measurementLabel">测量值</label><span id="measurementReference"></span></header>
+          <div class="measurement-input-row">
+            <input id="guidanceMeasurementValue" type="number" inputmode="decimal" required>
+            <span id="measurementUnit"></span>
+            <button id="recordMeasurement" type="button">记录</button>
+          </div>
+          <p id="measurementFeedback" data-evaluation="unrecorded"></p>
+        </section>
+        <fieldset class="result-control" id="resultControl">
+          <legend>返回检测结果</legend>
+          <div role="group" aria-label="选择本次检测结果">
+            <button type="button" data-guidance-result="normal" aria-pressed="false">正常</button>
+            <button type="button" data-guidance-result="abnormal" aria-pressed="false">异常</button>
+            <button type="button" data-guidance-result="uncertain" aria-pressed="false">无法确认</button>
+          </div>
+        </fieldset>
+        <p class="result-status" id="guidanceResultStatus" aria-live="polite"></p>
+        <details class="model-boundary-details" id="modelBoundaryDetails">
+          <summary>模型说明</summary><p id="modelBoundary"></p>
+        </details>
+      </section>
+      <details class="source-evidence-details physical-registration-details" id="physicalRegistrationDetails" hidden>
+        <summary><span id="physicalRegistrationTitle">实拍配准</span><small id="physicalRegistrationCount"></small></summary>
+        <div class="source-evidence-content" id="physicalRegistrationEvidence"></div>
+      </details>
+      <details class="source-evidence-details" id="schematicEvidenceDetails">
+        <summary><span>原理图依据</span><small id="schematicEvidenceCount"></small></summary>
+        <div class="source-evidence-content" id="schematicEvidence"></div>
+      </details>
+      <details class="source-evidence-details" id="repairEvidenceDetails">
+        <summary><span>维修手册原文</span><small id="repairEvidenceCount"></small></summary>
+        <div class="source-evidence-content" id="repairEvidence"></div>
+      </details>
+      <section class="pilot-feedback" id="pilotFeedback" hidden aria-labelledby="pilotFeedbackTitle">
+        <header><span>内测反馈</span><strong id="pilotFeedbackTitle">这份资料是否帮你继续定位？</strong></header>
+        <fieldset>
+          <legend>目标位置</legend>
+          <div class="feedback-segments" role="group" aria-label="目标位置反馈">
+            <button type="button" data-feedback-target="found" aria-pressed="false">已找到</button>
+            <button type="button" data-feedback-target="uncertain" aria-pressed="false">不确定</button>
+            <button type="button" data-feedback-target="not_found" aria-pressed="false">未找到</button>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>资料可用性</legend>
+          <div class="feedback-segments" role="group" aria-label="资料可用性反馈">
+            <button type="button" data-feedback-usefulness="enough_to_continue" aria-pressed="false">足够继续</button>
+            <button type="button" data-feedback-usefulness="insufficient" aria-pressed="false">资料不足</button>
+            <button type="button" data-feedback-usefulness="not_applicable" aria-pressed="false">暂不适用</button>
+          </div>
+        </fieldset>
+        <label class="feedback-note" for="pilotFeedbackNote"><span>补充说明（可选）</span><textarea id="pilotFeedbackNote" maxlength="500" rows="2"></textarea></label>
+        <div class="feedback-actions"><button id="savePilotFeedback" type="button">记录本次反馈</button><button id="exportPilotFeedback" type="button">导出 JSON</button></div>
+        <p id="pilotFeedbackStatus" role="status" aria-live="polite"></p>
+      </section>
+      <section class="entity-list-section"><h3 id="entityListHeading">第2面已关联实体</h3><div class="entity-list" id="entityList"></div></section>
+    </aside>
+  </main>
+  <dialog class="evidence-dialog" id="evidenceDialog" aria-label="原理图局部证据">
+    <button class="dialog-close" type="button" aria-label="关闭原理图预览">×</button>
+    <img alt="原理图局部证据">
+    <p></p>
+  </dialog>
+  <script type="module" src="./app.js?v=20260813-task-first"></script>
+</body>
+</html>

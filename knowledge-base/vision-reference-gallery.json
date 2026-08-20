@@ -1,0 +1,1670 @@
+{
+  "gallery_id": "VISION-REFERENCE-GALLERY-20260710",
+  "title": "Service-manual board vision reference candidates",
+  "source_inventory_id": "SERVICE-MANUAL-LIBRARY-20260710",
+  "scope": [
+    "KM4",
+    "KL4",
+    "CLA5",
+    "KJ5",
+    "CM5",
+    "CM6",
+    "X6880"
+  ],
+  "review_policy": "Candidate extraction is automatic. Board side and reference role remain unknown until visual review provides explicit evidence.",
+  "statistics": {
+    "model_count": 7,
+    "candidate_page_count": 26,
+    "embedded_image_count": 96,
+    "approved_image_count": 21
+  },
+  "models": [
+    {
+      "model": "KM4",
+      "aliases": [
+        "L6735",
+        "F151",
+        "TECNO KM4"
+      ],
+      "status": "candidates_extracted",
+      "board_versions": {
+        "main": [
+          "F151_MAIN_PCB_V1.2"
+        ],
+        "sub": [
+          "F151_SUB_PCB_1_V1.1"
+        ],
+        "other": []
+      },
+      "main_point_map": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KM4-F151/F151_MAIN_PCB_V1.2_位号图.pdf",
+      "manuals": [
+        "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO KM4 Service Manual_1753264377935.pdf"
+      ],
+      "candidate_pages": [
+        {
+          "page_number": 3,
+          "score": 12,
+          "board_side_evidence": "unknown",
+          "rendered_page": "assets/vision-reference-gallery/km4/source-pages/page-003.png",
+          "text_excerpt": "Copyright belongs to Carlcare, cannot leak without permission Document Number Document Name Page CCTM2025076 TECNO KM4 Service Manual 3/16 Security Classification Release Time Version Internal Use 2025-5-12 V1.0 38104790 Front housing 19101400 Coaxial cable 25002727 Battery 37301081 Side key FPC 17601283 Fingerprint 12114977 Sub PCBA 37301081 Battery Cover 1 EXPLODED VIEW 19301172 Motor 17401940 2 IN 1 12114850 PCBA 17201890 F CAM 8M 17201894 R CAM 13M 37600728 Card holder 19501143 Receiver 19401377 Speaker 37200514 CAM lens 38104958 Middle housing",
+          "embedded_images": [
+            {
+              "asset_path": "assets/vision-reference-gallery/km4/embedded/page-003-image-01.jpg",
+              "source_object": "IM14.jpg",
+              "source_page": 3,
+              "width": 675,
+              "height": 418,
+              "size_bytes": 24787,
+              "sha256": "6517a8f72a3557a5269aa37d5b10e78896fadf9aae16463560a533fb3a8cb06b",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/km4/embedded/page-003-image-02.jpg",
+              "source_object": "IM65.jpg",
+              "source_page": 3,
+              "width": 1087,
+              "height": 663,
+              "size_bytes": 72398,
+              "sha256": "97e66e2f399f8c20e54b2e336f3aa9e49f54736ded55470b7e6ab7933f7be91c",
+              "review_status": "approved",
+              "reference_role": "exploded_structure",
+              "board_side": "unknown",
+              "board_scope": "mixed_phone_components",
+              "reference_strength": "weak"
+            }
+          ]
+        },
+        {
+          "page_number": 10,
+          "score": 10,
+          "board_side_evidence": "unknown",
+          "rendered_page": "assets/vision-reference-gallery/km4/source-pages/page-010.png",
+          "text_excerpt": "Copyright belongs to Carlcare, cannot leak without permission Document Number Document Name Page CCTM2025076 TECNO KM4 Service Manual 10/16 Security Classification Release Time Version Internal Use 2025-5-12 V1.0 *7.Remove the middle housing slowly, notice protecting the fingerprint FPC, then check whether waterproof labels is white. *8.Use disassemble stick to open battery connector, then open main connector and fingerprint connector. 9.Use disassemble stick to open main connector. 10.Disassemble coaxial cable. 11.Use tweezers to disassemble mainboard from the gap of bottom. 12.Use tweezers t",
+          "embedded_images": [
+            {
+              "asset_path": "assets/vision-reference-gallery/km4/embedded/page-010-image-01.jpg",
+              "source_object": "IM114.jpg",
+              "source_page": 10,
+              "width": 825,
+              "height": 600,
+              "size_bytes": 56439,
+              "sha256": "53169fbb4b30d745dd6e277d7b3cbff9b7863cbae34b8ddeffb176f95931cbac",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/km4/embedded/page-010-image-02.jpg",
+              "source_object": "IM115.jpg",
+              "source_page": 10,
+              "width": 738,
+              "height": 506,
+              "size_bytes": 58343,
+              "sha256": "672cee47d747f72c60b7ce102c176a05f034433e1a2c2e9dc105e480395f2ca9",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/km4/embedded/page-010-image-03.jpg",
+              "source_object": "IM116.jpg",
+              "source_page": 10,
+              "width": 962,
+              "height": 593,
+              "size_bytes": 59606,
+              "sha256": "d07152b48d082d2fc29673e9cd00bc26bef0b11f2245e85309be8f4b9db0a65c",
+              "review_status": "approved",
+              "reference_role": "installed_subboard",
+              "board_side": "unknown",
+              "board_scope": "sub",
+              "reference_strength": "medium"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/km4/embedded/page-010-image-04.jpg",
+              "source_object": "IM117.jpg",
+              "source_page": 10,
+              "width": 947,
+              "height": 585,
+              "size_bytes": 66492,
+              "sha256": "ff957b9a0c3d667355f86c2cdfed1859efa674ec8bc6f170a377e51fb77a49b5",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/km4/embedded/page-010-image-05.jpg",
+              "source_object": "IM118.jpg",
+              "source_page": 10,
+              "width": 725,
+              "height": 426,
+              "size_bytes": 42795,
+              "sha256": "9135ef05e1475226c14d6fd2a352fd11df69fa9c5c6245fc9ee9db679625bf6a",
+              "review_status": "approved",
+              "reference_role": "installed_mainboard",
+              "board_side": "unknown",
+              "board_scope": "main",
+              "reference_strength": "medium"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/km4/embedded/page-010-image-06.jpg",
+              "source_object": "IM119.jpg",
+              "source_page": 10,
+              "width": 924,
+              "height": 530,
+              "size_bytes": 70841,
+              "sha256": "e484aea8d6a675ed03a3f070c2f3c2308f87f0f5fbb275dd9037f94a6d9f4db4",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            }
+          ]
+        },
+        {
+          "page_number": 11,
+          "score": 11,
+          "board_side_evidence": "unknown",
+          "rendered_page": "assets/vision-reference-gallery/km4/source-pages/page-011.png",
+          "text_excerpt": "Copyright belongs to Carlcare, cannot leak without permission Document Number Document Name Page CCTM2025076 TECNO KM4 Service Manual 11/16 Security Classification Release Time Version Internal Use 2025-5-12 V1.0 13.Use tweezers to disassemble receiver from the groove of bottom. 14.Use tweezers to disassemble sub PCBA. 15.Use tweezers to disassemble motor from groove of right. 16.Use tweezers to disassemble speaker from left. *17.Pull left easy-to-pull gel slowly, and keep about 30°, avoid it to be broken, right hand pull gel while another hand press the gel. *18. Heat the battery for 10 min.",
+          "embedded_images": [
+            {
+              "asset_path": "assets/vision-reference-gallery/km4/embedded/page-011-image-01.jpg",
+              "source_object": "IM122.jpg",
+              "source_page": 11,
+              "width": 728,
+              "height": 470,
+              "size_bytes": 56935,
+              "sha256": "e69cf6e338cee599d973155d947b59307943e3282501f26a6ca3a92172d562b5",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/km4/embedded/page-011-image-02.jpg",
+              "source_object": "IM123.jpg",
+              "source_page": 11,
+              "width": 780,
+              "height": 472,
+              "size_bytes": 36814,
+              "sha256": "b42376fa5459c5b39e5fd590b2fb24eff44e36a1f0029d51a1b3b8d0904f35c4",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/km4/embedded/page-011-image-03.jpg",
+              "source_object": "IM124.jpg",
+              "source_page": 11,
+              "width": 896,
+              "height": 545,
+              "size_bytes": 44463,
+              "sha256": "54bb96f138320ad494ff52067c30f16806b0109dd6eca1346f6673843718917a",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/km4/embedded/page-011-image-04.jpg",
+              "source_object": "IM125.jpg",
+              "source_page": 11,
+              "width": 822,
+              "height": 502,
+              "size_bytes": 46486,
+              "sha256": "24bb5a717a7f988c7822630caec8a02e89a35c65d13a2ae9e3a5fd62b5ba62a2",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/km4/embedded/page-011-image-05.jpg",
+              "source_object": "IM126.jpg",
+              "source_page": 11,
+              "width": 774,
+              "height": 510,
+              "size_bytes": 43806,
+              "sha256": "0239c30e79b0117591964a0bd1969ac7a6bbc46a4becdb9b465b50af0359e458",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/km4/embedded/page-011-image-06.jpg",
+              "source_object": "IM127.jpg",
+              "source_page": 11,
+              "width": 704,
+              "height": 458,
+              "size_bytes": 37524,
+              "sha256": "b19b53d052b3729e4bcd2589c8838c26735dbcccf4c7a03cc9ed7bb66f742836",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            }
+          ]
+        }
+      ],
+      "coverage": {
+        "main_board_top_standard_photo": "missing",
+        "main_board_bottom_standard_photo": "missing",
+        "exploded_structure": "available",
+        "installed_main_board": "available",
+        "installed_sub_board": "available"
+      },
+      "review_notes": "Manual provides a useful exploded structure view and installed shield-side context, but no isolated front/back main-board pair."
+    },
+    {
+      "model": "KL4",
+      "aliases": [
+        "K6735",
+        "F201",
+        "TECNO KL4"
+      ],
+      "status": "candidates_extracted",
+      "board_versions": {
+        "main": [
+          "F201_MAIN_V1.2"
+        ],
+        "sub": [
+          "F201_SUB_SCH_1_V1.2"
+        ],
+        "other": []
+      },
+      "main_point_map": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KL4-F201/F201_MAIN_V1.2_零件位号.pdf",
+      "manuals": [
+        "source-materials/service-manual-library/2026-07-10-desktop-manual/files/778_TECNO KL4 Service Manual (1).pdf"
+      ],
+      "candidate_pages": [
+        {
+          "page_number": 3,
+          "score": 12,
+          "board_side_evidence": "unknown",
+          "rendered_page": "assets/vision-reference-gallery/kl4/source-pages/page-003.png",
+          "text_excerpt": "Copyright belongs to Carlcare, cannot leak without permission Document Number Document Name Page CCTM2024135 TECNO KL4 Service Manual 3/15 Security Classification Release Time Version Internal Use 2024-8-16 V1.0 38103352 Front housing 19101353 Coaxial cable 25002439 Battery 23002396 Side key FPC 17601107 Fingerprint 12112902 Sub PCBA 37300652 Battery Cover 1 EXPLODED VIEW 19301172 Motor 17401862 2 IN 1 37400263 LT sensor Rubber 17201890 F CAM 8M 17201894 R CAM 13M 37600467 Card holder 19501130 Receiver 19401157 Speaker 38103347 CAM Deco asm 12112934 PCBA 38103349 Middle housing",
+          "embedded_images": [
+            {
+              "asset_path": "assets/vision-reference-gallery/kl4/embedded/page-003-image-01.jpg",
+              "source_object": "IM14.jpg",
+              "source_page": 3,
+              "width": 675,
+              "height": 418,
+              "size_bytes": 24787,
+              "sha256": "6517a8f72a3557a5269aa37d5b10e78896fadf9aae16463560a533fb3a8cb06b",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/kl4/embedded/page-003-image-02.jpg",
+              "source_object": "IM65.jpg",
+              "source_page": 3,
+              "width": 1023,
+              "height": 605,
+              "size_bytes": 72029,
+              "sha256": "ccdb00e66f7e2c149fbc04a378e5febb58d33c4a7395976c9f8d6bf96f5afa3b",
+              "review_status": "approved",
+              "reference_role": "exploded_structure",
+              "board_side": "unknown",
+              "board_scope": "mixed_phone_components",
+              "reference_strength": "weak"
+            }
+          ]
+        },
+        {
+          "page_number": 6,
+          "score": 4,
+          "board_side_evidence": "unknown",
+          "rendered_page": "assets/vision-reference-gallery/kl4/source-pages/page-006.png",
+          "text_excerpt": "Copyright belongs to Carlcare, cannot leak without permission Document Number Document Name Page CCTM2024135 TECNO KL4 Service Manual 6/15 Security Classification Release Time Version Internal Use 2024-8-16 V1.0 4 AUXILIARY MATERIALS INFORMATION SAP code Chinese Description English Description 23309408 后主摄导电海绵_14.5*11.4*0.2_KL4_V0 RMAIN CAM Con foams 14.5*11.4*0.2 KL4 V0 23309410 主板屏蔽罩铜箔 A_46.9*32.93*0.06_KL4_V0 MB Shield foil A 46.9*32.93*0.06 KL4 V0 23309486 指纹 FPC 固定麦拉_3*15*0.03_KL4_V0 FP FPC fixed Mylar 3*15*0.03 KL4 V0 23309508 静电屏蔽铜箔_18.28*15*0.06_KL4_V0 ESD Shield Cop Foil 18.28*15*0.06",
+          "embedded_images": []
+        },
+        {
+          "page_number": 10,
+          "score": 10,
+          "board_side_evidence": "unknown",
+          "rendered_page": "assets/vision-reference-gallery/kl4/source-pages/page-010.png",
+          "text_excerpt": "Copyright belongs to Carlcare, cannot leak without permission Document Number Document Name Page CCTM2024135 TECNO KL4 Service Manual 10/15 Security Classification Release Time Version Internal Use 2024-8-16 V1.0 *7.Remove the middle housing slowly, notice protecting the fingerprint FPC, then check whether waterproof labels is white. *8.Use disassemble stick to open battery connector, then open main connector and fingerprint connector. 9.Disassemble coaxial cable. 10.Use disassemble stick to disassemble mainboard from the gap of bottom. 11.Use tweezers to lift the receiver pad from the groove ",
+          "embedded_images": [
+            {
+              "asset_path": "assets/vision-reference-gallery/kl4/embedded/page-010-image-01.jpg",
+              "source_object": "IM114.jpg",
+              "source_page": 10,
+              "width": 1007,
+              "height": 674,
+              "size_bytes": 71099,
+              "sha256": "73deb38857ac403565dfa0e6f0c0fdf9513870e55422a9dca640e5460779fe6f",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/kl4/embedded/page-010-image-02.jpg",
+              "source_object": "IM115.jpg",
+              "source_page": 10,
+              "width": 609,
+              "height": 392,
+              "size_bytes": 38664,
+              "sha256": "8d24312b87990bb12f06dde56c0d5d6e198a0df22b42ed3e487123ed7d544f0f",
+              "review_status": "approved",
+              "reference_role": "installed_mainboard",
+              "board_side": "unknown",
+              "board_scope": "main",
+              "reference_strength": "medium"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/kl4/embedded/page-010-image-03.jpg",
+              "source_object": "IM116.jpg",
+              "source_page": 10,
+              "width": 899,
+              "height": 521,
+              "size_bytes": 57518,
+              "sha256": "461fdac8f41074dfe281647bace762e0babc1bb4ba9a1a5c8a90f5ec4325e93c",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/kl4/embedded/page-010-image-05.jpg",
+              "source_object": "IM118.jpg",
+              "source_page": 10,
+              "width": 785,
+              "height": 510,
+              "size_bytes": 39712,
+              "sha256": "03e9c3c3d5f11698bd64a898d3272eb51badce1a5043edbe1863a9beff31c9f5",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/kl4/embedded/page-010-image-06.jpg",
+              "source_object": "IM119.jpg",
+              "source_page": 10,
+              "width": 686,
+              "height": 426,
+              "size_bytes": 37708,
+              "sha256": "82ae32a9c2a1abe4808b6a52757fb3dff7088e6d9515ee6ec1aaaa97a41761a5",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            }
+          ]
+        },
+        {
+          "page_number": 11,
+          "score": 11,
+          "board_side_evidence": "unknown",
+          "rendered_page": "assets/vision-reference-gallery/kl4/source-pages/page-011.png",
+          "text_excerpt": "Copyright belongs to Carlcare, cannot leak without permission Document Number Document Name Page CCTM2024135 TECNO KL4 Service Manual 11/15 Security Classification Release Time Version Internal Use 2024-8-16 V1.0 13.Use disassemble stick to open main connector. 14.Use tweezers to disassemble sub PCBA. 15.Use tweezers to disassemble motor from groove of right. 16.Use tweezers to disassemble speaker from left. *17.Pull left easy-to-pull gel slowly, and keep about 30°, avoid it to be broken, right hand pull gel while another hand press the gel. *18.If easy-to-pull gel is broken, please heat the b",
+          "embedded_images": [
+            {
+              "asset_path": "assets/vision-reference-gallery/kl4/embedded/page-011-image-01.jpg",
+              "source_object": "IM122.jpg",
+              "source_page": 11,
+              "width": 738,
+              "height": 449,
+              "size_bytes": 32395,
+              "sha256": "4b054bf86b0f9ce07b81f30ce928d02768a7f4bf000c2245272a9f362ed2d937",
+              "review_status": "approved",
+              "reference_role": "installed_subboard",
+              "board_side": "unknown",
+              "board_scope": "sub",
+              "reference_strength": "medium"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/kl4/embedded/page-011-image-02.jpg",
+              "source_object": "IM123.jpg",
+              "source_page": 11,
+              "width": 776,
+              "height": 485,
+              "size_bytes": 42536,
+              "sha256": "8554b14842f0386d7c0eed1b445f872dc354131690c68cbd92f30fe1e1df3903",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/kl4/embedded/page-011-image-03.jpg",
+              "source_object": "IM124.jpg",
+              "source_page": 11,
+              "width": 792,
+              "height": 462,
+              "size_bytes": 37633,
+              "sha256": "48efb6da156bac98c7d18349c092878ab29c0586b1b81398bb538c263b1b75ad",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/kl4/embedded/page-011-image-04.jpg",
+              "source_object": "IM125.jpg",
+              "source_page": 11,
+              "width": 815,
+              "height": 463,
+              "size_bytes": 33571,
+              "sha256": "35e2a54f3e2b301369385961225e398e3a65bea35da3962f6d5baa508d2402df",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/kl4/embedded/page-011-image-05.jpg",
+              "source_object": "IM126.jpg",
+              "source_page": 11,
+              "width": 728,
+              "height": 462,
+              "size_bytes": 25605,
+              "sha256": "4fb1609bb311692ca42967c451e103bba855ed7c84050a4c4626d07a8aea1754",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/kl4/embedded/page-011-image-06.jpg",
+              "source_object": "IM127.jpg",
+              "source_page": 11,
+              "width": 1119,
+              "height": 687,
+              "size_bytes": 92456,
+              "sha256": "10e5065c5b140b18f1def800ac69cae246ea5784eafbbe6de01cb347d4d7e3ce",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            }
+          ]
+        }
+      ],
+      "coverage": {
+        "main_board_top_standard_photo": "missing",
+        "main_board_bottom_standard_photo": "missing",
+        "exploded_structure": "available",
+        "installed_main_board": "available",
+        "installed_sub_board": "available"
+      },
+      "review_notes": "Installed main-board and sub-board context is clear; isolated board faces are absent."
+    },
+    {
+      "model": "CLA5",
+      "aliases": [
+        "J6789",
+        "H8910",
+        "TECNO CLA5"
+      ],
+      "status": "candidates_extracted",
+      "board_versions": {
+        "main": [
+          "H8910_MAIN_PCB_V1.1"
+        ],
+        "sub": [
+          "H8910_SUB_PCB_1_V1.0"
+        ],
+        "other": []
+      },
+      "main_point_map": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CLA5-H8910/H8910_MAIN_PCB_V1.1_位号图.pdf",
+      "manuals": [
+        "source-materials/service-manual-library/2026-07-10-desktop-manual/files/975_TECNO CLA5 Service Manual.pdf"
+      ],
+      "candidate_pages": [
+        {
+          "page_number": 3,
+          "score": 19,
+          "board_side_evidence": "unknown",
+          "rendered_page": "assets/vision-reference-gallery/cla5/source-pages/page-003.png",
+          "text_excerpt": "Copyright belongs to Carlcare, cannot leak without permission Document Number Document Name Page CCTM2024152 TECNO CLA5 Service Manual 3/16 Security Classification Release Time Version Internal Use 2024-8-28 V1.0 12205673 3 IN 1 23002315 Main FPC 25002114 Battery 12112775 Main PCBA 37500376 CAM Imp steel 19101316 Coaxial cable 1 19401310 Speaker BOX 19101317 Coaxial cable 2 37300730 Battery Cover 23002460 FPCA Flash LED 1 EXPLODED VIEW 17601112 Fingerprint 38103749 Upper frame assembly 17201874 R CAM AI 17201866 R CAM 2M 17201919 R CAM 50M 37600517 Card holder 17201930 F CAM 13M 37200416 Camer",
+          "embedded_images": [
+            {
+              "asset_path": "assets/vision-reference-gallery/cla5/embedded/page-003-image-01.jpg",
+              "source_object": "IM14.jpg",
+              "source_page": 3,
+              "width": 675,
+              "height": 418,
+              "size_bytes": 24787,
+              "sha256": "6517a8f72a3557a5269aa37d5b10e78896fadf9aae16463560a533fb3a8cb06b",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/cla5/embedded/page-003-image-02.jpg",
+              "source_object": "IM65.jpg",
+              "source_page": 3,
+              "width": 1199,
+              "height": 758,
+              "size_bytes": 104089,
+              "sha256": "b85d355163373da3b2ea844f35044fb6ddcc37ce5b4e94806bfc7fa6e60af758",
+              "review_status": "approved",
+              "reference_role": "exploded_structure",
+              "board_side": "unknown",
+              "board_scope": "mixed_phone_components",
+              "reference_strength": "weak"
+            }
+          ]
+        },
+        {
+          "page_number": 6,
+          "score": 10,
+          "board_side_evidence": "unknown",
+          "rendered_page": "assets/vision-reference-gallery/cla5/source-pages/page-006.png",
+          "text_excerpt": "Copyright belongs to Carlcare, cannot leak without permission Document Number Document Name Page CCTM2024152 TECNO CLA5 Service Manual 6/16 Security Classification Release Time Version Internal Use 2024-8-28 V1.0 4 AUXILIARY MATERIALS INFORMATION SAP code Chinese Description English Description 23308513 中框 USB 防刮麦拉_42.5*3.87*0.05_X6731B_V0 Mi hsg USBMylar 42.5*3.87*0.05 X6731B V0 23308699 屏下指纹模组压紧泡棉_4.0*5.5*0.55_KJ7_V0 LCM FM Imp foam 4.0*5.5*0.55 KJ7 V0 23308707 后副摄导电胶_5.3*5.3*0.03_KJ7_V0 R vice CAM CON ADS 5.3*5.3*0.03 KJ7 V0 23308708 天线小板固定背胶_2.87*3.17*0.03_KJ7_V0 ANT SUB PCB ADS 2.87*3.17*",
+          "embedded_images": []
+        },
+        {
+          "page_number": 10,
+          "score": 12,
+          "board_side_evidence": "unknown",
+          "rendered_page": "assets/vision-reference-gallery/cla5/source-pages/page-010.png",
+          "text_excerpt": "Copyright belongs to Carlcare, cannot leak without permission Document Number Document Name Page CCTM2024152 TECNO CLA5 Service Manual 10/16 Security Classification Release Time Version Internal Use 2024-8-28 V1.0 7.Use tweezers to remove the steel sheet. 8.Use disassemble stick to disassemble camera connector. 9.Remove Upper frame assembly from bottom slowly. *10.Check whether waterproof labels is white, then use disassemble stick to open battery connector.Finally,open main connector and LCD connector. 11.Use tweezers to disassemble speaker BOX from top. 12.Remove speaker BOX and antenna sub ",
+          "embedded_images": [
+            {
+              "asset_path": "assets/vision-reference-gallery/cla5/embedded/page-010-image-06.jpg",
+              "source_object": "IM119.jpg",
+              "source_page": 10,
+              "width": 750,
+              "height": 443,
+              "size_bytes": 34080,
+              "sha256": "da84cf00b7b535c2d6724103da67416f06212e11d172be6df528c706a032198c",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            }
+          ]
+        },
+        {
+          "page_number": 11,
+          "score": 11,
+          "board_side_evidence": "unknown",
+          "rendered_page": "assets/vision-reference-gallery/cla5/source-pages/page-011.png",
+          "text_excerpt": "Copyright belongs to Carlcare, cannot leak without permission Document Number Document Name Page CCTM2024152 TECNO CLA5 Service Manual 11/16 Security Classification Release Time Version Internal Use 2024-8-28 V1.0 13.Use disassemble stick to open main connector and LCD connector. 14.Use tweezers to disassemble LCD connector. 15.Disassemble 2 coaxial cables. 16.Use tweezers to disassemble PCBA from the groove of lower right corner. 17.Use tweezers to lift the receiver pad from the groove of bottom. 18.Use tweezers to disassemble receiver from the groove of left.",
+          "embedded_images": [
+            {
+              "asset_path": "assets/vision-reference-gallery/cla5/embedded/page-011-image-02.jpg",
+              "source_object": "IM123.jpg",
+              "source_page": 11,
+              "width": 870,
+              "height": 545,
+              "size_bytes": 51540,
+              "sha256": "ae3cf7426cf932ee2eefeac450ff3d02c46f48a343f5f65cd05963a9cc16dda5",
+              "review_status": "approved",
+              "reference_role": "installed_subboard",
+              "board_side": "unknown",
+              "board_scope": "sub",
+              "reference_strength": "medium"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/cla5/embedded/page-011-image-03.jpg",
+              "source_object": "IM124.jpg",
+              "source_page": 11,
+              "width": 601,
+              "height": 366,
+              "size_bytes": 25234,
+              "sha256": "1b54f59b0b279cd7862d683359f926b98985d21d690a0ed962c6a70c2bd7b439",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/cla5/embedded/page-011-image-04.jpg",
+              "source_object": "IM125.jpg",
+              "source_page": 11,
+              "width": 645,
+              "height": 387,
+              "size_bytes": 26286,
+              "sha256": "5cc99aca2e7a20900b25af8d94f897120fe318ac0ef12ef70edb4bf4b46f3ed2",
+              "review_status": "approved",
+              "reference_role": "installed_mainboard",
+              "board_side": "unknown",
+              "board_scope": "main",
+              "reference_strength": "medium"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/cla5/embedded/page-011-image-05.jpg",
+              "source_object": "IM126.jpg",
+              "source_page": 11,
+              "width": 644,
+              "height": 384,
+              "size_bytes": 23675,
+              "sha256": "2f0516f96fe4bbc1c70a8d31c325dd28954d3b82e56b0dc6e13796dd740aa210",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/cla5/embedded/page-011-image-06.jpg",
+              "source_object": "IM127.jpg",
+              "source_page": 11,
+              "width": 671,
+              "height": 392,
+              "size_bytes": 21644,
+              "sha256": "b1decbc60f868c4bd12b06c36299fb1c387b0f4bb68a063bf66bdc41af52e1a9",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            }
+          ]
+        },
+        {
+          "page_number": 12,
+          "score": 11,
+          "board_side_evidence": "unknown",
+          "rendered_page": "assets/vision-reference-gallery/cla5/source-pages/page-012.png",
+          "text_excerpt": "Copyright belongs to Carlcare, cannot leak without permission Document Number Document Name Page CCTM2024152 TECNO CLA5 Service Manual 12/16 Security Classification Release Time Version Internal Use 2024-8-28 V1.0 19.Use tweezers to disassemble sub PCBA from the gap of left. 20.Use tweezers to disassemble motor from groove of left. 21.Use tweezers to disassemble fingerprint. *22.Pull the easy-to-pull gel slowly, and keep about 30°, avoid it to be broken, right hand pull gel while another hand press the gel. 23.If the easy-to-pull gel is broken, please heat the battery for 10 min. 24.Then use a",
+          "embedded_images": [
+            {
+              "asset_path": "assets/vision-reference-gallery/cla5/embedded/page-012-image-01.jpg",
+              "source_object": "IM130.jpg",
+              "source_page": 12,
+              "width": 687,
+              "height": 398,
+              "size_bytes": 20447,
+              "sha256": "4802571698083a31b258828bba03dd03c29b35c7ea2f408a22dd3daf64d4666f",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/cla5/embedded/page-012-image-02.jpg",
+              "source_object": "IM131.jpg",
+              "source_page": 12,
+              "width": 837,
+              "height": 443,
+              "size_bytes": 41761,
+              "sha256": "83e3f386a8a961823c0e929a560edf208f5ae60c6a047f985afda524ffbcf7d8",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/cla5/embedded/page-012-image-03.jpg",
+              "source_object": "IM132.jpg",
+              "source_page": 12,
+              "width": 868,
+              "height": 515,
+              "size_bytes": 49669,
+              "sha256": "fdb599746c987cf6167aaaf6e8eb776b3b9a2ff58ede1573969255fe219f10d4",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/cla5/embedded/page-012-image-04.jpg",
+              "source_object": "IM133.jpg",
+              "source_page": 12,
+              "width": 608,
+              "height": 360,
+              "size_bytes": 25836,
+              "sha256": "00f5ef1874ce232bb411012e0f367eaa4892809152c8edc9c55617ccfbebf350",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/cla5/embedded/page-012-image-05.jpg",
+              "source_object": "IM134.jpg",
+              "source_page": 12,
+              "width": 725,
+              "height": 429,
+              "size_bytes": 33154,
+              "sha256": "04155821ad3c6da64539681e55f46e5250e16c34f6802811a94c251d90b6717c",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/cla5/embedded/page-012-image-06.jpg",
+              "source_object": "IM135.jpg",
+              "source_page": 12,
+              "width": 682,
+              "height": 397,
+              "size_bytes": 27910,
+              "sha256": "facfb645b8e25d4f78814ecf5f249da14ff6818dc2ea4445fc49504695f3da64",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            }
+          ]
+        },
+        {
+          "page_number": 15,
+          "score": 12,
+          "board_side_evidence": "unknown",
+          "rendered_page": "assets/vision-reference-gallery/cla5/source-pages/page-015.png",
+          "text_excerpt": "Copyright belongs to Carlcare, cannot leak without permission Document Number Document Name Page CCTM2024152 TECNO CLA5 Service Manual 15/16 Security Classification Release Time Version Internal Use 2024-8-28 V1.0 2 Pressing the NFC antenna when you Remove the battery cover,avoid damaging the NFC antenna. 3 Before disassembling the receiver, please lift the receiver FPC pad first, avoid broken the receiver FPC. 4 To disassemble the battery, first you need to pull left easy-to-pull gel. 5 If easy-to-pull gel is broken, please heat the battery for 10 min, then use a suction cup to suck the batte",
+          "embedded_images": [
+            {
+              "asset_path": "assets/vision-reference-gallery/cla5/embedded/page-015-image-02.jpg",
+              "source_object": "IM154.jpg",
+              "source_page": 15,
+              "width": 842,
+              "height": 521,
+              "size_bytes": 37226,
+              "sha256": "60498fdde1a2fda4e02c4a477b9b64c17799ae1d9e7313ba4fd59a8ebc7aa738",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/cla5/embedded/page-015-image-03.jpg",
+              "source_object": "IM155.jpg",
+              "source_page": 15,
+              "width": 825,
+              "height": 518,
+              "size_bytes": 37161,
+              "sha256": "5bdfd5b5a8c45611f4b9dde3e47ec3db294bf2905a0d00f2db550ec48f2ded82",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/cla5/embedded/page-015-image-04.jpg",
+              "source_object": "IM156.jpg",
+              "source_page": 15,
+              "width": 683,
+              "height": 384,
+              "size_bytes": 31113,
+              "sha256": "419ca1c43e65d5a78da462685a75242f1df884cd6bd741587f72eb5e94c3d088",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/cla5/embedded/page-015-image-05.jpg",
+              "source_object": "IM157.jpg",
+              "source_page": 15,
+              "width": 736,
+              "height": 440,
+              "size_bytes": 33221,
+              "sha256": "71c08a04a7b779824541013a8f859d95d5ab384ce1543b53783f10fdb68fe978",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/cla5/embedded/page-015-image-06.jpg",
+              "source_object": "IM158.jpg",
+              "source_page": 15,
+              "width": 731,
+              "height": 432,
+              "size_bytes": 34502,
+              "sha256": "923a5162da48cf4fd321ac6bf4525a6fe05001eeb9580c28395a4a2339cdff59",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            }
+          ]
+        }
+      ],
+      "coverage": {
+        "main_board_top_standard_photo": "missing",
+        "main_board_bottom_standard_photo": "missing",
+        "exploded_structure": "available",
+        "installed_main_board": "available",
+        "installed_sub_board": "available"
+      },
+      "review_notes": "The manual shows assembly structure and board regions but not a clean isolated main-board pair."
+    },
+    {
+      "model": "KJ5",
+      "aliases": [
+        "J6563",
+        "H6931",
+        "TECNO KJ5"
+      ],
+      "status": "candidates_extracted",
+      "board_versions": {
+        "main": [
+          "H6931_MAIN_PCB_V1.0",
+          "H6931_MAIN_PCB_V1.2"
+        ],
+        "sub": [],
+        "other": []
+      },
+      "main_point_map": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/KJ5-H6931/H6931_MAIN_PCB_V1.0_ 位号图.pdf",
+      "manuals": [
+        "source-materials/service-manual-library/2026-07-10-desktop-manual/files/593_TECNO KJ5 Service Manual.pdf"
+      ],
+      "candidate_pages": [
+        {
+          "page_number": 3,
+          "score": 12,
+          "board_side_evidence": "unknown",
+          "rendered_page": "assets/vision-reference-gallery/kj5/source-pages/page-003.png",
+          "text_excerpt": "Copyright belongs to Carlcare, cannot leak without permission Document Number Document Name Page CCTM2023154 TECNO KJ5 Service Manual 3/14 Security Classification Release Time Version Internal Use 2023-11-14 V1.0 23002211 Side key FPC 12110858 Sub PCBA 38101800 Front housing 19101277 Coaxial Cable 25002122 Battery 17401825 2 in 1 37600256 Card holder 38101797 Middle Housing 1 EXPLODED VIEW 19401157 Speaker 17201859 R CAM 50M 17201744 R CAM PDT17 17201856 F CAM 32M 12111139 PCBA 19501125 Receiver 17601109 Fingerprint 37400167 Sensor Rubber 19301172 Motor 23002202 FPCA FlashLED 37300291 Battery ",
+          "embedded_images": [
+            {
+              "asset_path": "assets/vision-reference-gallery/kj5/embedded/page-003-image-01.jpg",
+              "source_object": "IM14.jpg",
+              "source_page": 3,
+              "width": 675,
+              "height": 418,
+              "size_bytes": 24787,
+              "sha256": "6517a8f72a3557a5269aa37d5b10e78896fadf9aae16463560a533fb3a8cb06b",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/kj5/embedded/page-003-image-02.jpg",
+              "source_object": "IM63.jpg",
+              "source_page": 3,
+              "width": 1152,
+              "height": 693,
+              "size_bytes": 118068,
+              "sha256": "75e358f1d390a2e67e77d78fabc312b92fa5a5ca958944824fb0fe261a40aefb",
+              "review_status": "approved",
+              "reference_role": "exploded_structure",
+              "board_side": "unknown",
+              "board_scope": "mixed_phone_components",
+              "reference_strength": "weak"
+            }
+          ]
+        },
+        {
+          "page_number": 9,
+          "score": 12,
+          "board_side_evidence": "unknown",
+          "rendered_page": "assets/vision-reference-gallery/kj5/source-pages/page-009.png",
+          "text_excerpt": "Copyright belongs to Carlcare, cannot leak without permission Document Number Document Name Page CCTM2023154 TECNO KJ5 Service Manual 9/14 Security Classification Release Time Version Internal Use 2023-11-14 V1.0 7. Use disassemble piece to disassemble middle housing from the right. *8.Remove the middle housing slowly, notice protecting the fingerprint FPC, then check whether waterproof labels is white. *9.Use disassemble stick to open battery connector, then open main connector and fingerprint connector. 10.Use disassemble stick to open LCD connector. 11.Disassemble coaxial cable. 12.Use disa",
+          "embedded_images": [
+            {
+              "asset_path": "assets/vision-reference-gallery/kj5/embedded/page-009-image-01.jpg",
+              "source_object": "IM111.jpg",
+              "source_page": 9,
+              "width": 741,
+              "height": 562,
+              "size_bytes": 18841,
+              "sha256": "6ff6ba2d869ecc6ab805fe2657391373a87660575768e8ff29833a1f5d57b6cc",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/kj5/embedded/page-009-image-02.jpg",
+              "source_object": "IM112.jpg",
+              "source_page": 9,
+              "width": 939,
+              "height": 721,
+              "size_bytes": 78125,
+              "sha256": "ed5ee6cce6bcb7d1272260d1fe6201c17f2bd4b62f566dd3296b6ba655d25e97",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/kj5/embedded/page-009-image-03.jpg",
+              "source_object": "IM113.jpg",
+              "source_page": 9,
+              "width": 859,
+              "height": 503,
+              "size_bytes": 69567,
+              "sha256": "b6a31c3e9071ef861dbfa8b51cc460602e23ff40db2ca63b7313d8484921c587",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/kj5/embedded/page-009-image-04.jpg",
+              "source_object": "IM114.jpg",
+              "source_page": 9,
+              "width": 758,
+              "height": 454,
+              "size_bytes": 37578,
+              "sha256": "543e809e5c9ad63398869f045af9ad730093e8c0ac976dec6cdb91dd1ead0167",
+              "review_status": "approved",
+              "reference_role": "installed_subboard",
+              "board_side": "unknown",
+              "board_scope": "sub",
+              "reference_strength": "medium"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/kj5/embedded/page-009-image-05.jpg",
+              "source_object": "IM115.jpg",
+              "source_page": 9,
+              "width": 929,
+              "height": 531,
+              "size_bytes": 72602,
+              "sha256": "1315a8212fd964742fdb5bd470a0b220d9fbc84f066852aa6f1da54dfaac615e",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/kj5/embedded/page-009-image-06.jpg",
+              "source_object": "IM116.jpg",
+              "source_page": 9,
+              "width": 824,
+              "height": 474,
+              "size_bytes": 55882,
+              "sha256": "ed289e47d0ecdaf2c7fcf7d800e00aed8c8a692595c945579d314f5bd6c3da64",
+              "review_status": "approved",
+              "reference_role": "installed_mainboard",
+              "board_side": "unknown",
+              "board_scope": "main",
+              "reference_strength": "medium"
+            }
+          ]
+        },
+        {
+          "page_number": 10,
+          "score": 11,
+          "board_side_evidence": "unknown",
+          "rendered_page": "assets/vision-reference-gallery/kj5/source-pages/page-010.png",
+          "text_excerpt": "Copyright belongs to Carlcare, cannot leak without permission Document Number Document Name Page CCTM2023154 TECNO KJ5 Service Manual 10/14 Security Classification Release Time Version Internal Use 2023-11-14 V1.0 13. Use disassemble stick to disassemble sub PCBA from the gap of top. 14.Use tweezers to lift the receiver pad from the groove of bottom. 15.Use tweezers to disassemble receiver from the groove of right. 16.Use tweezers to disassemble motor from the gap of bottom. 17.Use tweezers to disassemble speaker from the gap of left. *18.Pull left easy-to-pull gel slowly, if easy- to-pull gel",
+          "embedded_images": [
+            {
+              "asset_path": "assets/vision-reference-gallery/kj5/embedded/page-010-image-01.jpg",
+              "source_object": "IM119.jpg",
+              "source_page": 10,
+              "width": 608,
+              "height": 411,
+              "size_bytes": 35704,
+              "sha256": "6a6c560ce5052ba2ea914003c962ec6ec70bd7d8b8f36a71d3e9df670fb8f098",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/kj5/embedded/page-010-image-02.jpg",
+              "source_object": "IM120.jpg",
+              "source_page": 10,
+              "width": 765,
+              "height": 517,
+              "size_bytes": 48100,
+              "sha256": "dc095b9792638afd4217f73d5d72bc44f8d4ce9af8e30f46f16050a978700b16",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/kj5/embedded/page-010-image-03.jpg",
+              "source_object": "IM121.jpg",
+              "source_page": 10,
+              "width": 809,
+              "height": 488,
+              "size_bytes": 44624,
+              "sha256": "0631280e857ca00652249b0797703558c9afeac5ef8a2431ceb19c5db90536fd",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/kj5/embedded/page-010-image-04.jpg",
+              "source_object": "IM122.jpg",
+              "source_page": 10,
+              "width": 707,
+              "height": 425,
+              "size_bytes": 33214,
+              "sha256": "713c44936b38053c52bac8b7dce4a9beb1626e9a081fac1eec7df5fbaf27bd7c",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/kj5/embedded/page-010-image-05.jpg",
+              "source_object": "IM123.jpg",
+              "source_page": 10,
+              "width": 705,
+              "height": 419,
+              "size_bytes": 31573,
+              "sha256": "136b52b6561bea3ab6d89a1a106b57af171b10af0e4f94876f9fe2d4c5e87d8b",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/kj5/embedded/page-010-image-06.jpg",
+              "source_object": "IM124.jpg",
+              "source_page": 10,
+              "width": 918,
+              "height": 567,
+              "size_bytes": 67929,
+              "sha256": "1b7ad8144dd647d50029083200bd01a1556b5f46aa0eedaea4a000fc5af4dbae",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            }
+          ]
+        }
+      ],
+      "coverage": {
+        "main_board_top_standard_photo": "missing",
+        "main_board_bottom_standard_photo": "missing",
+        "exploded_structure": "available",
+        "installed_main_board": "available",
+        "installed_sub_board": "available"
+      },
+      "review_notes": "Service-manual photos are useful for installed-board recognition; the exact H6931 revision still needs confirmation from the physical board."
+    },
+    {
+      "model": "CM5",
+      "aliases": [
+        "K6855",
+        "H8918",
+        "TECNO CM5"
+      ],
+      "status": "candidates_extracted",
+      "board_versions": {
+        "main": [
+          "H8918_MAIN_PCB_V1.2"
+        ],
+        "sub": [
+          "H8918_SUB_PCB_2_V1.2"
+        ],
+        "other": []
+      },
+      "main_point_map": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM5-H8918/H8918_MAIN_PCB_V1.2_╬╗║┼═╝20241030.pdf",
+      "manuals": [
+        "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO CM5 Service Manual_1740044636762.pdf"
+      ],
+      "candidate_pages": [
+        {
+          "page_number": 3,
+          "score": 12,
+          "board_side_evidence": "unknown",
+          "rendered_page": "assets/vision-reference-gallery/cm5/source-pages/page-003.png",
+          "text_excerpt": "Copyright belongs to Carlcare, cannot leak without permission Document Number Document Name Page CCTM2025016 TECNO CM5 Service Manual 3/18 Security Classification Release Time Version Internal Use 2025-1-22 V1.0 38104320 Middle housing 19401370 Speaker BOX 23002500 Main FPC 17401834 2 in 1 12113873 Sub PCBA 23002516 Sidekey FPC 95601988 Vol Key frame 25002550 Battery 23002508 SIM FPC 23002501 Flash LED FPC 19101379 Coaxial cable2 12113399 ANT Sub PCBA 12113652 SIM Sub PCBA 1 EXPLODED VIEW 17601242 Fingerprint 19101378 Coaxial cable1 12113843 PCBA 17201942 R CAM 8M 17201919 R CAM 50M 38104246 U",
+          "embedded_images": [
+            {
+              "asset_path": "assets/vision-reference-gallery/cm5/embedded/page-003-image-01.jpg",
+              "source_object": "IM14.jpg",
+              "source_page": 3,
+              "width": 675,
+              "height": 418,
+              "size_bytes": 24787,
+              "sha256": "6517a8f72a3557a5269aa37d5b10e78896fadf9aae16463560a533fb3a8cb06b",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/cm5/embedded/page-003-image-02.jpg",
+              "source_object": "IM65.jpg",
+              "source_page": 3,
+              "width": 1290,
+              "height": 785,
+              "size_bytes": 118222,
+              "sha256": "add0a66dd35721f17675702ef179943a829014787fd3eb56b5ae96c02a8741f9",
+              "review_status": "approved",
+              "reference_role": "exploded_structure",
+              "board_side": "unknown",
+              "board_scope": "mixed_phone_components",
+              "reference_strength": "weak"
+            }
+          ]
+        },
+        {
+          "page_number": 6,
+          "score": 10,
+          "board_side_evidence": "unknown",
+          "rendered_page": "assets/vision-reference-gallery/cm5/source-pages/page-006.png",
+          "text_excerpt": "Copyright belongs to Carlcare, cannot leak without permission Document Number Document Name Page CCTM2025016 TECNO CM5 Service Manual 6/18 Security Classification Release Time Version Internal Use 2025-1-22 V1.0 4 AUXILIARY MATERIALS INFORMATION SAP code Chinese Description English Description 23309864 闪光灯罩防窜光泡棉_3.7*2*0.55_CM6_V0 Flash Lens Foam 3.7*2*0.55 CM6 V0 23309875 LCM BTB 密封胶圈_10.85*5.2*2.65_CM5_V0 LCM BTB Rubber 10.85*5.2*2.65 CM5 V0 23309876 上主副板 BTB 密封胶圈_22*3.5*0.5_CM5_V0 UP M&S BoardBTB Rubber 22*3.5*0.5 CM5 V0 23309877 下主副板 BTB 密封胶圈_14*5*0.5_CM5_V0 Down M&S BoardBTBRubber 14*5*0.5",
+          "embedded_images": []
+        },
+        {
+          "page_number": 11,
+          "score": 11,
+          "board_side_evidence": "unknown",
+          "rendered_page": "assets/vision-reference-gallery/cm5/source-pages/page-011.png",
+          "text_excerpt": "Copyright belongs to Carlcare, cannot leak without permission Document Number Document Name Page CCTM2025016 TECNO CM5 Service Manual 11/18 Security Classification Release Time Version Internal Use 2025-1-22 V1.0 13.Use disassemble stick to disassemble PCBA from bottom. 14.Use tweezers to lift the receiver pad from the groove of right. 15.Use tweezers to disassemble receiver from the groove of right. 16.Tear off black heat dissipation film. 17.Use disassemble stick to disassemble lower frame. 18.Check whether the waterproof is white, then use disassemble stick to open main FPC connector and SI",
+          "embedded_images": [
+            {
+              "asset_path": "assets/vision-reference-gallery/cm5/embedded/page-011-image-01.jpg",
+              "source_object": "IM124.jpg",
+              "source_page": 11,
+              "width": 851,
+              "height": 524,
+              "size_bytes": 52967,
+              "sha256": "1827121a573ab472f58236ae7f3aae1e1b6438441dad9820c0a7e3f284963b32",
+              "review_status": "approved",
+              "reference_role": "installed_mainboard",
+              "board_side": "unknown",
+              "board_scope": "main",
+              "reference_strength": "medium"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/cm5/embedded/page-011-image-02.jpg",
+              "source_object": "IM125.jpg",
+              "source_page": 11,
+              "width": 740,
+              "height": 449,
+              "size_bytes": 45417,
+              "sha256": "2918289d5b3bf23ab6428fd64ef3c45443bdc36cd112f19b51b0b3e572070bee",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/cm5/embedded/page-011-image-03.jpg",
+              "source_object": "IM126.jpg",
+              "source_page": 11,
+              "width": 895,
+              "height": 530,
+              "size_bytes": 57442,
+              "sha256": "e4171afa6c4c280ff8023eead264498cf011e179e1c72fb0086315859d0b87b4",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/cm5/embedded/page-011-image-04.jpg",
+              "source_object": "IM127.jpg",
+              "source_page": 11,
+              "width": 794,
+              "height": 464,
+              "size_bytes": 38030,
+              "sha256": "70023bdabb2ed1a73fa594285f2da973591351aadc55554b98dfd2f4dd1cc80f",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/cm5/embedded/page-011-image-05.jpg",
+              "source_object": "IM128.jpg",
+              "source_page": 11,
+              "width": 929,
+              "height": 611,
+              "size_bytes": 56273,
+              "sha256": "0ec98b637c82c1e120ce52ab354f2ee167ab51fe5b9b543676f6e1f31a5410a3",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/cm5/embedded/page-011-image-06.jpg",
+              "source_object": "IM129.jpg",
+              "source_page": 11,
+              "width": 1010,
+              "height": 647,
+              "size_bytes": 69318,
+              "sha256": "ede55dbd5f4bbab11a837b4b683d277870e15ddc68171600fd3403d70477f836",
+              "review_status": "approved",
+              "reference_role": "installed_subboard",
+              "board_side": "unknown",
+              "board_scope": "sub",
+              "reference_strength": "medium"
+            }
+          ]
+        },
+        {
+          "page_number": 12,
+          "score": 11,
+          "board_side_evidence": "unknown",
+          "rendered_page": "assets/vision-reference-gallery/cm5/source-pages/page-012.png",
+          "text_excerpt": "Copyright belongs to Carlcare, cannot leak without permission Document Number Document Name Page CCTM2025016 TECNO CM5 Service Manual 12/18 Security Classification Release Time Version Internal Use 2025-1-22 V1.0 19.Use tweezers to disassemble speaker BOX. 20.Disassemble coaxial cables and antenna sub PCBA. 21.Use tweezers to disassemble SIM sub PCBA. 22.Use tweezers to disassemble fingerprint and sub PCBA. 23.Use tweezers to disassemble motor from groove of right. *24.Pull easy-to-pull gel slowly, and keep about 30°, avoid it to be broken, right hand pull gel while another hand press the gel.",
+          "embedded_images": [
+            {
+              "asset_path": "assets/vision-reference-gallery/cm5/embedded/page-012-image-01.jpg",
+              "source_object": "IM132.jpg",
+              "source_page": 12,
+              "width": 1088,
+              "height": 626,
+              "size_bytes": 77725,
+              "sha256": "0de2c9834fc73635a4a80bd538d0e3e9c40741f25bc9bcdf8e4caa5da9182e06",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/cm5/embedded/page-012-image-02.jpg",
+              "source_object": "IM133.jpg",
+              "source_page": 12,
+              "width": 1064,
+              "height": 596,
+              "size_bytes": 79170,
+              "sha256": "6c6812f60c76022651e5f28615bc9ad7dccd6c9011398170d6959e7b455be93e",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/cm5/embedded/page-012-image-03.jpg",
+              "source_object": "IM134.jpg",
+              "source_page": 12,
+              "width": 788,
+              "height": 467,
+              "size_bytes": 32848,
+              "sha256": "45e2e1006b77cd746c7054dfe95b589ca52785fcb6216ae14376f1ef0f9177c9",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/cm5/embedded/page-012-image-04.jpg",
+              "source_object": "IM135.jpg",
+              "source_page": 12,
+              "width": 1022,
+              "height": 563,
+              "size_bytes": 55959,
+              "sha256": "69e5cbb1ea24f57aa826de249d485fc577a1fc31a4b3d11d1987b6654c9079d3",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/cm5/embedded/page-012-image-05.jpg",
+              "source_object": "IM136.jpg",
+              "source_page": 12,
+              "width": 1319,
+              "height": 762,
+              "size_bytes": 104811,
+              "sha256": "f55debf57d69777743cfd00902d79ba20e4f44d9fc70c411248b85cf215898bb",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/cm5/embedded/page-012-image-06.jpg",
+              "source_object": "IM137.jpg",
+              "source_page": 12,
+              "width": 795,
+              "height": 440,
+              "size_bytes": 29898,
+              "sha256": "bb1f01df4a2e5ab1c83c7e446b3fee0892540d7befe6b0f14897804629b0b5b7",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            }
+          ]
+        }
+      ],
+      "coverage": {
+        "main_board_top_standard_photo": "missing",
+        "main_board_bottom_standard_photo": "missing",
+        "exploded_structure": "available",
+        "installed_main_board": "available",
+        "installed_sub_board": "available"
+      },
+      "review_notes": "CM5 shares the H8918 main-board platform with CM6; sales-model separation must use assembly context or sub-board evidence."
+    },
+    {
+      "model": "CM6",
+      "aliases": [
+        "K6855",
+        "H8918",
+        "TECNO CM6"
+      ],
+      "status": "candidates_extracted",
+      "board_versions": {
+        "main": [
+          "H8918_MAIN_PCB_V1.2"
+        ],
+        "sub": [
+          "H8918_SUB_PCB_1_V1.3"
+        ],
+        "other": []
+      },
+      "main_point_map": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/CM6-H8918/H8918_MAIN_PCB_V1.2_╬╗║┼═╝20241030.pdf",
+      "manuals": [
+        "source-materials/service-manual-library/2026-07-10-desktop-manual/files/TECNO CM6 Service Manual_1740044953319.pdf"
+      ],
+      "candidate_pages": [
+        {
+          "page_number": 3,
+          "score": 12,
+          "board_side_evidence": "unknown",
+          "rendered_page": "assets/vision-reference-gallery/cm6/source-pages/page-003.png",
+          "text_excerpt": "Copyright belongs to Carlcare, cannot leak without permission Document Number Document Name Page CCTM2025001 TECNO CM6 Service Manual 3/16 Security Classification Release Time Version Internal Use 2025-1-9 V1.0 12206028 3 in 1 19101377 Coaxial cable2 23002500 SIM FPC 12113623 SIM sub PCBA 12113872 Sub PCBA 23002501 Flash FPC 19101376 Coaxial cable1 25002550 Battery 23002503 Main KEY FPC 38104229 Lower frame 1 EXPLODED VIEW 17601244 Fingerprint 17201907 Upper frame 12113797 PCBA 17201907 F CAM 50M 17201919 R CAM 50M 19501147 Receiver 17201942 R CAM 8M 95602008 Card holder 19301172 Motor 1220602",
+          "embedded_images": [
+            {
+              "asset_path": "assets/vision-reference-gallery/cm6/embedded/page-003-image-01.jpg",
+              "source_object": "IM14.jpg",
+              "source_page": 3,
+              "width": 675,
+              "height": 418,
+              "size_bytes": 24787,
+              "sha256": "6517a8f72a3557a5269aa37d5b10e78896fadf9aae16463560a533fb3a8cb06b",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/cm6/embedded/page-003-image-02.jpg",
+              "source_object": "IM65.jpg",
+              "source_page": 3,
+              "width": 1361,
+              "height": 798,
+              "size_bytes": 142416,
+              "sha256": "5476682112d3b82996c5eb503c0e7e4b06503e579642267ac75bb5a6f8e23bbf",
+              "review_status": "approved",
+              "reference_role": "exploded_structure",
+              "board_side": "unknown",
+              "board_scope": "mixed_phone_components",
+              "reference_strength": "weak"
+            }
+          ]
+        },
+        {
+          "page_number": 6,
+          "score": 10,
+          "board_side_evidence": "unknown",
+          "rendered_page": "assets/vision-reference-gallery/cm6/source-pages/page-006.png",
+          "text_excerpt": "Copyright belongs to Carlcare, cannot leak without permission Document Number Document Name Page CCTM2025001 TECNO CM6 Service Manual 6/16 Security Classification Release Time Version Internal Use 2025-1-9 V1.0 4 AUXILIARY MATERIALS INFORMATION SAP code Chinese Description English Description 23309862 前摄密封泡棉_φ8.22*0.45_CM6_V0 Front CAM seal Foam φ8.22*0.45 CM6 V0 23309865 指纹压紧泡棉_5.9*4.07*0.35_CM6_V0 FP Imp foam 5.9*4.07*0.35 CM6 V0 23309866 USB FPC 压紧泡棉_12.6*3.25*0.55_CM6_V0 USB FPC Imp foam 12.6*3.25*0.55 CM6 V0 23309867 后主摄防尘罩_14.3*14.3*3.3_CM6_V0 R M CAM Dust shield 14.3*14.3*3.3 CM6 V0 233",
+          "embedded_images": []
+        },
+        {
+          "page_number": 11,
+          "score": 11,
+          "board_side_evidence": "unknown",
+          "rendered_page": "assets/vision-reference-gallery/cm6/source-pages/page-011.png",
+          "text_excerpt": "Copyright belongs to Carlcare, cannot leak without permission Document Number Document Name Page CCTM2025001 TECNO CM6 Service Manual 11/16 Security Classification Release Time Version Internal Use 2025-1-9 V1.0 13.Use disassemble stick to disassemble PCBA from bottom. 14.Use tweezers to lift the receiver pad from the groove of right. 15.Use tweezers to disassemble receiver from the groove of bottom. 16.Use tweezers to disassemble speaker BOX, then use disassemble stick to open all connectors. 17.Screw off silver screw, then use tweezers to disassemble SIM sub PCBA. 18.Use tweezers to disassem",
+          "embedded_images": [
+            {
+              "asset_path": "assets/vision-reference-gallery/cm6/embedded/page-011-image-01.jpg",
+              "source_object": "IM124.jpg",
+              "source_page": 11,
+              "width": 863,
+              "height": 504,
+              "size_bytes": 55426,
+              "sha256": "4f692c3124f6ef26f7d9fe566bd719b20875666a8b878a5007220c5abc7c95af",
+              "review_status": "approved",
+              "reference_role": "installed_mainboard",
+              "board_side": "unknown",
+              "board_scope": "main",
+              "reference_strength": "medium"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/cm6/embedded/page-011-image-02.jpg",
+              "source_object": "IM125.jpg",
+              "source_page": 11,
+              "width": 801,
+              "height": 443,
+              "size_bytes": 51081,
+              "sha256": "23dcb3d2076f64d808dabb77001168f71854f57e390c5c90a5e5b4514c6e2af1",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/cm6/embedded/page-011-image-03.jpg",
+              "source_object": "IM126.jpg",
+              "source_page": 11,
+              "width": 726,
+              "height": 438,
+              "size_bytes": 50874,
+              "sha256": "c59fccb27fcadbbb2e252866d87c3d8403d01942a2f91a0c08723285e3ce68c7",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/cm6/embedded/page-011-image-04.jpg",
+              "source_object": "IM127.jpg",
+              "source_page": 11,
+              "width": 765,
+              "height": 446,
+              "size_bytes": 39940,
+              "sha256": "39fb17c4f74f60a2df73fde4750be31e53fcf04c3fc3d1e9b2e91fd50944b81a",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/cm6/embedded/page-011-image-05.jpg",
+              "source_object": "IM128.jpg",
+              "source_page": 11,
+              "width": 701,
+              "height": 419,
+              "size_bytes": 31184,
+              "sha256": "f8a89234bc91b1d1f731d390a510657a183bb6b08e1d65121bad1f84f135d221",
+              "review_status": "approved",
+              "reference_role": "installed_subboard",
+              "board_side": "unknown",
+              "board_scope": "sub",
+              "reference_strength": "medium"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/cm6/embedded/page-011-image-06.jpg",
+              "source_object": "IM129.jpg",
+              "source_page": 11,
+              "width": 780,
+              "height": 446,
+              "size_bytes": 39492,
+              "sha256": "fb04e6a603ea7faccfc636b02f547e65d8b2ee37298249976115d92cfc61e822",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            }
+          ]
+        }
+      ],
+      "coverage": {
+        "main_board_top_standard_photo": "missing",
+        "main_board_bottom_standard_photo": "missing",
+        "exploded_structure": "available",
+        "installed_main_board": "available",
+        "installed_sub_board": "available"
+      },
+      "review_notes": "CM6 shares the H8918 main-board platform with CM5; sub-board and full assembly context are discriminating references."
+    },
+    {
+      "model": "X6880",
+      "aliases": [
+        "K6789",
+        "H8912",
+        "Infinix X6880"
+      ],
+      "status": "candidates_extracted",
+      "board_versions": {
+        "main": [
+          "H8912_MAIN_PCB_V1.1"
+        ],
+        "sub": [
+          "H8912_SUB_PCB_1_V1.1"
+        ],
+        "other": []
+      },
+      "main_point_map": "source-materials/manufacturing-center/top20-model-board-assets/2026-07-02-inhouse-top20/packages/X6880-H8912/H8912_MAIN_PCB_V1.1_位号图_20240605.pdf",
+      "manuals": [
+        "source-materials/service-manual-library/2026-07-10-desktop-manual/files/Infinix X6880 Service Manual.pdf"
+      ],
+      "candidate_pages": [
+        {
+          "page_number": 3,
+          "score": 12,
+          "board_side_evidence": "unknown",
+          "rendered_page": "assets/vision-reference-gallery/x6880/source-pages/page-003.png",
+          "text_excerpt": "Copyright belongs to Carlcare, cannot leak without permission Document Number Document Name Page CCTM2024137 Infinix X6880 Service Manual 3/14 Security Classification Release Time Version Internal Use 2024-8-19 V1.0 17201866 2M CAM 23002413 Main FPC 19301172 Motor 12112969 Sub 25002206 Battery 19401352 BOX speaker 17201930 13M CAM 12206006 3in1 37600493C ard holder 1 EXPLODED VIEW 23002414 Side key FPC 19501130 Receiver 12113194 PCBA 17201891 50M CAM 38103588 Upper frame 12205603 Battery cover 19101359 Coaxial cable 90401164 Power Key Black 17601103 Fingerprint 90401158 Vol Key Black",
+          "embedded_images": [
+            {
+              "asset_path": "assets/vision-reference-gallery/x6880/embedded/page-003-image-01.jpg",
+              "source_object": "IM14.jpg",
+              "source_page": 3,
+              "width": 675,
+              "height": 418,
+              "size_bytes": 24787,
+              "sha256": "6517a8f72a3557a5269aa37d5b10e78896fadf9aae16463560a533fb3a8cb06b",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/x6880/embedded/page-003-image-02.jpg",
+              "source_object": "IM64.jpg",
+              "source_page": 3,
+              "width": 1587,
+              "height": 798,
+              "size_bytes": 170923,
+              "sha256": "f370828435491a778bd4f3d5ba54d9c9a99d5e0f4318d380bbdbd3d8cfe1306d",
+              "review_status": "approved",
+              "reference_role": "exploded_structure",
+              "board_side": "unknown",
+              "board_scope": "mixed_phone_components",
+              "reference_strength": "weak"
+            }
+          ]
+        },
+        {
+          "page_number": 9,
+          "score": 18,
+          "board_side_evidence": "unknown",
+          "rendered_page": "assets/vision-reference-gallery/x6880/source-pages/page-009.png",
+          "text_excerpt": "Copyright belongs to Carlcare, cannot leak without permission Document Number Document Name Page CCTM2024137 Infinix X6880 Service Manual 9/14 Security Classification Release Time Version Internal Use 2024-8-19 V1.0 5. Use a screwdriver to remove the 18 screws. 6. Use a pry bar to remove the BOX speaker. 7. After the BOX speaker is removed, Pry open from the lower left side of the upper frame with a pry bar. 8.After the upper frame is removed, it show like the picture. *9.Check the color of the waterproof mark. If it turns red, it means the phone has been flooded. 10. Use a pry bar to disconne",
+          "embedded_images": [
+            {
+              "asset_path": "assets/vision-reference-gallery/x6880/embedded/page-009-image-01.jpg",
+              "source_object": "IM108.jpg",
+              "source_page": 9,
+              "width": 1578,
+              "height": 732,
+              "size_bytes": 159723,
+              "sha256": "6c82e4a92bd540ac864041d95a479e202f3cac95e8247656856487f1471e1097",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/x6880/embedded/page-009-image-02.jpg",
+              "source_object": "IM109.jpg",
+              "source_page": 9,
+              "width": 1281,
+              "height": 585,
+              "size_bytes": 112520,
+              "sha256": "0397845ce8a0fbc2aaf4e3f44ccd96bf4aa974c3629e680b0d8a8de53aff7669",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/x6880/embedded/page-009-image-03.jpg",
+              "source_object": "IM110.jpg",
+              "source_page": 9,
+              "width": 1067,
+              "height": 857,
+              "size_bytes": 110636,
+              "sha256": "6b77c857cff9b1422639a0f869c6dda2d9823cf5e123e06d113d1799e496965e",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/x6880/embedded/page-009-image-04.jpg",
+              "source_object": "IM111.jpg",
+              "source_page": 9,
+              "width": 1110,
+              "height": 846,
+              "size_bytes": 117180,
+              "sha256": "7088ef2e4947bc52cf6a4f8255151fb83d8f5f66f37a94432f26afdabce7231d",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/x6880/embedded/page-009-image-05.jpg",
+              "source_object": "IM112.jpg",
+              "source_page": 9,
+              "width": 1193,
+              "height": 555,
+              "size_bytes": 93147,
+              "sha256": "6a6b302b65823fb5ce77f8efa2e2ab461a6a3cd10d53fec8c73649a671e2c29b",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/x6880/embedded/page-009-image-06.jpg",
+              "source_object": "IM113.jpg",
+              "source_page": 9,
+              "width": 1519,
+              "height": 865,
+              "size_bytes": 182517,
+              "sha256": "a33b576b1be4173148a8770a07d764863b4f7c030df7462203a7f3417bf65596",
+              "review_status": "approved",
+              "reference_role": "installed_mainboard",
+              "board_side": "unknown",
+              "board_scope": "main",
+              "reference_strength": "medium"
+            }
+          ]
+        },
+        {
+          "page_number": 10,
+          "score": 30,
+          "board_side_evidence": "unknown",
+          "rendered_page": "assets/vision-reference-gallery/x6880/source-pages/page-010.png",
+          "text_excerpt": "Copyright belongs to Carlcare, cannot leak without permission Document Number Document Name Page CCTM2024137 Infinix X6880 Service Manual 10/14 Security Classification Release Time Version Internal Use 2024-8-19 V1.0 11.Using a pry bar, lift the motherboard from the edge. 12. Use tweezers to remove the earpiece. 13.Use a pry bar to disconnect the coaxial cable，fingerprint and main PCBA from sub board. 14.Lift the sub board from the top with a pry bar. *15.Use tweezers to gently remove the fingerprint module under the screen, taking care not to damage it. 16.Use tweezers to remove the vibration",
+          "embedded_images": [
+            {
+              "asset_path": "assets/vision-reference-gallery/x6880/embedded/page-010-image-01.jpg",
+              "source_object": "IM116.jpg",
+              "source_page": 10,
+              "width": 1003,
+              "height": 699,
+              "size_bytes": 96535,
+              "sha256": "6e473fcf297aa0d4521aa68088862ce57224572160d2ade99242e06d951c728d",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/x6880/embedded/page-010-image-02.jpg",
+              "source_object": "IM117.jpg",
+              "source_page": 10,
+              "width": 1315,
+              "height": 927,
+              "size_bytes": 157317,
+              "sha256": "20314e0af3a0d27df37f9da1ded58dd7650f491a7f030497a2bdc06d8b65f1f4",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/x6880/embedded/page-010-image-03.jpg",
+              "source_object": "IM118.jpg",
+              "source_page": 10,
+              "width": 1124,
+              "height": 647,
+              "size_bytes": 90464,
+              "sha256": "5cfd5f5d17c622aba7baa0112260e7276abe1643b1dc2c8fe920530eb8f6fa6f",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/x6880/embedded/page-010-image-04.jpg",
+              "source_object": "IM119.jpg",
+              "source_page": 10,
+              "width": 1287,
+              "height": 728,
+              "size_bytes": 131864,
+              "sha256": "f779ea11e3db2efb60d1e1190c0f4c95765589d38bca05dc32ff0854ed58071f",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/x6880/embedded/page-010-image-05.jpg",
+              "source_object": "IM120.jpg",
+              "source_page": 10,
+              "width": 1323,
+              "height": 786,
+              "size_bytes": 126563,
+              "sha256": "2606a8b345ad713db0362ff4671c52029e27de42b89513df8795935d2aaf6f44",
+              "review_status": "approved",
+              "reference_role": "installed_subboard",
+              "board_side": "unknown",
+              "board_scope": "sub",
+              "reference_strength": "medium"
+            },
+            {
+              "asset_path": "assets/vision-reference-gallery/x6880/embedded/page-010-image-06.jpg",
+              "source_object": "IM121.jpg",
+              "source_page": 10,
+              "width": 1224,
+              "height": 702,
+              "size_bytes": 117187,
+              "sha256": "24ef5ef4e918f046686fb09f5ce7f7845a1f809d8d20268c6d62a901627924ba",
+              "review_status": "not_selected",
+              "reference_role": "candidate",
+              "board_side": "unknown"
+            }
+          ]
+        }
+      ],
+      "coverage": {
+        "main_board_top_standard_photo": "missing",
+        "main_board_bottom_standard_photo": "missing",
+        "exploded_structure": "available",
+        "installed_main_board": "available",
+        "installed_sub_board": "available"
+      },
+      "review_notes": "This manual has the strongest installed-board closeups in the batch, but still lacks an isolated two-side main-board pair."
+    }
+  ]
+}

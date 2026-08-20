@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "VISUAL-QC-SOURCE-AUDIT-V1",
+  "title": "Visual QC Controlled Source Library Audit",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "status",
+    "counts",
+    "packages",
+    "invalid_objects",
+    "orphaned_objects",
+    "library_issues"
+  ],
+  "properties": {
+    "schema_version": {"const": "VISUAL-QC-SOURCE-AUDIT-V1"},
+    "status": {"enum": ["healthy", "attention", "issues"]},
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "package_total",
+        "valid_packages",
+        "invalid_packages",
+        "incomplete_packages",
+        "object_total",
+        "referenced_objects",
+        "invalid_objects",
+        "orphaned_objects",
+        "library_issues"
+      ],
+      "properties": {
+        "package_total": {"type": "integer", "minimum": 0},
+        "valid_packages": {"type": "integer", "minimum": 0},
+        "invalid_packages": {"type": "integer", "minimum": 0},
+        "incomplete_packages": {"type": "integer", "minimum": 0},
+        "object_total": {"type": "integer", "minimum": 0},
+        "referenced_objects": {"type": "integer", "minimum": 0},
+        "invalid_objects": {"type": "integer", "minimum": 0},
+        "orphaned_objects": {"type": "integer", "minimum": 0},
+        "library_issues": {"type": "integer", "minimum": 0}
+      }
+    },
+    "packages": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["package_id", "status", "entry_count"],
+            "properties": {
+              "package_id": {"type": "string", "minLength": 1},
+              "status": {"const": "valid"},
+              "entry_count": {"type": "integer", "minimum": 1}
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["package_id", "status", "error_code", "message"],
+            "properties": {
+              "package_id": {"type": "string", "minLength": 1},
+              "status": {"const": "invalid"},
+              "error_code": {"type": "string", "minLength": 1},
+              "message": {"type": "string", "minLength": 1}
+            }
+          }
+        ]
+      }
+    },
+    "invalid_objects": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/finding"}
+    },
+    "orphaned_objects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["object_path", "status"],
+        "properties": {
+          "object_path": {"type": "string", "minLength": 1},
+          "status": {"const": "orphaned"}
+        }
+      }
+    },
+    "library_issues": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/libraryFinding"}
+    }
+  },
+  "$defs": {
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["object_path", "error_code", "message"],
+      "properties": {
+        "object_path": {"type": "string", "minLength": 1},
+        "error_code": {"type": "string", "minLength": 1},
+        "message": {"type": "string", "minLength": 1}
+      }
+    },
+    "libraryFinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "error_code", "message"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "error_code": {"type": "string", "minLength": 1},
+        "message": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "manifest_id": "KL4-F201-BOARD-SIDES-V1",
+  "profile_id": "kl4-f201",
+  "board_id": "BOARD-KL4-F201-MAIN-V1.2",
+  "default_side_id": "main_page_2",
+  "sides": [
+    {
+      "side_id": "main_page_1",
+      "label": "第1面",
+      "source_pdf_page": 1,
+      "engineering_texture": "assets/board-atlas/kl4-f201/main-point-map-page-1.png",
+      "compiled_data": "knowledge-base/kl4-board-compiled-page-1.json"
+    },
+    {
+      "side_id": "main_page_2",
+      "label": "第2面",
+      "source_pdf_page": 2,
+      "engineering_texture": "assets/board-atlas/kl4-f201/main-point-map-page-2.png",
+      "compiled_data": "knowledge-base/kl4-board-compiled.json"
+    }
+  ]
+}
