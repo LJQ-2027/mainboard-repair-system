@@ -301,4 +301,16 @@ are mode `0400` inside a deployment-unique mode `0500` staging directory and
 are removed after success or rollback. The script refuses a dirty worktree and
 deploys only committed `HEAD`.
 
+After a successful smoke test, the deployment script runs bounded retention for
+deployment-owned server caches. By default it keeps the active Visual-QC venv,
+one previous Visual-QC venv, and the two newest rollback directories that
+contain an app backup. Older `visual-qc-*` venv directories, older or partial
+rollback directories, and legacy flat deploy artifacts under
+`/opt/motherboard-repair-beta/deploy.tar.gz` or
+`/opt/motherboard-repair-beta/deploy-input/` are eligible for removal. The
+retention guard refuses runtime app, data, log, and active symlink paths. Use
+`-RetentionDryRun` to print candidates without deletion, or increase
+`-RetainVisualQcVenvs` / `-RetainRollbackPackages` when a release needs a
+wider rollback window.
+
 Basic Auth is the internal visual-data identity provider, not a technician requirement or the final global identity architecture. A later corporate SSO/OIDC gateway may replace it while preserving the same verified `X-Actor-Id` and `X-Actor-Role` API contract.

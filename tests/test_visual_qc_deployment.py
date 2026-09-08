@@ -156,6 +156,17 @@ class VisualQcDeploymentContractTests(unittest.TestCase):
             "/tmp/mb-repair-public-technician-index.html",
             '"/api/v1/visual-qc/identity"',
             '"/assets/visual-qc-workbench/"',
+            "RetainVisualQcVenvs",
+            "RetainRollbackPackages",
+            "RetentionDryRun",
+            "run_deployment_retention",
+            "retention_candidate bytes=",
+            "retention_keep active_venv",
+            "retention_keep previous_venv",
+            "retention_keep rollback",
+            "find \"$REMOTE_DIR/venvs\"",
+            "find \"$REMOTE_DIR/rollback\"",
+            "-printf '%T@ %p\\n'",
         ):
             self.assertIn(required, script)
 
@@ -231,6 +242,33 @@ class VisualQcDeploymentContractTests(unittest.TestCase):
         self.assertIn("chmod 0400 '$remoteInputDir'/*", script)
         self.assertIn("chmod 0500 '$remoteInputDir'", script)
         self.assertIn("rm -rf '$remoteInputDir'", script)
+
+    def test_deployment_retention_keeps_runtime_paths_and_supports_dry_run(self):
+        script = (
+            ROOT / "scripts" / "deploy-visual-qc-pilot.ps1"
+        ).read_text(encoding="utf-8")
+
+        for required in (
+            "RetainVisualQcVenvs must be at least 2",
+            "RetainRollbackPackages must be at least 2",
+            "RETENTION_DRY_RUN=\"__RETENTION_DRY_RUN__\"",
+            "RETAIN_VISUAL_QC_VENVS=\"__RETAIN_VISUAL_QC_VENVS__\"",
+            "RETAIN_ROLLBACK_PACKAGES=\"__RETAIN_ROLLBACK_PACKAGES__\"",
+            "assert_retention_path",
+            'case "$path" in',
+            '"$REMOTE_DIR/deploy-input/"*',
+            '"$REMOTE_DIR/venvs/visual-qc-"*',
+            '"$REMOTE_DIR/rollback/"*)',
+            "Refusing retention path required by runtime",
+            'if [ "$RETENTION_DRY_RUN" = "1" ]; then',
+            "Deployment retention dry-run complete; no files removed.",
+            "Deployment retention cleanup failed after successful smoke",
+        ):
+            self.assertIn(required, script)
+
+        smoke = script.index("wait_for_public_technician_entry")
+        retention = script.index("if ! run_deployment_retention")
+        self.assertLess(smoke, retention)
 
     def test_remote_archive_identity_is_verified_before_extraction(self):
         script = (

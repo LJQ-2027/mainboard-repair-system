@@ -7,6 +7,9 @@ param(
   [string]$ReviewerMapPath = "",
   [PSCredential]$TechnicianCredential,
   [PSCredential]$ReviewerCredential,
+  [int]$RetainVisualQcVenvs = 2,
+  [int]$RetainRollbackPackages = 2,
+  [switch]$RetentionDryRun,
   [switch]$PreflightOnly
 )
 
@@ -51,6 +54,12 @@ if (-not $KeyPath) {
 }
 if ($RemoteDir -notmatch '^/[A-Za-z0-9._/-]+$') {
   throw "RemoteDir must be an absolute path containing only safe path characters."
+}
+if ($RetainVisualQcVenvs -lt 2) {
+  throw "RetainVisualQcVenvs must be at least 2 to keep current and previous venvs."
+}
+if ($RetainRollbackPackages -lt 2) {
+  throw "RetainRollbackPackages must be at least 2 to keep two successful rollback packages."
 }
 
 $resolvedKey = (Resolve-Path -LiteralPath $KeyPath).Path
@@ -236,6 +245,9 @@ DATABASE_SNAPSHOT_READY=0
 DATABASE_MAY_BE_MUTATED=0
 SERVICE_STATE_CAPTURED=0
 OLD_VENV_TARGET=""
+RETENTION_DRY_RUN="__RETENTION_DRY_RUN__"
+RETAIN_VISUAL_QC_VENVS="__RETAIN_VISUAL_QC_VENVS__"
+RETAIN_ROLLBACK_PACKAGES="__RETAIN_ROLLBACK_PACKAGES__"
 
 mkdir -p "$ROLLBACK_DIR" "$REMOTE_DIR/logs" "$DATA_DIR" "$REMOTE_DIR/venvs"
 exec 9>"$DEPLOY_LOCK"
@@ -267,6 +279,97 @@ restore_optional() {
 remove_staged_secrets() {
   rm -f "$INPUT_DIR/.htpasswd-mb-repair-beta"
   rm -f "$INPUT_DIR/mb-repair-beta-reviewers.map"
+}
+
+assert_retention_path() {
+  local path="$1"
+  case "$path" in
+    "$REMOTE_DIR/deploy.tar.gz"|\
+    "$REMOTE_DIR/deploy-input/"*|\
+    "$REMOTE_DIR/venvs/visual-qc-"*|\
+    "$REMOTE_DIR/rollback/"*) ;;
+    *)
+      echo "Refusing retention path outside approved deployment caches: $path" >&2
+      return 1
+      ;;
+  esac
+  case "$path" in
+    "$APP_DIR"|"$APP_DIR/"*|"$DATA_DIR"|"$DATA_DIR/"*|"$VENV_LINK")
+      echo "Refusing retention path required by runtime: $path" >&2
+      return 1
+      ;;
+  esac
+}
+
+retention_remove() {
+  local path="$1"
+  assert_retention_path "$path"
+  [ -e "$path" ] || [ -L "$path" ] || return 0
+  local bytes
+  bytes="$(du -sb "$path" | awk '{print $1}')"
+  echo "retention_candidate bytes=$bytes path=$path"
+  if [ "$RETENTION_DRY_RUN" = "1" ]; then
+    return 0
+  fi
+  rm -rf -- "$path"
+}
+
+run_deployment_retention() {
+  echo "== deployment retention cleanup =="
+  local active_venv=""
+  if [ -L "$VENV_LINK" ]; then
+    active_venv="$(readlink -f "$VENV_LINK")"
+  fi
+
+  retention_remove "$REMOTE_DIR/deploy.tar.gz"
+  for legacy_input in \
+    "$REMOTE_DIR/deploy-input/app.tar.gz" \
+    "$REMOTE_DIR/deploy-input/mb-repair-beta.locations.conf" \
+    "$REMOTE_DIR/deploy-input/mb-repair-beta-role-map.conf"; do
+    retention_remove "$legacy_input"
+  done
+
+  local kept_venvs=0
+  local venv
+  while IFS= read -r venv; do
+    if [ "$venv" = "$active_venv" ]; then
+      kept_venvs=$((kept_venvs + 1))
+      echo "retention_keep active_venv path=$venv"
+      continue
+    fi
+    if [ "$kept_venvs" -lt "$RETAIN_VISUAL_QC_VENVS" ]; then
+      kept_venvs=$((kept_venvs + 1))
+      echo "retention_keep previous_venv path=$venv"
+      continue
+    fi
+    retention_remove "$venv"
+  done < <(
+    find "$REMOTE_DIR/venvs" -mindepth 1 -maxdepth 1 \
+      -type d -name 'visual-qc-*' -printf '%T@ %p\n' 2>/dev/null |
+      sort -nr | cut -d ' ' -f2-
+  )
+
+  local kept_rollbacks=0
+  local rollback_dir
+  while IFS= read -r rollback_dir; do
+    if [ -d "$rollback_dir/app" ] &&
+      [ "$kept_rollbacks" -lt "$RETAIN_ROLLBACK_PACKAGES" ]; then
+      kept_rollbacks=$((kept_rollbacks + 1))
+      echo "retention_keep rollback path=$rollback_dir"
+      continue
+    fi
+    retention_remove "$rollback_dir"
+  done < <(
+    find "$REMOTE_DIR/rollback" -mindepth 1 -maxdepth 1 \
+      -type d -printf '%T@ %p\n' 2>/dev/null | sort -nr |
+      cut -d ' ' -f2-
+  )
+
+  if [ "$RETENTION_DRY_RUN" = "1" ]; then
+    echo "Deployment retention dry-run complete; no files removed."
+  else
+    echo "Deployment retention cleanup complete."
+  fi
 }
 
 restore_database() {
@@ -576,6 +679,9 @@ done
 
 pm2 save
 remove_staged_secrets
+if ! run_deployment_retention; then
+  echo "Deployment retention cleanup failed after successful smoke; review manually." >&2
+fi
 trap - ERR
 echo "Deployment __COMMIT_FULL__ completed."
 pm2 status motherboard-repair-beta
@@ -622,6 +728,18 @@ cat /tmp/mb-repair-visual-qc-health.json
   $remoteScript = $remoteScript.Replace(
     "__REVIEWER_USER__",
     $ReviewerCredential.UserName
+  )
+  $remoteScript = $remoteScript.Replace(
+    "__RETENTION_DRY_RUN__",
+    $(if ($RetentionDryRun) { "1" } else { "0" })
+  )
+  $remoteScript = $remoteScript.Replace(
+    "__RETAIN_VISUAL_QC_VENVS__",
+    [string]$RetainVisualQcVenvs
+  )
+  $remoteScript = $remoteScript.Replace(
+    "__RETAIN_ROLLBACK_PACKAGES__",
+    [string]$RetainRollbackPackages
   )
   Invoke-RemoteBash $remoteScript $sshArguments
 
